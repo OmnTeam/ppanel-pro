@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package api.auth.oauth.v1;
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/auth/oauth/v1;v1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+// OAuth认证服务
+service OAuth {
+  // OAuth登录 - 获取OAuth提供商的授权URL
+  rpc OAuthLogin (OAuthLoginRequest) returns (LoginRedirectReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/oauth/login"
+      body: "*"
+    };
+  }
+
+  // OAuth登录获取令牌 - 处理OAuth回调并返回JWT token
+  rpc OAuthLoginGetToken (OAuthLoginGetTokenRequest) returns (LoginTokenReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/oauth/login/token"
+      body: "*"
+    };
+  }
+
+  // Apple登录回调处理
+  rpc AppleLoginCallback (AppleLoginCallbackRequest) returns (CallbackReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/oauth/callback/apple"
+      body: "*"
+    };
+  }
+}
+
+// OAuth登录请求
+message OAuthLoginRequest {
+  string method = 1;   // OAuth提供商: google, apple, telegram, github, facebook
+  string redirect = 2; // 登录成功后的重定向URL
+}
+
+// LoginRedirectData OAuth登录重定向数据
+message LoginRedirectData {
+  string redirect = 1; // OAuth提供商的授权URL
+}
+
+// LoginRedirectReply OAuth登录响应
+message LoginRedirectReply {
+  int32 code = 1;              // 状态码
+  string message = 2;          // 消息内容
+  LoginRedirectData data = 3;  // 响应数据
+}
+
+// OAuth登录获取令牌请求
+message OAuthLoginGetTokenRequest {
+  string method = 1;     // OAuth提供商: google, apple, telegram
+  string callback = 2;   // OAuth回调数据（JSON格式）
+  string ip = 3;         // 客户端IP
+  string user_agent = 4; // 用户代理
+}
+
+// LoginTokenData 登录令牌数据
+message LoginTokenData {
+  string token = 1; // JWT访问令牌
+}
+
+// LoginTokenReply OAuth登录获取令牌响应
+message LoginTokenReply {
+  int32 code = 1;          // 状态码
+  string message = 2;      // 消息内容
+  LoginTokenData data = 3; // 响应数据
+}
+
+// Apple登录回调请求
+message AppleLoginCallbackRequest {
+  string code = 1;     // Apple authorization code
+  string id_token = 2; // Apple ID token
+  string state = 3;    // State code for validation
+}
+
+// CallbackReply 回调响应
+message CallbackReply {
+  int32 code = 1;     // 状态码
+  string message = 2; // 消息内容
+}

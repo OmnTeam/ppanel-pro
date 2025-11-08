@@ -1,0 +1,147 @@
+package document
+
+import (
+	"context"
+	"strings"
+	"time"
+
+	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/go-kratos/kratos/v2/log"
+)
+
+// Document 文档业务实体
+type Document struct {
+	ID        int64
+	TenantID  int64
+	Title     string
+	Content   string
+	Tags      string // 逗号分隔的标签字符串
+	Show      bool
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+// DocumentRepo 文档仓储接口
+type DocumentRepo interface {
+	Create(ctx context.Context, doc *Document) (*Document, error)
+	Update(ctx context.Context, doc *Document) error
+	Delete(ctx context.Context, id int64) error
+	FindByID(ctx context.Context, id int64) (*Document, error)
+	List(ctx context.Context, page, size int64, tag, search string) (int64, []*Document, error)
+}
+
+// DocumentUsecase 文档用例
+type DocumentUsecase struct {
+	repo   DocumentRepo
+	logger *log.Helper
+}
+
+// NewDocumentUsecase 创建文档用例
+func NewDocumentUsecase(repo DocumentRepo, logger log.Logger) *DocumentUsecase {
+	return &DocumentUsecase{
+		repo:   repo,
+		logger: log.NewHelper(logger),
+	}
+}
+
+// CreateDocument 创建文档
+// 对应原项目 createDocumentLogic.go
+func (uc *DocumentUsecase) CreateDocument(ctx context.Context, title, content string, tags []string, show *bool) (*Document, error) {
+	// 第30-40行：构造 Document 并插入
+	doc := &Document{
+		Title:    title,
+		Content:  content,
+		Tags:     strings.Join(tags, ","), // 第34行：tags 转为逗号分隔
+	}
+
+	// 处理 show 字段
+	if show != nil {
+		doc.Show = *show
+	} else {
+		doc.Show = true // 默认显示
+	}
+
+	result, err := uc.repo.Create(ctx, doc)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorw("Database Error", "error", err.Error())
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseInsert)
+	}
+
+	return result, nil
+}
+
+// UpdateDocument 更新文档
+// 对应原项目 updateDocumentLogic.go
+func (uc *DocumentUsecase) UpdateDocument(ctx context.Context, id int64, title, content string, tags []string, show *bool) error {
+	// 第30-42行：构造 Document 并更新
+	doc := &Document{
+		ID:       id,
+		Title:    title,
+		Content:  content,
+		Tags:     strings.Join(tags, ","), // 第35行：tags 转为逗号分隔
+	}
+
+	// 处理 show 字段
+	if show != nil {
+		doc.Show = *show
+	} else {
+		doc.Show = true
+	}
+
+	if err := uc.repo.Update(ctx, doc); err != nil {
+		uc.logger.WithContext(ctx).Errorw("Database Error", "error", err.Error())
+		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
+	}
+
+	return nil
+}
+
+// DeleteDocument 删除文档
+// 对应原项目 deleteDocumentLogic.go
+func (uc *DocumentUsecase) DeleteDocument(ctx context.Context, id int64) error {
+	// 第28-33行：删除文档
+	if err := uc.repo.Delete(ctx, id); err != nil {
+		uc.logger.WithContext(ctx).Errorw("Database Error", "error", err.Error())
+		return responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
+	}
+	return nil
+}
+
+// BatchDeleteDocument 批量删除文档
+// 对应原项目 batchDeleteDocumentLogic.go
+func (uc *DocumentUsecase) BatchDeleteDocument(ctx context.Context, ids []int64) error {
+	// 第28-35行：循环删除
+	for _, id := range ids {
+		if err := uc.repo.Delete(ctx, id); err != nil {
+			uc.logger.WithContext(ctx).Errorw("Database Error", "error", err.Error())
+			return responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
+		}
+	}
+	return nil
+}
+
+// GetDocumentDetail 获取文档详情
+// 对应原项目 getDocumentDetailLogic.go
+func (uc *DocumentUsecase) GetDocumentDetail(ctx context.Context, id int64) (*Document, error) {
+	// 第29-44行：查询文档详情
+	data, err := uc.repo.FindByID(ctx, id)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorw("Database Error", "error", err.Error())
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	return data, nil
+}
+
+// GetDocumentList 获取文档列表
+// 对应原项目 getDocumentListLogic.go
+func (uc *DocumentUsecase) GetDocumentList(ctx context.Context, page, size int64, tag, search string) (int64, []*Document, error) {
+	// 第29-50行：查询文档列表
+	total, data, err := uc.repo.List(ctx, page, size, tag, search)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorw("Database Error", "error", err.Error())
+		return 0, nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	return total, data, nil
+}

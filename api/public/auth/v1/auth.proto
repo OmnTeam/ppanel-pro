@@ -1,0 +1,220 @@
+syntax = "proto3";
+
+package api.public.auth.v1;
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/public/auth/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.public.auth.v1";
+
+import "google/api/annotations.proto";
+
+service Auth {
+  // CheckUser checks if user email exists
+  rpc CheckUser(CheckUserRequest) returns (CheckUserReply) {
+    option (google.api.http) = {
+      get: "/v1/auth/check"
+    };
+  }
+
+  // CheckUserTelephone checks if user telephone exists
+  rpc CheckUserTelephone(CheckUserTelephoneRequest) returns (CheckUserTelephoneReply) {
+    option (google.api.http) = {
+      get: "/v1/auth/check/telephone"
+    };
+  }
+
+  // UserLogin logs in user with email and password
+  rpc UserLogin(UserLoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/login"
+      body: "*"
+    };
+  }
+
+  // TelephoneLogin logs in user with telephone and password or code
+  rpc TelephoneLogin(TelephoneLoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/login/telephone"
+      body: "*"
+    };
+  }
+
+  // UserRegister registers a new user with email
+  rpc UserRegister(UserRegisterRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/register"
+      body: "*"
+    };
+  }
+
+  // TelephoneRegister registers a new user with telephone
+  rpc TelephoneRegister(TelephoneRegisterRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/register/telephone"
+      body: "*"
+    };
+  }
+
+  // ResetPassword resets user password with email
+  rpc ResetPassword(ResetPasswordRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/reset"
+      body: "*"
+    };
+  }
+
+  // TelephoneResetPassword resets user password with telephone
+  rpc TelephoneResetPassword(TelephoneResetPasswordRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/reset/telephone"
+      body: "*"
+    };
+  }
+}
+
+// ============================================================================
+// CheckUser - 检查用户是否存在（邮箱）
+// ============================================================================
+
+// CheckUser request
+message CheckUserRequest {
+  string email = 1;
+}
+
+// CheckUserData 检查用户响应数据
+message CheckUserData {
+  bool exist = 1;
+}
+
+// CheckUser reply
+message CheckUserReply {
+  int32 code = 1;  // 状态码
+  string message = 2;  // 消息内容
+  CheckUserData data = 3;  // 响应数据
+}
+
+// ============================================================================
+// CheckUserTelephone - 检查用户是否存在（手机）
+// ============================================================================
+
+// CheckUserTelephone request
+message CheckUserTelephoneRequest {
+  string telephone = 1;
+  string telephone_area_code = 2;
+}
+
+// CheckUserTelephoneData 检查用户手机响应数据
+message CheckUserTelephoneData {
+  bool exist = 1;
+}
+
+// CheckUserTelephone reply
+message CheckUserTelephoneReply {
+  int32 code = 1;  // 状态码
+  string message = 2;  // 消息内容
+  CheckUserTelephoneData data = 3;  // 响应数据
+}
+
+// ============================================================================
+// UserLogin - 用户登录（邮箱）
+// ============================================================================
+
+// UserLogin request
+message UserLoginRequest {
+  string email = 1;
+  string password = 2;
+  string cf_token = 3; // Cloudflare turnstile token (optional)
+  string ip = 4;        // X-Original-Forwarded-For header
+  string user_agent = 5; // User-Agent header
+}
+
+// ============================================================================
+// TelephoneLogin - 用户登录（手机）
+// ============================================================================
+
+// TelephoneLogin request
+message TelephoneLoginRequest {
+  string telephone = 1;
+  string telephone_area_code = 2;
+  string password = 3;           // Either password or telephone_code is required
+  string telephone_code = 4;     // Either password or telephone_code is required
+  string cf_token = 5;           // Cloudflare turnstile token (optional)
+  string ip = 6;                 // X-Original-Forwarded-For header
+  string user_agent = 7;         // User-Agent header
+}
+
+// ============================================================================
+// UserRegister - 用户注册（邮箱）
+// ============================================================================
+
+// UserRegister request
+message UserRegisterRequest {
+  string email = 1;
+  string password = 2;
+  string invite = 3;    // Invite code (optional)
+  string code = 4;      // Email verification code (optional, required if email verification enabled)
+  string cf_token = 5;  // Cloudflare turnstile token (optional)
+  string ip = 6;        // X-Original-Forwarded-For header
+  string user_agent = 7; // User-Agent header
+}
+
+// ============================================================================
+// TelephoneRegister - 用户注册（手机）
+// ============================================================================
+
+// TelephoneRegister request
+message TelephoneRegisterRequest {
+  string telephone = 1;
+  string telephone_area_code = 2;
+  string password = 3;
+  string invite = 4;    // Invite code (optional)
+  string code = 5;      // SMS verification code (required)
+  string cf_token = 6;  // Cloudflare turnstile token (optional)
+  string ip = 7;        // X-Original-Forwarded-For header
+  string user_agent = 8; // User-Agent header
+}
+
+// ============================================================================
+// ResetPassword - 重置密码（邮箱）
+// ============================================================================
+
+// ResetPassword request
+message ResetPasswordRequest {
+  string email = 1;
+  string password = 2;
+  string code = 3;      // Email verification code (required)
+  string cf_token = 4;  // Cloudflare turnstile token (optional)
+  string ip = 5;        // X-Original-Forwarded-For header
+  string user_agent = 6; // User-Agent header
+}
+
+// ============================================================================
+// TelephoneResetPassword - 重置密码（手机）
+// ============================================================================
+
+// TelephoneResetPassword request
+message TelephoneResetPasswordRequest {
+  string telephone = 1;
+  string telephone_area_code = 2;
+  string password = 3;
+  string code = 4;      // SMS verification code (required)
+  string cf_token = 5;  // Cloudflare turnstile token (optional)
+  string ip = 6;        // X-Original-Forwarded-For header
+  string user_agent = 7; // User-Agent header
+}
+
+// ============================================================================
+// 通用响应格式
+// ============================================================================
+
+// LoginData 登录响应数据（用于所有登录、注册、重置密码操作）
+message LoginData {
+  string token = 1; // JWT token
+}
+
+// LoginReply 登录响应（统一响应格式）
+message LoginReply {
+  int32 code = 1;  // 状态码
+  string message = 2;  // 消息内容
+  LoginData data = 3;  // 响应数据
+}

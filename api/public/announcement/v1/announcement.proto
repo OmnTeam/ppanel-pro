@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package api.public.announcement.v1;
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/public/announcement/v1;v1";
+
+import "google/api/annotations.proto";
+
+// Public Announcement service
+// 公共公告服务（需要认证）
+service Announcement {
+  // QueryAnnouncement 查询公告列表
+  rpc QueryAnnouncement (QueryAnnouncementRequest) returns (AnnouncementListReply) {
+    option (google.api.http) = {
+      get: "/v1/public/announcement/list"
+    };
+  }
+}
+
+// QueryAnnouncementRequest 查询公告请求
+message QueryAnnouncementRequest {
+  int32 page = 1;
+  int32 size = 2;
+  optional bool pinned = 3;
+  optional bool popup = 4;
+}
+
+// AnnouncementListData 公告列表数据
+message AnnouncementListData {
+  repeated AnnouncementItem list = 1;
+  int64 total = 2;
+}
+
+// AnnouncementListReply 查询公告列表响应
+message AnnouncementListReply {
+  int32 code = 1;                  // 状态码
+  string message = 2;              // 消息内容
+  AnnouncementListData data = 3;   // 响应数据
+}
+
+// AnnouncementItem 公告项
+message AnnouncementItem {
+  int64 id = 1;
+  string title = 2;
+  string content = 3;
+  bool show = 4;
+  bool pinned = 5;
+  bool popup = 6;
+  int64 created_at = 7;
+  int64 updated_at = 8;
+}

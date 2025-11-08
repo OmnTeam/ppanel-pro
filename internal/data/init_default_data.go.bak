@@ -1,0 +1,507 @@
+package data
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"time"
+
+	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyannouncement"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
+	"github.com/OmnTeam/ppanel-pro/ent/proxydocument"
+	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
+	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
+	"github.com/OmnTeam/ppanel-pro/internal/model/auth"
+	"github.com/go-kratos/kratos/v2/log"
+)
+
+// InitDefaultData 初始化默认数据
+func InitDefaultData(client *ent.Client, logger log.Logger) error {
+	ctx := context.Background()
+	helper := log.NewHelper(logger)
+
+	helper.Info("开始初始化默认数据...")
+
+	// 1. 初始化认证方法
+	if err := initAuthMethods(client, helper); err != nil {
+		return fmt.Errorf("初始化认证方法失败: %w", err)
+	}
+
+	// 2. 初始化支付方式
+	if err := initPaymentMethods(client, helper); err != nil {
+		return fmt.Errorf("初始化支付方式失败: %w", err)
+	}
+
+	// 3. 初始化系统配置
+	if err := initSystemConfig(client, helper); err != nil {
+		return fmt.Errorf("初始化系统配置失败: %w", err)
+	}
+
+	// 4. 初始化默认公告
+	if err := initDefaultAnnouncements(client, helper); err != nil {
+		return fmt.Errorf("初始化默认公告失败: %w", err)
+	}
+
+	// 5. 初始化默认文档
+	if err := initDefaultDocuments(client, helper); err != nil {
+		return fmt.Errorf("初始化默认文档失败: %w", err)
+	}
+
+	helper.Info("默认数据初始化完成")
+	return nil
+}
+
+// initAuthMethods 初始化认证方法
+func initAuthMethods(client *ent.Client, helper *log.Helper) error {
+	ctx := context.Background()
+
+	// 检查是否已存在认证方法
+	count, err := client.ProxyAuthMethod.Query().Count(ctx)
+	if err != nil {
+		return err
+	}
+
+	if count > 0 {
+		helper.Info("认证方法已存在，跳过初始化")
+		return nil
+	}
+
+	// 邮件认证配置
+	emailConfig := auth.EmailAuthConfig{
+		Platform:         "smtp",
+		EnableVerify:     false,
+		EnableNotify:     false,
+		EnableDomainSuffix: false,
+		DomainSuffixList: "",
+		PlatformConfig: auth.SMTPConfig{
+			Host:     "",
+			Port:     587,
+			User:     "",
+			Pass:     "",
+			From:     "",
+			SSL:      false,
+		},
+		VerifyEmailTemplate:     "",
+		ExpirationEmailTemplate: "",
+		MaintenanceEmailTemplate: "",
+		TrafficExceedEmailTemplate: "",
+	}
+	emailConfigJSON, _ := json.Marshal(emailConfig)
+
+	// 手机认证配置 - 使用abosend平台
+	mobileConfig := auth.MobileAuthConfig{
+		Platform:        "abosend",
+		EnableWhitelist: false,
+		Whitelist:       []string{},
+		PlatformConfig: auth.AbosendConfig{
+			ApiDomain: "https://smsapi.abosend.com",
+			Access:    "UVTtbbTz",
+			Secret:    "CVRZQVJLTJWTBDXDWSYSOITEWLUMBRCO",
+			Template:  "Your verification code is: {{.code}}",
+		},
+	}
+	mobileConfigJSON, _ := json.Marshal(mobileConfig)
+
+	// OAuth认证配置
+	oauthProviders := []struct {
+		method  string
+		config  string
+		enabled bool
+	}{
+		{
+			method:  "apple",
+			config:  `{"team_id":"","key_id":"","client_id":"","client_secret":"","redirect_url":""}`,
+			enabled: false,
+		},
+		{
+			method:  "google",
+			config:  `{"client_id":"","client_secret":"","redirect_url":""}`,
+			enabled: false,
+		},
+		{
+			method:  "github",
+			config:  `{"client_id":"","client_secret":"","redirect_url":""}`,
+			enabled: false,
+		},
+	}
+
+	authMethods := []struct {
+		method  string
+		config  string
+		enabled bool
+	}{
+		{"email", string(emailConfigJSON), true},
+		{"mobile", string(mobileConfigJSON), true},
+	}
+
+	// 添加OAuth方法
+	for _, provider := range oauthProviders {
+		authMethods = append(authMethods, provider)
+	}
+
+	// 设备认证配置
+	deviceConfig := auth.DeviceAuthConfig{
+		ShowAds:         false,
+		OnlyRealDevice:  false,
+		EnableSecurity:  false,
+		SecuritySecret:  "",
+	}
+	deviceConfigJSON, _ := json.Marshal(deviceConfig)
+	authMethods = append(authMethods, struct {
+		method  string
+		config  string
+		enabled bool
+	}{"device", string(deviceConfigJSON), false})
+
+	// Telegram认证配置
+	telegramConfig := auth.TelegramAuthConfig{
+		BotToken:     "",
+		EnableNotify: false,
+		WebhookDomain: "",
+	}
+	telegramConfigJSON, _ := json.Marshal(telegramConfig)
+	authMethods = append(authMethods, struct {
+		method  string
+		config  string
+		enabled bool
+	}{"telegram", string(telegramConfigJSON), false})
+
+	// 创建认证方法
+	for _, authMethod := range authMethods {
+		_, err := client.ProxyAuthMethod.Create().
+			SetMethod(authMethod.method).
+			SetConfig(authMethod.config).
+			SetEnabled(authMethod.enabled).
+			SetCreatedAt(time.Now()).
+			SetUpdatedAt(time.Now()).
+			Save(ctx)
+		if err != nil {
+			return fmt.Errorf("创建认证方法 %s 失败: %w", authMethod.method, err)
+		}
+	}
+
+	helper.Infof("成功初始化 %d 个认证方法", len(authMethods))
+	return nil
+}
+
+// initPaymentMethods 初始化支付方式
+func initPaymentMethods(client *ent.Client, helper *log.Helper) error {
+	ctx := context.Background()
+
+	// 检查是否已存在支付方式
+	count, err := client.ProxyPayment.Query().Count(ctx)
+	if err != nil {
+		return err
+	}
+
+	if count > 0 {
+		helper.Info("支付方式已存在，跳过初始化")
+		return nil
+	}
+
+	// 默认支付方式
+	paymentMethods := []struct {
+		name        string
+		platform    string
+		description string
+		icon        string
+		domain      string
+		config      string
+		feeMode     int8
+		feePercent  int64
+		feeAmount   int64
+		enable      bool
+		token       string
+	}{
+		{
+			name:        "余额支付",
+			platform:    "balance",
+			description: "使用账户余额进行支付",
+			icon:        "",
+			domain:      "",
+			config:      "",
+			feeMode:     0,
+			feePercent:  0,
+			feeAmount:   0,
+			enable:      true,
+			token:       "",
+		},
+		{
+			name:        "支付宝",
+			platform:    "alipay",
+			description: "支付宝在线支付",
+			icon:        "/assets/icons/alipay.png",
+			domain:      "",
+			config:      `{"app_id":"","private_key":"","public_key":"","notify_url":"","return_url":""}`,
+			feeMode:     1,
+			feePercent:  0,
+			feeAmount:   0,
+			enable:      false,
+			token:       "",
+		},
+		{
+			name:        "微信支付",
+			platform:    "wechat",
+			description: "微信在线支付",
+			icon:        "/assets/icons/wechat.png",
+			domain:      "",
+			config:      `{"app_id":"","mch_id":"","key":"","cert_path":"","key_path":"","notify_url":""}`,
+			feeMode:     1,
+			feePercent:  0,
+			feeAmount:   0,
+			enable:      false,
+			token:       "",
+		},
+		{
+			name:        "Stripe",
+			platform:    "stripe",
+			description: "Stripe信用卡支付",
+			icon:        "/assets/icons/stripe.png",
+			domain:      "",
+			config:      `{"public_key":"","secret_key":"","webhook_secret":""}`,
+			feeMode:     1,
+			feePercent:  0,
+			feeAmount:   0,
+			enable:      false,
+			token:       "",
+		},
+	}
+
+	for _, payment := range paymentMethods {
+		_, err := client.ProxyPayment.Create().
+			SetName(payment.name).
+			SetPlatform(payment.platform).
+			SetDescription(payment.description).
+			SetIcon(payment.icon).
+			SetDomain(payment.domain).
+			SetConfig(payment.config).
+			SetFeeMode(payment.feeMode).
+			SetFeePercent(payment.feePercent).
+			SetFeeAmount(payment.feeAmount).
+			SetEnable(payment.enable).
+			SetToken(payment.token).
+			SetCreatedAt(time.Now()).
+			SetUpdatedAt(time.Now()).
+			Save(ctx)
+		if err != nil {
+			return fmt.Errorf("创建支付方式 %s 失败: %w", payment.name, err)
+		}
+	}
+
+	helper.Infof("成功初始化 %d 个支付方式", len(paymentMethods))
+	return nil
+}
+
+// initSystemConfig 初始化系统配置
+func initSystemConfig(client *ent.Client, helper *log.Helper) error {
+	ctx := context.Background()
+
+	// 检查是否已存在系统配置
+	count, err := client.ProxySystem.Query().Count(ctx)
+	if err != nil {
+		return err
+	}
+
+	if count > 0 {
+		helper.Info("系统配置已存在，跳过初始化")
+		return nil
+	}
+
+	// 默认系统配置
+	systemConfigs := []struct {
+		category string
+		key      string
+		value    string
+		typ      string
+		desc     string
+	}{
+		// 站点配置
+		{"site", "site_name", "PPanel Pro", "string", "站点名称"},
+		{"site", "site_desc", "Professional Panel Management System", "string", "站点描述"},
+		{"site", "site_logo", "/assets/logo.png", "string", "站点Logo"},
+		{"site", "keywords", "panel,management,proxy", "string", "站点关键词"},
+		{"site", "custom_html", "", "string", "自定义HTML"},
+		{"site", "custom_data", "", "string", "自定义数据"},
+
+		// 货币配置
+		{"currency", "default_currency", "CNY", "string", "默认货币"},
+		{"currency", "currency_symbol", "¥", "string", "货币符号"},
+
+		// 注册配置
+		{"register", "stop_register", "false", "bool", "停止注册"},
+		{"register", "enable_ip_register_limit", "false", "bool", "启用IP注册限制"},
+		{"register", "ip_register_limit", "5", "int", "IP注册限制数量"},
+		{"register", "ip_register_limit_duration", "3600", "int", "IP注册限制时长(秒)"},
+		{"register", "enable_trial", "false", "bool", "启用试用"},
+		{"register", "trial_subscribe", "7", "int", "试用订阅天数"},
+		{"register", "trial_time_unit", "day", "string", "试用时间单位"},
+
+		// 邀请配置
+		{"invite", "forced_invite", "false", "bool", "强制邀请"},
+		{"invite", "referral_percentage", "10", "int", "推荐百分比"},
+		{"invite", "only_first_purchase", "true", "bool", "仅首次购买"},
+
+		// 验证配置
+		{"verify", "turnstile_site_key", "", "string", "Cloudflare Turnstile站点密钥"},
+		{"verify", "enable_login_verify", "false", "bool", "启用登录验证"},
+		{"verify", "enable_register_verify", "false", "bool", "启用注册验证"},
+		{"verify", "enable_reset_password_verify", "false", "bool", "启用重置密码验证"},
+
+		// 订阅配置
+		{"subscribe", "single_model", "false", "bool", "单订阅模式"},
+		{"subscribe", "subscribe_path", "/subscribe", "string", "订阅路径"},
+		{"subscribe", "subscribe_domain", "", "string", "订阅域名"},
+		{"subscribe", "pan_domain", "false", "bool", "泛域名"},
+		{"subscribe", "user_agent_limit", "false", "bool", "User-Agent限制"},
+		{"subscribe", "user_agent_list", "", "string", "User-Agent列表"},
+
+		// 节点配置
+		{"node", "node_push_interval", "60", "int", "节点推送间隔(秒)"},
+		{"node", "traffic_report_threshold", "1024", "int", "流量报告阈值(MB)"},
+		{"node", "ip_strategy", "ipv4_first", "string", "IP策略"},
+	}
+
+	for _, config := range systemConfigs {
+		_, err := client.ProxySystem.Create().
+			SetTenantID(0). // 全局配置使用tenant_id=0
+			SetCategory(config.category).
+			SetKey(config.key).
+			SetValue(config.value).
+			SetType(config.typ).
+			SetDesc(config.desc).
+			SetCreatedAt(time.Now()).
+			SetUpdatedAt(time.Now()).
+			Save(ctx)
+		if err != nil {
+			return fmt.Errorf("创建系统配置 %s.%s 失败: %w", config.category, config.key, err)
+		}
+	}
+
+	helper.Infof("成功初始化 %d 个系统配置", len(systemConfigs))
+	return nil
+}
+
+// initDefaultAnnouncements 初始化默认公告
+func initDefaultAnnouncements(client *ent.Client, helper *log.Helper) error {
+	ctx := context.Background()
+
+	// 检查是否已存在公告
+	count, err := client.ProxyAnnouncement.Query().Count(ctx)
+	if err != nil {
+		return err
+	}
+
+	if count > 0 {
+		helper.Info("公告已存在，跳过初始化")
+		return nil
+	}
+
+	// 默认公告
+	announcements := []struct {
+		title       string
+		content     string
+		imgUrl      string
+		link        string
+		isVisible   bool
+		sort        int
+	}{
+		{
+			title:     "欢迎使用PPanel Pro",
+			content:   "欢迎使用PPanel Pro，这是一个专业的代理面板管理系统。如果您在使用过程中遇到任何问题，请随时联系我们的技术支持。",
+			imgUrl:    "/assets/images/welcome.png",
+			link:      "",
+			isVisible: true,
+			sort:      1,
+		},
+		{
+			title:     "系统更新通知",
+			content:   "系统已更新至最新版本，新增了多项功能和性能优化。建议您查看最新的使用文档以了解新功能。",
+			imgUrl:    "/assets/images/update.png",
+			link:      "",
+			isVisible: true,
+			sort:      2,
+		},
+	}
+
+	for _, announcement := range announcements {
+		_, err := client.ProxyAnnouncement.Create().
+			SetTenantID(0).
+			SetTitle(announcement.title).
+			SetContent(announcement.content).
+			SetImgUrl(announcement.imgUrl).
+			SetLink(announcement.link).
+			SetIsVisible(announcement.isVisible).
+			SetSort(announcement.sort).
+			SetCreatedAt(time.Now()).
+			SetUpdatedAt(time.Now()).
+			Save(ctx)
+		if err != nil {
+			return fmt.Errorf("创建公告 %s 失败: %w", announcement.title, err)
+		}
+	}
+
+	helper.Infof("成功初始化 %d 个默认公告", len(announcements))
+	return nil
+}
+
+// initDefaultDocuments 初始化默认文档
+func initDefaultDocuments(client *ent.Client, helper *log.Helper) error {
+	ctx := context.Background()
+
+	// 检查是否已存在文档
+	count, err := client.ProxyDocument.Query().Count(ctx)
+	if err != nil {
+		return err
+	}
+
+	if count > 0 {
+		helper.Info("文档已存在，跳过初始化")
+		return nil
+	}
+
+	// 默认文档
+	documents := []struct {
+		title     string
+		content   string
+		isVisible bool
+		sort      int
+	}{
+		{
+			title:     "用户使用指南",
+			content:   "# 用户使用指南\n\n## 基础操作\n1. 注册账户\n2. 购买订阅\n3. 配置客户端\n\n## 高级功能\n1. 多设备管理\n2. 流量监控\n3. 自定义配置\n\n详细的图文教程请查看我们的在线文档。",
+			isVisible: true,
+			sort:      1,
+		},
+		{
+			title:     "客户端配置教程",
+			content:   "# 客户端配置教程\n\n## 支持的客户端\n- Clash\n- V2Ray\n- Shadowsocks\n- Surge\n\n## 配置步骤\n1. 下载订阅链接\n2. 导入客户端\n3. 配置代理规则\n\n详细配置方法请参考各客户端的官方文档。",
+			isVisible: true,
+			sort:      2,
+		},
+		{
+			title:     "常见问题解答",
+			content:   "# 常见问题解答\n\n## 账户相关\n**Q: 忘记密码怎么办？**\nA: 可以通过邮箱或手机号重置密码。\n\n## 订阅相关\n**Q: 如何查看流量使用情况？**\nA: 在用户中心可以查看详细的流量统计。\n\n## 技术支持\n如果遇到其他问题，请联系技术支持。",
+			isVisible: true,
+			sort:      3,
+		},
+	}
+
+	for _, doc := range documents {
+		_, err := client.ProxyDocument.Create().
+			SetTenantID(0).
+			SetTitle(doc.title).
+			SetContent(doc.content).
+			SetIsVisible(doc.isVisible).
+			SetSort(doc.sort).
+			SetCreatedAt(time.Now()).
+			SetUpdatedAt(time.Now()).
+			Save(ctx)
+		if err != nil {
+			return fmt.Errorf("创建文档 %s 失败: %w", doc.title, err)
+		}
+	}
+
+	helper.Infof("成功初始化 %d 个默认文档", len(documents))
+	return nil
+}

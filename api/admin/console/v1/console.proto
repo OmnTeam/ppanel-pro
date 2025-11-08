@@ -1,0 +1,154 @@
+syntax = "proto3";
+
+package api.admin.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/console/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.admin.v1";
+
+service AdminConsole {
+  // Query revenue statistics
+  rpc QueryRevenueStatistics(QueryRevenueStatisticsRequest) returns (QueryRevenueStatisticsReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/console/revenue"
+    };
+  }
+
+  // Query user statistics
+  rpc QueryUserStatistics(QueryUserStatisticsRequest) returns (QueryUserStatisticsReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/console/user"
+      
+    };
+  }
+
+  // Query ticket wait reply
+  rpc QueryTicketWaitReply(QueryTicketWaitReplyRequest) returns (QueryTicketWaitReplyReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/console/ticket"
+    };
+  }
+
+  // Query server total data
+  rpc QueryServerTotalData(QueryServerTotalDataRequest) returns (QueryServerTotalDataReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/console/server"
+    };
+  }
+}
+
+// ==================== Revenue Statistics ====================
+
+message QueryRevenueStatisticsRequest {
+  int64 tenant_id = 1;
+}
+
+message OrdersStatistics {
+  int64 amount_total = 1;
+  int64 new_order_amount = 2;
+  int64 renewal_order_amount = 3;
+  repeated OrdersStatisticsWithDate list = 4;
+}
+
+message OrdersStatisticsWithDate {
+  string date = 1;
+  int64 amount_total = 2;
+  int64 new_order_amount = 3;
+  int64 renewal_order_amount = 4;
+}
+
+message QueryRevenueStatisticsData {
+  OrdersStatistics today = 1;
+  OrdersStatistics monthly = 2;
+  OrdersStatistics all = 3;
+}
+
+message QueryRevenueStatisticsReply {
+  int32 code = 1;                       // 状态码
+  string message = 2;                   // 消息内容
+  QueryRevenueStatisticsData data = 3;  // 响应数据
+}
+
+// ==================== User Statistics ====================
+
+message QueryUserStatisticsRequest {
+  int64 tenant_id = 1;
+}
+
+message UserStatistics {
+  string date = 1;
+  int64 register = 2;
+  int64 new_order_users = 3;
+  int64 renewal_order_users = 4;
+  repeated UserStatistics list = 5;
+}
+
+message QueryUserStatisticsData {
+  UserStatistics today = 1;
+  UserStatistics monthly = 2;
+  UserStatistics all = 3;
+}
+
+message QueryUserStatisticsReply {
+  int32 code = 1;                   // 状态码
+  string message = 2;               // 消息内容
+  QueryUserStatisticsData data = 3; // 响应数据
+}
+
+// ==================== Ticket Wait Reply ====================
+
+message QueryTicketWaitReplyRequest {
+  int64 tenant_id = 1;
+}
+
+message QueryTicketWaitReplyData {
+  int64 count = 1;
+}
+
+message QueryTicketWaitReplyReply {
+  int32 code = 1;                    // 状态码
+  string message = 2;                // 消息内容
+  QueryTicketWaitReplyData data = 3; // 响应数据
+}
+
+// ==================== Server Total Data ====================
+
+message QueryServerTotalDataRequest {
+  int64 tenant_id = 1;
+}
+
+message ServerTrafficData {
+  int64 server_id = 1;
+  string name = 2;
+  int64 upload = 3;
+  int64 download = 4;
+}
+
+message UserTrafficData {
+  int64 sid = 1;
+  int64 upload = 2;
+  int64 download = 3;
+}
+
+message QueryServerTotalDataData {
+  int64 online_users = 1;
+  int64 online_servers = 2;
+  int64 offline_servers = 3;
+  int64 today_upload = 4;
+  int64 today_download = 5;
+  int64 monthly_upload = 6;
+  int64 monthly_download = 7;
+  int64 updated_at = 8;
+  repeated ServerTrafficData server_traffic_ranking_today = 9;
+  repeated ServerTrafficData server_traffic_ranking_yesterday = 10;
+  repeated UserTrafficData user_traffic_ranking_today = 11;
+  repeated UserTrafficData user_traffic_ranking_yesterday = 12;
+}
+
+message QueryServerTotalDataReply {
+  int32 code = 1;                     // 状态码
+  string message = 2;                 // 消息内容
+  QueryServerTotalDataData data = 3;  // 响应数据
+}

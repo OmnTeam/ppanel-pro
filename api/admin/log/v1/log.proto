@@ -1,0 +1,527 @@
+syntax = "proto3";
+
+package api.admin.log.v1;
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/log/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.admin.log.v1";
+
+import "google/api/annotations.proto";
+
+service LogService {
+  // System Log APIs (proxy_system_log table)
+  rpc FilterBalanceLog(FilterBalanceLogRequest) returns (FilterBalanceLogReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/balance/list"
+    };
+  }
+
+  rpc FilterCommissionLog(FilterCommissionLogRequest) returns (FilterCommissionLogReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/commission/list"
+    };
+  }
+
+  rpc FilterEmailLog(FilterEmailLogRequest) returns (FilterEmailLogReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/email/list"
+    };
+  }
+
+  rpc FilterGiftLog(FilterGiftLogRequest) returns (FilterGiftLogReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/gift/list"
+    };
+  }
+
+  rpc FilterLoginLog(FilterLoginLogRequest) returns (FilterLoginLogReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/login/list"
+    };
+  }
+
+  rpc GetMessageLogList(GetMessageLogListRequest) returns (GetMessageLogListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/message/list"
+    };
+  }
+
+  rpc FilterMobileLog(FilterMobileLogRequest) returns (FilterMobileLogReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/mobile/list"
+    };
+  }
+
+  rpc FilterRegisterLog(FilterRegisterLogRequest) returns (FilterRegisterLogReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/register/list"
+    };
+  }
+
+  rpc FilterServerTrafficLog(FilterServerTrafficLogRequest) returns (FilterServerTrafficLogReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/server/traffic/list"
+    };
+  }
+
+  rpc FilterSubscribeLog(FilterSubscribeLogRequest) returns (FilterSubscribeLogReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/subscribe/list"
+    };
+  }
+
+  rpc FilterResetSubscribeLog(FilterResetSubscribeLogRequest) returns (FilterResetSubscribeLogReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/subscribe/reset/list"
+    };
+  }
+
+  rpc FilterUserSubscribeTrafficLog(FilterUserSubscribeTrafficLogRequest) returns (FilterUserSubscribeTrafficLogReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/subscribe/traffic/list"
+    };
+  }
+
+  // Traffic Log APIs (proxy_traffic_log table)
+  rpc FilterTrafficLogDetails(FilterTrafficLogDetailsRequest) returns (FilterTrafficLogDetailsReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/traffic/details"
+    };
+  }
+
+  // Log Setting APIs (proxy_system table)
+  rpc GetLogSetting(GetLogSettingRequest) returns (GetLogSettingReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/log/setting"
+    };
+  }
+
+  rpc UpdateLogSetting(UpdateLogSettingRequest) returns (UpdateLogSettingReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/log/setting"
+      body: "*"
+    };
+  }
+}
+
+// Common filter parameters
+message FilterLogParams {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;      // 日期过滤，格式如 "2025-01-01"
+  string search = 5;    // 搜索关键词
+}
+
+// ==================== Balance Log ====================
+message FilterBalanceLogRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  int64 user_id = 5;    // 可选，过滤特定用户
+}
+
+message BalanceLog {
+  int32 type = 1;
+  int64 user_id = 2;
+  int64 amount = 3;
+  string order_no = 4;
+  int64 balance = 5;
+  int64 timestamp = 6;
+}
+
+message FilterBalanceLogData {
+  int64 total = 1;
+  repeated BalanceLog list = 2;
+}
+
+message FilterBalanceLogReply {
+  int32 code = 1;                   // 状态码
+  string message = 2;               // 消息内容
+  FilterBalanceLogData data = 3;    // 响应数据
+}
+
+// ==================== Commission Log ====================
+message FilterCommissionLogRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  int64 user_id = 5;
+}
+
+message CommissionLog {
+  int32 type = 1;
+  int64 user_id = 2;
+  int64 amount = 3;
+  string order_no = 4;
+  int64 timestamp = 5;
+}
+
+message FilterCommissionLogData {
+  int64 total = 1;
+  repeated CommissionLog list = 2;
+}
+
+message FilterCommissionLogReply {
+  int32 code = 1;                      // 状态码
+  string message = 2;                  // 消息内容
+  FilterCommissionLogData data = 3;    // 响应数据
+}
+
+// ==================== Email Log ====================
+message FilterEmailLogRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string search = 5;
+}
+
+message EmailLog {
+  int64 id = 1;
+  int32 type = 2;
+  string platform = 3;
+  string to = 4;
+  string subject = 5;
+  string content = 6;
+  int32 status = 7;
+  int64 created_at = 8;
+}
+
+message FilterEmailLogData {
+  int64 total = 1;
+  repeated EmailLog list = 2;
+}
+
+message FilterEmailLogReply {
+  int32 code = 1;                 // 状态码
+  string message = 2;             // 消息内容
+  FilterEmailLogData data = 3;    // 响应数据
+}
+
+// ==================== Gift Log ====================
+message FilterGiftLogRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  int64 user_id = 5;
+}
+
+message GiftLog {
+  int32 type = 1;
+  int64 user_id = 2;
+  string order_no = 3;
+  int64 subscribe_id = 4;
+  int64 amount = 5;
+  int64 balance = 6;
+  string remark = 7;
+  int64 timestamp = 8;
+}
+
+message FilterGiftLogData {
+  int64 total = 1;
+  repeated GiftLog list = 2;
+}
+
+message FilterGiftLogReply {
+  int32 code = 1;               // 状态码
+  string message = 2;           // 消息内容
+  FilterGiftLogData data = 3;   // 响应数据
+}
+
+// ==================== Login Log ====================
+message FilterLoginLogRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  int64 user_id = 5;
+}
+
+message LoginLog {
+  int64 user_id = 1;
+  string method = 2;
+  string login_ip = 3;
+  string user_agent = 4;
+  bool success = 5;
+  int64 timestamp = 6;
+}
+
+message FilterLoginLogData {
+  int64 total = 1;
+  repeated LoginLog list = 2;
+}
+
+message FilterLoginLogReply {
+  int32 code = 1;                // 状态码
+  string message = 2;            // 消息内容
+  FilterLoginLogData data = 3;   // 响应数据
+}
+
+// ==================== Message Log ====================
+message GetMessageLogListRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  int32 type = 4;       // 1: Email, 2: Mobile
+  string search = 5;
+}
+
+message MessageLog {
+  int64 id = 1;
+  int32 type = 2;
+  string platform = 3;
+  string to = 4;
+  string subject = 5;
+  string content = 6;
+  int32 status = 7;
+  int64 created_at = 8;
+}
+
+message GetMessageLogListData {
+  int64 total = 1;
+  repeated MessageLog list = 2;
+}
+
+message GetMessageLogListReply {
+  int32 code = 1;                    // 状态码
+  string message = 2;                // 消息内容
+  GetMessageLogListData data = 3;    // 响应数据
+}
+
+// ==================== Mobile Log ====================
+message FilterMobileLogRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string search = 5;
+}
+
+message MobileLog {
+  int64 id = 1;
+  int32 type = 2;
+  string platform = 3;
+  string to = 4;
+  string subject = 5;
+  string content = 6;
+  int32 status = 7;
+  int64 created_at = 8;
+}
+
+message FilterMobileLogData {
+  int64 total = 1;
+  repeated MobileLog list = 2;
+}
+
+message FilterMobileLogReply {
+  int32 code = 1;                 // 状态码
+  string message = 2;             // 消息内容
+  FilterMobileLogData data = 3;   // 响应数据
+}
+
+// ==================== Register Log ====================
+message FilterRegisterLogRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  int64 user_id = 5;
+}
+
+message RegisterLog {
+  int64 user_id = 1;
+  string auth_method = 2;
+  string identifier = 3;
+  string register_ip = 4;
+  string user_agent = 5;
+  int64 timestamp = 6;
+}
+
+message FilterRegisterLogData {
+  int64 total = 1;
+  repeated RegisterLog list = 2;
+}
+
+message FilterRegisterLogReply {
+  int32 code = 1;                   // 状态码
+  string message = 2;               // 消息内容
+  FilterRegisterLogData data = 3;   // 响应数据
+}
+
+// ==================== Server Traffic Log ====================
+message FilterServerTrafficLogRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  int64 server_id = 5;
+}
+
+message ServerTrafficLog {
+  int64 server_id = 1;
+  int64 upload = 2;
+  int64 download = 3;
+  int64 timestamp = 4;
+}
+
+message FilterServerTrafficLogData {
+  int64 total = 1;
+  repeated ServerTrafficLog list = 2;
+}
+
+message FilterServerTrafficLogReply {
+  int32 code = 1;                        // 状态码
+  string message = 2;                    // 消息内容
+  FilterServerTrafficLogData data = 3;   // 响应数据
+}
+
+// ==================== Subscribe Log ====================
+message FilterSubscribeLogRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  int64 user_id = 5;
+}
+
+message SubscribeLog {
+  int64 user_id = 1;
+  string token = 2;
+  string user_agent = 3;
+  string client_ip = 4;
+  int64 user_subscribe_id = 5;
+  int64 timestamp = 6;
+}
+
+message FilterSubscribeLogData {
+  int64 total = 1;
+  repeated SubscribeLog list = 2;
+}
+
+message FilterSubscribeLogReply {
+  int32 code = 1;                    // 状态码
+  string message = 2;                // 消息内容
+  FilterSubscribeLogData data = 3;   // 响应数据
+}
+
+// ==================== Reset Subscribe Log ====================
+message FilterResetSubscribeLogRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  int64 user_id = 5;
+}
+
+message ResetSubscribeLog {
+  int32 type = 1;
+  int64 user_id = 2;
+  int64 user_subscribe_id = 3;
+  string order_no = 4;
+  int64 timestamp = 5;
+}
+
+message FilterResetSubscribeLogData {
+  int64 total = 1;
+  repeated ResetSubscribeLog list = 2;
+}
+
+message FilterResetSubscribeLogReply {
+  int32 code = 1;                         // 状态码
+  string message = 2;                     // 消息内容
+  FilterResetSubscribeLogData data = 3;   // 响应数据
+}
+
+// ==================== User Subscribe Traffic Log ====================
+message FilterUserSubscribeTrafficLogRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  int64 user_id = 5;
+  int64 subscribe_id = 6;
+}
+
+message UserSubscribeTrafficLog {
+  int64 user_id = 1;
+  int64 subscribe_id = 2;
+  int64 upload = 3;
+  int64 download = 4;
+  int64 timestamp = 5;
+}
+
+message FilterUserSubscribeTrafficLogData {
+  int64 total = 1;
+  repeated UserSubscribeTrafficLog list = 2;
+}
+
+message FilterUserSubscribeTrafficLogReply {
+  int32 code = 1;                                 // 状态码
+  string message = 2;                             // 消息内容
+  FilterUserSubscribeTrafficLogData data = 3;     // 响应数据
+}
+
+// ==================== Traffic Log Details ====================
+message FilterTrafficLogDetailsRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  int64 server_id = 4;
+  int64 user_id = 5;
+  int64 subscribe_id = 6;
+  int64 start_time = 7;   // Unix timestamp in milliseconds
+  int64 end_time = 8;     // Unix timestamp in milliseconds
+}
+
+message TrafficLogDetail {
+  int64 id = 1;
+  int64 server_id = 2;
+  int64 user_id = 3;
+  int64 subscribe_id = 4;
+  int64 download = 5;
+  int64 upload = 6;
+  int64 timestamp = 7;
+}
+
+message FilterTrafficLogDetailsData {
+  int64 total = 1;
+  repeated TrafficLogDetail list = 2;
+}
+
+message FilterTrafficLogDetailsReply {
+  int32 code = 1;                           // 状态码
+  string message = 2;                       // 消息内容
+  FilterTrafficLogDetailsData data = 3;     // 响应数据
+}
+
+// ==================== Log Setting ====================
+message GetLogSettingRequest {
+  // ⚠️ Admin API: tenant_id 从 JWT middleware 获取，不需要请求参数
+}
+
+// ⚠️ 复刻原项目：日志自动清理设置（types.go LogSetting）
+message LogSetting {
+  bool auto_clear = 1;    // 是否自动清理日志
+  int64 clear_days = 2;   // 清理天数
+}
+
+message GetLogSettingReply {
+  int32 code = 1;         // 状态码
+  string message = 2;     // 消息内容
+  LogSetting data = 3;    // 响应数据（直接返回配置对象）
+}
+
+message UpdateLogSettingRequest {
+  // ⚠️ Admin API: tenant_id 从 JWT middleware 获取，不需要请求参数
+  bool auto_clear = 1;    // 是否自动清理日志
+  int64 clear_days = 2;   // 清理天数
+}
+
+message UpdateLogSettingReply {
+  int32 code = 1;     // 状态码
+  string message = 2; // 消息内容
+}

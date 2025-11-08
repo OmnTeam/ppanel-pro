@@ -1,0 +1,174 @@
+syntax = "proto3";
+
+package api.auth.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/auth/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.auth.v1";
+
+// Auth service for user authentication
+service Auth {
+  // Check if user exists by email
+  rpc CheckUser(CheckUserRequest) returns (CheckUserReply) {
+    option (google.api.http) = {
+      get: "/v1/auth/check"
+    };
+  }
+
+  // Check if user exists by telephone
+  rpc CheckUserTelephone(CheckUserTelephoneRequest) returns (CheckUserTelephoneReply) {
+    option (google.api.http) = {
+      get: "/v1/auth/check-telephone"
+    };
+  }
+
+  // User login with email and password
+  rpc UserLogin(UserLoginRequest) returns (UserLoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/login"
+      body: "*"
+    };
+  }
+
+  // User register with email and password
+  rpc UserRegister(UserRegisterRequest) returns (UserRegisterReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/register"
+      body: "*"
+    };
+  }
+
+  // User register with telephone and password
+  rpc TelephoneUserRegister(TelephoneUserRegisterRequest) returns (TelephoneUserRegisterReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/register/telephone"
+      body: "*"
+    };
+  }
+
+  // User login with telephone and password
+  rpc TelephoneLogin(TelephoneLoginRequest) returns (TelephoneLoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/login/telephone"
+      body: "*"
+    };
+  }
+
+  // Reset password with email
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/reset"
+      body: "*"
+    };
+  }
+
+  // Reset password with telephone
+  rpc TelephoneResetPassword(TelephoneResetPasswordRequest) returns (TelephoneResetPasswordReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/reset/telephone"
+      body: "*"
+    };
+  }
+}
+
+// CheckUser Request
+message CheckUserRequest {
+  string email = 1;
+}
+
+// CheckUser Reply
+message CheckUserReply {
+  bool exist = 1;
+}
+
+// CheckUserTelephone Request
+message CheckUserTelephoneRequest {
+  string telephone = 1;
+}
+
+// CheckUserTelephone Reply
+message CheckUserTelephoneReply {
+  bool exist = 1;
+}
+
+// UserLogin Request
+message UserLoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+// UserLogin Reply
+message UserLoginReply {
+  int64 user_id = 1;
+  string token = 2;
+  string email = 3;
+}
+
+// UserRegister Request
+message UserRegisterRequest {
+  string email = 1;
+  string password = 2;
+}
+
+// UserRegister Reply
+message UserRegisterReply {
+  int64 user_id = 1;
+  string token = 2;
+  string email = 3;
+}
+
+// TelephoneUserRegister Request
+message TelephoneUserRegisterRequest {
+    string telephone = 2;
+  string password = 3;
+}
+
+// TelephoneUserRegister Reply
+message TelephoneUserRegisterReply {
+  int64 user_id = 1;
+  string token = 2;
+  string telephone = 3;
+  }
+
+// TelephoneLogin Request
+message TelephoneLoginRequest {
+    string telephone = 2;
+  string password = 3;
+}
+
+// TelephoneLogin Reply
+message TelephoneLoginReply {
+  int64 user_id = 1;
+  string token = 2;
+  string telephone = 3;
+  }
+
+// ResetPassword Request
+message ResetPasswordRequest {
+    string email = 2;
+  string verification_code = 3;
+  string new_password = 4;
+}
+
+// ResetPassword Reply
+message ResetPasswordReply {
+  int64 user_id = 1;
+  string token = 2;
+  string email = 3;
+  }
+
+// TelephoneResetPassword Request
+message TelephoneResetPasswordRequest {
+    string telephone = 2;
+  string verification_code = 3;
+  string new_password = 4;
+}
+
+// TelephoneResetPassword Reply
+message TelephoneResetPasswordReply {
+  int64 user_id = 1;
+  string token = 2;
+  string telephone = 3;
+  }

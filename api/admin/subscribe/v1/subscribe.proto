@@ -1,0 +1,436 @@
+syntax = "proto3";
+
+package api.admin.subscribe.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/omnsaas/services/kratos-service/api/admin/subscribe/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.admin.subscribe.v1";
+
+service Subscribe {
+  // CreateSubscribe 创建订阅套餐
+  rpc CreateSubscribe (CreateSubscribeRequest) returns (CreateSubscribeReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/subscribe"
+      body: "*"
+    };
+  }
+
+  // UpdateSubscribe 更新订阅套餐
+  rpc UpdateSubscribe (UpdateSubscribeRequest) returns (UpdateSubscribeReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/subscribe"
+      body: "*"
+    };
+  }
+
+  // DeleteSubscribe 删除订阅套餐
+  rpc DeleteSubscribe (DeleteSubscribeRequest) returns (DeleteSubscribeReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/subscribe"
+      body: "*"
+    };
+  }
+
+  // BatchDeleteSubscribe 批量删除订阅套餐
+  rpc BatchDeleteSubscribe (BatchDeleteSubscribeRequest) returns (BatchDeleteSubscribeReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/subscribe/batch"
+      body: "*"
+    };
+  }
+
+  // GetSubscribeDetails 获取订阅套餐详情
+  rpc GetSubscribeDetails (GetSubscribeDetailsRequest) returns (GetSubscribeDetailsReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/subscribe/details"
+    };
+  }
+
+  // GetSubscribeList 获取订阅套餐列表
+  rpc GetSubscribeList (GetSubscribeListRequest) returns (GetSubscribeListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/subscribe/list"
+    };
+  }
+
+  // SubscribeSort 订阅套餐排序
+  rpc SubscribeSort (SubscribeSortRequest) returns (SubscribeSortReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/subscribe/sort"
+      body: "*"
+    };
+  }
+
+  // CreateSubscribeGroup 创建订阅组
+  rpc CreateSubscribeGroup (CreateSubscribeGroupRequest) returns (CreateSubscribeGroupReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/subscribe/group"
+      body: "*"
+    };
+  }
+
+  // UpdateSubscribeGroup 更新订阅组
+  rpc UpdateSubscribeGroup (UpdateSubscribeGroupRequest) returns (UpdateSubscribeGroupReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/subscribe/group"
+      body: "*"
+    };
+  }
+
+  // DeleteSubscribeGroup 删除订阅组
+  rpc DeleteSubscribeGroup (DeleteSubscribeGroupRequest) returns (DeleteSubscribeGroupReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/subscribe/group"
+      body: "*"
+    };
+  }
+
+  // BatchDeleteSubscribeGroup 批量删除订阅组
+  rpc BatchDeleteSubscribeGroup (BatchDeleteSubscribeGroupRequest) returns (BatchDeleteSubscribeGroupReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/subscribe/group/batch"
+      body: "*"
+    };
+  }
+
+  // GetSubscribeGroupList 获取订阅组列表
+  rpc GetSubscribeGroupList (GetSubscribeGroupListRequest) returns (GetSubscribeGroupListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/subscribe/group/list"
+    };
+  }
+}
+
+// ==================== Subscribe Messages ====================
+
+// SubscribeDiscount 折扣配置
+message SubscribeDiscount {
+  int64 quantity = 1;  // 数量(月数)
+  int64 discount = 2;  // 折扣
+}
+
+// SubscribeInfo 订阅套餐信息
+message SubscribeInfo {
+  int64 id = 1;                           // 订阅套餐ID
+  string name = 2;                        // 订阅套餐名称
+  string language = 3;                    // 语言
+  string description = 4;                 // 订阅套餐描述
+  int64 unit_price = 5;                   // 单位价格（单位：分）
+  string unit_time = 6;                   // 单位时间
+  repeated SubscribeDiscount discount = 7; // 折扣配置
+  int64 replacement = 8;                  // 替换
+  int64 inventory = 9;                    // 库存
+  int64 traffic = 10;                     // 流量（字节）
+  int64 speed_limit = 11;                 // 速度限制
+  int64 device_limit = 12;                // 设备数限制
+  int64 quota = 13;                       // 配额
+  repeated int64 nodes = 14;              // 节点IDs
+  repeated string node_tags = 15;         // 节点标签
+  bool show = 16;                         // 是否在门户页面显示
+  bool sell = 17;                         // 是否售卖
+  int64 sort = 18;                        // 排序
+  int64 deduction_ratio = 19;             // 扣除比例
+  bool allow_deduction = 20;              // 允许扣除
+  int64 reset_cycle = 21;                 // 重置周期: 0-不重置 1-1号 2-每月 3-每年
+  bool renewal_reset = 22;                // 续费重置
+  int64 created_at = 23;                  // 创建时间
+  int64 updated_at = 24;                  // 更新时间
+}
+
+// SubscribeItem 订阅套餐列表项（包含销量）
+message SubscribeItem {
+  int64 id = 1;
+  string name = 2;
+  string language = 3;
+  string description = 4;
+  int64 unit_price = 5;
+  string unit_time = 6;
+  repeated SubscribeDiscount discount = 7;
+  int64 replacement = 8;
+  int64 inventory = 9;
+  int64 traffic = 10;
+  int64 speed_limit = 11;
+  int64 device_limit = 12;
+  int64 quota = 13;
+  repeated int64 nodes = 14;
+  repeated string node_tags = 15;
+  bool show = 16;
+  bool sell = 17;
+  int64 sort = 18;
+  int64 deduction_ratio = 19;
+  bool allow_deduction = 20;
+  int64 reset_cycle = 21;
+  bool renewal_reset = 22;
+  int64 created_at = 23;
+  int64 updated_at = 24;
+  int64 sold = 25;  // 销量
+}
+
+// CreateSubscribeRequest 创建订阅套餐请求
+message CreateSubscribeRequest {
+  string name = 1;                        // 订阅套餐名称
+  string language = 2;                    // 语言
+  string description = 3;                 // 订阅套餐描述
+  int64 unit_price = 4;                   // 单位价格（单位：分）
+  string unit_time = 5;                   // 单位时间
+  repeated SubscribeDiscount discount = 6; // 折扣配置
+  int64 replacement = 7;                  // 替换
+  int64 inventory = 8;                    // 库存
+  int64 traffic = 9;                      // 流量（字节）
+  int64 speed_limit = 10;                 // 速度限制
+  int64 device_limit = 11;                // 设备数限制
+  int64 quota = 12;                       // 配额
+  repeated int64 nodes = 13;              // 节点IDs
+  repeated string node_tags = 14;         // 节点标签
+  optional bool show = 15;                // 是否在门户页面显示
+  optional bool sell = 16;                // 是否售卖
+  int64 deduction_ratio = 17;             // 扣除比例
+  optional bool allow_deduction = 18;     // 允许扣除
+  int64 reset_cycle = 19;                 // 重置周期
+  optional bool renewal_reset = 20;       // 续费重置
+}
+
+// CreateSubscribeData 创建订阅套餐数据
+message CreateSubscribeData {
+  bool success = 1;
+}
+
+// CreateSubscribeReply 创建订阅套餐响应
+message CreateSubscribeReply {
+  int32 code = 1;                  // 状态码
+  string message = 2;              // 消息内容
+  CreateSubscribeData data = 3;    // 响应数据
+}
+
+// UpdateSubscribeRequest 更新订阅套餐请求
+message UpdateSubscribeRequest {
+  int64 id = 1;                           // 订阅套餐ID
+  string name = 2;                        // 订阅套餐名称
+  string language = 3;                    // 语言
+  string description = 4;                 // 订阅套餐描述
+  int64 unit_price = 5;                   // 单位价格（单位：分）
+  string unit_time = 6;                   // 单位时间
+  repeated SubscribeDiscount discount = 7; // 折扣配置
+  int64 replacement = 8;                  // 替换
+  int64 inventory = 9;                    // 库存
+  int64 traffic = 10;                     // 流量（字节）
+  int64 speed_limit = 11;                 // 速度限制
+  int64 device_limit = 12;                // 设备数限制
+  int64 quota = 13;                       // 配额
+  repeated int64 nodes = 14;              // 节点IDs
+  repeated string node_tags = 15;         // 节点标签
+  optional bool show = 16;                // 是否在门户页面显示
+  optional bool sell = 17;                // 是否售卖
+  int64 sort = 18;                        // 排序
+  int64 deduction_ratio = 19;             // 扣除比例
+  optional bool allow_deduction = 20;     // 允许扣除
+  int64 reset_cycle = 21;                 // 重置周期
+  optional bool renewal_reset = 22;       // 续费重置
+}
+
+// UpdateSubscribeData 更新订阅套餐数据
+message UpdateSubscribeData {
+  bool success = 1;
+}
+
+// UpdateSubscribeReply 更新订阅套餐响应
+message UpdateSubscribeReply {
+  int32 code = 1;                  // 状态码
+  string message = 2;              // 消息内容
+  UpdateSubscribeData data = 3;    // 响应数据
+}
+
+// DeleteSubscribeRequest 删除订阅套餐请求
+message DeleteSubscribeRequest {
+  int64 id = 1;  // 订阅套餐ID
+}
+
+// DeleteSubscribeData 删除订阅套餐数据
+message DeleteSubscribeData {
+  bool success = 1;
+}
+
+// DeleteSubscribeReply 删除订阅套餐响应
+message DeleteSubscribeReply {
+  int32 code = 1;                  // 状态码
+  string message = 2;              // 消息内容
+  DeleteSubscribeData data = 3;    // 响应数据
+}
+
+// BatchDeleteSubscribeRequest 批量删除订阅套餐请求
+message BatchDeleteSubscribeRequest {
+  repeated int64 ids = 1;  // 订阅套餐ID列表
+}
+
+// BatchDeleteSubscribeData 批量删除订阅套餐数据
+message BatchDeleteSubscribeData {
+  bool success = 1;
+}
+
+// BatchDeleteSubscribeReply 批量删除订阅套餐响应
+message BatchDeleteSubscribeReply {
+  int32 code = 1;                      // 状态码
+  string message = 2;                  // 消息内容
+  BatchDeleteSubscribeData data = 3;   // 响应数据
+}
+
+// GetSubscribeDetailsRequest 获取订阅套餐详情请求
+message GetSubscribeDetailsRequest {
+  int64 id = 1;  // 订阅套餐ID
+}
+
+// GetSubscribeDetailsData 获取订阅套餐详情数据
+message GetSubscribeDetailsData {
+  SubscribeInfo subscribe = 1;  // 订阅套餐信息
+}
+
+// GetSubscribeDetailsReply 获取订阅套餐详情响应
+message GetSubscribeDetailsReply {
+  int32 code = 1;                      // 状态码
+  string message = 2;                  // 消息内容
+  GetSubscribeDetailsData data = 3;    // 响应数据
+}
+
+// GetSubscribeListRequest 获取订阅套餐列表请求
+message GetSubscribeListRequest {
+  int64 page = 1;        // 页码
+  int64 size = 2;        // 每页数量
+  string language = 3;   // 语言筛选
+  string search = 4;     // 搜索关键词
+}
+
+// GetSubscribeListData 获取订阅套餐列表数据
+message GetSubscribeListData {
+  repeated SubscribeItem list = 1;  // 订阅套餐列表
+  int64 total = 2;                   // 总数
+}
+
+// GetSubscribeListReply 获取订阅套餐列表响应
+message GetSubscribeListReply {
+  int32 code = 1;                    // 状态码
+  string message = 2;                // 消息内容
+  GetSubscribeListData data = 3;     // 响应数据
+}
+
+// SortItem 排序项
+message SortItem {
+  int64 id = 1;    // 订阅套餐ID
+  int64 sort = 2;  // 排序值
+}
+
+// SubscribeSortRequest 订阅套餐排序请求
+message SubscribeSortRequest {
+  repeated SortItem sort = 1;  // 排序列表
+}
+
+// SubscribeSortData 订阅套餐排序数据
+message SubscribeSortData {
+  bool success = 1;
+}
+
+// SubscribeSortReply 订阅套餐排序响应
+message SubscribeSortReply {
+  int32 code = 1;                // 状态码
+  string message = 2;            // 消息内容
+  SubscribeSortData data = 3;    // 响应数据
+}
+
+// ==================== SubscribeGroup Messages ====================
+
+// SubscribeGroupInfo 订阅组信息
+message SubscribeGroupInfo {
+  int64 id = 1;           // 订阅组ID
+  string name = 2;        // 订阅组名称
+  string description = 3; // 订阅组描述
+  int64 created_at = 4;   // 创建时间
+  int64 updated_at = 5;   // 更新时间
+}
+
+// CreateSubscribeGroupRequest 创建订阅组请求
+message CreateSubscribeGroupRequest {
+  string name = 1;        // 订阅组名称
+  string description = 2; // 订阅组描述
+}
+
+// CreateSubscribeGroupData 创建订阅组数据
+message CreateSubscribeGroupData {
+  bool success = 1;
+}
+
+// CreateSubscribeGroupReply 创建订阅组响应
+message CreateSubscribeGroupReply {
+  int32 code = 1;                     // 状态码
+  string message = 2;                 // 消息内容
+  CreateSubscribeGroupData data = 3;  // 响应数据
+}
+
+// UpdateSubscribeGroupRequest 更新订阅组请求
+message UpdateSubscribeGroupRequest {
+  int64 id = 1;           // 订阅组ID
+  string name = 2;        // 订阅组名称
+  string description = 3; // 订阅组描述
+}
+
+// UpdateSubscribeGroupData 更新订阅组数据
+message UpdateSubscribeGroupData {
+  bool success = 1;
+}
+
+// UpdateSubscribeGroupReply 更新订阅组响应
+message UpdateSubscribeGroupReply {
+  int32 code = 1;                     // 状态码
+  string message = 2;                 // 消息内容
+  UpdateSubscribeGroupData data = 3;  // 响应数据
+}
+
+// DeleteSubscribeGroupRequest 删除订阅组请求
+message DeleteSubscribeGroupRequest {
+  int64 id = 1;  // 订阅组ID
+}
+
+// DeleteSubscribeGroupData 删除订阅组数据
+message DeleteSubscribeGroupData {
+  bool success = 1;
+}
+
+// DeleteSubscribeGroupReply 删除订阅组响应
+message DeleteSubscribeGroupReply {
+  int32 code = 1;                     // 状态码
+  string message = 2;                 // 消息内容
+  DeleteSubscribeGroupData data = 3;  // 响应数据
+}
+
+// BatchDeleteSubscribeGroupRequest 批量删除订阅组请求
+message BatchDeleteSubscribeGroupRequest {
+  repeated int64 ids = 1;  // 订阅组ID列表
+}
+
+// BatchDeleteSubscribeGroupData 批量删除订阅组数据
+message BatchDeleteSubscribeGroupData {
+  bool success = 1;
+}
+
+// BatchDeleteSubscribeGroupReply 批量删除订阅组响应
+message BatchDeleteSubscribeGroupReply {
+  int32 code = 1;                           // 状态码
+  string message = 2;                       // 消息内容
+  BatchDeleteSubscribeGroupData data = 3;   // 响应数据
+}
+
+// GetSubscribeGroupListRequest 获取订阅组列表请求
+message GetSubscribeGroupListRequest {}
+
+// GetSubscribeGroupListData 获取订阅组列表数据
+message GetSubscribeGroupListData {
+  repeated SubscribeGroupInfo list = 1;  // 订阅组列表
+  int64 total = 2;                        // 总数
+}
+
+// GetSubscribeGroupListReply 获取订阅组列表响应
+message GetSubscribeGroupListReply {
+  int32 code = 1;                        // 状态码
+  string message = 2;                    // 消息内容
+  GetSubscribeGroupListData data = 3;    // 响应数据
+}

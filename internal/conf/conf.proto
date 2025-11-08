@@ -1,0 +1,120 @@
+syntax = "proto3";
+package kratos.api;
+
+option go_package = "kratos-service/internal/conf;conf";
+
+import "google/protobuf/duration.proto";
+
+message Bootstrap {
+  Server server = 1;
+  Data data = 2;
+  Application app = 3;
+}
+
+message Server {
+  message HTTP {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  message GRPC {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration timeout = 3;
+  }
+  HTTP http = 1;
+  GRPC grpc = 2;
+}
+
+message Data {
+  message Database {
+    string driver = 1;
+    string source = 2;
+  }
+  message Redis {
+    string network = 1;
+    string addr = 2;
+    google.protobuf.Duration read_timeout = 3;
+    google.protobuf.Duration write_timeout = 4;
+    string password = 5;
+    int32 db = 6;
+    int32 pool_size = 7;
+    int32 min_idle_conns = 8;
+  }
+  Database database = 1;
+  Redis redis = 2;
+}
+
+message Site {
+  string host = 1;
+  string site_name = 2;
+  string site_desc = 3;
+  string site_logo = 4;
+  string keywords = 5;
+  string custom_html = 6;
+  string custom_data = 7;
+}
+
+message Verify {
+  string turnstile_site_key = 1;
+  bool enable_login_verify = 2;
+  bool enable_register_verify = 3;
+  bool enable_reset_password_verify = 4;
+}
+
+message MobileAuth {
+  bool enable = 1;
+  bool enable_whitelist = 2;
+  repeated string whitelist = 3;
+}
+
+message EmailAuth {
+  bool enable = 1;
+  bool enable_verify = 2;
+  bool enable_domain_suffix = 3;
+  string domain_suffix_list = 4;
+}
+
+message Register {
+  bool stop_register = 1;
+  bool enable_ip_register_limit = 2;
+  int64 ip_register_limit = 3;
+  int64 ip_register_limit_duration = 4;
+  // Trial subscription settings
+  bool enable_trial = 5;
+  int64 trial_subscribe = 6;
+  string trial_time_unit = 7;
+  int64 trial_time = 8;
+}
+
+message Invite {
+  bool forced_invite = 1;
+  int64 referral_percentage = 2;
+  bool only_first_purchase = 3;
+}
+
+message Subscribe {
+  bool single_model = 1;
+  string subscribe_path = 2;
+  string subscribe_domain = 3;
+  bool pan_domain = 4;
+  bool user_agent_limit = 5;
+  string user_agent_list = 6;
+}
+
+message Admin {
+  string email = 1;
+  string password = 2;
+  string algo = 3;
+}
+
+message Application {
+  Site site = 1;
+  Verify verify = 2;
+  MobileAuth mobile = 3;
+  EmailAuth email = 4;
+  Register register = 5;
+  Invite invite = 6;
+  Subscribe subscribe = 7;
+  Admin admin = 8;
+}

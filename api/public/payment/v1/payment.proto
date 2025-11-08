@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package api.public.payment.v1;
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/public/payment/v1;v1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+// Public Payment service
+// 公共支付服务（需要认证）
+service Payment {
+  // GetAvailablePaymentMethods 获取可用支付方式
+  rpc GetAvailablePaymentMethods (google.protobuf.Empty) returns (PaymentMethodsReply) {
+    option (google.api.http) = {
+      get: "/v1/public/payment/methods"
+    };
+  }
+}
+
+// PaymentMethodsData 支付方式数据
+message PaymentMethodsData {
+  repeated PaymentMethod list = 1;
+}
+
+// PaymentMethodsReply 获取可用支付方式响应
+message PaymentMethodsReply {
+  int32 code = 1;                // 状态码
+  string message = 2;            // 消息内容
+  PaymentMethodsData data = 3;   // 响应数据
+}
+
+// PaymentMethod 支付方式
+message PaymentMethod {
+  int64 id = 1;
+  string name = 2;
+  string platform = 3;
+  string description = 4;
+  string icon = 5;
+  int32 fee_mode = 6;
+  int64 fee_percent = 7;
+  int64 fee_amount = 8;
+}

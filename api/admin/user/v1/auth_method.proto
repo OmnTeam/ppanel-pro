@@ -1,0 +1,101 @@
+syntax = "proto3";
+
+package api.admin.user.v1;
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/user/v1;v1";
+
+import "google/api/annotations.proto";
+
+// UserAuthMethodService 用户认证方法管理服务
+service UserAuthMethodService {
+  // CreateUserAuthMethod 创建用户认证方法
+  rpc CreateUserAuthMethod(CreateUserAuthMethodRequest) returns (CreateUserAuthMethodReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/user/auth_method"
+      body: "*"
+    };
+  }
+
+  // UpdateUserAuthMethod 更新用户认证方法
+  rpc UpdateUserAuthMethod(UpdateUserAuthMethodRequest) returns (UpdateUserAuthMethodReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/user/auth_method"
+      body: "*"
+    };
+  }
+
+  // DeleteUserAuthMethod 删除用户认证方法
+  rpc DeleteUserAuthMethod(DeleteUserAuthMethodRequest) returns (DeleteUserAuthMethodReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/user/auth_method"
+    };
+  }
+
+  // GetUserAuthMethod 获取用户认证方法
+  rpc GetUserAuthMethod(GetUserAuthMethodRequest) returns (GetUserAuthMethodReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/user/auth_method"
+    };
+  }
+}
+
+// ===== CreateUserAuthMethod =====
+
+message CreateUserAuthMethodRequest {
+  int64 tenant_id = 1;
+  int64 user_id = 2;
+  string auth_type = 3;  // apple, google, github, facebook, telegram, email, mobile
+  string auth_identifier = 4;  // 认证标识（邮箱、手机号、OpenID等）
+  bool verified = 5;  // 是否已验证
+}
+
+message CreateUserAuthMethodReply {
+  int64 id = 1;
+}
+
+// ===== UpdateUserAuthMethod =====
+
+message UpdateUserAuthMethodRequest {
+  int64 tenant_id = 1;
+  int64 user_id = 2;  // 用户ID
+  string auth_type = 3;  // 认证类型
+  string auth_identifier = 4;  // 认证标识
+}
+
+message UpdateUserAuthMethodReply {}
+
+// ===== DeleteUserAuthMethod =====
+
+message DeleteUserAuthMethodRequest {
+  int64 tenant_id = 1;
+  int64 user_id = 2;  // 用户ID
+  string auth_type = 3;  // 认证类型
+}
+
+message DeleteUserAuthMethodReply {}
+
+// ===== GetUserAuthMethod =====
+
+message GetUserAuthMethodRequest {
+  int64 tenant_id = 1;
+  int64 user_id = 2;  // 用户ID
+  string auth_type = 3;  // 可选：过滤认证类型
+}
+
+message GetUserAuthMethodReply {
+  repeated UserAuthMethod list = 1;
+}
+
+// ===== Common Messages =====
+
+// UserAuthMethod 用户认证方法
+message UserAuthMethod {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  int64 user_id = 3;
+  string auth_type = 4;  // apple, google, github, facebook, telegram, email, mobile
+  string auth_identifier = 5;  // 认证标识
+  bool verified = 6;  // 是否已验证
+  int64 created_at = 7;  // Unix timestamp in milliseconds
+  int64 updated_at = 8;  // Unix timestamp in milliseconds
+}

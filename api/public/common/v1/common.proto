@@ -1,0 +1,342 @@
+syntax = "proto3";
+
+package api.public.common.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/public/common/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.public.common.v1";
+
+// Common service for public APIs
+service Common {
+  // Get ads list
+  rpc GetAds(GetAdsRequest) returns (GetAdsReply) {
+    option (google.api.http) = {
+      get: "/v1/common/ads"
+    };
+  }
+
+  // Get subscribe client list
+  rpc GetClient(GetClientRequest) returns (GetClientReply) {
+    option (google.api.http) = {
+      get: "/v1/common/client"
+    };
+  }
+
+  // Get privacy policy
+  rpc GetPrivacyPolicy(GetPrivacyPolicyRequest) returns (GetPrivacyPolicyReply) {
+    option (google.api.http) = {
+      get: "/v1/common/site/privacy"
+    };
+  }
+
+  // Get TOS (Terms of Service)
+  rpc GetTos(GetTosRequest) returns (GetTosReply) {
+    option (google.api.http) = {
+      get: "/v1/common/site/tos"
+    };
+  }
+
+  // Get global config
+  rpc GetGlobalConfig(GetGlobalConfigRequest) returns (GetGlobalConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/common/site/config"
+    };
+  }
+
+  // Get statistics
+  rpc GetStat(GetStatRequest) returns (GetStatReply) {
+    option (google.api.http) = {
+      get: "/v1/common/site/stat"
+    };
+  }
+
+  // Send email verification code
+  rpc SendEmailCode(SendEmailCodeRequest) returns (SendCodeReply) {
+    option (google.api.http) = {
+      post: "/v1/common/send_code"
+      body: "*"
+    };
+  }
+
+  // Send SMS verification code
+  rpc SendSmsCode(SendSmsCodeRequest) returns (SendCodeReply) {
+    option (google.api.http) = {
+      post: "/v1/common/send_sms_code"
+      body: "*"
+    };
+  }
+
+  // Check verification code
+  rpc CheckVerificationCode(CheckVerificationCodeRequest) returns (CheckVerificationCodeReply) {
+    option (google.api.http) = {
+      post: "/v1/common/check_verification_code"
+      body: "*"
+    };
+  }
+}
+
+// GetAds Request
+message GetAdsRequest {
+  string device = 1;
+  string position = 2;
+}
+
+// Ads message
+message Ads {
+  int64 id = 1;
+  string title = 2;
+  string type = 3;
+  string content = 4;
+  string description = 5;
+  string target_url = 6;
+  int64 start_time = 7;
+  int64 end_time = 8;
+  int32 status = 9;
+  int64 created_at = 10;
+  int64 updated_at = 11;
+}
+
+// GetAdsData 广告列表数据
+message GetAdsData {
+  repeated Ads list = 1;
+}
+
+// GetAds Reply
+message GetAdsReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  GetAdsData data = 3;   // 响应数据
+}
+
+// GetClient Request (empty)
+message GetClientRequest {}
+
+// DownloadLink message
+message DownloadLink {
+  string ios = 1;
+  string android = 2;
+  string windows = 3;
+  string mac = 4;
+  string linux = 5;
+  string harmony = 6;
+}
+
+// SubscribeClient message
+message SubscribeClient {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  string icon = 4;
+  string scheme = 5;
+  bool is_default = 6;
+  DownloadLink download_link = 7;
+}
+
+// GetClientData 客户端列表数据
+message GetClientData {
+  int64 total = 1;
+  repeated SubscribeClient list = 2;
+}
+
+// GetClient Reply
+message GetClientReply {
+  int32 code = 1;         // 状态码
+  string message = 2;     // 消息内容
+  GetClientData data = 3; // 响应数据
+}
+
+// GetPrivacyPolicy Request (empty)
+message GetPrivacyPolicyRequest {}
+
+// GetPrivacyPolicyData 隐私政策数据
+message GetPrivacyPolicyData {
+  string privacy_policy = 1;
+}
+
+// GetPrivacyPolicy Reply
+message GetPrivacyPolicyReply {
+  int32 code = 1;                 // 状态码
+  string message = 2;             // 消息内容
+  GetPrivacyPolicyData data = 3;  // 响应数据
+}
+
+// GetTos Request (empty)
+message GetTosRequest {}
+
+// GetTosData 服务条款数据
+message GetTosData {
+  string tos_content = 1;
+}
+
+// GetTos Reply
+message GetTosReply {
+  int32 code = 1;       // 状态码
+  string message = 2;   // 消息内容
+  GetTosData data = 3;  // 响应数据
+}
+
+// GetGlobalConfig Request (empty)
+message GetGlobalConfigRequest {}
+
+// Site configuration
+message SiteConfig {
+  string host = 1;
+  string site_name = 2;
+  string site_desc = 3;
+  string site_logo = 4;
+  string keywords = 5;
+  string custom_html = 6;
+  string custom_data = 7;
+}
+
+// Verify configuration
+message VerifyConfig {
+  string turnstile_site_key = 1;
+  bool enable_login_verify = 2;
+  bool enable_register_verify = 3;
+  bool enable_reset_password_verify = 4;
+}
+
+// Mobile auth configuration
+message MobileAuthConfig {
+  bool enable = 1;
+  bool enable_whitelist = 2;
+  repeated string whitelist = 3;
+}
+
+// Email auth configuration
+message EmailAuthConfig {
+  bool enable = 1;
+  bool enable_verify = 2;
+  bool enable_domain_suffix = 3;
+  string domain_suffix_list = 4;
+}
+
+// Register configuration
+message RegisterConfig {
+  bool stop_register = 1;
+  bool enable_ip_register_limit = 2;
+  int64 ip_register_limit = 3;
+  int64 ip_register_limit_duration = 4;
+}
+
+// Auth configuration
+message AuthConfig {
+  MobileAuthConfig mobile = 1;
+  EmailAuthConfig email = 2;
+  RegisterConfig register = 3;
+}
+
+// Invite configuration
+message InviteConfig {
+  bool forced_invite = 1;
+  int64 referral_percentage = 2;
+  bool only_first_purchase = 3;
+}
+
+// Currency configuration
+message CurrencyConfig {
+  string currency_unit = 1;
+  string currency_symbol = 2;
+}
+
+// Subscribe configuration
+message SubscribeConfig {
+  bool single_model = 1;
+  string subscribe_path = 2;
+  string subscribe_domain = 3;
+  bool pan_domain = 4;
+  bool user_agent_limit = 5;
+  string user_agent_list = 6;
+}
+
+// Public verify code configuration
+message PublicVerifyCodeConfig {
+  int64 verify_code_interval = 1;
+}
+
+// GetGlobalConfigData 全局配置数据
+message GetGlobalConfigData {
+  SiteConfig site = 1;
+  VerifyConfig verify = 2;
+  AuthConfig auth = 3;
+  InviteConfig invite = 4;
+  CurrencyConfig currency = 5;
+  SubscribeConfig subscribe = 6;
+  PublicVerifyCodeConfig verify_code = 7;
+  repeated string oauth_methods = 8;
+  bool web_ad = 9;
+}
+
+// GetGlobalConfig Reply
+message GetGlobalConfigReply {
+  int32 code = 1;              // 状态码
+  string message = 2;          // 消息内容
+  GetGlobalConfigData data = 3; // 响应数据
+}
+
+// GetStat Request (empty)
+message GetStatRequest {}
+
+// GetStatData 统计数据
+message GetStatData {
+  int64 user = 1;
+  int64 node = 2;
+  int64 country = 3;
+  repeated string protocol = 4;
+}
+
+// GetStat Reply
+message GetStatReply {
+  int32 code = 1;       // 状态码
+  string message = 2;   // 消息内容
+  GetStatData data = 3; // 响应数据
+}
+
+// SendEmailCode Request
+message SendEmailCodeRequest {
+  string email = 1;
+  int32 type = 2;
+}
+
+// SendSmsCode Request
+message SendSmsCodeRequest {
+  int32 type = 1;
+  string telephone = 2;
+  string telephone_area_code = 3;
+}
+
+// SendCodeData 发送验证码数据
+message SendCodeData {
+  bool status = 1;
+  string code = 2; // Only returned in development mode
+}
+
+// SendCode Reply (shared by email and SMS)
+message SendCodeReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  SendCodeData data = 3; // 响应数据
+}
+
+// CheckVerificationCode Request
+message CheckVerificationCodeRequest {
+  string method = 1;  // email or mobile
+  string account = 2;
+  string code = 3;
+  int32 type = 4;
+}
+
+// CheckVerificationCodeData 验证码校验数据
+message CheckVerificationCodeData {
+  bool status = 1;
+}
+
+// CheckVerificationCode Reply
+message CheckVerificationCodeReply {
+  int32 code = 1;                     // 状态码
+  string message = 2;                 // 消息内容
+  CheckVerificationCodeData data = 3; // 响应数据
+}

@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package api.public.subscribe.v1;
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/public/subscribe/v1;v1";
+
+import "google/api/annotations.proto";
+
+// Public Subscribe service
+// 公共订阅服务（需要认证）
+service Subscribe {
+  // QuerySubscribeList 查询订阅列表
+  rpc QuerySubscribeList (QuerySubscribeListRequest) returns (SubscribeListReply) {
+    option (google.api.http) = {
+      get: "/v1/public/subscribe/list"
+    };
+  }
+}
+
+// QuerySubscribeListRequest 查询订阅列表请求
+message QuerySubscribeListRequest {
+  string language = 1;  // 语言
+}
+
+// SubscribeListData 订阅列表数据
+message SubscribeListData {
+  repeated SubscribeItem list = 1;
+  int64 total = 2;
+}
+
+// SubscribeListReply 查询订阅列表响应
+message SubscribeListReply {
+  int32 code = 1;              // 状态码
+  string message = 2;          // 消息内容
+  SubscribeListData data = 3;  // 响应数据
+}
+
+// SubscribeItem 订阅项
+message SubscribeItem {
+  int64 id = 1;
+  string name = 2;
+  string language = 3;
+  string description = 4;
+  int64 unit_price = 5;
+  string unit_time = 6;
+  repeated SubscribeDiscount discount = 7;
+  int64 replacement = 8;
+  int64 inventory = 9;
+  int64 traffic = 10;
+  int64 speed_limit = 11;
+  int64 device_limit = 12;
+  int64 quota = 13;
+  repeated int64 nodes = 14;
+  repeated string node_tags = 15;
+  bool show = 16;
+  bool sell = 17;
+  int64 sort = 18;
+  int64 deduction_ratio = 19;
+  bool allow_deduction = 20;
+  int32 reset_cycle = 21;
+  int64 created_at = 22;
+  int64 updated_at = 23;
+}
+
+// SubscribeDiscount 订阅折扣
+message SubscribeDiscount {
+  int32 quantity = 1;
+  int32 percentage = 2;
+}

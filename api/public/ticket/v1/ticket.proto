@@ -1,0 +1,143 @@
+syntax = "proto3";
+
+package api.public.ticket.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/public/ticket/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.public.ticket.v1";
+
+// Ticket service for users
+service Ticket {
+  // CreateUserTicket creates a new ticket
+  rpc CreateUserTicket (CreateUserTicketRequest) returns (TicketCreateReply) {
+    option (google.api.http) = {
+      post: "/v1/public/ticket"
+      body: "*"
+    };
+  }
+
+  // GetUserTicketList gets user's ticket list with pagination
+  rpc GetUserTicketList (GetUserTicketListRequest) returns (TicketListReply) {
+    option (google.api.http) = {
+      get: "/v1/public/ticket/list"
+    };
+  }
+
+  // GetUserTicketDetails gets ticket details
+  rpc GetUserTicketDetails (GetUserTicketDetailsRequest) returns (TicketDetailReply) {
+    option (google.api.http) = {
+      get: "/v1/public/ticket/detail"
+    };
+  }
+
+  // UpdateUserTicketStatus updates ticket status
+  rpc UpdateUserTicketStatus (UpdateUserTicketStatusRequest) returns (TicketStatusReply) {
+    option (google.api.http) = {
+      put: "/v1/public/ticket"
+      body: "*"
+    };
+  }
+
+  // CreateUserTicketFollow creates a follow-up for ticket
+  rpc CreateUserTicketFollow (CreateUserTicketFollowRequest) returns (TicketFollowReply) {
+    option (google.api.http) = {
+      post: "/v1/public/ticket/follow"
+      body: "*"
+    };
+  }
+}
+
+// CreateUserTicketRequest is the request to create a ticket
+message CreateUserTicketRequest {
+  string title = 1;        // Ticket title
+  string description = 2;  // Ticket description
+}
+
+// TicketCreateReply 创建工单响应
+message TicketCreateReply {
+  int32 code = 1;     // 状态码
+  string message = 2; // 消息内容
+}
+
+// GetUserTicketListRequest is the request to get ticket list
+message GetUserTicketListRequest {
+  int64 page = 1;           // Page number (starts from 1)
+  int64 size = 2;           // Page size
+  optional int32 status = 3; // Filter by status (1=Pending, 2=Waiting, 3=Processed, 4=Closed)
+  optional string search = 4; // Search keyword
+}
+
+// TicketListData 工单列表数据
+message TicketListData {
+  int64 total = 1;                // Total count
+  repeated TicketInfo list = 2;   // Ticket list
+}
+
+// TicketListReply 工单列表响应
+message TicketListReply {
+  int32 code = 1;          // 状态码
+  string message = 2;      // 消息内容
+  TicketListData data = 3; // 响应数据
+}
+
+// GetUserTicketDetailsRequest is the request to get ticket details
+message GetUserTicketDetailsRequest {
+  int64 id = 1;  // Ticket ID
+}
+
+// TicketDetailReply 工单详情响应
+message TicketDetailReply {
+  int32 code = 1;      // 状态码
+  string message = 2;  // 消息内容
+  TicketInfo data = 3; // 响应数据
+}
+
+// UpdateUserTicketStatusRequest is the request to update ticket status
+message UpdateUserTicketStatusRequest {
+  int64 id = 1;       // Ticket ID
+  int32 status = 2;   // New status (1=Pending, 2=Waiting, 3=Processed, 4=Closed)
+}
+
+// TicketStatusReply 更新工单状态响应
+message TicketStatusReply {
+  int32 code = 1;     // 状态码
+  string message = 2; // 消息内容
+}
+
+// CreateUserTicketFollowRequest is the request to create a follow-up
+message CreateUserTicketFollowRequest {
+  int64 ticket_id = 1;  // Ticket ID
+  string from = 2;      // Who created this follow-up
+  int32 type = 3;       // Type: 1=text, 2=image
+  string content = 4;   // Follow-up content
+}
+
+// TicketFollowReply 创建工单跟进响应
+message TicketFollowReply {
+  int32 code = 1;     // 状态码
+  string message = 2; // 消息内容
+}
+
+// TicketInfo represents a ticket with follow-ups
+message TicketInfo {
+  int64 id = 1;                         // Ticket ID
+  string title = 2;                     // Title
+  string description = 3;               // Description
+  int64 user_id = 4;                    // User ID
+  repeated TicketFollow follow = 5;     // Follow-up records
+  int32 status = 6;                     // Status
+  int64 created_at = 7;                 // Created time (Unix timestamp milliseconds)
+  int64 updated_at = 8;                 // Updated time (Unix timestamp milliseconds)
+}
+
+// TicketFollow represents a follow-up record
+message TicketFollow {
+  int64 id = 1;           // Follow ID
+  int64 ticket_id = 2;    // Ticket ID
+  string from = 3;        // Who created this
+  int32 type = 4;         // Type
+  string content = 5;     // Content
+  int64 created_at = 6;   // Created time (Unix timestamp milliseconds)
+}

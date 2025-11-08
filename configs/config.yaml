@@ -1,0 +1,74 @@
+server:
+  http:
+    addr: 0.0.0.0:8010
+    timeout: 1s
+  grpc:
+    addr: 0.0.0.0:9011
+    timeout: 1s
+data:
+  database:
+    driver: mysql
+    source: root:password@tcp(127.0.0.1:3306)/ppanel-pro?parseTime=True&loc=Local
+  redis:
+    addr: 127.0.0.1:6379
+    password:
+    read_timeout: 0.2s
+    write_timeout: 0.2s
+    db: 0
+    pool_size: 10
+    min_idle_conns: 5
+
+application:
+  site:
+    host: "localhost:8001"
+    site_name: "PPanel Pro"
+    site_desc: "Professional Panel Management System"
+    site_logo: "/assets/logo.png"
+    keywords: "panel,management,pro"
+    custom_html: ""
+    custom_data: ""
+
+  verify:
+    turnstile_site_key: ""
+    enable_login_verify: false
+    enable_register_verify: false
+    enable_reset_password_verify: false
+
+  mobile_auth:
+    enable: false
+    enable_whitelist: false
+    whitelist: []
+
+  email_auth:
+    enable: false
+    enable_verify: false
+    enable_domain_suffix: false
+    domain_suffix_list: ""
+
+  register:
+    stop_register: false
+    enable_ip_register_limit: false
+    ip_register_limit: 5
+    ip_register_limit_duration: 3600
+    enable_trial: false
+    trial_subscribe: 7
+    trial_time_unit: "day"
+    trial_time: 7
+
+  invite:
+    forced_invite: false
+    referral_percentage: 10
+    only_first_purchase: true
+
+  subscribe:
+    single_model: false
+    subscribe_path: "/subscribe"
+    subscribe_domain: ""
+    pan_domain: false
+    user_agent_limit: false
+    user_agent_list: ""
+
+  admin:
+    email: "admin@qq.com"
+    password: "123456"
+    algo: "default"

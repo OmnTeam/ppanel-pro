@@ -1,0 +1,267 @@
+package user
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
+	"github.com/OmnTeam/ppanel-pro/internal/service"
+	"github.com/go-kratos/kratos/v2/log"
+)
+
+// UserCacheLogic 用户缓存业务逻辑
+type UserCacheLogic struct {
+	db           *ent.Client
+	cacheService *service.CacheService
+	logger       *log.Helper
+}
+
+// NewUserCacheLogic 创建用户缓存逻辑
+func NewUserCacheLogic(db *ent.Client, cacheService *service.CacheService, logger log.Logger) *UserCacheLogic {
+	return &UserCacheLogic{
+		db:           db,
+		cacheService: cacheService,
+		logger:       log.NewHelper(logger),
+	}
+}
+
+// GetUserWithCache 带缓存的用户查询
+func (l *UserCacheLogic) GetUserWithCache(ctx context.Context, tenantID, userID int64) (*ent.ProxyUser, error) {
+	// 1. 先从缓存查询
+	cacheUser, err := l.cacheService.GetUserFromCache(ctx, userID)
+	if err == nil {
+		l.logger.Debugf("User cache hit: tenantID=%d, userID=%d", tenantID, userID)
+		return l.convertToProxyUser(cacheUser), nil
+	}
+
+	// 2. 缓存未命中，从数据库查询
+	l.logger.Debugf("User cache miss: tenantID=%d, userID=%d", tenantID, userID)
+	user, err := l.db.ProxyUser.Query().
+		Where(proxyuser.ID(userID)).
+		WithProxyUserAuthMethods().
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			l.logger.Warnf("User not found: tenantID=%d, userID=%d", tenantID, userID)
+		}
+		return nil, err
+	}
+
+	// 3. 设置缓存
+	if setErr := l.cacheService.SetUserCache(ctx, userID, user); setErr != nil {
+		l.logger.Warnf("Failed to set user cache: tenantID=%d, userID=%d, error=%v", tenantID, userID, setErr)
+	}
+
+	return user, nil
+}
+
+// UpdateUserBalanceCache 更新用户余额缓存
+func (l *UserCacheLogic) UpdateUserBalanceCache(ctx context.Context, tenantID, userID int64, balance, giftAmount int64) error {
+	// 1. 更新数据库
+	err := l.db.ProxyUser.UpdateOneID(userID).
+		SetBalance(balance).
+		SetGiftAmount(&giftAmount).
+		Exec(ctx)
+	if err != nil {
+		l.logger.Errorf("Failed to update user balance in database: tenantID=%d, userID=%d, error=%v", tenantID, userID, err)
+		return err
+	}
+
+	// 2. 更新缓存
+	err = l.cacheService.UpdateUserBalanceCache(ctx, userID, balance, giftAmount)
+	if err != nil {
+		l.logger.Errorf("Failed to update user balance cache: tenantID=%d, userID=%d, error=%v", tenantID, userID, err)
+		// 不影响业务流程，因为数据库已经更新成功
+	}
+
+	l.logger.Infof("User balance updated: tenantID=%d, userID=%d, balance=%d, giftAmount=%d",
+		tenantID, userID, balance, giftAmount)
+	return nil
+}
+
+// ClearUserCache 清理用户缓存
+func (l *UserCacheLogic) ClearUserCache(ctx context.Context, tenantID, userID int64) error {
+	err := l.cacheService.ClearUserCache(ctx, userID)
+	if err != nil {
+		l.logger.Errorf("Failed to clear user cache: tenantID=%d, userID=%d, error=%v", tenantID, userID, err)
+		return err
+	}
+
+	l.logger.Debugf("User cache cleared: tenantID=%d, userID=%d", tenantID, userID)
+	return nil
+}
+
+// BatchClearRelatedCache 批量清理相关缓存
+func (l *UserCacheLogic) BatchClearRelatedCache(ctx context.Context, tenantID int64, userID int64) error {
+	err := l.cacheService.BatchClearRelatedCache(ctx, userID)
+	if err != nil {
+		l.logger.Errorf("Failed to batch clear related cache: tenantID=%d, userID=%d, error=%v", tenantID, userID, err)
+		return err
+	}
+
+	l.logger.Infof("Related cache cleared for user: tenantID=%d, userID=%d", tenantID, userID)
+	return nil
+}
+
+// GetUserByEmailWithCache 带缓存的邮箱查询用户
+func (l *UserCacheLogic) GetUserByEmailWithCache(ctx context.Context, tenantID int64, email string) (*ent.ProxyUser, error) {
+	// 1. 先从缓存查询邮箱到用户的映射
+	cacheKey := fmt.Sprintf("email_to_user:%s", email)
+	var userID int64
+
+	err := l.cacheService.GetCache(ctx, userID, cacheKey, &userID)
+	if err == nil {
+		// 缓存命中，根据userID查询用户
+		return l.GetUserWithCache(ctx, tenantID, userID)
+	}
+
+	// 2. 缓存未命中，从数据库查询
+	l.logger.Debugf("Email to user cache miss: tenantID=%d, email=%s", tenantID, email)
+
+	authMethod, err := l.db.ProxyUserAuthMethod.Query().
+		Where(
+			proxyuserauthmethod.AuthTypeEQ("email"),
+			proxyuserauthmethod.AuthIdentifierEQ(email),
+		).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			l.logger.Warnf("User not found by email: tenantID=%d, email=%s", tenantID, email)
+		}
+		return nil, err
+	}
+
+	// 3. 根据userID查询用户信息
+	user, err := l.GetUserWithCache(ctx, tenantID, authMethod.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 4. 设置邮箱到用户ID的映射缓存
+	if setErr := l.cacheService.SetCache(ctx, userID, cacheKey, authMethod.UserID,
+		10*time.Minute); setErr != nil {
+		l.logger.Warnf("Failed to set email to user cache: tenantID=%d, email=%s, error=%v", tenantID, email, setErr)
+	}
+
+	return user, nil
+}
+
+// UpdateUserCache 更新用户缓存
+func (l *UserCacheLogic) UpdateUserCache(ctx context.Context, tenantID int64, user *ent.ProxyUser) error {
+	err := l.cacheService.SetUserCache(ctx, user.ID, user)
+	if err != nil {
+		l.logger.Errorf("Failed to update user cache: tenantID=%d, userID=%d, error=%v", tenantID, user.ID, err)
+		return err
+	}
+
+	l.logger.Debugf("User cache updated: tenantID=%d, userID=%d", tenantID, user.ID)
+	return nil
+}
+
+// convertToProxyUser 将缓存模型转换为数据库模型
+func (l *UserCacheLogic) convertToProxyUser(cacheUser *service.UserCacheModel) *ent.ProxyUser {
+	user := &ent.ProxyUser{
+		ID:      cacheUser.ID,
+		Balance: cacheUser.Balance,
+	}
+
+	if cacheUser.GiftAmount != nil {
+		user.GiftAmount = cacheUser.GiftAmount
+	}
+
+	return user
+}
+
+// GetCachedUserBalance 获取缓存的用户余额
+func (l *UserCacheLogic) GetCachedUserBalance(ctx context.Context, tenantID, userID int64) (balance, giftAmount int64, found bool) {
+	cacheUser, err := l.cacheService.GetUserFromCache(ctx, userID)
+	if err != nil {
+		l.logger.Debugf("Failed to get user balance from cache: tenantID=%d, userID=%d, error=%v", tenantID, userID, err)
+		return 0, 0, false
+	}
+
+	balance = int64(0)
+	if cacheUser.Balance != nil {
+		balance = *cacheUser.Balance
+	}
+
+	if cacheUser.GiftAmount != nil {
+		return balance, *cacheUser.GiftAmount, true
+	}
+
+	return balance, 0, true
+}
+
+// CacheInvalidationHandler 缓存失效处理器
+func (l *UserCacheLogic) CacheInvalidationHandler(ctx context.Context, tenantID int64, operation string, modelType string, modelID int64) error {
+	switch operation {
+	case "create", "update", "delete":
+		switch modelType {
+		case "user":
+			if operation == "update" {
+				return l.UpdateUserCache(ctx, tenantID, &ent.ProxyUser{ID: modelID})
+			}
+			return l.ClearUserCache(ctx, tenantID, modelID)
+		case "order":
+			// 订单操作可能影响用户余额缓存
+			if operation == "update" || operation == "delete" {
+				// 这里需要根据具体的订单操作来决定是否清理用户缓存
+				// 可以通过查询订单信息来判断
+				order, err := l.db.ProxyOrder.Get(ctx, modelID)
+				if err == nil && order.UserID != 0 {
+					l.logger.Infof("Clearing user cache due to order operation: tenantID=%d, userID=%d, orderID=%d",
+						tenantID, order.UserID, modelID)
+					return l.ClearUserCache(ctx, tenantID, order.UserID)
+				}
+			}
+		}
+	}
+	return nil
+}
+
+// GetRelatedCacheKeys 获取相关缓存键
+func (l *UserCacheLogic) GetRelatedCacheKeys(ctx context.Context, tenantID int64, modelType string, modelID int64) ([]string, error) {
+	var keys []string
+
+	switch modelType {
+	case "user":
+		// 获取用户相关的所有缓存键
+		cacheUser, err := l.cacheService.GetUserFromCache(ctx, modelID)
+		if err == nil {
+			keys = append(keys, cacheUser.GetCacheKeys()...)
+		} else {
+			// 如果缓存中没有，使用基本键格式
+			keys = append(keys, fmt.Sprintf(service.UserIDKeyPrefix, modelID))
+		}
+
+		// 获取认证方法相关的缓存键
+		authMethods, err := l.db.ProxyUserAuthMethod.Query().
+			Where(proxyuserauthmethod.UserID(modelID)).
+			All(ctx)
+		if err == nil {
+			for _, auth := range authMethods {
+				if auth.AuthType == "email" {
+					keys = append(keys, fmt.Sprintf(service.UserEmailKeyPrefix, auth.AuthIdentifier))
+				}
+			}
+		}
+
+	case "order":
+		// 获取订单相关的缓存键
+		order, err := l.db.ProxyOrder.Get(ctx, modelID)
+		if err == nil {
+			orderModel := &service.OrderCacheModel{
+				ID:      order.ID,
+				OrderNo: order.OrderNo,
+				UserID:  order.UserID,
+				Status:  order.Status,
+			}
+			keys = append(keys, orderModel.GetCacheKeys()...)
+		}
+	}
+
+	return keys, nil
+}

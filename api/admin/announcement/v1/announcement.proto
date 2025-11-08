@@ -1,0 +1,149 @@
+syntax = "proto3";
+
+package api.admin.announcement.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/announcement/v1;v1";
+
+// 公告服务
+service AnnouncementService {
+  // 创建公告
+  rpc CreateAnnouncement(CreateAnnouncementRequest) returns (AnnouncementReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/announcement"
+      body: "*"
+    };
+  }
+
+  // 更新公告
+  rpc UpdateAnnouncement(UpdateAnnouncementRequest) returns (AnnouncementReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/announcement"
+      body: "*"
+    };
+  }
+
+  // 获取公告详情
+  rpc GetAnnouncement(GetAnnouncementRequest) returns (AnnouncementReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/announcement/detail"
+    };
+  }
+
+  // 获取公告列表
+  rpc ListAnnouncements(ListAnnouncementsRequest) returns (ListAnnouncementsReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/announcement/list"
+    };
+  }
+
+  // 删除公告
+  rpc DeleteAnnouncement(DeleteAnnouncementRequest) returns (DeleteAnnouncementReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/announcement"
+    };
+  }
+}
+
+// 公告信息
+message Announcement {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  string title = 3;
+  string content = 4;
+  optional bool show = 5;
+  optional bool pinned = 6;
+  optional bool popup = 7;
+  int64 created_at = 8;  // Unix timestamp in milliseconds
+  int64 updated_at = 9;  // Unix timestamp in milliseconds
+}
+
+// 创建公告请求
+message CreateAnnouncementRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  string title = 2 [(validate.rules).string = {min_len: 1, max_len: 255}];
+  string content = 3;
+  bool show = 4;
+  bool pinned = 5;
+  bool popup = 6;
+}
+
+// 更新公告请求
+message UpdateAnnouncementRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  int64 id = 2 [(validate.rules).int64.gt = 0];
+  string title = 3 [(validate.rules).string = {min_len: 1, max_len: 255}];
+  string content = 4;
+  bool show = 5;
+  bool pinned = 6;
+  bool popup = 7;
+}
+
+// 获取公告详情请求
+message GetAnnouncementRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  int64 id = 2 [(validate.rules).int64.gt = 0];
+}
+
+// 公告数据
+message AnnouncementData {
+  Announcement announcement = 1;
+}
+
+// 公告响应
+message AnnouncementReply {
+  int32 code = 1;                // 状态码
+  string message = 2;            // 消息内容
+  AnnouncementData data = 3;     // 响应数据
+}
+
+// 获取公告列表请求
+message ListAnnouncementsRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  int64 page = 2 [(validate.rules).int64.gte = 1];
+  int64 size = 3 [(validate.rules).int64 = {gte: 1, lte: 100}];
+  string search = 4;
+  optional bool show = 5;
+  optional bool pinned = 6;
+  optional bool popup = 7;
+}
+
+// 获取公告列表数据
+message ListAnnouncementsData {
+  repeated Announcement list = 1;
+  int64 total = 2;
+}
+
+// 获取公告列表响应
+message ListAnnouncementsReply {
+  int32 code = 1;                   // 状态码
+  string message = 2;               // 消息内容
+  ListAnnouncementsData data = 3;   // 响应数据
+}
+
+// 删除公告请求
+message DeleteAnnouncementRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  int64 id = 2 [(validate.rules).int64.gt = 0];
+}
+
+// 删除公告数据
+message DeleteAnnouncementData {
+  bool success = 1;
+}
+
+// 删除公告响应
+message DeleteAnnouncementReply {
+  int32 code = 1;                   // 状态码
+  string message = 2;               // 消息内容
+  DeleteAnnouncementData data = 3;  // 响应数据
+}
+
+// 获取公开公告请求
+message GetPublicAnnouncementsRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  // 可选的限制数量参数
+  optional int32 limit = 2;
+}

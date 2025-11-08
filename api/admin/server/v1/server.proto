@@ -1,0 +1,467 @@
+syntax = "proto3";
+
+package api.admin.server.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/server/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.admin.server.v1";
+
+service ServerService {
+  // Server Management
+  rpc CreateServer (CreateServerRequest) returns (CreateServerReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/server/create"
+      body: "*"
+    };
+  }
+
+  rpc UpdateServer (UpdateServerRequest) returns (UpdateServerReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/server/update"
+      body: "*"
+    };
+  }
+
+  rpc DeleteServer (DeleteServerRequest) returns (DeleteServerReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/server/delete"
+      body: "*"
+    };
+  }
+
+  rpc FilterServerList (FilterServerListRequest) returns (FilterServerListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/server/list"
+    };
+  }
+
+  rpc GetServerProtocols (GetServerProtocolsRequest) returns (GetServerProtocolsReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/server/protocols"
+    };
+  }
+
+  // Node Management
+  rpc CreateNode (CreateNodeRequest) returns (CreateNodeReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/server/node/create"
+      body: "*"
+    };
+  }
+
+  rpc UpdateNode (UpdateNodeRequest) returns (UpdateNodeReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/server/node/update"
+      body: "*"
+    };
+  }
+
+  rpc DeleteNode (DeleteNodeRequest) returns (DeleteNodeReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/server/node/delete"
+      body: "*"
+    };
+  }
+
+  rpc FilterNodeList (FilterNodeListRequest) returns (FilterNodeListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/server/node/list"
+    };
+  }
+
+  rpc ToggleNodeStatus (ToggleNodeStatusRequest) returns (ToggleNodeStatusReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/server/node/status/toggle"
+      body: "*"
+    };
+  }
+
+  rpc QueryNodeTag (QueryNodeTagRequest) returns (QueryNodeTagReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/server/node/tags"
+    };
+  }
+
+  // Migration
+  rpc HasMigrateServerNode (HasMigrateServerNodeRequest) returns (HasMigrateServerNodeReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/server/migrate/has"
+    };
+  }
+
+  rpc MigrateServerNode (MigrateServerNodeRequest) returns (MigrateServerNodeReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/server/migrate/run"
+      body: "*"
+    };
+  }
+
+  // Sort
+  rpc ResetSortWithServer (ResetSortRequest) returns (ResetSortReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/server/server/sort"
+      body: "*"
+    };
+  }
+
+  rpc ResetSortWithNode (ResetSortRequest) returns (ResetSortReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/server/node/sort"
+      body: "*"
+    };
+  }
+}
+
+// Protocol represents a server protocol configuration with all fields
+message Protocol {
+  string type = 1;
+  int32 port = 2;
+  bool enable = 3;
+  string security = 4;
+  string sni = 5;
+  bool allow_insecure = 6;
+  string fingerprint = 7;
+  string reality_server_addr = 8;
+  int32 reality_server_port = 9;
+  string reality_private_key = 10;
+  string reality_public_key = 11;
+  string reality_short_id = 12;
+  string transport = 13;
+  string host = 14;
+  string path = 15;
+  string service_name = 16;
+  string cipher = 17;
+  string server_key = 18;
+  string flow = 19;
+  string hop_ports = 20;
+  int32 hop_interval = 21;
+  string obfs_password = 22;
+  bool disable_sni = 23;
+  bool reduce_rtt = 24;
+  string udp_relay_mode = 25;
+  string congestion_controller = 26;
+  string multiplex = 27;
+  string padding_scheme = 28;
+  int32 up_mbps = 29;
+  int32 down_mbps = 30;
+  string obfs = 31;
+  string obfs_host = 32;
+  string obfs_path = 33;
+  string xhttp_mode = 34;
+  string xhttp_extra = 35;
+  string encryption = 36;
+  string encryption_mode = 37;
+  string encryption_rtt = 38;
+  string encryption_ticket = 39;
+  string encryption_server_padding = 40;
+  string encryption_private_key = 41;
+  string encryption_client_padding = 42;
+  string encryption_password = 43;
+  double ratio = 44;
+  string cert_mode = 45;
+  string cert_dns_provider = 46;
+  string cert_dns_env = 47;
+}
+
+message SortItem {
+  int64 id = 1;
+  int64 sort = 2;  // 使用 int64 以兼容 Server(bigint) 和 Node(uint32)
+}
+
+message ServerOnlineIP {
+  string ip = 1;
+  string protocol = 2;
+}
+
+message ServerOnlineUser {
+  repeated ServerOnlineIP ip = 1;
+  int64 user_id = 2;
+  string subscribe = 3;
+  int64 subscribe_id = 4;
+  int64 traffic = 5;
+  int64 expired_at = 6;
+}
+
+message ServerStatus {
+  double cpu = 1;
+  double mem = 2;
+  double disk = 3;
+  string protocol = 4;
+  repeated ServerOnlineUser online = 5;
+  string status = 6;
+}
+
+message Server {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  string name = 3;
+  string country = 4;
+  string city = 5;
+  string address = 6;
+  int64 sort = 7;  // 匹配数据库 bigint 类型
+  repeated Protocol protocols = 8;
+  int64 last_reported_at = 9;
+  ServerStatus status = 10;
+  int64 created_at = 11;
+  int64 updated_at = 12;
+}
+
+message Node {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  string name = 3;
+  repeated string tags = 4;
+  uint32 port = 5;  // Proto3 不支持 uint16，使用 uint32（值范围 0-65535，对应数据库 smallint unsigned）
+  string address = 6;
+  int64 server_id = 7;
+  string protocol = 8;
+  optional bool enabled = 9;  // 使用 optional 支持 null 和布尔值，与老项目兼容
+  uint32 sort = 10;  // 匹配数据库 INT UNSIGNED 类型
+  int64 created_at = 11;
+  int64 updated_at = 12;
+}
+
+// Server Requests/Replies
+message CreateServerRequest {
+  int64 tenant_id = 1;
+  string name = 2;
+  string country = 3;
+  string city = 4;
+  string address = 5;
+  int32 sort = 6;
+  repeated Protocol protocols = 7;
+}
+
+message CreateServerData {
+  Server server = 1;
+}
+
+message CreateServerReply {
+  int32 code = 1;          // 状态码
+  string message = 2;      // 消息内容
+  CreateServerData data = 3; // 响应数据
+}
+
+message UpdateServerRequest {
+  int64 tenant_id = 1;
+  int64 id = 2;
+  string name = 3;
+  string country = 4;
+  string city = 5;
+  string address = 6;
+  int32 sort = 7;
+  repeated Protocol protocols = 8;
+}
+
+message UpdateServerData {
+  Server server = 1;
+}
+
+message UpdateServerReply {
+  int32 code = 1;          // 状态码
+  string message = 2;      // 消息内容
+  UpdateServerData data = 3; // 响应数据
+}
+
+message DeleteServerRequest {
+  int64 tenant_id = 1;
+  int64 id = 2;
+}
+
+message DeleteServerData {
+  bool success = 1;
+}
+
+message DeleteServerReply {
+  int32 code = 1;          // 状态码
+  string message = 2;      // 消息内容
+  DeleteServerData data = 3; // 响应数据
+}
+
+message FilterServerListRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string search = 4;
+}
+
+message FilterServerListData {
+  int64 total = 1;
+  repeated Server list = 2;
+}
+
+message FilterServerListReply {
+  int32 code = 1;              // 状态码
+  string message = 2;          // 消息内容
+  FilterServerListData data = 3; // 响应数据
+}
+
+message GetServerProtocolsRequest {
+  int64 tenant_id = 1;
+  int64 id = 2;
+}
+
+message GetServerProtocolsData {
+  repeated Protocol protocols = 1;
+}
+
+message GetServerProtocolsReply {
+  int32 code = 1;                // 状态码
+  string message = 2;            // 消息内容
+  GetServerProtocolsData data = 3; // 响应数据
+}
+
+// Node Requests/Replies
+message CreateNodeRequest {
+  int64 tenant_id = 1;
+  string name = 2;
+  repeated string tags = 3;
+  uint32 port = 4;  // Proto3 不支持 uint16，使用 uint32（值范围 0-65535）
+  string address = 5;
+  int64 server_id = 6;
+  string protocol = 7;
+  optional bool enabled = 8;  // 使用 optional 支持 null 和布尔值，与老项目兼容
+}
+
+message CreateNodeData {
+  Node node = 1;
+}
+
+message CreateNodeReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  CreateNodeData data = 3; // 响应数据
+}
+
+message UpdateNodeRequest {
+  int64 tenant_id = 1;
+  int64 id = 2;
+  string name = 3;
+  repeated string tags = 4;
+  uint32 port = 5;  // Proto3 不支持 uint16，使用 uint32（值范围 0-65535）
+  string address = 6;
+  int64 server_id = 7;
+  string protocol = 8;
+  optional bool enabled = 9;  // 使用 optional 支持 null 和布尔值，与老项目兼容
+}
+
+message UpdateNodeData {
+  Node node = 1;
+}
+
+message UpdateNodeReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  UpdateNodeData data = 3; // 响应数据
+}
+
+message DeleteNodeRequest {
+  int64 tenant_id = 1;
+  int64 id = 2;
+}
+
+message DeleteNodeData {
+  bool success = 1;
+}
+
+message DeleteNodeReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  DeleteNodeData data = 3; // 响应数据
+}
+
+message FilterNodeListRequest {
+  int64 tenant_id = 1;
+  int32 page = 2;
+  int32 size = 3;
+  string search = 4;
+}
+
+message FilterNodeListData {
+  int64 total = 1;
+  repeated Node list = 2;
+}
+
+message FilterNodeListReply {
+  int32 code = 1;            // 状态码
+  string message = 2;        // 消息内容
+  FilterNodeListData data = 3; // 响应数据
+}
+
+message ToggleNodeStatusRequest {
+  int64 tenant_id = 1;
+  int64 id = 2;
+  optional bool enable = 3;  // 使用 optional 支持 null 和布尔值，与老项目兼容
+}
+
+message ToggleNodeStatusData {
+  Node node = 1;
+}
+
+message ToggleNodeStatusReply {
+  int32 code = 1;              // 状态码
+  string message = 2;          // 消息内容
+  ToggleNodeStatusData data = 3; // 响应数据
+}
+
+message QueryNodeTagRequest {
+  int64 tenant_id = 1;
+}
+
+message QueryNodeTagData {
+  repeated string tags = 1;
+}
+
+message QueryNodeTagReply {
+  int32 code = 1;          // 状态码
+  string message = 2;      // 消息内容
+  QueryNodeTagData data = 3; // 响应数据
+}
+
+// Migration Requests/Replies
+message HasMigrateServerNodeRequest {
+  int64 tenant_id = 1;
+}
+
+message HasMigrateServerNodeData {
+  bool has_migrate = 1;
+}
+
+message HasMigrateServerNodeReply {
+  int32 code = 1;                  // 状态码
+  string message = 2;              // 消息内容
+  HasMigrateServerNodeData data = 3; // 响应数据
+}
+
+message MigrateServerNodeRequest {
+  int64 tenant_id = 1;
+}
+
+message MigrateServerNodeData {
+  uint64 success = 1;
+  uint64 fail = 2;
+}
+
+message MigrateServerNodeReply {
+  int32 code = 1;                 // 状态码
+  string message = 2;             // 消息内容
+  MigrateServerNodeData data = 3; // 响应数据
+}
+
+// Sort Requests/Replies
+message ResetSortRequest {
+  int64 tenant_id = 1;
+  repeated SortItem sort = 2;
+}
+
+message ResetSortData {
+  bool success = 1;
+}
+
+message ResetSortReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  ResetSortData data = 3; // 响应数据
+}

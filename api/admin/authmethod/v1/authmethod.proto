@@ -1,0 +1,169 @@
+syntax = "proto3";
+
+package api.admin.authmethod.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/authmethod/v1;v1";
+
+// 认证方法服务
+service AuthMethodService {
+  // 获取认证方法配置
+  rpc GetAuthMethodConfig(GetAuthMethodConfigRequest) returns (AuthMethodConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/auth-method/config"
+    };
+  }
+
+  // 更新认证方法配置
+  rpc UpdateAuthMethodConfig(UpdateAuthMethodConfigRequest) returns (AuthMethodConfigReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/auth-method/config"
+      body: "*"
+    };
+  }
+
+  // 获取邮件支持平台列表
+  rpc GetEmailPlatform(GetEmailPlatformRequest) returns (PlatformListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/auth-method/email_platform"
+    };
+  }
+
+  // 获取短信支持平台列表
+  rpc GetSmsPlatform(GetSmsPlatformRequest) returns (PlatformListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/auth-method/sms_platform"
+    };
+  }
+
+  // 获取认证方法列表
+  rpc GetAuthMethodList(GetAuthMethodListRequest) returns (AuthMethodListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/auth-method/list"
+    };
+  }
+
+  // 测试邮件发送
+  rpc TestEmailSend(TestEmailSendRequest) returns (TestSendReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/auth-method/test_email_send"
+      body: "*"
+    };
+  }
+
+  // 测试短信发送
+  rpc TestSmsSend(TestSmsSendRequest) returns (TestSendReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/auth-method/test_sms_send"
+      body: "*"
+    };
+  }
+}
+
+// 平台信息
+message Platform {
+  string name = 1;
+  string label = 2;
+}
+
+// 认证方法配置
+message AuthMethodConfig {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  string method = 3;
+  google.protobuf.Struct config = 4;
+  bool enabled = 5;
+}
+
+// 获取认证方法配置请求
+message GetAuthMethodConfigRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  string method = 2 [(validate.rules).string.min_len = 1];
+}
+
+// 更新认证方法配置请求
+message UpdateAuthMethodConfigRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  string method = 2 [(validate.rules).string.min_len = 1];
+  google.protobuf.Struct config = 3;
+  bool enabled = 4;
+}
+
+// 获取邮件平台请求
+message GetEmailPlatformRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+}
+
+// 获取短信平台请求
+message GetSmsPlatformRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+}
+
+// 获取认证方法列表请求
+message GetAuthMethodListRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+}
+
+// 测试邮件发送请求
+message TestEmailSendRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  string email = 2 [(validate.rules).string.email = true];
+}
+
+// 测试短信发送请求
+message TestSmsSendRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  string mobile = 2 [(validate.rules).string.min_len = 1];
+}
+
+// 认证方法配置数据
+message AuthMethodConfigData {
+  AuthMethodConfig config = 1;
+}
+
+// 认证方法配置响应
+message AuthMethodConfigReply {
+  int32 code = 1;                    // 状态码
+  string message = 2;                // 消息内容
+  AuthMethodConfigData data = 3;     // 响应数据
+}
+
+// 平台列表数据
+message PlatformListData {
+  repeated Platform platforms = 1;
+}
+
+// 平台列表响应
+message PlatformListReply {
+  int32 code = 1;                // 状态码
+  string message = 2;            // 消息内容
+  PlatformListData data = 3;     // 响应数据
+}
+
+// 认证方法列表数据
+message AuthMethodListData {
+  repeated AuthMethodConfig list = 1;
+}
+
+// 认证方法列表响应
+message AuthMethodListReply {
+  int32 code = 1;                 // 状态码
+  string message = 2;             // 消息内容
+  AuthMethodListData data = 3;    // 响应数据
+}
+
+// 测试发送数据
+message TestSendData {
+  bool success = 1;
+  string result_message = 2;  // 测试结果消息
+}
+
+// 测试发送响应
+message TestSendReply {
+  int32 code = 1;             // 状态码
+  string message = 2;         // 消息内容
+  TestSendData data = 3;      // 响应数据
+}

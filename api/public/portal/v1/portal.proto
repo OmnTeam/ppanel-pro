@@ -1,0 +1,244 @@
+syntax = "proto3";
+
+package api.public.portal.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/public/portal/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.public.portal.v1";
+
+// Portal service for unregistered users
+// 为未注册用户提供的公共门户服务
+service Portal {
+  // GetSubscription 获取订阅（未登录）
+  rpc GetSubscription (GetSubscriptionRequest) returns (GetSubscriptionReply) {
+    option (google.api.http) = {
+      get: "/v1/public/portal/subscribe"
+    };
+  }
+
+  // PrePurchaseOrder 预购买订单（未登录）- 计算价格
+  rpc PrePurchaseOrder (PrePurchaseOrderRequest) returns (PrePurchaseOrderReply) {
+    option (google.api.http) = {
+      post: "/v1/public/portal/pre"
+      body: "*"
+    };
+  }
+
+  // Purchase 购买/创建订单（未登录）
+  rpc Purchase (PurchaseRequest) returns (PurchaseReply) {
+    option (google.api.http) = {
+      post: "/v1/public/portal/purchase"
+      body: "*"
+    };
+  }
+
+  // GetAvailablePaymentMethods 获取可用支付方式（未登录）
+  rpc GetAvailablePaymentMethods (google.protobuf.Empty) returns (GetAvailablePaymentMethodsReply) {
+    option (google.api.http) = {
+      get: "/v1/public/portal/payment-method"
+    };
+  }
+
+  // PurchaseCheckout 购买结账（未登录）- 获取支付信息
+  rpc PurchaseCheckout (PurchaseCheckoutRequest) returns (PurchaseCheckoutReply) {
+    option (google.api.http) = {
+      post: "/v1/public/portal/order/checkout"
+      body: "*"
+    };
+  }
+
+  // QueryPurchaseOrder 查询购买订单状态（未登录）
+  rpc QueryPurchaseOrder (QueryPurchaseOrderRequest) returns (QueryPurchaseOrderReply) {
+    option (google.api.http) = {
+      get: "/v1/public/portal/order/status"
+    };
+  }
+}
+
+// GetSubscriptionRequest 获取订阅请求
+message GetSubscriptionRequest {
+  optional string language = 1;  // 语言（可选，如zh-CN, en-US）
+}
+
+// GetSubscriptionData 获取订阅数据
+message GetSubscriptionData {
+  repeated SubscribeInfo list = 1;
+}
+
+// GetSubscriptionReply 获取订阅响应
+message GetSubscriptionReply {
+  int32 code = 1;                  // 状态码
+  string message = 2;              // 消息内容
+  GetSubscriptionData data = 3;    // 响应数据
+}
+
+// SubscribeInfo 订阅信息
+// ⚠️ 完全复刻原项目（server-master/internal/types/types.go:Subscribe）
+message SubscribeInfo {
+  int64 id = 1;
+  string name = 2;
+  string language = 3;
+  optional string description = 4;
+  int64 unit_price = 5;
+  string unit_time = 6;
+  repeated SubscribeDiscount discount = 7;
+  int64 replacement = 8;
+  int64 inventory = 9;
+  int64 traffic = 10;
+  int64 speed_limit = 11;
+  int64 device_limit = 12;
+  int64 quota = 13;
+  repeated int64 nodes = 14;
+  repeated string node_tags = 15;
+  bool show = 16;
+  bool sell = 17;
+  int64 sort = 18;
+  int64 deduction_ratio = 19;
+  bool allow_deduction = 20;
+  int64 reset_cycle = 21;
+  bool renewal_reset = 22;
+  int64 created_at = 23;
+  int64 updated_at = 24;
+}
+
+// SubscribeDiscount 订阅折扣配置
+message SubscribeDiscount {
+  int64 quantity = 1;  // 购买数量
+  int64 discount = 2;  // 折扣值（百分比 0-100）
+}
+
+// PrePurchaseOrderRequest 预购买订单请求
+message PrePurchaseOrderRequest {
+  int64 subscribe_id = 1;      // 订阅ID
+  int64 quantity = 2;          // 数量
+  optional string coupon = 3;  // 优惠券（可选）
+  optional int64 payment_id = 4;  // 支付方式ID（可选，用于计算手续费）
+}
+
+// PrePurchaseOrderData 预购买订单数据（价格预览）
+// ⚠️ 完全复刻原项目（server-master/internal/types/types.go:PrePurchaseOrderResponse）
+message PrePurchaseOrderData {
+  int64 price = 1;             // 原价
+  int64 amount = 2;            // 实际支付金额（含手续费）
+  int64 discount = 3;          // 折扣金额
+  string coupon = 4;           // 优惠券代码
+  int64 coupon_discount = 5;   // 优惠券折扣金额
+  int64 fee_amount = 6;        // 手续费金额
+}
+
+// PrePurchaseOrderReply 预购买订单响应
+message PrePurchaseOrderReply {
+  int32 code = 1;                    // 状态码
+  string message = 2;                // 消息内容
+  PrePurchaseOrderData data = 3;     // 响应数据
+}
+
+// PurchaseRequest 购买请求
+message PurchaseRequest {
+  int64 subscribe_id = 1;           // 订阅ID
+  int64 quantity = 2;                // 数量
+  optional string coupon = 3;        // 优惠券（可选）
+  string identifier = 4;             // 认证标识符（邮箱/Telegram ID等）
+  string auth_type = 5;              // 认证类型（email/telegram等）
+  string password = 6;               // 用户密码（明文，后端加密）
+  optional string invite_code = 7;   // 邀请码（可选）
+  int64 payment_id = 8;              // 支付方式ID（用于计算手续费）
+}
+
+// PurchaseData 购买数据
+message PurchaseData {
+  string order_no = 1;  // 订单号
+}
+
+// PurchaseReply 购买响应
+message PurchaseReply {
+  int32 code = 1;           // 状态码
+  string message = 2;       // 消息内容
+  PurchaseData data = 3;    // 响应数据
+}
+
+// GetAvailablePaymentMethodsData 获取可用支付方式数据
+message GetAvailablePaymentMethodsData {
+  repeated PaymentMethod methods = 1;
+}
+
+// GetAvailablePaymentMethodsReply 获取可用支付方式响应
+message GetAvailablePaymentMethodsReply {
+  int32 code = 1;                             // 状态码
+  string message = 2;                         // 消息内容
+  GetAvailablePaymentMethodsData data = 3;    // 响应数据
+}
+
+// PaymentMethod 支付方式
+message PaymentMethod {
+  int64 id = 1;
+  string name = 2;
+  string platform = 3;      // 支付平台
+  string description = 4;   // 支付描述
+  string icon = 5;
+  int32 fee_mode = 6;       // 费用模式：0=无费用 1=百分比 2=固定金额 3=百分比+固定金额
+  int64 fee_percent = 7;    // 费用百分比
+  int64 fee_amount = 8;     // 固定费用金额
+}
+
+// PurchaseCheckoutRequest 购买结账请求
+message PurchaseCheckoutRequest {
+  string order_no = 1 [json_name = "orderNo"];              // 订单号
+  optional string return_url = 2 [json_name = "returnUrl"]; // 支付回调地址（可选）
+}
+
+// PurchaseCheckoutData 购买结账数据
+// ⚠️ 完全复刻原项目（server-master/internal/types/types.go:CheckoutOrderResponse）
+message PurchaseCheckoutData {
+  string type = 1;                     // 支付类型：url/stripe/qr/balance
+  optional string checkout_url = 2;    // 支付URL（type=url/qr时使用）
+  optional StripePayment stripe = 3;   // Stripe支付信息（type=stripe时使用）
+}
+
+// PurchaseCheckoutReply 购买结账响应
+message PurchaseCheckoutReply {
+  int32 code = 1;                   // 状态码
+  string message = 2;               // 消息内容
+  PurchaseCheckoutData data = 3;    // 响应数据
+}
+
+// StripePayment Stripe支付信息
+message StripePayment {
+  string publishable_key = 1;          // Stripe公钥
+  string client_secret = 2;            // 客户端密钥
+  string method = 3;                   // 支付方式
+}
+
+// QueryPurchaseOrderRequest 查询购买订单请求
+message QueryPurchaseOrderRequest {
+  string order_no = 1;    // 订单号
+  string auth_type = 2;   // 认证类型（email/telegram等）
+  string identifier = 3;  // 认证标识符（邮箱/Telegram ID等）
+}
+
+// QueryPurchaseOrderData 查询购买订单数据
+message QueryPurchaseOrderData {
+  string order_no = 1;
+  SubscribeInfo subscribe = 2;      // 订阅信息
+  int64 quantity = 3;                // 数量
+  int64 price = 4;                   // 原价
+  int64 amount = 5;                  // 订单金额
+  int64 discount = 6;                // 折扣金额
+  string coupon = 7;                 // 优惠券代码
+  int64 coupon_discount = 8;         // 优惠券折扣金额
+  int64 fee_amount = 9;              // 手续费金额
+  PaymentMethod payment = 10;        // 支付方式信息
+  int32 status = 11;                 // 订单状态：1=待付款 2=已付款 3=关闭 4=失败 5=已完成
+  int64 created_at = 12;             // 创建时间（毫秒时间戳）
+  string token = 13;                 // Session token（订单已完成时返回）
+}
+
+// QueryPurchaseOrderReply 查询购买订单响应
+message QueryPurchaseOrderReply {
+  int32 code = 1;                     // 状态码
+  string message = 2;                 // 消息内容
+  QueryPurchaseOrderData data = 3;    // 响应数据
+}

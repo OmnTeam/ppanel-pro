@@ -1,0 +1,630 @@
+syntax = "proto3";
+
+package api.admin.system.v1;
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/system/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.admin.system.v1";
+
+import "google/api/annotations.proto";
+
+service SystemService {
+  // GetCurrencyConfig 获取货币配置
+  rpc GetCurrencyConfig(GetCurrencyConfigRequest) returns (GetCurrencyConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/system/currency_config"
+    };
+  }
+
+  // UpdateCurrencyConfig 更新货币配置
+  rpc UpdateCurrencyConfig(UpdateCurrencyConfigRequest) returns (UpdateCurrencyConfigReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/system/currency_config"
+      body: "*"
+    };
+  }
+
+  // GetInviteConfig 获取邀请配置
+  rpc GetInviteConfig(GetInviteConfigRequest) returns (GetInviteConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/system/invite_config"
+    };
+  }
+
+  // UpdateInviteConfig 更新邀请配置
+  rpc UpdateInviteConfig(UpdateInviteConfigRequest) returns (UpdateInviteConfigReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/system/invite_config"
+      body: "*"
+    };
+  }
+
+  // GetNodeConfig 获取节点配置
+  rpc GetNodeConfig(GetNodeConfigRequest) returns (GetNodeConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/system/node_config"
+    };
+  }
+
+  // UpdateNodeConfig 更新节点配置
+  rpc UpdateNodeConfig(UpdateNodeConfigRequest) returns (UpdateNodeConfigReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/system/node_config"
+      body: "*"
+    };
+  }
+
+  // GetPrivacyPolicyConfig 获取隐私政策配置
+  rpc GetPrivacyPolicyConfig(GetPrivacyPolicyConfigRequest) returns (GetPrivacyPolicyConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/system/privacy"
+    };
+  }
+
+  // UpdatePrivacyPolicyConfig 更新隐私政策配置
+  rpc UpdatePrivacyPolicyConfig(UpdatePrivacyPolicyConfigRequest) returns (UpdatePrivacyPolicyConfigReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/system/privacy"
+      body: "*"
+    };
+  }
+
+  // GetRegisterConfig 获取注册配置
+  rpc GetRegisterConfig(GetRegisterConfigRequest) returns (GetRegisterConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/system/register_config"
+    };
+  }
+
+  // UpdateRegisterConfig 更新注册配置
+  rpc UpdateRegisterConfig(UpdateRegisterConfigRequest) returns (UpdateRegisterConfigReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/system/register_config"
+      body: "*"
+    };
+  }
+
+  // GetSiteConfig 获取站点配置
+  rpc GetSiteConfig(GetSiteConfigRequest) returns (GetSiteConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/system/site_config"
+    };
+  }
+
+  // UpdateSiteConfig 更新站点配置
+  rpc UpdateSiteConfig(UpdateSiteConfigRequest) returns (UpdateSiteConfigReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/system/site_config"
+      body: "*"
+    };
+  }
+
+  // GetSubscribeConfig 获取订阅配置
+  rpc GetSubscribeConfig(GetSubscribeConfigRequest) returns (GetSubscribeConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/system/subscribe_config"
+    };
+  }
+
+  // UpdateSubscribeConfig 更新订阅配置
+  rpc UpdateSubscribeConfig(UpdateSubscribeConfigRequest) returns (UpdateSubscribeConfigReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/system/subscribe_config"
+      body: "*"
+    };
+  }
+
+  // GetTosConfig 获取服务条款配置
+  rpc GetTosConfig(GetTosConfigRequest) returns (GetTosConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/system/tos_config"
+    };
+  }
+
+  // UpdateTosConfig 更新服务条款配置
+  rpc UpdateTosConfig(UpdateTosConfigRequest) returns (UpdateTosConfigReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/system/tos_config"
+      body: "*"
+    };
+  }
+
+  // GetVerifyCodeConfig 获取验证码配置
+  rpc GetVerifyCodeConfig(GetVerifyCodeConfigRequest) returns (GetVerifyCodeConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/system/verify_code_config"
+    };
+  }
+
+  // UpdateVerifyCodeConfig 更新验证码配置
+  rpc UpdateVerifyCodeConfig(UpdateVerifyCodeConfigRequest) returns (UpdateVerifyCodeConfigReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/system/verify_code_config"
+      body: "*"
+    };
+  }
+
+  // GetVerifyConfig 获取验证配置
+  rpc GetVerifyConfig(GetVerifyConfigRequest) returns (GetVerifyConfigReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/system/verify_config"
+    };
+  }
+
+  // UpdateVerifyConfig 更新验证配置
+  rpc UpdateVerifyConfig(UpdateVerifyConfigRequest) returns (UpdateVerifyConfigReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/system/verify_config"
+      body: "*"
+    };
+  }
+
+  // GetNodeMultiplier 获取节点倍率
+  rpc GetNodeMultiplier(GetNodeMultiplierRequest) returns (GetNodeMultiplierReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/system/get_node_multiplier"
+    };
+  }
+
+  // PreViewNodeMultiplier 预览节点倍率
+  rpc PreViewNodeMultiplier(PreViewNodeMultiplierRequest) returns (PreViewNodeMultiplierReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/system/node_multiplier/preview"
+    };
+  }
+
+  // SetNodeMultiplier 设置节点倍率
+  rpc SetNodeMultiplier(SetNodeMultiplierRequest) returns (SetNodeMultiplierReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/system/set_node_multiplier"
+      body: "*"
+    };
+  }
+
+  // SettingTelegramBot 设置Telegram机器人
+  rpc SettingTelegramBot(SettingTelegramBotRequest) returns (SettingTelegramBotReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/system/setting_telegram_bot"
+      body: "*"
+    };
+  }
+}
+
+// CurrencyConfig 货币配置
+message CurrencyConfig {
+  string access_key = 1;        // 访问密钥
+  string currency_unit = 2;     // 货币单位
+  string currency_symbol = 3;   // 货币符号
+}
+
+// InviteConfig 邀请配置
+message InviteConfig {
+  bool forced_invite = 1;         // 是否强制邀请
+  int64 referral_percentage = 2;  // 返利百分比
+  bool only_first_purchase = 3;   // 是否仅首次购买
+}
+
+// GetCurrencyConfig
+message GetCurrencyConfigRequest {}
+
+message GetCurrencyConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  CurrencyConfig data = 3; // 响应数据
+}
+
+// UpdateCurrencyConfig
+message UpdateCurrencyConfigRequest {
+  string access_key = 1;
+  string currency_unit = 2;
+  string currency_symbol = 3;
+}
+
+message UpdateCurrencyConfigData {
+  bool success = 1;
+}
+
+message UpdateCurrencyConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  UpdateCurrencyConfigData data = 3; // 响应数据
+}
+
+// GetInviteConfig
+message GetInviteConfigRequest {}
+
+message GetInviteConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  InviteConfig data = 3; // 响应数据
+}
+
+// UpdateInviteConfig
+message UpdateInviteConfigRequest {
+  bool forced_invite = 1;
+  int64 referral_percentage = 2;
+  bool only_first_purchase = 3;
+}
+
+message UpdateInviteConfigData {
+  bool success = 1;
+}
+
+message UpdateInviteConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  UpdateInviteConfigData data = 3; // 响应数据
+}
+
+// NodeDNS 节点DNS配置
+message NodeDNS {
+  string proto = 1;              // 协议
+  string address = 2;            // 地址
+  repeated string domains = 3;   // 域名列表
+}
+
+// NodeOutbound 节点出站配置
+message NodeOutbound {
+  string name = 1;              // 名称
+  string protocol = 2;          // 协议
+  string address = 3;           // 地址
+  int64 port = 4;               // 端口
+  string password = 5;          // 密码
+  repeated string rules = 6;    // 规则列表
+}
+
+// NodeConfig 节点配置
+message NodeConfig {
+  string node_secret = 1;                 // 节点密钥
+  int64 node_pull_interval = 2;          // 节点拉取间隔
+  int64 node_push_interval = 3;          // 节点推送间隔
+  int64 traffic_report_threshold = 4;    // 流量报告阈值
+  string ip_strategy = 5;                // IP策略
+  repeated NodeDNS dns = 6;              // DNS配置
+  repeated string block = 7;             // 屏蔽列表
+  repeated NodeOutbound outbound = 8;    // 出站配置
+}
+
+// PrivacyPolicyConfig 隐私政策配置
+message PrivacyPolicyConfig {
+  string privacy_policy = 1;    // 隐私政策内容
+}
+
+// GetNodeConfig
+message GetNodeConfigRequest {}
+
+message GetNodeConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  NodeConfig data = 3;   // 响应数据
+}
+
+// UpdateNodeConfig
+message UpdateNodeConfigRequest {
+  string node_secret = 1;
+  int64 node_pull_interval = 2;
+  int64 node_push_interval = 3;
+  int64 traffic_report_threshold = 4;
+  string ip_strategy = 5;
+  repeated NodeDNS dns = 6;
+  repeated string block = 7;
+  repeated NodeOutbound outbound = 8;
+}
+
+message UpdateNodeConfigData {
+  bool success = 1;
+}
+
+message UpdateNodeConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  UpdateNodeConfigData data = 3; // 响应数据
+}
+
+// GetPrivacyPolicyConfig
+message GetPrivacyPolicyConfigRequest {}
+
+message GetPrivacyPolicyConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  PrivacyPolicyConfig data = 3; // 响应数据
+}
+
+// UpdatePrivacyPolicyConfig
+message UpdatePrivacyPolicyConfigRequest {
+  string privacy_policy = 1;
+}
+
+message UpdatePrivacyPolicyConfigData {
+  bool success = 1;
+}
+
+message UpdatePrivacyPolicyConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  UpdatePrivacyPolicyConfigData data = 3; // 响应数据
+}
+
+// RegisterConfig 注册配置
+message RegisterConfig {
+  bool stop_register = 1;                    // 是否停止注册
+  bool enable_trial = 2;                     // 是否启用试用
+  int64 trial_subscribe = 3;                 // 试用订阅
+  int64 trial_time = 4;                      // 试用时间
+  string trial_time_unit = 5;                // 试用时间单位
+  bool enable_ip_register_limit = 6;         // 是否启用IP注册限制
+  int64 ip_register_limit = 7;               // IP注册限制
+  int64 ip_register_limit_duration = 8;      // IP注册限制时长
+}
+
+// SiteConfig 站点配置
+message SiteConfig {
+  string host = 1;           // 主机地址
+  string site_name = 2;      // 站点名称
+  string site_desc = 3;      // 站点描述
+  string site_logo = 4;      // 站点Logo
+  string keywords = 5;       // 关键词
+  string custom_html = 6;    // 自定义HTML
+  string custom_data = 7;    // 自定义数据
+}
+
+// GetRegisterConfig
+message GetRegisterConfigRequest {}
+
+message GetRegisterConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  RegisterConfig data = 3; // 响应数据
+}
+
+// UpdateRegisterConfig
+message UpdateRegisterConfigRequest {
+  bool stop_register = 1;
+  bool enable_trial = 2;
+  int64 trial_subscribe = 3;
+  int64 trial_time = 4;
+  string trial_time_unit = 5;
+  bool enable_ip_register_limit = 6;
+  int64 ip_register_limit = 7;
+  int64 ip_register_limit_duration = 8;
+}
+
+message UpdateRegisterConfigData {
+  bool success = 1;
+}
+
+message UpdateRegisterConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  UpdateRegisterConfigData data = 3; // 响应数据
+}
+
+// GetSiteConfig
+message GetSiteConfigRequest {}
+
+message GetSiteConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  SiteConfig data = 3;   // 响应数据
+}
+
+// UpdateSiteConfig
+message UpdateSiteConfigRequest {
+  string host = 1;
+  string site_name = 2;
+  string site_desc = 3;
+  string site_logo = 4;
+  string keywords = 5;
+  string custom_html = 6;
+  string custom_data = 7;
+}
+
+message UpdateSiteConfigData {
+  bool success = 1;
+}
+
+message UpdateSiteConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  UpdateSiteConfigData data = 3; // 响应数据
+}
+
+// SubscribeConfig 订阅配置
+message SubscribeConfig {
+  bool single_model = 1;          // 是否单模型
+  string subscribe_path = 2;      // 订阅路径
+  string subscribe_domain = 3;    // 订阅域名
+  bool pan_domain = 4;            // 是否泛域名
+  bool user_agent_limit = 5;      // 是否用户代理限制
+  string user_agent_list = 6;     // 用户代理列表
+}
+
+// TosConfig 服务条款配置
+message TosConfig {
+  string tos_content = 1;         // 服务条款内容
+}
+
+// GetSubscribeConfig
+message GetSubscribeConfigRequest {}
+
+message GetSubscribeConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  SubscribeConfig data = 3; // 响应数据
+}
+
+// UpdateSubscribeConfig
+message UpdateSubscribeConfigRequest {
+  bool single_model = 1;
+  string subscribe_path = 2;
+  string subscribe_domain = 3;
+  bool pan_domain = 4;
+  bool user_agent_limit = 5;
+  string user_agent_list = 6;
+}
+
+message UpdateSubscribeConfigData {
+  bool success = 1;
+}
+
+message UpdateSubscribeConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  UpdateSubscribeConfigData data = 3; // 响应数据
+}
+
+// GetTosConfig
+message GetTosConfigRequest {}
+
+message GetTosConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  TosConfig data = 3;    // 响应数据
+}
+
+// UpdateTosConfig
+message UpdateTosConfigRequest {
+  string tos_content = 1;
+}
+
+message UpdateTosConfigData {
+  bool success = 1;
+}
+
+message UpdateTosConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  UpdateTosConfigData data = 3; // 响应数据
+}
+
+// VerifyCodeConfig 验证码配置
+message VerifyCodeConfig {
+  int64 verify_code_expire_time = 1;  // 验证码过期时间
+  int64 verify_code_limit = 2;        // 验证码限制
+  int64 verify_code_interval = 3;     // 验证码间隔
+}
+
+// GetVerifyCodeConfig
+message GetVerifyCodeConfigRequest {}
+
+message GetVerifyCodeConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  VerifyCodeConfig data = 3; // 响应数据
+}
+
+// UpdateVerifyCodeConfig
+message UpdateVerifyCodeConfigRequest {
+  int64 verify_code_expire_time = 1;
+  int64 verify_code_limit = 2;
+  int64 verify_code_interval = 3;
+}
+
+message UpdateVerifyCodeConfigData {
+  bool success = 1;
+}
+
+message UpdateVerifyCodeConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  UpdateVerifyCodeConfigData data = 3; // 响应数据
+}
+
+// VerifyConfig 验证配置
+message VerifyConfig {
+  string turnstile_site_key = 1;           // Turnstile站点密钥
+  string turnstile_secret = 2;             // Turnstile密钥
+  bool enable_login_verify = 3;            // 是否启用登录验证
+  bool enable_register_verify = 4;         // 是否启用注册验证
+  bool enable_reset_password_verify = 5;   // 是否启用重置密码验证
+}
+
+// GetVerifyConfig
+message GetVerifyConfigRequest {}
+
+message GetVerifyConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  VerifyConfig data = 3; // 响应数据
+}
+
+// UpdateVerifyConfig
+message UpdateVerifyConfigRequest {
+  string turnstile_site_key = 1;
+  string turnstile_secret = 2;
+  bool enable_login_verify = 3;
+  bool enable_register_verify = 4;
+  bool enable_reset_password_verify = 5;
+}
+
+message UpdateVerifyConfigData {
+  bool success = 1;
+}
+
+message UpdateVerifyConfigReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  UpdateVerifyConfigData data = 3; // 响应数据
+}
+
+// TimePeriod 时间段倍率
+message TimePeriod {
+  string start_time = 1;   // 开始时间
+  string end_time = 2;     // 结束时间
+  float multiplier = 3;    // 倍率
+}
+
+// GetNodeMultiplier
+message GetNodeMultiplierRequest {}
+
+message GetNodeMultiplierData {
+  repeated TimePeriod periods = 1;
+}
+
+message GetNodeMultiplierReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  GetNodeMultiplierData data = 3; // 响应数据
+}
+
+// PreViewNodeMultiplier
+message PreViewNodeMultiplierRequest {}
+
+message PreViewNodeMultiplierData {
+  string current_time = 1;  // 当前时间
+  float ratio = 2;          // 当前倍率
+}
+
+message PreViewNodeMultiplierReply {
+  int32 code = 1;                    // 状态码
+  string message = 2;                // 消息内容
+  PreViewNodeMultiplierData data = 3; // 响应数据
+}
+
+// SetNodeMultiplier
+message SetNodeMultiplierRequest {
+  repeated TimePeriod periods = 1;
+}
+
+message SetNodeMultiplierData {
+  bool success = 1;
+}
+
+message SetNodeMultiplierReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  SetNodeMultiplierData data = 3; // 响应数据
+}
+
+// SettingTelegramBot
+message SettingTelegramBotRequest {}
+
+message SettingTelegramBotData {
+  bool success = 1;
+}
+
+message SettingTelegramBotReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  SettingTelegramBotData data = 3; // 响应数据
+}

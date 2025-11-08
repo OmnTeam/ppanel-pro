@@ -1,0 +1,137 @@
+package application
+
+import (
+	"context"
+	"encoding/json"
+	"time"
+
+	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/go-kratos/kratos/v2/log"
+)
+
+// DownloadLink 下载链接
+type DownloadLink struct {
+	Windows string `json:"windows"`
+	MacOS   string `json:"macos"`
+	Linux   string `json:"linux"`
+	Android string `json:"android"`
+	IOS     string `json:"ios"`
+}
+
+// Marshal 序列化为JSON
+func (d *DownloadLink) Marshal() (string, error) {
+	data, err := json.Marshal(d)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+// Unmarshal 从JSON反序列化
+func (d *DownloadLink) Unmarshal(data string) error {
+	return json.Unmarshal([]byte(data), d)
+}
+
+// SubscribeApplication 订阅应用配置
+type SubscribeApplication struct {
+	ID                int64
+	TenantID          int64
+	Name              string
+	Icon              *string
+	Description       *string
+	Scheme            string
+	UserAgent         string
+	IsDefault         bool
+	SubscribeTemplate *string
+	OutputFormat      string
+	DownloadLink      string // JSON格式存储
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+}
+
+// SubscribeApplicationRepo 订阅应用配置仓储接口
+type SubscribeApplicationRepo interface {
+	Create(ctx context.Context, app *SubscribeApplication) (*SubscribeApplication, error)
+	Update(ctx context.Context, app *SubscribeApplication) (*SubscribeApplication, error)
+	Delete(ctx context.Context, id int64) error
+	FindByID(ctx context.Context, id int64) (*SubscribeApplication, error)
+	List(ctx context.Context) ([]*SubscribeApplication, error)
+}
+
+// SubscribeApplicationUsecase 订阅应用配置用例
+type SubscribeApplicationUsecase struct {
+	repo   SubscribeApplicationRepo
+	logger *log.Helper
+}
+
+// NewSubscribeApplicationUsecase 创建订阅应用配置用例
+func NewSubscribeApplicationUsecase(repo SubscribeApplicationRepo, logger log.Logger) *SubscribeApplicationUsecase {
+	return &SubscribeApplicationUsecase{
+		repo:   repo,
+		logger: log.NewHelper(logger),
+	}
+}
+
+// CreateSubscribeApplication 创建订阅应用配置
+func (uc *SubscribeApplicationUsecase) CreateSubscribeApplication(ctx context.Context, app *SubscribeApplication) (*SubscribeApplication, error) {
+	result, err := uc.repo.Create(ctx, app)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorf("create subscribe application error: %v", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseInsert)
+	}
+	return result, nil
+}
+
+// UpdateSubscribeApplication 更新订阅应用配置
+func (uc *SubscribeApplicationUsecase) UpdateSubscribeApplication(ctx context.Context, app *SubscribeApplication) (*SubscribeApplication, error) {
+	// 先查询是否存在
+	_, err := uc.repo.FindByID(ctx, app.ID)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorf("find subscribe application error: %v", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	result, err := uc.repo.Update(ctx, app)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorf("update subscribe application error: %v", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
+	}
+	return result, nil
+}
+
+// DeleteSubscribeApplication 删除订阅应用配置
+func (uc *SubscribeApplicationUsecase) DeleteSubscribeApplication(ctx context.Context, id int64) error {
+	err := uc.repo.Delete(ctx, id)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorf("delete subscribe application error: %v", err)
+		return responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
+	}
+	return nil
+}
+
+// GetSubscribeApplicationList 获取订阅应用配置列表
+func (uc *SubscribeApplicationUsecase) GetSubscribeApplicationList(ctx context.Context) ([]*SubscribeApplication, error) {
+	list, err := uc.repo.List(ctx)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorf("get subscribe application list error: %v", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	return list, nil
+}
+
+// PreviewSubscribeTemplate 预览订阅模板
+func (uc *SubscribeApplicationUsecase) PreviewSubscribeTemplate(ctx context.Context, id int64) (string, error) {
+	app, err := uc.repo.FindByID(ctx, id)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorf("find subscribe application error: %v", err)
+		return "", responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	// TODO: 实现模板预览逻辑
+	// 这里需要调用adapter来生成预览内容
+	// 暂时返回模板内容
+	if app.SubscribeTemplate != nil {
+		return *app.SubscribeTemplate, nil
+	}
+	return "", nil
+}

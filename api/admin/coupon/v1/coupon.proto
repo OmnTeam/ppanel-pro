@@ -1,0 +1,156 @@
+syntax = "proto3";
+
+package api.admin.coupon.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/coupon/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.admin.coupon.v1";
+
+service CouponService {
+  // CreateCoupon 创建优惠券
+  rpc CreateCoupon (CreateCouponRequest) returns (CreateCouponReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/coupon"
+      body: "*"
+    };
+  }
+
+  // UpdateCoupon 更新优惠券
+  rpc UpdateCoupon (UpdateCouponRequest) returns (UpdateCouponReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/coupon"
+      body: "*"
+    };
+  }
+
+  // DeleteCoupon 删除优惠券
+  rpc DeleteCoupon (DeleteCouponRequest) returns (DeleteCouponReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/coupon"
+    };
+  }
+
+  // BatchDeleteCoupon 批量删除优惠券
+  rpc BatchDeleteCoupon (BatchDeleteCouponRequest) returns (BatchDeleteCouponReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/coupon/batch"
+      body: "*"
+    };
+  }
+
+  // GetCouponList 获取优惠券列表
+  rpc GetCouponList (GetCouponListRequest) returns (GetCouponListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/coupon/list"
+    };
+  }
+}
+
+// CreateCouponRequest 创建优惠券请求
+message CreateCouponRequest {
+  int64 tenant_id = 1;          // 租户ID
+  string name = 2;              // 优惠券名称
+  string code = 3;              // 优惠券代码（可选，为空则自动生成）
+  int64 count = 4;              // 数量限制
+  int32 type = 5;               // 类型：1：百分比 2：固定金额
+  int64 discount = 6;           // 折扣
+  int64 start_time = 7;         // 开始时间（Unix时间戳）
+  int64 expire_time = 8;        // 过期时间（Unix时间戳）
+  int64 user_limit = 9;         // 用户限制
+  repeated int64 subscribe = 10; // 订阅限制（订阅ID列表）
+  bool enable = 11;             // 启用
+}
+
+// CreateCouponReply 创建优惠券响应
+message CreateCouponReply {
+  int32 code = 1;      // 状态码
+  string message = 2;  // 消息内容
+}
+
+// UpdateCouponRequest 更新优惠券请求
+message UpdateCouponRequest {
+  int64 id = 1;                 // 优惠券ID
+  int64 tenant_id = 2;          // 租户ID
+  string name = 3;              // 优惠券名称
+  string code = 4;              // 优惠券代码
+  int64 count = 5;              // 数量限制
+  int32 type = 6;               // 类型
+  int64 discount = 7;           // 折扣
+  int64 start_time = 8;         // 开始时间
+  int64 expire_time = 9;        // 过期时间
+  int64 user_limit = 10;        // 用户限制
+  repeated int64 subscribe = 11; // 订阅限制
+  bool enable = 12;             // 启用
+}
+
+// UpdateCouponReply 更新优惠券响应
+message UpdateCouponReply {
+  int32 code = 1;      // 状态码
+  string message = 2;  // 消息内容
+}
+
+// DeleteCouponRequest 删除优惠券请求
+message DeleteCouponRequest {
+  int64 id = 1;        // 优惠券ID
+  int64 tenant_id = 2; // 租户ID
+}
+
+// DeleteCouponReply 删除优惠券响应
+message DeleteCouponReply {
+  int32 code = 1;      // 状态码
+  string message = 2;  // 消息内容
+}
+
+// BatchDeleteCouponRequest 批量删除优惠券请求
+message BatchDeleteCouponRequest {
+  int64 tenant_id = 1;      // 租户ID
+  repeated int64 ids = 2;   // 优惠券ID列表
+}
+
+// BatchDeleteCouponReply 批量删除优惠券响应
+message BatchDeleteCouponReply {
+  int32 code = 1;      // 状态码
+  string message = 2;  // 消息内容
+}
+
+// GetCouponListRequest 获取优惠券列表请求
+message GetCouponListRequest {
+  int64 tenant_id = 1;  // 租户ID
+  int64 page = 2;       // 页码
+  int64 size = 3;       // 每页数量
+  int64 subscribe = 4;  // 订阅筛选
+  string search = 5;    // 搜索关键字
+}
+
+// GetCouponListData 获取优惠券列表数据
+message GetCouponListData {
+  repeated CouponItem list = 1;  // 优惠券列表
+  int64 total = 2;                // 总数
+}
+
+// GetCouponListReply 获取优惠券列表响应
+message GetCouponListReply {
+  int32 code = 1;                // 状态码
+  string message = 2;            // 消息内容
+  GetCouponListData data = 3;    // 响应数据
+}
+
+// CouponItem 优惠券项
+message CouponItem {
+  int64 id = 1;                   // 优惠券ID
+  string name = 2;                // 优惠券名称
+  string code = 3;                // 优惠券代码
+  int64 count = 4;                // 数量限制
+  int32 type = 5;                 // 类型
+  int64 discount = 6;             // 折扣
+  int64 start_time = 7;           // 开始时间
+  int64 expire_time = 8;          // 过期时间
+  int64 user_limit = 9;           // 用户限制
+  repeated int64 subscribe = 10;  // 订阅限制
+  int64 used_count = 11;          // 已使用数量
+  bool enable = 12;               // 启用
+  int64 created_at = 13;          // 创建时间
+  int64 updated_at = 14;          // 更新时间
+}

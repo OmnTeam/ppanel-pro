@@ -1,0 +1,174 @@
+syntax = "proto3";
+
+package api.admin.ads.v1;
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/ads/v1;v1";
+
+// 广告服务
+service AdsService {
+  // 获取广告列表
+  rpc GetAdsList(GetAdsListRequest) returns (GetAdsListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/ads/list"
+    };
+  }
+
+  // 获取广告详情
+  rpc GetAds(GetAdsRequest) returns (GetAdsReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/ads/detail"
+    };
+  }
+
+  // 创建广告
+  rpc CreateAds(CreateAdsRequest) returns (CreateAdsReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/ads"
+      body: "*"
+    };
+  }
+
+  // 更新广告
+  rpc UpdateAds(UpdateAdsRequest) returns (UpdateAdsReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/ads"
+      body: "*"
+    };
+  }
+
+  // 删除广告
+  rpc DeleteAds(DeleteAdsRequest) returns (DeleteAdsReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/ads"
+    };
+  }
+}
+
+// 广告信息
+message Ads {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  string title = 3;
+  string type = 4;
+  string content = 5;
+  string description = 6;
+  string target_url = 7;
+  google.protobuf.Timestamp start_time = 8;
+  google.protobuf.Timestamp end_time = 9;
+  bool status = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+}
+
+// 获取广告列表请求
+message GetAdsListRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  int64 page = 2 [(validate.rules).int64.gte = 1];
+  int64 size = 3 [(validate.rules).int64 = {gte: 1, lte: 100}];
+  string search = 4;
+  optional bool status = 5;
+}
+
+// 获取广告列表数据
+message GetAdsListData {
+  int64 total = 1;
+  repeated Ads list = 2;
+}
+
+// 获取广告列表响应
+message GetAdsListReply {
+  int32 code = 1;              // 状态码
+  string message = 2;          // 消息内容
+  GetAdsListData data = 3;     // 响应数据
+}
+
+// 获取广告详情请求
+message GetAdsRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  int64 id = 2 [(validate.rules).int64.gt = 0];
+}
+
+// 获取广告详情数据
+message GetAdsData {
+  Ads ads = 1;
+}
+
+// 获取广告详情响应
+message GetAdsReply {
+  int32 code = 1;          // 状态码
+  string message = 2;      // 消息内容
+  GetAdsData data = 3;     // 响应数据
+}
+
+// 创建广告请求
+message CreateAdsRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  string title = 2 [(validate.rules).string = {min_len: 1, max_len: 255}];
+  string type = 3 [(validate.rules).string = {min_len: 1, max_len: 255}];
+  string content = 4;
+  string description = 5;
+  string target_url = 6;
+  google.protobuf.Timestamp start_time = 7;
+  google.protobuf.Timestamp end_time = 8;
+  bool status = 9;
+}
+
+// 创建广告数据
+message CreateAdsData {
+  Ads ads = 1;
+}
+
+// 创建广告响应
+message CreateAdsReply {
+  int32 code = 1;           // 状态码
+  string message = 2;       // 消息内容
+  CreateAdsData data = 3;   // 响应数据
+}
+
+// 更新广告请求
+message UpdateAdsRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  int64 id = 2 [(validate.rules).int64.gt = 0];
+  string title = 3 [(validate.rules).string = {min_len: 1, max_len: 255}];
+  string type = 4 [(validate.rules).string = {min_len: 1, max_len: 255}];
+  string content = 5;
+  string description = 6;
+  string target_url = 7;
+  google.protobuf.Timestamp start_time = 8;
+  google.protobuf.Timestamp end_time = 9;
+  bool status = 10;
+}
+
+// 更新广告数据
+message UpdateAdsData {
+  Ads ads = 1;
+}
+
+// 更新广告响应
+message UpdateAdsReply {
+  int32 code = 1;           // 状态码
+  string message = 2;       // 消息内容
+  UpdateAdsData data = 3;   // 响应数据
+}
+
+// 删除广告请求
+message DeleteAdsRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  int64 id = 2 [(validate.rules).int64.gt = 0];
+}
+
+// 删除广告数据
+message DeleteAdsData {
+  bool success = 1;
+}
+
+// 删除广告响应
+message DeleteAdsReply {
+  int32 code = 1;           // 状态码
+  string message = 2;       // 消息内容
+  DeleteAdsData data = 3;   // 响应数据
+}

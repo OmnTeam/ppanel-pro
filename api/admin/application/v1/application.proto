@@ -1,0 +1,173 @@
+syntax = "proto3";
+
+package api.admin.application.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/application/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.admin.application.v1";
+
+// 订阅应用配置服务
+service SubscribeApplicationService {
+  // 创建订阅应用配置
+  rpc CreateSubscribeApplication(CreateSubscribeApplicationRequest) returns (SubscribeApplicationReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/application"
+      body: "*"
+    };
+  }
+
+  // 预览订阅模板
+  rpc PreviewSubscribeTemplate(PreviewSubscribeTemplateRequest) returns (PreviewSubscribeTemplateReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/application/preview"
+    };
+  }
+
+  // 更新订阅应用配置
+  rpc UpdateSubscribeApplication(UpdateSubscribeApplicationRequest) returns (SubscribeApplicationReply) {
+    option (google.api.http) = {
+      put: "/v1/admin/application/subscribe_application"
+      body: "*"
+    };
+  }
+
+  // 删除订阅应用配置
+  rpc DeleteSubscribeApplication(DeleteSubscribeApplicationRequest) returns (DeleteSubscribeApplicationReply) {
+    option (google.api.http) = {
+      delete: "/v1/admin/application/subscribe_application"
+      body: "*"
+    };
+  }
+
+  // 获取订阅应用配置列表
+  rpc GetSubscribeApplicationList(GetSubscribeApplicationListRequest) returns (GetSubscribeApplicationListReply) {
+    option (google.api.http) = {
+      get: "/v1/admin/application/subscribe_application_list"
+    };
+  }
+}
+
+// 下载链接信息
+message DownloadLink {
+  string windows = 1;
+  string macos = 2;
+  string linux = 3;
+  string android = 4;
+  string ios = 5;
+}
+
+// 订阅应用配置信息
+message SubscribeApplication {
+  int64 id = 1;
+  int64 tenant_id = 2;
+  string name = 3;
+  string icon = 4;
+  string description = 5;
+  string scheme = 6;
+  string user_agent = 7;
+  bool is_default = 8;
+  string subscribe_template = 9 [json_name = "template"]; // 与老项目保持一致
+  string output_format = 10;
+  DownloadLink download_link = 11;
+  google.protobuf.Timestamp created_at = 12;
+  google.protobuf.Timestamp updated_at = 13;
+}
+
+// 创建订阅应用配置请求
+message CreateSubscribeApplicationRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  string name = 2;
+  string icon = 3;
+  string description = 4;
+  string scheme = 5;
+  string user_agent = 6;
+  bool is_default = 7;
+  string subscribe_template = 8 [json_name = "template"]; // 与老项目保持一致
+  string output_format = 9;
+  DownloadLink download_link = 10;
+}
+
+// 更新订阅应用配置请求
+message UpdateSubscribeApplicationRequest {
+  int64 id = 1 [(validate.rules).int64.gt = 0];
+  int64 tenant_id = 2 [(validate.rules).int64.gt = 0];
+  string name = 3;
+  string icon = 4;
+  string description = 5;
+  string scheme = 6;
+  string user_agent = 7;
+  bool is_default = 8;
+  string subscribe_template = 9 [json_name = "template"]; // 与老项目保持一致
+  string output_format = 10;
+  DownloadLink download_link = 11;
+}
+
+// 删除订阅应用配置请求
+message DeleteSubscribeApplicationRequest {
+  int64 id = 1 [(validate.rules).int64.gt = 0];
+  int64 tenant_id = 2 [(validate.rules).int64.gt = 0];
+}
+
+// 预览订阅模板请求
+message PreviewSubscribeTemplateRequest {
+  int64 id = 1 [(validate.rules).int64.gt = 0];
+  int64 tenant_id = 2 [(validate.rules).int64.gt = 0];
+}
+
+// 获取订阅应用配置列表请求
+message GetSubscribeApplicationListRequest {
+  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+}
+
+// 订阅应用配置数据
+message SubscribeApplicationData {
+  SubscribeApplication application = 1;
+}
+
+// 订阅应用配置响应
+message SubscribeApplicationReply {
+  int32 code = 1;                         // 状态码
+  string message = 2;                     // 消息内容
+  SubscribeApplicationData data = 3;      // 响应数据
+}
+
+// 订阅应用配置列表数据
+message GetSubscribeApplicationListData {
+  repeated SubscribeApplication list = 1;
+  int64 total = 2;
+}
+
+// 订阅应用配置列表响应
+message GetSubscribeApplicationListReply {
+  int32 code = 1;                              // 状态码
+  string message = 2;                          // 消息内容
+  GetSubscribeApplicationListData data = 3;    // 响应数据
+}
+
+// 删除订阅应用配置数据
+message DeleteSubscribeApplicationData {
+  bool success = 1;
+}
+
+// 删除订阅应用配置响应
+message DeleteSubscribeApplicationReply {
+  int32 code = 1;                               // 状态码
+  string message = 2;                           // 消息内容
+  DeleteSubscribeApplicationData data = 3;      // 响应数据
+}
+
+// 预览订阅模板数据
+message PreviewSubscribeTemplateData {
+  string template = 1;
+}
+
+// 预览订阅模板响应
+message PreviewSubscribeTemplateReply {
+  int32 code = 1;                          // 状态码
+  string message = 2;                      // 消息内容
+  PreviewSubscribeTemplateData data = 3;   // 响应数据
+}

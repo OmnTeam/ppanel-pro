@@ -1,0 +1,724 @@
+syntax = "proto3";
+
+package api.public.user.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/public/user/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.public.user.v1";
+
+// Public User service
+// 公共用户服务（需要认证）
+service User {
+  // QueryUserInfo 查询用户信息
+  rpc QueryUserInfo (google.protobuf.Empty) returns (UserInfoReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/info"
+    };
+  }
+
+  // GetLoginLog 获取登录日志
+  rpc GetLoginLog (GetLoginLogRequest) returns (LoginLogReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/login_log"
+    };
+  }
+
+  // QueryUserBalanceLog 查询用户余额日志
+  rpc QueryUserBalanceLog (google.protobuf.Empty) returns (BalanceLogReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/balance_log"
+    };
+  }
+
+  // QueryUserCommissionLog 查询用户佣金日志
+  rpc QueryUserCommissionLog (QueryUserCommissionLogRequest) returns (CommissionLogReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/commission_log"
+    };
+  }
+
+  // QueryUserAffiliate 查询用户推荐数量
+  rpc QueryUserAffiliate (google.protobuf.Empty) returns (UserAffiliateReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/affiliate/count"
+    };
+  }
+
+  // QueryUserAffiliateList 查询用户推荐列表
+  rpc QueryUserAffiliateList (QueryUserAffiliateListRequest) returns (UserAffiliateListReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/affiliate/list"
+    };
+  }
+
+  // GetOAuthMethods 获取OAuth方法
+  rpc GetOAuthMethods (google.protobuf.Empty) returns (OAuthMethodsReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/oauth_methods"
+    };
+  }
+
+  // QueryUserSubscribe 查询用户订阅
+  rpc QueryUserSubscribe (google.protobuf.Empty) returns (UserSubscribeReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/subscribe"
+    };
+  }
+
+  // GetSubscribeLog 获取订阅日志
+  rpc GetSubscribeLog (GetSubscribeLogRequest) returns (SubscribeLogReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/subscribe_log"
+    };
+  }
+
+  // ResetUserSubscribeToken 重置订阅令牌
+  rpc ResetUserSubscribeToken (ResetUserSubscribeTokenRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      put: "/v1/public/user/subscribe_token"
+      body: "*"
+    };
+  }
+
+  // PreUnsubscribe 预退订
+  rpc PreUnsubscribe (PreUnsubscribeRequest) returns (UnsubscribeInfoReply) {
+    option (google.api.http) = {
+      post: "/v1/public/user/unsubscribe/pre"
+      body: "*"
+    };
+  }
+
+  // Unsubscribe 退订
+  rpc Unsubscribe (UnsubscribeRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      post: "/v1/public/user/unsubscribe"
+      body: "*"
+    };
+  }
+
+  // UpdateUserNotify 更新通知设置
+  rpc UpdateUserNotify (UpdateUserNotifyRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      put: "/v1/public/user/notify"
+    };
+  }
+
+  // UpdateUserPassword 更新密码
+  rpc UpdateUserPassword (UpdateUserPasswordRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      put: "/v1/public/user/password"
+    };
+  }
+
+  // BindTelegram 绑定Telegram
+  rpc BindTelegram (google.protobuf.Empty) returns (TelegramBindReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/bind_telegram"
+    };
+  }
+
+  // UnbindTelegram 解绑Telegram
+  rpc UnbindTelegram (google.protobuf.Empty) returns (CommonReply) {
+    option (google.api.http) = {
+      post: "/v1/public/user/unbind_telegram"
+    };
+  }
+
+  // BindOAuth 绑定OAuth
+  rpc BindOAuth (BindOAuthRequest) returns (OAuthBindReply) {
+    option (google.api.http) = {
+      post: "/v1/public/user/bind_oauth"
+      body: "*"
+    };
+  }
+
+  // BindOAuthCallback OAuth回调
+  rpc BindOAuthCallback (BindOAuthCallbackRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      post: "/v1/public/user/bind_oauth/callback"
+      body: "*"
+    };
+  }
+
+  // UnbindOAuth 解绑OAuth
+  rpc UnbindOAuth (UnbindOAuthRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      post: "/v1/public/user/unbind_oauth"
+      body: "*"
+    };
+  }
+
+  // VerifyEmail 验证邮箱
+  rpc VerifyEmail (VerifyEmailRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      post: "/v1/public/user/verify_email"
+      body: "*"
+    };
+  }
+
+  // UpdateBindMobile 更新绑定手机
+  rpc UpdateBindMobile (UpdateBindMobileRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      put: "/v1/public/user/bind_mobile"
+      body: "*"
+    };
+  }
+
+  // UpdateBindEmail 更新绑定邮箱
+  rpc UpdateBindEmail (UpdateBindEmailRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      put: "/v1/public/user/bind_email"
+      body: "*"
+    };
+  }
+
+  // GetDeviceList 获取设备列表
+  rpc GetDeviceList (google.protobuf.Empty) returns (GetDeviceListReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/devices"
+    };
+  }
+
+  // UnbindDevice 解绑设备
+  rpc UnbindDevice (UnbindDeviceRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      put: "/v1/public/user/unbind_device"
+      body: "*"
+    };
+  }
+
+  // GetDeviceOnlineStatistics 获取设备在线统计
+  rpc GetDeviceOnlineStatistics (google.protobuf.Empty) returns (GetDeviceOnlineStatisticsReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/device_online_statistics"
+    };
+  }
+
+  // DeviceWSConnect 设备WebSocket连接
+  rpc DeviceWSConnect (google.protobuf.Empty) returns (CommonReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/device_ws_connect"
+    };
+  }
+}
+
+// ============================================================================
+// QueryUserInfo - 查询用户信息
+// ============================================================================
+
+// UserInfoData 用户信息数据
+message UserInfoData {
+  int64 id = 1;
+  string avatar = 2;
+  int64 balance = 3;
+  int64 commission = 4;
+  int32 referral_percentage = 5;
+  bool only_first_purchase = 6;
+  int64 gift_amount = 7;
+  int64 telegram = 8;
+  string refer_code = 9;
+  int64 referer_id = 10;
+  bool enable = 11;
+  bool is_admin = 12;
+  bool enable_balance_notify = 13;
+  bool enable_login_notify = 14;
+  bool enable_subscribe_notify = 15;
+  bool enable_trade_notify = 16;
+  repeated UserAuthMethod auth_methods = 17;
+  int64 created_at = 18;
+  int64 updated_at = 19;
+}
+
+// UserInfoReply 查询用户信息响应
+message UserInfoReply {
+  int32 code = 1;          // 状态码
+  string message = 2;      // 消息内容
+  UserInfoData data = 3;   // 响应数据
+}
+
+// UserAuthMethod 用户认证方法
+message UserAuthMethod {
+  string auth_type = 1;
+  string auth_identifier = 2;
+  bool verified = 3;
+}
+
+// ============================================================================
+// GetLoginLog - 获取登录日志
+// ============================================================================
+
+// GetLoginLogRequest 获取登录日志请求
+message GetLoginLogRequest {
+  int64 page = 1;
+  int64 size = 2;
+}
+
+// LoginLogData 登录日志数据
+message LoginLogData {
+  repeated UserLoginLog list = 1;
+  int64 total = 2;
+}
+
+// LoginLogReply 获取登录日志响应
+message LoginLogReply {
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  LoginLogData data = 3; // 响应数据
+}
+
+// UserLoginLog 用户登录日志
+message UserLoginLog {
+  int64 id = 1;
+  int64 user_id = 2;
+  string login_ip = 3;
+  string user_agent = 4;
+  bool success = 5;
+  int64 timestamp = 6;
+}
+
+// ============================================================================
+// QueryUserBalanceLog - 查询用户余额日志
+// ============================================================================
+
+// BalanceLogData 余额日志数据
+message BalanceLogData {
+  repeated BalanceLog list = 1;
+  int64 total = 2;
+}
+
+// BalanceLogReply 查询用户余额日志响应
+message BalanceLogReply {
+  int32 code = 1;          // 状态码
+  string message = 2;      // 消息内容
+  BalanceLogData data = 3; // 响应数据
+}
+
+// BalanceLog 余额日志
+message BalanceLog {
+  int32 type = 1;
+  int64 user_id = 2;
+  int64 amount = 3;
+  string order_no = 4;
+  int64 balance = 5;
+  int64 timestamp = 6;
+}
+
+// ============================================================================
+// QueryUserCommissionLog - 查询用户佣金日志
+// ============================================================================
+
+// QueryUserCommissionLogRequest 查询用户佣金日志请求
+message QueryUserCommissionLogRequest {
+  int64 page = 1;
+  int64 size = 2;
+}
+
+// CommissionLogData 佣金日志数据
+message CommissionLogData {
+  repeated CommissionLog list = 1;
+  int64 total = 2;
+}
+
+// CommissionLogReply 查询用户佣金日志响应
+message CommissionLogReply {
+  int32 code = 1;             // 状态码
+  string message = 2;         // 消息内容
+  CommissionLogData data = 3; // 响应数据
+}
+
+// CommissionLog 佣金日志
+message CommissionLog {
+  int32 type = 1;
+  int64 user_id = 2;
+  int64 amount = 3;
+  string order_no = 4;
+  int64 timestamp = 5;
+}
+
+// ============================================================================
+// QueryUserAffiliate - 查询用户推荐数量
+// ============================================================================
+
+// UserAffiliateData 用户推荐数据
+message UserAffiliateData {
+  int64 registers = 1;           // 推荐注册数
+  int64 total_commission = 2;    // 总佣金
+}
+
+// UserAffiliateReply 查询用户推荐数量响应
+message UserAffiliateReply {
+  int32 code = 1;             // 状态码
+  string message = 2;         // 消息内容
+  UserAffiliateData data = 3; // 响应数据
+}
+
+// ============================================================================
+// QueryUserAffiliateList - 查询用户推荐列表
+// ============================================================================
+
+// QueryUserAffiliateListRequest 查询用户推荐列表请求
+message QueryUserAffiliateListRequest {
+  int64 page = 1;
+  int64 size = 2;
+}
+
+// UserAffiliateListData 用户推荐列表数据
+message UserAffiliateListData {
+  repeated UserAffiliate list = 1;
+  int64 total = 2;
+}
+
+// UserAffiliateListReply 查询用户推荐列表响应
+message UserAffiliateListReply {
+  int32 code = 1;                 // 状态码
+  string message = 2;             // 消息内容
+  UserAffiliateListData data = 3; // 响应数据
+}
+
+// UserAffiliate 用户推荐信息
+message UserAffiliate {
+  string avatar = 1;
+  string identifier = 2;
+  int64 registered_at = 3;
+  bool enable = 4;
+}
+
+// ============================================================================
+// GetOAuthMethods - 获取OAuth方法
+// ============================================================================
+
+// OAuthMethodsData OAuth方法数据
+message OAuthMethodsData {
+  repeated UserAuthMethod methods = 1;
+}
+
+// OAuthMethodsReply 获取OAuth方法响应
+message OAuthMethodsReply {
+  int32 code = 1;            // 状态码
+  string message = 2;        // 消息内容
+  OAuthMethodsData data = 3; // 响应数据
+}
+
+// ============================================================================
+// QueryUserSubscribe - 查询用户订阅
+// ============================================================================
+
+// UserSubscribeData 用户订阅数据
+message UserSubscribeData {
+  repeated UserSubscribe list = 1;
+  int64 total = 2;
+}
+
+// UserSubscribeReply 查询用户订阅响应
+message UserSubscribeReply {
+  int32 code = 1;             // 状态码
+  string message = 2;         // 消息内容
+  UserSubscribeData data = 3; // 响应数据
+}
+
+// UserSubscribe 用户订阅信息
+message UserSubscribe {
+  int64 id = 1;
+  int64 user_id = 2;
+  int64 order_id = 3;
+  int64 subscribe_id = 4;
+  Subscribe subscribe = 5;
+  int64 start_time = 6;
+  int64 expire_time = 7;
+  int64 finished_at = 8;
+  int64 reset_time = 9;
+  int64 traffic = 10;
+  int64 download = 11;
+  int64 upload = 12;
+  string token = 13;
+  int32 status = 14;
+  int64 created_at = 15;
+  int64 updated_at = 16;
+}
+
+// Subscribe 订阅套餐信息
+message Subscribe {
+  int64 id = 1;
+  string name = 2;
+  string description = 3;
+  int64 price = 4;
+  int64 traffic = 5;
+  int32 device_limit = 6;
+  int32 speed_limit = 7;
+  int32 unit_time = 8;
+  int64 unit_price = 9;
+  int32 reset_cycle = 10;
+  int32 deduction_ratio = 11;
+  bool allow_deduction = 12;
+  repeated SubscribeDiscount discount = 13;
+  bool enable = 14;
+  int64 created_at = 15;
+  int64 updated_at = 16;
+}
+
+// SubscribeDiscount 订阅折扣信息
+message SubscribeDiscount {
+  int32 quantity = 1;
+  int32 percentage = 2;
+}
+
+// ============================================================================
+// GetSubscribeLog - 获取订阅日志
+// ============================================================================
+
+// GetSubscribeLogRequest 获取订阅日志请求
+message GetSubscribeLogRequest {
+  int64 page = 1;
+  int64 size = 2;
+}
+
+// SubscribeLogData 订阅日志数据
+message SubscribeLogData {
+  repeated UserSubscribeLog list = 1;
+  int64 total = 2;
+}
+
+// SubscribeLogReply 获取订阅日志响应
+message SubscribeLogReply {
+  int32 code = 1;             // 状态码
+  string message = 2;         // 消息内容
+  SubscribeLogData data = 3;  // 响应数据
+}
+
+// UserSubscribeLog 用户订阅日志
+message UserSubscribeLog {
+  int64 id = 1;
+  int64 user_id = 2;
+  int64 user_subscribe_id = 3;
+  string token = 4;
+  string ip = 5;
+  string user_agent = 6;
+  int64 timestamp = 7;
+}
+
+// ============================================================================
+// ResetUserSubscribeToken - 重置订阅令牌
+// ============================================================================
+
+// ResetUserSubscribeTokenRequest 重置订阅令牌请求
+message ResetUserSubscribeTokenRequest {
+  int64 user_subscribe_id = 1;
+}
+
+// CommonReply 通用响应
+message CommonReply {
+  int32 code = 1;     // 状态码
+  string message = 2; // 消息内容
+}
+
+// ============================================================================
+// PreUnsubscribe - 预退订
+// ============================================================================
+
+// PreUnsubscribeRequest 预退订请求
+message PreUnsubscribeRequest {
+  int64 id = 1;
+}
+
+// UnsubscribeInfoData 退订信息数据
+message UnsubscribeInfoData {
+  int64 deduction_amount = 1;
+}
+
+// UnsubscribeInfoReply 预退订响应
+message UnsubscribeInfoReply {
+  int32 code = 1;                // 状态码
+  string message = 2;            // 消息内容
+  UnsubscribeInfoData data = 3;  // 响应数据
+}
+
+// ============================================================================
+// Unsubscribe - 退订
+// ============================================================================
+
+// UnsubscribeRequest 退订请求
+message UnsubscribeRequest {
+  int64 id = 1;
+}
+
+// ============================================================================
+// UpdateUserNotify - 更新通知设置
+// ============================================================================
+
+// UpdateUserNotifyRequest 更新通知设置请求
+message UpdateUserNotifyRequest {
+  bool enable_login_notify = 1;
+  bool enable_balance_notify = 2;
+  bool enable_subscribe_notify = 3;
+  bool enable_trade_notify = 4;
+}
+
+// ============================================================================
+// UpdateUserPassword - 更新密码
+// ============================================================================
+
+// UpdateUserPasswordRequest 更新密码请求
+message UpdateUserPasswordRequest {
+  string password = 1;
+}
+
+// ============================================================================
+// BindTelegram - 绑定Telegram
+// ============================================================================
+
+// TelegramBindData Telegram绑定数据
+message TelegramBindData {
+  string url = 1;         // Telegram Bot URL
+  int64 expired_at = 2;   // 过期时间（毫秒时间戳）
+}
+
+// TelegramBindReply 绑定Telegram响应
+message TelegramBindReply {
+  int32 code = 1;            // 状态码
+  string message = 2;        // 消息内容
+  TelegramBindData data = 3; // 响应数据
+}
+
+// ============================================================================
+// BindOAuth - 绑定OAuth
+// ============================================================================
+
+// BindOAuthRequest 绑定OAuth请求
+message BindOAuthRequest {
+  string method = 1;    // OAuth方法: google/apple/github/facebook
+  string redirect = 2;  // 回调地址
+}
+
+// OAuthBindData OAuth绑定数据
+message OAuthBindData {
+  string redirect = 1;  // OAuth授权URL
+}
+
+// OAuthBindReply 绑定OAuth响应
+message OAuthBindReply {
+  int32 code = 1;         // 状态码
+  string message = 2;     // 消息内容
+  OAuthBindData data = 3; // 响应数据
+}
+
+// ============================================================================
+// BindOAuthCallback - OAuth回调
+// ============================================================================
+
+// BindOAuthCallbackRequest OAuth回调请求
+message BindOAuthCallbackRequest {
+  string method = 1;    // OAuth方法
+  string callback = 2;  // 回调参数（JSON字符串）
+}
+
+// ============================================================================
+// UnbindOAuth - 解绑OAuth
+// ============================================================================
+
+// UnbindOAuthRequest 解绑OAuth请求
+message UnbindOAuthRequest {
+  string method = 1;  // OAuth方法
+}
+
+// ============================================================================
+// VerifyEmail - 验证邮箱
+// ============================================================================
+
+// VerifyEmailRequest 验证邮箱请求
+message VerifyEmailRequest {
+  string email = 1;  // 邮箱地址
+  string code = 2;   // 验证码
+}
+
+// ============================================================================
+// UpdateBindMobile - 更新绑定手机
+// ============================================================================
+
+// UpdateBindMobileRequest 更新绑定手机请求
+message UpdateBindMobileRequest {
+  string area_code = 1;  // 区号
+  string mobile = 2;     // 手机号
+  string code = 3;       // 验证码
+}
+
+// ============================================================================
+// UpdateBindEmail - 更新绑定邮箱
+// ============================================================================
+
+// UpdateBindEmailRequest 更新绑定邮箱请求
+message UpdateBindEmailRequest {
+  string email = 1;  // 邮箱地址
+}
+
+// ============================================================================
+// GetDeviceList - 获取设备列表
+// ============================================================================
+
+// UserDevice 用户设备信息
+message UserDevice {
+  int64  id = 1;         // 设备ID
+  string ip = 2;         // IP地址
+  string identifier = 3; // 设备标识符
+  string user_agent = 4; // 用户代理
+  bool   online = 5;     // 在线状态
+  bool   enabled = 6;    // 启用状态
+  int64  created_at = 7; // 创建时间
+  int64  updated_at = 8; // 更新时间
+}
+
+// GetDeviceListData 获取设备列表响应数据
+message GetDeviceListData {
+  repeated UserDevice list = 1;  // 设备列表
+  int64 total = 2;               // 总数
+}
+
+// GetDeviceListReply 获取设备列表响应
+message GetDeviceListReply {
+  int32 code = 1;  // 状态码
+  string message = 2;  // 消息内容
+  GetDeviceListData data = 3;  // 响应数据
+}
+
+// ============================================================================
+// UnbindDevice - 解绑设备
+// ============================================================================
+
+// UnbindDeviceRequest 解绑设备请求
+message UnbindDeviceRequest {
+  int64 id = 1;  // 设备ID
+}
+
+// ============================================================================
+// GetDeviceOnlineStatistics - 获取设备在线统计
+// ============================================================================
+
+// WeeklyStat 每周统计
+message WeeklyStat {
+  int32   day = 1;      // 星期几 (1-7)
+  string  day_name = 2; // 星期名称
+  double  hours = 3;    // 小时数
+}
+
+// ConnectionRecords 连接记录
+message ConnectionRecords {
+  int64 current_continuous_days = 1; // 当前连续天数
+  int64 history_continuous_days = 2; // 历史连续天数
+  int64 longest_single_connection = 3; // 最长单次连接时长
+}
+
+// GetDeviceOnlineStatisticsData 获取设备在线统计数据
+message GetDeviceOnlineStatisticsData {
+  repeated WeeklyStat weekly_stats = 1;     // 每周统计
+  ConnectionRecords connection_records = 2; // 连接记录
+}
+
+// GetDeviceOnlineStatisticsReply 获取设备在线统计响应
+message GetDeviceOnlineStatisticsReply {
+  int32 code = 1;  // 状态码
+  string message = 2;  // 消息内容
+  GetDeviceOnlineStatisticsData data = 3;  // 响应数据
+}
+
