@@ -10,10 +10,10 @@ import (
 // LogSettingRepo 日志设置仓库接口
 type LogSettingRepo interface {
 	// GetLogSetting 获取日志设置
-	GetLogSetting(ctx context.Context, tenantID int64) (*v1.LogSetting, error)
+	GetLogSetting(ctx context.Context) (*v1.LogSetting, error)
 
 	// UpdateLogSetting 更新日志设置
-	UpdateLogSetting(ctx context.Context, tenantID int64, setting *v1.LogSetting) error
+	UpdateLogSetting(ctx context.Context, setting *v1.LogSetting) error
 }
 
 // LogSettingUsecase 日志设置用例
@@ -31,11 +31,11 @@ func NewLogSettingUsecase(repo LogSettingRepo, logger log.Logger) *LogSettingUse
 }
 
 // GetLogSetting 获取日志设置
-func (uc *LogSettingUsecase) GetLogSetting(ctx context.Context, tenantID int64) (*v1.LogSetting, error) {
-	return uc.repo.GetLogSetting(ctx, tenantID)
+func (uc *LogSettingUsecase) GetLogSetting(ctx context.Context) (*v1.LogSetting, error) {
+	return uc.repo.GetLogSetting(ctx)
 }
 
 // UpdateLogSetting 更新日志设置
-func (uc *LogSettingUsecase) UpdateLogSetting(ctx context.Context, tenantID int64, setting *v1.LogSetting) error {
-	return uc.repo.UpdateLogSetting(ctx, tenantID, setting)
+func (uc *LogSettingUsecase) UpdateLogSetting(ctx context.Context, setting *v1.LogSetting) error {
+	return uc.repo.UpdateLogSetting(ctx, setting)
 }

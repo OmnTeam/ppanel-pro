@@ -14,13 +14,13 @@ type UserRepo interface {
 	CreateUser(ctx context.Context, req *v1.CreateUserRequest) (int64, error)
 
 	// DeleteUser 删除用户
-	DeleteUser(ctx context.Context, userID int64) error
+	DeleteUser(ctx context.Context, userID int) error
 
 	// BatchDeleteUser 批量删除用户
-	BatchDeleteUser(ctx context.Context, userIDs []int64) (int64, error)
+	BatchDeleteUser(ctx context.Context, userIDs []int) (int64, error)
 
 	// GetUserByID 根据ID获取用户
-	GetUserByID(ctx context.Context, userID int64) (*ent.ProxyUser, error)
+	GetUserByID(ctx context.Context, userID int) (*ent.ProxyUser, error)
 
 	// GetUserList 获取用户列表
 	GetUserList(ctx context.Context, page, size int32, search string, userID, subscribeID, userSubscribeID *int64) ([]*ent.ProxyUser, int64, error)
@@ -55,22 +55,22 @@ func (uc *UserUsecase) CreateUser(ctx context.Context, req *v1.CreateUserRequest
 }
 
 // DeleteUser 删除用户
-func (uc *UserUsecase) DeleteUser(ctx context.Context, userID int64) error {
+func (uc *UserUsecase) DeleteUser(ctx context.Context, userID int) error {
 	return uc.repo.DeleteUser(ctx, userID)
 }
 
 // BatchDeleteUser 批量删除用户
-func (uc *UserUsecase) BatchDeleteUser(ctx context.Context, userIDs []int64) (int64, error) {
+func (uc *UserUsecase) BatchDeleteUser(ctx context.Context, userIDs []int) (int64, error) {
 	return uc.repo.BatchDeleteUser(ctx, userIDs)
 }
 
 // CurrentUser 获取当前用户
-func (uc *UserUsecase) CurrentUser(ctx context.Context, userID int64) (*ent.ProxyUser, error) {
+func (uc *UserUsecase) CurrentUser(ctx context.Context, userID int) (*ent.ProxyUser, error) {
 	return uc.repo.GetUserByID(ctx, userID)
 }
 
 // GetUserDetail 获取用户详情
-func (uc *UserUsecase) GetUserDetail(ctx context.Context, userID int64) (*ent.ProxyUser, error) {
+func (uc *UserUsecase) GetUserDetail(ctx context.Context, userID int) (*ent.ProxyUser, error) {
 	return uc.repo.GetUserByID(ctx, userID)
 }
 

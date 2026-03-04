@@ -26,14 +26,14 @@ func (ProxyUserSubscribe) Annotations() []schema.Annotation {
 // Fields of the ProxyUserSubscribe
 func (ProxyUserSubscribe) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Positive().
 			Comment("ID"),
-		field.Int("user_id").
+		field.Int64("user_id").
 			Comment("用户ID"),
-		field.Int("order_id").
+		field.Int64("order_id").
 			Comment("订单ID"),
-		field.Int("subscribe_id").
+		field.Int64("subscribe_id").
 			Comment("订阅套餐ID"),
 		field.Time("start_time").
 			Comment("订阅开始时间"),
@@ -67,7 +67,7 @@ func (ProxyUserSubscribe) Fields() []ent.Field {
 			Optional().
 			Nillable().
 			Comment("订阅UUID"),
-		field.Int("status").
+		field.Int8("status").
 			Optional().
 			Nillable().
 			Comment("订阅状态: 0-待激活 1-激活 2-完成 3-过期 4-已扣除"),

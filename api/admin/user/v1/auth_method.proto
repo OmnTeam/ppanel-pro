@@ -42,24 +42,22 @@ service UserAuthMethodService {
 // ===== CreateUserAuthMethod =====
 
 message CreateUserAuthMethodRequest {
-  int64 tenant_id = 1;
-  int64 user_id = 2;
-  string auth_type = 3;  // apple, google, github, facebook, telegram, email, mobile
-  string auth_identifier = 4;  // 认证标识（邮箱、手机号、OpenID等）
-  bool verified = 5;  // 是否已验证
+  string user_id = 1;
+  string auth_type = 2;  // apple, google, github, facebook, telegram, email, mobile
+  string auth_identifier = 3;  // 认证标识（邮箱、手机号、OpenID等）
+  bool verified = 4;  // 是否已验证
 }
 
 message CreateUserAuthMethodReply {
-  int64 id = 1;
+  string id = 1;
 }
 
 // ===== UpdateUserAuthMethod =====
 
 message UpdateUserAuthMethodRequest {
-  int64 tenant_id = 1;
-  int64 user_id = 2;  // 用户ID
-  string auth_type = 3;  // 认证类型
-  string auth_identifier = 4;  // 认证标识
+  string user_id = 1;  // 用户ID
+  string auth_type = 2;  // 认证类型
+  string auth_identifier = 3;  // 认证标识
 }
 
 message UpdateUserAuthMethodReply {}
@@ -67,9 +65,8 @@ message UpdateUserAuthMethodReply {}
 // ===== DeleteUserAuthMethod =====
 
 message DeleteUserAuthMethodRequest {
-  int64 tenant_id = 1;
-  int64 user_id = 2;  // 用户ID
-  string auth_type = 3;  // 认证类型
+  string user_id = 1;  // 用户ID
+  string auth_type = 2;  // 认证类型
 }
 
 message DeleteUserAuthMethodReply {}
@@ -77,9 +74,8 @@ message DeleteUserAuthMethodReply {}
 // ===== GetUserAuthMethod =====
 
 message GetUserAuthMethodRequest {
-  int64 tenant_id = 1;
-  int64 user_id = 2;  // 用户ID
-  string auth_type = 3;  // 可选：过滤认证类型
+  string user_id = 1;  // 用户ID
+  string auth_type = 2;  // 可选：过滤认证类型
 }
 
 message GetUserAuthMethodReply {
@@ -90,12 +86,11 @@ message GetUserAuthMethodReply {
 
 // UserAuthMethod 用户认证方法
 message UserAuthMethod {
-  int64 id = 1;
-  int64 tenant_id = 2;
-  int64 user_id = 3;
-  string auth_type = 4;  // apple, google, github, facebook, telegram, email, mobile
-  string auth_identifier = 5;  // 认证标识
-  bool verified = 6;  // 是否已验证
-  int64 created_at = 7;  // Unix timestamp in milliseconds
-  int64 updated_at = 8;  // Unix timestamp in milliseconds
+  string id = 1;
+  string user_id = 2;
+  string auth_type = 3;  // apple, google, github, facebook, telegram, email, mobile
+  string auth_identifier = 4;  // 认证标识
+  bool verified = 5;  // 是否已验证
+  string created_at = 6;  // Unix timestamp in milliseconds
+  string updated_at = 7;  // Unix timestamp in milliseconds
 }

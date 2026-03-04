@@ -9,42 +9,42 @@ import (
 
 // OrdersTotal represents order statistics totals
 type OrdersTotal struct {
-	AmountTotal        int64                  `json:"amount_total"`
-	NewOrderAmount     int64                  `json:"new_order_amount"`
-	RenewalOrderAmount int64                  `json:"renewal_order_amount"`
+	AmountTotal        int                    `json:"amount_total"`
+	NewOrderAmount     int                    `json:"new_order_amount"`
+	RenewalOrderAmount int                    `json:"renewal_order_amount"`
 	List               []*OrdersTotalWithDate `json:"list,omitempty"`
 }
 
 // OrdersTotalWithDate represents order statistics with date
 type OrdersTotalWithDate struct {
 	Date               string `json:"date"`
-	AmountTotal        int64  `json:"amount_total"`
-	NewOrderAmount     int64  `json:"new_order_amount"`
-	RenewalOrderAmount int64  `json:"renewal_order_amount"`
+	AmountTotal        int    `json:"amount_total"`
+	NewOrderAmount     int    `json:"new_order_amount"`
+	RenewalOrderAmount int    `json:"renewal_order_amount"`
 }
 
 // UserStatistics represents user statistics
 type UserStatistics struct {
 	Date              string            `json:"date,omitempty"`
-	Register          int64             `json:"register"`
-	NewOrderUsers     int64             `json:"new_order_users"`
-	RenewalOrderUsers int64             `json:"renewal_order_users"`
+	Register          int               `json:"register"`
+	NewOrderUsers     int               `json:"new_order_users"`
+	RenewalOrderUsers int               `json:"renewal_order_users"`
 	List              []*UserStatistics `json:"list,omitempty"`
 }
 
 // UserTrafficData represents user traffic ranking data
 type UserTrafficData struct {
-	SID      int64 `json:"sid"`
-	Upload   int64 `json:"upload"`
-	Download int64 `json:"download"`
+	SID      int `json:"sid"`
+	Upload   int `json:"upload"`
+	Download int `json:"download"`
 }
 
 // ServerTrafficData represents server traffic ranking data
 type ServerTrafficData struct {
-	ServerID int64  `json:"server_id"`
+	ServerID int    `json:"server_id"`
 	Name     string `json:"name"`
-	Upload   int64  `json:"upload"`
-	Download int64  `json:"download"`
+	Upload   int    `json:"upload"`
+	Download int    `json:"download"`
 }
 
 // ConsoleRepo defines the repository interface for console operations
@@ -57,9 +57,9 @@ type ConsoleRepo interface {
 	QueryMonthlyOrdersList(ctx context.Context, date time.Time) ([]*OrdersTotalWithDate, error)
 
 	// User Statistics
-	QueryRegisterUserTotalByDate(ctx context.Context, date time.Time) (int64, error)
-	QueryRegisterUserTotalByMonthly(ctx context.Context, date time.Time) (int64, error)
-	QueryRegisterUserTotal(ctx context.Context) (int64, error)
+	QueryRegisterUserTotalByDate(ctx context.Context, date time.Time) (int, error)
+	QueryRegisterUserTotalByMonthly(ctx context.Context, date time.Time) (int, error)
+	QueryRegisterUserTotal(ctx context.Context) (int, error)
 	QueryDateUserCounts(ctx context.Context, date time.Time) (newUsers int64, renewalUsers int64, err error)
 	QueryMonthlyUserCounts(ctx context.Context, date time.Time) (newUsers int64, renewalUsers int64, err error)
 	QueryTotalUserCounts(ctx context.Context) (newUsers int64, renewalUsers int64, err error)
@@ -67,12 +67,12 @@ type ConsoleRepo interface {
 	QueryMonthlyUserStatisticsList(ctx context.Context, date time.Time) ([]*UserStatistics, error)
 
 	// Ticket Statistics
-	QueryWaitReplyTotal(ctx context.Context) (int64, error)
+	QueryWaitReplyTotal(ctx context.Context) (int, error)
 
 	// Server Statistics
-	QueryOnlineServers(ctx context.Context) (int64, error)
-	QueryOfflineServers(ctx context.Context) (int64, error)
-	QueryOnlineUsers(ctx context.Context) (int64, error)
+	QueryOnlineServers(ctx context.Context) (int, error)
+	QueryOfflineServers(ctx context.Context) (int, error)
+	QueryOnlineUsers(ctx context.Context) (int, error)
 	QueryTodayTraffic(ctx context.Context, date time.Time) (upload int64, download int64, err error)
 	QueryMonthlyTraffic(ctx context.Context, date time.Time) (upload int64, download int64, err error)
 	QueryTodayUserTrafficRanking(ctx context.Context, date time.Time) ([]*UserTrafficData, error)
@@ -159,7 +159,7 @@ func (uc *ConsoleUsecase) QueryUserStatistics(ctx context.Context) (*UserStatist
 	if err != nil {
 		uc.log.Errorw("QueryRegisterUserTotalByDate error", "error", err)
 	} else {
-		resp.Today.Register = todayRegister
+		resp.Today.Register = int(todayRegister)
 	}
 
 	// Query today user purchase count
@@ -167,8 +167,8 @@ func (uc *ConsoleUsecase) QueryUserStatistics(ctx context.Context) (*UserStatist
 	if err != nil {
 		uc.log.Errorw("QueryDateUserCounts error", "error", err)
 	} else {
-		resp.Today.NewOrderUsers = newToday
-		resp.Today.RenewalOrderUsers = renewalToday
+		resp.Today.NewOrderUsers = int(newToday)
+		resp.Today.RenewalOrderUsers = int(renewalToday)
 	}
 
 	// Query month user register count
@@ -176,7 +176,7 @@ func (uc *ConsoleUsecase) QueryUserStatistics(ctx context.Context) (*UserStatist
 	if err != nil {
 		uc.log.Errorw("QueryRegisterUserTotalByMonthly error", "error", err)
 	} else {
-		resp.Monthly.Register = monthRegister
+		resp.Monthly.Register = int(monthRegister)
 	}
 
 	// Query month user purchase count
@@ -184,8 +184,8 @@ func (uc *ConsoleUsecase) QueryUserStatistics(ctx context.Context) (*UserStatist
 	if err != nil {
 		uc.log.Errorw("QueryMonthlyUserCounts error", "error", err)
 	} else {
-		resp.Monthly.NewOrderUsers = newMonth
-		resp.Monthly.RenewalOrderUsers = renewalMonth
+		resp.Monthly.NewOrderUsers = int(newMonth)
+		resp.Monthly.RenewalOrderUsers = int(renewalMonth)
 	}
 
 	// Get monthly daily user statistics list
@@ -201,7 +201,7 @@ func (uc *ConsoleUsecase) QueryUserStatistics(ctx context.Context) (*UserStatist
 	if err != nil {
 		uc.log.Errorw("QueryRegisterUserTotal error", "error", err)
 	} else {
-		resp.All.Register = allRegister
+		resp.All.Register = int(allRegister)
 	}
 
 	// Query all user order counts
@@ -209,8 +209,8 @@ func (uc *ConsoleUsecase) QueryUserStatistics(ctx context.Context) (*UserStatist
 	if err != nil {
 		uc.log.Errorw("QueryTotalUserCounts error", "error", err)
 	} else {
-		resp.All.NewOrderUsers = allNew
-		resp.All.RenewalOrderUsers = allRenewal
+		resp.All.NewOrderUsers = int(allNew)
+		resp.All.RenewalOrderUsers = int(allRenewal)
 	}
 
 	// Get all monthly user statistics list (past 6 months)
@@ -241,7 +241,7 @@ func (uc *ConsoleUsecase) QueryTicketWaitReply(ctx context.Context) (*TicketWait
 func (uc *ConsoleUsecase) QueryServerTotalData(ctx context.Context) (*ServerTotalDataResponse, error) {
 	now := time.Now()
 	resp := &ServerTotalDataResponse{
-		UpdatedAt: now.Unix(),
+		UpdatedAt: now.Format(time.RFC3339),
 	}
 
 	// Query online servers
@@ -265,8 +265,8 @@ func (uc *ConsoleUsecase) QueryServerTotalData(ctx context.Context) (*ServerTota
 	if err != nil {
 		uc.log.Errorw("QueryTodayTraffic error", "error", err)
 	} else {
-		resp.TodayUpload = todayUpload
-		resp.TodayDownload = todayDownload
+		resp.TodayUpload = int(todayUpload)
+		resp.TodayDownload = int(todayDownload)
 	}
 
 	// Query monthly traffic
@@ -274,8 +274,8 @@ func (uc *ConsoleUsecase) QueryServerTotalData(ctx context.Context) (*ServerTota
 	if err != nil {
 		uc.log.Errorw("QueryMonthlyTraffic error", "error", err)
 	} else {
-		resp.MonthlyUpload = monthlyUpload
-		resp.MonthlyDownload = monthlyDownload
+		resp.MonthlyUpload = int(monthlyUpload)
+		resp.MonthlyDownload = int(monthlyDownload)
 	}
 
 	// Query online users
@@ -336,18 +336,18 @@ type UserStatisticsResponse struct {
 }
 
 type TicketWaitReplyResponse struct {
-	Count int64 `json:"count"`
+	Count int `json:"count"`
 }
 
 type ServerTotalDataResponse struct {
-	OnlineUsers                   int64                `json:"online_users"`
-	OnlineServers                 int64                `json:"online_servers"`
-	OfflineServers                int64                `json:"offline_servers"`
-	TodayUpload                   int64                `json:"today_upload"`
-	TodayDownload                 int64                `json:"today_download"`
-	MonthlyUpload                 int64                `json:"monthly_upload"`
-	MonthlyDownload               int64                `json:"monthly_download"`
-	UpdatedAt                     int64                `json:"updated_at"`
+	OnlineUsers                   int                  `json:"online_users"`
+	OnlineServers                 int                  `json:"online_servers"`
+	OfflineServers                int                  `json:"offline_servers"`
+	TodayUpload                   int                  `json:"today_upload"`
+	TodayDownload                 int                  `json:"today_download"`
+	MonthlyUpload                 int                  `json:"monthly_upload"`
+	MonthlyDownload               int                  `json:"monthly_download"`
+	UpdatedAt                     string               `json:"updated_at"`
 	ServerTrafficRankingToday     []*ServerTrafficData `json:"server_traffic_ranking_today,omitempty"`
 	ServerTrafficRankingYesterday []*ServerTrafficData `json:"server_traffic_ranking_yesterday,omitempty"`
 	UserTrafficRankingToday       []*UserTrafficData   `json:"user_traffic_ranking_today,omitempty"`

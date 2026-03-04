@@ -2,6 +2,7 @@ package announcement
 
 import (
 	"context"
+	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/public/announcement/v1"
 	announcementBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/announcement"
@@ -33,7 +34,7 @@ func (s *AnnouncementService) QueryAnnouncement(ctx context.Context, req *v1.Que
 	}
 
 	// 调用业务层
-	announcements, total, err := s.uc.QueryAnnouncement(ctx, 0, req.Page, req.Size, pinned, popup)
+	announcements, total, err := s.uc.QueryAnnouncement(ctx, req.Page, req.Size, pinned, popup)
 	if err != nil {
 		return nil, err
 	}
@@ -42,14 +43,14 @@ func (s *AnnouncementService) QueryAnnouncement(ctx context.Context, req *v1.Que
 	list := make([]*v1.AnnouncementItem, 0, len(announcements))
 	for _, a := range announcements {
 		list = append(list, &v1.AnnouncementItem{
-			Id:        a.ID,
+			Id:        strconv.FormatInt(a.ID, 10),
 			Title:     a.Title,
 			Content:   a.Content,
 			Show:      a.Show,
 			Pinned:    a.Pinned,
 			Popup:     a.Popup,
-			CreatedAt: a.CreatedAt,
-			UpdatedAt: a.UpdatedAt,
+			CreatedAt: strconv.FormatInt(a.CreatedAt, 10),
+			UpdatedAt: strconv.FormatInt(a.UpdatedAt, 10),
 		})
 	}
 
@@ -58,7 +59,7 @@ func (s *AnnouncementService) QueryAnnouncement(ctx context.Context, req *v1.Que
 		Message: responsecode.CodeMessages[responsecode.AnnouncementQuerySuccess],
 		Data: &v1.AnnouncementListData{
 			List:  list,
-			Total: total,
+			Total: int32(total),
 		},
 	}, nil
 }

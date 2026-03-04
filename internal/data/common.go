@@ -9,7 +9,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyads"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
-		"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
+	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	v1 "github.com/OmnTeam/ppanel-pro/internal/biz/common"
 	"github.com/OmnTeam/ppanel-pro/internal/queue/types"
@@ -28,7 +28,7 @@ type commonRepo struct {
 // CacheKeyPayload stores verification code in Redis
 type CacheKeyPayload struct {
 	Code   string `json:"code"`
-	LastAt int64  `json:"lastAt"`
+	LastAt int    `json:"lastAt"`
 }
 
 // NewCommonRepo creates a new common repository
@@ -284,7 +284,7 @@ func (r *commonRepo) SendEmailVerificationCode(ctx context.Context, email string
 	// Prepare cache payload
 	cachePayload := CacheKeyPayload{
 		Code:   code,
-		LastAt: time.Now().Unix(),
+		LastAt: int(time.Now().Unix()),
 	}
 
 	// Marshal cache payload
@@ -308,7 +308,7 @@ func (r *commonRepo) SendEmailVerificationCode(ctx context.Context, email string
 		Content: map[string]interface{}{
 			"Type":     verifyType,
 			"SiteLogo": "https://example.com/logo.png", // 站点Logo，当前实现与原项目保持一致
-			"SiteName": "PPanel Pro",                    // 站点名称，当前实现与原项目保持一致
+			"SiteName": "PPanel Pro",                   // 站点名称，当前实现与原项目保持一致
 			"Expire":   5,
 			"Code":     code,
 		},
@@ -399,7 +399,7 @@ func (r *commonRepo) SendSmsVerificationCode(ctx context.Context, telephone, tel
 	// Prepare cache payload
 	cachePayload := CacheKeyPayload{
 		Code:   code,
-		LastAt: time.Now().Unix(),
+		LastAt: int(time.Now().Unix()),
 	}
 
 	// Marshal cache payload

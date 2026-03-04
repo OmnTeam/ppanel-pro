@@ -26,8 +26,11 @@ func (ProxyServer) Annotations() []schema.Annotation {
 // Fields of the ProxyServer
 func (ProxyServer) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Comment("服务器ID"),
+		field.Int64("tenant_id").
+			Default(0).
+			Comment("租户ID"),
 		field.String("name").
 			MaxLen(100).
 			Default("").

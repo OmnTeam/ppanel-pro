@@ -10,7 +10,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptionrecord"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyuserwithdrawal"
 )
 
 // ProxyUserCreate is the builder for creating a ProxyUser entity.
@@ -97,13 +99,13 @@ func (_c *ProxyUserCreate) SetNillableBalance(v *int64) *ProxyUserCreate {
 }
 
 // SetTelegram sets the "telegram" field.
-func (_c *ProxyUserCreate) SetTelegram(v int64) *ProxyUserCreate {
+func (_c *ProxyUserCreate) SetTelegram(v int) *ProxyUserCreate {
 	_c.mutation.SetTelegram(v)
 	return _c
 }
 
 // SetNillableTelegram sets the "telegram" field if the given value is not nil.
-func (_c *ProxyUserCreate) SetNillableTelegram(v *int64) *ProxyUserCreate {
+func (_c *ProxyUserCreate) SetNillableTelegram(v *int) *ProxyUserCreate {
 	if v != nil {
 		_c.SetTelegram(*v)
 	}
@@ -125,13 +127,13 @@ func (_c *ProxyUserCreate) SetNillableReferCode(v *string) *ProxyUserCreate {
 }
 
 // SetRefererID sets the "referer_id" field.
-func (_c *ProxyUserCreate) SetRefererID(v int) *ProxyUserCreate {
+func (_c *ProxyUserCreate) SetRefererID(v int64) *ProxyUserCreate {
 	_c.mutation.SetRefererID(v)
 	return _c
 }
 
 // SetNillableRefererID sets the "referer_id" field if the given value is not nil.
-func (_c *ProxyUserCreate) SetNillableRefererID(v *int) *ProxyUserCreate {
+func (_c *ProxyUserCreate) SetNillableRefererID(v *int64) *ProxyUserCreate {
 	if v != nil {
 		_c.SetRefererID(*v)
 	}
@@ -153,13 +155,13 @@ func (_c *ProxyUserCreate) SetNillableCommission(v *int64) *ProxyUserCreate {
 }
 
 // SetReferralPercentage sets the "referral_percentage" field.
-func (_c *ProxyUserCreate) SetReferralPercentage(v int) *ProxyUserCreate {
+func (_c *ProxyUserCreate) SetReferralPercentage(v int8) *ProxyUserCreate {
 	_c.mutation.SetReferralPercentage(v)
 	return _c
 }
 
 // SetNillableReferralPercentage sets the "referral_percentage" field if the given value is not nil.
-func (_c *ProxyUserCreate) SetNillableReferralPercentage(v *int) *ProxyUserCreate {
+func (_c *ProxyUserCreate) SetNillableReferralPercentage(v *int8) *ProxyUserCreate {
 	if v != nil {
 		_c.SetReferralPercentage(*v)
 	}
@@ -320,6 +322,34 @@ func (_c *ProxyUserCreate) SetNillableEnableTradeNotify(v *bool) *ProxyUserCreat
 	return _c
 }
 
+// SetGroupID sets the "group_id" field.
+func (_c *ProxyUserCreate) SetGroupID(v int64) *ProxyUserCreate {
+	_c.mutation.SetGroupID(v)
+	return _c
+}
+
+// SetNillableGroupID sets the "group_id" field if the given value is not nil.
+func (_c *ProxyUserCreate) SetNillableGroupID(v *int64) *ProxyUserCreate {
+	if v != nil {
+		_c.SetGroupID(*v)
+	}
+	return _c
+}
+
+// SetGroupLocked sets the "group_locked" field.
+func (_c *ProxyUserCreate) SetGroupLocked(v bool) *ProxyUserCreate {
+	_c.mutation.SetGroupLocked(v)
+	return _c
+}
+
+// SetNillableGroupLocked sets the "group_locked" field if the given value is not nil.
+func (_c *ProxyUserCreate) SetNillableGroupLocked(v *bool) *ProxyUserCreate {
+	if v != nil {
+		_c.SetGroupLocked(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *ProxyUserCreate) SetCreatedAt(v time.Time) *ProxyUserCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -377,9 +407,39 @@ func (_c *ProxyUserCreate) SetNillableIsDel(v *bool) *ProxyUserCreate {
 }
 
 // SetID sets the "id" field.
-func (_c *ProxyUserCreate) SetID(v int) *ProxyUserCreate {
+func (_c *ProxyUserCreate) SetID(v int64) *ProxyUserCreate {
 	_c.mutation.SetID(v)
 	return _c
+}
+
+// AddRedemptionRecordIDs adds the "redemption_records" edge to the ProxyRedemptionRecord entity by IDs.
+func (_c *ProxyUserCreate) AddRedemptionRecordIDs(ids ...int64) *ProxyUserCreate {
+	_c.mutation.AddRedemptionRecordIDs(ids...)
+	return _c
+}
+
+// AddRedemptionRecords adds the "redemption_records" edges to the ProxyRedemptionRecord entity.
+func (_c *ProxyUserCreate) AddRedemptionRecords(v ...*ProxyRedemptionRecord) *ProxyUserCreate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddRedemptionRecordIDs(ids...)
+}
+
+// AddWithdrawalIDs adds the "withdrawals" edge to the ProxyUserWithdrawal entity by IDs.
+func (_c *ProxyUserCreate) AddWithdrawalIDs(ids ...int64) *ProxyUserCreate {
+	_c.mutation.AddWithdrawalIDs(ids...)
+	return _c
+}
+
+// AddWithdrawals adds the "withdrawals" edges to the ProxyUserWithdrawal entity.
+func (_c *ProxyUserCreate) AddWithdrawals(v ...*ProxyUserWithdrawal) *ProxyUserCreate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddWithdrawalIDs(ids...)
 }
 
 // Mutation returns the ProxyUserMutation object of the builder.
@@ -481,6 +541,14 @@ func (_c *ProxyUserCreate) defaults() {
 		v := proxyuser.DefaultEnableTradeNotify
 		_c.mutation.SetEnableTradeNotify(v)
 	}
+	if _, ok := _c.mutation.GroupID(); !ok {
+		v := proxyuser.DefaultGroupID
+		_c.mutation.SetGroupID(v)
+	}
+	if _, ok := _c.mutation.GroupLocked(); !ok {
+		v := proxyuser.DefaultGroupLocked
+		_c.mutation.SetGroupLocked(v)
+	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := proxyuser.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
@@ -559,6 +627,9 @@ func (_c *ProxyUserCreate) check() error {
 	if _, ok := _c.mutation.EnableTradeNotify(); !ok {
 		return &ValidationError{Name: "enable_trade_notify", err: errors.New(`ent: missing required field "ProxyUser.enable_trade_notify"`)}
 	}
+	if _, ok := _c.mutation.GroupLocked(); !ok {
+		return &ValidationError{Name: "group_locked", err: errors.New(`ent: missing required field "ProxyUser.group_locked"`)}
+	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProxyUser.created_at"`)}
 	}
@@ -586,7 +657,7 @@ func (_c *ProxyUserCreate) sqlSave(ctx context.Context) (*ProxyUser, error) {
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = int64(id)
 	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
@@ -596,7 +667,7 @@ func (_c *ProxyUserCreate) sqlSave(ctx context.Context) (*ProxyUser, error) {
 func (_c *ProxyUserCreate) createSpec() (*ProxyUser, *sqlgraph.CreateSpec) {
 	var (
 		_node = &ProxyUser{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(proxyuser.Table, sqlgraph.NewFieldSpec(proxyuser.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(proxyuser.Table, sqlgraph.NewFieldSpec(proxyuser.FieldID, field.TypeInt64))
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
@@ -627,7 +698,7 @@ func (_c *ProxyUserCreate) createSpec() (*ProxyUser, *sqlgraph.CreateSpec) {
 		_node.Balance = &value
 	}
 	if value, ok := _c.mutation.Telegram(); ok {
-		_spec.SetField(proxyuser.FieldTelegram, field.TypeInt64, value)
+		_spec.SetField(proxyuser.FieldTelegram, field.TypeInt, value)
 		_node.Telegram = &value
 	}
 	if value, ok := _c.mutation.ReferCode(); ok {
@@ -635,7 +706,7 @@ func (_c *ProxyUserCreate) createSpec() (*ProxyUser, *sqlgraph.CreateSpec) {
 		_node.ReferCode = &value
 	}
 	if value, ok := _c.mutation.RefererID(); ok {
-		_spec.SetField(proxyuser.FieldRefererID, field.TypeInt, value)
+		_spec.SetField(proxyuser.FieldRefererID, field.TypeInt64, value)
 		_node.RefererID = &value
 	}
 	if value, ok := _c.mutation.Commission(); ok {
@@ -643,7 +714,7 @@ func (_c *ProxyUserCreate) createSpec() (*ProxyUser, *sqlgraph.CreateSpec) {
 		_node.Commission = &value
 	}
 	if value, ok := _c.mutation.ReferralPercentage(); ok {
-		_spec.SetField(proxyuser.FieldReferralPercentage, field.TypeInt, value)
+		_spec.SetField(proxyuser.FieldReferralPercentage, field.TypeInt8, value)
 		_node.ReferralPercentage = value
 	}
 	if value, ok := _c.mutation.OnlyFirstPurchase(); ok {
@@ -690,6 +761,14 @@ func (_c *ProxyUserCreate) createSpec() (*ProxyUser, *sqlgraph.CreateSpec) {
 		_spec.SetField(proxyuser.FieldEnableTradeNotify, field.TypeBool, value)
 		_node.EnableTradeNotify = value
 	}
+	if value, ok := _c.mutation.GroupID(); ok {
+		_spec.SetField(proxyuser.FieldGroupID, field.TypeInt64, value)
+		_node.GroupID = &value
+	}
+	if value, ok := _c.mutation.GroupLocked(); ok {
+		_spec.SetField(proxyuser.FieldGroupLocked, field.TypeBool, value)
+		_node.GroupLocked = value
+	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(proxyuser.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -705,6 +784,38 @@ func (_c *ProxyUserCreate) createSpec() (*ProxyUser, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.IsDel(); ok {
 		_spec.SetField(proxyuser.FieldIsDel, field.TypeBool, value)
 		_node.IsDel = &value
+	}
+	if nodes := _c.mutation.RedemptionRecordsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.RedemptionRecordsTable,
+			Columns: []string{proxyuser.RedemptionRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyredemptionrecord.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.WithdrawalsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.WithdrawalsTable,
+			Columns: []string{proxyuser.WithdrawalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyuserwithdrawal.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
@@ -756,7 +867,7 @@ func (_c *ProxyUserCreateBulk) Save(ctx context.Context) ([]*ProxyUser, error) {
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

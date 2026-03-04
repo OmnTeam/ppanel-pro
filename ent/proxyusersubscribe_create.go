@@ -21,19 +21,19 @@ type ProxyUserSubscribeCreate struct {
 }
 
 // SetUserID sets the "user_id" field.
-func (_c *ProxyUserSubscribeCreate) SetUserID(v int) *ProxyUserSubscribeCreate {
+func (_c *ProxyUserSubscribeCreate) SetUserID(v int64) *ProxyUserSubscribeCreate {
 	_c.mutation.SetUserID(v)
 	return _c
 }
 
 // SetOrderID sets the "order_id" field.
-func (_c *ProxyUserSubscribeCreate) SetOrderID(v int) *ProxyUserSubscribeCreate {
+func (_c *ProxyUserSubscribeCreate) SetOrderID(v int64) *ProxyUserSubscribeCreate {
 	_c.mutation.SetOrderID(v)
 	return _c
 }
 
 // SetSubscribeID sets the "subscribe_id" field.
-func (_c *ProxyUserSubscribeCreate) SetSubscribeID(v int) *ProxyUserSubscribeCreate {
+func (_c *ProxyUserSubscribeCreate) SetSubscribeID(v int64) *ProxyUserSubscribeCreate {
 	_c.mutation.SetSubscribeID(v)
 	return _c
 }
@@ -143,13 +143,13 @@ func (_c *ProxyUserSubscribeCreate) SetNillableUUID(v *string) *ProxyUserSubscri
 }
 
 // SetStatus sets the "status" field.
-func (_c *ProxyUserSubscribeCreate) SetStatus(v int) *ProxyUserSubscribeCreate {
+func (_c *ProxyUserSubscribeCreate) SetStatus(v int8) *ProxyUserSubscribeCreate {
 	_c.mutation.SetStatus(v)
 	return _c
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (_c *ProxyUserSubscribeCreate) SetNillableStatus(v *int) *ProxyUserSubscribeCreate {
+func (_c *ProxyUserSubscribeCreate) SetNillableStatus(v *int8) *ProxyUserSubscribeCreate {
 	if v != nil {
 		_c.SetStatus(*v)
 	}
@@ -185,7 +185,7 @@ func (_c *ProxyUserSubscribeCreate) SetNillableUpdatedAt(v *time.Time) *ProxyUse
 }
 
 // SetID sets the "id" field.
-func (_c *ProxyUserSubscribeCreate) SetID(v int) *ProxyUserSubscribeCreate {
+func (_c *ProxyUserSubscribeCreate) SetID(v int64) *ProxyUserSubscribeCreate {
 	_c.mutation.SetID(v)
 	return _c
 }
@@ -286,7 +286,7 @@ func (_c *ProxyUserSubscribeCreate) sqlSave(ctx context.Context) (*ProxyUserSubs
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = int64(id)
 	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
@@ -296,22 +296,22 @@ func (_c *ProxyUserSubscribeCreate) sqlSave(ctx context.Context) (*ProxyUserSubs
 func (_c *ProxyUserSubscribeCreate) createSpec() (*ProxyUserSubscribe, *sqlgraph.CreateSpec) {
 	var (
 		_node = &ProxyUserSubscribe{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(proxyusersubscribe.Table, sqlgraph.NewFieldSpec(proxyusersubscribe.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(proxyusersubscribe.Table, sqlgraph.NewFieldSpec(proxyusersubscribe.FieldID, field.TypeInt64))
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
 	if value, ok := _c.mutation.UserID(); ok {
-		_spec.SetField(proxyusersubscribe.FieldUserID, field.TypeInt, value)
+		_spec.SetField(proxyusersubscribe.FieldUserID, field.TypeInt64, value)
 		_node.UserID = value
 	}
 	if value, ok := _c.mutation.OrderID(); ok {
-		_spec.SetField(proxyusersubscribe.FieldOrderID, field.TypeInt, value)
+		_spec.SetField(proxyusersubscribe.FieldOrderID, field.TypeInt64, value)
 		_node.OrderID = value
 	}
 	if value, ok := _c.mutation.SubscribeID(); ok {
-		_spec.SetField(proxyusersubscribe.FieldSubscribeID, field.TypeInt, value)
+		_spec.SetField(proxyusersubscribe.FieldSubscribeID, field.TypeInt64, value)
 		_node.SubscribeID = value
 	}
 	if value, ok := _c.mutation.StartTime(); ok {
@@ -347,7 +347,7 @@ func (_c *ProxyUserSubscribeCreate) createSpec() (*ProxyUserSubscribe, *sqlgraph
 		_node.UUID = &value
 	}
 	if value, ok := _c.mutation.Status(); ok {
-		_spec.SetField(proxyusersubscribe.FieldStatus, field.TypeInt, value)
+		_spec.SetField(proxyusersubscribe.FieldStatus, field.TypeInt8, value)
 		_node.Status = &value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
@@ -408,7 +408,7 @@ func (_c *ProxyUserSubscribeCreateBulk) Save(ctx context.Context) ([]*ProxyUserS
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

@@ -11,7 +11,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribe"
-		"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	oauthBiz "github.com/OmnTeam/ppanel-pro/internal/biz/auth/oauth"
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
 	"github.com/OmnTeam/ppanel-pro/internal/model/log"
@@ -42,16 +42,16 @@ func NewOAuthRepo(d *Data, config *conf.Application, logger kratoLog.Logger) oau
 }
 
 // getJWTConfig returns JWT secret and expiry from environment or defaults
-func (r *oauthRepo) getJWTConfig() (string, int64) {
+func (r *oauthRepo) getJWTConfig() (string, int) {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
 		secret = DefaultJWTSecret
 	}
 
 	expireStr := os.Getenv("JWT_EXPIRE")
-	expire := int64(DefaultJWTExpire)
+	expire := DefaultJWTExpire
 	if expireStr != "" {
-		if val, err := strconv.ParseInt(expireStr, 10, 64); err == nil {
+		if val, err := strconv.Atoi(expireStr); err == nil {
 			expire = val
 		}
 	}
@@ -61,9 +61,8 @@ func (r *oauthRepo) getJWTConfig() (string, int64) {
 
 // GetOAuthConfig 获取OAuth配置
 // 从 proxy_auth_method 表读取指定提供商的OAuth配置
-// ⚠️ 包含tenant_id过滤
-func (r *oauthRepo) GetOAuthConfig(ctx context.Context, tenantID int64, method string) (map[string]string, error) {
-	r.logger.Infof("[GetOAuthConfig] tenantID: %d, method: %s", tenantID, method)
+func (r *oauthRepo) GetOAuthConfig(ctx context.Context, method string) (map[string]string, error) {
+	r.logger.Infof("[GetOAuthConfig] method: %s", method)
 
 	// 查询 proxy_auth_method 表，移除 tenant_id 过滤
 	authMethod, err := r.data.db.ProxyAuthMethod.Query().
@@ -82,7 +81,7 @@ func (r *oauthRepo) GetOAuthConfig(ctx context.Context, tenantID int64, method s
 		return nil, errors.InternalServer("CONFIG_PARSE_ERROR", fmt.Sprintf("解析OAuth配置失败: %v", err))
 	}
 
-	r.logger.Infof("[GetOAuthConfig] 成功获取OAuth配置, tenantID: %d, method: %s", tenantID, method)
+	r.logger.Infof("[GetOAuthConfig] 成功获取OAuth配置, method: %s", method)
 	return config, nil
 }
 
@@ -132,9 +131,8 @@ func (r *oauthRepo) GetStateCode(ctx context.Context, provider, code string) (st
 
 // FindUserByOAuth 通过OAuth查找用户
 // 查询 proxy_user_auth_method 表，通过 auth_method 和 auth_identifier 查找用户
-// ⚠️ 包含tenant_id过滤
-func (r *oauthRepo) FindUserByOAuth(ctx context.Context, tenantID int64, method, openID string) (int64, error) {
-	r.logger.Infof("[FindUserByOAuth] tenantID: %d, method: %s, openID: %s", tenantID, method, openID)
+func (r *oauthRepo) FindUserByOAuth(ctx context.Context, method, openID string) (int, error) {
+	r.logger.Infof("[FindUserByOAuth] method: %s, openID: %s", method, openID)
 
 	// 查询 proxy_user_auth_method 表，移除 tenant_id 过滤
 	authMethod, err := r.data.db.ProxyUserAuthMethod.Query().
@@ -151,7 +149,7 @@ func (r *oauthRepo) FindUserByOAuth(ctx context.Context, tenantID int64, method,
 	}
 
 	r.logger.Infof("[FindUserByOAuth] 找到用户, userID: %d", authMethod.UserID)
-	return int64(authMethod.UserID), nil
+	return int(authMethod.UserID), nil
 }
 
 // CreateUserWithOAuth 创建OAuth用户
@@ -165,9 +163,8 @@ func (r *oauthRepo) FindUserByOAuth(ctx context.Context, tenantID int64, method,
 // 6. 创建 email auth_method 记录（如果email不为空）
 // 7. 激活试用订阅（如果配置启用）
 // 8. 记录注册日志
-// ⚠️ 所有操作都包含tenant_id字段
-func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, tenantID int64, method, openID, email, avatar, ip, userAgent string) (int64, error) {
-	r.logger.Infof("[CreateUserWithOAuth] tenantID: %d, method: %s, email: %s, ip: %s", tenantID, method, email, ip)
+func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, method, openID, email, avatar, ip, userAgent string) (int, error) {
+	r.logger.Infof("[CreateUserWithOAuth] method: %s, email: %s, ip: %s", method, email, ip)
 
 	// 1. 检查强制邀请配置
 	if r.config != nil && r.config.Invite != nil && r.config.Invite.ForcedInvite {
@@ -175,7 +172,7 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, tenantID int64, met
 		return 0, errors.BadRequest("INVITE_CODE_REQUIRED", "需要邀请码才能注册")
 	}
 
-	var userID int64
+	var userID int
 
 	// 开始事务
 	err := r.data.db.TX(ctx, func(tx *ent.Tx) error {
@@ -218,15 +215,15 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, tenantID int64, met
 			return errors.InternalServer("DATABASE_ERROR", fmt.Sprintf("创建用户失败: %v", err))
 		}
 
-		userID = int64(user.ID)
+		userID = int(user.ID)
 		r.logger.Infof("[CreateUserWithOAuth] 用户创建成功, userID: %d", userID)
 
 		// 4. 生成并更新 refer_code
-		referCode := uuidx.UserInviteCode(userID)
+		referCode := uuidx.UserInviteCode(int64(userID))
 		r.logger.Infof("[CreateUserWithOAuth] 生成refer_code: %s, userID: %d", referCode, userID)
 
 		// 移除 tenant_id 隔离条件
-		err = tx.ProxyUser.UpdateOneID(int(userID)).
+		err = tx.ProxyUser.UpdateOneID(int64(userID)).
 			SetReferCode(referCode).
 			Exec(ctx)
 		if err != nil {
@@ -238,7 +235,7 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, tenantID int64, met
 		r.logger.Infof("[CreateUserWithOAuth] 创建OAuth认证方法, method: %s, openID: %s", method, openID)
 
 		_, err = tx.ProxyUserAuthMethod.Create().
-			SetUserID(int(userID)).
+			SetUserID(int64(userID)).
 			SetAuthType(method).
 			SetAuthIdentifier(openID).
 			SetVerified(true).
@@ -253,7 +250,7 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, tenantID int64, met
 			r.logger.Infof("[CreateUserWithOAuth] 创建email认证方法, email: %s", email)
 
 			_, err = tx.ProxyUserAuthMethod.Create().
-				SetUserID(int(userID)).
+				SetUserID(int64(userID)).
 				SetAuthType("email").
 				SetAuthIdentifier(email).
 				SetVerified(true).
@@ -267,7 +264,7 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, tenantID int64, met
 		// 7. 激活试用订阅（如果配置启用）
 		if r.config != nil && r.config.Register != nil && r.config.Register.EnableTrial {
 			r.logger.Infof("[CreateUserWithOAuth] 激活试用订阅, userID: %d", userID)
-			err = r.activeTrial(ctx, tx, tenantID, userID)
+			err = r.activeTrial(ctx, tx, userID)
 			if err != nil {
 				r.logger.Errorf("[CreateUserWithOAuth] 激活试用订阅失败: %v", err)
 				return err
@@ -297,7 +294,7 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, tenantID int64, met
 	_, err = r.data.db.ProxySystemLog.Create().
 		SetType(int8(log.TypeRegister.Uint8())).
 		SetDate(time.Now().Format("2006-01-02")).
-		SetObjectID(userID).
+		SetObjectID(int64(userID)).
 		SetContent(string(content)).
 		Save(ctx)
 	if err != nil {
@@ -311,9 +308,8 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, tenantID int64, met
 // RecordLoginLog 记录登录日志
 // 完整复刻原项目的 recordLoginStatus 函数（oAuthLoginGetTokenLogic.go Line 515-540）
 // 记录到proxy_system_log表，Type = TypeLogin (30)
-// ⚠️ 包含tenant_id字段
-func (r *oauthRepo) RecordLoginLog(ctx context.Context, tenantID, userID int64, method, ip, userAgent string, success bool) error {
-	r.logger.Infof("[RecordLoginLog] tenantID: %d, userID: %d, method: %s, success: %v", tenantID, userID, method, success)
+func (r *oauthRepo) RecordLoginLog(ctx context.Context, userID int, method, ip, userAgent string, success bool) error {
+	r.logger.Infof("[RecordLoginLog] userID: %d, method: %s, success: %v", userID, method, success)
 
 	loginLog := log.Login{
 		Method:    method,
@@ -331,7 +327,7 @@ func (r *oauthRepo) RecordLoginLog(ctx context.Context, tenantID, userID int64, 
 	_, err = r.data.db.ProxySystemLog.Create().
 		SetType(int8(log.TypeLogin.Uint8())).
 		SetDate(time.Now().Format("2006-01-02")).
-		SetObjectID(userID).
+		SetObjectID(int64(userID)).
 		SetContent(string(content)).
 		Save(ctx)
 	if err != nil {
@@ -345,9 +341,8 @@ func (r *oauthRepo) RecordLoginLog(ctx context.Context, tenantID, userID int64, 
 
 // activeTrial 激活试用订阅
 // 完整复刻原项目的 activeTrial 函数（Line 796-861）
-// ⚠️ 包含tenant_id字段
-func (r *oauthRepo) activeTrial(ctx context.Context, tx *ent.Tx, tenantID, userID int64) error {
-	r.logger.Infof("[activeTrial] tenantID: %d, userID: %d", tenantID, userID)
+func (r *oauthRepo) activeTrial(ctx context.Context, tx *ent.Tx, userID int) error {
+	r.logger.Infof("[activeTrial] userID: %d", userID)
 
 	// 获取试用订阅配置
 	if r.config == nil || r.config.Register == nil {
@@ -362,7 +357,7 @@ func (r *oauthRepo) activeTrial(ctx context.Context, tx *ent.Tx, tenantID, userI
 
 	// 查询试用订阅模板（移除tenant_id过滤）
 	sub, err := tx.ProxySubscribe.Query().
-		Where(proxysubscribe.IDEQ(int(trialSubscribeID))).
+		Where(proxysubscribe.IDEQ(trialSubscribeID)).
 		Only(ctx)
 	if err != nil {
 		r.logger.Errorf("[activeTrial] 查询试用订阅模板失败: %v", err)
@@ -382,7 +377,7 @@ func (r *oauthRepo) activeTrial(ctx context.Context, tx *ent.Tx, tenantID, userI
 
 	// 创建试用订阅记录
 	_, err = tx.ProxyUserSubscribe.Create().
-		SetUserID(int(userID)).
+		SetUserID(int64(userID)).
 		SetOrderID(0).
 		SetSubscribeID(sub.ID).
 		SetStartTime(startTime).
@@ -405,10 +400,10 @@ func (r *oauthRepo) activeTrial(ctx context.Context, tx *ent.Tx, tenantID, userI
 
 // GenerateJWTToken 生成JWT令牌
 // 完整复刻原项目的 generateToken 函数（Line 564-609）
-// Claims包含: TenantId (新增), UserId, SessionId
+// Claims包含: UserId, SessionId
 // Session ID保存到Redis，过期时间与JWT一致
-func (r *oauthRepo) GenerateJWTToken(ctx context.Context, tenantID, userID int64) (string, error) {
-	r.logger.Infof("[GenerateJWTToken] tenantID: %d, userID: %d", tenantID, userID)
+func (r *oauthRepo) GenerateJWTToken(ctx context.Context, userID int) (string, error) {
+	r.logger.Infof("[GenerateJWTToken] userID: %d", userID)
 
 	// 生成session ID
 	sessionID := uuidx.NewUUID().String()
@@ -419,13 +414,12 @@ func (r *oauthRepo) GenerateJWTToken(ctx context.Context, tenantID, userID int64
 	r.logger.Infof("[GenerateJWTToken] 生成JWT token, userID: %d, sessionID: %s, expire: %d秒",
 		userID, sessionID, accessExpire)
 
-	// 生成JWT token（添加 TenantId 到 Claims）
+	// 生成JWT token
 	token, err := jwt.NewJwtToken(
 		accessSecret,
 		time.Now().Unix(),
-		accessExpire,
-		jwt.WithOption("TenantId", tenantID), // ⚠️ 新增租户ID
-		jwt.WithOption("UserId", userID),
+		int64(accessExpire),
+		jwt.WithOption("UserId", int64(userID)),
 		jwt.WithOption("SessionId", sessionID),
 	)
 	if err != nil {
@@ -435,7 +429,7 @@ func (r *oauthRepo) GenerateJWTToken(ctx context.Context, tenantID, userID int64
 
 	// 将session ID保存到Redis
 	sessionKey := fmt.Sprintf("session:%s", sessionID)
-	err = r.data.rdb.Set(ctx, sessionKey, userID, time.Duration(accessExpire)*time.Second).Err()
+	err = r.data.rdb.Set(ctx, sessionKey, int64(userID), time.Duration(accessExpire)*time.Second).Err()
 	if err != nil {
 		r.logger.Errorf("[GenerateJWTToken] 保存session到Redis失败: %v", err)
 		return "", errors.InternalServer("REDIS_ERROR", fmt.Sprintf("保存session失败: %v", err))

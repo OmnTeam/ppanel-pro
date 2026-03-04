@@ -27,8 +27,11 @@ func (ProxyAuthMethod) Annotations() []schema.Annotation {
 // Fields of the ProxyAuthMethod
 func (ProxyAuthMethod) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Comment("认证方法ID"),
+		field.Int64("tenant_id").
+			Default(0).
+			Comment("租户ID"),
 		field.String("method").
 			MaxLen(255).
 			NotEmpty().

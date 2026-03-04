@@ -26,7 +26,7 @@ func (ProxyServerGroup) Annotations() []schema.Annotation {
 // Fields of the ProxyServerGroup
 func (ProxyServerGroup) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Positive().
 			Comment("ID"),
 		field.String("name").
@@ -37,6 +37,9 @@ func (ProxyServerGroup) Fields() []ent.Field {
 			MaxLen(255).
 			Default("").
 			Comment("Group Description"),
+		field.Int("sort").
+			Default(0).
+			Comment("Sort Order"),
 		field.Time("created_at").
 			Default(time.Now).
 			Comment("Creation Time"),

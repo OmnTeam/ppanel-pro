@@ -13,6 +13,10 @@ const (
 	Label = "proxy_coupon"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldUserLimit holds the string denoting the user_limit field in the database.
+	FieldUserLimit = "user_limit"
+	// FieldSubscribe holds the string denoting the subscribe field in the database.
+	FieldSubscribe = "subscribe"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldCode holds the string denoting the code field in the database.
@@ -40,6 +44,8 @@ const (
 // Columns holds all SQL columns for proxycoupon fields.
 var Columns = []string{
 	FieldID,
+	FieldUserLimit,
+	FieldSubscribe,
 	FieldName,
 	FieldCode,
 	FieldCount,
@@ -63,6 +69,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultUserLimit holds the default value on creation for the "user_limit" field.
+	DefaultUserLimit int64
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 	// CodeValidator is a validator for the "code" field. It is called by the builders before save.
@@ -93,6 +101,16 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByUserLimit orders the results by the user_limit field.
+func ByUserLimit(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserLimit, opts...).ToFunc()
+}
+
+// BySubscribe orders the results by the subscribe field.
+func BySubscribe(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSubscribe, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.

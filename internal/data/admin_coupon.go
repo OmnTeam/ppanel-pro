@@ -27,60 +27,81 @@ func NewCouponRepo(data *Data, logger log.Logger) coupon.CouponRepo {
 }
 
 // CreateCoupon 创建优惠券
-func (r *couponRepo) CreateCoupon(ctx context.Context, tenantID int64, name, code string, count int64, typ int32, discount, startTime, expireTime, userLimit int64, subscribe string, enable bool) error {
+func (r *couponRepo) CreateCoupon(ctx context.Context, name, code string, count int, typ int32, discount, startTime, expireTime, userLimit int64, subscribe string, enable bool) error {
 	_, err := r.data.db.ProxyCoupon.Create().
 		SetName(name).
 		SetCode(code).
-		SetCount(count).
+		SetCount(int64(count)).
 		SetType(int8(typ)).
 		SetDiscount(discount).
 		SetStartTime(time.Unix(startTime, 0)).
 		SetEndTime(time.Unix(expireTime, 0)).
-		SetStatus(func() int8 { if enable { return 1 } else { return 0 } }()).
+		SetUserLimit(userLimit).
+		SetSubscribe(subscribe).
+		SetStatus(func() int8 {
+			if enable {
+				return 1
+			} else {
+				return 0
+			}
+		}()).
 		Save(ctx)
 
 	return err
 }
 
 // UpdateCoupon 更新优惠券
-func (r *couponRepo) UpdateCoupon(ctx context.Context, id, tenantID int64, name, code string, count int64, typ int32, discount, startTime, expireTime, userLimit int64, subscribe string, enable bool) error {
+func (r *couponRepo) UpdateCoupon(ctx context.Context, id int, name, code string, count int, typ int32, discount, startTime, expireTime, userLimit int64, subscribe string, enable bool) error {
 	return r.data.db.ProxyCoupon.Update().
 		Where(
-			proxycoupon.ID(id),
+			proxycoupon.ID(int64(id)),
 		).
 		SetName(name).
 		SetCode(code).
-		SetCount(count).
+		SetCount(int64(count)).
 		SetType(int8(typ)).
 		SetDiscount(discount).
 		SetStartTime(time.Unix(startTime, 0)).
 		SetEndTime(time.Unix(expireTime, 0)).
-		SetStatus(func() int8 { if enable { return 1 } else { return 0 } }()).
+		SetUserLimit(userLimit).
+		SetSubscribe(subscribe).
+		SetStatus(func() int8 {
+			if enable {
+				return 1
+			} else {
+				return 0
+			}
+		}()).
 		Exec(ctx)
 }
 
 // DeleteCoupon 删除优惠券
-func (r *couponRepo) DeleteCoupon(ctx context.Context, id, tenantID int64) error {
+func (r *couponRepo) DeleteCoupon(ctx context.Context, id int) error {
 	_, err := r.data.db.ProxyCoupon.Delete().
 		Where(
-			proxycoupon.ID(id),
+			proxycoupon.ID(int64(id)),
 		).
 		Exec(ctx)
 	return err
 }
 
 // BatchDeleteCoupon 批量删除优惠券
-func (r *couponRepo) BatchDeleteCoupon(ctx context.Context, tenantID int64, ids []int64) error {
+func (r *couponRepo) BatchDeleteCoupon(ctx context.Context, ids []int) error {
+	// Convert int IDs to int64
+	int64IDs := make([]int64, len(ids))
+	for i, id := range ids {
+		int64IDs[i] = int64(id)
+	}
 	_, err := r.data.db.ProxyCoupon.Delete().
 		Where(
-			proxycoupon.IDIn(ids...),
+			proxycoupon.IDIn(int64IDs...),
 		).
 		Exec(ctx)
 	return err
 }
 
 // GetCouponList 获取优惠券列表
-func (r *couponRepo) GetCouponList(ctx context.Context, tenantID, page, size, subscribe int64, search string) ([]*ent.ProxyCoupon, int64, error) {
+func (r *couponRepo) GetCouponList(ctx context.Context, page, size, subscribe int64, search string) ([]*ent.ProxyCoupon, int64, error) {
 	query := r.data.db.ProxyCoupon.Query()
 
 	// 如果有搜索关键字

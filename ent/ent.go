@@ -17,9 +17,12 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxycoupon"
 	"github.com/OmnTeam/ppanel-pro/ent/proxydocument"
+	"github.com/OmnTeam/ppanel-pro/ent/proxygrouphistory"
 	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyorder"
 	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptioncode"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptionrecord"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyschemamigrations"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyserver"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyservergroup"
@@ -36,7 +39,9 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdevice"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdeviceonlinerecord"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyusergroup"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyuserwithdrawal"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -102,9 +107,12 @@ func checkColumn(t, c string) error {
 			proxyauthmethod.Table:             proxyauthmethod.ValidColumn,
 			proxycoupon.Table:                 proxycoupon.ValidColumn,
 			proxydocument.Table:               proxydocument.ValidColumn,
+			proxygrouphistory.Table:           proxygrouphistory.ValidColumn,
 			proxynode.Table:                   proxynode.ValidColumn,
 			proxyorder.Table:                  proxyorder.ValidColumn,
 			proxypayment.Table:                proxypayment.ValidColumn,
+			proxyredemptioncode.Table:         proxyredemptioncode.ValidColumn,
+			proxyredemptionrecord.Table:       proxyredemptionrecord.ValidColumn,
 			proxyschemamigrations.Table:       proxyschemamigrations.ValidColumn,
 			proxyserver.Table:                 proxyserver.ValidColumn,
 			proxyservergroup.Table:            proxyservergroup.ValidColumn,
@@ -121,7 +129,9 @@ func checkColumn(t, c string) error {
 			proxyuserauthmethod.Table:         proxyuserauthmethod.ValidColumn,
 			proxyuserdevice.Table:             proxyuserdevice.ValidColumn,
 			proxyuserdeviceonlinerecord.Table: proxyuserdeviceonlinerecord.ValidColumn,
+			proxyusergroup.Table:              proxyusergroup.ValidColumn,
 			proxyusersubscribe.Table:          proxyusersubscribe.ValidColumn,
+			proxyuserwithdrawal.Table:         proxyuserwithdrawal.ValidColumn,
 		})
 	})
 	return columnCheck(t, c)

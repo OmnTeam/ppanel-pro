@@ -38,8 +38,8 @@ func NewAdminMarketingRepo(data *Data, logger log.Logger) marketingbiz.Marketing
 // ========== Email Task Methods ==========
 
 // CreateBatchSendEmailTask 创建批量发送邮件任务
-func (r *adminMarketingRepo) CreateBatchSendEmailTask(ctx context.Context, tenantID int64, subject, content string, scope int32,
-	registerStartTime, registerEndTime int64, additional string, scheduled int64, interval int32, limit int64) error {
+func (r *adminMarketingRepo) CreateBatchSendEmailTask(ctx context.Context, subject, content string, scope int32,
+	registerStartTime, registerEndTime int64, additional string, scheduled int, interval int32, limit int) error {
 
 	scopeType := taskmodel.ScopeType(scope)
 
@@ -156,7 +156,7 @@ func (r *adminMarketingRepo) CreateBatchSendEmailTask(ctx context.Context, tenan
 	// 设置定时执行时间（默认延迟10秒执行，防止任务创建和执行时间过于接近）
 	scheduledAt := time.Now().Add(10 * time.Second)
 	if scheduled != 0 {
-		scheduledAt = time.Unix(scheduled, 0)
+		scheduledAt = time.Unix(int64(scheduled), 0)
 		if scheduledAt.Before(time.Now()) {
 			scheduledAt = time.Now()
 		}
@@ -169,7 +169,7 @@ func (r *adminMarketingRepo) CreateBatchSendEmailTask(ctx context.Context, tenan
 		RegisterEndTime:   registerEndTime,
 		Recipients:        emails,
 		Additional:        additionalEmails,
-		Scheduled:         scheduled,
+		Scheduled:         int64(scheduled),
 		Interval:          uint8(interval),
 		Limit:             uint64(limit),
 	}
@@ -206,7 +206,7 @@ func (r *adminMarketingRepo) CreateBatchSendEmailTask(ctx context.Context, tenan
 		SetContent(contentJSON).
 		SetStatus(int8(taskmodel.StatusPending)).
 		SetErrors("").
-		SetTotal(total).
+		SetTotal(uint32(total)).
 		SetCurrent(0).
 		Save(ctx)
 
@@ -218,7 +218,7 @@ func (r *adminMarketingRepo) CreateBatchSendEmailTask(ctx context.Context, tenan
 	r.log.Infof("CreateBatchSendEmailTask: successfully created task with ID: %d", taskRecord.ID)
 
 	// 创建Asynq任务并加入队列
-	asynqTask := asynq.NewTask(queuetypes.ScheduledBatchSendEmail, []byte(strconv.FormatInt(taskRecord.ID, 10)))
+	asynqTask := asynq.NewTask(queuetypes.ScheduledBatchSendEmail, []byte(strconv.FormatInt(int64(taskRecord.ID), 10)))
 	info, err := r.data.queue.EnqueueContext(ctx, asynqTask, asynq.ProcessAt(scheduledAt))
 	if err != nil {
 		r.log.Errorf("CreateBatchSendEmailTask: failed to enqueue task: %v", err)
@@ -231,7 +231,7 @@ func (r *adminMarketingRepo) CreateBatchSendEmailTask(ctx context.Context, tenan
 }
 
 // GetBatchSendEmailTaskList 获取批量发送邮件任务列表
-func (r *adminMarketingRepo) GetBatchSendEmailTaskList(ctx context.Context, tenantID int64, page, size int32, scope, status *int32) ([]*ent.ProxyTask, int64, error) {
+func (r *adminMarketingRepo) GetBatchSendEmailTaskList(ctx context.Context, page, size int32, scope, status *int32) ([]*ent.ProxyTask, int64, error) {
 	if page == 0 {
 		page = 1
 	}
@@ -270,7 +270,7 @@ func (r *adminMarketingRepo) GetBatchSendEmailTaskList(ctx context.Context, tena
 }
 
 // StopBatchSendEmailTask 停止批量发送邮件任务
-func (r *adminMarketingRepo) StopBatchSendEmailTask(ctx context.Context, tenantID, id int64) error {
+func (r *adminMarketingRepo) StopBatchSendEmailTask(ctx context.Context, id int) error {
 	// 注意：原始项目使用 email.Manager.RemoveWorker(id) 停止工作线程
 	// 当前实现使用 Asynq 队列系统，无法直接停止正在执行的任务
 	// 仅更新数据库状态为 Completed (status=2)，与原始逻辑保持一致
@@ -295,7 +295,7 @@ func (r *adminMarketingRepo) StopBatchSendEmailTask(ctx context.Context, tenantI
 }
 
 // GetPreSendEmailCount 获取预发送邮件数量
-func (r *adminMarketingRepo) GetPreSendEmailCount(ctx context.Context, tenantID int64, scope int32, registerStartTime, registerEndTime int64) (int64, error) {
+func (r *adminMarketingRepo) GetPreSendEmailCount(ctx context.Context, scope int32, registerStartTime, registerEndTime int) (int64, error) {
 	scopeType := taskmodel.ScopeType(scope)
 
 	// 基础查询：auth_type = 'email' 的用户认证方法
@@ -390,7 +390,7 @@ func (r *adminMarketingRepo) GetPreSendEmailCount(ctx context.Context, tenantID 
 }
 
 // GetBatchSendEmailTaskStatus 获取批量发送邮件任务状态
-func (r *adminMarketingRepo) GetBatchSendEmailTaskStatus(ctx context.Context, tenantID, id int64) (*ent.ProxyTask, error) {
+func (r *adminMarketingRepo) GetBatchSendEmailTaskStatus(ctx context.Context, id int) (*ent.ProxyTask, error) {
 	task, err := r.data.db.ProxyTask.Query().
 		Where(func(s *sql.Selector) {
 			s.Where(sql.And(
@@ -410,15 +410,21 @@ func (r *adminMarketingRepo) GetBatchSendEmailTaskStatus(ctx context.Context, te
 // ========== Quota Task Methods ==========
 
 // CreateQuotaTask 创建配额任务
-func (r *adminMarketingRepo) CreateQuotaTask(ctx context.Context, tenantID int64, subscribers []int64, isActive *bool,
-	startTime, endTime int64, resetTraffic bool, days int64, giftType int32, giftValue int64) error {
+func (r *adminMarketingRepo) CreateQuotaTask(ctx context.Context, subscribers []int, isActive *bool,
+	startTime, endTime int64, resetTraffic bool, days int64, giftType int32, giftValue int) error {
 
 	// 查询符合条件的用户订阅记录
+	// 将[]int转换为[]int64
+	subscribersInt64 := make([]int64, len(subscribers))
+	for i, id := range subscribers {
+		subscribersInt64[i] = int64(id)
+	}
+
 	query := r.data.db.ProxyUserSubscribe.Query().
 		Where(func(s *sql.Selector) {
 			// 订阅ID列表过滤
 			if len(subscribers) > 0 {
-				s.Where(sql.In(s.C(proxyusersubscribe.FieldSubscribeID), toInterfaceSlice(subscribers)...))
+				s.Where(sql.In(s.C(proxyusersubscribe.FieldSubscribeID), toInterfaceSlice(subscribersInt64)...))
 			}
 
 			// 是否仅活跃订阅（status IN (0,1,2)）
@@ -460,7 +466,7 @@ func (r *adminMarketingRepo) CreateQuotaTask(ctx context.Context, tenantID int64
 
 	// 构建QuotaScope
 	scopeInfo := &taskmodel.QuotaScope{
-		Subscribers: subscribers,
+		Subscribers: subscribersInt64,
 		IsActive:    isActive,
 		StartTime:   startTime,
 		EndTime:     endTime,
@@ -492,7 +498,7 @@ func (r *adminMarketingRepo) CreateQuotaTask(ctx context.Context, tenantID int64
 		SetContent(contentJSON).
 		SetStatus(int8(taskmodel.StatusPending)).
 		SetErrors("").
-		SetTotal(uint64(len(subIds))).
+		SetTotal(uint32(len(subIds))).
 		SetCurrent(0).
 		Save(ctx)
 
@@ -504,7 +510,7 @@ func (r *adminMarketingRepo) CreateQuotaTask(ctx context.Context, tenantID int64
 	r.log.Infof("CreateQuotaTask: successfully created task with ID: %d", taskRecord.ID)
 
 	// 创建Asynq任务并立即加入队列
-	asynqTask := asynq.NewTask(queuetypes.ForthwithQuotaTask, []byte(strconv.FormatInt(taskRecord.ID, 10)))
+	asynqTask := asynq.NewTask(queuetypes.ForthwithQuotaTask, []byte(strconv.FormatInt(int64(taskRecord.ID), 10)))
 	info, err := r.data.queue.EnqueueContext(ctx, asynqTask)
 	if err != nil {
 		r.log.Errorf("CreateQuotaTask: failed to enqueue task: %v", err)
@@ -517,12 +523,17 @@ func (r *adminMarketingRepo) CreateQuotaTask(ctx context.Context, tenantID int64
 }
 
 // QueryQuotaTaskPreCount 查询配额任务预计数量
-func (r *adminMarketingRepo) QueryQuotaTaskPreCount(ctx context.Context, tenantID int64, subscribers []int64, isActive *bool, startTime, endTime int64) (int64, error) {
+func (r *adminMarketingRepo) QueryQuotaTaskPreCount(ctx context.Context, subscribers []int, isActive *bool, startTime, endTime int) (int64, error) {
+	// 将[]int转换为[]int64
+	subscribersInt64 := make([]int64, len(subscribers))
+	for i, id := range subscribers {
+		subscribersInt64[i] = int64(id)
+	}
 	query := r.data.db.ProxyUserSubscribe.Query().
 		Where(func(s *sql.Selector) {
 			// 订阅ID列表过滤
 			if len(subscribers) > 0 {
-				s.Where(sql.In(s.C(proxyusersubscribe.FieldSubscribeID), toInterfaceSlice(subscribers)...))
+				s.Where(sql.In(s.C(proxyusersubscribe.FieldSubscribeID), toInterfaceSlice(subscribersInt64)...))
 			}
 
 			// 是否仅活跃订阅（status IN (0,1,2)）
@@ -555,7 +566,7 @@ func (r *adminMarketingRepo) QueryQuotaTaskPreCount(ctx context.Context, tenantI
 }
 
 // QueryQuotaTaskList 查询配额任务列表
-func (r *adminMarketingRepo) QueryQuotaTaskList(ctx context.Context, tenantID int64, page, size int32, status *int32) ([]*ent.ProxyTask, int64, error) {
+func (r *adminMarketingRepo) QueryQuotaTaskList(ctx context.Context, page, size int32, status *int32) ([]*ent.ProxyTask, int64, error) {
 	if page == 0 {
 		page = 1
 	}

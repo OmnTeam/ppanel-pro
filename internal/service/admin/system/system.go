@@ -27,8 +27,8 @@ func NewSystemService(uc *systembiz.SystemUsecase, logger log.Logger) *SystemSer
 
 // GetCurrencyConfig 获取货币配置
 func (s *SystemService) GetCurrencyConfig(ctx context.Context, req *pb.GetCurrencyConfigRequest) (*pb.GetCurrencyConfigReply, error) {
-	
-	config, err := s.uc.GetCurrencyConfig(ctx, 0)
+
+	config, err := s.uc.GetCurrencyConfig(ctx)
 	if err != nil {
 		s.log.Errorf("Failed to get currency config: %v", err)
 		return nil, err
@@ -47,14 +47,14 @@ func (s *SystemService) GetCurrencyConfig(ctx context.Context, req *pb.GetCurren
 
 // UpdateCurrencyConfig 更新货币配置
 func (s *SystemService) UpdateCurrencyConfig(ctx context.Context, req *pb.UpdateCurrencyConfigRequest) (*pb.UpdateCurrencyConfigReply, error) {
-	
+
 	config := &systembiz.CurrencyConfig{
 		AccessKey:      req.AccessKey,
 		CurrencyUnit:   req.CurrencyUnit,
 		CurrencySymbol: req.CurrencySymbol,
 	}
 
-	if err := s.uc.UpdateCurrencyConfig(ctx, 0, config); err != nil {
+	if err := s.uc.UpdateCurrencyConfig(ctx, config); err != nil {
 		s.log.Errorf("Failed to update currency config: %v", err)
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (s *SystemService) UpdateCurrencyConfig(ctx context.Context, req *pb.Update
 // GetInviteConfig 获取邀请配置
 func (s *SystemService) GetInviteConfig(ctx context.Context, req *pb.GetInviteConfigRequest) (*pb.GetInviteConfigReply, error) {
 
-	config, err := s.uc.GetInviteConfig(ctx, 0)
+	config, err := s.uc.GetInviteConfig(ctx)
 	if err != nil {
 		s.log.Errorf("Failed to get invite config: %v", err)
 		return nil, err
@@ -80,7 +80,7 @@ func (s *SystemService) GetInviteConfig(ctx context.Context, req *pb.GetInviteCo
 		Message: responsecode.CodeMessages[responsecode.AdminGetInviteConfigSuccess],
 		Data: &pb.InviteConfig{
 			ForcedInvite:       config.ForcedInvite,
-			ReferralPercentage: config.ReferralPercentage,
+			ReferralPercentage: int32(config.ReferralPercentage),
 			OnlyFirstPurchase:  config.OnlyFirstPurchase,
 		},
 	}, nil
@@ -88,14 +88,14 @@ func (s *SystemService) GetInviteConfig(ctx context.Context, req *pb.GetInviteCo
 
 // UpdateInviteConfig 更新邀请配置
 func (s *SystemService) UpdateInviteConfig(ctx context.Context, req *pb.UpdateInviteConfigRequest) (*pb.UpdateInviteConfigReply, error) {
-	
+
 	config := &systembiz.InviteConfig{
 		ForcedInvite:       req.ForcedInvite,
-		ReferralPercentage: req.ReferralPercentage,
+		ReferralPercentage: int(req.ReferralPercentage),
 		OnlyFirstPurchase:  req.OnlyFirstPurchase,
 	}
 
-	if err := s.uc.UpdateInviteConfig(ctx, 0, config); err != nil {
+	if err := s.uc.UpdateInviteConfig(ctx, config); err != nil {
 		s.log.Errorf("Failed to update invite config: %v", err)
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (s *SystemService) UpdateInviteConfig(ctx context.Context, req *pb.UpdateIn
 // GetNodeConfig 获取节点配置
 func (s *SystemService) GetNodeConfig(ctx context.Context, req *pb.GetNodeConfigRequest) (*pb.GetNodeConfigReply, error) {
 
-	config, err := s.uc.GetNodeConfig(ctx, 0)
+	config, err := s.uc.GetNodeConfig(ctx)
 	if err != nil {
 		s.log.Errorf("Failed to get node config: %v", err)
 		return nil, err
@@ -126,10 +126,10 @@ func (s *SystemService) GetNodeConfig(ctx context.Context, req *pb.GetNodeConfig
 
 // UpdateNodeConfig 更新节点配置
 func (s *SystemService) UpdateNodeConfig(ctx context.Context, req *pb.UpdateNodeConfigRequest) (*pb.UpdateNodeConfigReply, error) {
-	
+
 	config := convertPbNodeConfigToBiz(req)
 
-	if err := s.uc.UpdateNodeConfig(ctx, 0, config); err != nil {
+	if err := s.uc.UpdateNodeConfig(ctx, config); err != nil {
 		s.log.Errorf("Failed to update node config: %v", err)
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func (s *SystemService) UpdateNodeConfig(ctx context.Context, req *pb.UpdateNode
 // GetPrivacyPolicyConfig 获取隐私政策配置
 func (s *SystemService) GetPrivacyPolicyConfig(ctx context.Context, req *pb.GetPrivacyPolicyConfigRequest) (*pb.GetPrivacyPolicyConfigReply, error) {
 
-	config, err := s.uc.GetPrivacyPolicyConfig(ctx, 0)
+	config, err := s.uc.GetPrivacyPolicyConfig(ctx)
 	if err != nil {
 		s.log.Errorf("Failed to get privacy policy config: %v", err)
 		return nil, err
@@ -161,12 +161,12 @@ func (s *SystemService) GetPrivacyPolicyConfig(ctx context.Context, req *pb.GetP
 
 // UpdatePrivacyPolicyConfig 更新隐私政策配置
 func (s *SystemService) UpdatePrivacyPolicyConfig(ctx context.Context, req *pb.UpdatePrivacyPolicyConfigRequest) (*pb.UpdatePrivacyPolicyConfigReply, error) {
-	
+
 	config := &systembiz.PrivacyPolicyConfig{
 		PrivacyPolicy: req.PrivacyPolicy,
 	}
 
-	if err := s.uc.UpdatePrivacyPolicyConfig(ctx, 0, config); err != nil {
+	if err := s.uc.UpdatePrivacyPolicyConfig(ctx, config); err != nil {
 		s.log.Errorf("Failed to update privacy policy config: %v", err)
 		return nil, err
 	}
@@ -182,9 +182,9 @@ func (s *SystemService) UpdatePrivacyPolicyConfig(ctx context.Context, req *pb.U
 func convertBizNodeConfigToPb(config *systembiz.NodeConfig) *pb.NodeConfig {
 	pbConfig := &pb.NodeConfig{
 		NodeSecret:             config.NodeSecret,
-		NodePullInterval:       config.NodePullInterval,
-		NodePushInterval:       config.NodePushInterval,
-		TrafficReportThreshold: config.TrafficReportThreshold,
+		NodePullInterval:       int32(config.NodePullInterval),
+		NodePushInterval:       int32(config.NodePushInterval),
+		TrafficReportThreshold: int32(config.TrafficReportThreshold),
 		IpStrategy:             config.IPStrategy,
 	}
 
@@ -217,7 +217,7 @@ func convertBizNodeConfigToPb(config *systembiz.NodeConfig) *pb.NodeConfig {
 					Name:     outbound.Name,
 					Protocol: outbound.Protocol,
 					Address:  outbound.Address,
-					Port:     outbound.Port,
+					Port:     int32(outbound.Port),
 					Password: outbound.Password,
 					Rules:    outbound.Rules,
 				})
@@ -232,9 +232,9 @@ func convertBizNodeConfigToPb(config *systembiz.NodeConfig) *pb.NodeConfig {
 func convertPbNodeConfigToBiz(req *pb.UpdateNodeConfigRequest) *systembiz.NodeConfig {
 	config := &systembiz.NodeConfig{
 		NodeSecret:             req.NodeSecret,
-		NodePullInterval:       req.NodePullInterval,
-		NodePushInterval:       req.NodePushInterval,
-		TrafficReportThreshold: req.TrafficReportThreshold,
+		NodePullInterval:       int(req.NodePullInterval),
+		NodePushInterval:       int(req.NodePushInterval),
+		TrafficReportThreshold: int(req.TrafficReportThreshold),
 		IPStrategy:             req.IpStrategy,
 	}
 
@@ -268,7 +268,7 @@ func convertPbNodeConfigToBiz(req *pb.UpdateNodeConfigRequest) *systembiz.NodeCo
 				Name:     outbound.Name,
 				Protocol: outbound.Protocol,
 				Address:  outbound.Address,
-				Port:     outbound.Port,
+				Port:     int(outbound.Port),
 				Password: outbound.Password,
 				Rules:    outbound.Rules,
 			})
@@ -283,8 +283,8 @@ func convertPbNodeConfigToBiz(req *pb.UpdateNodeConfigRequest) *systembiz.NodeCo
 
 // GetRegisterConfig 获取注册配置
 func (s *SystemService) GetRegisterConfig(ctx context.Context, req *pb.GetRegisterConfigRequest) (*pb.GetRegisterConfigReply, error) {
-	
-	config, err := s.uc.GetRegisterConfig(ctx, 0)
+
+	config, err := s.uc.GetRegisterConfig(ctx)
 	if err != nil {
 		s.log.Errorf("Failed to get register config: %v", err)
 		return nil, err
@@ -296,31 +296,31 @@ func (s *SystemService) GetRegisterConfig(ctx context.Context, req *pb.GetRegist
 		Data: &pb.RegisterConfig{
 			StopRegister:            config.StopRegister,
 			EnableTrial:             config.EnableTrial,
-			TrialSubscribe:          config.TrialSubscribe,
-			TrialTime:               config.TrialTime,
+			TrialSubscribe:          int32(config.TrialSubscribe),
+			TrialTime:               int32(config.TrialTime),
 			TrialTimeUnit:           config.TrialTimeUnit,
 			EnableIpRegisterLimit:   config.EnableIpRegisterLimit,
-			IpRegisterLimit:         config.IpRegisterLimit,
-			IpRegisterLimitDuration: config.IpRegisterLimitDuration,
+			IpRegisterLimit:         int32(config.IpRegisterLimit),
+			IpRegisterLimitDuration: int32(config.IpRegisterLimitDuration),
 		},
 	}, nil
 }
 
 // UpdateRegisterConfig 更新注册配置
 func (s *SystemService) UpdateRegisterConfig(ctx context.Context, req *pb.UpdateRegisterConfigRequest) (*pb.UpdateRegisterConfigReply, error) {
-	
+
 	config := &systembiz.RegisterConfig{
 		StopRegister:            req.StopRegister,
 		EnableTrial:             req.EnableTrial,
-		TrialSubscribe:          req.TrialSubscribe,
-		TrialTime:               req.TrialTime,
+		TrialSubscribe:          int(req.TrialSubscribe),
+		TrialTime:               int(req.TrialTime),
 		TrialTimeUnit:           req.TrialTimeUnit,
 		EnableIpRegisterLimit:   req.EnableIpRegisterLimit,
-		IpRegisterLimit:         req.IpRegisterLimit,
-		IpRegisterLimitDuration: req.IpRegisterLimitDuration,
+		IpRegisterLimit:         int(req.IpRegisterLimit),
+		IpRegisterLimitDuration: int(req.IpRegisterLimitDuration),
 	}
 
-	if err := s.uc.UpdateRegisterConfig(ctx, 0, config); err != nil {
+	if err := s.uc.UpdateRegisterConfig(ctx, config); err != nil {
 		s.log.Errorf("Failed to update register config: %v", err)
 		return nil, err
 	}
@@ -334,8 +334,8 @@ func (s *SystemService) UpdateRegisterConfig(ctx context.Context, req *pb.Update
 
 // GetSiteConfig 获取站点配置
 func (s *SystemService) GetSiteConfig(ctx context.Context, req *pb.GetSiteConfigRequest) (*pb.GetSiteConfigReply, error) {
-	
-	config, err := s.uc.GetSiteConfig(ctx, 0)
+
+	config, err := s.uc.GetSiteConfig(ctx)
 	if err != nil {
 		s.log.Errorf("Failed to get site config: %v", err)
 		return nil, err
@@ -358,7 +358,7 @@ func (s *SystemService) GetSiteConfig(ctx context.Context, req *pb.GetSiteConfig
 
 // UpdateSiteConfig 更新站点配置
 func (s *SystemService) UpdateSiteConfig(ctx context.Context, req *pb.UpdateSiteConfigRequest) (*pb.UpdateSiteConfigReply, error) {
-	
+
 	config := &systembiz.SiteConfig{
 		Host:       req.Host,
 		SiteName:   req.SiteName,
@@ -369,7 +369,7 @@ func (s *SystemService) UpdateSiteConfig(ctx context.Context, req *pb.UpdateSite
 		CustomData: req.CustomData,
 	}
 
-	if err := s.uc.UpdateSiteConfig(ctx, 0, config); err != nil {
+	if err := s.uc.UpdateSiteConfig(ctx, config); err != nil {
 		s.log.Errorf("Failed to update site config: %v", err)
 		return nil, err
 	}
@@ -383,8 +383,8 @@ func (s *SystemService) UpdateSiteConfig(ctx context.Context, req *pb.UpdateSite
 
 // GetSubscribeConfig 获取订阅配置
 func (s *SystemService) GetSubscribeConfig(ctx context.Context, req *pb.GetSubscribeConfigRequest) (*pb.GetSubscribeConfigReply, error) {
-	
-	config, err := s.uc.GetSubscribeConfig(ctx, 0)
+
+	config, err := s.uc.GetSubscribeConfig(ctx)
 	if err != nil {
 		s.log.Errorf("Failed to get subscribe config: %v", err)
 		return nil, err
@@ -406,7 +406,7 @@ func (s *SystemService) GetSubscribeConfig(ctx context.Context, req *pb.GetSubsc
 
 // UpdateSubscribeConfig 更新订阅配置
 func (s *SystemService) UpdateSubscribeConfig(ctx context.Context, req *pb.UpdateSubscribeConfigRequest) (*pb.UpdateSubscribeConfigReply, error) {
-	
+
 	config := &systembiz.SubscribeConfig{
 		SingleModel:     req.SingleModel,
 		SubscribePath:   req.SubscribePath,
@@ -416,7 +416,7 @@ func (s *SystemService) UpdateSubscribeConfig(ctx context.Context, req *pb.Updat
 		UserAgentList:   req.UserAgentList,
 	}
 
-	if err := s.uc.UpdateSubscribeConfig(ctx, 0, config); err != nil {
+	if err := s.uc.UpdateSubscribeConfig(ctx, config); err != nil {
 		s.log.Errorf("Failed to update subscribe config: %v", err)
 		return nil, err
 	}
@@ -430,8 +430,8 @@ func (s *SystemService) UpdateSubscribeConfig(ctx context.Context, req *pb.Updat
 
 // GetTosConfig 获取服务条款配置
 func (s *SystemService) GetTosConfig(ctx context.Context, req *pb.GetTosConfigRequest) (*pb.GetTosConfigReply, error) {
-	
-	config, err := s.uc.GetTosConfig(ctx, 0)
+
+	config, err := s.uc.GetTosConfig(ctx)
 	if err != nil {
 		s.log.Errorf("Failed to get tos config: %v", err)
 		return nil, err
@@ -448,12 +448,12 @@ func (s *SystemService) GetTosConfig(ctx context.Context, req *pb.GetTosConfigRe
 
 // UpdateTosConfig 更新服务条款配置
 func (s *SystemService) UpdateTosConfig(ctx context.Context, req *pb.UpdateTosConfigRequest) (*pb.UpdateTosConfigReply, error) {
-	
+
 	config := &systembiz.TosConfig{
 		TosContent: req.TosContent,
 	}
 
-	if err := s.uc.UpdateTosConfig(ctx, 0, config); err != nil {
+	if err := s.uc.UpdateTosConfig(ctx, config); err != nil {
 		s.log.Errorf("Failed to update tos config: %v", err)
 		return nil, err
 	}
@@ -467,8 +467,8 @@ func (s *SystemService) UpdateTosConfig(ctx context.Context, req *pb.UpdateTosCo
 
 // GetVerifyCodeConfig 获取验证码配置
 func (s *SystemService) GetVerifyCodeConfig(ctx context.Context, req *pb.GetVerifyCodeConfigRequest) (*pb.GetVerifyCodeConfigReply, error) {
-	
-	config, err := s.uc.GetVerifyCodeConfig(ctx, 0)
+
+	config, err := s.uc.GetVerifyCodeConfig(ctx)
 	if err != nil {
 		s.log.Errorf("Failed to get verify code config: %v", err)
 		return nil, err
@@ -478,23 +478,23 @@ func (s *SystemService) GetVerifyCodeConfig(ctx context.Context, req *pb.GetVeri
 		Code:    responsecode.AdminGetVerifyCodeConfigSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminGetVerifyCodeConfigSuccess],
 		Data: &pb.VerifyCodeConfig{
-			VerifyCodeExpireTime: config.VerifyCodeExpireTime,
-			VerifyCodeLimit:      config.VerifyCodeLimit,
-			VerifyCodeInterval:   config.VerifyCodeInterval,
+			VerifyCodeExpireTime: int32(config.VerifyCodeExpireTime),
+			VerifyCodeLimit:      int32(config.VerifyCodeLimit),
+			VerifyCodeInterval:   int32(config.VerifyCodeInterval),
 		},
 	}, nil
 }
 
 // UpdateVerifyCodeConfig 更新验证码配置
 func (s *SystemService) UpdateVerifyCodeConfig(ctx context.Context, req *pb.UpdateVerifyCodeConfigRequest) (*pb.UpdateVerifyCodeConfigReply, error) {
-	
+
 	config := &systembiz.VerifyCodeConfig{
-		VerifyCodeExpireTime: req.VerifyCodeExpireTime,
-		VerifyCodeLimit:      req.VerifyCodeLimit,
-		VerifyCodeInterval:   req.VerifyCodeInterval,
+		VerifyCodeExpireTime: int(req.VerifyCodeExpireTime),
+		VerifyCodeLimit:      int(req.VerifyCodeLimit),
+		VerifyCodeInterval:   int(req.VerifyCodeInterval),
 	}
 
-	if err := s.uc.UpdateVerifyCodeConfig(ctx, 0, config); err != nil {
+	if err := s.uc.UpdateVerifyCodeConfig(ctx, config); err != nil {
 		s.log.Errorf("Failed to update verify code config: %v", err)
 		return nil, err
 	}
@@ -508,8 +508,8 @@ func (s *SystemService) UpdateVerifyCodeConfig(ctx context.Context, req *pb.Upda
 
 // GetVerifyConfig 获取验证配置
 func (s *SystemService) GetVerifyConfig(ctx context.Context, req *pb.GetVerifyConfigRequest) (*pb.GetVerifyConfigReply, error) {
-	
-	config, err := s.uc.GetVerifyConfig(ctx, 0)
+
+	config, err := s.uc.GetVerifyConfig(ctx)
 	if err != nil {
 		s.log.Errorf("Failed to get verify config: %v", err)
 		return nil, err
@@ -530,7 +530,7 @@ func (s *SystemService) GetVerifyConfig(ctx context.Context, req *pb.GetVerifyCo
 
 // UpdateVerifyConfig 更新验证配置
 func (s *SystemService) UpdateVerifyConfig(ctx context.Context, req *pb.UpdateVerifyConfigRequest) (*pb.UpdateVerifyConfigReply, error) {
-	
+
 	config := &systembiz.VerifyConfig{
 		TurnstileSiteKey:          req.TurnstileSiteKey,
 		TurnstileSecret:           req.TurnstileSecret,
@@ -539,7 +539,7 @@ func (s *SystemService) UpdateVerifyConfig(ctx context.Context, req *pb.UpdateVe
 		EnableResetPasswordVerify: req.EnableResetPasswordVerify,
 	}
 
-	if err := s.uc.UpdateVerifyConfig(ctx, 0, config); err != nil {
+	if err := s.uc.UpdateVerifyConfig(ctx, config); err != nil {
 		s.log.Errorf("Failed to update verify config: %v", err)
 		return nil, err
 	}
@@ -553,8 +553,8 @@ func (s *SystemService) UpdateVerifyConfig(ctx context.Context, req *pb.UpdateVe
 
 // GetNodeMultiplier 获取节点倍率
 func (s *SystemService) GetNodeMultiplier(ctx context.Context, req *pb.GetNodeMultiplierRequest) (*pb.GetNodeMultiplierReply, error) {
-	
-	periods, err := s.uc.GetNodeMultiplier(ctx, 0)
+
+	periods, err := s.uc.GetNodeMultiplier(ctx)
 	if err != nil {
 		s.log.Errorf("Failed to get node multiplier: %v", err)
 		return nil, err
@@ -578,8 +578,8 @@ func (s *SystemService) GetNodeMultiplier(ctx context.Context, req *pb.GetNodeMu
 
 // PreViewNodeMultiplier 预览节点倍率
 func (s *SystemService) PreViewNodeMultiplier(ctx context.Context, req *pb.PreViewNodeMultiplierRequest) (*pb.PreViewNodeMultiplierReply, error) {
-	
-	periods, err := s.uc.GetNodeMultiplier(ctx, 0)
+
+	periods, err := s.uc.GetNodeMultiplier(ctx)
 	if err != nil {
 		s.log.Errorf("Failed to get node multiplier for preview: %v", err)
 		return nil, err
@@ -609,7 +609,7 @@ func (s *SystemService) PreViewNodeMultiplier(ctx context.Context, req *pb.PreVi
 
 // SetNodeMultiplier 设置节点倍率
 func (s *SystemService) SetNodeMultiplier(ctx context.Context, req *pb.SetNodeMultiplierRequest) (*pb.SetNodeMultiplierReply, error) {
-	
+
 	var periods []systembiz.TimePeriod
 	for _, pbPeriod := range req.Periods {
 		periods = append(periods, systembiz.TimePeriod{
@@ -619,7 +619,7 @@ func (s *SystemService) SetNodeMultiplier(ctx context.Context, req *pb.SetNodeMu
 		})
 	}
 
-	if err := s.uc.SetNodeMultiplier(ctx, 0, periods); err != nil {
+	if err := s.uc.SetNodeMultiplier(ctx, periods); err != nil {
 		s.log.Errorf("Failed to set node multiplier: %v", err)
 		return nil, err
 	}

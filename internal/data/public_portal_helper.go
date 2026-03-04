@@ -10,8 +10,8 @@ import (
 
 // SubscribeDiscount 订阅折扣配置
 //type SubscribeDiscount struct {
-//	Quantity int64 `json:"quantity"` // 购买数量
-//	Discount int64 `json:"discount"` // 折扣值（百分比 0-100）
+//	Quantity int`json:"quantity"` // 购买数量
+//	Discount int`json:"discount"` // 折扣值（百分比 0-100）
 //}
 
 // parseSubscribeDiscounts 解析订阅折扣配置
@@ -63,22 +63,22 @@ func getDiscount(discounts []SubscribeDiscount, quantity int64) float64 {
 // calculateCoupon 计算优惠券折扣金额
 // ⚠️ 完全复刻原项目逻辑（portal/tool.go line 20-26）
 // type: 1=百分比, 2=固定金额
-func calculateCoupon(amount int64, coupon *ent.ProxyCoupon) int64 {
+func calculateCoupon(amount int64, coupon *ent.ProxyCoupon) int {
 	if coupon.Type == 1 {
 		// 百分比折扣 - 使用float64计算避免精度问题
-		return int64(float64(amount) * (float64(coupon.Discount) / float64(100)))
+		return int(float64(amount) * (float64(coupon.Discount) / float64(100)))
 	} else {
 		// 固定金额 - 取折扣值和订单金额的最小值
 		if coupon.Discount < amount {
-			return coupon.Discount
+			return int(coupon.Discount)
 		}
-		return amount
+		return int(amount)
 	}
 }
 
 // calculateFee 计算支付手续费
 // feeMode: 0=无费用, 1=百分比, 2=固定金额, 3=百分比+固定金额
-func calculateFee(amount int64, payment *ent.ProxyPayment) int64 {
+func calculateFee(amount int64, payment *ent.ProxyPayment) int {
 	var fee float64
 
 	switch payment.FeeMode {
@@ -98,5 +98,5 @@ func calculateFee(amount int64, payment *ent.ProxyPayment) int64 {
 		fee = float64(amount)*(float64(payment.FeePercent)/float64(100)) + float64(payment.FeeAmount)
 	}
 
-	return int64(fee)
+	return int(fee)
 }

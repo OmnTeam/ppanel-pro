@@ -20,6 +20,20 @@ type ProxyAuthMethodCreate struct {
 	hooks    []Hook
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_c *ProxyAuthMethodCreate) SetTenantID(v int64) *ProxyAuthMethodCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_c *ProxyAuthMethodCreate) SetNillableTenantID(v *int64) *ProxyAuthMethodCreate {
+	if v != nil {
+		_c.SetTenantID(*v)
+	}
+	return _c
+}
+
 // SetMethod sets the "method" field.
 func (_c *ProxyAuthMethodCreate) SetMethod(v string) *ProxyAuthMethodCreate {
 	_c.mutation.SetMethod(v)
@@ -75,7 +89,7 @@ func (_c *ProxyAuthMethodCreate) SetNillableUpdatedAt(v *time.Time) *ProxyAuthMe
 }
 
 // SetID sets the "id" field.
-func (_c *ProxyAuthMethodCreate) SetID(v int) *ProxyAuthMethodCreate {
+func (_c *ProxyAuthMethodCreate) SetID(v int64) *ProxyAuthMethodCreate {
 	_c.mutation.SetID(v)
 	return _c
 }
@@ -115,6 +129,10 @@ func (_c *ProxyAuthMethodCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxyAuthMethodCreate) defaults() {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		v := proxyauthmethod.DefaultTenantID
+		_c.mutation.SetTenantID(v)
+	}
 	if _, ok := _c.mutation.Enabled(); !ok {
 		v := proxyauthmethod.DefaultEnabled
 		_c.mutation.SetEnabled(v)
@@ -131,6 +149,9 @@ func (_c *ProxyAuthMethodCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ProxyAuthMethodCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "ProxyAuthMethod.tenant_id"`)}
+	}
 	if _, ok := _c.mutation.Method(); !ok {
 		return &ValidationError{Name: "method", err: errors.New(`ent: missing required field "ProxyAuthMethod.method"`)}
 	}
@@ -172,7 +193,7 @@ func (_c *ProxyAuthMethodCreate) sqlSave(ctx context.Context) (*ProxyAuthMethod,
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = int64(id)
 	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
@@ -182,11 +203,15 @@ func (_c *ProxyAuthMethodCreate) sqlSave(ctx context.Context) (*ProxyAuthMethod,
 func (_c *ProxyAuthMethodCreate) createSpec() (*ProxyAuthMethod, *sqlgraph.CreateSpec) {
 	var (
 		_node = &ProxyAuthMethod{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(proxyauthmethod.Table, sqlgraph.NewFieldSpec(proxyauthmethod.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(proxyauthmethod.Table, sqlgraph.NewFieldSpec(proxyauthmethod.FieldID, field.TypeInt64))
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
+	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(proxyauthmethod.FieldTenantID, field.TypeInt64, value)
+		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.Method(); ok {
 		_spec.SetField(proxyauthmethod.FieldMethod, field.TypeString, value)
@@ -258,7 +283,7 @@ func (_c *ProxyAuthMethodCreateBulk) Save(ctx context.Context) ([]*ProxyAuthMeth
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

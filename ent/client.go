@@ -14,14 +14,18 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyads"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyannouncement"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxycoupon"
 	"github.com/OmnTeam/ppanel-pro/ent/proxydocument"
+	"github.com/OmnTeam/ppanel-pro/ent/proxygrouphistory"
 	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyorder"
 	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptioncode"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptionrecord"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyschemamigrations"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyserver"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyservergroup"
@@ -38,7 +42,9 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdevice"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdeviceonlinerecord"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyusergroup"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyuserwithdrawal"
 )
 
 // Client is the client that holds all ent builders.
@@ -56,12 +62,18 @@ type Client struct {
 	ProxyCoupon *ProxyCouponClient
 	// ProxyDocument is the client for interacting with the ProxyDocument builders.
 	ProxyDocument *ProxyDocumentClient
+	// ProxyGroupHistory is the client for interacting with the ProxyGroupHistory builders.
+	ProxyGroupHistory *ProxyGroupHistoryClient
 	// ProxyNode is the client for interacting with the ProxyNode builders.
 	ProxyNode *ProxyNodeClient
 	// ProxyOrder is the client for interacting with the ProxyOrder builders.
 	ProxyOrder *ProxyOrderClient
 	// ProxyPayment is the client for interacting with the ProxyPayment builders.
 	ProxyPayment *ProxyPaymentClient
+	// ProxyRedemptionCode is the client for interacting with the ProxyRedemptionCode builders.
+	ProxyRedemptionCode *ProxyRedemptionCodeClient
+	// ProxyRedemptionRecord is the client for interacting with the ProxyRedemptionRecord builders.
+	ProxyRedemptionRecord *ProxyRedemptionRecordClient
 	// ProxySchemaMigrations is the client for interacting with the ProxySchemaMigrations builders.
 	ProxySchemaMigrations *ProxySchemaMigrationsClient
 	// ProxyServer is the client for interacting with the ProxyServer builders.
@@ -94,8 +106,12 @@ type Client struct {
 	ProxyUserDevice *ProxyUserDeviceClient
 	// ProxyUserDeviceOnlineRecord is the client for interacting with the ProxyUserDeviceOnlineRecord builders.
 	ProxyUserDeviceOnlineRecord *ProxyUserDeviceOnlineRecordClient
+	// ProxyUserGroup is the client for interacting with the ProxyUserGroup builders.
+	ProxyUserGroup *ProxyUserGroupClient
 	// ProxyUserSubscribe is the client for interacting with the ProxyUserSubscribe builders.
 	ProxyUserSubscribe *ProxyUserSubscribeClient
+	// ProxyUserWithdrawal is the client for interacting with the ProxyUserWithdrawal builders.
+	ProxyUserWithdrawal *ProxyUserWithdrawalClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -112,9 +128,12 @@ func (c *Client) init() {
 	c.ProxyAuthMethod = NewProxyAuthMethodClient(c.config)
 	c.ProxyCoupon = NewProxyCouponClient(c.config)
 	c.ProxyDocument = NewProxyDocumentClient(c.config)
+	c.ProxyGroupHistory = NewProxyGroupHistoryClient(c.config)
 	c.ProxyNode = NewProxyNodeClient(c.config)
 	c.ProxyOrder = NewProxyOrderClient(c.config)
 	c.ProxyPayment = NewProxyPaymentClient(c.config)
+	c.ProxyRedemptionCode = NewProxyRedemptionCodeClient(c.config)
+	c.ProxyRedemptionRecord = NewProxyRedemptionRecordClient(c.config)
 	c.ProxySchemaMigrations = NewProxySchemaMigrationsClient(c.config)
 	c.ProxyServer = NewProxyServerClient(c.config)
 	c.ProxyServerGroup = NewProxyServerGroupClient(c.config)
@@ -131,7 +150,9 @@ func (c *Client) init() {
 	c.ProxyUserAuthMethod = NewProxyUserAuthMethodClient(c.config)
 	c.ProxyUserDevice = NewProxyUserDeviceClient(c.config)
 	c.ProxyUserDeviceOnlineRecord = NewProxyUserDeviceOnlineRecordClient(c.config)
+	c.ProxyUserGroup = NewProxyUserGroupClient(c.config)
 	c.ProxyUserSubscribe = NewProxyUserSubscribeClient(c.config)
+	c.ProxyUserWithdrawal = NewProxyUserWithdrawalClient(c.config)
 }
 
 type (
@@ -229,9 +250,12 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ProxyAuthMethod:             NewProxyAuthMethodClient(cfg),
 		ProxyCoupon:                 NewProxyCouponClient(cfg),
 		ProxyDocument:               NewProxyDocumentClient(cfg),
+		ProxyGroupHistory:           NewProxyGroupHistoryClient(cfg),
 		ProxyNode:                   NewProxyNodeClient(cfg),
 		ProxyOrder:                  NewProxyOrderClient(cfg),
 		ProxyPayment:                NewProxyPaymentClient(cfg),
+		ProxyRedemptionCode:         NewProxyRedemptionCodeClient(cfg),
+		ProxyRedemptionRecord:       NewProxyRedemptionRecordClient(cfg),
 		ProxySchemaMigrations:       NewProxySchemaMigrationsClient(cfg),
 		ProxyServer:                 NewProxyServerClient(cfg),
 		ProxyServerGroup:            NewProxyServerGroupClient(cfg),
@@ -248,7 +272,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ProxyUserAuthMethod:         NewProxyUserAuthMethodClient(cfg),
 		ProxyUserDevice:             NewProxyUserDeviceClient(cfg),
 		ProxyUserDeviceOnlineRecord: NewProxyUserDeviceOnlineRecordClient(cfg),
+		ProxyUserGroup:              NewProxyUserGroupClient(cfg),
 		ProxyUserSubscribe:          NewProxyUserSubscribeClient(cfg),
+		ProxyUserWithdrawal:         NewProxyUserWithdrawalClient(cfg),
 	}, nil
 }
 
@@ -273,9 +299,12 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ProxyAuthMethod:             NewProxyAuthMethodClient(cfg),
 		ProxyCoupon:                 NewProxyCouponClient(cfg),
 		ProxyDocument:               NewProxyDocumentClient(cfg),
+		ProxyGroupHistory:           NewProxyGroupHistoryClient(cfg),
 		ProxyNode:                   NewProxyNodeClient(cfg),
 		ProxyOrder:                  NewProxyOrderClient(cfg),
 		ProxyPayment:                NewProxyPaymentClient(cfg),
+		ProxyRedemptionCode:         NewProxyRedemptionCodeClient(cfg),
+		ProxyRedemptionRecord:       NewProxyRedemptionRecordClient(cfg),
 		ProxySchemaMigrations:       NewProxySchemaMigrationsClient(cfg),
 		ProxyServer:                 NewProxyServerClient(cfg),
 		ProxyServerGroup:            NewProxyServerGroupClient(cfg),
@@ -292,7 +321,9 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ProxyUserAuthMethod:         NewProxyUserAuthMethodClient(cfg),
 		ProxyUserDevice:             NewProxyUserDeviceClient(cfg),
 		ProxyUserDeviceOnlineRecord: NewProxyUserDeviceOnlineRecordClient(cfg),
+		ProxyUserGroup:              NewProxyUserGroupClient(cfg),
 		ProxyUserSubscribe:          NewProxyUserSubscribeClient(cfg),
+		ProxyUserWithdrawal:         NewProxyUserWithdrawalClient(cfg),
 	}, nil
 }
 
@@ -323,12 +354,14 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.ProxyAds, c.ProxyAnnouncement, c.ProxyAuthMethod, c.ProxyCoupon,
-		c.ProxyDocument, c.ProxyNode, c.ProxyOrder, c.ProxyPayment,
+		c.ProxyDocument, c.ProxyGroupHistory, c.ProxyNode, c.ProxyOrder,
+		c.ProxyPayment, c.ProxyRedemptionCode, c.ProxyRedemptionRecord,
 		c.ProxySchemaMigrations, c.ProxyServer, c.ProxyServerGroup, c.ProxySubscribe,
 		c.ProxySubscribeApplication, c.ProxySubscribeGroup, c.ProxySystem,
 		c.ProxySystemLog, c.ProxyTask, c.ProxyTicket, c.ProxyTicketFollow,
 		c.ProxyTrafficLog, c.ProxyUser, c.ProxyUserAuthMethod, c.ProxyUserDevice,
-		c.ProxyUserDeviceOnlineRecord, c.ProxyUserSubscribe,
+		c.ProxyUserDeviceOnlineRecord, c.ProxyUserGroup, c.ProxyUserSubscribe,
+		c.ProxyUserWithdrawal,
 	} {
 		n.Use(hooks...)
 	}
@@ -339,12 +372,14 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.ProxyAds, c.ProxyAnnouncement, c.ProxyAuthMethod, c.ProxyCoupon,
-		c.ProxyDocument, c.ProxyNode, c.ProxyOrder, c.ProxyPayment,
+		c.ProxyDocument, c.ProxyGroupHistory, c.ProxyNode, c.ProxyOrder,
+		c.ProxyPayment, c.ProxyRedemptionCode, c.ProxyRedemptionRecord,
 		c.ProxySchemaMigrations, c.ProxyServer, c.ProxyServerGroup, c.ProxySubscribe,
 		c.ProxySubscribeApplication, c.ProxySubscribeGroup, c.ProxySystem,
 		c.ProxySystemLog, c.ProxyTask, c.ProxyTicket, c.ProxyTicketFollow,
 		c.ProxyTrafficLog, c.ProxyUser, c.ProxyUserAuthMethod, c.ProxyUserDevice,
-		c.ProxyUserDeviceOnlineRecord, c.ProxyUserSubscribe,
+		c.ProxyUserDeviceOnlineRecord, c.ProxyUserGroup, c.ProxyUserSubscribe,
+		c.ProxyUserWithdrawal,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -363,12 +398,18 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ProxyCoupon.mutate(ctx, m)
 	case *ProxyDocumentMutation:
 		return c.ProxyDocument.mutate(ctx, m)
+	case *ProxyGroupHistoryMutation:
+		return c.ProxyGroupHistory.mutate(ctx, m)
 	case *ProxyNodeMutation:
 		return c.ProxyNode.mutate(ctx, m)
 	case *ProxyOrderMutation:
 		return c.ProxyOrder.mutate(ctx, m)
 	case *ProxyPaymentMutation:
 		return c.ProxyPayment.mutate(ctx, m)
+	case *ProxyRedemptionCodeMutation:
+		return c.ProxyRedemptionCode.mutate(ctx, m)
+	case *ProxyRedemptionRecordMutation:
+		return c.ProxyRedemptionRecord.mutate(ctx, m)
 	case *ProxySchemaMigrationsMutation:
 		return c.ProxySchemaMigrations.mutate(ctx, m)
 	case *ProxyServerMutation:
@@ -401,8 +442,12 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ProxyUserDevice.mutate(ctx, m)
 	case *ProxyUserDeviceOnlineRecordMutation:
 		return c.ProxyUserDeviceOnlineRecord.mutate(ctx, m)
+	case *ProxyUserGroupMutation:
+		return c.ProxyUserGroup.mutate(ctx, m)
 	case *ProxyUserSubscribeMutation:
 		return c.ProxyUserSubscribe.mutate(ctx, m)
+	case *ProxyUserWithdrawalMutation:
+		return c.ProxyUserWithdrawal.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -735,7 +780,7 @@ func (c *ProxyAuthMethodClient) UpdateOne(_m *ProxyAuthMethod) *ProxyAuthMethodU
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxyAuthMethodClient) UpdateOneID(id int) *ProxyAuthMethodUpdateOne {
+func (c *ProxyAuthMethodClient) UpdateOneID(id int64) *ProxyAuthMethodUpdateOne {
 	mutation := newProxyAuthMethodMutation(c.config, OpUpdateOne, withProxyAuthMethodID(id))
 	return &ProxyAuthMethodUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -752,7 +797,7 @@ func (c *ProxyAuthMethodClient) DeleteOne(_m *ProxyAuthMethod) *ProxyAuthMethodD
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxyAuthMethodClient) DeleteOneID(id int) *ProxyAuthMethodDeleteOne {
+func (c *ProxyAuthMethodClient) DeleteOneID(id int64) *ProxyAuthMethodDeleteOne {
 	builder := c.Delete().Where(proxyauthmethod.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -769,12 +814,12 @@ func (c *ProxyAuthMethodClient) Query() *ProxyAuthMethodQuery {
 }
 
 // Get returns a ProxyAuthMethod entity by its id.
-func (c *ProxyAuthMethodClient) Get(ctx context.Context, id int) (*ProxyAuthMethod, error) {
+func (c *ProxyAuthMethodClient) Get(ctx context.Context, id int64) (*ProxyAuthMethod, error) {
 	return c.Query().Where(proxyauthmethod.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxyAuthMethodClient) GetX(ctx context.Context, id int) *ProxyAuthMethod {
+func (c *ProxyAuthMethodClient) GetX(ctx context.Context, id int64) *ProxyAuthMethod {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1001,7 +1046,7 @@ func (c *ProxyDocumentClient) UpdateOne(_m *ProxyDocument) *ProxyDocumentUpdateO
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxyDocumentClient) UpdateOneID(id int) *ProxyDocumentUpdateOne {
+func (c *ProxyDocumentClient) UpdateOneID(id int64) *ProxyDocumentUpdateOne {
 	mutation := newProxyDocumentMutation(c.config, OpUpdateOne, withProxyDocumentID(id))
 	return &ProxyDocumentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1018,7 +1063,7 @@ func (c *ProxyDocumentClient) DeleteOne(_m *ProxyDocument) *ProxyDocumentDeleteO
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxyDocumentClient) DeleteOneID(id int) *ProxyDocumentDeleteOne {
+func (c *ProxyDocumentClient) DeleteOneID(id int64) *ProxyDocumentDeleteOne {
 	builder := c.Delete().Where(proxydocument.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1035,12 +1080,12 @@ func (c *ProxyDocumentClient) Query() *ProxyDocumentQuery {
 }
 
 // Get returns a ProxyDocument entity by its id.
-func (c *ProxyDocumentClient) Get(ctx context.Context, id int) (*ProxyDocument, error) {
+func (c *ProxyDocumentClient) Get(ctx context.Context, id int64) (*ProxyDocument, error) {
 	return c.Query().Where(proxydocument.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxyDocumentClient) GetX(ctx context.Context, id int) *ProxyDocument {
+func (c *ProxyDocumentClient) GetX(ctx context.Context, id int64) *ProxyDocument {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1070,6 +1115,139 @@ func (c *ProxyDocumentClient) mutate(ctx context.Context, m *ProxyDocumentMutati
 		return (&ProxyDocumentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ProxyDocument mutation op: %q", m.Op())
+	}
+}
+
+// ProxyGroupHistoryClient is a client for the ProxyGroupHistory schema.
+type ProxyGroupHistoryClient struct {
+	config
+}
+
+// NewProxyGroupHistoryClient returns a client for the ProxyGroupHistory from the given config.
+func NewProxyGroupHistoryClient(c config) *ProxyGroupHistoryClient {
+	return &ProxyGroupHistoryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `proxygrouphistory.Hooks(f(g(h())))`.
+func (c *ProxyGroupHistoryClient) Use(hooks ...Hook) {
+	c.hooks.ProxyGroupHistory = append(c.hooks.ProxyGroupHistory, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `proxygrouphistory.Intercept(f(g(h())))`.
+func (c *ProxyGroupHistoryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProxyGroupHistory = append(c.inters.ProxyGroupHistory, interceptors...)
+}
+
+// Create returns a builder for creating a ProxyGroupHistory entity.
+func (c *ProxyGroupHistoryClient) Create() *ProxyGroupHistoryCreate {
+	mutation := newProxyGroupHistoryMutation(c.config, OpCreate)
+	return &ProxyGroupHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProxyGroupHistory entities.
+func (c *ProxyGroupHistoryClient) CreateBulk(builders ...*ProxyGroupHistoryCreate) *ProxyGroupHistoryCreateBulk {
+	return &ProxyGroupHistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProxyGroupHistoryClient) MapCreateBulk(slice any, setFunc func(*ProxyGroupHistoryCreate, int)) *ProxyGroupHistoryCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProxyGroupHistoryCreateBulk{err: fmt.Errorf("calling to ProxyGroupHistoryClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProxyGroupHistoryCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProxyGroupHistoryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProxyGroupHistory.
+func (c *ProxyGroupHistoryClient) Update() *ProxyGroupHistoryUpdate {
+	mutation := newProxyGroupHistoryMutation(c.config, OpUpdate)
+	return &ProxyGroupHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProxyGroupHistoryClient) UpdateOne(_m *ProxyGroupHistory) *ProxyGroupHistoryUpdateOne {
+	mutation := newProxyGroupHistoryMutation(c.config, OpUpdateOne, withProxyGroupHistory(_m))
+	return &ProxyGroupHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProxyGroupHistoryClient) UpdateOneID(id int64) *ProxyGroupHistoryUpdateOne {
+	mutation := newProxyGroupHistoryMutation(c.config, OpUpdateOne, withProxyGroupHistoryID(id))
+	return &ProxyGroupHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProxyGroupHistory.
+func (c *ProxyGroupHistoryClient) Delete() *ProxyGroupHistoryDelete {
+	mutation := newProxyGroupHistoryMutation(c.config, OpDelete)
+	return &ProxyGroupHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProxyGroupHistoryClient) DeleteOne(_m *ProxyGroupHistory) *ProxyGroupHistoryDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProxyGroupHistoryClient) DeleteOneID(id int64) *ProxyGroupHistoryDeleteOne {
+	builder := c.Delete().Where(proxygrouphistory.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProxyGroupHistoryDeleteOne{builder}
+}
+
+// Query returns a query builder for ProxyGroupHistory.
+func (c *ProxyGroupHistoryClient) Query() *ProxyGroupHistoryQuery {
+	return &ProxyGroupHistoryQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProxyGroupHistory},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ProxyGroupHistory entity by its id.
+func (c *ProxyGroupHistoryClient) Get(ctx context.Context, id int64) (*ProxyGroupHistory, error) {
+	return c.Query().Where(proxygrouphistory.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProxyGroupHistoryClient) GetX(ctx context.Context, id int64) *ProxyGroupHistory {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ProxyGroupHistoryClient) Hooks() []Hook {
+	return c.hooks.ProxyGroupHistory
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProxyGroupHistoryClient) Interceptors() []Interceptor {
+	return c.inters.ProxyGroupHistory
+}
+
+func (c *ProxyGroupHistoryClient) mutate(ctx context.Context, m *ProxyGroupHistoryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProxyGroupHistoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProxyGroupHistoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProxyGroupHistoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProxyGroupHistoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProxyGroupHistory mutation op: %q", m.Op())
 	}
 }
 
@@ -1134,7 +1312,7 @@ func (c *ProxyNodeClient) UpdateOne(_m *ProxyNode) *ProxyNodeUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxyNodeClient) UpdateOneID(id int) *ProxyNodeUpdateOne {
+func (c *ProxyNodeClient) UpdateOneID(id int64) *ProxyNodeUpdateOne {
 	mutation := newProxyNodeMutation(c.config, OpUpdateOne, withProxyNodeID(id))
 	return &ProxyNodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1151,7 +1329,7 @@ func (c *ProxyNodeClient) DeleteOne(_m *ProxyNode) *ProxyNodeDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxyNodeClient) DeleteOneID(id int) *ProxyNodeDeleteOne {
+func (c *ProxyNodeClient) DeleteOneID(id int64) *ProxyNodeDeleteOne {
 	builder := c.Delete().Where(proxynode.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1168,12 +1346,12 @@ func (c *ProxyNodeClient) Query() *ProxyNodeQuery {
 }
 
 // Get returns a ProxyNode entity by its id.
-func (c *ProxyNodeClient) Get(ctx context.Context, id int) (*ProxyNode, error) {
+func (c *ProxyNodeClient) Get(ctx context.Context, id int64) (*ProxyNode, error) {
 	return c.Query().Where(proxynode.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxyNodeClient) GetX(ctx context.Context, id int) *ProxyNode {
+func (c *ProxyNodeClient) GetX(ctx context.Context, id int64) *ProxyNode {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1400,7 +1578,7 @@ func (c *ProxyPaymentClient) UpdateOne(_m *ProxyPayment) *ProxyPaymentUpdateOne 
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxyPaymentClient) UpdateOneID(id int) *ProxyPaymentUpdateOne {
+func (c *ProxyPaymentClient) UpdateOneID(id int64) *ProxyPaymentUpdateOne {
 	mutation := newProxyPaymentMutation(c.config, OpUpdateOne, withProxyPaymentID(id))
 	return &ProxyPaymentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1417,7 +1595,7 @@ func (c *ProxyPaymentClient) DeleteOne(_m *ProxyPayment) *ProxyPaymentDeleteOne 
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxyPaymentClient) DeleteOneID(id int) *ProxyPaymentDeleteOne {
+func (c *ProxyPaymentClient) DeleteOneID(id int64) *ProxyPaymentDeleteOne {
 	builder := c.Delete().Where(proxypayment.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1434,12 +1612,12 @@ func (c *ProxyPaymentClient) Query() *ProxyPaymentQuery {
 }
 
 // Get returns a ProxyPayment entity by its id.
-func (c *ProxyPaymentClient) Get(ctx context.Context, id int) (*ProxyPayment, error) {
+func (c *ProxyPaymentClient) Get(ctx context.Context, id int64) (*ProxyPayment, error) {
 	return c.Query().Where(proxypayment.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxyPaymentClient) GetX(ctx context.Context, id int) *ProxyPayment {
+func (c *ProxyPaymentClient) GetX(ctx context.Context, id int64) *ProxyPayment {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1469,6 +1647,320 @@ func (c *ProxyPaymentClient) mutate(ctx context.Context, m *ProxyPaymentMutation
 		return (&ProxyPaymentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ProxyPayment mutation op: %q", m.Op())
+	}
+}
+
+// ProxyRedemptionCodeClient is a client for the ProxyRedemptionCode schema.
+type ProxyRedemptionCodeClient struct {
+	config
+}
+
+// NewProxyRedemptionCodeClient returns a client for the ProxyRedemptionCode from the given config.
+func NewProxyRedemptionCodeClient(c config) *ProxyRedemptionCodeClient {
+	return &ProxyRedemptionCodeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `proxyredemptioncode.Hooks(f(g(h())))`.
+func (c *ProxyRedemptionCodeClient) Use(hooks ...Hook) {
+	c.hooks.ProxyRedemptionCode = append(c.hooks.ProxyRedemptionCode, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `proxyredemptioncode.Intercept(f(g(h())))`.
+func (c *ProxyRedemptionCodeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProxyRedemptionCode = append(c.inters.ProxyRedemptionCode, interceptors...)
+}
+
+// Create returns a builder for creating a ProxyRedemptionCode entity.
+func (c *ProxyRedemptionCodeClient) Create() *ProxyRedemptionCodeCreate {
+	mutation := newProxyRedemptionCodeMutation(c.config, OpCreate)
+	return &ProxyRedemptionCodeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProxyRedemptionCode entities.
+func (c *ProxyRedemptionCodeClient) CreateBulk(builders ...*ProxyRedemptionCodeCreate) *ProxyRedemptionCodeCreateBulk {
+	return &ProxyRedemptionCodeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProxyRedemptionCodeClient) MapCreateBulk(slice any, setFunc func(*ProxyRedemptionCodeCreate, int)) *ProxyRedemptionCodeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProxyRedemptionCodeCreateBulk{err: fmt.Errorf("calling to ProxyRedemptionCodeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProxyRedemptionCodeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProxyRedemptionCodeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProxyRedemptionCode.
+func (c *ProxyRedemptionCodeClient) Update() *ProxyRedemptionCodeUpdate {
+	mutation := newProxyRedemptionCodeMutation(c.config, OpUpdate)
+	return &ProxyRedemptionCodeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProxyRedemptionCodeClient) UpdateOne(_m *ProxyRedemptionCode) *ProxyRedemptionCodeUpdateOne {
+	mutation := newProxyRedemptionCodeMutation(c.config, OpUpdateOne, withProxyRedemptionCode(_m))
+	return &ProxyRedemptionCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProxyRedemptionCodeClient) UpdateOneID(id int64) *ProxyRedemptionCodeUpdateOne {
+	mutation := newProxyRedemptionCodeMutation(c.config, OpUpdateOne, withProxyRedemptionCodeID(id))
+	return &ProxyRedemptionCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProxyRedemptionCode.
+func (c *ProxyRedemptionCodeClient) Delete() *ProxyRedemptionCodeDelete {
+	mutation := newProxyRedemptionCodeMutation(c.config, OpDelete)
+	return &ProxyRedemptionCodeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProxyRedemptionCodeClient) DeleteOne(_m *ProxyRedemptionCode) *ProxyRedemptionCodeDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProxyRedemptionCodeClient) DeleteOneID(id int64) *ProxyRedemptionCodeDeleteOne {
+	builder := c.Delete().Where(proxyredemptioncode.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProxyRedemptionCodeDeleteOne{builder}
+}
+
+// Query returns a query builder for ProxyRedemptionCode.
+func (c *ProxyRedemptionCodeClient) Query() *ProxyRedemptionCodeQuery {
+	return &ProxyRedemptionCodeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProxyRedemptionCode},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ProxyRedemptionCode entity by its id.
+func (c *ProxyRedemptionCodeClient) Get(ctx context.Context, id int64) (*ProxyRedemptionCode, error) {
+	return c.Query().Where(proxyredemptioncode.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProxyRedemptionCodeClient) GetX(ctx context.Context, id int64) *ProxyRedemptionCode {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRecords queries the records edge of a ProxyRedemptionCode.
+func (c *ProxyRedemptionCodeClient) QueryRecords(_m *ProxyRedemptionCode) *ProxyRedemptionRecordQuery {
+	query := (&ProxyRedemptionRecordClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proxyredemptioncode.Table, proxyredemptioncode.FieldID, id),
+			sqlgraph.To(proxyredemptionrecord.Table, proxyredemptionrecord.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, proxyredemptioncode.RecordsTable, proxyredemptioncode.RecordsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ProxyRedemptionCodeClient) Hooks() []Hook {
+	return c.hooks.ProxyRedemptionCode
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProxyRedemptionCodeClient) Interceptors() []Interceptor {
+	return c.inters.ProxyRedemptionCode
+}
+
+func (c *ProxyRedemptionCodeClient) mutate(ctx context.Context, m *ProxyRedemptionCodeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProxyRedemptionCodeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProxyRedemptionCodeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProxyRedemptionCodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProxyRedemptionCodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProxyRedemptionCode mutation op: %q", m.Op())
+	}
+}
+
+// ProxyRedemptionRecordClient is a client for the ProxyRedemptionRecord schema.
+type ProxyRedemptionRecordClient struct {
+	config
+}
+
+// NewProxyRedemptionRecordClient returns a client for the ProxyRedemptionRecord from the given config.
+func NewProxyRedemptionRecordClient(c config) *ProxyRedemptionRecordClient {
+	return &ProxyRedemptionRecordClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `proxyredemptionrecord.Hooks(f(g(h())))`.
+func (c *ProxyRedemptionRecordClient) Use(hooks ...Hook) {
+	c.hooks.ProxyRedemptionRecord = append(c.hooks.ProxyRedemptionRecord, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `proxyredemptionrecord.Intercept(f(g(h())))`.
+func (c *ProxyRedemptionRecordClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProxyRedemptionRecord = append(c.inters.ProxyRedemptionRecord, interceptors...)
+}
+
+// Create returns a builder for creating a ProxyRedemptionRecord entity.
+func (c *ProxyRedemptionRecordClient) Create() *ProxyRedemptionRecordCreate {
+	mutation := newProxyRedemptionRecordMutation(c.config, OpCreate)
+	return &ProxyRedemptionRecordCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProxyRedemptionRecord entities.
+func (c *ProxyRedemptionRecordClient) CreateBulk(builders ...*ProxyRedemptionRecordCreate) *ProxyRedemptionRecordCreateBulk {
+	return &ProxyRedemptionRecordCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProxyRedemptionRecordClient) MapCreateBulk(slice any, setFunc func(*ProxyRedemptionRecordCreate, int)) *ProxyRedemptionRecordCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProxyRedemptionRecordCreateBulk{err: fmt.Errorf("calling to ProxyRedemptionRecordClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProxyRedemptionRecordCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProxyRedemptionRecordCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProxyRedemptionRecord.
+func (c *ProxyRedemptionRecordClient) Update() *ProxyRedemptionRecordUpdate {
+	mutation := newProxyRedemptionRecordMutation(c.config, OpUpdate)
+	return &ProxyRedemptionRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProxyRedemptionRecordClient) UpdateOne(_m *ProxyRedemptionRecord) *ProxyRedemptionRecordUpdateOne {
+	mutation := newProxyRedemptionRecordMutation(c.config, OpUpdateOne, withProxyRedemptionRecord(_m))
+	return &ProxyRedemptionRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProxyRedemptionRecordClient) UpdateOneID(id int64) *ProxyRedemptionRecordUpdateOne {
+	mutation := newProxyRedemptionRecordMutation(c.config, OpUpdateOne, withProxyRedemptionRecordID(id))
+	return &ProxyRedemptionRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProxyRedemptionRecord.
+func (c *ProxyRedemptionRecordClient) Delete() *ProxyRedemptionRecordDelete {
+	mutation := newProxyRedemptionRecordMutation(c.config, OpDelete)
+	return &ProxyRedemptionRecordDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProxyRedemptionRecordClient) DeleteOne(_m *ProxyRedemptionRecord) *ProxyRedemptionRecordDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProxyRedemptionRecordClient) DeleteOneID(id int64) *ProxyRedemptionRecordDeleteOne {
+	builder := c.Delete().Where(proxyredemptionrecord.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProxyRedemptionRecordDeleteOne{builder}
+}
+
+// Query returns a query builder for ProxyRedemptionRecord.
+func (c *ProxyRedemptionRecordClient) Query() *ProxyRedemptionRecordQuery {
+	return &ProxyRedemptionRecordQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProxyRedemptionRecord},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ProxyRedemptionRecord entity by its id.
+func (c *ProxyRedemptionRecordClient) Get(ctx context.Context, id int64) (*ProxyRedemptionRecord, error) {
+	return c.Query().Where(proxyredemptionrecord.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProxyRedemptionRecordClient) GetX(ctx context.Context, id int64) *ProxyRedemptionRecord {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a ProxyRedemptionRecord.
+func (c *ProxyRedemptionRecordClient) QueryUser(_m *ProxyRedemptionRecord) *ProxyUserQuery {
+	query := (&ProxyUserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proxyredemptionrecord.Table, proxyredemptionrecord.FieldID, id),
+			sqlgraph.To(proxyuser.Table, proxyuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, proxyredemptionrecord.UserTable, proxyredemptionrecord.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRedemptionCode queries the redemption_code edge of a ProxyRedemptionRecord.
+func (c *ProxyRedemptionRecordClient) QueryRedemptionCode(_m *ProxyRedemptionRecord) *ProxyRedemptionCodeQuery {
+	query := (&ProxyRedemptionCodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proxyredemptionrecord.Table, proxyredemptionrecord.FieldID, id),
+			sqlgraph.To(proxyredemptioncode.Table, proxyredemptioncode.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, proxyredemptionrecord.RedemptionCodeTable, proxyredemptionrecord.RedemptionCodeColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ProxyRedemptionRecordClient) Hooks() []Hook {
+	return c.hooks.ProxyRedemptionRecord
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProxyRedemptionRecordClient) Interceptors() []Interceptor {
+	return c.inters.ProxyRedemptionRecord
+}
+
+func (c *ProxyRedemptionRecordClient) mutate(ctx context.Context, m *ProxyRedemptionRecordMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProxyRedemptionRecordCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProxyRedemptionRecordUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProxyRedemptionRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProxyRedemptionRecordDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProxyRedemptionRecord mutation op: %q", m.Op())
 	}
 }
 
@@ -1666,7 +2158,7 @@ func (c *ProxyServerClient) UpdateOne(_m *ProxyServer) *ProxyServerUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxyServerClient) UpdateOneID(id int) *ProxyServerUpdateOne {
+func (c *ProxyServerClient) UpdateOneID(id int64) *ProxyServerUpdateOne {
 	mutation := newProxyServerMutation(c.config, OpUpdateOne, withProxyServerID(id))
 	return &ProxyServerUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1683,7 +2175,7 @@ func (c *ProxyServerClient) DeleteOne(_m *ProxyServer) *ProxyServerDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxyServerClient) DeleteOneID(id int) *ProxyServerDeleteOne {
+func (c *ProxyServerClient) DeleteOneID(id int64) *ProxyServerDeleteOne {
 	builder := c.Delete().Where(proxyserver.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1700,12 +2192,12 @@ func (c *ProxyServerClient) Query() *ProxyServerQuery {
 }
 
 // Get returns a ProxyServer entity by its id.
-func (c *ProxyServerClient) Get(ctx context.Context, id int) (*ProxyServer, error) {
+func (c *ProxyServerClient) Get(ctx context.Context, id int64) (*ProxyServer, error) {
 	return c.Query().Where(proxyserver.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxyServerClient) GetX(ctx context.Context, id int) *ProxyServer {
+func (c *ProxyServerClient) GetX(ctx context.Context, id int64) *ProxyServer {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1799,7 +2291,7 @@ func (c *ProxyServerGroupClient) UpdateOne(_m *ProxyServerGroup) *ProxyServerGro
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxyServerGroupClient) UpdateOneID(id int) *ProxyServerGroupUpdateOne {
+func (c *ProxyServerGroupClient) UpdateOneID(id int64) *ProxyServerGroupUpdateOne {
 	mutation := newProxyServerGroupMutation(c.config, OpUpdateOne, withProxyServerGroupID(id))
 	return &ProxyServerGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1816,7 +2308,7 @@ func (c *ProxyServerGroupClient) DeleteOne(_m *ProxyServerGroup) *ProxyServerGro
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxyServerGroupClient) DeleteOneID(id int) *ProxyServerGroupDeleteOne {
+func (c *ProxyServerGroupClient) DeleteOneID(id int64) *ProxyServerGroupDeleteOne {
 	builder := c.Delete().Where(proxyservergroup.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1833,12 +2325,12 @@ func (c *ProxyServerGroupClient) Query() *ProxyServerGroupQuery {
 }
 
 // Get returns a ProxyServerGroup entity by its id.
-func (c *ProxyServerGroupClient) Get(ctx context.Context, id int) (*ProxyServerGroup, error) {
+func (c *ProxyServerGroupClient) Get(ctx context.Context, id int64) (*ProxyServerGroup, error) {
 	return c.Query().Where(proxyservergroup.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxyServerGroupClient) GetX(ctx context.Context, id int) *ProxyServerGroup {
+func (c *ProxyServerGroupClient) GetX(ctx context.Context, id int64) *ProxyServerGroup {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1932,7 +2424,7 @@ func (c *ProxySubscribeClient) UpdateOne(_m *ProxySubscribe) *ProxySubscribeUpda
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxySubscribeClient) UpdateOneID(id int) *ProxySubscribeUpdateOne {
+func (c *ProxySubscribeClient) UpdateOneID(id int64) *ProxySubscribeUpdateOne {
 	mutation := newProxySubscribeMutation(c.config, OpUpdateOne, withProxySubscribeID(id))
 	return &ProxySubscribeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -1949,7 +2441,7 @@ func (c *ProxySubscribeClient) DeleteOne(_m *ProxySubscribe) *ProxySubscribeDele
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxySubscribeClient) DeleteOneID(id int) *ProxySubscribeDeleteOne {
+func (c *ProxySubscribeClient) DeleteOneID(id int64) *ProxySubscribeDeleteOne {
 	builder := c.Delete().Where(proxysubscribe.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -1966,12 +2458,12 @@ func (c *ProxySubscribeClient) Query() *ProxySubscribeQuery {
 }
 
 // Get returns a ProxySubscribe entity by its id.
-func (c *ProxySubscribeClient) Get(ctx context.Context, id int) (*ProxySubscribe, error) {
+func (c *ProxySubscribeClient) Get(ctx context.Context, id int64) (*ProxySubscribe, error) {
 	return c.Query().Where(proxysubscribe.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxySubscribeClient) GetX(ctx context.Context, id int) *ProxySubscribe {
+func (c *ProxySubscribeClient) GetX(ctx context.Context, id int64) *ProxySubscribe {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -2065,7 +2557,7 @@ func (c *ProxySubscribeApplicationClient) UpdateOne(_m *ProxySubscribeApplicatio
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxySubscribeApplicationClient) UpdateOneID(id int) *ProxySubscribeApplicationUpdateOne {
+func (c *ProxySubscribeApplicationClient) UpdateOneID(id int64) *ProxySubscribeApplicationUpdateOne {
 	mutation := newProxySubscribeApplicationMutation(c.config, OpUpdateOne, withProxySubscribeApplicationID(id))
 	return &ProxySubscribeApplicationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -2082,7 +2574,7 @@ func (c *ProxySubscribeApplicationClient) DeleteOne(_m *ProxySubscribeApplicatio
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxySubscribeApplicationClient) DeleteOneID(id int) *ProxySubscribeApplicationDeleteOne {
+func (c *ProxySubscribeApplicationClient) DeleteOneID(id int64) *ProxySubscribeApplicationDeleteOne {
 	builder := c.Delete().Where(proxysubscribeapplication.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -2099,12 +2591,12 @@ func (c *ProxySubscribeApplicationClient) Query() *ProxySubscribeApplicationQuer
 }
 
 // Get returns a ProxySubscribeApplication entity by its id.
-func (c *ProxySubscribeApplicationClient) Get(ctx context.Context, id int) (*ProxySubscribeApplication, error) {
+func (c *ProxySubscribeApplicationClient) Get(ctx context.Context, id int64) (*ProxySubscribeApplication, error) {
 	return c.Query().Where(proxysubscribeapplication.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxySubscribeApplicationClient) GetX(ctx context.Context, id int) *ProxySubscribeApplication {
+func (c *ProxySubscribeApplicationClient) GetX(ctx context.Context, id int64) *ProxySubscribeApplication {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -2198,7 +2690,7 @@ func (c *ProxySubscribeGroupClient) UpdateOne(_m *ProxySubscribeGroup) *ProxySub
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxySubscribeGroupClient) UpdateOneID(id int) *ProxySubscribeGroupUpdateOne {
+func (c *ProxySubscribeGroupClient) UpdateOneID(id int64) *ProxySubscribeGroupUpdateOne {
 	mutation := newProxySubscribeGroupMutation(c.config, OpUpdateOne, withProxySubscribeGroupID(id))
 	return &ProxySubscribeGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -2215,7 +2707,7 @@ func (c *ProxySubscribeGroupClient) DeleteOne(_m *ProxySubscribeGroup) *ProxySub
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxySubscribeGroupClient) DeleteOneID(id int) *ProxySubscribeGroupDeleteOne {
+func (c *ProxySubscribeGroupClient) DeleteOneID(id int64) *ProxySubscribeGroupDeleteOne {
 	builder := c.Delete().Where(proxysubscribegroup.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -2232,12 +2724,12 @@ func (c *ProxySubscribeGroupClient) Query() *ProxySubscribeGroupQuery {
 }
 
 // Get returns a ProxySubscribeGroup entity by its id.
-func (c *ProxySubscribeGroupClient) Get(ctx context.Context, id int) (*ProxySubscribeGroup, error) {
+func (c *ProxySubscribeGroupClient) Get(ctx context.Context, id int64) (*ProxySubscribeGroup, error) {
 	return c.Query().Where(proxysubscribegroup.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxySubscribeGroupClient) GetX(ctx context.Context, id int) *ProxySubscribeGroup {
+func (c *ProxySubscribeGroupClient) GetX(ctx context.Context, id int64) *ProxySubscribeGroup {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -3129,7 +3621,7 @@ func (c *ProxyUserClient) UpdateOne(_m *ProxyUser) *ProxyUserUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxyUserClient) UpdateOneID(id int) *ProxyUserUpdateOne {
+func (c *ProxyUserClient) UpdateOneID(id int64) *ProxyUserUpdateOne {
 	mutation := newProxyUserMutation(c.config, OpUpdateOne, withProxyUserID(id))
 	return &ProxyUserUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -3146,7 +3638,7 @@ func (c *ProxyUserClient) DeleteOne(_m *ProxyUser) *ProxyUserDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxyUserClient) DeleteOneID(id int) *ProxyUserDeleteOne {
+func (c *ProxyUserClient) DeleteOneID(id int64) *ProxyUserDeleteOne {
 	builder := c.Delete().Where(proxyuser.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -3163,17 +3655,49 @@ func (c *ProxyUserClient) Query() *ProxyUserQuery {
 }
 
 // Get returns a ProxyUser entity by its id.
-func (c *ProxyUserClient) Get(ctx context.Context, id int) (*ProxyUser, error) {
+func (c *ProxyUserClient) Get(ctx context.Context, id int64) (*ProxyUser, error) {
 	return c.Query().Where(proxyuser.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxyUserClient) GetX(ctx context.Context, id int) *ProxyUser {
+func (c *ProxyUserClient) GetX(ctx context.Context, id int64) *ProxyUser {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryRedemptionRecords queries the redemption_records edge of a ProxyUser.
+func (c *ProxyUserClient) QueryRedemptionRecords(_m *ProxyUser) *ProxyRedemptionRecordQuery {
+	query := (&ProxyRedemptionRecordClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proxyuser.Table, proxyuser.FieldID, id),
+			sqlgraph.To(proxyredemptionrecord.Table, proxyredemptionrecord.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, proxyuser.RedemptionRecordsTable, proxyuser.RedemptionRecordsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryWithdrawals queries the withdrawals edge of a ProxyUser.
+func (c *ProxyUserClient) QueryWithdrawals(_m *ProxyUser) *ProxyUserWithdrawalQuery {
+	query := (&ProxyUserWithdrawalClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proxyuser.Table, proxyuser.FieldID, id),
+			sqlgraph.To(proxyuserwithdrawal.Table, proxyuserwithdrawal.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, proxyuser.WithdrawalsTable, proxyuser.WithdrawalsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
@@ -3262,7 +3786,7 @@ func (c *ProxyUserAuthMethodClient) UpdateOne(_m *ProxyUserAuthMethod) *ProxyUse
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxyUserAuthMethodClient) UpdateOneID(id int) *ProxyUserAuthMethodUpdateOne {
+func (c *ProxyUserAuthMethodClient) UpdateOneID(id int64) *ProxyUserAuthMethodUpdateOne {
 	mutation := newProxyUserAuthMethodMutation(c.config, OpUpdateOne, withProxyUserAuthMethodID(id))
 	return &ProxyUserAuthMethodUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -3279,7 +3803,7 @@ func (c *ProxyUserAuthMethodClient) DeleteOne(_m *ProxyUserAuthMethod) *ProxyUse
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxyUserAuthMethodClient) DeleteOneID(id int) *ProxyUserAuthMethodDeleteOne {
+func (c *ProxyUserAuthMethodClient) DeleteOneID(id int64) *ProxyUserAuthMethodDeleteOne {
 	builder := c.Delete().Where(proxyuserauthmethod.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -3296,12 +3820,12 @@ func (c *ProxyUserAuthMethodClient) Query() *ProxyUserAuthMethodQuery {
 }
 
 // Get returns a ProxyUserAuthMethod entity by its id.
-func (c *ProxyUserAuthMethodClient) Get(ctx context.Context, id int) (*ProxyUserAuthMethod, error) {
+func (c *ProxyUserAuthMethodClient) Get(ctx context.Context, id int64) (*ProxyUserAuthMethod, error) {
 	return c.Query().Where(proxyuserauthmethod.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxyUserAuthMethodClient) GetX(ctx context.Context, id int) *ProxyUserAuthMethod {
+func (c *ProxyUserAuthMethodClient) GetX(ctx context.Context, id int64) *ProxyUserAuthMethod {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -3395,7 +3919,7 @@ func (c *ProxyUserDeviceClient) UpdateOne(_m *ProxyUserDevice) *ProxyUserDeviceU
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxyUserDeviceClient) UpdateOneID(id int) *ProxyUserDeviceUpdateOne {
+func (c *ProxyUserDeviceClient) UpdateOneID(id int64) *ProxyUserDeviceUpdateOne {
 	mutation := newProxyUserDeviceMutation(c.config, OpUpdateOne, withProxyUserDeviceID(id))
 	return &ProxyUserDeviceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -3412,7 +3936,7 @@ func (c *ProxyUserDeviceClient) DeleteOne(_m *ProxyUserDevice) *ProxyUserDeviceD
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxyUserDeviceClient) DeleteOneID(id int) *ProxyUserDeviceDeleteOne {
+func (c *ProxyUserDeviceClient) DeleteOneID(id int64) *ProxyUserDeviceDeleteOne {
 	builder := c.Delete().Where(proxyuserdevice.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -3429,12 +3953,12 @@ func (c *ProxyUserDeviceClient) Query() *ProxyUserDeviceQuery {
 }
 
 // Get returns a ProxyUserDevice entity by its id.
-func (c *ProxyUserDeviceClient) Get(ctx context.Context, id int) (*ProxyUserDevice, error) {
+func (c *ProxyUserDeviceClient) Get(ctx context.Context, id int64) (*ProxyUserDevice, error) {
 	return c.Query().Where(proxyuserdevice.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxyUserDeviceClient) GetX(ctx context.Context, id int) *ProxyUserDevice {
+func (c *ProxyUserDeviceClient) GetX(ctx context.Context, id int64) *ProxyUserDevice {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -3528,7 +4052,7 @@ func (c *ProxyUserDeviceOnlineRecordClient) UpdateOne(_m *ProxyUserDeviceOnlineR
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxyUserDeviceOnlineRecordClient) UpdateOneID(id int) *ProxyUserDeviceOnlineRecordUpdateOne {
+func (c *ProxyUserDeviceOnlineRecordClient) UpdateOneID(id int64) *ProxyUserDeviceOnlineRecordUpdateOne {
 	mutation := newProxyUserDeviceOnlineRecordMutation(c.config, OpUpdateOne, withProxyUserDeviceOnlineRecordID(id))
 	return &ProxyUserDeviceOnlineRecordUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -3545,7 +4069,7 @@ func (c *ProxyUserDeviceOnlineRecordClient) DeleteOne(_m *ProxyUserDeviceOnlineR
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxyUserDeviceOnlineRecordClient) DeleteOneID(id int) *ProxyUserDeviceOnlineRecordDeleteOne {
+func (c *ProxyUserDeviceOnlineRecordClient) DeleteOneID(id int64) *ProxyUserDeviceOnlineRecordDeleteOne {
 	builder := c.Delete().Where(proxyuserdeviceonlinerecord.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -3562,12 +4086,12 @@ func (c *ProxyUserDeviceOnlineRecordClient) Query() *ProxyUserDeviceOnlineRecord
 }
 
 // Get returns a ProxyUserDeviceOnlineRecord entity by its id.
-func (c *ProxyUserDeviceOnlineRecordClient) Get(ctx context.Context, id int) (*ProxyUserDeviceOnlineRecord, error) {
+func (c *ProxyUserDeviceOnlineRecordClient) Get(ctx context.Context, id int64) (*ProxyUserDeviceOnlineRecord, error) {
 	return c.Query().Where(proxyuserdeviceonlinerecord.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxyUserDeviceOnlineRecordClient) GetX(ctx context.Context, id int) *ProxyUserDeviceOnlineRecord {
+func (c *ProxyUserDeviceOnlineRecordClient) GetX(ctx context.Context, id int64) *ProxyUserDeviceOnlineRecord {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -3597,6 +4121,139 @@ func (c *ProxyUserDeviceOnlineRecordClient) mutate(ctx context.Context, m *Proxy
 		return (&ProxyUserDeviceOnlineRecordDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ProxyUserDeviceOnlineRecord mutation op: %q", m.Op())
+	}
+}
+
+// ProxyUserGroupClient is a client for the ProxyUserGroup schema.
+type ProxyUserGroupClient struct {
+	config
+}
+
+// NewProxyUserGroupClient returns a client for the ProxyUserGroup from the given config.
+func NewProxyUserGroupClient(c config) *ProxyUserGroupClient {
+	return &ProxyUserGroupClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `proxyusergroup.Hooks(f(g(h())))`.
+func (c *ProxyUserGroupClient) Use(hooks ...Hook) {
+	c.hooks.ProxyUserGroup = append(c.hooks.ProxyUserGroup, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `proxyusergroup.Intercept(f(g(h())))`.
+func (c *ProxyUserGroupClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProxyUserGroup = append(c.inters.ProxyUserGroup, interceptors...)
+}
+
+// Create returns a builder for creating a ProxyUserGroup entity.
+func (c *ProxyUserGroupClient) Create() *ProxyUserGroupCreate {
+	mutation := newProxyUserGroupMutation(c.config, OpCreate)
+	return &ProxyUserGroupCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProxyUserGroup entities.
+func (c *ProxyUserGroupClient) CreateBulk(builders ...*ProxyUserGroupCreate) *ProxyUserGroupCreateBulk {
+	return &ProxyUserGroupCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProxyUserGroupClient) MapCreateBulk(slice any, setFunc func(*ProxyUserGroupCreate, int)) *ProxyUserGroupCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProxyUserGroupCreateBulk{err: fmt.Errorf("calling to ProxyUserGroupClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProxyUserGroupCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProxyUserGroupCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProxyUserGroup.
+func (c *ProxyUserGroupClient) Update() *ProxyUserGroupUpdate {
+	mutation := newProxyUserGroupMutation(c.config, OpUpdate)
+	return &ProxyUserGroupUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProxyUserGroupClient) UpdateOne(_m *ProxyUserGroup) *ProxyUserGroupUpdateOne {
+	mutation := newProxyUserGroupMutation(c.config, OpUpdateOne, withProxyUserGroup(_m))
+	return &ProxyUserGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProxyUserGroupClient) UpdateOneID(id int64) *ProxyUserGroupUpdateOne {
+	mutation := newProxyUserGroupMutation(c.config, OpUpdateOne, withProxyUserGroupID(id))
+	return &ProxyUserGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProxyUserGroup.
+func (c *ProxyUserGroupClient) Delete() *ProxyUserGroupDelete {
+	mutation := newProxyUserGroupMutation(c.config, OpDelete)
+	return &ProxyUserGroupDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProxyUserGroupClient) DeleteOne(_m *ProxyUserGroup) *ProxyUserGroupDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProxyUserGroupClient) DeleteOneID(id int64) *ProxyUserGroupDeleteOne {
+	builder := c.Delete().Where(proxyusergroup.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProxyUserGroupDeleteOne{builder}
+}
+
+// Query returns a query builder for ProxyUserGroup.
+func (c *ProxyUserGroupClient) Query() *ProxyUserGroupQuery {
+	return &ProxyUserGroupQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProxyUserGroup},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ProxyUserGroup entity by its id.
+func (c *ProxyUserGroupClient) Get(ctx context.Context, id int64) (*ProxyUserGroup, error) {
+	return c.Query().Where(proxyusergroup.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProxyUserGroupClient) GetX(ctx context.Context, id int64) *ProxyUserGroup {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ProxyUserGroupClient) Hooks() []Hook {
+	return c.hooks.ProxyUserGroup
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProxyUserGroupClient) Interceptors() []Interceptor {
+	return c.inters.ProxyUserGroup
+}
+
+func (c *ProxyUserGroupClient) mutate(ctx context.Context, m *ProxyUserGroupMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProxyUserGroupCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProxyUserGroupUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProxyUserGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProxyUserGroupDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProxyUserGroup mutation op: %q", m.Op())
 	}
 }
 
@@ -3661,7 +4318,7 @@ func (c *ProxyUserSubscribeClient) UpdateOne(_m *ProxyUserSubscribe) *ProxyUserS
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxyUserSubscribeClient) UpdateOneID(id int) *ProxyUserSubscribeUpdateOne {
+func (c *ProxyUserSubscribeClient) UpdateOneID(id int64) *ProxyUserSubscribeUpdateOne {
 	mutation := newProxyUserSubscribeMutation(c.config, OpUpdateOne, withProxyUserSubscribeID(id))
 	return &ProxyUserSubscribeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -3678,7 +4335,7 @@ func (c *ProxyUserSubscribeClient) DeleteOne(_m *ProxyUserSubscribe) *ProxyUserS
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxyUserSubscribeClient) DeleteOneID(id int) *ProxyUserSubscribeDeleteOne {
+func (c *ProxyUserSubscribeClient) DeleteOneID(id int64) *ProxyUserSubscribeDeleteOne {
 	builder := c.Delete().Where(proxyusersubscribe.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -3695,12 +4352,12 @@ func (c *ProxyUserSubscribeClient) Query() *ProxyUserSubscribeQuery {
 }
 
 // Get returns a ProxyUserSubscribe entity by its id.
-func (c *ProxyUserSubscribeClient) Get(ctx context.Context, id int) (*ProxyUserSubscribe, error) {
+func (c *ProxyUserSubscribeClient) Get(ctx context.Context, id int64) (*ProxyUserSubscribe, error) {
 	return c.Query().Where(proxyusersubscribe.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxyUserSubscribeClient) GetX(ctx context.Context, id int) *ProxyUserSubscribe {
+func (c *ProxyUserSubscribeClient) GetX(ctx context.Context, id int64) *ProxyUserSubscribe {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -3733,23 +4390,173 @@ func (c *ProxyUserSubscribeClient) mutate(ctx context.Context, m *ProxyUserSubsc
 	}
 }
 
+// ProxyUserWithdrawalClient is a client for the ProxyUserWithdrawal schema.
+type ProxyUserWithdrawalClient struct {
+	config
+}
+
+// NewProxyUserWithdrawalClient returns a client for the ProxyUserWithdrawal from the given config.
+func NewProxyUserWithdrawalClient(c config) *ProxyUserWithdrawalClient {
+	return &ProxyUserWithdrawalClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `proxyuserwithdrawal.Hooks(f(g(h())))`.
+func (c *ProxyUserWithdrawalClient) Use(hooks ...Hook) {
+	c.hooks.ProxyUserWithdrawal = append(c.hooks.ProxyUserWithdrawal, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `proxyuserwithdrawal.Intercept(f(g(h())))`.
+func (c *ProxyUserWithdrawalClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProxyUserWithdrawal = append(c.inters.ProxyUserWithdrawal, interceptors...)
+}
+
+// Create returns a builder for creating a ProxyUserWithdrawal entity.
+func (c *ProxyUserWithdrawalClient) Create() *ProxyUserWithdrawalCreate {
+	mutation := newProxyUserWithdrawalMutation(c.config, OpCreate)
+	return &ProxyUserWithdrawalCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProxyUserWithdrawal entities.
+func (c *ProxyUserWithdrawalClient) CreateBulk(builders ...*ProxyUserWithdrawalCreate) *ProxyUserWithdrawalCreateBulk {
+	return &ProxyUserWithdrawalCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProxyUserWithdrawalClient) MapCreateBulk(slice any, setFunc func(*ProxyUserWithdrawalCreate, int)) *ProxyUserWithdrawalCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProxyUserWithdrawalCreateBulk{err: fmt.Errorf("calling to ProxyUserWithdrawalClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProxyUserWithdrawalCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProxyUserWithdrawalCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProxyUserWithdrawal.
+func (c *ProxyUserWithdrawalClient) Update() *ProxyUserWithdrawalUpdate {
+	mutation := newProxyUserWithdrawalMutation(c.config, OpUpdate)
+	return &ProxyUserWithdrawalUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProxyUserWithdrawalClient) UpdateOne(_m *ProxyUserWithdrawal) *ProxyUserWithdrawalUpdateOne {
+	mutation := newProxyUserWithdrawalMutation(c.config, OpUpdateOne, withProxyUserWithdrawal(_m))
+	return &ProxyUserWithdrawalUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProxyUserWithdrawalClient) UpdateOneID(id int64) *ProxyUserWithdrawalUpdateOne {
+	mutation := newProxyUserWithdrawalMutation(c.config, OpUpdateOne, withProxyUserWithdrawalID(id))
+	return &ProxyUserWithdrawalUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProxyUserWithdrawal.
+func (c *ProxyUserWithdrawalClient) Delete() *ProxyUserWithdrawalDelete {
+	mutation := newProxyUserWithdrawalMutation(c.config, OpDelete)
+	return &ProxyUserWithdrawalDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProxyUserWithdrawalClient) DeleteOne(_m *ProxyUserWithdrawal) *ProxyUserWithdrawalDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProxyUserWithdrawalClient) DeleteOneID(id int64) *ProxyUserWithdrawalDeleteOne {
+	builder := c.Delete().Where(proxyuserwithdrawal.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProxyUserWithdrawalDeleteOne{builder}
+}
+
+// Query returns a query builder for ProxyUserWithdrawal.
+func (c *ProxyUserWithdrawalClient) Query() *ProxyUserWithdrawalQuery {
+	return &ProxyUserWithdrawalQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProxyUserWithdrawal},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ProxyUserWithdrawal entity by its id.
+func (c *ProxyUserWithdrawalClient) Get(ctx context.Context, id int64) (*ProxyUserWithdrawal, error) {
+	return c.Query().Where(proxyuserwithdrawal.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProxyUserWithdrawalClient) GetX(ctx context.Context, id int64) *ProxyUserWithdrawal {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryUser queries the user edge of a ProxyUserWithdrawal.
+func (c *ProxyUserWithdrawalClient) QueryUser(_m *ProxyUserWithdrawal) *ProxyUserQuery {
+	query := (&ProxyUserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proxyuserwithdrawal.Table, proxyuserwithdrawal.FieldID, id),
+			sqlgraph.To(proxyuser.Table, proxyuser.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, proxyuserwithdrawal.UserTable, proxyuserwithdrawal.UserColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ProxyUserWithdrawalClient) Hooks() []Hook {
+	return c.hooks.ProxyUserWithdrawal
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProxyUserWithdrawalClient) Interceptors() []Interceptor {
+	return c.inters.ProxyUserWithdrawal
+}
+
+func (c *ProxyUserWithdrawalClient) mutate(ctx context.Context, m *ProxyUserWithdrawalMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProxyUserWithdrawalCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProxyUserWithdrawalUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProxyUserWithdrawalUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProxyUserWithdrawalDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProxyUserWithdrawal mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
 		ProxyAds, ProxyAnnouncement, ProxyAuthMethod, ProxyCoupon, ProxyDocument,
-		ProxyNode, ProxyOrder, ProxyPayment, ProxySchemaMigrations, ProxyServer,
-		ProxyServerGroup, ProxySubscribe, ProxySubscribeApplication,
-		ProxySubscribeGroup, ProxySystem, ProxySystemLog, ProxyTask, ProxyTicket,
-		ProxyTicketFollow, ProxyTrafficLog, ProxyUser, ProxyUserAuthMethod,
-		ProxyUserDevice, ProxyUserDeviceOnlineRecord, ProxyUserSubscribe []ent.Hook
+		ProxyGroupHistory, ProxyNode, ProxyOrder, ProxyPayment, ProxyRedemptionCode,
+		ProxyRedemptionRecord, ProxySchemaMigrations, ProxyServer, ProxyServerGroup,
+		ProxySubscribe, ProxySubscribeApplication, ProxySubscribeGroup, ProxySystem,
+		ProxySystemLog, ProxyTask, ProxyTicket, ProxyTicketFollow, ProxyTrafficLog,
+		ProxyUser, ProxyUserAuthMethod, ProxyUserDevice, ProxyUserDeviceOnlineRecord,
+		ProxyUserGroup, ProxyUserSubscribe, ProxyUserWithdrawal []ent.Hook
 	}
 	inters struct {
 		ProxyAds, ProxyAnnouncement, ProxyAuthMethod, ProxyCoupon, ProxyDocument,
-		ProxyNode, ProxyOrder, ProxyPayment, ProxySchemaMigrations, ProxyServer,
-		ProxyServerGroup, ProxySubscribe, ProxySubscribeApplication,
-		ProxySubscribeGroup, ProxySystem, ProxySystemLog, ProxyTask, ProxyTicket,
-		ProxyTicketFollow, ProxyTrafficLog, ProxyUser, ProxyUserAuthMethod,
-		ProxyUserDevice, ProxyUserDeviceOnlineRecord,
-		ProxyUserSubscribe []ent.Interceptor
+		ProxyGroupHistory, ProxyNode, ProxyOrder, ProxyPayment, ProxyRedemptionCode,
+		ProxyRedemptionRecord, ProxySchemaMigrations, ProxyServer, ProxyServerGroup,
+		ProxySubscribe, ProxySubscribeApplication, ProxySubscribeGroup, ProxySystem,
+		ProxySystemLog, ProxyTask, ProxyTicket, ProxyTicketFollow, ProxyTrafficLog,
+		ProxyUser, ProxyUserAuthMethod, ProxyUserDevice, ProxyUserDeviceOnlineRecord,
+		ProxyUserGroup, ProxyUserSubscribe, ProxyUserWithdrawal []ent.Interceptor
 	}
 )

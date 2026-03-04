@@ -6,6 +6,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
 	"github.com/OmnTeam/ppanel-pro/ent/proxytrafficlog"
 	logbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/log"
 	"github.com/go-kratos/kratos/v2/log"
@@ -25,7 +26,7 @@ func NewAdminTrafficLogRepo(data *Data, logger log.Logger) logbiz.TrafficLogRepo
 }
 
 // FilterTrafficLogDetails 过滤流量日志详情
-func (r *adminTrafficLogRepo) FilterTrafficLogDetails(ctx context.Context, tenantID int64, page, size int32, date string, serverID, userID, subscribeID *int64) ([]*ent.ProxyTrafficLog, int64, error) {
+func (r *adminTrafficLogRepo) FilterTrafficLogDetails(ctx context.Context, page, size int32, date string, serverID, userID, subscribeID *int64) ([]*ent.ProxyTrafficLog, int64, error) {
 	// 设置默认值
 	if page == 0 {
 		page = 1
@@ -99,4 +100,218 @@ func (r *adminTrafficLogRepo) FilterTrafficLogDetails(ctx context.Context, tenan
 	}
 
 	return list, int64(total), nil
+}
+
+// ServerTrafficData 服务器流量数据
+type ServerTrafficData struct {
+	ServerID int64
+	Name     string
+	Upload   int64
+	Download int64
+}
+
+// UserTrafficData 用户流量数据
+type UserTrafficData struct {
+	UserID   int64
+	Upload   int64
+	Download int64
+}
+
+// TrafficTotal 流量总计
+type TrafficTotal struct {
+	Upload   int64
+	Download int64
+}
+
+// TopServersTrafficByDay 按天查询Top N服务器流量
+func (r *adminTrafficLogRepo) TopServersTrafficByDay(ctx context.Context, day time.Time, limit int) ([]*ServerTrafficData, error) {
+	start := time.Date(day.Year(), day.Month(), day.Day(), 0, 0, 0, 0, time.Local)
+	end := start.Add(24*time.Hour - time.Nanosecond)
+
+	// 查询所有符合条件的流量日志
+	logs, err := r.data.db.ProxyTrafficLog.Query().
+		Where(
+			proxytrafficlog.TimestampGTE(start),
+			proxytrafficlog.TimestampLTE(end),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// 按服务器ID聚合
+	serverMap := make(map[int64]*ServerTrafficData)
+	for _, log := range logs {
+		if log.ServerID == 0 {
+			continue
+		}
+		if _, exists := serverMap[log.ServerID]; !exists {
+			serverMap[log.ServerID] = &ServerTrafficData{
+				ServerID: log.ServerID,
+				Upload:   0,
+				Download: 0,
+			}
+		}
+		serverMap[log.ServerID].Upload += int64(log.Upload)
+		serverMap[log.ServerID].Download += int64(log.Download)
+	}
+
+	// 查询服务器名称并构建结果
+	var results []*ServerTrafficData
+	for _, data := range serverMap {
+		// 查询服务器信息获取名称
+		server, err := r.data.db.ProxyNode.Query().
+			Where(proxynode.IDEQ(data.ServerID)).
+			First(ctx)
+		if err != nil {
+			r.log.Warnf("[TopServersTrafficByDay] Server not found: %d", data.ServerID)
+			data.Name = "Unknown"
+		} else {
+			data.Name = server.Name
+		}
+		results = append(results, data)
+	}
+
+	// 按总流量排序（降序）
+	for i := 0; i < len(results)-1; i++ {
+		for j := i + 1; j < len(results); j++ {
+			if results[i].Upload+results[i].Download < results[j].Upload+results[j].Download {
+				results[i], results[j] = results[j], results[i]
+			}
+		}
+	}
+
+	// 限制返回数量
+	if len(results) > limit {
+		results = results[:limit]
+	}
+
+	return results, nil
+}
+
+// TopUsersTrafficByDay 按天查询Top N用户流量
+func (r *adminTrafficLogRepo) TopUsersTrafficByDay(ctx context.Context, day time.Time, limit int) ([]*UserTrafficData, error) {
+	start := time.Date(day.Year(), day.Month(), day.Day(), 0, 0, 0, 0, time.Local)
+	end := start.Add(24*time.Hour - time.Nanosecond)
+
+	// 查询所有符合条件的流量日志
+	logs, err := r.data.db.ProxyTrafficLog.Query().
+		Where(
+			proxytrafficlog.TimestampGTE(start),
+			proxytrafficlog.TimestampLTE(end),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// 按用户ID聚合
+	userMap := make(map[int64]*UserTrafficData)
+	for _, log := range logs {
+		if log.UserID == 0 {
+			continue
+		}
+		if _, exists := userMap[log.UserID]; !exists {
+			userMap[log.UserID] = &UserTrafficData{
+				UserID:   log.UserID,
+				Upload:   0,
+				Download: 0,
+			}
+		}
+		userMap[log.UserID].Upload += int64(log.Upload)
+		userMap[log.UserID].Download += int64(log.Download)
+	}
+
+	// 构建结果
+	var results []*UserTrafficData
+	for _, data := range userMap {
+		results = append(results, data)
+	}
+
+	// 按总流量排序（降序）
+	for i := 0; i < len(results)-1; i++ {
+		for j := i + 1; j < len(results); j++ {
+			if results[i].Upload+results[i].Download < results[j].Upload+results[j].Download {
+				results[i], results[j] = results[j], results[i]
+			}
+		}
+	}
+
+	// 限制返回数量
+	if len(results) > limit {
+		results = results[:limit]
+	}
+
+	return results, nil
+}
+
+// QueryTrafficByDay 查询指定日期的总流量
+func (r *adminTrafficLogRepo) QueryTrafficByDay(ctx context.Context, day time.Time) (*TrafficTotal, error) {
+	start := time.Date(day.Year(), day.Month(), day.Day(), 0, 0, 0, 0, time.Local)
+	end := start.Add(24*time.Hour - time.Nanosecond)
+
+	logs, err := r.data.db.ProxyTrafficLog.Query().
+		Where(
+			proxytrafficlog.TimestampGTE(start),
+			proxytrafficlog.TimestampLTE(end),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	total := &TrafficTotal{}
+	for _, log := range logs {
+		total.Upload += int64(log.Upload)
+		total.Download += int64(log.Download)
+	}
+
+	return total, nil
+}
+
+// QueryTrafficByMonthly 查询指定月份的总流量
+func (r *adminTrafficLogRepo) QueryTrafficByMonthly(ctx context.Context, date time.Time) (*TrafficTotal, error) {
+	start := time.Date(date.Year(), date.Month(), 1, 0, 0, 0, 0, time.Local)
+	end := start.AddDate(0, 1, 0).Add(-time.Nanosecond)
+
+	logs, err := r.data.db.ProxyTrafficLog.Query().
+		Where(
+			proxytrafficlog.TimestampGTE(start),
+			proxytrafficlog.TimestampLTE(end),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	total := &TrafficTotal{}
+	for _, log := range logs {
+		total.Upload += int64(log.Upload)
+		total.Download += int64(log.Download)
+	}
+
+	return total, nil
+}
+
+// CreateTrafficLog 创建流量日志记录
+func (r *adminTrafficLogRepo) CreateTrafficLog(ctx context.Context, serverID, userID, subscribeID int64, upload, download int64, timestamp time.Time) error {
+	_, err := r.data.db.ProxyTrafficLog.Create().
+		SetServerID(serverID).
+		SetUserID(userID).
+		SetSubscribeID(subscribeID).
+		SetUpload(int(upload)).
+		SetDownload(int(download)).
+		SetTimestamp(timestamp).
+		Save(ctx)
+	return err
+}
+
+// DeleteOldTrafficLogs 删除旧的流量日志
+func (r *adminTrafficLogRepo) DeleteOldTrafficLogs(ctx context.Context, beforeDate time.Time) (int64, error) {
+	deletedCount, err := r.data.db.ProxyTrafficLog.Delete().
+		Where(func(s *sql.Selector) {
+			s.Where(sql.LTE(s.C(proxytrafficlog.FieldTimestamp), beforeDate))
+		}).
+		Exec(ctx)
+	return int64(deletedCount), err
 }

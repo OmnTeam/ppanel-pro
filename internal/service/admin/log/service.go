@@ -3,6 +3,7 @@ package log
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/log/v1"
 	logbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/log"
@@ -10,6 +11,16 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
+
+// Helper functions for type conversion
+func parseInt64(s string) int64 {
+	val, _ := strconv.ParseInt(s, 10, 64)
+	return val
+}
+
+func formatInt64(i int64) string {
+	return strconv.FormatInt(i, 10)
+}
 
 // LogService 日志服务（统一所有日志相关 API）
 type LogService struct {
@@ -41,17 +52,18 @@ func NewLogService(
 func (s *LogService) FilterBalanceLog(ctx context.Context, req *v1.FilterBalanceLogRequest) (*v1.FilterBalanceLogReply, error) {
 
 	var userID *int64
-	if req.UserId > 0 {
-		userID = &req.UserId
+	if req.UserId != "" {
+		parsedID := parseInt64(req.UserId)
+		userID = &parsedID
 	}
 
-	logs, total, err := s.systemLogUc.FilterBalanceLog(ctx, req.Page, req.Size, req.Date, userID)
+	logs, total, err := s.systemLogUc.FilterBalanceLog(ctx, int32(req.Page), int32(req.Size), req.Date, userID)
 	if err != nil {
 		s.log.Errorw("msg", "filter balance log failed", "error", err)
 		return nil, err
 	}
 
-	list := make([]*v1.BalanceLog, 0, len(logs))
+	list := make([]*v1.BalanceLog, len(logs))
 	for _, l := range logs {
 		var content logmodel.Balance
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -61,11 +73,11 @@ func (s *LogService) FilterBalanceLog(ctx context.Context, req *v1.FilterBalance
 
 		list = append(list, &v1.BalanceLog{
 			Type:      int32(content.Type),
-			UserId:    l.ObjectID,
-			Amount:    content.Amount,
+			UserId:    formatInt64(int64(l.ObjectID)),
+			Amount:    formatInt64(content.Amount),
 			OrderNo:   content.OrderNo,
-			Balance:   content.Balance,
-			Timestamp: content.Timestamp,
+			Balance:   formatInt64(content.Balance),
+			Timestamp: formatInt64(content.Timestamp),
 		})
 	}
 
@@ -73,7 +85,7 @@ func (s *LogService) FilterBalanceLog(ctx context.Context, req *v1.FilterBalance
 		Code:    int32(responsecode.FilterBalanceLogSuccess),
 		Message: responsecode.CodeMessages[responsecode.FilterBalanceLogSuccess],
 		Data: &v1.FilterBalanceLogData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -82,17 +94,18 @@ func (s *LogService) FilterBalanceLog(ctx context.Context, req *v1.FilterBalance
 // FilterCommissionLog 过滤佣金日志
 func (s *LogService) FilterCommissionLog(ctx context.Context, req *v1.FilterCommissionLogRequest) (*v1.FilterCommissionLogReply, error) {
 	var userID *int64
-	if req.UserId > 0 {
-		userID = &req.UserId
+	if req.UserId != "" {
+		parsedID := parseInt64(req.UserId)
+		userID = &parsedID
 	}
 
-	logs, total, err := s.systemLogUc.FilterCommissionLog(ctx, req.Page, req.Size, req.Date, userID)
+	logs, total, err := s.systemLogUc.FilterCommissionLog(ctx, int32(req.Page), int32(req.Size), req.Date, userID)
 	if err != nil {
 		s.log.Errorw("msg", "filter commission log failed", "error", err)
 		return nil, err
 	}
 
-	list := make([]*v1.CommissionLog, 0, len(logs))
+	list := make([]*v1.CommissionLog, len(logs))
 	for _, l := range logs {
 		var content logmodel.Commission
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -102,10 +115,10 @@ func (s *LogService) FilterCommissionLog(ctx context.Context, req *v1.FilterComm
 
 		list = append(list, &v1.CommissionLog{
 			Type:      int32(content.Type),
-			UserId:    l.ObjectID,
-			Amount:    content.Amount,
+			UserId:    formatInt64(int64(l.ObjectID)),
+			Amount:    formatInt64(content.Amount),
 			OrderNo:   content.OrderNo,
-			Timestamp: content.Timestamp,
+			Timestamp: formatInt64(content.Timestamp),
 		})
 	}
 
@@ -113,7 +126,7 @@ func (s *LogService) FilterCommissionLog(ctx context.Context, req *v1.FilterComm
 		Code:    int32(responsecode.FilterCommissionLogSuccess),
 		Message: responsecode.CodeMessages[responsecode.FilterCommissionLogSuccess],
 		Data: &v1.FilterCommissionLogData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -122,13 +135,13 @@ func (s *LogService) FilterCommissionLog(ctx context.Context, req *v1.FilterComm
 // FilterEmailLog 过滤邮件日志
 func (s *LogService) FilterEmailLog(ctx context.Context, req *v1.FilterEmailLogRequest) (*v1.FilterEmailLogReply, error) {
 
-	logs, total, err := s.systemLogUc.FilterEmailLog(ctx, req.Page, req.Size, req.Date, req.Search)
+	logs, total, err := s.systemLogUc.FilterEmailLog(ctx, int32(req.Page), int32(req.Size), req.Date, req.Search)
 	if err != nil {
 		s.log.Errorw("msg", "filter email log failed", "error", err)
 		return nil, err
 	}
 
-	list := make([]*v1.EmailLog, 0, len(logs))
+	list := make([]*v1.EmailLog, len(logs))
 	for _, l := range logs {
 		var content logmodel.Message
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -140,14 +153,14 @@ func (s *LogService) FilterEmailLog(ctx context.Context, req *v1.FilterEmailLogR
 		contentJSON, _ := json.Marshal(content.Content)
 
 		list = append(list, &v1.EmailLog{
-			Id:        l.ID,
+			Id:        formatInt64(int64(l.ID)),
 			Type:      int32(l.Type),
 			Platform:  content.Platform,
 			To:        content.To,
 			Subject:   content.Subject,
 			Content:   string(contentJSON),
 			Status:    int32(content.Status),
-			CreatedAt: l.CreatedAt.UnixMilli(),
+			CreatedAt: formatInt64(l.CreatedAt.UnixMilli()),
 		})
 	}
 
@@ -155,7 +168,7 @@ func (s *LogService) FilterEmailLog(ctx context.Context, req *v1.FilterEmailLogR
 		Code:    int32(responsecode.FilterEmailLogSuccess),
 		Message: responsecode.CodeMessages[responsecode.FilterEmailLogSuccess],
 		Data: &v1.FilterEmailLogData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -165,17 +178,18 @@ func (s *LogService) FilterEmailLog(ctx context.Context, req *v1.FilterEmailLogR
 func (s *LogService) FilterGiftLog(ctx context.Context, req *v1.FilterGiftLogRequest) (*v1.FilterGiftLogReply, error) {
 
 	var userID *int64
-	if req.UserId > 0 {
-		userID = &req.UserId
+	if req.UserId != "" {
+		parsedID := parseInt64(req.UserId)
+		userID = &parsedID
 	}
 
-	logs, total, err := s.systemLogUc.FilterGiftLog(ctx, req.Page, req.Size, req.Date, userID)
+	logs, total, err := s.systemLogUc.FilterGiftLog(ctx, int32(req.Page), int32(req.Size), req.Date, userID)
 	if err != nil {
 		s.log.Errorw("msg", "filter gift log failed", "error", err)
 		return nil, err
 	}
 
-	list := make([]*v1.GiftLog, 0, len(logs))
+	list := make([]*v1.GiftLog, len(logs))
 	for _, l := range logs {
 		var content logmodel.Gift
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -185,13 +199,13 @@ func (s *LogService) FilterGiftLog(ctx context.Context, req *v1.FilterGiftLogReq
 
 		list = append(list, &v1.GiftLog{
 			Type:        int32(content.Type),
-			UserId:      l.ObjectID,
+			UserId:      formatInt64(int64(l.ObjectID)),
 			OrderNo:     content.OrderNo,
-			SubscribeId: content.SubscribeId,
-			Amount:      content.Amount,
-			Balance:     content.Balance,
+			SubscribeId: formatInt64(content.SubscribeId),
+			Amount:      formatInt64(content.Amount),
+			Balance:     formatInt64(content.Balance),
 			Remark:      content.Remark,
-			Timestamp:   content.Timestamp,
+			Timestamp:   formatInt64(content.Timestamp),
 		})
 	}
 
@@ -199,7 +213,7 @@ func (s *LogService) FilterGiftLog(ctx context.Context, req *v1.FilterGiftLogReq
 		Code:    int32(responsecode.FilterGiftLogSuccess),
 		Message: responsecode.CodeMessages[responsecode.FilterGiftLogSuccess],
 		Data: &v1.FilterGiftLogData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -209,17 +223,18 @@ func (s *LogService) FilterGiftLog(ctx context.Context, req *v1.FilterGiftLogReq
 func (s *LogService) FilterLoginLog(ctx context.Context, req *v1.FilterLoginLogRequest) (*v1.FilterLoginLogReply, error) {
 
 	var userID *int64
-	if req.UserId > 0 {
-		userID = &req.UserId
+	if req.UserId != "" {
+		parsedID := parseInt64(req.UserId)
+		userID = &parsedID
 	}
 
-	logs, total, err := s.systemLogUc.FilterLoginLog(ctx, req.Page, req.Size, req.Date, userID)
+	logs, total, err := s.systemLogUc.FilterLoginLog(ctx, int32(req.Page), int32(req.Size), req.Date, userID)
 	if err != nil {
 		s.log.Errorw("msg", "filter login log failed", "error", err)
 		return nil, err
 	}
 
-	list := make([]*v1.LoginLog, 0, len(logs))
+	list := make([]*v1.LoginLog, len(logs))
 	for _, l := range logs {
 		var content logmodel.Login
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -228,12 +243,12 @@ func (s *LogService) FilterLoginLog(ctx context.Context, req *v1.FilterLoginLogR
 		}
 
 		list = append(list, &v1.LoginLog{
-			UserId:    l.ObjectID,
+			UserId:    formatInt64(int64(l.ObjectID)),
 			Method:    content.Method,
 			LoginIp:   content.LoginIP,
 			UserAgent: content.UserAgent,
 			Success:   content.Success,
-			Timestamp: l.CreatedAt.UnixMilli(),
+			Timestamp: formatInt64(l.CreatedAt.UnixMilli()),
 		})
 	}
 
@@ -241,7 +256,7 @@ func (s *LogService) FilterLoginLog(ctx context.Context, req *v1.FilterLoginLogR
 		Code:    int32(responsecode.FilterLoginLogSuccess),
 		Message: responsecode.CodeMessages[responsecode.FilterLoginLogSuccess],
 		Data: &v1.FilterLoginLogData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -250,13 +265,13 @@ func (s *LogService) FilterLoginLog(ctx context.Context, req *v1.FilterLoginLogR
 // GetMessageLogList 获取消息日志列表
 func (s *LogService) GetMessageLogList(ctx context.Context, req *v1.GetMessageLogListRequest) (*v1.GetMessageLogListReply, error) {
 
-	logs, total, err := s.systemLogUc.GetMessageLogList(ctx, req.Page, req.Size, req.Type, req.Search)
+	logs, total, err := s.systemLogUc.GetMessageLogList(ctx, int32(req.Page), int32(req.Size), req.Type, req.Search)
 	if err != nil {
 		s.log.Errorw("msg", "get message log list failed", "error", err)
 		return nil, err
 	}
 
-	list := make([]*v1.MessageLog, 0, len(logs))
+	list := make([]*v1.MessageLog, len(logs))
 	for _, l := range logs {
 		var content logmodel.Message
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -268,14 +283,14 @@ func (s *LogService) GetMessageLogList(ctx context.Context, req *v1.GetMessageLo
 		contentJSON, _ := json.Marshal(content.Content)
 
 		list = append(list, &v1.MessageLog{
-			Id:        l.ID,
+			Id:        formatInt64(int64(l.ID)),
 			Type:      int32(l.Type),
 			Platform:  content.Platform,
 			To:        content.To,
 			Subject:   content.Subject,
 			Content:   string(contentJSON),
 			Status:    int32(content.Status),
-			CreatedAt: l.CreatedAt.UnixMilli(),
+			CreatedAt: formatInt64(l.CreatedAt.UnixMilli()),
 		})
 	}
 
@@ -283,7 +298,7 @@ func (s *LogService) GetMessageLogList(ctx context.Context, req *v1.GetMessageLo
 		Code:    int32(responsecode.GetMessageLogListSuccess),
 		Message: responsecode.CodeMessages[responsecode.GetMessageLogListSuccess],
 		Data: &v1.GetMessageLogListData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -292,13 +307,13 @@ func (s *LogService) GetMessageLogList(ctx context.Context, req *v1.GetMessageLo
 // FilterMobileLog 过滤手机日志
 func (s *LogService) FilterMobileLog(ctx context.Context, req *v1.FilterMobileLogRequest) (*v1.FilterMobileLogReply, error) {
 
-	logs, total, err := s.systemLogUc.FilterMobileLog(ctx, req.Page, req.Size, req.Date, req.Search)
+	logs, total, err := s.systemLogUc.FilterMobileLog(ctx, int32(req.Page), int32(req.Size), req.Date, req.Search)
 	if err != nil {
 		s.log.Errorw("msg", "filter mobile log failed", "error", err)
 		return nil, err
 	}
 
-	list := make([]*v1.MobileLog, 0, len(logs))
+	list := make([]*v1.MobileLog, len(logs))
 	for _, l := range logs {
 		var content logmodel.Message
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -310,14 +325,14 @@ func (s *LogService) FilterMobileLog(ctx context.Context, req *v1.FilterMobileLo
 		contentJSON, _ := json.Marshal(content.Content)
 
 		list = append(list, &v1.MobileLog{
-			Id:        l.ID,
+			Id:        formatInt64(int64(l.ID)),
 			Type:      int32(l.Type),
 			Platform:  content.Platform,
 			To:        content.To,
 			Subject:   content.Subject,
 			Content:   string(contentJSON),
 			Status:    int32(content.Status),
-			CreatedAt: l.CreatedAt.UnixMilli(),
+			CreatedAt: formatInt64(l.CreatedAt.UnixMilli()),
 		})
 	}
 
@@ -325,7 +340,7 @@ func (s *LogService) FilterMobileLog(ctx context.Context, req *v1.FilterMobileLo
 		Code:    int32(responsecode.FilterMobileLogSuccess),
 		Message: responsecode.CodeMessages[responsecode.FilterMobileLogSuccess],
 		Data: &v1.FilterMobileLogData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -335,17 +350,18 @@ func (s *LogService) FilterMobileLog(ctx context.Context, req *v1.FilterMobileLo
 func (s *LogService) FilterRegisterLog(ctx context.Context, req *v1.FilterRegisterLogRequest) (*v1.FilterRegisterLogReply, error) {
 
 	var userID *int64
-	if req.UserId > 0 {
-		userID = &req.UserId
+	if req.UserId != "" {
+		parsedID := parseInt64(req.UserId)
+		userID = &parsedID
 	}
 
-	logs, total, err := s.systemLogUc.FilterRegisterLog(ctx, req.Page, req.Size, req.Date, userID)
+	logs, total, err := s.systemLogUc.FilterRegisterLog(ctx, int32(req.Page), int32(req.Size), req.Date, userID)
 	if err != nil {
 		s.log.Errorw("msg", "filter register log failed", "error", err)
 		return nil, err
 	}
 
-	list := make([]*v1.RegisterLog, 0, len(logs))
+	list := make([]*v1.RegisterLog, len(logs))
 	for _, l := range logs {
 		var content logmodel.Register
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -354,12 +370,12 @@ func (s *LogService) FilterRegisterLog(ctx context.Context, req *v1.FilterRegist
 		}
 
 		list = append(list, &v1.RegisterLog{
-			UserId:     l.ObjectID,
+			UserId:     formatInt64(int64(l.ObjectID)),
 			AuthMethod: content.AuthMethod,
 			Identifier: content.Identifier,
 			RegisterIp: content.RegisterIP,
 			UserAgent:  content.UserAgent,
-			Timestamp:  content.Timestamp,
+			Timestamp:  formatInt64(content.Timestamp),
 		})
 	}
 
@@ -367,7 +383,7 @@ func (s *LogService) FilterRegisterLog(ctx context.Context, req *v1.FilterRegist
 		Code:    int32(responsecode.FilterRegisterLogSuccess),
 		Message: responsecode.CodeMessages[responsecode.FilterRegisterLogSuccess],
 		Data: &v1.FilterRegisterLogData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -377,17 +393,18 @@ func (s *LogService) FilterRegisterLog(ctx context.Context, req *v1.FilterRegist
 func (s *LogService) FilterServerTrafficLog(ctx context.Context, req *v1.FilterServerTrafficLogRequest) (*v1.FilterServerTrafficLogReply, error) {
 
 	var serverID *int64
-	if req.ServerId > 0 {
-		serverID = &req.ServerId
+	if req.ServerId != "" {
+		parsedID := parseInt64(req.ServerId)
+		serverID = &parsedID
 	}
 
-	logs, total, err := s.systemLogUc.FilterServerTrafficLog(ctx, req.Page, req.Size, req.Date, serverID)
+	logs, total, err := s.systemLogUc.FilterServerTrafficLog(ctx, int32(req.Page), int32(req.Size), req.Date, serverID)
 	if err != nil {
 		s.log.Errorw("msg", "filter server traffic log failed", "error", err)
 		return nil, err
 	}
 
-	list := make([]*v1.ServerTrafficLog, 0, len(logs))
+	list := make([]*v1.ServerTrafficLog, len(logs))
 	for _, l := range logs {
 		var content logmodel.Traffic
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -396,10 +413,10 @@ func (s *LogService) FilterServerTrafficLog(ctx context.Context, req *v1.FilterS
 		}
 
 		list = append(list, &v1.ServerTrafficLog{
-			ServerId:  l.ObjectID,
-			Upload:    content.Upload,
-			Download:  content.Download,
-			Timestamp: l.CreatedAt.UnixMilli(),
+			ServerId:  formatInt64(int64(l.ObjectID)),
+			Upload:    formatInt64(content.Upload),
+			Download:  formatInt64(content.Download),
+			Timestamp: formatInt64(l.CreatedAt.UnixMilli()),
 		})
 	}
 
@@ -407,7 +424,7 @@ func (s *LogService) FilterServerTrafficLog(ctx context.Context, req *v1.FilterS
 		Code:    int32(responsecode.FilterServerTrafficLogSuccess),
 		Message: responsecode.CodeMessages[responsecode.FilterServerTrafficLogSuccess],
 		Data: &v1.FilterServerTrafficLogData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -417,17 +434,18 @@ func (s *LogService) FilterServerTrafficLog(ctx context.Context, req *v1.FilterS
 func (s *LogService) FilterSubscribeLog(ctx context.Context, req *v1.FilterSubscribeLogRequest) (*v1.FilterSubscribeLogReply, error) {
 
 	var userID *int64
-	if req.UserId > 0 {
-		userID = &req.UserId
+	if req.UserId != "" {
+		parsedID := parseInt64(req.UserId)
+		userID = &parsedID
 	}
 
-	logs, total, err := s.systemLogUc.FilterSubscribeLog(ctx, req.Page, req.Size, req.Date, userID)
+	logs, total, err := s.systemLogUc.FilterSubscribeLog(ctx, int32(req.Page), int32(req.Size), req.Date, userID)
 	if err != nil {
 		s.log.Errorw("msg", "filter subscribe log failed", "error", err)
 		return nil, err
 	}
 
-	list := make([]*v1.SubscribeLog, 0, len(logs))
+	list := make([]*v1.SubscribeLog, len(logs))
 	for _, l := range logs {
 		var content logmodel.Subscribe
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -436,12 +454,12 @@ func (s *LogService) FilterSubscribeLog(ctx context.Context, req *v1.FilterSubsc
 		}
 
 		list = append(list, &v1.SubscribeLog{
-			UserId:          l.ObjectID,
+			UserId:          formatInt64(int64(l.ObjectID)),
 			Token:           content.Token,
 			UserAgent:       content.UserAgent,
 			ClientIp:        content.ClientIP,
-			UserSubscribeId: content.UserSubscribeId,
-			Timestamp:       l.CreatedAt.UnixMilli(),
+			UserSubscribeId: int32(content.UserSubscribeId),
+			Timestamp:       formatInt64(l.CreatedAt.UnixMilli()),
 		})
 	}
 
@@ -449,7 +467,7 @@ func (s *LogService) FilterSubscribeLog(ctx context.Context, req *v1.FilterSubsc
 		Code:    int32(responsecode.FilterSubscribeLogSuccess),
 		Message: responsecode.CodeMessages[responsecode.FilterSubscribeLogSuccess],
 		Data: &v1.FilterSubscribeLogData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -459,17 +477,18 @@ func (s *LogService) FilterSubscribeLog(ctx context.Context, req *v1.FilterSubsc
 func (s *LogService) FilterResetSubscribeLog(ctx context.Context, req *v1.FilterResetSubscribeLogRequest) (*v1.FilterResetSubscribeLogReply, error) {
 
 	var userID *int64
-	if req.UserId > 0 {
-		userID = &req.UserId
+	if req.UserId != "" {
+		parsedID := parseInt64(req.UserId)
+		userID = &parsedID
 	}
 
-	logs, total, err := s.systemLogUc.FilterResetSubscribeLog(ctx, req.Page, req.Size, req.Date, userID)
+	logs, total, err := s.systemLogUc.FilterResetSubscribeLog(ctx, int32(req.Page), int32(req.Size), req.Date, userID)
 	if err != nil {
 		s.log.Errorw("msg", "filter reset subscribe log failed", "error", err)
 		return nil, err
 	}
 
-	list := make([]*v1.ResetSubscribeLog, 0, len(logs))
+	list := make([]*v1.ResetSubscribeLog, len(logs))
 	for _, l := range logs {
 		var content logmodel.ResetSubscribe
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -479,10 +498,10 @@ func (s *LogService) FilterResetSubscribeLog(ctx context.Context, req *v1.Filter
 
 		list = append(list, &v1.ResetSubscribeLog{
 			Type:            int32(content.Type),
-			UserId:          content.UserId,
-			UserSubscribeId: content.UserSubscribeId,
+			UserId:          formatInt64(content.UserId),
+			UserSubscribeId: int32(content.UserSubscribeId),
 			OrderNo:         content.OrderNo,
-			Timestamp:       content.Timestamp,
+			Timestamp:       formatInt64(content.Timestamp),
 		})
 	}
 
@@ -490,7 +509,7 @@ func (s *LogService) FilterResetSubscribeLog(ctx context.Context, req *v1.Filter
 		Code:    int32(responsecode.FilterResetSubscribeLogSuccess),
 		Message: responsecode.CodeMessages[responsecode.FilterResetSubscribeLogSuccess],
 		Data: &v1.FilterResetSubscribeLogData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -500,20 +519,22 @@ func (s *LogService) FilterResetSubscribeLog(ctx context.Context, req *v1.Filter
 func (s *LogService) FilterUserSubscribeTrafficLog(ctx context.Context, req *v1.FilterUserSubscribeTrafficLogRequest) (*v1.FilterUserSubscribeTrafficLogReply, error) {
 
 	var userID, subscribeID *int64
-	if req.UserId > 0 {
-		userID = &req.UserId
+	if req.UserId != "" {
+		parsedID := parseInt64(req.UserId)
+		userID = &parsedID
 	}
-	if req.SubscribeId > 0 {
-		subscribeID = &req.SubscribeId
+	if req.SubscribeId != "" {
+		parsedID := parseInt64(req.SubscribeId)
+		subscribeID = &parsedID
 	}
 
-	logs, total, err := s.systemLogUc.FilterUserSubscribeTrafficLog(ctx, req.Page, req.Size, req.Date, userID, subscribeID)
+	logs, total, err := s.systemLogUc.FilterUserSubscribeTrafficLog(ctx, int32(req.Page), int32(req.Size), req.Date, userID, subscribeID)
 	if err != nil {
 		s.log.Errorw("msg", "filter user subscribe traffic log failed", "error", err)
 		return nil, err
 	}
 
-	list := make([]*v1.UserSubscribeTrafficLog, 0, len(logs))
+	list := make([]*v1.UserSubscribeTrafficLog, len(logs))
 	for _, l := range logs {
 		var content logmodel.Traffic
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -522,11 +543,11 @@ func (s *LogService) FilterUserSubscribeTrafficLog(ctx context.Context, req *v1.
 		}
 
 		list = append(list, &v1.UserSubscribeTrafficLog{
-			UserId:      l.ObjectID,
-			SubscribeId: 0, // 需要从content解析
-			Upload:      content.Upload,
-			Download:    content.Download,
-			Timestamp:   l.CreatedAt.UnixMilli(),
+			UserId:      formatInt64(int64(l.ObjectID)),
+			SubscribeId: "", // 需要从content解析
+			Upload:      formatInt64(content.Upload),
+			Download:    formatInt64(content.Download),
+			Timestamp:   formatInt64(l.CreatedAt.UnixMilli()),
 		})
 	}
 
@@ -534,7 +555,7 @@ func (s *LogService) FilterUserSubscribeTrafficLog(ctx context.Context, req *v1.
 		Code:    int32(responsecode.FilterUserSubscribeTrafficLogSuccess),
 		Message: responsecode.CodeMessages[responsecode.FilterUserSubscribeTrafficLogSuccess],
 		Data: &v1.FilterUserSubscribeTrafficLogData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -546,33 +567,36 @@ func (s *LogService) FilterUserSubscribeTrafficLog(ctx context.Context, req *v1.
 func (s *LogService) FilterTrafficLogDetails(ctx context.Context, req *v1.FilterTrafficLogDetailsRequest) (*v1.FilterTrafficLogDetailsReply, error) {
 
 	var serverID, userID, subscribeID *int64
-	if req.ServerId > 0 {
-		serverID = &req.ServerId
+	if req.ServerId != "" {
+		parsedID := parseInt64(req.ServerId)
+		serverID = &parsedID
 	}
-	if req.UserId > 0 {
-		userID = &req.UserId
+	if req.UserId != "" {
+		parsedID := parseInt64(req.UserId)
+		userID = &parsedID
 	}
-	if req.SubscribeId > 0 {
-		subscribeID = &req.SubscribeId
+	if req.SubscribeId != "" {
+		parsedID := parseInt64(req.SubscribeId)
+		subscribeID = &parsedID
 	}
 
 	// date字段留空,使用start_time/end_time需要在data层处理
-	logs, total, err := s.trafficLogUc.FilterTrafficLogDetails(ctx, 0, req.Page, req.Size, "", serverID, userID, subscribeID)
+	logs, total, err := s.trafficLogUc.FilterTrafficLogDetails(ctx, int32(req.Page), int32(req.Size), "", serverID, userID, subscribeID)
 	if err != nil {
 		s.log.Errorw("msg", "filter traffic log details failed", "error", err)
 		return nil, err
 	}
 
-	list := make([]*v1.TrafficLogDetail, 0, len(logs))
+	list := make([]*v1.TrafficLogDetail, len(logs))
 	for _, l := range logs {
 		list = append(list, &v1.TrafficLogDetail{
-			Id:          l.ID,
-			ServerId:    l.ServerID,
-			UserId:      l.UserID,
-			SubscribeId: l.SubscribeID,
-			Download:    l.Download,
-			Upload:      l.Upload,
-			Timestamp:   l.Timestamp.UnixMilli(),
+			Id:          formatInt64(int64(l.ID)),
+			ServerId:    formatInt64(int64(l.ServerID)),
+			UserId:      formatInt64(int64(l.UserID)),
+			SubscribeId: formatInt64(int64(l.SubscribeID)),
+			Download:    formatInt64(int64(l.Download)),
+			Upload:      formatInt64(int64(l.Upload)),
+			Timestamp:   formatInt64(l.Timestamp.UnixMilli()),
 		})
 	}
 
@@ -580,7 +604,7 @@ func (s *LogService) FilterTrafficLogDetails(ctx context.Context, req *v1.Filter
 		Code:    int32(responsecode.FilterTrafficLogDetailsSuccess),
 		Message: responsecode.CodeMessages[responsecode.FilterTrafficLogDetailsSuccess],
 		Data: &v1.FilterTrafficLogDetailsData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -590,7 +614,7 @@ func (s *LogService) FilterTrafficLogDetails(ctx context.Context, req *v1.Filter
 
 // GetLogSetting 获取日志设置
 func (s *LogService) GetLogSetting(ctx context.Context, req *v1.GetLogSettingRequest) (*v1.GetLogSettingReply, error) {
-	setting, err := s.logSettingUc.GetLogSetting(ctx, 0)
+	setting, err := s.logSettingUc.GetLogSetting(ctx)
 	if err != nil {
 		s.log.Errorw("msg", "get log setting failed", "error", err)
 		return nil, err
@@ -611,7 +635,7 @@ func (s *LogService) UpdateLogSetting(ctx context.Context, req *v1.UpdateLogSett
 		ClearDays: req.ClearDays,
 	}
 
-	err := s.logSettingUc.UpdateLogSetting(ctx, 0, setting)
+	err := s.logSettingUc.UpdateLogSetting(ctx, setting)
 	if err != nil {
 		s.log.Errorw("msg", "update log setting failed", "error", err)
 		return nil, err

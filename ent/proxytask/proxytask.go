@@ -63,9 +63,9 @@ var (
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus int8
 	// DefaultTotal holds the default value on creation for the "total" field.
-	DefaultTotal uint64
+	DefaultTotal uint32
 	// DefaultCurrent holds the default value on creation for the "current" field.
-	DefaultCurrent uint64
+	DefaultCurrent uint32
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.

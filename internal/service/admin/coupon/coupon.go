@@ -2,11 +2,22 @@ package coupon
 
 import (
 	"context"
+	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/coupon/v1"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/coupon"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
+
+// Helper functions for type conversion
+func parseInt64(s string) int64 {
+	val, _ := strconv.ParseInt(s, 10, 64)
+	return val
+}
+
+func formatInt64(i int64) string {
+	return strconv.FormatInt(i, 10)
+}
 
 // CouponService coupon service implementation
 type CouponService struct {
@@ -24,7 +35,11 @@ func NewCouponService(uc *coupon.CouponUseCase) *CouponService {
 
 // CreateCoupon 创建优惠券
 func (s *CouponService) CreateCoupon(ctx context.Context, req *v1.CreateCouponRequest) (*v1.CreateCouponReply, error) {
-	if err := s.uc.CreateCoupon(ctx, 0, req.Name, req.Code, req.Count, req.Type, req.Discount, req.StartTime, req.ExpireTime, req.UserLimit, req.Subscribe, req.Enable); err != nil {
+	subscribeInt := make([]int, len(req.Subscribe))
+	for i, v := range req.Subscribe {
+		subscribeInt[i] = int(v)
+	}
+	if err := s.uc.CreateCoupon(ctx, req.Name, req.Code, int(req.Count), int32(req.Type), parseInt64(req.Discount), parseInt64(req.StartTime), parseInt64(req.ExpireTime), int64(req.UserLimit), subscribeInt, req.Enable); err != nil {
 		return nil, err
 	}
 	return &v1.CreateCouponReply{
@@ -35,7 +50,11 @@ func (s *CouponService) CreateCoupon(ctx context.Context, req *v1.CreateCouponRe
 
 // UpdateCoupon 更新优惠券
 func (s *CouponService) UpdateCoupon(ctx context.Context, req *v1.UpdateCouponRequest) (*v1.UpdateCouponReply, error) {
-	if err := s.uc.UpdateCoupon(ctx, 0, req.Id, req.Name, req.Code, req.Count, req.Type, req.Discount, req.StartTime, req.ExpireTime, req.UserLimit, req.Subscribe, req.Enable); err != nil {
+	subscribeInt := make([]int, len(req.Subscribe))
+	for i, v := range req.Subscribe {
+		subscribeInt[i] = int(v)
+	}
+	if err := s.uc.UpdateCoupon(ctx, int(parseInt64(req.Id)), req.Name, req.Code, int(req.Count), int32(req.Type), parseInt64(req.Discount), parseInt64(req.StartTime), parseInt64(req.ExpireTime), int64(req.UserLimit), subscribeInt, req.Enable); err != nil {
 		return nil, err
 	}
 	return &v1.UpdateCouponReply{
@@ -46,7 +65,7 @@ func (s *CouponService) UpdateCoupon(ctx context.Context, req *v1.UpdateCouponRe
 
 // DeleteCoupon 删除优惠券
 func (s *CouponService) DeleteCoupon(ctx context.Context, req *v1.DeleteCouponRequest) (*v1.DeleteCouponReply, error) {
-	if err := s.uc.DeleteCoupon(ctx, 0, req.Id); err != nil {
+	if err := s.uc.DeleteCoupon(ctx, int(parseInt64(req.Id))); err != nil {
 		return nil, err
 	}
 	return &v1.DeleteCouponReply{
@@ -57,7 +76,11 @@ func (s *CouponService) DeleteCoupon(ctx context.Context, req *v1.DeleteCouponRe
 
 // BatchDeleteCoupon 批量删除优惠券
 func (s *CouponService) BatchDeleteCoupon(ctx context.Context, req *v1.BatchDeleteCouponRequest) (*v1.BatchDeleteCouponReply, error) {
-	if err := s.uc.BatchDeleteCoupon(ctx, 0, req.Ids); err != nil {
+	idsInt := make([]int, len(req.Ids))
+	for i, v := range req.Ids {
+		idsInt[i] = int(v)
+	}
+	if err := s.uc.BatchDeleteCoupon(ctx, idsInt); err != nil {
 		return nil, err
 	}
 	return &v1.BatchDeleteCouponReply{
@@ -68,7 +91,7 @@ func (s *CouponService) BatchDeleteCoupon(ctx context.Context, req *v1.BatchDele
 
 // GetCouponList 获取优惠券列表
 func (s *CouponService) GetCouponList(ctx context.Context, req *v1.GetCouponListRequest) (*v1.GetCouponListReply, error) {
-	list, total, err := s.uc.GetCouponList(ctx, 0, req.Page, req.Size, req.Subscribe, req.Search)
+	list, total, err := s.uc.GetCouponList(ctx, int64(req.Page), int64(req.Size), int64(req.Subscribe), req.Search)
 	if err != nil {
 		return nil, err
 	}
@@ -76,21 +99,28 @@ func (s *CouponService) GetCouponList(ctx context.Context, req *v1.GetCouponList
 	// 转换为响应格式
 	items := make([]*v1.CouponItem, 0, len(list))
 	for _, c := range list {
+		// 解析订阅限制字符串
+		var subscribeList []int64
+		if c.Subscribe != "" {
+			// TODO: 解析逗号分隔的订阅ID列表
+			// subscribeList = parseSubscribeString(c.Subscribe)
+		}
+
 		items = append(items, &v1.CouponItem{
-			Id:         c.ID,
+			Id:         formatInt64(int64(c.ID)),
 			Name:       c.Name,
 			Code:       c.Code,
-			Count:      c.Count,
+			Count:      int32(c.Count),
 			Type:       int32(c.Type),
-			Discount:   c.Discount,
-			StartTime:  c.StartTime.Unix(),
-			ExpireTime: c.EndTime.Unix(),
-			UserLimit:  0, // Field doesn't exist in schema
-			Subscribe:  nil, // Field doesn't exist in schema
-			UsedCount:  0, // Field doesn't exist in schema
+			Discount:   formatInt64(int64(c.Discount)),
+			StartTime:  formatInt64(c.StartTime.Unix()),
+			ExpireTime: formatInt64(c.EndTime.Unix()),
+			UserLimit:  int32(c.UserLimit),
+			Subscribe:  convertIntSliceToInt32Slice(subscribeList),
+			UsedCount:  0, // TODO: 实现已使用数量统计
 			Enable:     c.Status == 1,
-			CreatedAt:  c.CreatedAt.Unix(),
-			UpdatedAt:  c.UpdatedAt.Unix(),
+			CreatedAt:  formatInt64(c.CreatedAt.Unix()),
+			UpdatedAt:  formatInt64(c.UpdatedAt.Unix()),
 		})
 	}
 
@@ -99,7 +129,19 @@ func (s *CouponService) GetCouponList(ctx context.Context, req *v1.GetCouponList
 		Message: responsecode.CodeMessages[responsecode.AdminGetCouponListSuccess],
 		Data: &v1.GetCouponListData{
 			List:  items,
-			Total: total,
+			Total: int32(total),
 		},
 	}, nil
+}
+
+// convertIntSliceToInt32Slice converts []int64 to []int32
+func convertIntSliceToInt32Slice(input []int64) []int32 {
+	if input == nil {
+		return nil
+	}
+	result := make([]int32, len(input))
+	for i, v := range input {
+		result[i] = int32(v)
+	}
+	return result
 }

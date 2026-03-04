@@ -17,7 +17,7 @@ type ProxySubscribeGroup struct {
 	config `json:"-"`
 	// ID of the ent.
 	// 订阅组ID
-	ID int `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// 订阅组名称
 	Name string `json:"name,omitempty"`
 	// 订阅组描述
@@ -60,7 +60,7 @@ func (_m *ProxySubscribeGroup) assignValues(columns []string, values []any) erro
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case proxysubscribegroup.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])

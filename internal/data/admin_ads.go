@@ -27,7 +27,7 @@ func NewAdsRepo(data *Data, logger log.Logger) adsbiz.AdsRepo {
 }
 
 // GetAdsListByPage 分页获取广告列表
-func (r *adsRepo) GetAdsListByPage(ctx context.Context, page, size int64, filter adsbiz.AdsFilter) (total int64, list []*adsbiz.Ads, err error) {
+func (r *adsRepo) GetAdsListByPage(ctx context.Context, page, size int, filter adsbiz.AdsFilter) (total int64, list []*adsbiz.Ads, err error) {
 	query := r.data.db.ProxyAds.Query()
 
 	// 应用搜索过滤
@@ -54,8 +54,8 @@ func (r *adsRepo) GetAdsListByPage(ctx context.Context, page, size int64, filter
 	// 分页查询
 	offset := (page - 1) * size
 	entAds, err := query.
-		Offset(int(offset)).
-		Limit(int(size)).
+		Offset(offset).
+		Limit(size).
 		All(ctx)
 	if err != nil {
 		r.log.WithContext(ctx).Errorf("Failed to query ads: %v", err)
@@ -72,7 +72,7 @@ func (r *adsRepo) GetAdsListByPage(ctx context.Context, page, size int64, filter
 }
 
 // GetAdsByID 根据ID获取广告详情
-func (r *adsRepo) GetAdsByID(ctx context.Context, tenantID, id int64) (*adsbiz.Ads, error) {
+func (r *adsRepo) GetAdsByID(ctx context.Context, id int64) (*adsbiz.Ads, error) {
 	entAd, err := r.data.db.ProxyAds.Query().
 		Where(
 			proxyads.ID(id),
@@ -145,7 +145,7 @@ func (r *adsRepo) UpdateAds(ctx context.Context, ads *adsbiz.Ads) (*adsbiz.Ads, 
 }
 
 // DeleteAds 删除广告
-func (r *adsRepo) DeleteAds(ctx context.Context, tenantID, id int64) error {
+func (r *adsRepo) DeleteAds(ctx context.Context, id int64) error {
 	err := r.data.db.ProxyAds.DeleteOneID(id).
 		Exec(ctx)
 	if err != nil {

@@ -10,47 +10,47 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.ProxyPayment {
+func ID(id int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.ProxyPayment {
+func IDEQ(id int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.ProxyPayment {
+func IDNEQ(id int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.ProxyPayment {
+func IDIn(ids ...int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.ProxyPayment {
+func IDNotIn(ids ...int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.ProxyPayment {
+func IDGT(id int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.ProxyPayment {
+func IDGTE(id int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.ProxyPayment {
+func IDLT(id int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.ProxyPayment {
+func IDLTE(id int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldLTE(FieldID, id))
 }
 
@@ -95,7 +95,7 @@ func FeePercent(v float64) predicate.ProxyPayment {
 }
 
 // FeeAmount applies equality check predicate on the "fee_amount" field. It's identical to FeeAmountEQ.
-func FeeAmount(v int64) predicate.ProxyPayment {
+func FeeAmount(v int) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldFeeAmount, v))
 }
 
@@ -630,42 +630,42 @@ func FeePercentNotNil() predicate.ProxyPayment {
 }
 
 // FeeAmountEQ applies the EQ predicate on the "fee_amount" field.
-func FeeAmountEQ(v int64) predicate.ProxyPayment {
+func FeeAmountEQ(v int) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldFeeAmount, v))
 }
 
 // FeeAmountNEQ applies the NEQ predicate on the "fee_amount" field.
-func FeeAmountNEQ(v int64) predicate.ProxyPayment {
+func FeeAmountNEQ(v int) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldNEQ(FieldFeeAmount, v))
 }
 
 // FeeAmountIn applies the In predicate on the "fee_amount" field.
-func FeeAmountIn(vs ...int64) predicate.ProxyPayment {
+func FeeAmountIn(vs ...int) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldIn(FieldFeeAmount, vs...))
 }
 
 // FeeAmountNotIn applies the NotIn predicate on the "fee_amount" field.
-func FeeAmountNotIn(vs ...int64) predicate.ProxyPayment {
+func FeeAmountNotIn(vs ...int) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldNotIn(FieldFeeAmount, vs...))
 }
 
 // FeeAmountGT applies the GT predicate on the "fee_amount" field.
-func FeeAmountGT(v int64) predicate.ProxyPayment {
+func FeeAmountGT(v int) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldGT(FieldFeeAmount, v))
 }
 
 // FeeAmountGTE applies the GTE predicate on the "fee_amount" field.
-func FeeAmountGTE(v int64) predicate.ProxyPayment {
+func FeeAmountGTE(v int) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldGTE(FieldFeeAmount, v))
 }
 
 // FeeAmountLT applies the LT predicate on the "fee_amount" field.
-func FeeAmountLT(v int64) predicate.ProxyPayment {
+func FeeAmountLT(v int) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldLT(FieldFeeAmount, v))
 }
 
 // FeeAmountLTE applies the LTE predicate on the "fee_amount" field.
-func FeeAmountLTE(v int64) predicate.ProxyPayment {
+func FeeAmountLTE(v int) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldLTE(FieldFeeAmount, v))
 }
 

@@ -10,14 +10,17 @@ import (
 	adminconsole "github.com/OmnTeam/ppanel-pro/internal/service/admin/console"
 	admincoupon "github.com/OmnTeam/ppanel-pro/internal/service/admin/coupon"
 	admindocument "github.com/OmnTeam/ppanel-pro/internal/service/admin/document"
+	maingroup "github.com/OmnTeam/ppanel-pro/internal/service/admin/group"
 	adminlog "github.com/OmnTeam/ppanel-pro/internal/service/admin/log"
 	adminmarketing "github.com/OmnTeam/ppanel-pro/internal/service/admin/marketing"
 	adminorder "github.com/OmnTeam/ppanel-pro/internal/service/admin/order"
 	adminpayment "github.com/OmnTeam/ppanel-pro/internal/service/admin/payment"
+	adminredemption "github.com/OmnTeam/ppanel-pro/internal/service/admin/redemption"
 	adminserver "github.com/OmnTeam/ppanel-pro/internal/service/admin/server"
 	adminsubscribe "github.com/OmnTeam/ppanel-pro/internal/service/admin/subscribe"
 	adminsystem "github.com/OmnTeam/ppanel-pro/internal/service/admin/system"
 	adminticket "github.com/OmnTeam/ppanel-pro/internal/service/admin/ticket"
+	admintool "github.com/OmnTeam/ppanel-pro/internal/service/admin/tool"
 	adminuser "github.com/OmnTeam/ppanel-pro/internal/service/admin/user"
 	"github.com/OmnTeam/ppanel-pro/internal/service/auth"
 	authoauth "github.com/OmnTeam/ppanel-pro/internal/service/auth/oauth"
@@ -30,6 +33,8 @@ import (
 	publicsubscribe "github.com/OmnTeam/ppanel-pro/internal/service/public/subscribe"
 	publicticket "github.com/OmnTeam/ppanel-pro/internal/service/public/ticket"
 	publicuser "github.com/OmnTeam/ppanel-pro/internal/service/public/user"
+	// Server模块服务
+	"github.com/OmnTeam/ppanel-pro/internal/service/server"
 )
 
 // ProviderSet is service providers
@@ -49,6 +54,9 @@ var ProviderSet = wire.NewSet(
 	adminsubscribe.NewSubscribeService,
 	adminsystem.NewSystemService,
 	adminticket.NewTicketService,
+	adminredemption.NewRedemptionService,
+	admintool.NewToolService,
+	maingroup.NewGroupService,
 	// Admin User模块服务
 	adminuser.NewUserService,
 	adminuser.NewUserAuthMethodService,
@@ -76,4 +84,6 @@ var ProviderSet = wire.NewSet(
 	publicticket.NewTicketService,
 	// Public User模块服务
 	publicuser.NewUserService,
+	// Server模块服务
+	server.NewServerService,
 )

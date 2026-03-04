@@ -121,14 +121,14 @@ func (h *BatchEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) e
 	}
 
 	// 加载邮件配置
-	emailConfig, err := h.loadEmailConfig(ctx, 0)
+	emailConfig, err := h.loadEmailConfig(ctx)
 	if err != nil {
 		h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Failed to load email config: %v", err)
 		return asynq.SkipRetry
 	}
 
 	// 从数据库加载站点配置
-	siteConfig, err := h.loadSiteConfig(ctx, 0)
+	siteConfig, err := h.loadSiteConfig(ctx)
 	if err != nil {
 		h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Failed to load site config: %v", err)
 		return asynq.SkipRetry
@@ -169,7 +169,7 @@ func (h *BatchEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) e
 			h.log.WithContext(ctx).Infof("[BatchEmailHandler] Worker stopped by context cancellation, taskID: %d", taskID)
 			// 更新任务状态
 			_ = h.db.ProxyTask.UpdateOneID(taskID).
-				SetCurrent(count).
+				SetCurrent(uint32(count)).
 				Exec(ctx)
 			return nil
 		default:
@@ -195,7 +195,7 @@ func (h *BatchEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) e
 		}
 
 		err = h.db.ProxyTask.UpdateOneID(taskID).
-			SetCurrent(count).
+			SetCurrent(uint32(count)).
 			SetErrors(errorJSON).
 			Exec(ctx)
 		if err != nil {
@@ -209,7 +209,7 @@ func (h *BatchEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) e
 	// 标记任务为完成
 	err = h.db.ProxyTask.UpdateOneID(taskID).
 		SetStatus(int8(taskmodel.StatusCompleted)).
-		SetCurrent(count).
+		SetCurrent(uint32(count)).
 		Exec(ctx)
 	if err != nil {
 		h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Failed to update task status to Completed: %v", err)
@@ -222,7 +222,7 @@ func (h *BatchEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) e
 }
 
 // loadEmailConfig loads email configuration from ProxySystem table
-func (h *BatchEmailHandler) loadEmailConfig(ctx context.Context, tenantID int64) (*EmailSystemConfig, error) {
+func (h *BatchEmailHandler) loadEmailConfig(ctx context.Context) (*EmailSystemConfig, error) {
 	// Query email config from ProxySystem table
 	// Category: "email", Key: "config"
 	config, err := h.db.ProxySystem.Query().
@@ -251,7 +251,7 @@ func (h *BatchEmailHandler) loadEmailConfig(ctx context.Context, tenantID int64)
 }
 
 // loadSiteConfig loads site configuration from ProxySystem table
-func (h *BatchEmailHandler) loadSiteConfig(ctx context.Context, tenantID int64) (*SiteConfig, error) {
+func (h *BatchEmailHandler) loadSiteConfig(ctx context.Context) (*SiteConfig, error) {
 	// Query site config from ProxySystem table
 	// Category: "site", Key: "config"
 	config, err := h.db.ProxySystem.Query().

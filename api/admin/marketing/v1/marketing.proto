@@ -75,16 +75,15 @@ service MarketingService {
 
 // CreateBatchSendEmailTaskRequest 创建批量发送邮件任务请求
 message CreateBatchSendEmailTaskRequest {
-  int64 tenant_id = 1;                  // 租户ID
   string subject = 2;                    // 邮件主题
   string content = 3;                    // 邮件内容
   int32 scope = 4;                       // 范围: 1:All, 2:Active, 3:Expired, 4:None, 5:Skip
-  int64 register_start_time = 5;         // 注册开始时间(毫秒时间戳，可选)
-  int64 register_end_time = 6;           // 注册结束时间(毫秒时间戳，可选)
+  int32 register_start_time = 5;         // 注册开始时间(毫秒时间戳，可选)
+  int32 register_end_time = 6;           // 注册结束时间(毫秒时间戳，可选)
   string additional = 7;                 // 额外的邮箱地址(换行分隔，可选)
-  int64 scheduled = 8;                   // 计划发送时间(秒时间戳，可选)
+  int32 scheduled = 8;                   // 计划发送时间(秒时间戳，可选)
   int32 interval = 9;                    // 发送间隔(秒，可选)
-  int64 limit = 10;                      // 每日发送限制(可选)
+  int32 limit = 10;                      // 每日发送限制(可选)
 }
 
 // CreateBatchSendEmailTaskData 创建批量发送邮件任务数据
@@ -101,7 +100,6 @@ message CreateBatchSendEmailTaskReply {
 
 // GetBatchSendEmailTaskListRequest 获取批量发送邮件任务列表请求
 message GetBatchSendEmailTaskListRequest {
-  int64 tenant_id = 1;                   // 租户ID
   int32 page = 2;                        // 页码
   int32 size = 3;                        // 每页数量
   optional int32 scope = 4;              // 范围过滤(可选)
@@ -110,28 +108,28 @@ message GetBatchSendEmailTaskListRequest {
 
 // BatchSendEmailTask 批量发送邮件任务
 message BatchSendEmailTask {
-  int64 id = 1;                          // 任务ID
+    string id = 1;                          // 任务ID
   string subject = 2;                    // 邮件主题
   string content = 3;                    // 邮件内容
   string recipients = 4;                 // 收件人列表(换行分隔)
   int32 scope = 5;                       // 范围: 1:All, 2:Active, 3:Expired, 4:None, 5:Skip
-  int64 register_start_time = 6;         // 注册开始时间(毫秒时间戳)
-  int64 register_end_time = 7;           // 注册结束时间(毫秒时间戳)
+  int32 register_start_time = 6;         // 注册开始时间(毫秒时间戳)
+  int32 register_end_time = 7;           // 注册结束时间(毫秒时间戳)
   string additional = 8;                 // 额外的邮箱地址(换行分隔)
-  int64 scheduled = 9;                   // 计划发送时间(秒时间戳)
+  int32 scheduled = 9;                   // 计划发送时间(秒时间戳)
   int32 interval = 10;                   // 发送间隔(秒)
-  int64 limit = 11;                      // 每日发送限制
+  int32 limit = 11;                      // 每日发送限制
   int32 status = 12;                     // 任务状态: 0:Pending, 1:In Progress, 2:Completed, 3:Failed
   string errors = 13;                    // 错误信息
-  int64 total = 14;                      // 总数
-  int64 current = 15;                    // 当前处理数
-  int64 created_at = 16;                 // 创建时间(毫秒时间戳)
-  int64 updated_at = 17;                 // 更新时间(毫秒时间戳)
+  int32 total = 14;                      // 总数
+  int32 current = 15;                    // 当前处理数
+    string created_at = 16;                 // 创建时间(毫秒时间戳)
+    string updated_at = 17;                 // 更新时间(毫秒时间戳)
 }
 
 // GetBatchSendEmailTaskListData 获取批量发送邮件任务列表数据
 message GetBatchSendEmailTaskListData {
-  int64 total = 1;                       // 总数
+  int32 total = 1;                       // 总数
   repeated BatchSendEmailTask list = 2;  // 任务列表
 }
 
@@ -144,8 +142,7 @@ message GetBatchSendEmailTaskListReply {
 
 // StopBatchSendEmailTaskRequest 停止批量发送邮件任务请求
 message StopBatchSendEmailTaskRequest {
-  int64 tenant_id = 1;                   // 租户ID
-  int64 id = 2;                          // 任务ID
+    string id = 2;                          // 任务ID
 }
 
 // StopBatchSendEmailTaskData 停止批量发送邮件任务数据
@@ -162,15 +159,14 @@ message StopBatchSendEmailTaskReply {
 
 // GetPreSendEmailCountRequest 获取预发送邮件数量请求
 message GetPreSendEmailCountRequest {
-  int64 tenant_id = 1;                   // 租户ID
   int32 scope = 2;                       // 范围: 1:All, 2:Active, 3:Expired, 4:None
-  int64 register_start_time = 3;         // 注册开始时间(毫秒时间戳，可选)
-  int64 register_end_time = 4;           // 注册结束时间(毫秒时间戳，可选)
+  int32 register_start_time = 3;         // 注册开始时间(毫秒时间戳，可选)
+  int32 register_end_time = 4;           // 注册结束时间(毫秒时间戳，可选)
 }
 
 // GetPreSendEmailCountData 获取预发送邮件数量数据
 message GetPreSendEmailCountData {
-  int64 count = 1;                       // 数量
+  int32 count = 1;                       // 数量
 }
 
 // GetPreSendEmailCountReply 获取预发送邮件数量响应
@@ -182,15 +178,14 @@ message GetPreSendEmailCountReply {
 
 // GetBatchSendEmailTaskStatusRequest 获取批量发送邮件任务状态请求
 message GetBatchSendEmailTaskStatusRequest {
-  int64 tenant_id = 1;                   // 租户ID
-  int64 id = 2;                          // 任务ID
+    string id = 2;                          // 任务ID
 }
 
 // GetBatchSendEmailTaskStatusData 获取批量发送邮件任务状态数据
 message GetBatchSendEmailTaskStatusData {
   int32 status = 1;                      // 任务状态: 0:Pending, 1:In Progress, 2:Completed, 3:Failed
-  int64 current = 2;                     // 当前处理数
-  int64 total = 3;                       // 总数
+  int32 current = 2;                     // 当前处理数
+  int32 total = 3;                       // 总数
   string errors = 4;                     // 错误信息
 }
 
@@ -205,15 +200,14 @@ message GetBatchSendEmailTaskStatusReply {
 
 // CreateQuotaTaskRequest 创建配额任务请求
 message CreateQuotaTaskRequest {
-  int64 tenant_id = 1;                   // 租户ID
-  repeated int64 subscribers = 2;        // 订阅ID列表
+  repeated int32 subscribers = 2;        // 订阅ID列表
   optional bool is_active = 3;           // 是否仅活跃订阅
-  int64 start_time = 4;                  // 开始时间过滤(毫秒时间戳)
-  int64 end_time = 5;                    // 结束时间过滤(毫秒时间戳)
+  string start_time = 4;                  // 开始时间过滤(毫秒时间戳)
+  int32 end_time = 5;                    // 结束时间过滤(毫秒时间戳)
   bool reset_traffic = 6;                // 是否重置流量
-  int64 days = 7;                        // 增加天数
+  int32 days = 7;                        // 增加天数
   int32 gift_type = 8;                   // 赠送类型: 1:Fixed, 2:Ratio
-  int64 gift_value = 9;                  // 赠送值
+  int32 gift_value = 9;                  // 赠送值
 }
 
 // CreateQuotaTaskData 创建配额任务数据
@@ -230,16 +224,15 @@ message CreateQuotaTaskReply {
 
 // QueryQuotaTaskPreCountRequest 查询配额任务预计数量请求
 message QueryQuotaTaskPreCountRequest {
-  int64 tenant_id = 1;                   // 租户ID
-  repeated int64 subscribers = 2;        // 订阅ID列表
+  repeated int32 subscribers = 2;        // 订阅ID列表
   optional bool is_active = 3;           // 是否仅活跃订阅
-  int64 start_time = 4;                  // 开始时间过滤(毫秒时间戳)
-  int64 end_time = 5;                    // 结束时间过滤(毫秒时间戳)
+  string start_time = 4;                  // 开始时间过滤(毫秒时间戳)
+  int32 end_time = 5;                    // 结束时间过滤(毫秒时间戳)
 }
 
 // QueryQuotaTaskPreCountData 查询配额任务预计数量数据
 message QueryQuotaTaskPreCountData {
-  int64 count = 1;                       // 数量
+  int32 count = 1;                       // 数量
 }
 
 // QueryQuotaTaskPreCountReply 查询配额任务预计数量响应
@@ -251,27 +244,26 @@ message QueryQuotaTaskPreCountReply {
 
 // QuotaTask 配额任务
 message QuotaTask {
-  int64 id = 1;                          // 任务ID
-  repeated int64 subscribers = 2;        // 订阅ID列表
+  string id = 1;                          // 任务ID
+  repeated int32 subscribers = 2;        // 订阅ID列表
   optional bool is_active = 3;           // 是否仅活跃订阅
-  int64 start_time = 4;                  // 开始时间过滤(毫秒时间戳)
-  int64 end_time = 5;                    // 结束时间过滤(毫秒时间戳)
+  string start_time = 4;                  // 开始时间过滤(毫秒时间戳)
+  int32 end_time = 5;                    // 结束时间过滤(毫秒时间戳)
   bool reset_traffic = 6;                // 是否重置流量
-  int64 days = 7;                        // 增加天数
+  int32 days = 7;                        // 增加天数
   int32 gift_type = 8;                   // 赠送类型: 1:Fixed, 2:Ratio
-  int64 gift_value = 9;                  // 赠送值
-  repeated int64 objects = 10;           // 用户订阅ID列表(实际影响的对象)
+  int32 gift_value = 9;                  // 赠送值
+  repeated int32 objects = 10;           // 用户订阅ID列表(实际影响的对象)
   int32 status = 11;                     // 任务状态: 0:Pending, 1:In Progress, 2:Completed, 3:Failed
-  int64 total = 12;                      // 总数
-  int64 current = 13;                    // 当前处理数
+  int32 total = 12;                      // 总数
+  int32 current = 13;                    // 当前处理数
   string errors = 14;                    // 错误信息
-  int64 created_at = 15;                 // 创建时间(毫秒时间戳)
-  int64 updated_at = 16;                 // 更新时间(毫秒时间戳)
+  string created_at = 15;                 // 创建时间(毫秒时间戳)
+  string updated_at = 16;                 // 更新时间(毫秒时间戳)
 }
 
 // QueryQuotaTaskListRequest 查询配额任务列表请求
 message QueryQuotaTaskListRequest {
-  int64 tenant_id = 1;                   // 租户ID
   int32 page = 2;                        // 页码
   int32 size = 3;                        // 每页数量
   optional int32 status = 4;             // 状态过滤: 0:Pending, 1:In Progress, 2:Completed, 3:Failed(可选)
@@ -279,7 +271,7 @@ message QueryQuotaTaskListRequest {
 
 // QueryQuotaTaskListData 查询配额任务列表数据
 message QueryQuotaTaskListData {
-  int64 total = 1;                       // 总数
+  int32 total = 1;                       // 总数
   repeated QuotaTask list = 2;           // 任务列表
 }
 

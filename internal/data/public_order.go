@@ -63,7 +63,7 @@ func NewPublicOrderRepo(data *Data, config *conf.Application, logger log.Logger)
 }
 
 // CloseOrder 关闭订单，包含完整的业务逻辑（含赠金退回）
-func (r *publicOrderRepo) CloseOrder(ctx context.Context, userID int64, orderNo string) error {
+func (r *publicOrderRepo) CloseOrder(ctx context.Context, userID int, orderNo string) error {
 	// 通过订单号查找订单信息
 	orderInfo, err := r.data.db.ProxyOrder.Query().
 		Where(
@@ -107,7 +107,7 @@ func (r *publicOrderRepo) CloseOrder(ctx context.Context, userID int64, orderNo 
 		if orderInfo.GiftAmount > 0 {
 			userInfo, err := tx.ProxyUser.Query().
 				Where(
-					proxyuser.IDEQ(int(orderInfo.UserID)),
+					proxyuser.IDEQ(orderInfo.UserID),
 				).
 				Only(ctx)
 			if err != nil {
@@ -123,7 +123,7 @@ func (r *publicOrderRepo) CloseOrder(ctx context.Context, userID int64, orderNo 
 			newGiftAmount := currentGiftAmount + orderInfo.GiftAmount
 
 			// 更新用户赠金金额
-			err = tx.ProxyUser.UpdateOneID(int(orderInfo.UserID)).
+			err = tx.ProxyUser.UpdateOneID(orderInfo.UserID).
 				SetGiftAmount(newGiftAmount).
 				Exec(ctx)
 			if err != nil {
@@ -154,11 +154,11 @@ func (r *publicOrderRepo) CloseOrder(ctx context.Context, userID int64, orderNo 
 }
 
 // QueryOrderDetail 查询订单详情及订阅和支付信息
-func (r *publicOrderRepo) QueryOrderDetail(ctx context.Context, userID int64, orderNo string) (*publicBiz.OrderDetail, error) {
+func (r *publicOrderRepo) QueryOrderDetail(ctx context.Context, userID int, orderNo string) (*publicBiz.OrderDetail, error) {
 	order, err := r.data.db.ProxyOrder.Query().
 		Where(
 			proxyorder.OrderNoEQ(orderNo),
-			proxyorder.UserIDEQ(userID),
+			proxyorder.UserIDEQ(int64(userID)),
 		).
 		Only(ctx)
 	if err != nil {
@@ -170,7 +170,7 @@ func (r *publicOrderRepo) QueryOrderDetail(ctx context.Context, userID int64, or
 	var subscribe *publicBiz.Subscribe
 	if order.SubscribeID > 0 {
 		subscribeEnt, err := r.data.db.ProxySubscribe.Query().
-			Where(proxysubscribe.IDEQ(int(order.SubscribeID))).
+			Where(proxysubscribe.IDEQ(order.SubscribeID)).
 			Only(ctx)
 		if err == nil {
 			subscribe = r.convertToSubscribe(subscribeEnt)
@@ -181,7 +181,7 @@ func (r *publicOrderRepo) QueryOrderDetail(ctx context.Context, userID int64, or
 	var payment *publicBiz.PaymentMethod
 	if order.PaymentID != 0 {
 		paymentEnt, err := r.data.db.ProxyPayment.Query().
-			Where(proxypayment.IDEQ(int(order.PaymentID))).
+			Where(proxypayment.IDEQ(order.PaymentID)).
 			Only(ctx)
 		if err == nil {
 			payment = r.convertToPaymentMethod(paymentEnt)
@@ -192,10 +192,10 @@ func (r *publicOrderRepo) QueryOrderDetail(ctx context.Context, userID int64, or
 }
 
 // QueryOrderList 查询订单列表及订阅和支付信息
-func (r *publicOrderRepo) QueryOrderList(ctx context.Context, userID int64, page, size int64, status, orderType int32) ([]*publicBiz.OrderDetail, int64, error) {
+func (r *publicOrderRepo) QueryOrderList(ctx context.Context, userID int, page, size int, status, orderType int32) ([]*publicBiz.OrderDetail, int64, error) {
 	query := r.data.db.ProxyOrder.Query().
 		Where(
-			proxyorder.UserIDEQ(userID),
+			proxyorder.UserIDEQ(int64(userID)),
 		)
 
 	// 应用过滤条件
@@ -210,7 +210,7 @@ func (r *publicOrderRepo) QueryOrderList(ctx context.Context, userID int64, page
 	total, err := query.Count(ctx)
 	if err != nil {
 		r.logger.Errorf("[PublicOrderRepo.QueryOrderList] count orders failed: %v", err)
-		return nil, 0, errors.InternalServer("ORDER_COUNT_FAILED", "统计订单失败")
+		return nil, int64(total), errors.InternalServer("ORDER_COUNT_FAILED", "统计订单失败")
 	}
 
 	// 应用分页
@@ -222,7 +222,7 @@ func (r *publicOrderRepo) QueryOrderList(ctx context.Context, userID int64, page
 		All(ctx)
 	if err != nil {
 		r.logger.Errorf("[PublicOrderRepo.QueryOrderList] query orders failed: %v", err)
-		return nil, 0, errors.InternalServer("ORDER_QUERY_FAILED", "查询订单失败")
+		return nil, int64(total), errors.InternalServer("ORDER_QUERY_FAILED", "查询订单失败")
 	}
 
 	// 收集订阅ID和支付ID用于批量加载
@@ -241,13 +241,8 @@ func (r *publicOrderRepo) QueryOrderList(ctx context.Context, userID int64, page
 	subscribeMap := make(map[int64]*publicBiz.Subscribe)
 	subscribeNameMap := make(map[int64]string)
 	if len(subscribeIDs) > 0 {
-		// Convert int64 slice to int slice for IDIn
-		intSubscribeIDs := make([]int, len(subscribeIDs))
-		for i, id := range subscribeIDs {
-			intSubscribeIDs[i] = int(id)
-		}
 		subscribes, err := r.data.db.ProxySubscribe.Query().
-			Where(proxysubscribe.IDIn(intSubscribeIDs...)).
+			Where(proxysubscribe.IDIn(subscribeIDs...)).
 			All(ctx)
 		if err == nil {
 			for _, sub := range subscribes {
@@ -261,13 +256,8 @@ func (r *publicOrderRepo) QueryOrderList(ctx context.Context, userID int64, page
 	paymentMap := make(map[int64]*publicBiz.PaymentMethod)
 	paymentNameMap := make(map[int64]string)
 	if len(paymentIDs) > 0 {
-		// Convert int64 slice to int slice for IDIn
-		intPaymentIDs := make([]int, len(paymentIDs))
-		for i, id := range paymentIDs {
-			intPaymentIDs[i] = int(id)
-		}
 		payments, err := r.data.db.ProxyPayment.Query().
-			Where(proxypayment.IDIn(intPaymentIDs...)).
+			Where(proxypayment.IDIn(paymentIDs...)).
 			All(ctx)
 		if err == nil {
 			for _, payment := range payments {
@@ -306,7 +296,7 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 	// 查找订阅套餐 (已修复：使用ProxySubscribe而非ProxySubscribeGroup)
 	sub, err := r.data.db.ProxySubscribe.Query().
 		Where(
-			proxysubscribe.IDEQ(int(req.SubscribeID)),
+			proxysubscribe.IDEQ(req.SubscribeID),
 		).
 		Only(ctx)
 	if err != nil {
@@ -374,7 +364,7 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 	// 检查用户赠金金额
 	userInfo, err := r.data.db.ProxyUser.Query().
 		Where(
-			proxyuser.IDEQ(int(req.UserID)),
+			proxyuser.IDEQ(req.UserID),
 		).
 		Only(ctx)
 	if err != nil {
@@ -396,7 +386,7 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 	if req.Payment != 0 {
 		payment, err := r.data.db.ProxyPayment.Query().
 			Where(
-				proxypayment.IDEQ(int(req.Payment)),
+				proxypayment.IDEQ(req.Payment),
 			).
 			Only(ctx)
 		if err != nil {
@@ -441,7 +431,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 	// 查找用户
 	userInfo, err := r.data.db.ProxyUser.Query().
 		Where(
-			proxyuser.IDEQ(int(req.UserID)),
+			proxyuser.IDEQ(req.UserID),
 		).
 		Only(ctx)
 	if err != nil {
@@ -454,7 +444,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 	if r.config != nil && r.config.Subscribe != nil && r.config.Subscribe.SingleModel {
 		existingSubscriptions, err := r.data.db.ProxyUserSubscribe.Query().
 			Where(
-				proxyusersubscribe.UserIDEQ(int(req.UserID)),
+				proxyusersubscribe.UserIDEQ(req.UserID),
 			).
 			Count(ctx)
 		if err != nil {
@@ -470,7 +460,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 	// 查找订阅套餐 (已修复：使用ProxySubscribe而非ProxySubscribeGroup)
 	sub, err := r.data.db.ProxySubscribe.Query().
 		Where(
-			proxysubscribe.IDEQ(int(req.SubscribeID)),
+			proxysubscribe.IDEQ(req.SubscribeID),
 		).
 		Only(ctx)
 	if err != nil {
@@ -492,8 +482,8 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 
 		existingCount, err := r.data.db.ProxyUserSubscribe.Query().
 			Where(
-				proxyusersubscribe.UserIDEQ(int(req.UserID)),
-				proxyusersubscribe.SubscribeIDEQ(int(req.SubscribeID)),
+				proxyusersubscribe.UserIDEQ(req.UserID),
+				proxyusersubscribe.SubscribeIDEQ(req.SubscribeID),
 				proxyusersubscribe.StatusNEQ(4), // 不等于已取消
 				// 完全按照老项目逻辑：只应用时间过滤，不应用状态过滤
 				// 老项目QueryUserSubscribe(l.ctx, u.Id)没有传入status参数
@@ -508,7 +498,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 			r.logger.Errorf("[Purchase] Check quota failed: %v", err)
 			return nil, errors.InternalServer("QUOTA_CHECK_FAILED", "检查配额失败")
 		}
-		if existingCount >= sub.Quota {
+		if int64(existingCount) >= sub.Quota {
 			r.logger.Warnf("[Purchase] Quota exceeded: user %d, subscribe %d, count %d, quota %d", req.UserID, req.SubscribeID, existingCount, sub.Quota)
 			return nil, errors.BadRequest("QUOTA_EXCEEDED", "订阅配额限制已超过")
 		}
@@ -596,7 +586,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 	// 查找支付方式
 	payment, err := r.data.db.ProxyPayment.Query().
 		Where(
-			proxypayment.IDEQ(int(req.Payment)),
+			proxypayment.IDEQ(req.Payment),
 		).
 		Only(ctx)
 	if err != nil {
@@ -628,7 +618,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 
 	// 创建订单
 	orderInfo := &ent.ProxyOrder{
-		
+
 		UserID:         req.UserID,
 		OrderNo:        orderNo,
 		Type:           1, // 购买类型
@@ -639,7 +629,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 		GiftAmount:     deductionAmount,
 		Coupon:         req.Coupon,
 		CouponDiscount: coupon,
-		PaymentID:      int64(payment.ID),
+		PaymentID:      payment.ID,
 		Method:         payment.Platform,
 		FeeAmount:      feeAmount,
 		Status:         1, // 待付款
@@ -652,7 +642,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 	err = r.data.db.TX(ctx, func(tx *ent.Tx) error {
 		// 更新用户赠金金额 如果存在扣除
 		if orderInfo.GiftAmount > 0 {
-			err := tx.ProxyUser.UpdateOneID(int(req.UserID)).
+			err := tx.ProxyUser.UpdateOneID(req.UserID).
 				SetGiftAmount(currentGiftAmount).
 				Exec(ctx)
 			if err != nil {
@@ -726,7 +716,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 	}
 
 	// 对于非余额支付，将延迟关闭订单任务入队
-	r.enqueueDeferCloseOrderTask(ctx, req.TenantID, req.UserID, createdOrder.OrderNo)
+	r.enqueueDeferCloseOrderTask(ctx, int(req.UserID), createdOrder.OrderNo)
 
 	// 根据支付方式生成支付信息
 	paymentURL, qrCode := r.generatePaymentInfo(ctx, createdOrder, payment)
@@ -745,7 +735,7 @@ func (r *publicOrderRepo) Recharge(ctx context.Context, req *publicBiz.RechargeP
 	// 查找支付方式
 	payment, err := r.data.db.ProxyPayment.Query().
 		Where(
-			proxypayment.IDEQ(int(req.Payment)),
+			proxypayment.IDEQ(req.Payment),
 		).
 		Only(ctx)
 	if err != nil {
@@ -779,7 +769,7 @@ func (r *publicOrderRepo) Recharge(ctx context.Context, req *publicBiz.RechargeP
 		SetPrice(req.Amount).
 		SetAmount(req.Amount + feeAmount).
 		SetFeeAmount(feeAmount).
-		SetPaymentID(int64(payment.ID)).
+		SetPaymentID(payment.ID).
 		SetMethod(payment.Platform).
 		SetStatus(1). // 待付款
 		SetIsNew(isNew).
@@ -806,7 +796,7 @@ func (r *publicOrderRepo) Recharge(ctx context.Context, req *publicBiz.RechargeP
 	}
 
 	// 对于非余额支付，将延迟关闭订单任务入队
-	r.enqueueDeferCloseOrderTask(ctx, req.TenantID, req.UserID, orderInfo.OrderNo)
+	r.enqueueDeferCloseOrderTask(ctx, int(req.UserID), orderInfo.OrderNo)
 
 	// 根据支付方式生成支付信息
 	paymentURL, qrCode := r.generatePaymentInfo(ctx, orderInfo, payment)
@@ -830,7 +820,7 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 	// 查找用户订阅
 	userSubscribe, err := r.data.db.ProxyUserSubscribe.Query().
 		Where(
-			proxyusersubscribe.IDEQ(int(req.UserSubscribeID)),
+			proxyusersubscribe.IDEQ(req.UserSubscribeID),
 		).
 		Only(ctx)
 	if err != nil {
@@ -918,7 +908,7 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 	// 查找用户
 	userInfo, err := r.data.db.ProxyUser.Query().
 		Where(
-			proxyuser.IDEQ(int(req.UserID)),
+			proxyuser.IDEQ(req.UserID),
 		).
 		Only(ctx)
 	if err != nil {
@@ -948,7 +938,7 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 	// 查找支付方式
 	payment, err := r.data.db.ProxyPayment.Query().
 		Where(
-			proxypayment.IDEQ(int(req.Payment)),
+			proxypayment.IDEQ(req.Payment),
 		).
 		Only(ctx)
 	if err != nil {
@@ -977,7 +967,7 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 	err = r.data.db.TX(ctx, func(tx *ent.Tx) error {
 		// 更新用户赠金金额 如果存在扣除
 		if deductionAmount > 0 {
-			err := tx.ProxyUser.UpdateOneID(int(req.UserID)).
+			err := tx.ProxyUser.UpdateOneID(req.UserID).
 				SetGiftAmount(currentGiftAmount).
 				Exec(ctx)
 			if err != nil {
@@ -1006,7 +996,7 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 		// 创建订单
 		order, err := tx.ProxyOrder.Create().
 			SetUserID(req.UserID).
-			SetParentID(int64(userSubscribe.OrderID)).
+			SetParentID(userSubscribe.OrderID).
 			SetOrderNo(orderNo).
 			SetType(2). // 续费类型
 			SetQuantity(quantity).
@@ -1016,11 +1006,11 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 			SetDiscount(discountAmount).
 			SetCoupon(req.Coupon).
 			SetCouponDiscount(coupon).
-			SetPaymentID(int64(payment.ID)).
+			SetPaymentID(payment.ID).
 			SetMethod(payment.Platform).
 			SetFeeAmount(feeAmount).
 			SetStatus(1). // 待付款
-			SetSubscribeID(int64(userSubscribe.SubscribeID)).
+			SetSubscribeID(userSubscribe.SubscribeID).
 			SetSubscribeToken(subscribeToken).
 			Save(ctx)
 		if err != nil {
@@ -1052,7 +1042,7 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 	}
 
 	// 对于非余额支付，将延迟关闭订单任务入队
-	r.enqueueDeferCloseOrderTask(ctx, req.TenantID, req.UserID, createdOrder.OrderNo)
+	r.enqueueDeferCloseOrderTask(ctx, int(req.UserID), createdOrder.OrderNo)
 
 	// 根据支付方式生成支付信息
 	paymentURL, qrCode := r.generatePaymentInfo(ctx, createdOrder, payment)
@@ -1073,7 +1063,7 @@ func (r *publicOrderRepo) ResetTraffic(ctx context.Context, req *publicBiz.Reset
 	// 查找用户订阅
 	userSubscribe, err := r.data.db.ProxyUserSubscribe.Query().
 		Where(
-			proxyusersubscribe.IDEQ(int(req.UserSubscribeID)),
+			proxyusersubscribe.IDEQ(req.UserSubscribeID),
 		).
 		Only(ctx)
 	if err != nil {
@@ -1098,7 +1088,7 @@ func (r *publicOrderRepo) ResetTraffic(ctx context.Context, req *publicBiz.Reset
 	// 查找用户
 	userInfo, err := r.data.db.ProxyUser.Query().
 		Where(
-			proxyuser.IDEQ(int(req.UserID)),
+			proxyuser.IDEQ(req.UserID),
 		).
 		Only(ctx)
 	if err != nil {
@@ -1128,7 +1118,7 @@ func (r *publicOrderRepo) ResetTraffic(ctx context.Context, req *publicBiz.Reset
 	// 查找支付方式
 	payment, err := r.data.db.ProxyPayment.Query().
 		Where(
-			proxypayment.IDEQ(int(req.Payment)),
+			proxypayment.IDEQ(req.Payment),
 		).
 		Only(ctx)
 	if err != nil {
@@ -1156,7 +1146,7 @@ func (r *publicOrderRepo) ResetTraffic(ctx context.Context, req *publicBiz.Reset
 	err = r.data.db.TX(ctx, func(tx *ent.Tx) error {
 		// 更新用户赠金金额 如果存在扣除
 		if deductionAmount > 0 {
-			err := tx.ProxyUser.UpdateOneID(int(req.UserID)).
+			err := tx.ProxyUser.UpdateOneID(req.UserID).
 				SetGiftAmount(currentGiftAmount).
 				Exec(ctx)
 			if err != nil {
@@ -1184,18 +1174,18 @@ func (r *publicOrderRepo) ResetTraffic(ctx context.Context, req *publicBiz.Reset
 
 		// 创建订单
 		order, err := tx.ProxyOrder.Create().
-			SetParentID(int64(userSubscribe.OrderID)).
+			SetParentID(userSubscribe.OrderID).
 			SetUserID(req.UserID).
 			SetOrderNo(orderNo).
 			SetType(3).                      // 重置流量类型
-			SetPrice(int64(subscribe.Replacement)). // 已修复：使用实际重置价格
+			SetPrice(subscribe.Replacement). // 已修复：使用实际重置价格
 			SetAmount(amount + feeAmount).
 			SetGiftAmount(deductionAmount).
 			SetFeeAmount(feeAmount).
-			SetPaymentID(int64(payment.ID)).
+			SetPaymentID(payment.ID).
 			SetMethod(payment.Platform).
 			SetStatus(1). // 待付款
-			SetSubscribeID(int64(userSubscribe.SubscribeID)).
+			SetSubscribeID(userSubscribe.SubscribeID).
 			SetSubscribeToken(subscribeToken).
 			Save(ctx)
 		if err != nil {
@@ -1226,7 +1216,7 @@ func (r *publicOrderRepo) ResetTraffic(ctx context.Context, req *publicBiz.Reset
 	}
 
 	// 对于非余额支付，将延迟关闭订单任务入队
-	r.enqueueDeferCloseOrderTask(ctx, req.TenantID, req.UserID, createdOrder.OrderNo)
+	r.enqueueDeferCloseOrderTask(ctx, int(req.UserID), createdOrder.OrderNo)
 
 	// 根据支付方式生成支付信息
 	paymentURL, qrCode := r.generatePaymentInfo(ctx, createdOrder, payment)
@@ -1367,7 +1357,7 @@ func (r *publicOrderRepo) convertToPaymentMethod(payment *ent.ProxyPayment) *pub
 		Icon:        payment.Icon,
 		FeeMode:     int32(payment.FeeMode),
 		FeePercent:  int64(payment.FeePercent),
-		FeeAmount:   payment.FeeAmount,
+		FeeAmount:   int64(payment.FeeAmount),
 	}
 }
 
@@ -1388,9 +1378,13 @@ func (r *publicOrderRepo) convertToSubscribe(subscribe *ent.ProxySubscribe) *pub
 	}
 
 	// 解析节点ID
-	var nodes []int64
+	var nodes []int
 	if subscribe.Nodes != "" {
-		nodes = tool.StringToInt64Slice(subscribe.Nodes)
+		nodes64 := tool.StringToInt64Slice(subscribe.Nodes)
+		nodes = make([]int, len(nodes64))
+		for i, v := range nodes64 {
+			nodes[i] = int(v)
+		}
 	}
 
 	// 解析节点标签
@@ -1472,7 +1466,7 @@ func (r *publicOrderRepo) getOrderStatusText(status int8) string {
 }
 
 // enqueueDeferCloseOrderTask 将任务加入队列以在15分钟后自动关闭未支付订单
-func (r *publicOrderRepo) enqueueDeferCloseOrderTask(ctx context.Context, tenantID, userID int64, orderNo string) {
+func (r *publicOrderRepo) enqueueDeferCloseOrderTask(ctx context.Context, userID int, orderNo string) {
 	// 创建任务负载
 	payload := queueTypes.DeferCloseOrderPayload{
 		OrderNo: orderNo,
@@ -1506,7 +1500,10 @@ func (r *publicOrderRepo) calculateCoupon(amount int64, couponInfo *ent.ProxyCou
 		return int64(float64(amount) * (float64(couponInfo.Discount) / float64(100)))
 	} else {
 		// 固定金额折扣
-		return min(couponInfo.Discount, amount)
+		if couponInfo.Discount < amount {
+			return couponInfo.Discount
+		}
+		return amount
 	}
 }
 
@@ -1543,14 +1540,6 @@ func (r *publicOrderRepo) getDiscount(discounts []SubscribeDiscount, inputMonths
 	}
 
 	return float64(finalDiscount) / float64(100)
-}
-
-// min返回两个int64值中的最小值
-func min(a, b int64) int64 {
-	if a < b {
-		return a
-	}
-	return b
 }
 
 // buildNotifyURL 构建支付通知回调URL
@@ -1612,7 +1601,7 @@ func (r *publicOrderRepo) generateAlipayF2FPayment(ctx context.Context, order *e
 	}
 
 	// 使用当前汇率将订单金额转换为CNY
-	amountFloat, err := r.queryExchangeRate(ctx, 0, "CNY", order.Amount)
+	amountFloat, err := r.queryExchangeRate(ctx, "CNY", int(order.Amount))
 	if err != nil {
 		r.logger.Errorf("[generateAlipayF2FPayment] queryExchangeRate failed: %v, orderNo: %s", err, order.OrderNo)
 		return "", ""
@@ -1652,7 +1641,7 @@ func (r *publicOrderRepo) generateEPayPayment(ctx context.Context, order *ent.Pr
 	client := epay.NewClient(config.PID, config.URL, config.Key)
 
 	// 使用当前汇率将订单金额转换为CNY
-	amountFloat, err := r.queryExchangeRate(ctx, 0, "CNY", order.Amount)
+	amountFloat, err := r.queryExchangeRate(ctx, "CNY", int(order.Amount))
 	if err != nil {
 		r.logger.Errorf("[generateEPayPayment] queryExchangeRate failed: %v, orderNo: %s", err, order.OrderNo)
 		return "", ""
@@ -1701,7 +1690,7 @@ func (r *publicOrderRepo) generateStripePayment(ctx context.Context, order *ent.
 	})
 
 	// 使用当前汇率将订单金额转换为CNY
-	amountFloat, err := r.queryExchangeRate(ctx, 0, "CNY", order.Amount)
+	amountFloat, err := r.queryExchangeRate(ctx, "CNY", int(order.Amount))
 	if err != nil {
 		r.logger.Errorf("[generateStripePayment] queryExchangeRate failed: %v, orderNo: %s", err, order.OrderNo)
 		return "", ""
@@ -1761,7 +1750,7 @@ func (r *publicOrderRepo) generateCryptoSaaSPayment(ctx context.Context, order *
 	client := epay.NewClient(config.AccountID, config.Endpoint, config.SecretKey)
 
 	// 使用当前汇率将订单金额转换为CNY
-	amountFloat, err := r.queryExchangeRate(ctx, 0, "CNY", order.Amount)
+	amountFloat, err := r.queryExchangeRate(ctx, "CNY", int(order.Amount))
 	if err != nil {
 		r.logger.Errorf("[generateCryptoSaaSPayment] queryExchangeRate failed: %v, orderNo: %s", err, order.OrderNo)
 		return "", ""
@@ -1791,7 +1780,6 @@ func (r *publicOrderRepo) generateCryptoSaaSPayment(ctx context.Context, order *
 // ⚠️ 重要：赠金已在订单创建时扣除并记录在 order.GiftAmount 字段中
 // 这里只需从用户 Balance 扣除 order.Amount 即可
 func (r *publicOrderRepo) processBalancePayment(ctx context.Context, order *ent.ProxyOrder) error {
-	tenantID := 0
 	userID := order.UserID
 
 	// 处理零金额订单（赠金已全额覆盖）
@@ -1805,14 +1793,14 @@ func (r *publicOrderRepo) processBalancePayment(ctx context.Context, order *ent.
 			return responsecode.NewKratosError(responsecode.ErrOrderPaymentFailed)
 		}
 		// 将立即激活任务入队
-		return r.enqueueActivateOrderTask(ctx, int64(tenantID), userID, order.OrderNo)
+		return r.enqueueActivateOrderTask(ctx, int(userID), order.OrderNo)
 	}
 
 	// ✅ 在事务中执行所有操作（包括查询用户），确保并发安全
 	err := r.data.db.TX(ctx, func(tx *ent.Tx) error {
 		// ✅ 在事务内查询用户（自动加行锁，防止并发问题）
 		user, err := tx.ProxyUser.Query().
-			Where(proxyuser.IDEQ(int(userID))).
+			Where(proxyuser.IDEQ(userID)).
 			Only(ctx)
 		if err != nil {
 			r.logger.Errorf("[processBalancePayment] Query user failed: %v, userID: %d", err, userID)
@@ -1884,7 +1872,7 @@ func (r *publicOrderRepo) processBalancePayment(ctx context.Context, order *ent.
 	}
 
 	// 将立即激活任务入队 (在事务外)
-	err = r.enqueueActivateOrderTask(ctx, int64(tenantID), userID, order.OrderNo)
+	err = r.enqueueActivateOrderTask(ctx, int(userID), order.OrderNo)
 	if err != nil {
 		r.logger.Warnf("[processBalancePayment] Enqueue activation task failed: %v, orderNo: %s", err, order.OrderNo)
 		// 如果激活任务入队失败，不要让支付失败
@@ -1897,11 +1885,9 @@ func (r *publicOrderRepo) processBalancePayment(ctx context.Context, order *ent.
 }
 
 // enqueueActivateOrderTask 将立即激活订单任务加入队列
-func (r *publicOrderRepo) enqueueActivateOrderTask(ctx context.Context, tenantID, userID int64, orderNo string) error {
+func (r *publicOrderRepo) enqueueActivateOrderTask(ctx context.Context, userID int, orderNo string) error {
 	payload := queueTypes.ForthwithActivateOrderPayload{
-		TenantID: tenantID,
-		UserID:   userID,
-		OrderNo:  orderNo,
+		OrderNo: orderNo,
 	}
 
 	payloadBytes, err := json.Marshal(payload)
@@ -1923,7 +1909,7 @@ func (r *publicOrderRepo) enqueueActivateOrderTask(ctx context.Context, tenantID
 
 // queryExchangeRate 将订单金额从系统货币转换为目标货币
 // 获取当前汇率并在需要时执行货币转换
-func (r *publicOrderRepo) queryExchangeRate(ctx context.Context, tenantID int64, targetCurrency string, amountInCents int64) (float64, error) {
+func (r *publicOrderRepo) queryExchangeRate(ctx context.Context, targetCurrency string, amountInCents int) (float64, error) {
 	// 将分转换为十进制金额
 	amount := float64(amountInCents) / float64(100)
 
@@ -1932,7 +1918,7 @@ func (r *publicOrderRepo) queryExchangeRate(ctx context.Context, tenantID int64,
 		Where(proxysystem.CategoryEQ("currency")).
 		All(ctx)
 	if err != nil {
-		r.logger.Errorf("[queryExchangeRate] Query currency config failed: %v, tenantID: %d", err, tenantID)
+		r.logger.Errorf("[queryExchangeRate] Query currency config failed: %v", err)
 		return 0, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
 
@@ -1948,7 +1934,7 @@ func (r *publicOrderRepo) queryExchangeRate(ctx context.Context, tenantID int64,
 
 	// 如果未配置汇率API密钥，跳过转换
 	if accessKey == "" {
-		r.logger.Warnf("[queryExchangeRate] AccessKey not configured, skip conversion. tenantID: %d", tenantID)
+		r.logger.Warnf("[queryExchangeRate] AccessKey not configured, skip conversion.")
 		return amount, nil
 	}
 

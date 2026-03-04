@@ -24,7 +24,7 @@ func NewPublicAnnouncementRepo(data *Data, logger log.Logger) announcementBiz.An
 }
 
 // QueryAnnouncement 查询公告列表
-func (r *publicAnnouncementRepo) QueryAnnouncement(ctx context.Context, tenantID int64, page, size int32, pinned, popup *bool) ([]*announcementBiz.Announcement, int64, error) {
+func (r *publicAnnouncementRepo) QueryAnnouncement(ctx context.Context, page, size int32, pinned, popup *bool) ([]*announcementBiz.Announcement, int64, error) {
 	// 查询条件: show=true (移除tenant_id过滤)
 	query := r.data.db.ProxyAnnouncement.Query().
 		Where(

@@ -17,7 +17,7 @@ type ProxySubscribe struct {
 	config `json:"-"`
 	// ID of the ent.
 	// 订阅套餐ID
-	ID int `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// 订阅套餐名称
 	Name string `json:"name,omitempty"`
 	// 语言
@@ -31,29 +31,29 @@ type ProxySubscribe struct {
 	// 折扣配置JSON
 	Discount *string `json:"discount,omitempty"`
 	// 替换
-	Replacement int `json:"replacement,omitempty"`
+	Replacement int64 `json:"replacement,omitempty"`
 	// 库存
-	Inventory int `json:"inventory,omitempty"`
+	Inventory int64 `json:"inventory,omitempty"`
 	// 流量（字节）
 	Traffic int64 `json:"traffic,omitempty"`
 	// 速度限制
-	SpeedLimit int `json:"speed_limit,omitempty"`
+	SpeedLimit int64 `json:"speed_limit,omitempty"`
 	// 设备数限制
-	DeviceLimit int `json:"device_limit,omitempty"`
+	DeviceLimit int64 `json:"device_limit,omitempty"`
 	// 配额
-	Quota int `json:"quota,omitempty"`
+	Quota int64 `json:"quota,omitempty"`
 	// 是否在门户页面显示
 	Show bool `json:"show,omitempty"`
 	// 是否售卖
 	Sell bool `json:"sell,omitempty"`
 	// 排序
-	Sort int `json:"sort,omitempty"`
+	Sort int64 `json:"sort,omitempty"`
 	// 扣除比例
-	DeductionRatio *float64 `json:"deduction_ratio,omitempty"`
+	DeductionRatio *int64 `json:"deduction_ratio,omitempty"`
 	// 允许扣除
 	AllowDeduction bool `json:"allow_deduction,omitempty"`
 	// 重置周期: 0-不重置 1-1号 2-每月 3-每年
-	ResetCycle *int `json:"reset_cycle,omitempty"`
+	ResetCycle *int64 `json:"reset_cycle,omitempty"`
 	// 续费重置
 	RenewalReset bool `json:"renewal_reset,omitempty"`
 	// 节点IDs
@@ -74,9 +74,7 @@ func (*ProxySubscribe) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case proxysubscribe.FieldShow, proxysubscribe.FieldSell, proxysubscribe.FieldAllowDeduction, proxysubscribe.FieldRenewalReset:
 			values[i] = new(sql.NullBool)
-		case proxysubscribe.FieldDeductionRatio:
-			values[i] = new(sql.NullFloat64)
-		case proxysubscribe.FieldID, proxysubscribe.FieldUnitPrice, proxysubscribe.FieldReplacement, proxysubscribe.FieldInventory, proxysubscribe.FieldTraffic, proxysubscribe.FieldSpeedLimit, proxysubscribe.FieldDeviceLimit, proxysubscribe.FieldQuota, proxysubscribe.FieldSort, proxysubscribe.FieldResetCycle:
+		case proxysubscribe.FieldID, proxysubscribe.FieldUnitPrice, proxysubscribe.FieldReplacement, proxysubscribe.FieldInventory, proxysubscribe.FieldTraffic, proxysubscribe.FieldSpeedLimit, proxysubscribe.FieldDeviceLimit, proxysubscribe.FieldQuota, proxysubscribe.FieldSort, proxysubscribe.FieldDeductionRatio, proxysubscribe.FieldResetCycle:
 			values[i] = new(sql.NullInt64)
 		case proxysubscribe.FieldName, proxysubscribe.FieldLanguage, proxysubscribe.FieldDescription, proxysubscribe.FieldUnitTime, proxysubscribe.FieldDiscount, proxysubscribe.FieldNodes, proxysubscribe.FieldNodeTags:
 			values[i] = new(sql.NullString)
@@ -102,7 +100,7 @@ func (_m *ProxySubscribe) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case proxysubscribe.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -145,13 +143,13 @@ func (_m *ProxySubscribe) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field replacement", values[i])
 			} else if value.Valid {
-				_m.Replacement = int(value.Int64)
+				_m.Replacement = value.Int64
 			}
 		case proxysubscribe.FieldInventory:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field inventory", values[i])
 			} else if value.Valid {
-				_m.Inventory = int(value.Int64)
+				_m.Inventory = value.Int64
 			}
 		case proxysubscribe.FieldTraffic:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -163,19 +161,19 @@ func (_m *ProxySubscribe) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field speed_limit", values[i])
 			} else if value.Valid {
-				_m.SpeedLimit = int(value.Int64)
+				_m.SpeedLimit = value.Int64
 			}
 		case proxysubscribe.FieldDeviceLimit:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field device_limit", values[i])
 			} else if value.Valid {
-				_m.DeviceLimit = int(value.Int64)
+				_m.DeviceLimit = value.Int64
 			}
 		case proxysubscribe.FieldQuota:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field quota", values[i])
 			} else if value.Valid {
-				_m.Quota = int(value.Int64)
+				_m.Quota = value.Int64
 			}
 		case proxysubscribe.FieldShow:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -193,14 +191,14 @@ func (_m *ProxySubscribe) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value.Valid {
-				_m.Sort = int(value.Int64)
+				_m.Sort = value.Int64
 			}
 		case proxysubscribe.FieldDeductionRatio:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field deduction_ratio", values[i])
 			} else if value.Valid {
-				_m.DeductionRatio = new(float64)
-				*_m.DeductionRatio = value.Float64
+				_m.DeductionRatio = new(int64)
+				*_m.DeductionRatio = value.Int64
 			}
 		case proxysubscribe.FieldAllowDeduction:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -212,8 +210,8 @@ func (_m *ProxySubscribe) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field reset_cycle", values[i])
 			} else if value.Valid {
-				_m.ResetCycle = new(int)
-				*_m.ResetCycle = int(value.Int64)
+				_m.ResetCycle = new(int64)
+				*_m.ResetCycle = value.Int64
 			}
 		case proxysubscribe.FieldRenewalReset:
 			if value, ok := values[i].(*sql.NullBool); !ok {

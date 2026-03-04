@@ -2,6 +2,7 @@ package marketing
 
 import (
 	"context"
+	"strconv"
 	"strings"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/marketing/v1"
@@ -10,6 +11,16 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
+
+// Helper functions for type conversion
+func parseInt64(s string) int64 {
+	val, _ := strconv.ParseInt(s, 10, 64)
+	return val
+}
+
+func formatInt64(i int64) string {
+	return strconv.FormatInt(i, 10)
+}
 
 // MarketingService 营销服务
 type MarketingService struct {
@@ -38,8 +49,8 @@ func (s *MarketingService) CreateBatchSendEmailTask(ctx context.Context, req *v1
 		return nil, responsecode.ErrInvalidParam()
 	}
 
-	err := s.uc.CreateBatchSendEmailTask(ctx, 0, req.Subject, req.Content, req.Scope,
-		req.RegisterStartTime, req.RegisterEndTime, req.Additional, req.Scheduled, req.Interval, req.Limit)
+	err := s.uc.CreateBatchSendEmailTask(ctx, req.Subject, req.Content, req.Scope,
+		int64(req.RegisterStartTime), int64(req.RegisterEndTime), req.Additional, int(req.Scheduled), req.Interval, int(req.Limit))
 	if err != nil {
 		s.log.Errorw("msg", "create batch send email task failed", "error", err)
 		return nil, responsecode.ErrTaskCreateFailed()
@@ -64,7 +75,7 @@ func (s *MarketingService) GetBatchSendEmailTaskList(ctx context.Context, req *v
 		status = req.Status
 	}
 
-	tasks, total, err := s.uc.GetBatchSendEmailTaskList(ctx, 0, req.Page, req.Size, scope, status)
+	tasks, total, err := s.uc.GetBatchSendEmailTaskList(ctx, int32(req.Page), int32(req.Size), scope, status)
 	if err != nil {
 		s.log.Errorw("msg", "get batch send email task list failed", "error", err)
 		return nil, responsecode.ErrTaskListFailed()
@@ -88,23 +99,23 @@ func (s *MarketingService) GetBatchSendEmailTaskList(ctx context.Context, req *v
 		}
 
 		list = append(list, &v1.BatchSendEmailTask{
-			Id:                task.ID,
+			Id:                formatInt64(int64(task.ID)),
 			Subject:           contentInfo.Subject,
 			Content:           contentInfo.Content,
 			Recipients:        strings.Join(scopeInfo.Recipients, "\n"),
 			Scope:             int32(scopeInfo.Type),
-			RegisterStartTime: scopeInfo.RegisterStartTime,
-			RegisterEndTime:   scopeInfo.RegisterEndTime,
+			RegisterStartTime: int32(scopeInfo.RegisterStartTime),
+			RegisterEndTime:   int32(scopeInfo.RegisterEndTime),
 			Additional:        strings.Join(scopeInfo.Additional, "\n"),
-			Scheduled:         scopeInfo.Scheduled,
+			Scheduled:         int32(scopeInfo.Scheduled),
 			Interval:          int32(scopeInfo.Interval),
-			Limit:             int64(scopeInfo.Limit),
+			Limit:             int32(scopeInfo.Limit),
 			Status:            int32(task.Status),
 			Errors:            task.Errors,
-			Total:             int64(task.Total),
-			Current:           int64(task.Current),
-			CreatedAt:         task.CreatedAt.UnixMilli(),
-			UpdatedAt:         task.UpdatedAt.UnixMilli(),
+			Total:             int32(task.Total),
+			Current:           int32(task.Current),
+			CreatedAt:         strconv.FormatInt(task.CreatedAt.UnixMilli(), 10),
+			UpdatedAt:         strconv.FormatInt(task.UpdatedAt.UnixMilli(), 10),
 		})
 	}
 
@@ -112,7 +123,7 @@ func (s *MarketingService) GetBatchSendEmailTaskList(ctx context.Context, req *v
 		Code:    int32(responsecode.AdminGetBatchSendEmailTaskListSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetBatchSendEmailTaskListSuccess],
 		Data: &v1.GetBatchSendEmailTaskListData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -120,11 +131,11 @@ func (s *MarketingService) GetBatchSendEmailTaskList(ctx context.Context, req *v
 
 // StopBatchSendEmailTask 停止批量发送邮件任务
 func (s *MarketingService) StopBatchSendEmailTask(ctx context.Context, req *v1.StopBatchSendEmailTaskRequest) (*v1.StopBatchSendEmailTaskReply, error) {
-	if req.Id == 0 {
+	if req.Id == "" {
 		return nil, responsecode.ErrInvalidParam()
 	}
 
-	err := s.uc.StopBatchSendEmailTask(ctx, 0, req.Id)
+	err := s.uc.StopBatchSendEmailTask(ctx, int(parseInt64(req.Id)))
 	if err != nil {
 		s.log.Errorw("msg", "stop batch send email task failed", "error", err)
 		return nil, responsecode.ErrTaskUpdateFailed()
@@ -141,7 +152,7 @@ func (s *MarketingService) StopBatchSendEmailTask(ctx context.Context, req *v1.S
 
 // GetPreSendEmailCount 获取预发送邮件数量
 func (s *MarketingService) GetPreSendEmailCount(ctx context.Context, req *v1.GetPreSendEmailCountRequest) (*v1.GetPreSendEmailCountReply, error) {
-	count, err := s.uc.GetPreSendEmailCount(ctx, 0, req.Scope, req.RegisterStartTime, req.RegisterEndTime)
+	count, err := s.uc.GetPreSendEmailCount(ctx, req.Scope, int(int64(req.RegisterStartTime)), int(int64(req.RegisterEndTime)))
 	if err != nil {
 		s.log.Errorw("msg", "get pre send email count failed", "error", err)
 		return nil, responsecode.ErrTaskQueryFailed()
@@ -151,18 +162,18 @@ func (s *MarketingService) GetPreSendEmailCount(ctx context.Context, req *v1.Get
 		Code:    int32(responsecode.AdminGetPreSendEmailCountSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetPreSendEmailCountSuccess],
 		Data: &v1.GetPreSendEmailCountData{
-			Count: count,
+			Count: int32(count),
 		},
 	}, nil
 }
 
 // GetBatchSendEmailTaskStatus 获取批量发送邮件任务状态
 func (s *MarketingService) GetBatchSendEmailTaskStatus(ctx context.Context, req *v1.GetBatchSendEmailTaskStatusRequest) (*v1.GetBatchSendEmailTaskStatusReply, error) {
-	if req.Id == 0 {
+	if req.Id == "" {
 		return nil, responsecode.ErrInvalidParam()
 	}
 
-	task, err := s.uc.GetBatchSendEmailTaskStatus(ctx, 0, req.Id)
+	task, err := s.uc.GetBatchSendEmailTaskStatus(ctx, int(parseInt64(req.Id)))
 	if err != nil {
 		s.log.Errorw("msg", "get batch send email task status failed", "error", err)
 		return nil, responsecode.ErrTaskQueryFailed()
@@ -173,8 +184,8 @@ func (s *MarketingService) GetBatchSendEmailTaskStatus(ctx context.Context, req 
 		Message: responsecode.CodeMessages[responsecode.AdminGetBatchSendEmailTaskStatusSuccess],
 		Data: &v1.GetBatchSendEmailTaskStatusData{
 			Status:  int32(task.Status),
-			Current: int64(task.Current),
-			Total:   int64(task.Total),
+			Current: int32(task.Current),
+			Total:   int32(task.Total),
 			Errors:  task.Errors,
 		},
 	}, nil
@@ -189,8 +200,14 @@ func (s *MarketingService) CreateQuotaTask(ctx context.Context, req *v1.CreateQu
 		isActive = req.IsActive
 	}
 
-	err := s.uc.CreateQuotaTask(ctx, 0, req.Subscribers, isActive,
-		req.StartTime, req.EndTime, req.ResetTraffic, req.Days, req.GiftType, req.GiftValue)
+	// 转换subscribers从[]int64到[]int
+	subscribersInt := make([]int, len(req.Subscribers))
+	for i, v := range req.Subscribers {
+		subscribersInt[i] = int(v)
+	}
+
+	err := s.uc.CreateQuotaTask(ctx, subscribersInt, isActive,
+		parseInt64(req.StartTime), int64(req.EndTime), req.ResetTraffic, int64(req.Days), req.GiftType, int(req.GiftValue))
 	if err != nil {
 		s.log.Errorw("msg", "create quota task failed", "error", err)
 		return nil, responsecode.ErrTaskCreateFailed()
@@ -212,7 +229,13 @@ func (s *MarketingService) QueryQuotaTaskPreCount(ctx context.Context, req *v1.Q
 		isActive = req.IsActive
 	}
 
-	count, err := s.uc.QueryQuotaTaskPreCount(ctx, 0, req.Subscribers, isActive, req.StartTime, req.EndTime)
+	// 转换subscribers从[]int64到[]int
+	subscribersInt := make([]int, len(req.Subscribers))
+	for i, v := range req.Subscribers {
+		subscribersInt[i] = int(v)
+	}
+
+	count, err := s.uc.QueryQuotaTaskPreCount(ctx, subscribersInt, isActive, int(parseInt64(req.StartTime)), int(req.EndTime))
 	if err != nil {
 		s.log.Errorw("msg", "query quota task pre count failed", "error", err)
 		return nil, responsecode.ErrTaskQueryFailed()
@@ -222,7 +245,7 @@ func (s *MarketingService) QueryQuotaTaskPreCount(ctx context.Context, req *v1.Q
 		Code:    int32(responsecode.AdminQueryQuotaTaskPreCountSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminQueryQuotaTaskPreCountSuccess],
 		Data: &v1.QueryQuotaTaskPreCountData{
-			Count: count,
+			Count: int32(count),
 		},
 	}, nil
 }
@@ -234,7 +257,7 @@ func (s *MarketingService) QueryQuotaTaskList(ctx context.Context, req *v1.Query
 		status = req.Status
 	}
 
-	tasks, total, err := s.uc.QueryQuotaTaskList(ctx, 0, req.Page, req.Size, status)
+	tasks, total, err := s.uc.QueryQuotaTaskList(ctx, int32(req.Page), int32(req.Size), status)
 	if err != nil {
 		s.log.Errorw("msg", "query quota task list failed", "error", err)
 		return nil, responsecode.ErrTaskListFailed()
@@ -257,23 +280,33 @@ func (s *MarketingService) QueryQuotaTaskList(ctx context.Context, req *v1.Query
 			continue
 		}
 
+		// Convert []int64 to []int32 for proto
+		subscribersInt32 := make([]int32, len(scopeInfo.Subscribers))
+		for i, v := range scopeInfo.Subscribers {
+			subscribersInt32[i] = int32(v)
+		}
+		objectsInt32 := make([]int32, len(scopeInfo.Objects))
+		for i, v := range scopeInfo.Objects {
+			objectsInt32[i] = int32(v)
+		}
+
 		list = append(list, &v1.QuotaTask{
-			Id:           task.ID,
-			Subscribers:  scopeInfo.Subscribers,
+			Id:           formatInt64(int64(task.ID)),
+			Subscribers:  subscribersInt32,
 			IsActive:     scopeInfo.IsActive,
-			StartTime:    scopeInfo.StartTime,
-			EndTime:      scopeInfo.EndTime,
+			StartTime:    strconv.FormatInt(scopeInfo.StartTime, 10),
+			EndTime:      int32(scopeInfo.EndTime),
 			ResetTraffic: contentInfo.ResetTraffic,
-			Days:         int64(contentInfo.Days),
+			Days:         int32(contentInfo.Days),
 			GiftType:     int32(contentInfo.GiftType),
-			GiftValue:    int64(contentInfo.GiftValue),
-			Objects:      scopeInfo.Objects,
+			GiftValue:    int32(contentInfo.GiftValue),
+			Objects:      objectsInt32,
 			Status:       int32(task.Status),
-			Total:        int64(task.Total),
-			Current:      int64(task.Current),
+			Total:        int32(task.Total),
+			Current:      int32(task.Current),
 			Errors:       task.Errors,
-			CreatedAt:    task.CreatedAt.UnixMilli(),
-			UpdatedAt:    task.UpdatedAt.UnixMilli(),
+			CreatedAt:    strconv.FormatInt(task.CreatedAt.UnixMilli(), 10),
+			UpdatedAt:    strconv.FormatInt(task.UpdatedAt.UnixMilli(), 10),
 		})
 	}
 
@@ -281,7 +314,7 @@ func (s *MarketingService) QueryQuotaTaskList(ctx context.Context, req *v1.Query
 		Code:    int32(responsecode.AdminQueryQuotaTaskListSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminQueryQuotaTaskListSuccess],
 		Data: &v1.QueryQuotaTaskListData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil

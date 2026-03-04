@@ -54,6 +54,11 @@ func IDLTE(id int64) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldLTE(FieldID, id))
 }
 
+// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
+func TenantID(v int64) predicate.ProxyAds {
+	return predicate.ProxyAds(sql.FieldEQ(FieldTenantID, v))
+}
+
 // Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
 func Title(v string) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldEQ(FieldTitle, v))
@@ -102,6 +107,46 @@ func CreatedAt(v time.Time) predicate.ProxyAds {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
+func TenantIDEQ(v int64) predicate.ProxyAds {
+	return predicate.ProxyAds(sql.FieldEQ(FieldTenantID, v))
+}
+
+// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
+func TenantIDNEQ(v int64) predicate.ProxyAds {
+	return predicate.ProxyAds(sql.FieldNEQ(FieldTenantID, v))
+}
+
+// TenantIDIn applies the In predicate on the "tenant_id" field.
+func TenantIDIn(vs ...int64) predicate.ProxyAds {
+	return predicate.ProxyAds(sql.FieldIn(FieldTenantID, vs...))
+}
+
+// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
+func TenantIDNotIn(vs ...int64) predicate.ProxyAds {
+	return predicate.ProxyAds(sql.FieldNotIn(FieldTenantID, vs...))
+}
+
+// TenantIDGT applies the GT predicate on the "tenant_id" field.
+func TenantIDGT(v int64) predicate.ProxyAds {
+	return predicate.ProxyAds(sql.FieldGT(FieldTenantID, v))
+}
+
+// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
+func TenantIDGTE(v int64) predicate.ProxyAds {
+	return predicate.ProxyAds(sql.FieldGTE(FieldTenantID, v))
+}
+
+// TenantIDLT applies the LT predicate on the "tenant_id" field.
+func TenantIDLT(v int64) predicate.ProxyAds {
+	return predicate.ProxyAds(sql.FieldLT(FieldTenantID, v))
+}
+
+// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
+func TenantIDLTE(v int64) predicate.ProxyAds {
+	return predicate.ProxyAds(sql.FieldLTE(FieldTenantID, v))
 }
 
 // TitleEQ applies the EQ predicate on the "title" field.

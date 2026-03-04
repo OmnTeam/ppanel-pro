@@ -17,7 +17,7 @@ type ProxyPayment struct {
 	config `json:"-"`
 	// ID of the ent.
 	// 支付ID
-	ID int `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// 支付名称
 	Name string `json:"name,omitempty"`
 	// 支付平台
@@ -35,7 +35,7 @@ type ProxyPayment struct {
 	// 费用百分比
 	FeePercent float64 `json:"fee_percent,omitempty"`
 	// 固定费用金额
-	FeeAmount int64 `json:"fee_amount,omitempty"`
+	FeeAmount int `json:"fee_amount,omitempty"`
 	// 是否启用
 	Enable bool `json:"enable,omitempty"`
 	// 支付令牌
@@ -82,7 +82,7 @@ func (_m *ProxyPayment) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case proxypayment.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -135,7 +135,7 @@ func (_m *ProxyPayment) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field fee_amount", values[i])
 			} else if value.Valid {
-				_m.FeeAmount = value.Int64
+				_m.FeeAmount = int(value.Int64)
 			}
 		case proxypayment.FieldEnable:
 			if value, ok := values[i].(*sql.NullBool); !ok {

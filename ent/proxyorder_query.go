@@ -262,12 +262,12 @@ func (_q *ProxyOrderQuery) Clone() *ProxyOrderQuery {
 // Example:
 //
 //	var v []struct {
-//		ParentID int64 `json:"parent_id,omitempty"`
+//		TenantID int64 `json:"tenant_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ProxyOrder.Query().
-//		GroupBy(proxyorder.FieldParentID).
+//		GroupBy(proxyorder.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *ProxyOrderQuery) GroupBy(field string, fields ...string) *ProxyOrderGroupBy {
@@ -285,11 +285,11 @@ func (_q *ProxyOrderQuery) GroupBy(field string, fields ...string) *ProxyOrderGr
 // Example:
 //
 //	var v []struct {
-//		ParentID int64 `json:"parent_id,omitempty"`
+//		TenantID int64 `json:"tenant_id,omitempty"`
 //	}
 //
 //	client.ProxyOrder.Query().
-//		Select(proxyorder.FieldParentID).
+//		Select(proxyorder.FieldTenantID).
 //		Scan(ctx, &v)
 func (_q *ProxyOrderQuery) Select(fields ...string) *ProxyOrderSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

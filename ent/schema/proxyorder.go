@@ -28,6 +28,9 @@ func (ProxyOrder) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").
 			Comment("订单ID"),
+		field.Int64("tenant_id").
+			Default(0).
+			Comment("租户ID"),
 		field.Int64("parent_id").
 			Optional().
 			Comment("父订单ID"),

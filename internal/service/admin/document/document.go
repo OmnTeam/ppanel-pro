@@ -2,6 +2,7 @@ package document
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -10,6 +11,12 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 )
+
+// Helper functions for type conversion
+func parseInt64(s string) int64 {
+	val, _ := strconv.ParseInt(s, 10, 64)
+	return val
+}
 
 // DocumentService 文档服务
 type DocumentService struct {
@@ -29,7 +36,7 @@ func NewDocumentService(uc *documentbiz.DocumentUsecase, logger log.Logger) *Doc
 
 // CreateDocument 创建文档
 func (s *DocumentService) CreateDocument(ctx context.Context, req *v1.CreateDocumentRequest) (*v1.CreateDocumentReply, error) {
-		// 处理 show 字段
+	// 处理 show 字段
 	var show *bool
 	if req.Show != nil {
 		show = &req.Show.Value
@@ -44,20 +51,20 @@ func (s *DocumentService) CreateDocument(ctx context.Context, req *v1.CreateDocu
 		Code:    int32(responsecode.AdminCreateDocumentSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminCreateDocumentSuccess],
 		Data: &v1.CreateDocumentData{
-			Id: doc.ID,
+			Id: strconv.FormatInt(doc.ID, 10),
 		},
 	}, nil
 }
 
 // UpdateDocument 更新文档
 func (s *DocumentService) UpdateDocument(ctx context.Context, req *v1.UpdateDocumentRequest) (*v1.UpdateDocumentReply, error) {
-		// 处理 show 字段
+	// 处理 show 字段
 	var show *bool
 	if req.Show != nil {
 		show = &req.Show.Value
 	}
 
-	err := s.uc.UpdateDocument(ctx, req.Id, req.Title, req.Content, req.Tags, show)
+	err := s.uc.UpdateDocument(ctx, int(parseInt64(req.Id)), req.Title, req.Content, req.Tags, show)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +80,7 @@ func (s *DocumentService) UpdateDocument(ctx context.Context, req *v1.UpdateDocu
 
 // DeleteDocument 删除文档
 func (s *DocumentService) DeleteDocument(ctx context.Context, req *v1.DeleteDocumentRequest) (*v1.DeleteDocumentReply, error) {
-		err := s.uc.DeleteDocument(ctx, req.Id)
+	err := s.uc.DeleteDocument(ctx, int(parseInt64(req.Id)))
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +96,7 @@ func (s *DocumentService) DeleteDocument(ctx context.Context, req *v1.DeleteDocu
 
 // BatchDeleteDocument 批量删除文档
 func (s *DocumentService) BatchDeleteDocument(ctx context.Context, req *v1.BatchDeleteDocumentRequest) (*v1.BatchDeleteDocumentReply, error) {
-		err := s.uc.BatchDeleteDocument(ctx, req.Ids)
+	err := s.uc.BatchDeleteDocument(ctx, convertInt32SliceToIntSlice(req.Ids))
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +112,7 @@ func (s *DocumentService) BatchDeleteDocument(ctx context.Context, req *v1.Batch
 
 // GetDocumentDetail 获取文档详情
 func (s *DocumentService) GetDocumentDetail(ctx context.Context, req *v1.GetDocumentDetailRequest) (*v1.GetDocumentDetailReply, error) {
-		doc, err := s.uc.GetDocumentDetail(ctx, req.Id)
+	doc, err := s.uc.GetDocumentDetail(ctx, int(parseInt64(req.Id)))
 	if err != nil {
 		return nil, err
 	}
@@ -116,13 +123,13 @@ func (s *DocumentService) GetDocumentDetail(ctx context.Context, req *v1.GetDocu
 		Message: responsecode.CodeMessages[responsecode.AdminGetDocumentDetailSuccess],
 		Data: &v1.GetDocumentDetailData{
 			Document: &v1.Document{
-				Id:        doc.ID,
+				Id:        strconv.FormatInt(doc.ID, 10),
 				Title:     doc.Title,
 				Content:   doc.Content,
 				Tags:      tool.StringMergeAndRemoveDuplicates(doc.Tags), // 第38行：转换 tags
 				Show:      doc.Show,
-				CreatedAt: doc.CreatedAt.UnixMilli(),
-				UpdatedAt: doc.UpdatedAt.UnixMilli(),
+				CreatedAt: strconv.FormatInt(doc.CreatedAt.UnixMilli(), 10),
+				UpdatedAt: strconv.FormatInt(doc.UpdatedAt.UnixMilli(), 10),
 			},
 		},
 	}, nil
@@ -130,7 +137,7 @@ func (s *DocumentService) GetDocumentDetail(ctx context.Context, req *v1.GetDocu
 
 // GetDocumentList 获取文档列表
 func (s *DocumentService) GetDocumentList(ctx context.Context, req *v1.GetDocumentListRequest) (*v1.GetDocumentListReply, error) {
-		total, data, err := s.uc.GetDocumentList(ctx, req.Page, req.Size, req.Tag, req.Search)
+	total, data, err := s.uc.GetDocumentList(ctx, int(req.Page), int(req.Size), req.Tag, req.Search)
 	if err != nil {
 		return nil, err
 	}
@@ -139,13 +146,13 @@ func (s *DocumentService) GetDocumentList(ctx context.Context, req *v1.GetDocume
 	list := make([]*v1.Document, 0, len(data))
 	for _, doc := range data {
 		list = append(list, &v1.Document{
-			Id:        doc.ID,
+			Id:        strconv.FormatInt(doc.ID, 10),
 			Title:     doc.Title,
 			Content:   doc.Content,
 			Tags:      tool.StringMergeAndRemoveDuplicates(doc.Tags), // 第43行：转换 tags
 			Show:      doc.Show,
-			CreatedAt: doc.CreatedAt.UnixMilli(),
-			UpdatedAt: doc.UpdatedAt.UnixMilli(),
+			CreatedAt: strconv.FormatInt(doc.CreatedAt.UnixMilli(), 10),
+			UpdatedAt: strconv.FormatInt(doc.UpdatedAt.UnixMilli(), 10),
 		})
 	}
 
@@ -153,8 +160,20 @@ func (s *DocumentService) GetDocumentList(ctx context.Context, req *v1.GetDocume
 		Code:    int32(responsecode.AdminGetDocumentListSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetDocumentListSuccess],
 		Data: &v1.GetDocumentListData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
+}
+
+// convertInt32SliceToIntSlice converts []int32 to []int
+func convertInt32SliceToIntSlice(input []int32) []int {
+	if input == nil {
+		return nil
+	}
+	result := make([]int, len(input))
+	for i, v := range input {
+		result[i] = int(v)
+	}
+	return result
 }

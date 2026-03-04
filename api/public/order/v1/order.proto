@@ -104,8 +104,8 @@ message OrderDetailReply {
 
 // QueryOrderList Request
 message QueryOrderListRequest {
-  int64 page = 1;
-  int64 size = 2;
+  int32 page = 1;
+  int32 size = 2;
   int32 status = 3;      // Optional: filter by status
   int32 type = 4;        // Optional: filter by type
 }
@@ -113,7 +113,7 @@ message QueryOrderListRequest {
 // OrderListData 查询订单列表数据
 message OrderListData {
   repeated OrderDetail list = 1;
-  int64 total = 2;
+  int32 total = 2;
 }
 
 // OrderListReply 查询订单列表响应
@@ -126,22 +126,22 @@ message OrderListReply {
 // PreCreateOrder Request
 message PreCreateOrderRequest {
   int32 type = 1;              // Order type: 1:订阅 2:续费 3:重置流量 4:充值
-  int64 subscribe_id = 2;      // Subscribe ID (for renewal/reset)
-  int64 subscribe_group_id = 3; // Subscribe group ID (for purchase)
-  int64 quantity = 4;          // Quantity (for recharge or purchase)
+  string subscribe_id = 2;      // Subscribe ID (for renewal/reset)
+  int32 subscribe_group_id = 3; // Subscribe group ID (for purchase)
+  int32 quantity = 4;          // Quantity (for recharge or purchase)
   string coupon = 5;           // Changed from coupon_code to coupon
-  int64 payment = 6;           // Changed from payment_id to payment
+  int32 payment = 6;           // Changed from payment_id to payment
 }
 
 // OrderPreCreateData 预创建订单数据
 message OrderPreCreateData {
-  int64 price = 1;             // Original price
-  int64 amount = 2;            // Final amount (after discount)
-  int64 discount = 3;          // Discount amount
-  int64 coupon_discount = 4;   // Coupon discount
-  int64 fee_amount = 5;        // Payment fee
-  int64 commission = 6;        // Commission
-  int64 gift_amount = 7;       // Gift amount deduction (ADDED - was missing)
+  string price = 1;             // Original price
+  string amount = 2;            // Final amount (after discount)
+  string discount = 3;          // Discount amount
+  string coupon_discount = 4;   // Coupon discount
+  string fee_amount = 5;        // Payment fee
+  string commission = 6;        // Commission
+  string gift_amount = 7;       // Gift amount deduction (ADDED - was missing)
   bool valid = 8;              // Whether the order is valid
   string error_message = 9;    // Error message if not valid
 }
@@ -155,10 +155,10 @@ message OrderPreCreateReply {
 
 // Purchase Request
 message PurchaseRequest {
-  int64 subscribe_id = 1;       // Subscribe ID (ADDED - was missing)
-  int64 quantity = 2;           // Quantity (ADDED - was missing)
+  string subscribe_id = 1;       // Subscribe ID (ADDED - was missing)
+  int32 quantity = 2;           // Quantity (ADDED - was missing)
   string coupon = 3;            // Changed from coupon_code to coupon
-  int64 payment = 4;            // Changed from payment_id to payment
+  int32 payment = 4;            // Changed from payment_id to payment
 }
 
 // PurchaseData 购买数据
@@ -176,8 +176,8 @@ message PurchaseReply {
 
 // Recharge Request
 message RechargeRequest {
-  int64 amount = 1;             // Changed from quantity to amount
-  int64 payment = 2;            // Changed from payment_id to payment
+  string amount = 1;             // Changed from quantity to amount
+  int32 payment = 2;            // Changed from payment_id to payment
 }
 
 // RechargeData 充值数据
@@ -195,10 +195,10 @@ message RechargeReply {
 
 // Renewal Request
 message RenewalRequest {
-  int64 user_subscribe_id = 1;  // Changed from subscribe_id to user_subscribe_id
-  int64 quantity = 2;           // Quantity (ADDED - was missing)
+  int32 user_subscribe_id = 1;  // Changed from subscribe_id to user_subscribe_id
+  int32 quantity = 2;           // Quantity (ADDED - was missing)
   string coupon = 3;            // Changed from coupon_code to coupon
-  int64 payment = 4;            // Changed from payment_id to payment
+  int32 payment = 4;            // Changed from payment_id to payment
 }
 
 // RenewalData 续费数据
@@ -216,8 +216,8 @@ message RenewalReply {
 
 // ResetTraffic Request
 message ResetTrafficRequest {
-  int64 user_subscribe_id = 1;  // Changed from subscribe_id to user_subscribe_id
-  int64 payment = 2;            // Changed from payment_id to payment
+  int32 user_subscribe_id = 1;  // Changed from subscribe_id to user_subscribe_id
+  int32 payment = 2;            // Changed from payment_id to payment
 }
 
 // TrafficResetData 重置流量数据
@@ -235,71 +235,71 @@ message TrafficResetReply {
 
 // PaymentMethod message
 message PaymentMethod {
-  int64 id = 1;
+  string id = 1;
   string name = 2;
   string platform = 3;
   string description = 4;
   string icon = 5;
   int32 fee_mode = 6;
-  int64 fee_percent = 7;
-  int64 fee_amount = 8;
+  string fee_percent = 7;
+  string fee_amount = 8;
 }
 
 // SubscribeDiscount message
 message SubscribeDiscount {
-  int64 quantity = 1;
-  int64 discount = 2;
+  int32 quantity = 1;
+  string discount = 2;
 }
 
 // Subscribe message
 message Subscribe {
-  int64 id = 1;
+  string id = 1;
   string name = 2;
   string language = 3;
   string description = 4;
-  int64 unit_price = 5;
+  string unit_price = 5;
   string unit_time = 6;
   repeated SubscribeDiscount discount = 7;
-  int64 replacement = 8;
-  int64 inventory = 9;
-  int64 traffic = 10;
-  int64 speed_limit = 11;
-  int64 device_limit = 12;
-  int64 quota = 13;
-  repeated int64 nodes = 14;
+  string replacement = 8;
+  string inventory = 9;
+  string traffic = 10;
+  string speed_limit = 11;
+  string device_limit = 12;
+  string quota = 13;
+  repeated int32 nodes = 14;
   repeated string node_tags = 15;
   bool show = 16;
   bool sell = 17;
-  int64 sort = 18;
-  int64 deduction_ratio = 19;
+  string sort = 18;
+  string deduction_ratio = 19;
   bool allow_deduction = 20;
 }
 
 // OrderDetail message
 message OrderDetail {
-  int64 id = 1;
-  int64 parent_id = 2;
-  int64 user_id = 3;
+  string id = 1;
+  string parent_id = 2;
+  string user_id = 3;
   string order_no = 4;
   int32 type = 5;               // 1:订阅 2:续费 3:重置流量 4:充值
-  int64 quantity = 6;
-  int64 price = 7;
-  int64 amount = 8;
-  int64 gift_amount = 9;
-  int64 discount = 10;
+  int32 quantity = 6;
+  string price = 7;
+  string amount = 8;
+  string gift_amount = 9;
+  string discount = 10;
   string coupon = 11;
-  int64 coupon_discount = 12;
-  int64 commission = 13;
+  string coupon_discount = 12;
+  string commission = 13;
   PaymentMethod payment = 14;   // Nested payment method object
   string method = 15;
-  int64 fee_amount = 16;
+  string fee_amount = 16;
   string trade_no = 17;
   int32 status = 18;            // 1:待付款 2:已付款 3:关闭 4:失败 5:已完成
-  int64 subscribe_id = 19;
+  string subscribe_id = 19;
   string subscribe_token = 20;
   bool is_new = 21;
-  int64 created_at = 22;
-  int64 updated_at = 23;
+  string created_at = 22;
+  string updated_at = 23;
   Subscribe subscribe = 24;     // Nested subscribe object
 
   // Additional fields for public API (kept for backward compatibility)

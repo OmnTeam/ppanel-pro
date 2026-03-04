@@ -105,7 +105,7 @@ func (_c *ProxyDocumentCreate) SetNillableUpdatedAt(v *time.Time) *ProxyDocument
 }
 
 // SetID sets the "id" field.
-func (_c *ProxyDocumentCreate) SetID(v int) *ProxyDocumentCreate {
+func (_c *ProxyDocumentCreate) SetID(v int64) *ProxyDocumentCreate {
 	_c.mutation.SetID(v)
 	return _c
 }
@@ -204,7 +204,7 @@ func (_c *ProxyDocumentCreate) sqlSave(ctx context.Context) (*ProxyDocument, err
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = int64(id)
 	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
@@ -214,7 +214,7 @@ func (_c *ProxyDocumentCreate) sqlSave(ctx context.Context) (*ProxyDocument, err
 func (_c *ProxyDocumentCreate) createSpec() (*ProxyDocument, *sqlgraph.CreateSpec) {
 	var (
 		_node = &ProxyDocument{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(proxydocument.Table, sqlgraph.NewFieldSpec(proxydocument.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(proxydocument.Table, sqlgraph.NewFieldSpec(proxydocument.FieldID, field.TypeInt64))
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
@@ -294,7 +294,7 @@ func (_c *ProxyDocumentCreateBulk) Save(ctx context.Context) ([]*ProxyDocument, 
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

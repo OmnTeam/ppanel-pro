@@ -82,8 +82,8 @@ func (_q *ProxyAuthMethodQuery) FirstX(ctx context.Context) *ProxyAuthMethod {
 
 // FirstID returns the first ProxyAuthMethod ID from the query.
 // Returns a *NotFoundError when no ProxyAuthMethod ID was found.
-func (_q *ProxyAuthMethodQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *ProxyAuthMethodQuery) FirstID(ctx context.Context) (id int64, err error) {
+	var ids []int64
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -95,7 +95,7 @@ func (_q *ProxyAuthMethodQuery) FirstID(ctx context.Context) (id int, err error)
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *ProxyAuthMethodQuery) FirstIDX(ctx context.Context) int {
+func (_q *ProxyAuthMethodQuery) FirstIDX(ctx context.Context) int64 {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -133,8 +133,8 @@ func (_q *ProxyAuthMethodQuery) OnlyX(ctx context.Context) *ProxyAuthMethod {
 // OnlyID is like Only, but returns the only ProxyAuthMethod ID in the query.
 // Returns a *NotSingularError when more than one ProxyAuthMethod ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *ProxyAuthMethodQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *ProxyAuthMethodQuery) OnlyID(ctx context.Context) (id int64, err error) {
+	var ids []int64
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -150,7 +150,7 @@ func (_q *ProxyAuthMethodQuery) OnlyID(ctx context.Context) (id int, err error) 
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *ProxyAuthMethodQuery) OnlyIDX(ctx context.Context) int {
+func (_q *ProxyAuthMethodQuery) OnlyIDX(ctx context.Context) int64 {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -178,7 +178,7 @@ func (_q *ProxyAuthMethodQuery) AllX(ctx context.Context) []*ProxyAuthMethod {
 }
 
 // IDs executes the query and returns a list of ProxyAuthMethod IDs.
-func (_q *ProxyAuthMethodQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (_q *ProxyAuthMethodQuery) IDs(ctx context.Context) (ids []int64, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
@@ -190,7 +190,7 @@ func (_q *ProxyAuthMethodQuery) IDs(ctx context.Context) (ids []int, err error) 
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *ProxyAuthMethodQuery) IDsX(ctx context.Context) []int {
+func (_q *ProxyAuthMethodQuery) IDsX(ctx context.Context) []int64 {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -262,12 +262,12 @@ func (_q *ProxyAuthMethodQuery) Clone() *ProxyAuthMethodQuery {
 // Example:
 //
 //	var v []struct {
-//		Method string `json:"method,omitempty"`
+//		TenantID int64 `json:"tenant_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ProxyAuthMethod.Query().
-//		GroupBy(proxyauthmethod.FieldMethod).
+//		GroupBy(proxyauthmethod.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *ProxyAuthMethodQuery) GroupBy(field string, fields ...string) *ProxyAuthMethodGroupBy {
@@ -285,11 +285,11 @@ func (_q *ProxyAuthMethodQuery) GroupBy(field string, fields ...string) *ProxyAu
 // Example:
 //
 //	var v []struct {
-//		Method string `json:"method,omitempty"`
+//		TenantID int64 `json:"tenant_id,omitempty"`
 //	}
 //
 //	client.ProxyAuthMethod.Query().
-//		Select(proxyauthmethod.FieldMethod).
+//		Select(proxyauthmethod.FieldTenantID).
 //		Scan(ctx, &v)
 func (_q *ProxyAuthMethodQuery) Select(fields ...string) *ProxyAuthMethodSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
@@ -365,7 +365,7 @@ func (_q *ProxyAuthMethodQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (_q *ProxyAuthMethodQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(proxyauthmethod.Table, proxyauthmethod.Columns, sqlgraph.NewFieldSpec(proxyauthmethod.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(proxyauthmethod.Table, proxyauthmethod.Columns, sqlgraph.NewFieldSpec(proxyauthmethod.FieldID, field.TypeInt64))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

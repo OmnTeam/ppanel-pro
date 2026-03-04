@@ -203,6 +203,21 @@ service User {
       get: "/v1/public/user/device_ws_connect"
     };
   }
+
+  // CommissionWithdraw 佣金提现
+  rpc CommissionWithdraw (CommissionWithdrawRequest) returns (WithdrawalLogReply) {
+    option (google.api.http) = {
+      post: "/v1/public/user/commission_withdraw"
+      body: "*"
+    };
+  }
+
+  // QueryWithdrawalLog 查询提现日志
+  rpc QueryWithdrawalLog (QueryWithdrawalLogRequest) returns (WithdrawalLogListReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/withdrawal_log"
+    };
+  }
 }
 
 // ============================================================================
@@ -720,5 +735,57 @@ message GetDeviceOnlineStatisticsReply {
   int32 code = 1;  // 状态码
   string message = 2;  // 消息内容
   GetDeviceOnlineStatisticsData data = 3;  // 响应数据
+}
+
+// ============================================================================
+// CommissionWithdraw - 佣金提现
+// ============================================================================
+
+// CommissionWithdrawRequest 佣金提现请求
+message CommissionWithdrawRequest {
+  string amount = 1;   // 提现金额（字符串，前端传递int64）
+  string content = 2; // 提现内容（如提现账号信息）
+}
+
+// WithdrawalLogData 提现日志数据
+message WithdrawalLogData {
+  string id = 1;
+  string user_id = 2;
+  string amount = 3;
+  string content = 4;
+  int32 status = 5;
+  string reason = 6;
+  string created_at = 7;
+  string updated_at = 8;
+}
+
+// WithdrawalLogReply 提现日志响应
+message WithdrawalLogReply {
+  int32 code = 1;            // 状态码
+  string message = 2;        // 消息内容
+  WithdrawalLogData data = 3; // 响应数据
+}
+
+// ============================================================================
+// QueryWithdrawalLog - 查询提现日志
+// ============================================================================
+
+// QueryWithdrawalLogRequest 查询提现日志请求
+message QueryWithdrawalLogRequest {
+  int64 page = 1;
+  int64 size = 2;
+}
+
+// WithdrawalLogListData 提现日志列表数据
+message WithdrawalLogListData {
+  repeated WithdrawalLogData list = 1;
+  string total = 2;
+}
+
+// WithdrawalLogListReply 提现日志列表响应
+message WithdrawalLogListReply {
+  int32 code = 1;                // 状态码
+  string message = 2;            // 消息内容
+  WithdrawalLogListData data = 3; // 响应数据
 }
 

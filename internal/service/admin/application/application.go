@@ -29,7 +29,7 @@ func NewSubscribeApplicationService(uc *applicationbiz.SubscribeApplicationUseca
 
 // CreateSubscribeApplication 创建订阅应用配置
 func (s *SubscribeApplicationService) CreateSubscribeApplication(ctx context.Context, req *v1.CreateSubscribeApplicationRequest) (*v1.SubscribeApplicationReply, error) {
-	
+
 	// 序列化下载链接
 	downloadLinkJSON, err := convertDownloadLinkToJSON(req.DownloadLink)
 	if err != nil {
@@ -38,7 +38,7 @@ func (s *SubscribeApplicationService) CreateSubscribeApplication(ctx context.Con
 	}
 
 	app := &applicationbiz.SubscribeApplication{
-				Name:              req.Name,
+		Name:              req.Name,
 		Icon:              &req.Icon,
 		Description:       &req.Description,
 		Scheme:            req.Scheme,
@@ -65,7 +65,7 @@ func (s *SubscribeApplicationService) CreateSubscribeApplication(ctx context.Con
 
 // UpdateSubscribeApplication 更新订阅应用配置
 func (s *SubscribeApplicationService) UpdateSubscribeApplication(ctx context.Context, req *v1.UpdateSubscribeApplicationRequest) (*v1.SubscribeApplicationReply, error) {
-		// 序列化下载链接
+	// 序列化下载链接
 	downloadLinkJSON, err := convertDownloadLinkToJSON(req.DownloadLink)
 	if err != nil {
 		s.logger.WithContext(ctx).Errorf("marshal download link error: %v", err)
@@ -79,7 +79,7 @@ func (s *SubscribeApplicationService) UpdateSubscribeApplication(ctx context.Con
 
 	app := &applicationbiz.SubscribeApplication{
 		ID:                req.Id,
-				Name:              req.Name,
+		Name:              req.Name,
 		Icon:              &icon,
 		Description:       &description,
 		Scheme:            req.Scheme,
@@ -106,7 +106,7 @@ func (s *SubscribeApplicationService) UpdateSubscribeApplication(ctx context.Con
 
 // DeleteSubscribeApplication 删除订阅应用配置
 func (s *SubscribeApplicationService) DeleteSubscribeApplication(ctx context.Context, req *v1.DeleteSubscribeApplicationRequest) (*v1.DeleteSubscribeApplicationReply, error) {
-		err := s.uc.DeleteSubscribeApplication(ctx, req.Id)
+	err := s.uc.DeleteSubscribeApplication(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (s *SubscribeApplicationService) DeleteSubscribeApplication(ctx context.Con
 
 // GetSubscribeApplicationList 获取订阅应用配置列表
 func (s *SubscribeApplicationService) GetSubscribeApplicationList(ctx context.Context, req *v1.GetSubscribeApplicationListRequest) (*v1.GetSubscribeApplicationListReply, error) {
-		list, err := s.uc.GetSubscribeApplicationList(ctx)
+	list, err := s.uc.GetSubscribeApplicationList(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +158,7 @@ func (s *SubscribeApplicationService) GetSubscribeApplicationList(ctx context.Co
 
 // PreviewSubscribeTemplate 预览订阅模板
 func (s *SubscribeApplicationService) PreviewSubscribeTemplate(ctx context.Context, req *v1.PreviewSubscribeTemplateRequest) (*v1.PreviewSubscribeTemplateReply, error) {
-		template, err := s.uc.PreviewSubscribeTemplate(ctx, req.Id)
+	template, err := s.uc.PreviewSubscribeTemplate(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (s *SubscribeApplicationService) PreviewSubscribeTemplate(ctx context.Conte
 func (s *SubscribeApplicationService) convertToProto(app *applicationbiz.SubscribeApplication, downloadLink *v1.DownloadLink) *v1.SubscribeApplication {
 	result := &v1.SubscribeApplication{
 		Id:           app.ID,
-				Name:         app.Name,
+		Name:         app.Name,
 		Scheme:       app.Scheme,
 		UserAgent:    app.UserAgent,
 		IsDefault:    app.IsDefault,

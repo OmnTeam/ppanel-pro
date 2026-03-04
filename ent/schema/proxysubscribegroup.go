@@ -26,7 +26,7 @@ func (ProxySubscribeGroup) Annotations() []schema.Annotation {
 // Fields of the ProxySubscribeGroup
 func (ProxySubscribeGroup) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Positive().
 			Comment("订阅组ID"),
 		field.String("name").

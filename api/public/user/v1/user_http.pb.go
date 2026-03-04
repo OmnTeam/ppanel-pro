@@ -23,6 +23,7 @@ const _ = http.SupportPackageIsVersion1
 const OperationUserBindOAuth = "/api.public.user.v1.User/BindOAuth"
 const OperationUserBindOAuthCallback = "/api.public.user.v1.User/BindOAuthCallback"
 const OperationUserBindTelegram = "/api.public.user.v1.User/BindTelegram"
+const OperationUserCommissionWithdraw = "/api.public.user.v1.User/CommissionWithdraw"
 const OperationUserDeviceWSConnect = "/api.public.user.v1.User/DeviceWSConnect"
 const OperationUserGetDeviceList = "/api.public.user.v1.User/GetDeviceList"
 const OperationUserGetDeviceOnlineStatistics = "/api.public.user.v1.User/GetDeviceOnlineStatistics"
@@ -36,6 +37,7 @@ const OperationUserQueryUserBalanceLog = "/api.public.user.v1.User/QueryUserBala
 const OperationUserQueryUserCommissionLog = "/api.public.user.v1.User/QueryUserCommissionLog"
 const OperationUserQueryUserInfo = "/api.public.user.v1.User/QueryUserInfo"
 const OperationUserQueryUserSubscribe = "/api.public.user.v1.User/QueryUserSubscribe"
+const OperationUserQueryWithdrawalLog = "/api.public.user.v1.User/QueryWithdrawalLog"
 const OperationUserResetUserSubscribeToken = "/api.public.user.v1.User/ResetUserSubscribeToken"
 const OperationUserUnbindDevice = "/api.public.user.v1.User/UnbindDevice"
 const OperationUserUnbindOAuth = "/api.public.user.v1.User/UnbindOAuth"
@@ -54,6 +56,8 @@ type UserHTTPServer interface {
 	BindOAuthCallback(context.Context, *BindOAuthCallbackRequest) (*CommonReply, error)
 	// BindTelegram BindTelegram 绑定Telegram
 	BindTelegram(context.Context, *emptypb.Empty) (*TelegramBindReply, error)
+	// CommissionWithdraw CommissionWithdraw 佣金提现
+	CommissionWithdraw(context.Context, *CommissionWithdrawRequest) (*WithdrawalLogReply, error)
 	// DeviceWSConnect DeviceWSConnect 设备WebSocket连接
 	DeviceWSConnect(context.Context, *emptypb.Empty) (*CommonReply, error)
 	// GetDeviceList GetDeviceList 获取设备列表
@@ -80,6 +84,8 @@ type UserHTTPServer interface {
 	QueryUserInfo(context.Context, *emptypb.Empty) (*UserInfoReply, error)
 	// QueryUserSubscribe QueryUserSubscribe 查询用户订阅
 	QueryUserSubscribe(context.Context, *emptypb.Empty) (*UserSubscribeReply, error)
+	// QueryWithdrawalLog QueryWithdrawalLog 查询提现日志
+	QueryWithdrawalLog(context.Context, *QueryWithdrawalLogRequest) (*WithdrawalLogListReply, error)
 	// ResetUserSubscribeToken ResetUserSubscribeToken 重置订阅令牌
 	ResetUserSubscribeToken(context.Context, *ResetUserSubscribeTokenRequest) (*CommonReply, error)
 	// UnbindDevice UnbindDevice 解绑设备
@@ -113,7 +119,7 @@ func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r.GET("/v1/public/user/oauth_methods", _User_GetOAuthMethods0_HTTP_Handler(srv))
 	r.GET("/v1/public/user/subscribe", _User_QueryUserSubscribe0_HTTP_Handler(srv))
 	r.GET("/v1/public/user/subscribe_log", _User_GetSubscribeLog0_HTTP_Handler(srv))
-	r.PUT("/v1/public/user/subscribe_token", _User_ResetUserSubscribeToken0_HTTP_Handler(srv))
+	r.PUT("/v1/public/user/subscribe_token", _User_ResetUserSubscribeToken1_HTTP_Handler(srv))
 	r.POST("/v1/public/user/unsubscribe/pre", _User_PreUnsubscribe0_HTTP_Handler(srv))
 	r.POST("/v1/public/user/unsubscribe", _User_Unsubscribe0_HTTP_Handler(srv))
 	r.PUT("/v1/public/user/notify", _User_UpdateUserNotify0_HTTP_Handler(srv))
@@ -130,6 +136,8 @@ func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r.PUT("/v1/public/user/unbind_device", _User_UnbindDevice0_HTTP_Handler(srv))
 	r.GET("/v1/public/user/device_online_statistics", _User_GetDeviceOnlineStatistics0_HTTP_Handler(srv))
 	r.GET("/v1/public/user/device_ws_connect", _User_DeviceWSConnect0_HTTP_Handler(srv))
+	r.POST("/v1/public/user/commission_withdraw", _User_CommissionWithdraw0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/withdrawal_log", _User_QueryWithdrawalLog0_HTTP_Handler(srv))
 }
 
 func _User_QueryUserInfo0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
@@ -303,7 +311,7 @@ func _User_GetSubscribeLog0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Conte
 	}
 }
 
-func _User_ResetUserSubscribeToken0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _User_ResetUserSubscribeToken1_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in ResetUserSubscribeTokenRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -656,10 +664,52 @@ func _User_DeviceWSConnect0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Conte
 	}
 }
 
+func _User_CommissionWithdraw0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CommissionWithdrawRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserCommissionWithdraw)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CommissionWithdraw(ctx, req.(*CommissionWithdrawRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*WithdrawalLogReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _User_QueryWithdrawalLog0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in QueryWithdrawalLogRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserQueryWithdrawalLog)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.QueryWithdrawalLog(ctx, req.(*QueryWithdrawalLogRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*WithdrawalLogListReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type UserHTTPClient interface {
 	BindOAuth(ctx context.Context, req *BindOAuthRequest, opts ...http.CallOption) (rsp *OAuthBindReply, err error)
 	BindOAuthCallback(ctx context.Context, req *BindOAuthCallbackRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 	BindTelegram(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *TelegramBindReply, err error)
+	CommissionWithdraw(ctx context.Context, req *CommissionWithdrawRequest, opts ...http.CallOption) (rsp *WithdrawalLogReply, err error)
 	DeviceWSConnect(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *CommonReply, err error)
 	GetDeviceList(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetDeviceListReply, err error)
 	GetDeviceOnlineStatistics(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetDeviceOnlineStatisticsReply, err error)
@@ -673,6 +723,7 @@ type UserHTTPClient interface {
 	QueryUserCommissionLog(ctx context.Context, req *QueryUserCommissionLogRequest, opts ...http.CallOption) (rsp *CommissionLogReply, err error)
 	QueryUserInfo(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *UserInfoReply, err error)
 	QueryUserSubscribe(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *UserSubscribeReply, err error)
+	QueryWithdrawalLog(ctx context.Context, req *QueryWithdrawalLogRequest, opts ...http.CallOption) (rsp *WithdrawalLogListReply, err error)
 	ResetUserSubscribeToken(ctx context.Context, req *ResetUserSubscribeTokenRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 	UnbindDevice(ctx context.Context, req *UnbindDeviceRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 	UnbindOAuth(ctx context.Context, req *UnbindOAuthRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
@@ -726,6 +777,19 @@ func (c *UserHTTPClientImpl) BindTelegram(ctx context.Context, in *emptypb.Empty
 	opts = append(opts, http.Operation(OperationUserBindTelegram))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *UserHTTPClientImpl) CommissionWithdraw(ctx context.Context, in *CommissionWithdrawRequest, opts ...http.CallOption) (*WithdrawalLogReply, error) {
+	var out WithdrawalLogReply
+	pattern := "/v1/public/user/commission_withdraw"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserCommissionWithdraw))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -893,6 +957,19 @@ func (c *UserHTTPClientImpl) QueryUserSubscribe(ctx context.Context, in *emptypb
 	pattern := "/v1/public/user/subscribe"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationUserQueryUserSubscribe))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *UserHTTPClientImpl) QueryWithdrawalLog(ctx context.Context, in *QueryWithdrawalLogRequest, opts ...http.CallOption) (*WithdrawalLogListReply, error) {
+	var out WithdrawalLogListReply
+	pattern := "/v1/public/user/withdrawal_log"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationUserQueryWithdrawalLog))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

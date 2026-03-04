@@ -18,9 +18,9 @@ type CurrencyConfig struct {
 
 // InviteConfig 邀请配置
 type InviteConfig struct {
-	ForcedInvite       bool  `json:"ForcedInvite"`
-	ReferralPercentage int64 `json:"ReferralPercentage"`
-	OnlyFirstPurchase  bool  `json:"OnlyFirstPurchase"`
+	ForcedInvite       bool `json:"ForcedInvite"`
+	ReferralPercentage int  `json:"ReferralPercentage"`
+	OnlyFirstPurchase  bool `json:"OnlyFirstPurchase"`
 }
 
 // NodeDNS 节点DNS配置
@@ -35,7 +35,7 @@ type NodeOutbound struct {
 	Name     string   `json:"Name"`
 	Protocol string   `json:"Protocol"`
 	Address  string   `json:"Address"`
-	Port     int64    `json:"Port"`
+	Port     int      `json:"Port"`
 	Password string   `json:"Password"`
 	Rules    []string `json:"Rules"`
 }
@@ -43,9 +43,9 @@ type NodeOutbound struct {
 // NodeConfig 节点配置
 type NodeConfig struct {
 	NodeSecret             string `json:"NodeSecret"`
-	NodePullInterval       int64  `json:"NodePullInterval"`
-	NodePushInterval       int64  `json:"NodePushInterval"`
-	TrafficReportThreshold int64  `json:"TrafficReportThreshold"`
+	NodePullInterval       int    `json:"NodePullInterval"`
+	NodePushInterval       int    `json:"NodePushInterval"`
+	TrafficReportThreshold int    `json:"TrafficReportThreshold"`
 	IPStrategy             string `json:"IPStrategy"`
 	DNS                    string `json:"DNS"`      // JSON string
 	Block                  string `json:"Block"`    // JSON string
@@ -61,12 +61,12 @@ type PrivacyPolicyConfig struct {
 type RegisterConfig struct {
 	StopRegister            bool   `json:"StopRegister"`
 	EnableTrial             bool   `json:"EnableTrial"`
-	TrialSubscribe          int64  `json:"TrialSubscribe"`
-	TrialTime               int64  `json:"TrialTime"`
+	TrialSubscribe          int    `json:"TrialSubscribe"`
+	TrialTime               int    `json:"TrialTime"`
 	TrialTimeUnit           string `json:"TrialTimeUnit"`
 	EnableIpRegisterLimit   bool   `json:"EnableIpRegisterLimit"`
-	IpRegisterLimit         int64  `json:"IpRegisterLimit"`
-	IpRegisterLimitDuration int64  `json:"IpRegisterLimitDuration"`
+	IpRegisterLimit         int    `json:"IpRegisterLimit"`
+	IpRegisterLimitDuration int    `json:"IpRegisterLimitDuration"`
 }
 
 // SiteConfig 站点配置
@@ -97,9 +97,9 @@ type TosConfig struct {
 
 // VerifyCodeConfig 验证码配置
 type VerifyCodeConfig struct {
-	VerifyCodeExpireTime int64 `json:"VerifyCodeExpireTime"`
-	VerifyCodeLimit      int64 `json:"VerifyCodeLimit"`
-	VerifyCodeInterval   int64 `json:"VerifyCodeInterval"`
+	VerifyCodeExpireTime int `json:"VerifyCodeExpireTime"`
+	VerifyCodeLimit      int `json:"VerifyCodeLimit"`
+	VerifyCodeInterval   int `json:"VerifyCodeInterval"`
 }
 
 // VerifyConfig 验证配置
@@ -120,10 +120,10 @@ type TimePeriod struct {
 
 // SystemRepo defines the interface for system repository
 type SystemRepo interface {
-	GetConfigByCategory(ctx context.Context, tenantID int64, category string) ([]*tool.SystemConfig, error)
-	UpdateConfigByCategory(ctx context.Context, tenantID int64, category string, configs map[string]*tool.SystemConfig) error
-	GetNodeMultiplier(ctx context.Context, tenantID int64) (string, error)
-	UpdateNodeMultiplier(ctx context.Context, tenantID int64, value string) error
+	GetConfigByCategory(ctx context.Context, category string) ([]*tool.SystemConfig, error)
+	UpdateConfigByCategory(ctx context.Context, category string, configs map[string]*tool.SystemConfig) error
+	GetNodeMultiplier(ctx context.Context) (string, error)
+	UpdateNodeMultiplier(ctx context.Context, value string) error
 }
 
 // SystemUsecase is the system use case
@@ -141,8 +141,8 @@ func NewSystemUsecase(repo SystemRepo, logger log.Logger) *SystemUsecase {
 }
 
 // GetCurrencyConfig 获取货币配置
-func (uc *SystemUsecase) GetCurrencyConfig(ctx context.Context, tenantID int64) (*CurrencyConfig, error) {
-	configs, err := uc.repo.GetConfigByCategory(ctx, tenantID, "currency")
+func (uc *SystemUsecase) GetCurrencyConfig(ctx context.Context) (*CurrencyConfig, error) {
+	configs, err := uc.repo.GetConfigByCategory(ctx, "currency")
 	if err != nil {
 		uc.log.Errorf("Failed to get currency config: %v", err)
 		return nil, err
@@ -155,7 +155,7 @@ func (uc *SystemUsecase) GetCurrencyConfig(ctx context.Context, tenantID int64) 
 }
 
 // UpdateCurrencyConfig 更新货币配置
-func (uc *SystemUsecase) UpdateCurrencyConfig(ctx context.Context, tenantID int64, config *CurrencyConfig) error {
+func (uc *SystemUsecase) UpdateCurrencyConfig(ctx context.Context, config *CurrencyConfig) error {
 	// Use reflection to convert struct to map
 	v := reflect.ValueOf(*config)
 	t := v.Type()
@@ -172,12 +172,12 @@ func (uc *SystemUsecase) UpdateCurrencyConfig(ctx context.Context, tenantID int6
 		}
 	}
 
-	return uc.repo.UpdateConfigByCategory(ctx, tenantID, "currency", configs)
+	return uc.repo.UpdateConfigByCategory(ctx, "currency", configs)
 }
 
 // GetInviteConfig 获取邀请配置
-func (uc *SystemUsecase) GetInviteConfig(ctx context.Context, tenantID int64) (*InviteConfig, error) {
-	configs, err := uc.repo.GetConfigByCategory(ctx, tenantID, "invite")
+func (uc *SystemUsecase) GetInviteConfig(ctx context.Context) (*InviteConfig, error) {
+	configs, err := uc.repo.GetConfigByCategory(ctx, "invite")
 	if err != nil {
 		uc.log.Errorf("Failed to get invite config: %v", err)
 		return nil, err
@@ -190,7 +190,7 @@ func (uc *SystemUsecase) GetInviteConfig(ctx context.Context, tenantID int64) (*
 }
 
 // UpdateInviteConfig 更新邀请配置
-func (uc *SystemUsecase) UpdateInviteConfig(ctx context.Context, tenantID int64, config *InviteConfig) error {
+func (uc *SystemUsecase) UpdateInviteConfig(ctx context.Context, config *InviteConfig) error {
 	// Use reflection to convert struct to map
 	v := reflect.ValueOf(*config)
 	t := v.Type()
@@ -207,12 +207,12 @@ func (uc *SystemUsecase) UpdateInviteConfig(ctx context.Context, tenantID int64,
 		}
 	}
 
-	return uc.repo.UpdateConfigByCategory(ctx, tenantID, "invite", configs)
+	return uc.repo.UpdateConfigByCategory(ctx, "invite", configs)
 }
 
 // GetNodeConfig 获取节点配置
-func (uc *SystemUsecase) GetNodeConfig(ctx context.Context, tenantID int64) (*NodeConfig, error) {
-	configs, err := uc.repo.GetConfigByCategory(ctx, tenantID, "server")
+func (uc *SystemUsecase) GetNodeConfig(ctx context.Context) (*NodeConfig, error) {
+	configs, err := uc.repo.GetConfigByCategory(ctx, "server")
 	if err != nil {
 		uc.log.Errorf("Failed to get node config: %v", err)
 		return nil, err
@@ -225,7 +225,7 @@ func (uc *SystemUsecase) GetNodeConfig(ctx context.Context, tenantID int64) (*No
 }
 
 // UpdateNodeConfig 更新节点配置
-func (uc *SystemUsecase) UpdateNodeConfig(ctx context.Context, tenantID int64, config *NodeConfig) error {
+func (uc *SystemUsecase) UpdateNodeConfig(ctx context.Context, config *NodeConfig) error {
 	// Use reflection to convert struct to map
 	v := reflect.ValueOf(*config)
 	t := v.Type()
@@ -242,12 +242,12 @@ func (uc *SystemUsecase) UpdateNodeConfig(ctx context.Context, tenantID int64, c
 		}
 	}
 
-	return uc.repo.UpdateConfigByCategory(ctx, tenantID, "server", configs)
+	return uc.repo.UpdateConfigByCategory(ctx, "server", configs)
 }
 
 // GetPrivacyPolicyConfig 获取隐私政策配置
-func (uc *SystemUsecase) GetPrivacyPolicyConfig(ctx context.Context, tenantID int64) (*PrivacyPolicyConfig, error) {
-	configs, err := uc.repo.GetConfigByCategory(ctx, tenantID, "tos")
+func (uc *SystemUsecase) GetPrivacyPolicyConfig(ctx context.Context) (*PrivacyPolicyConfig, error) {
+	configs, err := uc.repo.GetConfigByCategory(ctx, "tos")
 	if err != nil {
 		uc.log.Errorf("Failed to get privacy policy config: %v", err)
 		return nil, err
@@ -260,7 +260,7 @@ func (uc *SystemUsecase) GetPrivacyPolicyConfig(ctx context.Context, tenantID in
 }
 
 // UpdatePrivacyPolicyConfig 更新隐私政策配置
-func (uc *SystemUsecase) UpdatePrivacyPolicyConfig(ctx context.Context, tenantID int64, config *PrivacyPolicyConfig) error {
+func (uc *SystemUsecase) UpdatePrivacyPolicyConfig(ctx context.Context, config *PrivacyPolicyConfig) error {
 	// Use reflection to convert struct to map
 	v := reflect.ValueOf(*config)
 	t := v.Type()
@@ -277,12 +277,12 @@ func (uc *SystemUsecase) UpdatePrivacyPolicyConfig(ctx context.Context, tenantID
 		}
 	}
 
-	return uc.repo.UpdateConfigByCategory(ctx, tenantID, "tos", configs)
+	return uc.repo.UpdateConfigByCategory(ctx, "tos", configs)
 }
 
 // GetRegisterConfig 获取注册配置
-func (uc *SystemUsecase) GetRegisterConfig(ctx context.Context, tenantID int64) (*RegisterConfig, error) {
-	configs, err := uc.repo.GetConfigByCategory(ctx, tenantID, "register")
+func (uc *SystemUsecase) GetRegisterConfig(ctx context.Context) (*RegisterConfig, error) {
+	configs, err := uc.repo.GetConfigByCategory(ctx, "register")
 	if err != nil {
 		uc.log.Errorf("Failed to get register config: %v", err)
 		return nil, err
@@ -295,7 +295,7 @@ func (uc *SystemUsecase) GetRegisterConfig(ctx context.Context, tenantID int64) 
 }
 
 // UpdateRegisterConfig 更新注册配置
-func (uc *SystemUsecase) UpdateRegisterConfig(ctx context.Context, tenantID int64, config *RegisterConfig) error {
+func (uc *SystemUsecase) UpdateRegisterConfig(ctx context.Context, config *RegisterConfig) error {
 	// Use reflection to convert struct to map
 	v := reflect.ValueOf(*config)
 	t := v.Type()
@@ -312,12 +312,12 @@ func (uc *SystemUsecase) UpdateRegisterConfig(ctx context.Context, tenantID int6
 		}
 	}
 
-	return uc.repo.UpdateConfigByCategory(ctx, tenantID, "register", configs)
+	return uc.repo.UpdateConfigByCategory(ctx, "register", configs)
 }
 
 // GetSiteConfig 获取站点配置
-func (uc *SystemUsecase) GetSiteConfig(ctx context.Context, tenantID int64) (*SiteConfig, error) {
-	configs, err := uc.repo.GetConfigByCategory(ctx, tenantID, "site")
+func (uc *SystemUsecase) GetSiteConfig(ctx context.Context) (*SiteConfig, error) {
+	configs, err := uc.repo.GetConfigByCategory(ctx, "site")
 	if err != nil {
 		uc.log.Errorf("Failed to get site config: %v", err)
 		return nil, err
@@ -330,7 +330,7 @@ func (uc *SystemUsecase) GetSiteConfig(ctx context.Context, tenantID int64) (*Si
 }
 
 // UpdateSiteConfig 更新站点配置
-func (uc *SystemUsecase) UpdateSiteConfig(ctx context.Context, tenantID int64, config *SiteConfig) error {
+func (uc *SystemUsecase) UpdateSiteConfig(ctx context.Context, config *SiteConfig) error {
 	// Use reflection to convert struct to map
 	v := reflect.ValueOf(*config)
 	t := v.Type()
@@ -347,12 +347,12 @@ func (uc *SystemUsecase) UpdateSiteConfig(ctx context.Context, tenantID int64, c
 		}
 	}
 
-	return uc.repo.UpdateConfigByCategory(ctx, tenantID, "site", configs)
+	return uc.repo.UpdateConfigByCategory(ctx, "site", configs)
 }
 
 // GetSubscribeConfig 获取订阅配置
-func (uc *SystemUsecase) GetSubscribeConfig(ctx context.Context, tenantID int64) (*SubscribeConfig, error) {
-	configs, err := uc.repo.GetConfigByCategory(ctx, tenantID, "subscribe")
+func (uc *SystemUsecase) GetSubscribeConfig(ctx context.Context) (*SubscribeConfig, error) {
+	configs, err := uc.repo.GetConfigByCategory(ctx, "subscribe")
 	if err != nil {
 		uc.log.Errorf("Failed to get subscribe config: %v", err)
 		return nil, err
@@ -365,7 +365,7 @@ func (uc *SystemUsecase) GetSubscribeConfig(ctx context.Context, tenantID int64)
 }
 
 // UpdateSubscribeConfig 更新订阅配置
-func (uc *SystemUsecase) UpdateSubscribeConfig(ctx context.Context, tenantID int64, config *SubscribeConfig) error {
+func (uc *SystemUsecase) UpdateSubscribeConfig(ctx context.Context, config *SubscribeConfig) error {
 	// Use reflection to convert struct to map
 	v := reflect.ValueOf(*config)
 	t := v.Type()
@@ -382,12 +382,12 @@ func (uc *SystemUsecase) UpdateSubscribeConfig(ctx context.Context, tenantID int
 		}
 	}
 
-	return uc.repo.UpdateConfigByCategory(ctx, tenantID, "subscribe", configs)
+	return uc.repo.UpdateConfigByCategory(ctx, "subscribe", configs)
 }
 
 // GetTosConfig 获取服务条款配置
-func (uc *SystemUsecase) GetTosConfig(ctx context.Context, tenantID int64) (*TosConfig, error) {
-	configs, err := uc.repo.GetConfigByCategory(ctx, tenantID, "tos")
+func (uc *SystemUsecase) GetTosConfig(ctx context.Context) (*TosConfig, error) {
+	configs, err := uc.repo.GetConfigByCategory(ctx, "tos")
 	if err != nil {
 		uc.log.Errorf("Failed to get tos config: %v", err)
 		return nil, err
@@ -400,7 +400,7 @@ func (uc *SystemUsecase) GetTosConfig(ctx context.Context, tenantID int64) (*Tos
 }
 
 // UpdateTosConfig 更新服务条款配置
-func (uc *SystemUsecase) UpdateTosConfig(ctx context.Context, tenantID int64, config *TosConfig) error {
+func (uc *SystemUsecase) UpdateTosConfig(ctx context.Context, config *TosConfig) error {
 	// Use reflection to convert struct to map
 	v := reflect.ValueOf(*config)
 	t := v.Type()
@@ -417,12 +417,12 @@ func (uc *SystemUsecase) UpdateTosConfig(ctx context.Context, tenantID int64, co
 		}
 	}
 
-	return uc.repo.UpdateConfigByCategory(ctx, tenantID, "tos", configs)
+	return uc.repo.UpdateConfigByCategory(ctx, "tos", configs)
 }
 
 // GetVerifyCodeConfig 获取验证码配置
-func (uc *SystemUsecase) GetVerifyCodeConfig(ctx context.Context, tenantID int64) (*VerifyCodeConfig, error) {
-	configs, err := uc.repo.GetConfigByCategory(ctx, tenantID, "verify_code")
+func (uc *SystemUsecase) GetVerifyCodeConfig(ctx context.Context) (*VerifyCodeConfig, error) {
+	configs, err := uc.repo.GetConfigByCategory(ctx, "verify_code")
 	if err != nil {
 		uc.log.Errorf("Failed to get verify code config: %v", err)
 		return nil, err
@@ -435,7 +435,7 @@ func (uc *SystemUsecase) GetVerifyCodeConfig(ctx context.Context, tenantID int64
 }
 
 // UpdateVerifyCodeConfig 更新验证码配置
-func (uc *SystemUsecase) UpdateVerifyCodeConfig(ctx context.Context, tenantID int64, config *VerifyCodeConfig) error {
+func (uc *SystemUsecase) UpdateVerifyCodeConfig(ctx context.Context, config *VerifyCodeConfig) error {
 	// Use reflection to convert struct to map
 	v := reflect.ValueOf(*config)
 	t := v.Type()
@@ -452,12 +452,12 @@ func (uc *SystemUsecase) UpdateVerifyCodeConfig(ctx context.Context, tenantID in
 		}
 	}
 
-	return uc.repo.UpdateConfigByCategory(ctx, tenantID, "verify_code", configs)
+	return uc.repo.UpdateConfigByCategory(ctx, "verify_code", configs)
 }
 
 // GetVerifyConfig 获取验证配置
-func (uc *SystemUsecase) GetVerifyConfig(ctx context.Context, tenantID int64) (*VerifyConfig, error) {
-	configs, err := uc.repo.GetConfigByCategory(ctx, tenantID, "verify")
+func (uc *SystemUsecase) GetVerifyConfig(ctx context.Context) (*VerifyConfig, error) {
+	configs, err := uc.repo.GetConfigByCategory(ctx, "verify")
 	if err != nil {
 		uc.log.Errorf("Failed to get verify config: %v", err)
 		return nil, err
@@ -470,7 +470,7 @@ func (uc *SystemUsecase) GetVerifyConfig(ctx context.Context, tenantID int64) (*
 }
 
 // UpdateVerifyConfig 更新验证配置
-func (uc *SystemUsecase) UpdateVerifyConfig(ctx context.Context, tenantID int64, config *VerifyConfig) error {
+func (uc *SystemUsecase) UpdateVerifyConfig(ctx context.Context, config *VerifyConfig) error {
 	// Use reflection to convert struct to map
 	v := reflect.ValueOf(*config)
 	t := v.Type()
@@ -487,12 +487,12 @@ func (uc *SystemUsecase) UpdateVerifyConfig(ctx context.Context, tenantID int64,
 		}
 	}
 
-	return uc.repo.UpdateConfigByCategory(ctx, tenantID, "verify", configs)
+	return uc.repo.UpdateConfigByCategory(ctx, "verify", configs)
 }
 
 // GetNodeMultiplier 获取节点倍率配置
-func (uc *SystemUsecase) GetNodeMultiplier(ctx context.Context, tenantID int64) ([]TimePeriod, error) {
-	value, err := uc.repo.GetNodeMultiplier(ctx, tenantID)
+func (uc *SystemUsecase) GetNodeMultiplier(ctx context.Context) ([]TimePeriod, error) {
+	value, err := uc.repo.GetNodeMultiplier(ctx)
 	if err != nil {
 		uc.log.Errorf("Failed to get node multiplier: %v", err)
 		return nil, err
@@ -510,14 +510,14 @@ func (uc *SystemUsecase) GetNodeMultiplier(ctx context.Context, tenantID int64) 
 }
 
 // SetNodeMultiplier 设置节点倍率配置
-func (uc *SystemUsecase) SetNodeMultiplier(ctx context.Context, tenantID int64, periods []TimePeriod) error {
+func (uc *SystemUsecase) SetNodeMultiplier(ctx context.Context, periods []TimePeriod) error {
 	data, err := json.Marshal(periods)
 	if err != nil {
 		uc.log.Errorf("Failed to marshal node multiplier: %v", err)
 		return err
 	}
 
-	return uc.repo.UpdateNodeMultiplier(ctx, tenantID, string(data))
+	return uc.repo.UpdateNodeMultiplier(ctx, string(data))
 }
 
 // getFieldTypeString returns the type string for a reflect.Value

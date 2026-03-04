@@ -33,7 +33,7 @@ func NewAdminLogSettingRepo(data *Data, logger log.Logger) logbiz.LogSettingRepo
 
 // GetLogSetting 获取日志设置
 // ⚠️ 复刻原项目：getLogSettingLogic.go:27-37
-func (r *adminLogSettingRepo) GetLogSetting(ctx context.Context, tenantID int64) (*v1.LogSetting, error) {
+func (r *adminLogSettingRepo) GetLogSetting(ctx context.Context) (*v1.LogSetting, error) {
 	// 查询日志清理相关配置（复刻原项目 line 28）
 	configs, err := r.data.db.ProxySystem.
 		Query().
@@ -70,7 +70,7 @@ func (r *adminLogSettingRepo) GetLogSetting(ctx context.Context, tenantID int64)
 	// 复刻原项目：使用反射映射到结构体（line 35）
 	setting := &v1.LogSetting{
 		AutoClear: autoClear,
-		ClearDays: clearDays,
+		ClearDays: int32(clearDays),
 	}
 
 	return setting, nil
@@ -78,11 +78,11 @@ func (r *adminLogSettingRepo) GetLogSetting(ctx context.Context, tenantID int64)
 
 // UpdateLogSetting 更新日志设置
 // ⚠️ 完整复刻原项目：updateLogSettingLogic.go:33-63
-func (r *adminLogSettingRepo) UpdateLogSetting(ctx context.Context, tenantID int64, setting *v1.LogSetting) error {
+func (r *adminLogSettingRepo) UpdateLogSetting(ctx context.Context, setting *v1.LogSetting) error {
 	// 准备配置项（复刻原项目：字段名即key）
 	configs := map[string]string{
 		LogSettingAutoClear: strconv.FormatBool(setting.AutoClear),
-		LogSettingClearDays: strconv.FormatInt(setting.ClearDays, 10),
+		LogSettingClearDays: strconv.FormatInt(int64(setting.ClearDays), 10),
 	}
 
 	// ✅ 使用事务确保所有配置项更新的原子性（复刻原项目 line 37）

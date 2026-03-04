@@ -70,12 +70,12 @@ func SubscribeID(v int64) predicate.ProxyTrafficLog {
 }
 
 // Download applies equality check predicate on the "download" field. It's identical to DownloadEQ.
-func Download(v int64) predicate.ProxyTrafficLog {
+func Download(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldEQ(FieldDownload, v))
 }
 
 // Upload applies equality check predicate on the "upload" field. It's identical to UploadEQ.
-func Upload(v int64) predicate.ProxyTrafficLog {
+func Upload(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldEQ(FieldUpload, v))
 }
 
@@ -205,82 +205,82 @@ func SubscribeIDLTE(v int64) predicate.ProxyTrafficLog {
 }
 
 // DownloadEQ applies the EQ predicate on the "download" field.
-func DownloadEQ(v int64) predicate.ProxyTrafficLog {
+func DownloadEQ(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldEQ(FieldDownload, v))
 }
 
 // DownloadNEQ applies the NEQ predicate on the "download" field.
-func DownloadNEQ(v int64) predicate.ProxyTrafficLog {
+func DownloadNEQ(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldNEQ(FieldDownload, v))
 }
 
 // DownloadIn applies the In predicate on the "download" field.
-func DownloadIn(vs ...int64) predicate.ProxyTrafficLog {
+func DownloadIn(vs ...int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldIn(FieldDownload, vs...))
 }
 
 // DownloadNotIn applies the NotIn predicate on the "download" field.
-func DownloadNotIn(vs ...int64) predicate.ProxyTrafficLog {
+func DownloadNotIn(vs ...int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldNotIn(FieldDownload, vs...))
 }
 
 // DownloadGT applies the GT predicate on the "download" field.
-func DownloadGT(v int64) predicate.ProxyTrafficLog {
+func DownloadGT(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldGT(FieldDownload, v))
 }
 
 // DownloadGTE applies the GTE predicate on the "download" field.
-func DownloadGTE(v int64) predicate.ProxyTrafficLog {
+func DownloadGTE(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldGTE(FieldDownload, v))
 }
 
 // DownloadLT applies the LT predicate on the "download" field.
-func DownloadLT(v int64) predicate.ProxyTrafficLog {
+func DownloadLT(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldLT(FieldDownload, v))
 }
 
 // DownloadLTE applies the LTE predicate on the "download" field.
-func DownloadLTE(v int64) predicate.ProxyTrafficLog {
+func DownloadLTE(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldLTE(FieldDownload, v))
 }
 
 // UploadEQ applies the EQ predicate on the "upload" field.
-func UploadEQ(v int64) predicate.ProxyTrafficLog {
+func UploadEQ(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldEQ(FieldUpload, v))
 }
 
 // UploadNEQ applies the NEQ predicate on the "upload" field.
-func UploadNEQ(v int64) predicate.ProxyTrafficLog {
+func UploadNEQ(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldNEQ(FieldUpload, v))
 }
 
 // UploadIn applies the In predicate on the "upload" field.
-func UploadIn(vs ...int64) predicate.ProxyTrafficLog {
+func UploadIn(vs ...int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldIn(FieldUpload, vs...))
 }
 
 // UploadNotIn applies the NotIn predicate on the "upload" field.
-func UploadNotIn(vs ...int64) predicate.ProxyTrafficLog {
+func UploadNotIn(vs ...int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldNotIn(FieldUpload, vs...))
 }
 
 // UploadGT applies the GT predicate on the "upload" field.
-func UploadGT(v int64) predicate.ProxyTrafficLog {
+func UploadGT(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldGT(FieldUpload, v))
 }
 
 // UploadGTE applies the GTE predicate on the "upload" field.
-func UploadGTE(v int64) predicate.ProxyTrafficLog {
+func UploadGTE(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldGTE(FieldUpload, v))
 }
 
 // UploadLT applies the LT predicate on the "upload" field.
-func UploadLT(v int64) predicate.ProxyTrafficLog {
+func UploadLT(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldLT(FieldUpload, v))
 }
 
 // UploadLTE applies the LTE predicate on the "upload" field.
-func UploadLTE(v int64) predicate.ProxyTrafficLog {
+func UploadLTE(v int) predicate.ProxyTrafficLog {
 	return predicate.ProxyTrafficLog(sql.FieldLTE(FieldUpload, v))
 }
 

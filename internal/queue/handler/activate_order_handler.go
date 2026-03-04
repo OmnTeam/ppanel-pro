@@ -172,7 +172,7 @@ func (h *ActivateOrderHandler) NewPurchase(ctx context.Context, orderInfo *ent.P
 	}
 
 	// 2. 获取订阅套餐信息
-	sub, err := h.getSubscribeInfo(ctx, orderInfo.SubscribeID)
+	sub, err := h.getSubscribeInfo(ctx, int64(orderInfo.SubscribeID))
 	if err != nil {
 		return err
 	}
@@ -201,7 +201,7 @@ func (h *ActivateOrderHandler) NewPurchase(ctx context.Context, orderInfo *ent.P
 // 根据订单详情获取现有用户或创建新的访客用户
 func (h *ActivateOrderHandler) getUserOrCreate(ctx context.Context, orderInfo *ent.ProxyOrder) (*ent.ProxyUser, error) {
 	if orderInfo.UserID != 0 {
-		return h.getExistingUser(ctx, orderInfo.UserID)
+		return h.getExistingUser(ctx, int64(orderInfo.UserID))
 	}
 	return h.createGuestUser(ctx, orderInfo)
 }
@@ -211,7 +211,7 @@ func (h *ActivateOrderHandler) getUserOrCreate(ctx context.Context, orderInfo *e
 func (h *ActivateOrderHandler) getExistingUser(ctx context.Context, userID int64) (*ent.ProxyUser, error) {
 	userInfo, err := h.db.ProxyUser.Query().
 		Where(
-			proxyuser.IDEQ(int(userID)),
+			proxyuser.IDEQ(userID),
 		).
 		Only(ctx)
 
@@ -324,7 +324,7 @@ func (h *ActivateOrderHandler) handleReferrer(ctx context.Context, userInfo *ent
 	}
 
 	if err = h.db.ProxyUser.UpdateOneID(userInfo.ID).
-		SetRefererID(referer.ID).
+		SetRefererID(int64(referer.ID)).
 		Exec(ctx); err != nil {
 		h.logger.Errorf("[ActivateOrder] 更新用户推荐人失败: %v, userID=%d", err, userInfo.ID)
 	}
@@ -333,7 +333,7 @@ func (h *ActivateOrderHandler) handleReferrer(ctx context.Context, userInfo *ent
 // getSubscribeInfo 根据订阅ID获取订阅套餐详情
 // 复刻原项目 line 315-325
 func (h *ActivateOrderHandler) getSubscribeInfo(ctx context.Context, subscribeID int64) (*ent.ProxySubscribe, error) {
-	sub, err := h.db.ProxySubscribe.Get(ctx, int(subscribeID))
+	sub, err := h.db.ProxySubscribe.Get(ctx, subscribeID)
 	if err != nil {
 		h.logger.Errorf("[ActivateOrder] 查询订阅套餐失败: %v, subscribeID=%d", err, subscribeID)
 		return nil, err
@@ -345,13 +345,13 @@ func (h *ActivateOrderHandler) getSubscribeInfo(ctx context.Context, subscribeID
 // 复刻原项目 line 328-350
 func (h *ActivateOrderHandler) createUserSubscription(ctx context.Context, orderInfo *ent.ProxyOrder, sub *ent.ProxySubscribe) (*ent.ProxyUserSubscribe, error) {
 	now := time.Now()
-	expireTime := tool.AddTime(sub.UnitTime, orderInfo.Quantity, now)
+	expireTime := tool.AddTime(sub.UnitTime, int64(orderInfo.Quantity), now)
 	token := tool.GenerateSubscribeToken(orderInfo.OrderNo)
 
 	userSub, err := h.db.ProxyUserSubscribe.Create().
-		SetUserID(int(orderInfo.UserID)).
-		SetOrderID(int(orderInfo.ID)).
-		SetSubscribeID(int(orderInfo.SubscribeID)).
+		SetUserID(orderInfo.UserID).
+		SetOrderID(orderInfo.ID).
+		SetSubscribeID(orderInfo.SubscribeID).
 		SetStartTime(now).
 		SetExpireTime(expireTime).
 		SetTraffic(sub.Traffic).
@@ -397,7 +397,7 @@ func (h *ActivateOrderHandler) handleCommission(ctx context.Context, userInfo *e
 	if referer.ReferralPercentage != 0 {
 		referralPercentage = uint8(referer.ReferralPercentage)
 	} else {
-		percentage, err := h.loadGlobalReferralPercentage(ctx, 0)
+		percentage, err := h.loadGlobalReferralPercentage(ctx)
 		if err != nil {
 			h.logger.Errorf("[ActivateOrder] 加载全局佣金比例失败: %v", err)
 			return
@@ -406,14 +406,14 @@ func (h *ActivateOrderHandler) handleCommission(ctx context.Context, userInfo *e
 	}
 
 	// 佣金计算公式：(订单金额 - 订单手续费) * 佣金比例
-	amount := h.calculateCommission(orderInfo.Price-orderInfo.FeeAmount, referralPercentage)
+	amount := h.calculateCommission(int64(orderInfo.Price-orderInfo.FeeAmount), referralPercentage)
 
 	// 使用事务更新佣金
 	err = h.db.TX(ctx, func(tx *ent.Tx) error {
 		// 更新推荐人佣金余额
 		currentCommission := int64(0)
 		if referer.Commission != nil {
-			currentCommission = *referer.Commission
+			currentCommission = int64(*referer.Commission)
 		}
 		newCommission := currentCommission + amount
 
@@ -444,7 +444,7 @@ func (h *ActivateOrderHandler) handleCommission(ctx context.Context, userInfo *e
 		return tx.ProxySystemLog.Create().
 			SetType(int8(logmodel.TypeCommission)).
 			SetDate(time.Now().Format(time.DateOnly)).
-			SetObjectID(int64(referer.ID)).
+			SetObjectID(referer.ID).
 			SetContent(string(content)).
 			Exec(ctx)
 	})
@@ -485,7 +485,7 @@ func (h *ActivateOrderHandler) shouldProcessCommission(userInfo *ent.ProxyUser, 
 	}
 
 	// 使用全局配置
-	inviteConfig, err := h.loadInviteSystemConfig(context.Background(), 0)
+	inviteConfig, err := h.loadInviteSystemConfig(context.Background())
 	if err != nil {
 		h.logger.Errorf("[ActivateOrder] 加载邀请配置失败: %v", err)
 		return false
@@ -517,7 +517,7 @@ func (h *ActivateOrderHandler) calculateCommission(price int64, percentage uint8
 // 包括订阅延期、流量重置（如果配置）、佣金处理和通知发送
 func (h *ActivateOrderHandler) Renewal(ctx context.Context, orderInfo *ent.ProxyOrder) error {
 	// 1. 获取用户信息
-	userInfo, err := h.getExistingUser(ctx, orderInfo.UserID)
+	userInfo, err := h.getExistingUser(ctx, int64(orderInfo.UserID))
 	if err != nil {
 		return err
 	}
@@ -525,7 +525,7 @@ func (h *ActivateOrderHandler) Renewal(ctx context.Context, orderInfo *ent.Proxy
 	// 2. 获取用户订阅 - 注意：需要从订单关联的用户订阅中获取，而不是从订单的SubscribeToken字段
 	userSubs, err := h.db.ProxyUserSubscribe.Query().
 		Where(
-			proxyusersubscribe.OrderID(int(orderInfo.ID)),
+			proxyusersubscribe.OrderID(orderInfo.ID),
 		).
 		All(ctx)
 	if err != nil || len(userSubs) == 0 {
@@ -535,7 +535,7 @@ func (h *ActivateOrderHandler) Renewal(ctx context.Context, orderInfo *ent.Proxy
 	userSub := userSubs[0]
 
 	// 3. 获取订阅套餐信息
-	sub, err := h.getSubscribeInfo(ctx, orderInfo.SubscribeID)
+	sub, err := h.getSubscribeInfo(ctx, int64(orderInfo.SubscribeID))
 	if err != nil {
 		return err
 	}
@@ -565,7 +565,7 @@ func (h *ActivateOrderHandler) Renewal(ctx context.Context, orderInfo *ent.Proxy
 
 // getUserSubscription 根据token获取用户订阅
 // 复刻原项目 line 517-524
-func (h *ActivateOrderHandler) getUserSubscription(ctx context.Context, token string, tenantID int64) (*ent.ProxyUserSubscribe, error) {
+func (h *ActivateOrderHandler) getUserSubscription(ctx context.Context, token string) (*ent.ProxyUserSubscribe, error) {
 	userSub, err := h.db.ProxyUserSubscribe.Query().
 		Where(
 			proxyusersubscribe.TokenEQ(token),
@@ -609,7 +609,7 @@ func (h *ActivateOrderHandler) updateSubscriptionForRenewal(ctx context.Context,
 	}
 
 	// 计算新的过期时间
-	newExpireTime := tool.AddTime(sub.UnitTime, orderInfo.Quantity, expireTime)
+	newExpireTime := tool.AddTime(sub.UnitTime, int64(orderInfo.Quantity), expireTime)
 
 	// 更新订阅
 	updateBuilder := h.db.ProxyUserSubscribe.UpdateOneID(userSub.ID).
@@ -640,7 +640,7 @@ func (h *ActivateOrderHandler) updateSubscriptionForRenewal(ctx context.Context,
 // 复刻原项目 line 564-625
 func (h *ActivateOrderHandler) ResetTraffic(ctx context.Context, orderInfo *ent.ProxyOrder) error {
 	// 1. 获取用户信息
-	userInfo, err := h.getExistingUser(ctx, orderInfo.UserID)
+	userInfo, err := h.getExistingUser(ctx, int64(orderInfo.UserID))
 	if err != nil {
 		return err
 	}
@@ -648,7 +648,7 @@ func (h *ActivateOrderHandler) ResetTraffic(ctx context.Context, orderInfo *ent.
 	// 2. 获取用户订阅 - 注意：需要从订单关联的用户订阅中获取，而不是从订单的SubscribeToken字段
 	userSubs, err := h.db.ProxyUserSubscribe.Query().
 		Where(
-			proxyusersubscribe.OrderID(int(orderInfo.ID)),
+			proxyusersubscribe.OrderID(orderInfo.ID),
 		).
 		All(ctx)
 	if err != nil || len(userSubs) == 0 {
@@ -694,7 +694,7 @@ func (h *ActivateOrderHandler) ResetTraffic(ctx context.Context, orderInfo *ent.
 	if err = h.db.ProxySystemLog.Create().
 		SetType(int8(logmodel.TypeResetSubscribe)).
 		SetDate(time.Now().Format(time.DateOnly)).
-		SetObjectID(int64(userSub.ID)).
+		SetObjectID(userSub.ID).
 		SetContent(string(content)).
 		Exec(ctx); err != nil {
 		h.logger.Errorf("[ActivateOrder] 插入流量重置日志失败: %v", err)
@@ -716,7 +716,7 @@ func (h *ActivateOrderHandler) ResetTraffic(ctx context.Context, orderInfo *ent.
 // 包括余额更新、交易日志记录和通知发送
 func (h *ActivateOrderHandler) Recharge(ctx context.Context, orderInfo *ent.ProxyOrder) error {
 	// 1. 获取用户信息
-	userInfo, err := h.getExistingUser(ctx, orderInfo.UserID)
+	userInfo, err := h.getExistingUser(ctx, int64(orderInfo.UserID))
 	if err != nil {
 		return err
 	}
@@ -729,9 +729,9 @@ func (h *ActivateOrderHandler) Recharge(ctx context.Context, orderInfo *ent.Prox
 		// 获取当前余额
 		currentBalance := int64(0)
 		if userInfo.Balance != nil {
-			currentBalance = *userInfo.Balance
+			currentBalance = int64(*userInfo.Balance)
 		}
-		newBalance = currentBalance + orderInfo.Price
+		newBalance = currentBalance + int64(orderInfo.Price)
 
 		// 更新用户余额
 		if err := tx.ProxyUser.UpdateOneID(userInfo.ID).
@@ -753,7 +753,7 @@ func (h *ActivateOrderHandler) Recharge(ctx context.Context, orderInfo *ent.Prox
 		return tx.ProxySystemLog.Create().
 			SetType(int8(logmodel.TypeBalance)).
 			SetDate(time.Now().Format(time.DateOnly)).
-			SetObjectID(int64(userInfo.ID)).
+			SetObjectID(userInfo.ID).
 			SetContent(string(content)).
 			Exec(ctx)
 	})
@@ -802,7 +802,7 @@ func (h *ActivateOrderHandler) sendNotifications(ctx context.Context, orderInfo 
 
 	// 发送管理员通知
 	adminData := h.buildAdminNotificationData(orderInfo, sub)
-	h.sendAdminTelegramNotify(ctx, 0, adminData)
+	h.sendAdminTelegramNotify(ctx, adminData)
 }
 
 // sendRechargeNotifications 发送余额充值订单的专用通知
@@ -829,7 +829,7 @@ func (h *ActivateOrderHandler) sendRechargeNotifications(ctx context.Context, or
 		"OrderTime":     orderInfo.CreatedAt.Format("2006-01-02 15:04:05"),
 		"PaymentMethod": orderInfo.Method,
 	}
-	h.sendAdminTelegramNotify(ctx, 0, adminData)
+	h.sendAdminTelegramNotify(ctx, adminData)
 }
 
 // buildUserNotificationData 为用户通知创建模板数据
@@ -895,7 +895,7 @@ func (h *ActivateOrderHandler) sendUserTelegramNotify(chatID int64, notifyType s
 
 // sendAdminTelegramNotify 通过Telegram向所有管理员用户发送通知消息
 // 复刻原项目 line 767-783
-func (h *ActivateOrderHandler) sendAdminTelegramNotify(ctx context.Context, tenantID int64, data map[string]string) {
+func (h *ActivateOrderHandler) sendAdminTelegramNotify(ctx context.Context, data map[string]string) {
 	// 获取Telegram Bot实例
 	bot, err := h.getTelegramBot(ctx)
 	if err != nil || bot == nil {
@@ -1067,7 +1067,7 @@ type InviteSystemConfig struct {
 }
 
 // loadInviteSystemConfig 加载邀请系统配置
-func (h *ActivateOrderHandler) loadInviteSystemConfig(ctx context.Context, tenantID int64) (*InviteSystemConfig, error) {
+func (h *ActivateOrderHandler) loadInviteSystemConfig(ctx context.Context) (*InviteSystemConfig, error) {
 	config, err := h.db.ProxySystem.Query().
 		Where(
 			proxysystem.CategoryEQ("invite"),
@@ -1094,8 +1094,8 @@ func (h *ActivateOrderHandler) loadInviteSystemConfig(ctx context.Context, tenan
 }
 
 // loadGlobalReferralPercentage 加载全局佣金比例
-func (h *ActivateOrderHandler) loadGlobalReferralPercentage(ctx context.Context, tenantID int64) (int, error) {
-	config, err := h.loadInviteSystemConfig(ctx, tenantID)
+func (h *ActivateOrderHandler) loadGlobalReferralPercentage(ctx context.Context) (int, error) {
+	config, err := h.loadInviteSystemConfig(ctx)
 	if err != nil {
 		return 0, err
 	}

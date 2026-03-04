@@ -28,6 +28,9 @@ func (ProxyAds) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").
 			Comment("广告ID"),
+		field.Int64("tenant_id").
+			Default(0).
+			Comment("租户ID"),
 		field.String("title").
 			NotEmpty().
 			Default("").

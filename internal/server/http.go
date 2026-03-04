@@ -10,14 +10,17 @@ import (
 	adminv1 "github.com/OmnTeam/ppanel-pro/api/admin/console/v1"
 	admincouponv1 "github.com/OmnTeam/ppanel-pro/api/admin/coupon/v1"
 	admindocumentv1 "github.com/OmnTeam/ppanel-pro/api/admin/document/v1"
+	maingroupv1 "github.com/OmnTeam/ppanel-pro/api/admin/group/v1"
 	adminlogv1 "github.com/OmnTeam/ppanel-pro/api/admin/log/v1"
 	adminmarketingv1 "github.com/OmnTeam/ppanel-pro/api/admin/marketing/v1"
 	adminorderv1 "github.com/OmnTeam/ppanel-pro/api/admin/order/v1"
 	adminpaymentv1 "github.com/OmnTeam/ppanel-pro/api/admin/payment/v1"
+	adminredemptionv1 "github.com/OmnTeam/ppanel-pro/api/admin/redemption/v1"
 	adminserverv1 "github.com/OmnTeam/ppanel-pro/api/admin/server/v1"
 	adminsubscribev1 "github.com/OmnTeam/ppanel-pro/api/admin/subscribe/v1"
 	adminsystemv1 "github.com/OmnTeam/ppanel-pro/api/admin/system/v1"
 	adminticketv1 "github.com/OmnTeam/ppanel-pro/api/admin/ticket/v1"
+	admintoolv1 "github.com/OmnTeam/ppanel-pro/api/admin/tool/v1"
 	adminuserv1 "github.com/OmnTeam/ppanel-pro/api/admin/user/v1"
 	authoauthv1 "github.com/OmnTeam/ppanel-pro/api/auth/oauth/v1"
 	publicannouncementv1 "github.com/OmnTeam/ppanel-pro/api/public/announcement/v1"
@@ -30,6 +33,8 @@ import (
 	publicsubscribev1 "github.com/OmnTeam/ppanel-pro/api/public/subscribe/v1"
 	publicticketv1 "github.com/OmnTeam/ppanel-pro/api/public/ticket/v1"
 	publicuserv1 "github.com/OmnTeam/ppanel-pro/api/public/user/v1"
+	// Server模块API
+	bserv1 "github.com/OmnTeam/ppanel-pro/api/server/v1"
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
 	"github.com/OmnTeam/ppanel-pro/internal/data"
 	"github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
@@ -40,14 +45,17 @@ import (
 	adminconsoleservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/console"
 	admincouponservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/coupon"
 	admindocumentservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/document"
+	maingroupservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/group"
 	adminlogservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/log"
 	adminmarketingservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/marketing"
 	adminorderservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/order"
 	adminpaymentservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/payment"
+	adminredemptionservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/redemption"
 	adminserverservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/server"
 	adminsubscribeservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/subscribe"
 	adminsystemservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/system"
 	adminticketservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/ticket"
+	admintoolservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/tool"
 	adminuserservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/user"
 	authservice "github.com/OmnTeam/ppanel-pro/internal/service/auth"
 	authoauthservice "github.com/OmnTeam/ppanel-pro/internal/service/auth/oauth"
@@ -60,16 +68,18 @@ import (
 	publicsubscribeservice "github.com/OmnTeam/ppanel-pro/internal/service/public/subscribe"
 	publicticketservice "github.com/OmnTeam/ppanel-pro/internal/service/public/ticket"
 	publicuserservice "github.com/OmnTeam/ppanel-pro/internal/service/public/user"
+	serverservice "github.com/OmnTeam/ppanel-pro/internal/service/server"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport/http"
 )
 
 // NewHTTPServer new an HTTP server
-func NewHTTPServer(c *conf.Server, ads *adsservice.AdsService, announcement *announcementservice.AnnouncementService, application *applicationservice.SubscribeApplicationService, authmethod *authmethodservice.AuthMethodService, adminConsole *adminconsoleservice.ConsoleService, adminCoupon *admincouponservice.CouponService, adminDocument *admindocumentservice.DocumentService, adminLog *adminlogservice.LogService, adminMarketing *adminmarketingservice.MarketingService, adminOrder *adminorderservice.OrderService, adminPayment *adminpaymentservice.PaymentService, adminServer *adminserverservice.ServerService, adminSubscribe *adminsubscribeservice.SubscribeService, adminSystem *adminsystemservice.SystemService, adminTicket *adminticketservice.TicketService, adminUser *adminuserservice.UserService, adminUserAuthMethod *adminuserservice.UserAuthMethodService, adminUserDevice *adminuserservice.UserDeviceService, adminUserSubscribe *adminuserservice.UserSubscribeService, auth *authservice.AuthService, oauthSvc *authoauthservice.OAuthService, commonSvc *commonservice.CommonService, publicOrder *publicorderservice.PublicOrderService, publicAnnouncement *publicannouncementservice.AnnouncementService, publicDocument *publicdocumentservice.DocumentService, publicPayment *publicpaymentservice.PaymentService, publicPortal *publicportalservice.PortalService, publicSubscribe *publicsubscribeservice.SubscribeService, publicTicket *publicticketservice.TicketService, publicUser *publicuserservice.UserService, logger log.Logger) *http.Server {
+func NewHTTPServer(c *conf.Server, ads *adsservice.AdsService, announcement *announcementservice.AnnouncementService, application *applicationservice.SubscribeApplicationService, authmethod *authmethodservice.AuthMethodService, adminConsole *adminconsoleservice.ConsoleService, adminCoupon *admincouponservice.CouponService, adminDocument *admindocumentservice.DocumentService, adminLog *adminlogservice.LogService, adminMarketing *adminmarketingservice.MarketingService, adminOrder *adminorderservice.OrderService, adminPayment *adminpaymentservice.PaymentService, adminServer *adminserverservice.ServerService, adminSubscribe *adminsubscribeservice.SubscribeService, adminSystem *adminsystemservice.SystemService, adminTicket *adminticketservice.TicketService, adminRedemption *adminredemptionservice.RedemptionService, adminTool *admintoolservice.ToolService, adminGroup *maingroupservice.GroupService, adminUser *adminuserservice.UserService, adminUserAuthMethod *adminuserservice.UserAuthMethodService, adminUserDevice *adminuserservice.UserDeviceService, adminUserSubscribe *adminuserservice.UserSubscribeService, auth *authservice.AuthService, oauthSvc *authoauthservice.OAuthService, commonSvc *commonservice.CommonService, publicOrder *publicorderservice.PublicOrderService, publicAnnouncement *publicannouncementservice.AnnouncementService, publicDocument *publicdocumentservice.DocumentService, publicPayment *publicpaymentservice.PaymentService, publicPortal *publicportalservice.PortalService, publicSubscribe *publicsubscribeservice.SubscribeService, publicTicket *publicticketservice.TicketService, publicUser *publicuserservice.UserService, server *serverservice.ServerService, logger log.Logger) *http.Server {
 	var opts = []http.ServerOption{
-		http.Filter(middleware.CORSFilter()), // CORS Filter 必须在最前面
+		http.Filter(middleware.CORSFilter(c.Cors)), // CORS Filter 必须在最前面，使用配置
 		http.Middleware(
-			middleware.JWTAuth(), // JWT authentication middleware
+			middleware.Logging(logger), // Logging middleware，记录请求日志
+			middleware.JWTAuth(c.Auth), // JWT authentication middleware，使用配置
 		),
 		http.ErrorEncoder(CustomErrorEncoder),       // 使用自定义错误编码器，所有错误返回HTTP 200
 		http.RequestDecoder(CustomRequestDecoder),   // 使用自定义请求解码器，处理前端空对象问题
@@ -101,6 +111,9 @@ func NewHTTPServer(c *conf.Server, ads *adsservice.AdsService, announcement *ann
 	adminsubscribev1.RegisterSubscribeHTTPServer(srv, adminSubscribe)
 	adminsystemv1.RegisterSystemServiceHTTPServer(srv, adminSystem)
 	adminticketv1.RegisterTicketHTTPServer(srv, adminTicket)
+	adminredemptionv1.RegisterRedemptionHTTPServer(srv, adminRedemption)
+	admintoolv1.RegisterToolHTTPServer(srv, adminTool)
+	maingroupv1.RegisterGroupHTTPServer(srv, adminGroup)
 	// Admin User模块服务注册
 	adminuserv1.RegisterUserServiceHTTPServer(srv, adminUser)
 	adminuserv1.RegisterUserAuthMethodServiceHTTPServer(srv, adminUserAuthMethod)
@@ -128,6 +141,8 @@ func NewHTTPServer(c *conf.Server, ads *adsservice.AdsService, announcement *ann
 	publicticketv1.RegisterTicketHTTPServer(srv, publicTicket)
 	// Public User模块服务注册
 	publicuserv1.RegisterUserHTTPServer(srv, publicUser)
+	// Server模块服务注册（节点服务器接口）
+	bserv1.RegisterServerHTTPServer(srv, server)
 
 	// 注册WebSocket端点
 	srv.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {

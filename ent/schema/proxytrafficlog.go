@@ -30,8 +30,8 @@ func (ProxyTrafficLog) Fields() []ent.Field {
 		field.Int64("server_id").Comment("服务器ID"),
 		field.Int64("user_id").Comment("用户ID"),
 		field.Int64("subscribe_id").Comment("订阅ID"),
-		field.Int64("download").Default(0).Comment("下载流量"),
-		field.Int64("upload").Default(0).Comment("上传流量"),
+		field.Int("download").Default(0).Comment("下载流量"),
+		field.Int("upload").Default(0).Comment("上传流量"),
 		field.Time("timestamp").Default(time.Now).Comment("流量日志时间"),
 	}
 }

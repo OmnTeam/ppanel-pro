@@ -78,55 +78,55 @@ message GetSubscriptionReply {
 // SubscribeInfo 订阅信息
 // ⚠️ 完全复刻原项目（server-master/internal/types/types.go:Subscribe）
 message SubscribeInfo {
-  int64 id = 1;
+  string id = 1;
   string name = 2;
   string language = 3;
   optional string description = 4;
-  int64 unit_price = 5;
+  string unit_price = 5;
   string unit_time = 6;
   repeated SubscribeDiscount discount = 7;
-  int64 replacement = 8;
-  int64 inventory = 9;
-  int64 traffic = 10;
-  int64 speed_limit = 11;
-  int64 device_limit = 12;
-  int64 quota = 13;
-  repeated int64 nodes = 14;
+  string replacement = 8;
+  string inventory = 9;
+  string traffic = 10;
+  string speed_limit = 11;
+  string device_limit = 12;
+  string quota = 13;
+  repeated string nodes = 14;
   repeated string node_tags = 15;
   bool show = 16;
   bool sell = 17;
-  int64 sort = 18;
-  int64 deduction_ratio = 19;
+  string sort = 18;
+  string deduction_ratio = 19;
   bool allow_deduction = 20;
-  int64 reset_cycle = 21;
+  string reset_cycle = 21;
   bool renewal_reset = 22;
-  int64 created_at = 23;
-  int64 updated_at = 24;
+  string created_at = 23;
+  string updated_at = 24;
 }
 
 // SubscribeDiscount 订阅折扣配置
 message SubscribeDiscount {
-  int64 quantity = 1;  // 购买数量
-  int64 discount = 2;  // 折扣值（百分比 0-100）
+  string quantity = 1;  // 购买数量
+  string discount = 2;  // 折扣值（百分比 0-100）
 }
 
 // PrePurchaseOrderRequest 预购买订单请求
 message PrePurchaseOrderRequest {
-  int64 subscribe_id = 1;      // 订阅ID
-  int64 quantity = 2;          // 数量
+  string subscribe_id = 1;      // 订阅ID
+  string quantity = 2;          // 数量
   optional string coupon = 3;  // 优惠券（可选）
-  optional int64 payment_id = 4;  // 支付方式ID（可选，用于计算手续费）
+  optional string payment_id = 4;  // 支付方式ID（可选，用于计算手续费）
 }
 
 // PrePurchaseOrderData 预购买订单数据（价格预览）
 // ⚠️ 完全复刻原项目（server-master/internal/types/types.go:PrePurchaseOrderResponse）
 message PrePurchaseOrderData {
-  int64 price = 1;             // 原价
-  int64 amount = 2;            // 实际支付金额（含手续费）
-  int64 discount = 3;          // 折扣金额
+  string price = 1;             // 原价
+  string amount = 2;            // 实际支付金额（含手续费）
+  string discount = 3;          // 折扣金额
   string coupon = 4;           // 优惠券代码
-  int64 coupon_discount = 5;   // 优惠券折扣金额
-  int64 fee_amount = 6;        // 手续费金额
+  string coupon_discount = 5;   // 优惠券折扣金额
+  string fee_amount = 6;        // 手续费金额
 }
 
 // PrePurchaseOrderReply 预购买订单响应
@@ -138,14 +138,14 @@ message PrePurchaseOrderReply {
 
 // PurchaseRequest 购买请求
 message PurchaseRequest {
-  int64 subscribe_id = 1;           // 订阅ID
-  int64 quantity = 2;                // 数量
+  string subscribe_id = 1;           // 订阅ID
+  string quantity = 2;                // 数量
   optional string coupon = 3;        // 优惠券（可选）
   string identifier = 4;             // 认证标识符（邮箱/Telegram ID等）
   string auth_type = 5;              // 认证类型（email/telegram等）
   string password = 6;               // 用户密码（明文，后端加密）
   optional string invite_code = 7;   // 邀请码（可选）
-  int64 payment_id = 8;              // 支付方式ID（用于计算手续费）
+  string payment_id = 8;              // 支付方式ID（用于计算手续费）
 }
 
 // PurchaseData 购买数据
@@ -174,14 +174,14 @@ message GetAvailablePaymentMethodsReply {
 
 // PaymentMethod 支付方式
 message PaymentMethod {
-  int64 id = 1;
+  string id = 1;
   string name = 2;
   string platform = 3;      // 支付平台
   string description = 4;   // 支付描述
   string icon = 5;
   int32 fee_mode = 6;       // 费用模式：0=无费用 1=百分比 2=固定金额 3=百分比+固定金额
-  int64 fee_percent = 7;    // 费用百分比
-  int64 fee_amount = 8;     // 固定费用金额
+  string fee_percent = 7;    // 费用百分比
+  string fee_amount = 8;     // 固定费用金额
 }
 
 // PurchaseCheckoutRequest 购买结账请求
@@ -223,16 +223,16 @@ message QueryPurchaseOrderRequest {
 message QueryPurchaseOrderData {
   string order_no = 1;
   SubscribeInfo subscribe = 2;      // 订阅信息
-  int64 quantity = 3;                // 数量
-  int64 price = 4;                   // 原价
-  int64 amount = 5;                  // 订单金额
-  int64 discount = 6;                // 折扣金额
+  string quantity = 3;                // 数量
+  string price = 4;                   // 原价
+  string amount = 5;                  // 订单金额
+  string discount = 6;                // 折扣金额
   string coupon = 7;                 // 优惠券代码
-  int64 coupon_discount = 8;         // 优惠券折扣金额
-  int64 fee_amount = 9;              // 手续费金额
+  string coupon_discount = 8;         // 优惠券折扣金额
+  string fee_amount = 9;              // 手续费金额
   PaymentMethod payment = 10;        // 支付方式信息
   int32 status = 11;                 // 订单状态：1=待付款 2=已付款 3=关闭 4=失败 5=已完成
-  int64 created_at = 12;             // 创建时间（毫秒时间戳）
+  string created_at = 12;             // 创建时间（毫秒时间戳）
   string token = 13;                 // Session token（订单已完成时返回）
 }
 

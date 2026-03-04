@@ -2,6 +2,7 @@ package public
 
 import (
 	"context"
+	"strconv"
 
 	pb "github.com/OmnTeam/ppanel-pro/api/public/order/v1"
 	publicBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public"
@@ -21,12 +22,18 @@ func NewPublicOrderService(uc *publicBiz.OrderUsecase) *PublicOrderService {
 	}
 }
 
+// Helper functions for type conversion
+func parseInt64(s string) int64 {
+	val, _ := strconv.ParseInt(s, 10, 64)
+	return val
+}
+
 // CloseOrder closes an order
 func (s *PublicOrderService) CloseOrder(ctx context.Context, req *pb.CloseOrderRequest) (*pb.OrderCloseReply, error) {
 	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.CloseOrder(ctx, userID, req.OrderNo)
+	err := s.uc.CloseOrder(ctx, int(userID), req.OrderNo)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +52,7 @@ func (s *PublicOrderService) QueryOrderDetail(ctx context.Context, req *pb.Query
 	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
 
-	order, err := s.uc.QueryOrderDetail(ctx, userID, req.OrderNo)
+	order, err := s.uc.QueryOrderDetail(ctx, int(userID), req.OrderNo)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +69,7 @@ func (s *PublicOrderService) QueryOrderList(ctx context.Context, req *pb.QueryOr
 	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
 
-	orders, total, err := s.uc.QueryOrderList(ctx, userID, req.Page, req.Size, req.Status, req.Type)
+	orders, total, err := s.uc.QueryOrderList(ctx, int(userID), int(req.Page), int(req.Size), req.Status, req.Type)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +84,7 @@ func (s *PublicOrderService) QueryOrderList(ctx context.Context, req *pb.QueryOr
 		Message: responsecode.CodeMessages[responsecode.OrderListQuerySuccess],
 		Data: &pb.OrderListData{
 			List:  protoOrders,
-			Total: total,
+			Total: int32(total),
 		},
 	}, nil
 }
@@ -85,18 +92,16 @@ func (s *PublicOrderService) QueryOrderList(ctx context.Context, req *pb.QueryOr
 // PreCreateOrder validates and calculates order price
 func (s *PublicOrderService) PreCreateOrder(ctx context.Context, req *pb.PreCreateOrderRequest) (*pb.OrderPreCreateReply, error) {
 	// Get tenant ID and user ID from context
-	tenantID := int64(0) // 默认租户ID，与原项目保持一致
 	userID := middleware.GetUserID(ctx)
 
 	params := &publicBiz.PreCreateOrderParams{
-		TenantID:         tenantID,
 		UserID:           userID,
 		Type:             req.Type,
-		SubscribeID:      req.SubscribeId,
-		SubscribeGroupID: req.SubscribeGroupId,
-		Quantity:         req.Quantity,
+		SubscribeID:      parseInt64(req.SubscribeId),
+		SubscribeGroupID: int64(req.SubscribeGroupId),
+		Quantity:         int64(req.Quantity),
 		Coupon:           req.Coupon,
-		Payment:          req.Payment,
+		Payment:          int64(req.Payment),
 	}
 
 	result, err := s.uc.PreCreateOrder(ctx, params)
@@ -108,13 +113,13 @@ func (s *PublicOrderService) PreCreateOrder(ctx context.Context, req *pb.PreCrea
 		Code:    int32(responsecode.OrderPreCreateSuccess),
 		Message: responsecode.CodeMessages[responsecode.OrderPreCreateSuccess],
 		Data: &pb.OrderPreCreateData{
-			Price:          result.Price,
-			Amount:         result.Amount,
-			Discount:       result.Discount,
-			CouponDiscount: result.CouponDiscount,
-			FeeAmount:      result.FeeAmount,
-			Commission:     result.Commission,
-			GiftAmount:     result.GiftAmount,
+			Price:          strconv.FormatInt(result.Price, 10),
+			Amount:         strconv.FormatInt(result.Amount, 10),
+			Discount:       strconv.FormatInt(result.Discount, 10),
+			CouponDiscount: strconv.FormatInt(result.CouponDiscount, 10),
+			FeeAmount:      strconv.FormatInt(result.FeeAmount, 10),
+			Commission:     strconv.FormatInt(result.Commission, 10),
+			GiftAmount:     strconv.FormatInt(result.GiftAmount, 10),
 			Valid:          result.Valid,
 			ErrorMessage:   result.Message,
 		},
@@ -124,16 +129,14 @@ func (s *PublicOrderService) PreCreateOrder(ctx context.Context, req *pb.PreCrea
 // Purchase creates a purchase order
 func (s *PublicOrderService) Purchase(ctx context.Context, req *pb.PurchaseRequest) (*pb.PurchaseReply, error) {
 	// Get tenant ID and user ID from context
-	tenantID := int64(0) // 默认租户ID，与原项目保持一致
 	userID := middleware.GetUserID(ctx)
 
 	params := &publicBiz.PurchaseParams{
-		TenantID:    tenantID,
 		UserID:      userID,
-		SubscribeID: req.SubscribeId,
-		Quantity:    req.Quantity,
+		SubscribeID: parseInt64(req.SubscribeId),
+		Quantity:    int64(req.Quantity),
 		Coupon:      req.Coupon,
-		Payment:     req.Payment,
+		Payment:     int64(req.Payment),
 	}
 
 	result, err := s.uc.Purchase(ctx, params)
@@ -153,14 +156,12 @@ func (s *PublicOrderService) Purchase(ctx context.Context, req *pb.PurchaseReque
 // Recharge creates a recharge order
 func (s *PublicOrderService) Recharge(ctx context.Context, req *pb.RechargeRequest) (*pb.RechargeReply, error) {
 	// Get tenant ID and user ID from context
-	tenantID := int64(0) // 默认租户ID，与原项目保持一致
 	userID := middleware.GetUserID(ctx)
 
 	params := &publicBiz.RechargeParams{
-		TenantID: tenantID,
-		UserID:   userID,
-		Amount:   req.Amount,
-		Payment:  req.Payment,
+		UserID:  userID,
+		Amount:  parseInt64(req.Amount),
+		Payment: int64(req.Payment),
 	}
 
 	result, err := s.uc.Recharge(ctx, params)
@@ -180,16 +181,14 @@ func (s *PublicOrderService) Recharge(ctx context.Context, req *pb.RechargeReque
 // Renewal creates a renewal order
 func (s *PublicOrderService) Renewal(ctx context.Context, req *pb.RenewalRequest) (*pb.RenewalReply, error) {
 	// Get tenant ID and user ID from context
-	tenantID := int64(0) // 默认租户ID，与原项目保持一致
 	userID := middleware.GetUserID(ctx)
 
 	params := &publicBiz.RenewalParams{
-		TenantID:        tenantID,
 		UserID:          userID,
-		UserSubscribeID: req.UserSubscribeId,
-		Quantity:        req.Quantity,
+		UserSubscribeID: int64(req.UserSubscribeId),
+		Quantity:        int64(req.Quantity),
 		Coupon:          req.Coupon,
-		Payment:         req.Payment,
+		Payment:         int64(req.Payment),
 	}
 
 	result, err := s.uc.Renewal(ctx, params)
@@ -209,14 +208,12 @@ func (s *PublicOrderService) Renewal(ctx context.Context, req *pb.RenewalRequest
 // ResetTraffic creates a reset traffic order
 func (s *PublicOrderService) ResetTraffic(ctx context.Context, req *pb.ResetTrafficRequest) (*pb.TrafficResetReply, error) {
 	// Get tenant ID and user ID from context
-	tenantID := int64(0) // 默认租户ID，与原项目保持一致
 	userID := middleware.GetUserID(ctx)
 
 	params := &publicBiz.ResetTrafficParams{
-		TenantID:        tenantID,
 		UserID:          userID,
-		UserSubscribeID: req.UserSubscribeId,
-		Payment:         req.Payment,
+		UserSubscribeID: int64(req.UserSubscribeId),
+		Payment:         int64(req.Payment),
 	}
 
 	result, err := s.uc.ResetTraffic(ctx, params)
@@ -239,14 +236,14 @@ func (s *PublicOrderService) convertToProtoOrderDetail(order *publicBiz.OrderDet
 	var payment *pb.PaymentMethod
 	if order.Payment != nil {
 		payment = &pb.PaymentMethod{
-			Id:          order.Payment.ID,
+			Id:          strconv.FormatInt(order.Payment.ID, 10),
 			Name:        order.Payment.Name,
 			Platform:    order.Payment.Platform,
 			Description: order.Payment.Description,
 			Icon:        order.Payment.Icon,
 			FeeMode:     order.Payment.FeeMode,
-			FeePercent:  order.Payment.FeePercent,
-			FeeAmount:   order.Payment.FeeAmount,
+			FeePercent:  strconv.FormatInt(order.Payment.FeePercent, 10),
+			FeeAmount:   strconv.FormatInt(order.Payment.FeeAmount, 10),
 		}
 	}
 
@@ -257,63 +254,75 @@ func (s *PublicOrderService) convertToProtoOrderDetail(order *publicBiz.OrderDet
 		var discounts []*pb.SubscribeDiscount
 		for _, d := range order.Subscribe.Discount {
 			discounts = append(discounts, &pb.SubscribeDiscount{
-				Quantity: d.Quantity,
-				Discount: d.Discount,
+				Quantity: int32(d.Quantity),
+				Discount: strconv.FormatInt(d.Discount, 10),
 			})
 		}
 
 		subscribe = &pb.Subscribe{
-			Id:             order.Subscribe.ID,
+			Id:             strconv.FormatInt(order.Subscribe.ID, 10),
 			Name:           order.Subscribe.Name,
 			Language:       order.Subscribe.Language,
 			Description:    order.Subscribe.Description,
-			UnitPrice:      order.Subscribe.UnitPrice,
+			UnitPrice:      strconv.FormatInt(order.Subscribe.UnitPrice, 10),
 			UnitTime:       order.Subscribe.UnitTime,
 			Discount:       discounts,
-			Replacement:    order.Subscribe.Replacement,
-			Inventory:      order.Subscribe.Inventory,
-			Traffic:        order.Subscribe.Traffic,
-			SpeedLimit:     order.Subscribe.SpeedLimit,
-			DeviceLimit:    order.Subscribe.DeviceLimit,
-			Quota:          order.Subscribe.Quota,
-			Nodes:          order.Subscribe.Nodes,
+			Replacement:    strconv.FormatInt(order.Subscribe.Replacement, 10),
+			Inventory:      strconv.FormatInt(order.Subscribe.Inventory, 10),
+			Traffic:        strconv.FormatInt(order.Subscribe.Traffic, 10),
+			SpeedLimit:     strconv.FormatInt(order.Subscribe.SpeedLimit, 10),
+			DeviceLimit:    strconv.FormatInt(order.Subscribe.DeviceLimit, 10),
+			Quota:          strconv.FormatInt(order.Subscribe.Quota, 10),
+			Nodes:          convertIntSliceToInt32Slice(order.Subscribe.Nodes),
 			NodeTags:       order.Subscribe.NodeTags,
 			Show:           order.Subscribe.Show,
 			Sell:           order.Subscribe.Sell,
-			Sort:           order.Subscribe.Sort,
-			DeductionRatio: order.Subscribe.DeductionRatio,
+			Sort:           strconv.FormatInt(order.Subscribe.Sort, 10),
+			DeductionRatio: strconv.FormatInt(order.Subscribe.DeductionRatio, 10),
 			AllowDeduction: order.Subscribe.AllowDeduction,
 		}
 	}
 
 	return &pb.OrderDetail{
-		Id:             order.ID,
-		ParentId:       order.ParentID,
-		UserId:         order.UserID,
+		Id:             strconv.FormatInt(order.ID, 10),
+		ParentId:       strconv.FormatInt(order.ParentID, 10),
+		UserId:         strconv.FormatInt(order.UserID, 10),
 		OrderNo:        order.OrderNo,
 		Type:           order.Type,
-		Quantity:       order.Quantity,
-		Price:          order.Price,
-		Amount:         order.Amount,
-		GiftAmount:     order.GiftAmount,
-		Discount:       order.Discount,
+		Quantity:       int32(order.Quantity),
+		Price:          strconv.FormatInt(order.Price, 10),
+		Amount:         strconv.FormatInt(order.Amount, 10),
+		GiftAmount:     strconv.FormatInt(order.GiftAmount, 10),
+		Discount:       strconv.FormatInt(order.Discount, 10),
 		Coupon:         order.Coupon,
-		CouponDiscount: order.CouponDiscount,
-		Commission:     0, // Prevent commission amount leakage (set to 0 for public API)
+		CouponDiscount: strconv.FormatInt(order.CouponDiscount, 10),
+		Commission:     "0", // Prevent commission amount leakage (set to 0 for public API)
 		Payment:        payment,
 		Method:         order.Method,
-		FeeAmount:      order.FeeAmount,
+		FeeAmount:      strconv.FormatInt(order.FeeAmount, 10),
 		TradeNo:        order.TradeNo,
 		Status:         order.Status,
-		SubscribeId:    order.SubscribeID,
+		SubscribeId:    strconv.FormatInt(order.SubscribeID, 10),
 		SubscribeToken: order.SubscribeToken,
 		IsNew:          order.IsNew,
-		CreatedAt:      order.CreatedAt,
-		UpdatedAt:      order.UpdatedAt,
+		CreatedAt:      strconv.FormatInt(order.CreatedAt, 10),
+		UpdatedAt:      strconv.FormatInt(order.UpdatedAt, 10),
 		Subscribe:      subscribe,
 		SubscribeName:  order.SubscribeName,
 		PaymentName:    order.PaymentName,
 		StatusText:     order.StatusText,
 		TypeText:       order.TypeText,
 	}
+}
+
+// convertIntSliceToInt32Slice converts []int to []int32
+func convertIntSliceToInt32Slice(input []int) []int32 {
+	if input == nil {
+		return nil
+	}
+	result := make([]int32, len(input))
+	for i, v := range input {
+		result[i] = int32(v)
+	}
+	return result
 }

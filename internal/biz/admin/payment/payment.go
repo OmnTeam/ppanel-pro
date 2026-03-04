@@ -13,7 +13,6 @@ import (
 // PaymentMethod 支付方式模型
 type PaymentMethod struct {
 	ID          int64
-	TenantID    int64
 	Name        string
 	Platform    string
 	Description string
@@ -35,11 +34,11 @@ type PaymentRepo interface {
 	// Update 更新支付方式
 	Update(ctx context.Context, method *PaymentMethod) (*PaymentMethod, error)
 	// Delete 删除支付方式
-	Delete(ctx context.Context, id int64) error
+	Delete(ctx context.Context, id int) error
 	// Get 获取支付方式详情
-	Get(ctx context.Context, id int64) (*PaymentMethod, error)
+	Get(ctx context.Context, id int) (*PaymentMethod, error)
 	// List 获取支付方式列表
-	List(ctx context.Context, page, size int64, platform, search string, enable *bool) (int64, []*PaymentMethod, error)
+	List(ctx context.Context, page, size int, platform, search string, enable *bool) (int64, []*PaymentMethod, error)
 }
 
 // PaymentUsecase 支付方式用例
@@ -86,7 +85,7 @@ func (uc *PaymentUsecase) CreatePaymentMethod(ctx context.Context, name, platfor
 }
 
 // UpdatePaymentMethod 更新支付方式
-func (uc *PaymentUsecase) UpdatePaymentMethod(ctx context.Context, id int64, name, platform, description, icon, domain, config string, feeMode int32, feePercent, feeAmount int64, enable *bool) (*PaymentMethod, error) {
+func (uc *PaymentUsecase) UpdatePaymentMethod(ctx context.Context, id int, name, platform, description, icon, domain, config string, feeMode int32, feePercent, feeAmount int64, enable *bool) (*PaymentMethod, error) {
 	// 验证支付平台是否支持
 	if payment.ParsePlatform(platform) == payment.UNSUPPORTED {
 		return nil, responsecode.NewUnsupportedPlatformError()
@@ -99,7 +98,7 @@ func (uc *PaymentUsecase) UpdatePaymentMethod(ctx context.Context, id int64, nam
 	}
 
 	method := &PaymentMethod{
-		ID:          id,
+		ID:          int64(id),
 		Name:        name,
 		Platform:    platform,
 		Description: description,
@@ -122,7 +121,7 @@ func (uc *PaymentUsecase) UpdatePaymentMethod(ctx context.Context, id int64, nam
 }
 
 // DeletePaymentMethod 删除支付方式
-func (uc *PaymentUsecase) DeletePaymentMethod(ctx context.Context, id int64) error {
+func (uc *PaymentUsecase) DeletePaymentMethod(ctx context.Context, id int) error {
 	// 先验证支付方式是否存在
 	_, err := uc.repo.Get(ctx, id)
 	if err != nil {
@@ -133,7 +132,7 @@ func (uc *PaymentUsecase) DeletePaymentMethod(ctx context.Context, id int64) err
 }
 
 // GetPaymentMethodList 获取支付方式列表
-func (uc *PaymentUsecase) GetPaymentMethodList(ctx context.Context, page, size int64, platform, search string, enable *bool) (int64, []*PaymentMethod, error) {
+func (uc *PaymentUsecase) GetPaymentMethodList(ctx context.Context, page, size int, platform, search string, enable *bool) (int64, []*PaymentMethod, error) {
 	return uc.repo.List(ctx, page, size, platform, search, enable)
 }
 

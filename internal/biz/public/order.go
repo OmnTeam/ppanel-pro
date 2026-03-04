@@ -9,13 +9,13 @@ import (
 // OrderRepo is the interface for order data access
 type OrderRepo interface {
 	// CloseOrder closes an order
-	CloseOrder(ctx context.Context, userID int64, orderNo string) error
+	CloseOrder(ctx context.Context, userID int, orderNo string) error
 
 	// QueryOrderDetail queries order detail
-	QueryOrderDetail(ctx context.Context, userID int64, orderNo string) (*OrderDetail, error)
+	QueryOrderDetail(ctx context.Context, userID int, orderNo string) (*OrderDetail, error)
 
 	// QueryOrderList queries order list
-	QueryOrderList(ctx context.Context, userID int64, page, size int64, status, orderType int32) ([]*OrderDetail, int64, error)
+	QueryOrderList(ctx context.Context, userID int, page, size int, status, orderType int32) ([]*OrderDetail, int64, error)
 
 	// PreCreateOrder validates and calculates order price
 	PreCreateOrder(ctx context.Context, req *PreCreateOrderParams) (*PreCreateOrderResult, error)
@@ -66,7 +66,7 @@ type Subscribe struct {
 	SpeedLimit     int64
 	DeviceLimit    int64
 	Quota          int64
-	Nodes          []int64
+	Nodes          []int
 	NodeTags       []string
 	Show           bool
 	Sell           bool
@@ -110,7 +110,6 @@ type OrderDetail struct {
 
 // PreCreateOrderParams represents pre-create order parameters
 type PreCreateOrderParams struct {
-	TenantID         int64
 	UserID           int64
 	Type             int32
 	SubscribeID      int64
@@ -135,7 +134,6 @@ type PreCreateOrderResult struct {
 
 // PurchaseParams represents purchase parameters
 type PurchaseParams struct {
-	TenantID    int64
 	UserID      int64
 	SubscribeID int64
 	Quantity    int64
@@ -145,15 +143,13 @@ type PurchaseParams struct {
 
 // RechargeParams represents recharge parameters
 type RechargeParams struct {
-	TenantID int64
-	UserID   int64
-	Amount   int64
-	Payment  int64
+	UserID  int64
+	Amount  int64
+	Payment int64
 }
 
 // RenewalParams represents renewal parameters
 type RenewalParams struct {
-	TenantID        int64
 	UserID          int64
 	UserSubscribeID int64
 	Quantity        int64
@@ -163,7 +159,6 @@ type RenewalParams struct {
 
 // ResetTrafficParams represents reset traffic parameters
 type ResetTrafficParams struct {
-	TenantID        int64
 	UserID          int64
 	UserSubscribeID int64
 	Payment         int64
@@ -193,17 +188,17 @@ func NewOrderUsecase(repo OrderRepo, logger log.Logger) *OrderUsecase {
 }
 
 // CloseOrder closes an order
-func (uc *OrderUsecase) CloseOrder(ctx context.Context, userID int64, orderNo string) error {
+func (uc *OrderUsecase) CloseOrder(ctx context.Context, userID int, orderNo string) error {
 	return uc.repo.CloseOrder(ctx, userID, orderNo)
 }
 
 // QueryOrderDetail queries order detail
-func (uc *OrderUsecase) QueryOrderDetail(ctx context.Context, userID int64, orderNo string) (*OrderDetail, error) {
+func (uc *OrderUsecase) QueryOrderDetail(ctx context.Context, userID int, orderNo string) (*OrderDetail, error) {
 	return uc.repo.QueryOrderDetail(ctx, userID, orderNo)
 }
 
 // QueryOrderList queries order list
-func (uc *OrderUsecase) QueryOrderList(ctx context.Context, userID int64, page, size int64, status, orderType int32) ([]*OrderDetail, int64, error) {
+func (uc *OrderUsecase) QueryOrderList(ctx context.Context, userID int, page, size int, status, orderType int32) ([]*OrderDetail, int64, error) {
 	return uc.repo.QueryOrderList(ctx, userID, page, size, status, orderType)
 }
 

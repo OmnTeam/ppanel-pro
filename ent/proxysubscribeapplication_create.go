@@ -20,6 +20,20 @@ type ProxySubscribeApplicationCreate struct {
 	hooks    []Hook
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_c *ProxySubscribeApplicationCreate) SetTenantID(v int64) *ProxySubscribeApplicationCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_c *ProxySubscribeApplicationCreate) SetNillableTenantID(v *int64) *ProxySubscribeApplicationCreate {
+	if v != nil {
+		_c.SetTenantID(*v)
+	}
+	return _c
+}
+
 // SetName sets the "name" field.
 func (_c *ProxySubscribeApplicationCreate) SetName(v string) *ProxySubscribeApplicationCreate {
 	_c.mutation.SetName(v)
@@ -143,7 +157,7 @@ func (_c *ProxySubscribeApplicationCreate) SetNillableUpdatedAt(v *time.Time) *P
 }
 
 // SetID sets the "id" field.
-func (_c *ProxySubscribeApplicationCreate) SetID(v int) *ProxySubscribeApplicationCreate {
+func (_c *ProxySubscribeApplicationCreate) SetID(v int64) *ProxySubscribeApplicationCreate {
 	_c.mutation.SetID(v)
 	return _c
 }
@@ -183,6 +197,10 @@ func (_c *ProxySubscribeApplicationCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxySubscribeApplicationCreate) defaults() {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		v := proxysubscribeapplication.DefaultTenantID
+		_c.mutation.SetTenantID(v)
+	}
 	if _, ok := _c.mutation.IsDefault(); !ok {
 		v := proxysubscribeapplication.DefaultIsDefault
 		_c.mutation.SetIsDefault(v)
@@ -203,6 +221,9 @@ func (_c *ProxySubscribeApplicationCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ProxySubscribeApplicationCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "ProxySubscribeApplication.tenant_id"`)}
+	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "ProxySubscribeApplication.name"`)}
 	}
@@ -278,7 +299,7 @@ func (_c *ProxySubscribeApplicationCreate) sqlSave(ctx context.Context) (*ProxyS
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = int64(id)
 	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
@@ -288,11 +309,15 @@ func (_c *ProxySubscribeApplicationCreate) sqlSave(ctx context.Context) (*ProxyS
 func (_c *ProxySubscribeApplicationCreate) createSpec() (*ProxySubscribeApplication, *sqlgraph.CreateSpec) {
 	var (
 		_node = &ProxySubscribeApplication{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(proxysubscribeapplication.Table, sqlgraph.NewFieldSpec(proxysubscribeapplication.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(proxysubscribeapplication.Table, sqlgraph.NewFieldSpec(proxysubscribeapplication.FieldID, field.TypeInt64))
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
+	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(proxysubscribeapplication.FieldTenantID, field.TypeInt64, value)
+		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(proxysubscribeapplication.FieldName, field.TypeString, value)
@@ -388,7 +413,7 @@ func (_c *ProxySubscribeApplicationCreateBulk) Save(ctx context.Context) ([]*Pro
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

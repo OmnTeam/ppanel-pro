@@ -77,7 +77,7 @@ func (_c *ProxySubscribeGroupCreate) SetNillableUpdatedAt(v *time.Time) *ProxySu
 }
 
 // SetID sets the "id" field.
-func (_c *ProxySubscribeGroupCreate) SetID(v int) *ProxySubscribeGroupCreate {
+func (_c *ProxySubscribeGroupCreate) SetID(v int64) *ProxySubscribeGroupCreate {
 	_c.mutation.SetID(v)
 	return _c
 }
@@ -168,7 +168,7 @@ func (_c *ProxySubscribeGroupCreate) sqlSave(ctx context.Context) (*ProxySubscri
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = int64(id)
 	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
@@ -178,7 +178,7 @@ func (_c *ProxySubscribeGroupCreate) sqlSave(ctx context.Context) (*ProxySubscri
 func (_c *ProxySubscribeGroupCreate) createSpec() (*ProxySubscribeGroup, *sqlgraph.CreateSpec) {
 	var (
 		_node = &ProxySubscribeGroup{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(proxysubscribegroup.Table, sqlgraph.NewFieldSpec(proxysubscribegroup.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(proxysubscribegroup.Table, sqlgraph.NewFieldSpec(proxysubscribegroup.FieldID, field.TypeInt64))
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
@@ -250,7 +250,7 @@ func (_c *ProxySubscribeGroupCreateBulk) Save(ctx context.Context) ([]*ProxySubs
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

@@ -27,7 +27,7 @@ func (ProxyDocument) Annotations() []schema.Annotation {
 // Fields of the ProxyDocument
 func (ProxyDocument) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Comment("文档ID"),
 		field.String("title").
 			MaxLen(255).

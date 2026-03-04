@@ -92,14 +92,14 @@ func (_u *ProxyNodeUpdate) SetNillableAddress(v *string) *ProxyNodeUpdate {
 }
 
 // SetServerID sets the "server_id" field.
-func (_u *ProxyNodeUpdate) SetServerID(v int) *ProxyNodeUpdate {
+func (_u *ProxyNodeUpdate) SetServerID(v int64) *ProxyNodeUpdate {
 	_u.mutation.ResetServerID()
 	_u.mutation.SetServerID(v)
 	return _u
 }
 
 // SetNillableServerID sets the "server_id" field if the given value is not nil.
-func (_u *ProxyNodeUpdate) SetNillableServerID(v *int) *ProxyNodeUpdate {
+func (_u *ProxyNodeUpdate) SetNillableServerID(v *int64) *ProxyNodeUpdate {
 	if v != nil {
 		_u.SetServerID(*v)
 	}
@@ -107,7 +107,7 @@ func (_u *ProxyNodeUpdate) SetNillableServerID(v *int) *ProxyNodeUpdate {
 }
 
 // AddServerID adds value to the "server_id" field.
-func (_u *ProxyNodeUpdate) AddServerID(v int) *ProxyNodeUpdate {
+func (_u *ProxyNodeUpdate) AddServerID(v int64) *ProxyNodeUpdate {
 	_u.mutation.AddServerID(v)
 	return _u
 }
@@ -158,6 +158,47 @@ func (_u *ProxyNodeUpdate) SetNillableSort(v *int) *ProxyNodeUpdate {
 // AddSort adds value to the "sort" field.
 func (_u *ProxyNodeUpdate) AddSort(v int) *ProxyNodeUpdate {
 	_u.mutation.AddSort(v)
+	return _u
+}
+
+// SetGroupID sets the "group_id" field.
+func (_u *ProxyNodeUpdate) SetGroupID(v int64) *ProxyNodeUpdate {
+	_u.mutation.ResetGroupID()
+	_u.mutation.SetGroupID(v)
+	return _u
+}
+
+// SetNillableGroupID sets the "group_id" field if the given value is not nil.
+func (_u *ProxyNodeUpdate) SetNillableGroupID(v *int64) *ProxyNodeUpdate {
+	if v != nil {
+		_u.SetGroupID(*v)
+	}
+	return _u
+}
+
+// AddGroupID adds value to the "group_id" field.
+func (_u *ProxyNodeUpdate) AddGroupID(v int64) *ProxyNodeUpdate {
+	_u.mutation.AddGroupID(v)
+	return _u
+}
+
+// ClearGroupID clears the value of the "group_id" field.
+func (_u *ProxyNodeUpdate) ClearGroupID() *ProxyNodeUpdate {
+	_u.mutation.ClearGroupID()
+	return _u
+}
+
+// SetGroupLocked sets the "group_locked" field.
+func (_u *ProxyNodeUpdate) SetGroupLocked(v bool) *ProxyNodeUpdate {
+	_u.mutation.SetGroupLocked(v)
+	return _u
+}
+
+// SetNillableGroupLocked sets the "group_locked" field if the given value is not nil.
+func (_u *ProxyNodeUpdate) SetNillableGroupLocked(v *bool) *ProxyNodeUpdate {
+	if v != nil {
+		_u.SetGroupLocked(*v)
+	}
 	return _u
 }
 
@@ -263,7 +304,7 @@ func (_u *ProxyNodeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxynode.Table, proxynode.Columns, sqlgraph.NewFieldSpec(proxynode.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxynode.Table, proxynode.Columns, sqlgraph.NewFieldSpec(proxynode.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -287,10 +328,10 @@ func (_u *ProxyNodeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.SetField(proxynode.FieldAddress, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.ServerID(); ok {
-		_spec.SetField(proxynode.FieldServerID, field.TypeInt, value)
+		_spec.SetField(proxynode.FieldServerID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedServerID(); ok {
-		_spec.AddField(proxynode.FieldServerID, field.TypeInt, value)
+		_spec.AddField(proxynode.FieldServerID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Protocol(); ok {
 		_spec.SetField(proxynode.FieldProtocol, field.TypeString, value)
@@ -303,6 +344,18 @@ func (_u *ProxyNodeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
 		_spec.AddField(proxynode.FieldSort, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.GroupID(); ok {
+		_spec.SetField(proxynode.FieldGroupID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedGroupID(); ok {
+		_spec.AddField(proxynode.FieldGroupID, field.TypeInt64, value)
+	}
+	if _u.mutation.GroupIDCleared() {
+		_spec.ClearField(proxynode.FieldGroupID, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.GroupLocked(); ok {
+		_spec.SetField(proxynode.FieldGroupLocked, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxynode.FieldCreatedAt, field.TypeTime, value)
@@ -400,14 +453,14 @@ func (_u *ProxyNodeUpdateOne) SetNillableAddress(v *string) *ProxyNodeUpdateOne 
 }
 
 // SetServerID sets the "server_id" field.
-func (_u *ProxyNodeUpdateOne) SetServerID(v int) *ProxyNodeUpdateOne {
+func (_u *ProxyNodeUpdateOne) SetServerID(v int64) *ProxyNodeUpdateOne {
 	_u.mutation.ResetServerID()
 	_u.mutation.SetServerID(v)
 	return _u
 }
 
 // SetNillableServerID sets the "server_id" field if the given value is not nil.
-func (_u *ProxyNodeUpdateOne) SetNillableServerID(v *int) *ProxyNodeUpdateOne {
+func (_u *ProxyNodeUpdateOne) SetNillableServerID(v *int64) *ProxyNodeUpdateOne {
 	if v != nil {
 		_u.SetServerID(*v)
 	}
@@ -415,7 +468,7 @@ func (_u *ProxyNodeUpdateOne) SetNillableServerID(v *int) *ProxyNodeUpdateOne {
 }
 
 // AddServerID adds value to the "server_id" field.
-func (_u *ProxyNodeUpdateOne) AddServerID(v int) *ProxyNodeUpdateOne {
+func (_u *ProxyNodeUpdateOne) AddServerID(v int64) *ProxyNodeUpdateOne {
 	_u.mutation.AddServerID(v)
 	return _u
 }
@@ -466,6 +519,47 @@ func (_u *ProxyNodeUpdateOne) SetNillableSort(v *int) *ProxyNodeUpdateOne {
 // AddSort adds value to the "sort" field.
 func (_u *ProxyNodeUpdateOne) AddSort(v int) *ProxyNodeUpdateOne {
 	_u.mutation.AddSort(v)
+	return _u
+}
+
+// SetGroupID sets the "group_id" field.
+func (_u *ProxyNodeUpdateOne) SetGroupID(v int64) *ProxyNodeUpdateOne {
+	_u.mutation.ResetGroupID()
+	_u.mutation.SetGroupID(v)
+	return _u
+}
+
+// SetNillableGroupID sets the "group_id" field if the given value is not nil.
+func (_u *ProxyNodeUpdateOne) SetNillableGroupID(v *int64) *ProxyNodeUpdateOne {
+	if v != nil {
+		_u.SetGroupID(*v)
+	}
+	return _u
+}
+
+// AddGroupID adds value to the "group_id" field.
+func (_u *ProxyNodeUpdateOne) AddGroupID(v int64) *ProxyNodeUpdateOne {
+	_u.mutation.AddGroupID(v)
+	return _u
+}
+
+// ClearGroupID clears the value of the "group_id" field.
+func (_u *ProxyNodeUpdateOne) ClearGroupID() *ProxyNodeUpdateOne {
+	_u.mutation.ClearGroupID()
+	return _u
+}
+
+// SetGroupLocked sets the "group_locked" field.
+func (_u *ProxyNodeUpdateOne) SetGroupLocked(v bool) *ProxyNodeUpdateOne {
+	_u.mutation.SetGroupLocked(v)
+	return _u
+}
+
+// SetNillableGroupLocked sets the "group_locked" field if the given value is not nil.
+func (_u *ProxyNodeUpdateOne) SetNillableGroupLocked(v *bool) *ProxyNodeUpdateOne {
+	if v != nil {
+		_u.SetGroupLocked(*v)
+	}
 	return _u
 }
 
@@ -584,7 +678,7 @@ func (_u *ProxyNodeUpdateOne) sqlSave(ctx context.Context) (_node *ProxyNode, er
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxynode.Table, proxynode.Columns, sqlgraph.NewFieldSpec(proxynode.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxynode.Table, proxynode.Columns, sqlgraph.NewFieldSpec(proxynode.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProxyNode.id" for update`)}
@@ -625,10 +719,10 @@ func (_u *ProxyNodeUpdateOne) sqlSave(ctx context.Context) (_node *ProxyNode, er
 		_spec.SetField(proxynode.FieldAddress, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.ServerID(); ok {
-		_spec.SetField(proxynode.FieldServerID, field.TypeInt, value)
+		_spec.SetField(proxynode.FieldServerID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedServerID(); ok {
-		_spec.AddField(proxynode.FieldServerID, field.TypeInt, value)
+		_spec.AddField(proxynode.FieldServerID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Protocol(); ok {
 		_spec.SetField(proxynode.FieldProtocol, field.TypeString, value)
@@ -641,6 +735,18 @@ func (_u *ProxyNodeUpdateOne) sqlSave(ctx context.Context) (_node *ProxyNode, er
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
 		_spec.AddField(proxynode.FieldSort, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.GroupID(); ok {
+		_spec.SetField(proxynode.FieldGroupID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedGroupID(); ok {
+		_spec.AddField(proxynode.FieldGroupID, field.TypeInt64, value)
+	}
+	if _u.mutation.GroupIDCleared() {
+		_spec.ClearField(proxynode.FieldGroupID, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.GroupLocked(); ok {
+		_spec.SetField(proxynode.FieldGroupLocked, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxynode.FieldCreatedAt, field.TypeTime, value)

@@ -50,20 +50,19 @@ service PaymentService {
 
 // 支付方式信息
 message PaymentMethod {
-  int64 id = 1;
-  int64 tenant_id = 2;
-  string name = 3;
-  string platform = 4;
-  string description = 5;
-  string icon = 6;
-  string domain = 7;
-  google.protobuf.Struct config = 8;
-  int32 fee_mode = 9;
-  int64 fee_percent = 10;
-  int64 fee_amount = 11;
-  bool enable = 12;
-  string notify_url = 13;
-  string token = 14;
+string id = 1;
+  string name = 2;
+  string platform = 3;
+  string description = 4;
+  string icon = 5;
+  string domain = 6;
+  google.protobuf.Struct config = 7;
+  int32 fee_mode = 8;
+string fee_percent = 9;
+string fee_amount = 10;
+  bool enable = 11;
+  string notify_url = 12;
+  string token = 13;
 }
 
 // 支付平台信息 - 完全复刻原项目 server-master/internal/types/types.go:PlatformInfo
@@ -75,7 +74,21 @@ message PaymentPlatform {
 
 // 创建支付方式请求
 message CreatePaymentMethodRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  string name = 1 [(validate.rules).string.min_len = 1];
+  string platform = 2 [(validate.rules).string.min_len = 1];
+  string description = 3;
+  string icon = 4;
+  string domain = 5;
+  google.protobuf.Struct config = 6;
+  int32 fee_mode = 7;
+string fee_percent = 8;
+string fee_amount = 9;
+  optional bool enable = 10;
+}
+
+// 更新支付方式请求
+message UpdatePaymentMethodRequest {
+string id = 1;
   string name = 2 [(validate.rules).string.min_len = 1];
   string platform = 3 [(validate.rules).string.min_len = 1];
   string description = 4;
@@ -83,46 +96,27 @@ message CreatePaymentMethodRequest {
   string domain = 6;
   google.protobuf.Struct config = 7;
   int32 fee_mode = 8;
-  int64 fee_percent = 9;
-  int64 fee_amount = 10;
+string fee_percent = 9;
+string fee_amount = 10;
   optional bool enable = 11;
-}
-
-// 更新支付方式请求
-message UpdatePaymentMethodRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
-  int64 id = 2 [(validate.rules).int64.gt = 0];
-  string name = 3 [(validate.rules).string.min_len = 1];
-  string platform = 4 [(validate.rules).string.min_len = 1];
-  string description = 5;
-  string icon = 6;
-  string domain = 7;
-  google.protobuf.Struct config = 8;
-  int32 fee_mode = 9;
-  int64 fee_percent = 10;
-  int64 fee_amount = 11;
-  optional bool enable = 12;
 }
 
 // 删除支付方式请求
 message DeletePaymentMethodRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
-  int64 id = 2 [(validate.rules).int64.gt = 0];
+  string id = 1;
 }
 
 // 获取支付方式列表请求
 message GetPaymentMethodListRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
-  int64 page = 2 [(validate.rules).int64.gt = 0];
-  int64 size = 3 [(validate.rules).int64.gt = 0];
-  string platform = 4;
-  string search = 5;
-  optional bool enable = 6;
+  int32 page = 1;
+  int32 size = 2;
+  string platform = 3;
+  string search = 4;
+  optional bool enable = 5;
 }
 
 // 获取支付平台请求
 message GetPaymentPlatformRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
 }
 
 // 创建支付方式响应
@@ -148,7 +142,7 @@ message DeletePaymentMethodReply {
 
 // 获取支付方式列表数据
 message GetPaymentMethodListData {
-  int64 total = 1;
+  int32 total = 1;
   repeated PaymentMethod list = 2;
 }
 

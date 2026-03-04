@@ -7,8 +7,8 @@ option go_package = "github.com/OmnTeam/ppanel-pro/api/public/payment/v1;v1";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-// Public Payment service
-// 公共支付服务（需要认证）
+// Payment service
+// 支付服务（包含回调接口，不需要认证）
 service Payment {
   // GetAvailablePaymentMethods 获取可用支付方式
   rpc GetAvailablePaymentMethods (google.protobuf.Empty) returns (PaymentMethodsReply) {
@@ -16,7 +16,32 @@ service Payment {
       get: "/v1/public/payment/methods"
     };
   }
+
+  // AlipayNotify 支付宝回调
+  rpc AlipayNotify (AlipayNotifyRequest) returns (AlipayNotifyReply) {
+    option (google.api.http) = {
+      post: "/v1/payment/{token}/alipay/notify"
+    };
+  }
+
+  // EPayNotify 易支付回调
+  rpc EPayNotify (EPayNotifyRequest) returns (EPayNotifyReply) {
+    option (google.api.http) = {
+      post: "/v1/payment/{token}/epay/notify"
+    };
+  }
+
+  // StripeNotify Stripe回调
+  rpc StripeNotify (StripeNotifyRequest) returns (StripeNotifyReply) {
+    option (google.api.http) = {
+      post: "/v1/payment/{token}/stripe/notify"
+    };
+  }
 }
+
+// ============================================================================
+// GetAvailablePaymentMethods - 获取可用支付方式
+// ============================================================================
 
 // PaymentMethodsData 支付方式数据
 message PaymentMethodsData {
@@ -32,12 +57,87 @@ message PaymentMethodsReply {
 
 // PaymentMethod 支付方式
 message PaymentMethod {
-  int64 id = 1;
+  string id = 1;
   string name = 2;
   string platform = 3;
   string description = 4;
   string icon = 5;
   int32 fee_mode = 6;
-  int64 fee_percent = 7;
-  int64 fee_amount = 8;
+  string fee_percent = 7;
+  string fee_amount = 8;
+}
+
+// ============================================================================
+// AlipayNotify - 支付宝回调
+// ============================================================================
+
+// AlipayNotifyRequest 支付宝回调请求
+message AlipayNotifyRequest {
+  string token = 1;              // 支付配置token (从URL路径提取)
+  string trade_no = 2;           // 商户订单号
+  string out_trade_no = 3;       // 商户订单号
+  string trade_status = 4;       // 交易状态
+  string total_amount = 5;       // 交易金额
+  string receipt_amount = 6;     // 实收金额
+  string buyer_pay_amount = 7;   // 买家付款金额
+  string subject = 8;            // 订单标题
+  string body = 9;               // 订单描述
+  string gmt_create = 10;        // 交易创建时间
+  string gmt_payment = 11;       // 交易付款时间
+  string notify_time = 12;       // 通知时间
+  string app_id = 13;            // 应用ID
+  string seller_id = 14;         // 卖家ID
+  string seller_email = 15;      // 卖家邮箱
+  string notify_type = 16;       // 通知类型
+  string auth_app_id = 17;       // 授权应用ID
+  string charset = 18;           // 编码格式
+  string version = 19;           // 调用的接口版本
+  string sign = 20;              // 签名
+  map<string, string> extra_params = 21;  // 额外参数
+}
+
+// AlipayNotifyReply 支付宝回调响应
+message AlipayNotifyReply {
+  string response = 1;  // 响应内容（"success" 或 "failure"）
+}
+
+// ============================================================================
+// EPayNotify - 易支付回调
+// ============================================================================
+
+// EPayNotifyRequest 易支付回调请求
+message EPayNotifyRequest {
+  string token = 1;             // 支付配置token (从URL路径提取)
+  string pid = 2;               // 商户ID
+  string trade_no = 3;          // 商户订单号
+  string out_trade_no = 4;      // 商户订单号
+  string type = 5;              // 支付方式（alipay, wxpay等）
+  string name = 6;              // 商品名称
+  string money = 7;             // 交易金额
+  string trade_status = 8;      // 交易状态
+  string param = 9;             // 自定义参数
+  string sign = 10;             // 签名
+  map<string, string> extra_params = 11;  // 额外参数
+}
+
+// EPayNotifyReply 易支付回调响应
+message EPayNotifyReply {
+  string response = 1;  // 响应内容（"success" 或 "failure"）
+}
+
+// ============================================================================
+// StripeNotify - Stripe回调
+// ============================================================================
+
+// StripeNotifyRequest Stripe回调请求
+message StripeNotifyRequest {
+  string token = 1;             // 支付配置token (从URL路径提取)
+  bytes payload = 2;            // 回调载荷（JSON）
+  string stripe_signature = 3;  // Stripe签名（Stripe-Signature头）
+}
+
+// StripeNotifyReply Stripe回调响应
+message StripeNotifyReply {
+  int32 code = 1;             // 状态码
+  string message = 2;         // 消息内容
 }

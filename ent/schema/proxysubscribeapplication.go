@@ -26,9 +26,12 @@ func (ProxySubscribeApplication) Annotations() []schema.Annotation {
 // Fields of the ProxySubscribeApplication
 func (ProxySubscribeApplication) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Positive().
 			Comment("应用配置ID"),
+		field.Int64("tenant_id").
+			Default(0).
+			Comment("租户ID"),
 		field.String("name").
 			MaxLen(255).
 			NotEmpty().

@@ -29,11 +29,11 @@ func NewAnnouncementService(uc *announcementbiz.AnnouncementUsecase, logger log.
 // CreateAnnouncement 创建公告
 func (s *AnnouncementService) CreateAnnouncement(ctx context.Context, req *v1.CreateAnnouncementRequest) (*v1.AnnouncementReply, error) {
 	announcement := &announcementbiz.Announcement{
-		Title:    req.Title,
-		Content:  &req.Content,
-		Show:     req.Show,
-		Pinned:   req.Pinned,
-		Popup:    req.Popup,
+		Title:   req.Title,
+		Content: &req.Content,
+		Show:    req.Show,
+		Pinned:  req.Pinned,
+		Popup:   req.Popup,
 	}
 
 	result, err := s.uc.CreateAnnouncement(ctx, announcement)
@@ -53,12 +53,12 @@ func (s *AnnouncementService) CreateAnnouncement(ctx context.Context, req *v1.Cr
 // UpdateAnnouncement 更新公告
 func (s *AnnouncementService) UpdateAnnouncement(ctx context.Context, req *v1.UpdateAnnouncementRequest) (*v1.AnnouncementReply, error) {
 	announcement := &announcementbiz.Announcement{
-		ID:       req.Id,
-		Title:    req.Title,
-		Content:  &req.Content,
-		Show:     req.Show,
-		Pinned:   req.Pinned,
-		Popup:    req.Popup,
+		ID:      req.Id,
+		Title:   req.Title,
+		Content: &req.Content,
+		Show:    req.Show,
+		Pinned:  req.Pinned,
+		Popup:   req.Popup,
 	}
 
 	result, err := s.uc.UpdateAnnouncement(ctx, announcement)
@@ -77,7 +77,7 @@ func (s *AnnouncementService) UpdateAnnouncement(ctx context.Context, req *v1.Up
 
 // GetAnnouncement 获取公告详情
 func (s *AnnouncementService) GetAnnouncement(ctx context.Context, req *v1.GetAnnouncementRequest) (*v1.AnnouncementReply, error) {
-	announcement, err := s.uc.GetAnnouncement(ctx, 0, req.Id)
+	announcement, err := s.uc.GetAnnouncement(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (s *AnnouncementService) GetAnnouncement(ctx context.Context, req *v1.GetAn
 
 // ListAnnouncements 获取公告列表
 func (s *AnnouncementService) ListAnnouncements(ctx context.Context, req *v1.ListAnnouncementsRequest) (*v1.ListAnnouncementsReply, error) {
-	announcements, total, err := s.uc.ListAnnouncements(ctx, 0, req.Page, req.Size, req.Show, req.Pinned, req.Popup)
+	announcements, total, err := s.uc.ListAnnouncements(ctx, int(req.Page), int(req.Size), req.Show, req.Pinned, req.Popup)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (s *AnnouncementService) ListAnnouncements(ctx context.Context, req *v1.Lis
 
 // DeleteAnnouncement 删除公告
 func (s *AnnouncementService) DeleteAnnouncement(ctx context.Context, req *v1.DeleteAnnouncementRequest) (*v1.DeleteAnnouncementReply, error) {
-	err := s.uc.DeleteAnnouncement(ctx, 0, req.Id)
+	err := s.uc.DeleteAnnouncement(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -138,8 +138,8 @@ func (s *AnnouncementService) convertToProto(announcement *announcementbiz.Annou
 		Show:      &announcement.Show,
 		Pinned:    &announcement.Pinned,
 		Popup:     &announcement.Popup,
-		CreatedAt: announcement.CreatedAt.UnixMilli(),
-		UpdatedAt: announcement.UpdatedAt.UnixMilli(),
+		CreatedAt: announcement.CreatedAt.Unix(),
+		UpdatedAt: announcement.UpdatedAt.Unix(),
 	}
 
 	// 处理可选字段

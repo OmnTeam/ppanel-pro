@@ -86,6 +86,8 @@ type Server struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Http          *Server_HTTP           `protobuf:"bytes,1,opt,name=http,proto3" json:"http,omitempty"`
 	Grpc          *Server_GRPC           `protobuf:"bytes,2,opt,name=grpc,proto3" json:"grpc,omitempty"`
+	Auth          *Server_Auth           `protobuf:"bytes,3,opt,name=auth,proto3" json:"auth,omitempty"`
+	Cors          *Server_CORS           `protobuf:"bytes,4,opt,name=cors,proto3" json:"cors,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -130,6 +132,20 @@ func (x *Server) GetHttp() *Server_HTTP {
 func (x *Server) GetGrpc() *Server_GRPC {
 	if x != nil {
 		return x.Grpc
+	}
+	return nil
+}
+
+func (x *Server) GetAuth() *Server_Auth {
+	if x != nil {
+		return x.Auth
+	}
+	return nil
+}
+
+func (x *Server) GetCors() *Server_CORS {
+	if x != nil {
+		return x.Cors
 	}
 	return nil
 }
@@ -999,6 +1015,168 @@ func (x *Server_GRPC) GetTimeout() *durationpb.Duration {
 	return nil
 }
 
+type Server_Auth struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// 无需认证的路径前缀列表
+	NoAuthPaths []string `protobuf:"bytes,1,rep,name=no_auth_paths,json=noAuthPaths,proto3" json:"no_auth_paths,omitempty"`
+	// 是否启用JWT认证
+	EnableJwt bool `protobuf:"varint,2,opt,name=enable_jwt,json=enableJwt,proto3" json:"enable_jwt,omitempty"`
+	// JWT密钥
+	JwtSecret     string `protobuf:"bytes,3,opt,name=jwt_secret,json=jwtSecret,proto3" json:"jwt_secret,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Server_Auth) Reset() {
+	*x = Server_Auth{}
+	mi := &file_conf_conf_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Server_Auth) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Server_Auth) ProtoMessage() {}
+
+func (x *Server_Auth) ProtoReflect() protoreflect.Message {
+	mi := &file_conf_conf_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Server_Auth.ProtoReflect.Descriptor instead.
+func (*Server_Auth) Descriptor() ([]byte, []int) {
+	return file_conf_conf_proto_rawDescGZIP(), []int{1, 2}
+}
+
+func (x *Server_Auth) GetNoAuthPaths() []string {
+	if x != nil {
+		return x.NoAuthPaths
+	}
+	return nil
+}
+
+func (x *Server_Auth) GetEnableJwt() bool {
+	if x != nil {
+		return x.EnableJwt
+	}
+	return false
+}
+
+func (x *Server_Auth) GetJwtSecret() string {
+	if x != nil {
+		return x.JwtSecret
+	}
+	return ""
+}
+
+type Server_CORS struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// 是否启用CORS
+	Enable bool `protobuf:"varint,1,opt,name=enable,proto3" json:"enable,omitempty"`
+	// 允许的源
+	AllowedOrigins []string `protobuf:"bytes,2,rep,name=allowed_origins,json=allowedOrigins,proto3" json:"allowed_origins,omitempty"`
+	// 允许的方法
+	AllowedMethods []string `protobuf:"bytes,3,rep,name=allowed_methods,json=allowedMethods,proto3" json:"allowed_methods,omitempty"`
+	// 允许的头部
+	AllowedHeaders []string `protobuf:"bytes,4,rep,name=allowed_headers,json=allowedHeaders,proto3" json:"allowed_headers,omitempty"`
+	// 暴露的头部
+	ExposedHeaders []string `protobuf:"bytes,5,rep,name=exposed_headers,json=exposedHeaders,proto3" json:"exposed_headers,omitempty"`
+	// 是否允许凭证
+	AllowCredentials bool `protobuf:"varint,6,opt,name=allow_credentials,json=allowCredentials,proto3" json:"allow_credentials,omitempty"`
+	// 预检请求缓存时间
+	MaxAge        int32 `protobuf:"varint,7,opt,name=max_age,json=maxAge,proto3" json:"max_age,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Server_CORS) Reset() {
+	*x = Server_CORS{}
+	mi := &file_conf_conf_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Server_CORS) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Server_CORS) ProtoMessage() {}
+
+func (x *Server_CORS) ProtoReflect() protoreflect.Message {
+	mi := &file_conf_conf_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Server_CORS.ProtoReflect.Descriptor instead.
+func (*Server_CORS) Descriptor() ([]byte, []int) {
+	return file_conf_conf_proto_rawDescGZIP(), []int{1, 3}
+}
+
+func (x *Server_CORS) GetEnable() bool {
+	if x != nil {
+		return x.Enable
+	}
+	return false
+}
+
+func (x *Server_CORS) GetAllowedOrigins() []string {
+	if x != nil {
+		return x.AllowedOrigins
+	}
+	return nil
+}
+
+func (x *Server_CORS) GetAllowedMethods() []string {
+	if x != nil {
+		return x.AllowedMethods
+	}
+	return nil
+}
+
+func (x *Server_CORS) GetAllowedHeaders() []string {
+	if x != nil {
+		return x.AllowedHeaders
+	}
+	return nil
+}
+
+func (x *Server_CORS) GetExposedHeaders() []string {
+	if x != nil {
+		return x.ExposedHeaders
+	}
+	return nil
+}
+
+func (x *Server_CORS) GetAllowCredentials() bool {
+	if x != nil {
+		return x.AllowCredentials
+	}
+	return false
+}
+
+func (x *Server_CORS) GetMaxAge() int32 {
+	if x != nil {
+		return x.MaxAge
+	}
+	return 0
+}
+
 type Data_Database struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Driver        string                 `protobuf:"bytes,1,opt,name=driver,proto3" json:"driver,omitempty"`
@@ -1009,7 +1187,7 @@ type Data_Database struct {
 
 func (x *Data_Database) Reset() {
 	*x = Data_Database{}
-	mi := &file_conf_conf_proto_msgTypes[14]
+	mi := &file_conf_conf_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1021,7 +1199,7 @@ func (x *Data_Database) String() string {
 func (*Data_Database) ProtoMessage() {}
 
 func (x *Data_Database) ProtoReflect() protoreflect.Message {
-	mi := &file_conf_conf_proto_msgTypes[14]
+	mi := &file_conf_conf_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1067,7 +1245,7 @@ type Data_Redis struct {
 
 func (x *Data_Redis) Reset() {
 	*x = Data_Redis{}
-	mi := &file_conf_conf_proto_msgTypes[15]
+	mi := &file_conf_conf_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1079,7 +1257,7 @@ func (x *Data_Redis) String() string {
 func (*Data_Redis) ProtoMessage() {}
 
 func (x *Data_Redis) ProtoReflect() protoreflect.Message {
-	mi := &file_conf_conf_proto_msgTypes[15]
+	mi := &file_conf_conf_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1160,10 +1338,12 @@ const file_conf_conf_proto_rawDesc = "" +
 	"\tBootstrap\x12*\n" +
 	"\x06server\x18\x01 \x01(\v2\x12.kratos.api.ServerR\x06server\x12$\n" +
 	"\x04data\x18\x02 \x01(\v2\x10.kratos.api.DataR\x04data\x12)\n" +
-	"\x03app\x18\x03 \x01(\v2\x17.kratos.api.ApplicationR\x03app\"\xb8\x02\n" +
+	"\x03app\x18\x03 \x01(\v2\x17.kratos.api.ApplicationR\x03app\"\x87\x06\n" +
 	"\x06Server\x12+\n" +
 	"\x04http\x18\x01 \x01(\v2\x17.kratos.api.Server.HTTPR\x04http\x12+\n" +
-	"\x04grpc\x18\x02 \x01(\v2\x17.kratos.api.Server.GRPCR\x04grpc\x1ai\n" +
+	"\x04grpc\x18\x02 \x01(\v2\x17.kratos.api.Server.GRPCR\x04grpc\x12+\n" +
+	"\x04auth\x18\x03 \x01(\v2\x17.kratos.api.Server.AuthR\x04auth\x12+\n" +
+	"\x04cors\x18\x04 \x01(\v2\x17.kratos.api.Server.CORSR\x04cors\x1ai\n" +
 	"\x04HTTP\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x123\n" +
@@ -1171,7 +1351,21 @@ const file_conf_conf_proto_rawDesc = "" +
 	"\x04GRPC\x12\x18\n" +
 	"\anetwork\x18\x01 \x01(\tR\anetwork\x12\x12\n" +
 	"\x04addr\x18\x02 \x01(\tR\x04addr\x123\n" +
-	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\"\xcc\x03\n" +
+	"\atimeout\x18\x03 \x01(\v2\x19.google.protobuf.DurationR\atimeout\x1ah\n" +
+	"\x04Auth\x12\"\n" +
+	"\rno_auth_paths\x18\x01 \x03(\tR\vnoAuthPaths\x12\x1d\n" +
+	"\n" +
+	"enable_jwt\x18\x02 \x01(\bR\tenableJwt\x12\x1d\n" +
+	"\n" +
+	"jwt_secret\x18\x03 \x01(\tR\tjwtSecret\x1a\x88\x02\n" +
+	"\x04CORS\x12\x16\n" +
+	"\x06enable\x18\x01 \x01(\bR\x06enable\x12'\n" +
+	"\x0fallowed_origins\x18\x02 \x03(\tR\x0eallowedOrigins\x12'\n" +
+	"\x0fallowed_methods\x18\x03 \x03(\tR\x0eallowedMethods\x12'\n" +
+	"\x0fallowed_headers\x18\x04 \x03(\tR\x0eallowedHeaders\x12'\n" +
+	"\x0fexposed_headers\x18\x05 \x03(\tR\x0eexposedHeaders\x12+\n" +
+	"\x11allow_credentials\x18\x06 \x01(\bR\x10allowCredentials\x12\x17\n" +
+	"\amax_age\x18\a \x01(\x05R\x06maxAge\"\xcc\x03\n" +
 	"\x04Data\x125\n" +
 	"\bdatabase\x18\x01 \x01(\v2\x19.kratos.api.Data.DatabaseR\bdatabase\x12,\n" +
 	"\x05redis\x18\x02 \x01(\v2\x16.kratos.api.Data.RedisR\x05redis\x1a:\n" +
@@ -1260,7 +1454,7 @@ func file_conf_conf_proto_rawDescGZIP() []byte {
 	return file_conf_conf_proto_rawDescData
 }
 
-var file_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
+var file_conf_conf_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_conf_conf_proto_goTypes = []any{
 	(*Bootstrap)(nil),           // 0: kratos.api.Bootstrap
 	(*Server)(nil),              // 1: kratos.api.Server
@@ -1276,9 +1470,11 @@ var file_conf_conf_proto_goTypes = []any{
 	(*Application)(nil),         // 11: kratos.api.Application
 	(*Server_HTTP)(nil),         // 12: kratos.api.Server.HTTP
 	(*Server_GRPC)(nil),         // 13: kratos.api.Server.GRPC
-	(*Data_Database)(nil),       // 14: kratos.api.Data.Database
-	(*Data_Redis)(nil),          // 15: kratos.api.Data.Redis
-	(*durationpb.Duration)(nil), // 16: google.protobuf.Duration
+	(*Server_Auth)(nil),         // 14: kratos.api.Server.Auth
+	(*Server_CORS)(nil),         // 15: kratos.api.Server.CORS
+	(*Data_Database)(nil),       // 16: kratos.api.Data.Database
+	(*Data_Redis)(nil),          // 17: kratos.api.Data.Redis
+	(*durationpb.Duration)(nil), // 18: google.protobuf.Duration
 }
 var file_conf_conf_proto_depIdxs = []int32{
 	1,  // 0: kratos.api.Bootstrap.server:type_name -> kratos.api.Server
@@ -1286,25 +1482,27 @@ var file_conf_conf_proto_depIdxs = []int32{
 	11, // 2: kratos.api.Bootstrap.app:type_name -> kratos.api.Application
 	12, // 3: kratos.api.Server.http:type_name -> kratos.api.Server.HTTP
 	13, // 4: kratos.api.Server.grpc:type_name -> kratos.api.Server.GRPC
-	14, // 5: kratos.api.Data.database:type_name -> kratos.api.Data.Database
-	15, // 6: kratos.api.Data.redis:type_name -> kratos.api.Data.Redis
-	3,  // 7: kratos.api.Application.site:type_name -> kratos.api.Site
-	4,  // 8: kratos.api.Application.verify:type_name -> kratos.api.Verify
-	5,  // 9: kratos.api.Application.mobile:type_name -> kratos.api.MobileAuth
-	6,  // 10: kratos.api.Application.email:type_name -> kratos.api.EmailAuth
-	7,  // 11: kratos.api.Application.register:type_name -> kratos.api.Register
-	8,  // 12: kratos.api.Application.invite:type_name -> kratos.api.Invite
-	9,  // 13: kratos.api.Application.subscribe:type_name -> kratos.api.Subscribe
-	10, // 14: kratos.api.Application.admin:type_name -> kratos.api.Admin
-	16, // 15: kratos.api.Server.HTTP.timeout:type_name -> google.protobuf.Duration
-	16, // 16: kratos.api.Server.GRPC.timeout:type_name -> google.protobuf.Duration
-	16, // 17: kratos.api.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
-	16, // 18: kratos.api.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
-	19, // [19:19] is the sub-list for method output_type
-	19, // [19:19] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	14, // 5: kratos.api.Server.auth:type_name -> kratos.api.Server.Auth
+	15, // 6: kratos.api.Server.cors:type_name -> kratos.api.Server.CORS
+	16, // 7: kratos.api.Data.database:type_name -> kratos.api.Data.Database
+	17, // 8: kratos.api.Data.redis:type_name -> kratos.api.Data.Redis
+	3,  // 9: kratos.api.Application.site:type_name -> kratos.api.Site
+	4,  // 10: kratos.api.Application.verify:type_name -> kratos.api.Verify
+	5,  // 11: kratos.api.Application.mobile:type_name -> kratos.api.MobileAuth
+	6,  // 12: kratos.api.Application.email:type_name -> kratos.api.EmailAuth
+	7,  // 13: kratos.api.Application.register:type_name -> kratos.api.Register
+	8,  // 14: kratos.api.Application.invite:type_name -> kratos.api.Invite
+	9,  // 15: kratos.api.Application.subscribe:type_name -> kratos.api.Subscribe
+	10, // 16: kratos.api.Application.admin:type_name -> kratos.api.Admin
+	18, // 17: kratos.api.Server.HTTP.timeout:type_name -> google.protobuf.Duration
+	18, // 18: kratos.api.Server.GRPC.timeout:type_name -> google.protobuf.Duration
+	18, // 19: kratos.api.Data.Redis.read_timeout:type_name -> google.protobuf.Duration
+	18, // 20: kratos.api.Data.Redis.write_timeout:type_name -> google.protobuf.Duration
+	21, // [21:21] is the sub-list for method output_type
+	21, // [21:21] is the sub-list for method input_type
+	21, // [21:21] is the sub-list for extension type_name
+	21, // [21:21] is the sub-list for extension extendee
+	0,  // [0:21] is the sub-list for field type_name
 }
 
 func init() { file_conf_conf_proto_init() }
@@ -1318,7 +1516,7 @@ func file_conf_conf_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_conf_conf_proto_rawDesc), len(file_conf_conf_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   16,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

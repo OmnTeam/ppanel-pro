@@ -21,7 +21,7 @@ type ProxyUserAuthMethodCreate struct {
 }
 
 // SetUserID sets the "user_id" field.
-func (_c *ProxyUserAuthMethodCreate) SetUserID(v int) *ProxyUserAuthMethodCreate {
+func (_c *ProxyUserAuthMethodCreate) SetUserID(v int64) *ProxyUserAuthMethodCreate {
 	_c.mutation.SetUserID(v)
 	return _c
 }
@@ -95,7 +95,7 @@ func (_c *ProxyUserAuthMethodCreate) SetNillableUpdatedAt(v *time.Time) *ProxyUs
 }
 
 // SetID sets the "id" field.
-func (_c *ProxyUserAuthMethodCreate) SetID(v int) *ProxyUserAuthMethodCreate {
+func (_c *ProxyUserAuthMethodCreate) SetID(v int64) *ProxyUserAuthMethodCreate {
 	_c.mutation.SetID(v)
 	return _c
 }
@@ -207,7 +207,7 @@ func (_c *ProxyUserAuthMethodCreate) sqlSave(ctx context.Context) (*ProxyUserAut
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = int64(id)
 	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
@@ -217,14 +217,14 @@ func (_c *ProxyUserAuthMethodCreate) sqlSave(ctx context.Context) (*ProxyUserAut
 func (_c *ProxyUserAuthMethodCreate) createSpec() (*ProxyUserAuthMethod, *sqlgraph.CreateSpec) {
 	var (
 		_node = &ProxyUserAuthMethod{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(proxyuserauthmethod.Table, sqlgraph.NewFieldSpec(proxyuserauthmethod.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(proxyuserauthmethod.Table, sqlgraph.NewFieldSpec(proxyuserauthmethod.FieldID, field.TypeInt64))
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
 	if value, ok := _c.mutation.UserID(); ok {
-		_spec.SetField(proxyuserauthmethod.FieldUserID, field.TypeInt, value)
+		_spec.SetField(proxyuserauthmethod.FieldUserID, field.TypeInt64, value)
 		_node.UserID = value
 	}
 	if value, ok := _c.mutation.TenantID(); ok {
@@ -301,7 +301,7 @@ func (_c *ProxyUserAuthMethodCreateBulk) Save(ctx context.Context) ([]*ProxyUser
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -37,7 +38,8 @@ func (s *UserDeviceService) UpdateUserDevice(ctx context.Context, req *v1.Update
 
 // DeleteUserDevice 删除用户设备
 func (s *UserDeviceService) DeleteUserDevice(ctx context.Context, req *v1.DeleteUserDeviceRequest) (*v1.DeleteUserDeviceReply, error) {
-		err := s.uc.DeleteUserDevice(ctx,  req.Id)
+	val, _ := strconv.ParseInt(req.Id, 10, 64)
+	err := s.uc.DeleteUserDevice(ctx, val)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +49,8 @@ func (s *UserDeviceService) DeleteUserDevice(ctx context.Context, req *v1.Delete
 
 // KickOfflineByUserDevice 踢下线用户设备
 func (s *UserDeviceService) KickOfflineByUserDevice(ctx context.Context, req *v1.KickOfflineByUserDeviceRequest) (*v1.KickOfflineByUserDeviceReply, error) {
-		err := s.uc.KickOfflineByUserDevice(ctx,  req.Id)
+	val, _ := strconv.ParseInt(req.Id, 10, 64)
+	err := s.uc.KickOfflineByUserDevice(ctx, val)
 	if err != nil {
 		return nil, err
 	}

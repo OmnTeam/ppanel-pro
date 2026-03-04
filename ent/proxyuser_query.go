@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -12,16 +13,20 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/OmnTeam/ppanel-pro/ent/predicate"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptionrecord"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyuserwithdrawal"
 )
 
 // ProxyUserQuery is the builder for querying ProxyUser entities.
 type ProxyUserQuery struct {
 	config
-	ctx        *QueryContext
-	order      []proxyuser.OrderOption
-	inters     []Interceptor
-	predicates []predicate.ProxyUser
+	ctx                   *QueryContext
+	order                 []proxyuser.OrderOption
+	inters                []Interceptor
+	predicates            []predicate.ProxyUser
+	withRedemptionRecords *ProxyRedemptionRecordQuery
+	withWithdrawals       *ProxyUserWithdrawalQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -58,6 +63,50 @@ func (_q *ProxyUserQuery) Order(o ...proxyuser.OrderOption) *ProxyUserQuery {
 	return _q
 }
 
+// QueryRedemptionRecords chains the current query on the "redemption_records" edge.
+func (_q *ProxyUserQuery) QueryRedemptionRecords() *ProxyRedemptionRecordQuery {
+	query := (&ProxyRedemptionRecordClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proxyuser.Table, proxyuser.FieldID, selector),
+			sqlgraph.To(proxyredemptionrecord.Table, proxyredemptionrecord.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, proxyuser.RedemptionRecordsTable, proxyuser.RedemptionRecordsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryWithdrawals chains the current query on the "withdrawals" edge.
+func (_q *ProxyUserQuery) QueryWithdrawals() *ProxyUserWithdrawalQuery {
+	query := (&ProxyUserWithdrawalClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proxyuser.Table, proxyuser.FieldID, selector),
+			sqlgraph.To(proxyuserwithdrawal.Table, proxyuserwithdrawal.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, proxyuser.WithdrawalsTable, proxyuser.WithdrawalsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first ProxyUser entity from the query.
 // Returns a *NotFoundError when no ProxyUser was found.
 func (_q *ProxyUserQuery) First(ctx context.Context) (*ProxyUser, error) {
@@ -82,8 +131,8 @@ func (_q *ProxyUserQuery) FirstX(ctx context.Context) *ProxyUser {
 
 // FirstID returns the first ProxyUser ID from the query.
 // Returns a *NotFoundError when no ProxyUser ID was found.
-func (_q *ProxyUserQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *ProxyUserQuery) FirstID(ctx context.Context) (id int64, err error) {
+	var ids []int64
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -95,7 +144,7 @@ func (_q *ProxyUserQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *ProxyUserQuery) FirstIDX(ctx context.Context) int {
+func (_q *ProxyUserQuery) FirstIDX(ctx context.Context) int64 {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -133,8 +182,8 @@ func (_q *ProxyUserQuery) OnlyX(ctx context.Context) *ProxyUser {
 // OnlyID is like Only, but returns the only ProxyUser ID in the query.
 // Returns a *NotSingularError when more than one ProxyUser ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *ProxyUserQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *ProxyUserQuery) OnlyID(ctx context.Context) (id int64, err error) {
+	var ids []int64
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -150,7 +199,7 @@ func (_q *ProxyUserQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *ProxyUserQuery) OnlyIDX(ctx context.Context) int {
+func (_q *ProxyUserQuery) OnlyIDX(ctx context.Context) int64 {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -178,7 +227,7 @@ func (_q *ProxyUserQuery) AllX(ctx context.Context) []*ProxyUser {
 }
 
 // IDs executes the query and returns a list of ProxyUser IDs.
-func (_q *ProxyUserQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (_q *ProxyUserQuery) IDs(ctx context.Context) (ids []int64, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
@@ -190,7 +239,7 @@ func (_q *ProxyUserQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *ProxyUserQuery) IDsX(ctx context.Context) []int {
+func (_q *ProxyUserQuery) IDsX(ctx context.Context) []int64 {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -245,15 +294,39 @@ func (_q *ProxyUserQuery) Clone() *ProxyUserQuery {
 		return nil
 	}
 	return &ProxyUserQuery{
-		config:     _q.config,
-		ctx:        _q.ctx.Clone(),
-		order:      append([]proxyuser.OrderOption{}, _q.order...),
-		inters:     append([]Interceptor{}, _q.inters...),
-		predicates: append([]predicate.ProxyUser{}, _q.predicates...),
+		config:                _q.config,
+		ctx:                   _q.ctx.Clone(),
+		order:                 append([]proxyuser.OrderOption{}, _q.order...),
+		inters:                append([]Interceptor{}, _q.inters...),
+		predicates:            append([]predicate.ProxyUser{}, _q.predicates...),
+		withRedemptionRecords: _q.withRedemptionRecords.Clone(),
+		withWithdrawals:       _q.withWithdrawals.Clone(),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
 	}
+}
+
+// WithRedemptionRecords tells the query-builder to eager-load the nodes that are connected to
+// the "redemption_records" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ProxyUserQuery) WithRedemptionRecords(opts ...func(*ProxyRedemptionRecordQuery)) *ProxyUserQuery {
+	query := (&ProxyRedemptionRecordClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withRedemptionRecords = query
+	return _q
+}
+
+// WithWithdrawals tells the query-builder to eager-load the nodes that are connected to
+// the "withdrawals" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *ProxyUserQuery) WithWithdrawals(opts ...func(*ProxyUserWithdrawalQuery)) *ProxyUserQuery {
+	query := (&ProxyUserWithdrawalClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withWithdrawals = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -332,8 +405,12 @@ func (_q *ProxyUserQuery) prepareQuery(ctx context.Context) error {
 
 func (_q *ProxyUserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*ProxyUser, error) {
 	var (
-		nodes = []*ProxyUser{}
-		_spec = _q.querySpec()
+		nodes       = []*ProxyUser{}
+		_spec       = _q.querySpec()
+		loadedTypes = [2]bool{
+			_q.withRedemptionRecords != nil,
+			_q.withWithdrawals != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*ProxyUser).scanValues(nil, columns)
@@ -341,6 +418,7 @@ func (_q *ProxyUserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Pr
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &ProxyUser{config: _q.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -352,7 +430,84 @@ func (_q *ProxyUserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Pr
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := _q.withRedemptionRecords; query != nil {
+		if err := _q.loadRedemptionRecords(ctx, query, nodes,
+			func(n *ProxyUser) { n.Edges.RedemptionRecords = []*ProxyRedemptionRecord{} },
+			func(n *ProxyUser, e *ProxyRedemptionRecord) {
+				n.Edges.RedemptionRecords = append(n.Edges.RedemptionRecords, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withWithdrawals; query != nil {
+		if err := _q.loadWithdrawals(ctx, query, nodes,
+			func(n *ProxyUser) { n.Edges.Withdrawals = []*ProxyUserWithdrawal{} },
+			func(n *ProxyUser, e *ProxyUserWithdrawal) { n.Edges.Withdrawals = append(n.Edges.Withdrawals, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (_q *ProxyUserQuery) loadRedemptionRecords(ctx context.Context, query *ProxyRedemptionRecordQuery, nodes []*ProxyUser, init func(*ProxyUser), assign func(*ProxyUser, *ProxyRedemptionRecord)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int64]*ProxyUser)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(proxyredemptionrecord.FieldUserID)
+	}
+	query.Where(predicate.ProxyRedemptionRecord(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(proxyuser.RedemptionRecordsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UserID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *ProxyUserQuery) loadWithdrawals(ctx context.Context, query *ProxyUserWithdrawalQuery, nodes []*ProxyUser, init func(*ProxyUser), assign func(*ProxyUser, *ProxyUserWithdrawal)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int64]*ProxyUser)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(proxyuserwithdrawal.FieldUserID)
+	}
+	query.Where(predicate.ProxyUserWithdrawal(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(proxyuser.WithdrawalsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UserID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (_q *ProxyUserQuery) sqlCount(ctx context.Context) (int, error) {
@@ -365,7 +520,7 @@ func (_q *ProxyUserQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (_q *ProxyUserQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(proxyuser.Table, proxyuser.Columns, sqlgraph.NewFieldSpec(proxyuser.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(proxyuser.Table, proxyuser.Columns, sqlgraph.NewFieldSpec(proxyuser.FieldID, field.TypeInt64))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

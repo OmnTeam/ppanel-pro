@@ -10,47 +10,47 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.ProxySubscribe {
+func ID(id int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.ProxySubscribe {
+func IDEQ(id int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.ProxySubscribe {
+func IDNEQ(id int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.ProxySubscribe {
+func IDIn(ids ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.ProxySubscribe {
+func IDNotIn(ids ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.ProxySubscribe {
+func IDGT(id int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.ProxySubscribe {
+func IDGTE(id int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.ProxySubscribe {
+func IDLT(id int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.ProxySubscribe {
+func IDLTE(id int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLTE(FieldID, id))
 }
 
@@ -85,12 +85,12 @@ func Discount(v string) predicate.ProxySubscribe {
 }
 
 // Replacement applies equality check predicate on the "replacement" field. It's identical to ReplacementEQ.
-func Replacement(v int) predicate.ProxySubscribe {
+func Replacement(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldReplacement, v))
 }
 
 // Inventory applies equality check predicate on the "inventory" field. It's identical to InventoryEQ.
-func Inventory(v int) predicate.ProxySubscribe {
+func Inventory(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldInventory, v))
 }
 
@@ -100,17 +100,17 @@ func Traffic(v int64) predicate.ProxySubscribe {
 }
 
 // SpeedLimit applies equality check predicate on the "speed_limit" field. It's identical to SpeedLimitEQ.
-func SpeedLimit(v int) predicate.ProxySubscribe {
+func SpeedLimit(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldSpeedLimit, v))
 }
 
 // DeviceLimit applies equality check predicate on the "device_limit" field. It's identical to DeviceLimitEQ.
-func DeviceLimit(v int) predicate.ProxySubscribe {
+func DeviceLimit(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldDeviceLimit, v))
 }
 
 // Quota applies equality check predicate on the "quota" field. It's identical to QuotaEQ.
-func Quota(v int) predicate.ProxySubscribe {
+func Quota(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldQuota, v))
 }
 
@@ -125,12 +125,12 @@ func Sell(v bool) predicate.ProxySubscribe {
 }
 
 // Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
-func Sort(v int) predicate.ProxySubscribe {
+func Sort(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldSort, v))
 }
 
 // DeductionRatio applies equality check predicate on the "deduction_ratio" field. It's identical to DeductionRatioEQ.
-func DeductionRatio(v float64) predicate.ProxySubscribe {
+func DeductionRatio(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldDeductionRatio, v))
 }
 
@@ -140,7 +140,7 @@ func AllowDeduction(v bool) predicate.ProxySubscribe {
 }
 
 // ResetCycle applies equality check predicate on the "reset_cycle" field. It's identical to ResetCycleEQ.
-func ResetCycle(v int) predicate.ProxySubscribe {
+func ResetCycle(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldResetCycle, v))
 }
 
@@ -555,82 +555,82 @@ func DiscountContainsFold(v string) predicate.ProxySubscribe {
 }
 
 // ReplacementEQ applies the EQ predicate on the "replacement" field.
-func ReplacementEQ(v int) predicate.ProxySubscribe {
+func ReplacementEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldReplacement, v))
 }
 
 // ReplacementNEQ applies the NEQ predicate on the "replacement" field.
-func ReplacementNEQ(v int) predicate.ProxySubscribe {
+func ReplacementNEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNEQ(FieldReplacement, v))
 }
 
 // ReplacementIn applies the In predicate on the "replacement" field.
-func ReplacementIn(vs ...int) predicate.ProxySubscribe {
+func ReplacementIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldIn(FieldReplacement, vs...))
 }
 
 // ReplacementNotIn applies the NotIn predicate on the "replacement" field.
-func ReplacementNotIn(vs ...int) predicate.ProxySubscribe {
+func ReplacementNotIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNotIn(FieldReplacement, vs...))
 }
 
 // ReplacementGT applies the GT predicate on the "replacement" field.
-func ReplacementGT(v int) predicate.ProxySubscribe {
+func ReplacementGT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGT(FieldReplacement, v))
 }
 
 // ReplacementGTE applies the GTE predicate on the "replacement" field.
-func ReplacementGTE(v int) predicate.ProxySubscribe {
+func ReplacementGTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGTE(FieldReplacement, v))
 }
 
 // ReplacementLT applies the LT predicate on the "replacement" field.
-func ReplacementLT(v int) predicate.ProxySubscribe {
+func ReplacementLT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLT(FieldReplacement, v))
 }
 
 // ReplacementLTE applies the LTE predicate on the "replacement" field.
-func ReplacementLTE(v int) predicate.ProxySubscribe {
+func ReplacementLTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLTE(FieldReplacement, v))
 }
 
 // InventoryEQ applies the EQ predicate on the "inventory" field.
-func InventoryEQ(v int) predicate.ProxySubscribe {
+func InventoryEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldInventory, v))
 }
 
 // InventoryNEQ applies the NEQ predicate on the "inventory" field.
-func InventoryNEQ(v int) predicate.ProxySubscribe {
+func InventoryNEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNEQ(FieldInventory, v))
 }
 
 // InventoryIn applies the In predicate on the "inventory" field.
-func InventoryIn(vs ...int) predicate.ProxySubscribe {
+func InventoryIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldIn(FieldInventory, vs...))
 }
 
 // InventoryNotIn applies the NotIn predicate on the "inventory" field.
-func InventoryNotIn(vs ...int) predicate.ProxySubscribe {
+func InventoryNotIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNotIn(FieldInventory, vs...))
 }
 
 // InventoryGT applies the GT predicate on the "inventory" field.
-func InventoryGT(v int) predicate.ProxySubscribe {
+func InventoryGT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGT(FieldInventory, v))
 }
 
 // InventoryGTE applies the GTE predicate on the "inventory" field.
-func InventoryGTE(v int) predicate.ProxySubscribe {
+func InventoryGTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGTE(FieldInventory, v))
 }
 
 // InventoryLT applies the LT predicate on the "inventory" field.
-func InventoryLT(v int) predicate.ProxySubscribe {
+func InventoryLT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLT(FieldInventory, v))
 }
 
 // InventoryLTE applies the LTE predicate on the "inventory" field.
-func InventoryLTE(v int) predicate.ProxySubscribe {
+func InventoryLTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLTE(FieldInventory, v))
 }
 
@@ -675,122 +675,122 @@ func TrafficLTE(v int64) predicate.ProxySubscribe {
 }
 
 // SpeedLimitEQ applies the EQ predicate on the "speed_limit" field.
-func SpeedLimitEQ(v int) predicate.ProxySubscribe {
+func SpeedLimitEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldSpeedLimit, v))
 }
 
 // SpeedLimitNEQ applies the NEQ predicate on the "speed_limit" field.
-func SpeedLimitNEQ(v int) predicate.ProxySubscribe {
+func SpeedLimitNEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNEQ(FieldSpeedLimit, v))
 }
 
 // SpeedLimitIn applies the In predicate on the "speed_limit" field.
-func SpeedLimitIn(vs ...int) predicate.ProxySubscribe {
+func SpeedLimitIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldIn(FieldSpeedLimit, vs...))
 }
 
 // SpeedLimitNotIn applies the NotIn predicate on the "speed_limit" field.
-func SpeedLimitNotIn(vs ...int) predicate.ProxySubscribe {
+func SpeedLimitNotIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNotIn(FieldSpeedLimit, vs...))
 }
 
 // SpeedLimitGT applies the GT predicate on the "speed_limit" field.
-func SpeedLimitGT(v int) predicate.ProxySubscribe {
+func SpeedLimitGT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGT(FieldSpeedLimit, v))
 }
 
 // SpeedLimitGTE applies the GTE predicate on the "speed_limit" field.
-func SpeedLimitGTE(v int) predicate.ProxySubscribe {
+func SpeedLimitGTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGTE(FieldSpeedLimit, v))
 }
 
 // SpeedLimitLT applies the LT predicate on the "speed_limit" field.
-func SpeedLimitLT(v int) predicate.ProxySubscribe {
+func SpeedLimitLT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLT(FieldSpeedLimit, v))
 }
 
 // SpeedLimitLTE applies the LTE predicate on the "speed_limit" field.
-func SpeedLimitLTE(v int) predicate.ProxySubscribe {
+func SpeedLimitLTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLTE(FieldSpeedLimit, v))
 }
 
 // DeviceLimitEQ applies the EQ predicate on the "device_limit" field.
-func DeviceLimitEQ(v int) predicate.ProxySubscribe {
+func DeviceLimitEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldDeviceLimit, v))
 }
 
 // DeviceLimitNEQ applies the NEQ predicate on the "device_limit" field.
-func DeviceLimitNEQ(v int) predicate.ProxySubscribe {
+func DeviceLimitNEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNEQ(FieldDeviceLimit, v))
 }
 
 // DeviceLimitIn applies the In predicate on the "device_limit" field.
-func DeviceLimitIn(vs ...int) predicate.ProxySubscribe {
+func DeviceLimitIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldIn(FieldDeviceLimit, vs...))
 }
 
 // DeviceLimitNotIn applies the NotIn predicate on the "device_limit" field.
-func DeviceLimitNotIn(vs ...int) predicate.ProxySubscribe {
+func DeviceLimitNotIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNotIn(FieldDeviceLimit, vs...))
 }
 
 // DeviceLimitGT applies the GT predicate on the "device_limit" field.
-func DeviceLimitGT(v int) predicate.ProxySubscribe {
+func DeviceLimitGT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGT(FieldDeviceLimit, v))
 }
 
 // DeviceLimitGTE applies the GTE predicate on the "device_limit" field.
-func DeviceLimitGTE(v int) predicate.ProxySubscribe {
+func DeviceLimitGTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGTE(FieldDeviceLimit, v))
 }
 
 // DeviceLimitLT applies the LT predicate on the "device_limit" field.
-func DeviceLimitLT(v int) predicate.ProxySubscribe {
+func DeviceLimitLT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLT(FieldDeviceLimit, v))
 }
 
 // DeviceLimitLTE applies the LTE predicate on the "device_limit" field.
-func DeviceLimitLTE(v int) predicate.ProxySubscribe {
+func DeviceLimitLTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLTE(FieldDeviceLimit, v))
 }
 
 // QuotaEQ applies the EQ predicate on the "quota" field.
-func QuotaEQ(v int) predicate.ProxySubscribe {
+func QuotaEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldQuota, v))
 }
 
 // QuotaNEQ applies the NEQ predicate on the "quota" field.
-func QuotaNEQ(v int) predicate.ProxySubscribe {
+func QuotaNEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNEQ(FieldQuota, v))
 }
 
 // QuotaIn applies the In predicate on the "quota" field.
-func QuotaIn(vs ...int) predicate.ProxySubscribe {
+func QuotaIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldIn(FieldQuota, vs...))
 }
 
 // QuotaNotIn applies the NotIn predicate on the "quota" field.
-func QuotaNotIn(vs ...int) predicate.ProxySubscribe {
+func QuotaNotIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNotIn(FieldQuota, vs...))
 }
 
 // QuotaGT applies the GT predicate on the "quota" field.
-func QuotaGT(v int) predicate.ProxySubscribe {
+func QuotaGT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGT(FieldQuota, v))
 }
 
 // QuotaGTE applies the GTE predicate on the "quota" field.
-func QuotaGTE(v int) predicate.ProxySubscribe {
+func QuotaGTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGTE(FieldQuota, v))
 }
 
 // QuotaLT applies the LT predicate on the "quota" field.
-func QuotaLT(v int) predicate.ProxySubscribe {
+func QuotaLT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLT(FieldQuota, v))
 }
 
 // QuotaLTE applies the LTE predicate on the "quota" field.
-func QuotaLTE(v int) predicate.ProxySubscribe {
+func QuotaLTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLTE(FieldQuota, v))
 }
 
@@ -815,82 +815,82 @@ func SellNEQ(v bool) predicate.ProxySubscribe {
 }
 
 // SortEQ applies the EQ predicate on the "sort" field.
-func SortEQ(v int) predicate.ProxySubscribe {
+func SortEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldSort, v))
 }
 
 // SortNEQ applies the NEQ predicate on the "sort" field.
-func SortNEQ(v int) predicate.ProxySubscribe {
+func SortNEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNEQ(FieldSort, v))
 }
 
 // SortIn applies the In predicate on the "sort" field.
-func SortIn(vs ...int) predicate.ProxySubscribe {
+func SortIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldIn(FieldSort, vs...))
 }
 
 // SortNotIn applies the NotIn predicate on the "sort" field.
-func SortNotIn(vs ...int) predicate.ProxySubscribe {
+func SortNotIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNotIn(FieldSort, vs...))
 }
 
 // SortGT applies the GT predicate on the "sort" field.
-func SortGT(v int) predicate.ProxySubscribe {
+func SortGT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGT(FieldSort, v))
 }
 
 // SortGTE applies the GTE predicate on the "sort" field.
-func SortGTE(v int) predicate.ProxySubscribe {
+func SortGTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGTE(FieldSort, v))
 }
 
 // SortLT applies the LT predicate on the "sort" field.
-func SortLT(v int) predicate.ProxySubscribe {
+func SortLT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLT(FieldSort, v))
 }
 
 // SortLTE applies the LTE predicate on the "sort" field.
-func SortLTE(v int) predicate.ProxySubscribe {
+func SortLTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLTE(FieldSort, v))
 }
 
 // DeductionRatioEQ applies the EQ predicate on the "deduction_ratio" field.
-func DeductionRatioEQ(v float64) predicate.ProxySubscribe {
+func DeductionRatioEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldDeductionRatio, v))
 }
 
 // DeductionRatioNEQ applies the NEQ predicate on the "deduction_ratio" field.
-func DeductionRatioNEQ(v float64) predicate.ProxySubscribe {
+func DeductionRatioNEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNEQ(FieldDeductionRatio, v))
 }
 
 // DeductionRatioIn applies the In predicate on the "deduction_ratio" field.
-func DeductionRatioIn(vs ...float64) predicate.ProxySubscribe {
+func DeductionRatioIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldIn(FieldDeductionRatio, vs...))
 }
 
 // DeductionRatioNotIn applies the NotIn predicate on the "deduction_ratio" field.
-func DeductionRatioNotIn(vs ...float64) predicate.ProxySubscribe {
+func DeductionRatioNotIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNotIn(FieldDeductionRatio, vs...))
 }
 
 // DeductionRatioGT applies the GT predicate on the "deduction_ratio" field.
-func DeductionRatioGT(v float64) predicate.ProxySubscribe {
+func DeductionRatioGT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGT(FieldDeductionRatio, v))
 }
 
 // DeductionRatioGTE applies the GTE predicate on the "deduction_ratio" field.
-func DeductionRatioGTE(v float64) predicate.ProxySubscribe {
+func DeductionRatioGTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGTE(FieldDeductionRatio, v))
 }
 
 // DeductionRatioLT applies the LT predicate on the "deduction_ratio" field.
-func DeductionRatioLT(v float64) predicate.ProxySubscribe {
+func DeductionRatioLT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLT(FieldDeductionRatio, v))
 }
 
 // DeductionRatioLTE applies the LTE predicate on the "deduction_ratio" field.
-func DeductionRatioLTE(v float64) predicate.ProxySubscribe {
+func DeductionRatioLTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLTE(FieldDeductionRatio, v))
 }
 
@@ -925,42 +925,42 @@ func AllowDeductionNotNil() predicate.ProxySubscribe {
 }
 
 // ResetCycleEQ applies the EQ predicate on the "reset_cycle" field.
-func ResetCycleEQ(v int) predicate.ProxySubscribe {
+func ResetCycleEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldEQ(FieldResetCycle, v))
 }
 
 // ResetCycleNEQ applies the NEQ predicate on the "reset_cycle" field.
-func ResetCycleNEQ(v int) predicate.ProxySubscribe {
+func ResetCycleNEQ(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNEQ(FieldResetCycle, v))
 }
 
 // ResetCycleIn applies the In predicate on the "reset_cycle" field.
-func ResetCycleIn(vs ...int) predicate.ProxySubscribe {
+func ResetCycleIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldIn(FieldResetCycle, vs...))
 }
 
 // ResetCycleNotIn applies the NotIn predicate on the "reset_cycle" field.
-func ResetCycleNotIn(vs ...int) predicate.ProxySubscribe {
+func ResetCycleNotIn(vs ...int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldNotIn(FieldResetCycle, vs...))
 }
 
 // ResetCycleGT applies the GT predicate on the "reset_cycle" field.
-func ResetCycleGT(v int) predicate.ProxySubscribe {
+func ResetCycleGT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGT(FieldResetCycle, v))
 }
 
 // ResetCycleGTE applies the GTE predicate on the "reset_cycle" field.
-func ResetCycleGTE(v int) predicate.ProxySubscribe {
+func ResetCycleGTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldGTE(FieldResetCycle, v))
 }
 
 // ResetCycleLT applies the LT predicate on the "reset_cycle" field.
-func ResetCycleLT(v int) predicate.ProxySubscribe {
+func ResetCycleLT(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLT(FieldResetCycle, v))
 }
 
 // ResetCycleLTE applies the LTE predicate on the "reset_cycle" field.
-func ResetCycleLTE(v int) predicate.ProxySubscribe {
+func ResetCycleLTE(v int64) predicate.ProxySubscribe {
 	return predicate.ProxySubscribe(sql.FieldLTE(FieldResetCycle, v))
 }
 

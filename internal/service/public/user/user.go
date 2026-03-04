@@ -2,11 +2,13 @@ package user
 
 import (
 	"context"
+	"strconv"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/public/user/v1"
 	userBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/user"
+	withdrawalBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/withdrawal"
 	"github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
@@ -14,13 +16,15 @@ import (
 // UserService Public User服务实现
 type UserService struct {
 	v1.UnimplementedUserServer
-	uc *userBiz.UserUseCase
+	uc           *userBiz.UserUseCase
+	withdrawalUc *withdrawalBiz.WithdrawalUsecase
 }
 
 // NewUserService 创建Public User服务
-func NewUserService(uc *userBiz.UserUseCase) *UserService {
+func NewUserService(uc *userBiz.UserUseCase, withdrawalUc *withdrawalBiz.WithdrawalUsecase) *UserService {
 	return &UserService{
-		uc: uc,
+		uc:           uc,
+		withdrawalUc: withdrawalUc,
 	}
 }
 
@@ -30,7 +34,7 @@ func (s *UserService) QueryUserInfo(ctx context.Context, req *emptypb.Empty) (*v
 	userID := middleware.GetUserID(ctx)
 
 	// 调用业务层
-	userInfo, err := s.uc.QueryUserInfo(ctx, userID)
+	userInfo, err := s.uc.QueryUserInfo(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +83,7 @@ func (s *UserService) GetLoginLog(ctx context.Context, req *v1.GetLoginLogReques
 	userID := middleware.GetUserID(ctx)
 
 	// 调用业务层
-	logs, total, err := s.uc.GetLoginLog(ctx, userID, req.Page, req.Size)
+	logs, total, err := s.uc.GetLoginLog(ctx, int(userID), int(req.Page), int(req.Size))
 	if err != nil {
 		return nil, err
 	}
@@ -110,10 +114,10 @@ func (s *UserService) GetLoginLog(ctx context.Context, req *v1.GetLoginLogReques
 // QueryUserBalanceLog 查询用户余额日志
 func (s *UserService) QueryUserBalanceLog(ctx context.Context, req *emptypb.Empty) (*v1.BalanceLogReply, error) {
 	// 从context获取租户ID和用户ID
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
 	// 调用业务层
-	logs, total, err := s.uc.QueryUserBalanceLog(ctx,  userID)
+	logs, total, err := s.uc.QueryUserBalanceLog(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
@@ -144,10 +148,10 @@ func (s *UserService) QueryUserBalanceLog(ctx context.Context, req *emptypb.Empt
 // QueryUserCommissionLog 查询用户佣金日志
 func (s *UserService) QueryUserCommissionLog(ctx context.Context, req *v1.QueryUserCommissionLogRequest) (*v1.CommissionLogReply, error) {
 	// 从context获取租户ID和用户ID
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
 	// 调用业务层
-	logs, total, err := s.uc.QueryUserCommissionLog(ctx,  userID, req.Page, req.Size)
+	logs, total, err := s.uc.QueryUserCommissionLog(ctx, int(userID), int(req.Page), int(req.Size))
 	if err != nil {
 		return nil, err
 	}
@@ -177,10 +181,10 @@ func (s *UserService) QueryUserCommissionLog(ctx context.Context, req *v1.QueryU
 // QueryUserAffiliate 查询用户推荐数量
 func (s *UserService) QueryUserAffiliate(ctx context.Context, req *emptypb.Empty) (*v1.UserAffiliateReply, error) {
 	// 从context获取租户ID和用户ID
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
 	// 调用业务层
-	registers, totalCommission, err := s.uc.QueryUserAffiliate(ctx,  userID)
+	registers, totalCommission, err := s.uc.QueryUserAffiliate(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
@@ -198,10 +202,10 @@ func (s *UserService) QueryUserAffiliate(ctx context.Context, req *emptypb.Empty
 // QueryUserAffiliateList 查询用户推荐列表
 func (s *UserService) QueryUserAffiliateList(ctx context.Context, req *v1.QueryUserAffiliateListRequest) (*v1.UserAffiliateListReply, error) {
 	// 从context获取租户ID和用户ID
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
 	// 调用业务层
-	affiliates, total, err := s.uc.QueryUserAffiliateList(ctx,  userID, req.Page, req.Size)
+	affiliates, total, err := s.uc.QueryUserAffiliateList(ctx, int(userID), int(req.Page), int(req.Size))
 	if err != nil {
 		return nil, err
 	}
@@ -230,10 +234,10 @@ func (s *UserService) QueryUserAffiliateList(ctx context.Context, req *v1.QueryU
 // GetOAuthMethods 获取OAuth方法
 func (s *UserService) GetOAuthMethods(ctx context.Context, req *emptypb.Empty) (*v1.OAuthMethodsReply, error) {
 	// 从context获取租户ID和用户ID
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
 	// 调用业务层
-	methods, err := s.uc.GetOAuthMethods(ctx,  userID)
+	methods, err := s.uc.GetOAuthMethods(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
@@ -259,9 +263,9 @@ func (s *UserService) GetOAuthMethods(ctx context.Context, req *emptypb.Empty) (
 
 // QueryUserSubscribe 查询用户订阅
 func (s *UserService) QueryUserSubscribe(ctx context.Context, req *emptypb.Empty) (*v1.UserSubscribeReply, error) {
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
-	list, total, err := s.uc.QueryUserSubscribe(ctx,  userID)
+	list, total, err := s.uc.QueryUserSubscribe(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
@@ -330,9 +334,9 @@ func (s *UserService) QueryUserSubscribe(ctx context.Context, req *emptypb.Empty
 
 // GetSubscribeLog 获取订阅日志
 func (s *UserService) GetSubscribeLog(ctx context.Context, req *v1.GetSubscribeLogRequest) (*v1.SubscribeLogReply, error) {
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
-	logs, total, err := s.uc.GetSubscribeLog(ctx,  userID, req.Page, req.Size)
+	logs, total, err := s.uc.GetSubscribeLog(ctx, int(userID), int(req.Page), int(req.Size))
 	if err != nil {
 		return nil, err
 	}
@@ -363,9 +367,9 @@ func (s *UserService) GetSubscribeLog(ctx context.Context, req *v1.GetSubscribeL
 
 // ResetUserSubscribeToken 重置订阅令牌
 func (s *UserService) ResetUserSubscribeToken(ctx context.Context, req *v1.ResetUserSubscribeTokenRequest) (*v1.CommonReply, error) {
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.ResetUserSubscribeToken(ctx,  userID, req.UserSubscribeId)
+	err := s.uc.ResetUserSubscribeToken(ctx, int(userID), int(req.UserSubscribeId))
 	if err != nil {
 		return nil, err
 	}
@@ -378,9 +382,9 @@ func (s *UserService) ResetUserSubscribeToken(ctx context.Context, req *v1.Reset
 
 // PreUnsubscribe 预退订
 func (s *UserService) PreUnsubscribe(ctx context.Context, req *v1.PreUnsubscribeRequest) (*v1.UnsubscribeInfoReply, error) {
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
-	deductionAmount, err := s.uc.PreUnsubscribe(ctx,  userID, req.Id)
+	deductionAmount, err := s.uc.PreUnsubscribe(ctx, int(userID), int(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -396,9 +400,9 @@ func (s *UserService) PreUnsubscribe(ctx context.Context, req *v1.PreUnsubscribe
 
 // Unsubscribe 退订
 func (s *UserService) Unsubscribe(ctx context.Context, req *v1.UnsubscribeRequest) (*v1.CommonReply, error) {
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.Unsubscribe(ctx,  userID, req.Id)
+	err := s.uc.Unsubscribe(ctx, int(userID), int(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -411,9 +415,9 @@ func (s *UserService) Unsubscribe(ctx context.Context, req *v1.UnsubscribeReques
 
 // UpdateUserNotify 更新通知设置
 func (s *UserService) UpdateUserNotify(ctx context.Context, req *v1.UpdateUserNotifyRequest) (*v1.CommonReply, error) {
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.UpdateUserNotify(ctx,  userID, req.EnableLoginNotify, req.EnableBalanceNotify, req.EnableSubscribeNotify, req.EnableTradeNotify)
+	err := s.uc.UpdateUserNotify(ctx, int(userID), req.EnableLoginNotify, req.EnableBalanceNotify, req.EnableSubscribeNotify, req.EnableTradeNotify)
 	if err != nil {
 		return nil, err
 	}
@@ -426,9 +430,9 @@ func (s *UserService) UpdateUserNotify(ctx context.Context, req *v1.UpdateUserNo
 
 // UpdateUserPassword 更新密码
 func (s *UserService) UpdateUserPassword(ctx context.Context, req *v1.UpdateUserPasswordRequest) (*v1.CommonReply, error) {
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.UpdateUserPassword(ctx,  userID, req.Password)
+	err := s.uc.UpdateUserPassword(ctx, int(userID), req.Password)
 	if err != nil {
 		return nil, err
 	}
@@ -465,9 +469,9 @@ func (s *UserService) BindTelegram(ctx context.Context, req *emptypb.Empty) (*v1
 
 // UnbindTelegram 解绑Telegram
 func (s *UserService) UnbindTelegram(ctx context.Context, req *emptypb.Empty) (*v1.CommonReply, error) {
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.UnbindTelegram(ctx,  userID)
+	err := s.uc.UnbindTelegram(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
@@ -496,9 +500,9 @@ func (s *UserService) BindOAuth(ctx context.Context, req *v1.BindOAuthRequest) (
 
 // BindOAuthCallback OAuth回调
 func (s *UserService) BindOAuthCallback(ctx context.Context, req *v1.BindOAuthCallbackRequest) (*v1.CommonReply, error) {
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.BindOAuthCallback(ctx,  userID, req.Method, req.Callback)
+	err := s.uc.BindOAuthCallback(ctx, int(userID), req.Method, req.Callback)
 	if err != nil {
 		return nil, err
 	}
@@ -511,9 +515,9 @@ func (s *UserService) BindOAuthCallback(ctx context.Context, req *v1.BindOAuthCa
 
 // UnbindOAuth 解绑OAuth
 func (s *UserService) UnbindOAuth(ctx context.Context, req *v1.UnbindOAuthRequest) (*v1.CommonReply, error) {
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.UnbindOAuth(ctx,  userID, req.Method)
+	err := s.uc.UnbindOAuth(ctx, int(userID), req.Method)
 	if err != nil {
 		return nil, err
 	}
@@ -526,9 +530,9 @@ func (s *UserService) UnbindOAuth(ctx context.Context, req *v1.UnbindOAuthReques
 
 // VerifyEmail 验证邮箱
 func (s *UserService) VerifyEmail(ctx context.Context, req *v1.VerifyEmailRequest) (*v1.CommonReply, error) {
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.VerifyEmail(ctx,  userID, req.Email, req.Code)
+	err := s.uc.VerifyEmail(ctx, int(userID), req.Email, req.Code)
 	if err != nil {
 		return nil, err
 	}
@@ -541,9 +545,9 @@ func (s *UserService) VerifyEmail(ctx context.Context, req *v1.VerifyEmailReques
 
 // UpdateBindMobile 更新绑定手机
 func (s *UserService) UpdateBindMobile(ctx context.Context, req *v1.UpdateBindMobileRequest) (*v1.CommonReply, error) {
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.UpdateBindMobile(ctx,  userID, req.AreaCode, req.Mobile, req.Code)
+	err := s.uc.UpdateBindMobile(ctx, int(userID), req.AreaCode, req.Mobile, req.Code)
 	if err != nil {
 		return nil, err
 	}
@@ -556,9 +560,9 @@ func (s *UserService) UpdateBindMobile(ctx context.Context, req *v1.UpdateBindMo
 
 // UpdateBindEmail 更新绑定邮箱
 func (s *UserService) UpdateBindEmail(ctx context.Context, req *v1.UpdateBindEmailRequest) (*v1.CommonReply, error) {
-		userID := middleware.GetUserID(ctx)
+	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.UpdateBindEmail(ctx,  userID, req.Email)
+	err := s.uc.UpdateBindEmail(ctx, int(userID), req.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -586,7 +590,7 @@ func (s *UserService) DeviceWSConnect(ctx context.Context, req *emptypb.Empty) (
 func (s *UserService) GetDeviceList(ctx context.Context, req *emptypb.Empty) (*v1.GetDeviceListReply, error) {
 	userID := middleware.GetUserID(ctx)
 
-	list, total, err := s.uc.GetDeviceList(ctx, userID)
+	list, total, err := s.uc.GetDeviceList(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
@@ -620,7 +624,7 @@ func (s *UserService) GetDeviceList(ctx context.Context, req *emptypb.Empty) (*v
 func (s *UserService) UnbindDevice(ctx context.Context, req *v1.UnbindDeviceRequest) (*v1.CommonReply, error) {
 	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.UnbindDevice(ctx, userID, req.Id)
+	err := s.uc.UnbindDevice(ctx, int(userID), int(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -635,7 +639,7 @@ func (s *UserService) UnbindDevice(ctx context.Context, req *v1.UnbindDeviceRequ
 func (s *UserService) GetDeviceOnlineStatistics(ctx context.Context, req *emptypb.Empty) (*v1.GetDeviceOnlineStatisticsReply, error) {
 	userID := middleware.GetUserID(ctx)
 
-	stats, err := s.uc.GetDeviceOnlineStatistics(ctx, userID)
+	stats, err := s.uc.GetDeviceOnlineStatistics(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
@@ -661,9 +665,78 @@ func (s *UserService) GetDeviceOnlineStatistics(ctx context.Context, req *emptyp
 		Code:    int32(responsecode.UserDeviceStatisticsQuerySuccess),
 		Message: responsecode.CodeMessages[responsecode.UserDeviceStatisticsQuerySuccess],
 		Data: &v1.GetDeviceOnlineStatisticsData{
-			WeeklyStats:      weeklyStats,
+			WeeklyStats:       weeklyStats,
 			ConnectionRecords: connectionRecords,
 		},
 	}, nil
 }
 
+// CommissionWithdraw 佣金提现
+func (s *UserService) CommissionWithdraw(ctx context.Context, req *v1.CommissionWithdrawRequest) (*v1.WithdrawalLogReply, error) {
+	userID := middleware.GetUserID(ctx)
+
+	// 转换amount string to int64
+	amount, err := strconv.ParseInt(req.Amount, 10, 64)
+	if err != nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	// 调用业务层
+	withdrawal, err := s.withdrawalUc.CommissionWithdraw(ctx, int64(userID), &withdrawalBiz.CommissionWithdrawRequest{
+		Amount:  amount,
+		Content: req.Content,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.WithdrawalLogReply{
+		Code:    int32(responsecode.UserInfoQuerySuccess),
+		Message: responsecode.CodeMessages[responsecode.UserInfoQuerySuccess],
+		Data: &v1.WithdrawalLogData{
+			Id:        strconv.FormatInt(withdrawal.ID, 10),
+			UserId:    strconv.FormatInt(withdrawal.UserID, 10),
+			Amount:    strconv.FormatInt(withdrawal.Amount, 10),
+			Content:   withdrawal.Content,
+			Status:    int32(withdrawal.Status),
+			Reason:    withdrawal.Reason,
+			CreatedAt: strconv.FormatInt(withdrawal.CreatedAt.UnixMilli(), 10),
+			UpdatedAt: strconv.FormatInt(withdrawal.UpdatedAt.UnixMilli(), 10),
+		},
+	}, nil
+}
+
+// QueryWithdrawalLog 查询提现日志
+func (s *UserService) QueryWithdrawalLog(ctx context.Context, req *v1.QueryWithdrawalLogRequest) (*v1.WithdrawalLogListReply, error) {
+	userID := middleware.GetUserID(ctx)
+
+	// 调用业务层
+	withdrawals, total, err := s.withdrawalUc.QueryWithdrawalLog(ctx, int64(userID), int32(req.Page), int32(req.Size))
+	if err != nil {
+		return nil, err
+	}
+
+	// 转换结果
+	list := make([]*v1.WithdrawalLogData, 0, len(withdrawals))
+	for _, w := range withdrawals {
+		list = append(list, &v1.WithdrawalLogData{
+			Id:        strconv.FormatInt(w.ID, 10),
+			UserId:    strconv.FormatInt(w.UserID, 10),
+			Amount:    strconv.FormatInt(w.Amount, 10),
+			Content:   w.Content,
+			Status:    int32(w.Status),
+			Reason:    w.Reason,
+			CreatedAt: strconv.FormatInt(w.CreatedAt.UnixMilli(), 10),
+			UpdatedAt: strconv.FormatInt(w.UpdatedAt.UnixMilli(), 10),
+		})
+	}
+
+	return &v1.WithdrawalLogListReply{
+		Code:    int32(responsecode.UserInfoQuerySuccess),
+		Message: responsecode.CodeMessages[responsecode.UserInfoQuerySuccess],
+		Data: &v1.WithdrawalLogListData{
+			List:  list,
+			Total: strconv.FormatInt(int64(total), 10),
+		},
+	}, nil
+}

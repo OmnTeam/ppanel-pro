@@ -200,7 +200,7 @@ message CurrencyConfig {
 // InviteConfig 邀请配置
 message InviteConfig {
   bool forced_invite = 1;         // 是否强制邀请
-  int64 referral_percentage = 2;  // 返利百分比
+  int32 referral_percentage = 2;  // 返利百分比
   bool only_first_purchase = 3;   // 是否仅首次购买
 }
 
@@ -242,7 +242,7 @@ message GetInviteConfigReply {
 // UpdateInviteConfig
 message UpdateInviteConfigRequest {
   bool forced_invite = 1;
-  int64 referral_percentage = 2;
+  int32 referral_percentage = 2;
   bool only_first_purchase = 3;
 }
 
@@ -268,7 +268,7 @@ message NodeOutbound {
   string name = 1;              // 名称
   string protocol = 2;          // 协议
   string address = 3;           // 地址
-  int64 port = 4;               // 端口
+  int32 port = 4;               // 端口
   string password = 5;          // 密码
   repeated string rules = 6;    // 规则列表
 }
@@ -276,9 +276,9 @@ message NodeOutbound {
 // NodeConfig 节点配置
 message NodeConfig {
   string node_secret = 1;                 // 节点密钥
-  int64 node_pull_interval = 2;          // 节点拉取间隔
-  int64 node_push_interval = 3;          // 节点推送间隔
-  int64 traffic_report_threshold = 4;    // 流量报告阈值
+  int32 node_pull_interval = 2;          // 节点拉取间隔
+  int32 node_push_interval = 3;          // 节点推送间隔
+  int32 traffic_report_threshold = 4;    // 流量报告阈值
   string ip_strategy = 5;                // IP策略
   repeated NodeDNS dns = 6;              // DNS配置
   repeated string block = 7;             // 屏蔽列表
@@ -302,9 +302,9 @@ message GetNodeConfigReply {
 // UpdateNodeConfig
 message UpdateNodeConfigRequest {
   string node_secret = 1;
-  int64 node_pull_interval = 2;
-  int64 node_push_interval = 3;
-  int64 traffic_report_threshold = 4;
+  int32 node_pull_interval = 2;
+  int32 node_push_interval = 3;
+  int32 traffic_report_threshold = 4;
   string ip_strategy = 5;
   repeated NodeDNS dns = 6;
   repeated string block = 7;
@@ -349,12 +349,12 @@ message UpdatePrivacyPolicyConfigReply {
 message RegisterConfig {
   bool stop_register = 1;                    // 是否停止注册
   bool enable_trial = 2;                     // 是否启用试用
-  int64 trial_subscribe = 3;                 // 试用订阅
-  int64 trial_time = 4;                      // 试用时间
+  int32 trial_subscribe = 3;                 // 试用订阅
+  int32 trial_time = 4;                      // 试用时间
   string trial_time_unit = 5;                // 试用时间单位
   bool enable_ip_register_limit = 6;         // 是否启用IP注册限制
-  int64 ip_register_limit = 7;               // IP注册限制
-  int64 ip_register_limit_duration = 8;      // IP注册限制时长
+  int32 ip_register_limit = 7;               // IP注册限制
+  int32 ip_register_limit_duration = 8;      // IP注册限制时长
 }
 
 // SiteConfig 站点配置
@@ -381,12 +381,12 @@ message GetRegisterConfigReply {
 message UpdateRegisterConfigRequest {
   bool stop_register = 1;
   bool enable_trial = 2;
-  int64 trial_subscribe = 3;
-  int64 trial_time = 4;
+  int32 trial_subscribe = 3;
+  int32 trial_time = 4;
   string trial_time_unit = 5;
   bool enable_ip_register_limit = 6;
-  int64 ip_register_limit = 7;
-  int64 ip_register_limit_duration = 8;
+  int32 ip_register_limit = 7;
+  int32 ip_register_limit_duration = 8;
 }
 
 message UpdateRegisterConfigData {
@@ -499,9 +499,9 @@ message UpdateTosConfigReply {
 
 // VerifyCodeConfig 验证码配置
 message VerifyCodeConfig {
-  int64 verify_code_expire_time = 1;  // 验证码过期时间
-  int64 verify_code_limit = 2;        // 验证码限制
-  int64 verify_code_interval = 3;     // 验证码间隔
+  int32 verify_code_expire_time = 1;  // 验证码过期时间
+  int32 verify_code_limit = 2;        // 验证码限制
+  int32 verify_code_interval = 3;     // 验证码间隔
 }
 
 // GetVerifyCodeConfig
@@ -515,9 +515,9 @@ message GetVerifyCodeConfigReply {
 
 // UpdateVerifyCodeConfig
 message UpdateVerifyCodeConfigRequest {
-  int64 verify_code_expire_time = 1;
-  int64 verify_code_limit = 2;
-  int64 verify_code_interval = 3;
+  int32 verify_code_expire_time = 1;
+  int32 verify_code_limit = 2;
+  int32 verify_code_interval = 3;
 }
 
 message UpdateVerifyCodeConfigData {

@@ -17,6 +17,8 @@ type ProxyTicket struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
+	// 租户ID
+	TenantID int64 `json:"tenant_id,omitempty"`
 	// 工单标题
 	Title string `json:"title,omitempty"`
 	// 工单描述
@@ -37,7 +39,7 @@ func (*ProxyTicket) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case proxyticket.FieldID, proxyticket.FieldUserID, proxyticket.FieldStatus:
+		case proxyticket.FieldID, proxyticket.FieldTenantID, proxyticket.FieldUserID, proxyticket.FieldStatus:
 			values[i] = new(sql.NullInt64)
 		case proxyticket.FieldTitle, proxyticket.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -64,6 +66,12 @@ func (_m *ProxyTicket) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int64(value.Int64)
+		case proxyticket.FieldTenantID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value.Valid {
+				_m.TenantID = value.Int64
+			}
 		case proxyticket.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field title", values[i])
@@ -136,6 +144,9 @@ func (_m *ProxyTicket) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProxyTicket(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
 	builder.WriteString("title=")
 	builder.WriteString(_m.Title)
 	builder.WriteString(", ")

@@ -49,6 +49,8 @@ var ProviderSet = wire.NewSet(
 	NewSubscribeRepo,
 	NewAdminSystemRepo,
 	NewTicketRepo,
+	NewAdminRedemptionRepo,
+	NewAdminGroupRepo,
 	// Admin User模块仓储
 	NewAdminUserRepo,
 	NewAdminUserAuthMethodRepo,
@@ -74,18 +76,22 @@ var ProviderSet = wire.NewSet(
 	NewPublicPaymentRepo,
 	// Public Subscribe模块仓储
 	NewPublicSubscribeRepo,
+	// Public Withdrawal模块仓储
+	NewWithdrawalRepo,
+	// Server模块仓储
+	NewServerNodeRepo,
 	// Auth OAuth模块仓储
 	NewOAuthRepo,
 )
 
 // Data
 type Data struct {
-	db           *ent.Client
-	rdb          *redis.Client
-	queue        *asynq.Client
-	queueServer  *asynq.Server
-	conf         *conf.Application // 应用配置（包含JWT等配置）
-	deviceMgr    *device.DeviceManager // 设备管理器
+	db          *ent.Client
+	rdb         *redis.Client
+	queue       *asynq.Client
+	queueServer *asynq.Server
+	conf        *conf.Application     // 应用配置（包含JWT等配置）
+	deviceMgr   *device.DeviceManager // 设备管理器
 }
 
 // DB 获取数据库客户端
@@ -109,11 +115,11 @@ func (d *Data) DeviceManager() *device.DeviceManager {
 }
 
 // FindOne 实现用户服务接口 - 根据用户ID查找用户
-func (d *Data) FindOne(ctx context.Context, userId int64) (*ent.ProxyUser, error) {
-	return d.db.ProxyUser.Get(ctx, int(userId))
+func (d *Data) FindOne(ctx context.Context, userId int) (*ent.ProxyUser, error) {
+	return d.db.ProxyUser.Get(ctx, int64(userId))
 }
 
-// NewData 
+// NewData
 func NewData(c *conf.Data, appConf *conf.Application, logger log.Logger) (*Data, func(), error) {
 	log.NewHelper(logger).Infof("connecting to database: %s", c.Database.Source)
 
@@ -122,7 +128,7 @@ func NewData(c *conf.Data, appConf *conf.Application, logger log.Logger) (*Data,
 		log.NewHelper(logger).Errorf("failed opening connection to database: %v", err)
 		return nil, nil, err
 	}
-
+	client = client.Debug()
 	// 运行自动迁移工具
 	if err := client.Schema.Create(context.Background()); err != nil {
 		log.NewHelper(logger).Errorf("failed creating schema resources: %v", err)
@@ -200,12 +206,12 @@ func NewData(c *conf.Data, appConf *conf.Application, logger log.Logger) (*Data,
 	deviceManager := device.NewDeviceManager(logger, 60, 30) // 心跳超时60秒，检查间隔30秒
 
 	d := &Data{
-		db:           client,
-		rdb:          rdb,
-		queue:        queueClient,
-		queueServer:  queueServer,
-		conf:         appConf,
-		deviceMgr:    deviceManager,
+		db:          client,
+		rdb:         rdb,
+		queue:       queueClient,
+		queueServer: queueServer,
+		conf:        appConf,
+		deviceMgr:   deviceManager,
 	}
 
 	// 启动 asynq 队列服务器

@@ -18,6 +18,8 @@ type ProxyOrder struct {
 	// ID of the ent.
 	// 订单ID
 	ID int64 `json:"id,omitempty"`
+	// 租户ID
+	TenantID int64 `json:"tenant_id,omitempty"`
 	// 父订单ID
 	ParentID int64 `json:"parent_id,omitempty"`
 	// 用户ID
@@ -72,7 +74,7 @@ func (*ProxyOrder) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case proxyorder.FieldIsNew:
 			values[i] = new(sql.NullBool)
-		case proxyorder.FieldID, proxyorder.FieldParentID, proxyorder.FieldUserID, proxyorder.FieldType, proxyorder.FieldQuantity, proxyorder.FieldPrice, proxyorder.FieldAmount, proxyorder.FieldDiscount, proxyorder.FieldCouponDiscount, proxyorder.FieldCommission, proxyorder.FieldFeeAmount, proxyorder.FieldGiftAmount, proxyorder.FieldPaymentID, proxyorder.FieldStatus, proxyorder.FieldSubscribeID:
+		case proxyorder.FieldID, proxyorder.FieldTenantID, proxyorder.FieldParentID, proxyorder.FieldUserID, proxyorder.FieldType, proxyorder.FieldQuantity, proxyorder.FieldPrice, proxyorder.FieldAmount, proxyorder.FieldDiscount, proxyorder.FieldCouponDiscount, proxyorder.FieldCommission, proxyorder.FieldFeeAmount, proxyorder.FieldGiftAmount, proxyorder.FieldPaymentID, proxyorder.FieldStatus, proxyorder.FieldSubscribeID:
 			values[i] = new(sql.NullInt64)
 		case proxyorder.FieldOrderNo, proxyorder.FieldCoupon, proxyorder.FieldMethod, proxyorder.FieldTradeNo, proxyorder.FieldSubscribeToken:
 			values[i] = new(sql.NullString)
@@ -99,6 +101,12 @@ func (_m *ProxyOrder) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int64(value.Int64)
+		case proxyorder.FieldTenantID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value.Valid {
+				_m.TenantID = value.Int64
+			}
 		case proxyorder.FieldParentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field parent_id", values[i])
@@ -267,6 +275,9 @@ func (_m *ProxyOrder) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProxyOrder(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
 	builder.WriteString("parent_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.ParentID))
 	builder.WriteString(", ")

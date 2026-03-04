@@ -65,9 +65,9 @@ func (r *adminConsoleRepo) QueryDateOrders(ctx context.Context, date time.Time) 
 	}
 
 	return &v1.OrdersTotal{
-		AmountTotal:        amountTotal,
-		NewOrderAmount:     newOrderAmount,
-		RenewalOrderAmount: renewalOrderAmount,
+		AmountTotal:        int(amountTotal),
+		NewOrderAmount:     int(newOrderAmount),
+		RenewalOrderAmount: int(renewalOrderAmount),
 	}, nil
 }
 
@@ -102,9 +102,9 @@ func (r *adminConsoleRepo) QueryMonthlyOrders(ctx context.Context, date time.Tim
 	}
 
 	return &v1.OrdersTotal{
-		AmountTotal:        amountTotal,
-		NewOrderAmount:     newOrderAmount,
-		RenewalOrderAmount: renewalOrderAmount,
+		AmountTotal:        int(amountTotal),
+		NewOrderAmount:     int(newOrderAmount),
+		RenewalOrderAmount: int(renewalOrderAmount),
 	}, nil
 }
 
@@ -134,9 +134,9 @@ func (r *adminConsoleRepo) QueryTotalOrders(ctx context.Context) (*v1.OrdersTota
 	}
 
 	return &v1.OrdersTotal{
-		AmountTotal:        amountTotal,
-		NewOrderAmount:     newOrderAmount,
-		RenewalOrderAmount: renewalOrderAmount,
+		AmountTotal:        int(amountTotal),
+		NewOrderAmount:     int(newOrderAmount),
+		RenewalOrderAmount: int(renewalOrderAmount),
 	}, nil
 }
 
@@ -167,11 +167,11 @@ func (r *adminConsoleRepo) QueryDailyOrdersList(ctx context.Context, date time.T
 			dailyMap[dateStr] = &v1.OrdersTotalWithDate{Date: dateStr}
 		}
 
-		dailyMap[dateStr].AmountTotal += order.Amount
+		dailyMap[dateStr].AmountTotal += int(order.Amount)
 		if order.IsNew {
-			dailyMap[dateStr].NewOrderAmount += order.Amount
+			dailyMap[dateStr].NewOrderAmount += int(order.Amount)
 		} else {
-			dailyMap[dateStr].RenewalOrderAmount += order.Amount
+			dailyMap[dateStr].RenewalOrderAmount += int(order.Amount)
 		}
 	}
 
@@ -212,11 +212,11 @@ func (r *adminConsoleRepo) QueryMonthlyOrdersList(ctx context.Context, date time
 			monthlyMap[monthStr] = &v1.OrdersTotalWithDate{Date: monthStr}
 		}
 
-		monthlyMap[monthStr].AmountTotal += order.Amount
+		monthlyMap[monthStr].AmountTotal += int(order.Amount)
 		if order.IsNew {
-			monthlyMap[monthStr].NewOrderAmount += order.Amount
+			monthlyMap[monthStr].NewOrderAmount += int(order.Amount)
 		} else {
-			monthlyMap[monthStr].RenewalOrderAmount += order.Amount
+			monthlyMap[monthStr].RenewalOrderAmount += int(order.Amount)
 		}
 	}
 
@@ -232,7 +232,7 @@ func (r *adminConsoleRepo) QueryMonthlyOrdersList(ctx context.Context, date time
 // ==================== User Statistics Methods ====================
 
 // QueryRegisterUserTotalByDate queries user registration count by date
-func (r *adminConsoleRepo) QueryRegisterUserTotalByDate(ctx context.Context, date time.Time) (int64, error) {
+func (r *adminConsoleRepo) QueryRegisterUserTotalByDate(ctx context.Context, date time.Time) (int, error) {
 	start := date.Truncate(24 * time.Hour)
 	end := start.Add(24 * time.Hour).Add(-time.Nanosecond)
 
@@ -248,11 +248,11 @@ func (r *adminConsoleRepo) QueryRegisterUserTotalByDate(ctx context.Context, dat
 		return 0, err
 	}
 
-	return int64(count), nil
+	return count, nil
 }
 
 // QueryRegisterUserTotalByMonthly queries user registration count by month
-func (r *adminConsoleRepo) QueryRegisterUserTotalByMonthly(ctx context.Context, date time.Time) (int64, error) {
+func (r *adminConsoleRepo) QueryRegisterUserTotalByMonthly(ctx context.Context, date time.Time) (int, error) {
 	firstDay := time.Date(date.Year(), date.Month(), 1, 0, 0, 0, 0, date.Location())
 	lastDay := firstDay.AddDate(0, 1, 0).Add(-time.Nanosecond)
 
@@ -268,11 +268,11 @@ func (r *adminConsoleRepo) QueryRegisterUserTotalByMonthly(ctx context.Context, 
 		return 0, err
 	}
 
-	return int64(count), nil
+	return count, nil
 }
 
 // QueryRegisterUserTotal queries total user registration count
-func (r *adminConsoleRepo) QueryRegisterUserTotal(ctx context.Context) (int64, error) {
+func (r *adminConsoleRepo) QueryRegisterUserTotal(ctx context.Context) (int, error) {
 	count, err := r.data.db.ProxyUser.Query().
 		Count(ctx)
 
@@ -281,7 +281,7 @@ func (r *adminConsoleRepo) QueryRegisterUserTotal(ctx context.Context) (int64, e
 		return 0, err
 	}
 
-	return int64(count), nil
+	return count, nil
 }
 
 // QueryDateUserCounts queries new and renewal user counts by date
@@ -304,14 +304,14 @@ func (r *adminConsoleRepo) QueryDateUserCounts(ctx context.Context, date time.Ti
 	}
 
 	// Track unique users
-	newUserSet := make(map[int64]bool)
-	renewalUserSet := make(map[int64]bool)
+	newUserSet := make(map[int]bool)
+	renewalUserSet := make(map[int]bool)
 
 	for _, order := range orders {
 		if order.IsNew {
-			newUserSet[order.UserID] = true
+			newUserSet[int(order.UserID)] = true
 		} else {
-			renewalUserSet[order.UserID] = true
+			renewalUserSet[int(order.UserID)] = true
 		}
 	}
 
@@ -338,14 +338,14 @@ func (r *adminConsoleRepo) QueryMonthlyUserCounts(ctx context.Context, date time
 	}
 
 	// Track unique users
-	newUserSet := make(map[int64]bool)
-	renewalUserSet := make(map[int64]bool)
+	newUserSet := make(map[int]bool)
+	renewalUserSet := make(map[int]bool)
 
 	for _, order := range orders {
 		if order.IsNew {
-			newUserSet[order.UserID] = true
+			newUserSet[int(order.UserID)] = true
 		} else {
-			renewalUserSet[order.UserID] = true
+			renewalUserSet[int(order.UserID)] = true
 		}
 	}
 
@@ -367,14 +367,14 @@ func (r *adminConsoleRepo) QueryTotalUserCounts(ctx context.Context) (newUsers i
 	}
 
 	// Track unique users
-	newUserSet := make(map[int64]bool)
-	renewalUserSet := make(map[int64]bool)
+	newUserSet := make(map[int]bool)
+	renewalUserSet := make(map[int]bool)
 
 	for _, order := range orders {
 		if order.IsNew {
-			newUserSet[order.UserID] = true
+			newUserSet[int(order.UserID)] = true
 		} else {
-			renewalUserSet[order.UserID] = true
+			renewalUserSet[int(order.UserID)] = true
 		}
 	}
 
@@ -519,7 +519,7 @@ func (r *adminConsoleRepo) QueryMonthlyUserStatisticsList(ctx context.Context, d
 // ==================== Ticket Statistics Methods ====================
 
 // QueryWaitReplyTotal queries waiting reply ticket count
-func (r *adminConsoleRepo) QueryWaitReplyTotal(ctx context.Context) (int64, error) {
+func (r *adminConsoleRepo) QueryWaitReplyTotal(ctx context.Context) (int, error) {
 	count, err := r.data.db.ProxyTicket.Query().
 		Where(
 			proxyticket.StatusEQ(1), // 1 = Pending (waiting for reply)
@@ -531,13 +531,13 @@ func (r *adminConsoleRepo) QueryWaitReplyTotal(ctx context.Context) (int64, erro
 		return 0, err
 	}
 
-	return int64(count), nil
+	return count, nil
 }
 
 // ==================== Server Statistics Methods ====================
 
 // QueryOnlineServers queries online server count
-func (r *adminConsoleRepo) QueryOnlineServers(ctx context.Context) (int64, error) {
+func (r *adminConsoleRepo) QueryOnlineServers(ctx context.Context) (int, error) {
 	fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
 
 	count, err := r.data.db.ProxyServer.Query().
@@ -551,11 +551,11 @@ func (r *adminConsoleRepo) QueryOnlineServers(ctx context.Context) (int64, error
 		return 0, err
 	}
 
-	return int64(count), nil
+	return count, nil
 }
 
 // QueryOfflineServers queries offline server count
-func (r *adminConsoleRepo) QueryOfflineServers(ctx context.Context) (int64, error) {
+func (r *adminConsoleRepo) QueryOfflineServers(ctx context.Context) (int, error) {
 	fiveMinutesAgo := time.Now().Add(-5 * time.Minute)
 
 	count, err := r.data.db.ProxyServer.Query().
@@ -572,11 +572,11 @@ func (r *adminConsoleRepo) QueryOfflineServers(ctx context.Context) (int64, erro
 		return 0, err
 	}
 
-	return int64(count), nil
+	return count, nil
 }
 
 // QueryOnlineUsers queries online user count
-func (r *adminConsoleRepo) QueryOnlineUsers(ctx context.Context) (int64, error) {
+func (r *adminConsoleRepo) QueryOnlineUsers(ctx context.Context) (int, error) {
 	// TODO: This requires an online user tracking system
 	// For now, return 0
 	return 0, nil
@@ -602,8 +602,8 @@ func (r *adminConsoleRepo) QueryTodayTraffic(ctx context.Context, date time.Time
 	// Calculate totals in Go
 	var totalUpload, totalDownload int64
 	for _, log := range trafficLogs {
-		totalUpload += log.Upload
-		totalDownload += log.Download
+		totalUpload += int64(log.Upload)
+		totalDownload += int64(log.Download)
 	}
 
 	return totalUpload, totalDownload, nil
@@ -668,17 +668,18 @@ func (r *adminConsoleRepo) QueryTodayUserTrafficRanking(ctx context.Context, dat
 	}
 
 	// Group by user and calculate totals in Go
-	userTrafficMap := make(map[int64]*v1.UserTrafficData)
+	userTrafficMap := make(map[int]*v1.UserTrafficData)
 	for _, log := range trafficLogs {
-		if _, exists := userTrafficMap[log.SubscribeID]; !exists {
-			userTrafficMap[log.SubscribeID] = &v1.UserTrafficData{
-				SID:      log.SubscribeID,
+		subscribeID := int(log.SubscribeID)
+		if _, exists := userTrafficMap[subscribeID]; !exists {
+			userTrafficMap[subscribeID] = &v1.UserTrafficData{
+				SID:      subscribeID,
 				Upload:   0,
 				Download: 0,
 			}
 		}
-		userTrafficMap[log.SubscribeID].Upload += log.Upload
-		userTrafficMap[log.SubscribeID].Download += log.Download
+		userTrafficMap[subscribeID].Upload += log.Upload
+		userTrafficMap[subscribeID].Download += log.Download
 	}
 
 	// Convert to slice and sort by total traffic
@@ -733,9 +734,9 @@ func (r *adminConsoleRepo) QueryYesterdayUserTrafficRanking(ctx context.Context,
 	result := make([]*v1.UserTrafficData, 0, len(ranking.Rank))
 	for _, item := range ranking.Rank {
 		result = append(result, &v1.UserTrafficData{
-			SID:      item.SubscribeID,
-			Upload:   item.Upload,
-			Download: item.Download,
+			SID:      int(item.SubscribeID),
+			Upload:   int(item.Upload),
+			Download: int(item.Download),
 		})
 	}
 
@@ -760,25 +761,26 @@ func (r *adminConsoleRepo) QueryTodayServerTrafficRanking(ctx context.Context, d
 	}
 
 	// Group by server and calculate totals in Go
-	serverTrafficMap := make(map[int64]*v1.ServerTrafficData)
+	serverTrafficMap := make(map[int]*v1.ServerTrafficData)
 	for _, log := range trafficLogs {
-		if _, exists := serverTrafficMap[log.ServerID]; !exists {
-			serverTrafficMap[log.ServerID] = &v1.ServerTrafficData{
-				ServerID: log.ServerID,
-				Name:     fmt.Sprintf("Server %d", log.ServerID),
+		serverID := int(log.ServerID)
+		if _, exists := serverTrafficMap[serverID]; !exists {
+			serverTrafficMap[serverID] = &v1.ServerTrafficData{
+				ServerID: serverID,
+				Name:     fmt.Sprintf("Server %d", serverID),
 				Upload:   0,
 				Download: 0,
 			}
 		}
-		serverTrafficMap[log.ServerID].Upload += log.Upload
-		serverTrafficMap[log.ServerID].Download += log.Download
+		serverTrafficMap[serverID].Upload += log.Upload
+		serverTrafficMap[serverID].Download += log.Download
 	}
 
 	// Get server names
 	for serverID, data := range serverTrafficMap {
 		server, err := r.data.db.ProxyServer.Query().
 			Where(
-				proxyserver.IDEQ(int(serverID)),
+				proxyserver.IDEQ(int64(serverID)),
 			).
 			Only(ctx)
 
@@ -844,7 +846,7 @@ func (r *adminConsoleRepo) QueryYesterdayServerTrafficRanking(ctx context.Contex
 		// Get server name
 		server, err := r.data.db.ProxyServer.Query().
 			Where(
-				proxyserver.IDEQ(int(item.ServerID)),
+				proxyserver.IDEQ(item.ServerID),
 			).
 			Only(ctx)
 
@@ -857,10 +859,10 @@ func (r *adminConsoleRepo) QueryYesterdayServerTrafficRanking(ctx context.Contex
 		}
 
 		result = append(result, &v1.ServerTrafficData{
-			ServerID: item.ServerID,
+			ServerID: int(item.ServerID),
 			Name:     name,
-			Upload:   item.Upload,
-			Download: item.Download,
+			Upload:   int(item.Upload),
+			Download: int(item.Download),
 		})
 	}
 

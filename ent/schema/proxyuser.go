@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -26,7 +27,7 @@ func (ProxyUser) Annotations() []schema.Annotation {
 // Fields of the ProxyUser
 func (ProxyUser) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Positive().
 			Comment("用户ID"),
 		field.String("password").
@@ -54,7 +55,7 @@ func (ProxyUser) Fields() []ent.Field {
 			Nillable().
 			Default(0).
 			Comment("用户余额（单位：分）"),
-		field.Int64("telegram").
+		field.Int("telegram").
 			Optional().
 			Nillable().
 			Comment("Telegram账号"),
@@ -63,7 +64,7 @@ func (ProxyUser) Fields() []ent.Field {
 			Optional().
 			Nillable().
 			Comment("推荐码"),
-		field.Int("referer_id").
+		field.Int64("referer_id").
 			Optional().
 			Nillable().
 			Comment("推荐人ID"),
@@ -72,7 +73,7 @@ func (ProxyUser) Fields() []ent.Field {
 			Nillable().
 			Default(0).
 			Comment("佣金（单位：分）"),
-		field.Int("referral_percentage").
+		field.Int8("referral_percentage").
 			Default(0).
 			Comment("推荐百分比"),
 		field.Bool("only_first_purchase").
@@ -110,6 +111,14 @@ func (ProxyUser) Fields() []ent.Field {
 		field.Bool("enable_trade_notify").
 			Default(false).
 			Comment("启用交易通知"),
+		field.Int64("group_id").
+			Optional().
+			Nillable().
+			Default(0).
+			Comment("用户分组ID"),
+		field.Bool("group_locked").
+			Default(false).
+			Comment("是否锁定分组"),
 		field.Time("created_at").
 			Default(time.Now).
 			Immutable().
@@ -132,5 +141,10 @@ func (ProxyUser) Fields() []ent.Field {
 
 // Edges of the ProxyUser
 func (ProxyUser) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		// 用户的兑换记录
+		edge.To("redemption_records", ProxyRedemptionRecord.Type),
+		// 用户的提现记录
+		edge.To("withdrawals", ProxyUserWithdrawal.Type),
+	}
 }

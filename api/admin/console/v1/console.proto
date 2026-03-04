@@ -42,7 +42,6 @@ service AdminConsole {
 // ==================== Revenue Statistics ====================
 
 message QueryRevenueStatisticsRequest {
-  int64 tenant_id = 1;
 }
 
 message OrdersStatistics {
@@ -74,7 +73,6 @@ message QueryRevenueStatisticsReply {
 // ==================== User Statistics ====================
 
 message QueryUserStatisticsRequest {
-  int64 tenant_id = 1;
 }
 
 message UserStatistics {
@@ -100,7 +98,6 @@ message QueryUserStatisticsReply {
 // ==================== Ticket Wait Reply ====================
 
 message QueryTicketWaitReplyRequest {
-  int64 tenant_id = 1;
 }
 
 message QueryTicketWaitReplyData {
@@ -116,7 +113,6 @@ message QueryTicketWaitReplyReply {
 // ==================== Server Total Data ====================
 
 message QueryServerTotalDataRequest {
-  int64 tenant_id = 1;
 }
 
 message ServerTrafficData {
@@ -140,7 +136,7 @@ message QueryServerTotalDataData {
   int64 today_download = 5;
   int64 monthly_upload = 6;
   int64 monthly_download = 7;
-  int64 updated_at = 8;
+string updated_at = 8;
   repeated ServerTrafficData server_traffic_ranking_today = 9;
   repeated ServerTrafficData server_traffic_ranking_yesterday = 10;
   repeated UserTrafficData user_traffic_ranking_today = 11;

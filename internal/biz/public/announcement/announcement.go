@@ -7,7 +7,7 @@ import (
 // AnnouncementRepo Public Announcement数据仓库接口
 type AnnouncementRepo interface {
 	// QueryAnnouncement 查询公告列表
-	QueryAnnouncement(ctx context.Context, tenantID int64, page, size int32, pinned, popup *bool) ([]*Announcement, int64, error)
+	QueryAnnouncement(ctx context.Context, page, size int32, pinned, popup *bool) ([]*Announcement, int64, error)
 }
 
 // Announcement 公告信息
@@ -33,6 +33,6 @@ func NewAnnouncementUseCase(repo AnnouncementRepo) *AnnouncementUseCase {
 }
 
 // QueryAnnouncement 查询公告列表
-func (uc *AnnouncementUseCase) QueryAnnouncement(ctx context.Context, tenantID int64, page, size int32, pinned, popup *bool) ([]*Announcement, int64, error) {
-	return uc.repo.QueryAnnouncement(ctx, tenantID, page, size, pinned, popup)
+func (uc *AnnouncementUseCase) QueryAnnouncement(ctx context.Context, page, size int32, pinned, popup *bool) ([]*Announcement, int64, error) {
+	return uc.repo.QueryAnnouncement(ctx, page, size, pinned, popup)
 }

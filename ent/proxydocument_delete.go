@@ -40,7 +40,7 @@ func (_d *ProxyDocumentDelete) ExecX(ctx context.Context) int {
 }
 
 func (_d *ProxyDocumentDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(proxydocument.Table, sqlgraph.NewFieldSpec(proxydocument.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(proxydocument.Table, sqlgraph.NewFieldSpec(proxydocument.FieldID, field.TypeInt64))
 	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

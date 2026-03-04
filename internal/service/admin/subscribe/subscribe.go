@@ -54,7 +54,7 @@ func (s *SubscribeService) UpdateSubscribe(ctx context.Context, req *v1.UpdateSu
 
 // DeleteSubscribe delete subscribe
 func (s *SubscribeService) DeleteSubscribe(ctx context.Context, req *v1.DeleteSubscribeRequest) (*v1.DeleteSubscribeReply, error) {
-		if err := s.uc.DeleteSubscribe(ctx, req.Id); err != nil {
+	if err := s.uc.DeleteSubscribe(ctx, int(req.Id)); err != nil {
 		return nil, err
 	}
 	return &v1.DeleteSubscribeReply{
@@ -68,7 +68,11 @@ func (s *SubscribeService) DeleteSubscribe(ctx context.Context, req *v1.DeleteSu
 
 // BatchDeleteSubscribe batch delete subscribes
 func (s *SubscribeService) BatchDeleteSubscribe(ctx context.Context, req *v1.BatchDeleteSubscribeRequest) (*v1.BatchDeleteSubscribeReply, error) {
-		if err := s.uc.BatchDeleteSubscribe(ctx,  req.Ids); err != nil {
+	idsInt := make([]int, len(req.Ids))
+	for i, v := range req.Ids {
+		idsInt[i] = int(v)
+	}
+	if err := s.uc.BatchDeleteSubscribe(ctx, idsInt); err != nil {
 		return nil, err
 	}
 	return &v1.BatchDeleteSubscribeReply{
@@ -82,7 +86,7 @@ func (s *SubscribeService) BatchDeleteSubscribe(ctx context.Context, req *v1.Bat
 
 // GetSubscribeDetails get subscribe details
 func (s *SubscribeService) GetSubscribeDetails(ctx context.Context, req *v1.GetSubscribeDetailsRequest) (*v1.GetSubscribeDetailsReply, error) {
-		subscribe, err := s.uc.GetSubscribeDetails(ctx,  req.Id)
+	subscribe, err := s.uc.GetSubscribeDetails(ctx, int(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +101,7 @@ func (s *SubscribeService) GetSubscribeDetails(ctx context.Context, req *v1.GetS
 
 // GetSubscribeList get subscribe list
 func (s *SubscribeService) GetSubscribeList(ctx context.Context, req *v1.GetSubscribeListRequest) (*v1.GetSubscribeListReply, error) {
-		data, err := s.uc.GetSubscribeList(ctx,  req)
+	data, err := s.uc.GetSubscribeList(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +114,7 @@ func (s *SubscribeService) GetSubscribeList(ctx context.Context, req *v1.GetSubs
 
 // SubscribeSort subscribe sort
 func (s *SubscribeService) SubscribeSort(ctx context.Context, req *v1.SubscribeSortRequest) (*v1.SubscribeSortReply, error) {
-		if err := s.uc.SubscribeSort(ctx,  req); err != nil {
+	if err := s.uc.SubscribeSort(ctx, req); err != nil {
 		return nil, err
 	}
 	return &v1.SubscribeSortReply{
@@ -126,7 +130,7 @@ func (s *SubscribeService) SubscribeSort(ctx context.Context, req *v1.SubscribeS
 
 // CreateSubscribeGroup create subscribe group
 func (s *SubscribeService) CreateSubscribeGroup(ctx context.Context, req *v1.CreateSubscribeGroupRequest) (*v1.CreateSubscribeGroupReply, error) {
-		if err := s.uc.CreateSubscribeGroup(ctx,  req); err != nil {
+	if err := s.uc.CreateSubscribeGroup(ctx, req); err != nil {
 		return nil, err
 	}
 	return &v1.CreateSubscribeGroupReply{
@@ -140,7 +144,7 @@ func (s *SubscribeService) CreateSubscribeGroup(ctx context.Context, req *v1.Cre
 
 // UpdateSubscribeGroup update subscribe group
 func (s *SubscribeService) UpdateSubscribeGroup(ctx context.Context, req *v1.UpdateSubscribeGroupRequest) (*v1.UpdateSubscribeGroupReply, error) {
-		if err := s.uc.UpdateSubscribeGroup(ctx,  req); err != nil {
+	if err := s.uc.UpdateSubscribeGroup(ctx, req); err != nil {
 		return nil, err
 	}
 	return &v1.UpdateSubscribeGroupReply{
@@ -154,7 +158,7 @@ func (s *SubscribeService) UpdateSubscribeGroup(ctx context.Context, req *v1.Upd
 
 // DeleteSubscribeGroup delete subscribe group
 func (s *SubscribeService) DeleteSubscribeGroup(ctx context.Context, req *v1.DeleteSubscribeGroupRequest) (*v1.DeleteSubscribeGroupReply, error) {
-		if err := s.uc.DeleteSubscribeGroup(ctx,  req.Id); err != nil {
+	if err := s.uc.DeleteSubscribeGroup(ctx, int(req.Id)); err != nil {
 		return nil, err
 	}
 	return &v1.DeleteSubscribeGroupReply{
@@ -168,7 +172,11 @@ func (s *SubscribeService) DeleteSubscribeGroup(ctx context.Context, req *v1.Del
 
 // BatchDeleteSubscribeGroup batch delete subscribe groups
 func (s *SubscribeService) BatchDeleteSubscribeGroup(ctx context.Context, req *v1.BatchDeleteSubscribeGroupRequest) (*v1.BatchDeleteSubscribeGroupReply, error) {
-		if err := s.uc.BatchDeleteSubscribeGroup(ctx,  req.Ids); err != nil {
+	idsInt := make([]int, len(req.Ids))
+	for i, v := range req.Ids {
+		idsInt[i] = int(v)
+	}
+	if err := s.uc.BatchDeleteSubscribeGroup(ctx, idsInt); err != nil {
 		return nil, err
 	}
 	return &v1.BatchDeleteSubscribeGroupReply{
@@ -182,7 +190,7 @@ func (s *SubscribeService) BatchDeleteSubscribeGroup(ctx context.Context, req *v
 
 // GetSubscribeGroupList get subscribe group list
 func (s *SubscribeService) GetSubscribeGroupList(ctx context.Context, req *v1.GetSubscribeGroupListRequest) (*v1.GetSubscribeGroupListReply, error) {
-		data, err := s.uc.GetSubscribeGroupList(ctx)
+	data, err := s.uc.GetSubscribeGroupList(ctx)
 	if err != nil {
 		return nil, err
 	}

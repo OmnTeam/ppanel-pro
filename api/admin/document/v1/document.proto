@@ -57,64 +57,58 @@ service DocumentService {
 
 // 文档信息
 message Document {
-  int64 id = 1;
+string id = 1;
   string title = 2;
   string content = 3;
   repeated string tags = 4;
   bool show = 5;
-  int64 created_at = 6;
-  int64 updated_at = 7;
+string created_at = 6;
+string updated_at = 7;
 }
 
 // 创建文档请求
 message CreateDocumentRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  string title = 1 [(validate.rules).string.min_len = 1];
+  string content = 2 [(validate.rules).string.min_len = 1];
+  repeated string tags = 3;
+  google.protobuf.BoolValue show = 4;
+}
+
+// 更新文档请求
+message UpdateDocumentRequest {
+string id = 1;
   string title = 2 [(validate.rules).string.min_len = 1];
   string content = 3 [(validate.rules).string.min_len = 1];
   repeated string tags = 4;
   google.protobuf.BoolValue show = 5;
 }
 
-// 更新文档请求
-message UpdateDocumentRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
-  int64 id = 2 [(validate.rules).int64.gt = 0];
-  string title = 3 [(validate.rules).string.min_len = 1];
-  string content = 4 [(validate.rules).string.min_len = 1];
-  repeated string tags = 5;
-  google.protobuf.BoolValue show = 6;
-}
-
 // 删除文档请求
 message DeleteDocumentRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
-  int64 id = 2 [(validate.rules).int64.gt = 0];
+string id = 1;
 }
 
 // 批量删除文档请求
 message BatchDeleteDocumentRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
-  repeated int64 ids = 2 [(validate.rules).repeated.min_items = 1];
+  repeated int32 ids = 1 [(validate.rules).repeated.min_items = 1];
 }
 
 // 获取文档列表请求
 message GetDocumentListRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
-  int64 page = 2 [(validate.rules).int64.gt = 0];
-  int64 size = 3 [(validate.rules).int64.gt = 0];
-  string tag = 4;
-  string search = 5;
+  int32 page = 1;
+  int32 size = 2;
+  string tag = 3;
+  string search = 4;
 }
 
 // 获取文档详情请求
 message GetDocumentDetailRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
-  int64 id = 2 [(validate.rules).int64.gt = 0];
+string id = 1;
 }
 
 // 创建文档数据
 message CreateDocumentData {
-  int64 id = 1;
+string id = 1;
 }
 
 // 创建文档响应
@@ -162,7 +156,7 @@ message BatchDeleteDocumentReply {
 
 // 获取文档列表数据
 message GetDocumentListData {
-  int64 total = 1;
+  int32 total = 1;
   repeated Document list = 2;
 }
 

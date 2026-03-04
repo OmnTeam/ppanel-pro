@@ -22,12 +22,18 @@ type Tx struct {
 	ProxyCoupon *ProxyCouponClient
 	// ProxyDocument is the client for interacting with the ProxyDocument builders.
 	ProxyDocument *ProxyDocumentClient
+	// ProxyGroupHistory is the client for interacting with the ProxyGroupHistory builders.
+	ProxyGroupHistory *ProxyGroupHistoryClient
 	// ProxyNode is the client for interacting with the ProxyNode builders.
 	ProxyNode *ProxyNodeClient
 	// ProxyOrder is the client for interacting with the ProxyOrder builders.
 	ProxyOrder *ProxyOrderClient
 	// ProxyPayment is the client for interacting with the ProxyPayment builders.
 	ProxyPayment *ProxyPaymentClient
+	// ProxyRedemptionCode is the client for interacting with the ProxyRedemptionCode builders.
+	ProxyRedemptionCode *ProxyRedemptionCodeClient
+	// ProxyRedemptionRecord is the client for interacting with the ProxyRedemptionRecord builders.
+	ProxyRedemptionRecord *ProxyRedemptionRecordClient
 	// ProxySchemaMigrations is the client for interacting with the ProxySchemaMigrations builders.
 	ProxySchemaMigrations *ProxySchemaMigrationsClient
 	// ProxyServer is the client for interacting with the ProxyServer builders.
@@ -60,8 +66,12 @@ type Tx struct {
 	ProxyUserDevice *ProxyUserDeviceClient
 	// ProxyUserDeviceOnlineRecord is the client for interacting with the ProxyUserDeviceOnlineRecord builders.
 	ProxyUserDeviceOnlineRecord *ProxyUserDeviceOnlineRecordClient
+	// ProxyUserGroup is the client for interacting with the ProxyUserGroup builders.
+	ProxyUserGroup *ProxyUserGroupClient
 	// ProxyUserSubscribe is the client for interacting with the ProxyUserSubscribe builders.
 	ProxyUserSubscribe *ProxyUserSubscribeClient
+	// ProxyUserWithdrawal is the client for interacting with the ProxyUserWithdrawal builders.
+	ProxyUserWithdrawal *ProxyUserWithdrawalClient
 
 	// lazily loaded.
 	client     *Client
@@ -198,9 +208,12 @@ func (tx *Tx) init() {
 	tx.ProxyAuthMethod = NewProxyAuthMethodClient(tx.config)
 	tx.ProxyCoupon = NewProxyCouponClient(tx.config)
 	tx.ProxyDocument = NewProxyDocumentClient(tx.config)
+	tx.ProxyGroupHistory = NewProxyGroupHistoryClient(tx.config)
 	tx.ProxyNode = NewProxyNodeClient(tx.config)
 	tx.ProxyOrder = NewProxyOrderClient(tx.config)
 	tx.ProxyPayment = NewProxyPaymentClient(tx.config)
+	tx.ProxyRedemptionCode = NewProxyRedemptionCodeClient(tx.config)
+	tx.ProxyRedemptionRecord = NewProxyRedemptionRecordClient(tx.config)
 	tx.ProxySchemaMigrations = NewProxySchemaMigrationsClient(tx.config)
 	tx.ProxyServer = NewProxyServerClient(tx.config)
 	tx.ProxyServerGroup = NewProxyServerGroupClient(tx.config)
@@ -217,7 +230,9 @@ func (tx *Tx) init() {
 	tx.ProxyUserAuthMethod = NewProxyUserAuthMethodClient(tx.config)
 	tx.ProxyUserDevice = NewProxyUserDeviceClient(tx.config)
 	tx.ProxyUserDeviceOnlineRecord = NewProxyUserDeviceOnlineRecordClient(tx.config)
+	tx.ProxyUserGroup = NewProxyUserGroupClient(tx.config)
 	tx.ProxyUserSubscribe = NewProxyUserSubscribeClient(tx.config)
+	tx.ProxyUserWithdrawal = NewProxyUserWithdrawalClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

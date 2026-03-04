@@ -10,62 +10,62 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.ProxyUserSubscribe {
+func ID(id int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.ProxyUserSubscribe {
+func IDEQ(id int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.ProxyUserSubscribe {
+func IDNEQ(id int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.ProxyUserSubscribe {
+func IDIn(ids ...int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.ProxyUserSubscribe {
+func IDNotIn(ids ...int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.ProxyUserSubscribe {
+func IDGT(id int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.ProxyUserSubscribe {
+func IDGTE(id int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.ProxyUserSubscribe {
+func IDLT(id int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.ProxyUserSubscribe {
+func IDLTE(id int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldLTE(FieldID, id))
 }
 
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
-func UserID(v int) predicate.ProxyUserSubscribe {
+func UserID(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldUserID, v))
 }
 
 // OrderID applies equality check predicate on the "order_id" field. It's identical to OrderIDEQ.
-func OrderID(v int) predicate.ProxyUserSubscribe {
+func OrderID(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldOrderID, v))
 }
 
 // SubscribeID applies equality check predicate on the "subscribe_id" field. It's identical to SubscribeIDEQ.
-func SubscribeID(v int) predicate.ProxyUserSubscribe {
+func SubscribeID(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldSubscribeID, v))
 }
 
@@ -110,7 +110,7 @@ func UUID(v string) predicate.ProxyUserSubscribe {
 }
 
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
-func Status(v int) predicate.ProxyUserSubscribe {
+func Status(v int8) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldStatus, v))
 }
 
@@ -125,122 +125,122 @@ func UpdatedAt(v time.Time) predicate.ProxyUserSubscribe {
 }
 
 // UserIDEQ applies the EQ predicate on the "user_id" field.
-func UserIDEQ(v int) predicate.ProxyUserSubscribe {
+func UserIDEQ(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldUserID, v))
 }
 
 // UserIDNEQ applies the NEQ predicate on the "user_id" field.
-func UserIDNEQ(v int) predicate.ProxyUserSubscribe {
+func UserIDNEQ(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldNEQ(FieldUserID, v))
 }
 
 // UserIDIn applies the In predicate on the "user_id" field.
-func UserIDIn(vs ...int) predicate.ProxyUserSubscribe {
+func UserIDIn(vs ...int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldIn(FieldUserID, vs...))
 }
 
 // UserIDNotIn applies the NotIn predicate on the "user_id" field.
-func UserIDNotIn(vs ...int) predicate.ProxyUserSubscribe {
+func UserIDNotIn(vs ...int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldNotIn(FieldUserID, vs...))
 }
 
 // UserIDGT applies the GT predicate on the "user_id" field.
-func UserIDGT(v int) predicate.ProxyUserSubscribe {
+func UserIDGT(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldGT(FieldUserID, v))
 }
 
 // UserIDGTE applies the GTE predicate on the "user_id" field.
-func UserIDGTE(v int) predicate.ProxyUserSubscribe {
+func UserIDGTE(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldGTE(FieldUserID, v))
 }
 
 // UserIDLT applies the LT predicate on the "user_id" field.
-func UserIDLT(v int) predicate.ProxyUserSubscribe {
+func UserIDLT(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldLT(FieldUserID, v))
 }
 
 // UserIDLTE applies the LTE predicate on the "user_id" field.
-func UserIDLTE(v int) predicate.ProxyUserSubscribe {
+func UserIDLTE(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldLTE(FieldUserID, v))
 }
 
 // OrderIDEQ applies the EQ predicate on the "order_id" field.
-func OrderIDEQ(v int) predicate.ProxyUserSubscribe {
+func OrderIDEQ(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldOrderID, v))
 }
 
 // OrderIDNEQ applies the NEQ predicate on the "order_id" field.
-func OrderIDNEQ(v int) predicate.ProxyUserSubscribe {
+func OrderIDNEQ(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldNEQ(FieldOrderID, v))
 }
 
 // OrderIDIn applies the In predicate on the "order_id" field.
-func OrderIDIn(vs ...int) predicate.ProxyUserSubscribe {
+func OrderIDIn(vs ...int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldIn(FieldOrderID, vs...))
 }
 
 // OrderIDNotIn applies the NotIn predicate on the "order_id" field.
-func OrderIDNotIn(vs ...int) predicate.ProxyUserSubscribe {
+func OrderIDNotIn(vs ...int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldNotIn(FieldOrderID, vs...))
 }
 
 // OrderIDGT applies the GT predicate on the "order_id" field.
-func OrderIDGT(v int) predicate.ProxyUserSubscribe {
+func OrderIDGT(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldGT(FieldOrderID, v))
 }
 
 // OrderIDGTE applies the GTE predicate on the "order_id" field.
-func OrderIDGTE(v int) predicate.ProxyUserSubscribe {
+func OrderIDGTE(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldGTE(FieldOrderID, v))
 }
 
 // OrderIDLT applies the LT predicate on the "order_id" field.
-func OrderIDLT(v int) predicate.ProxyUserSubscribe {
+func OrderIDLT(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldLT(FieldOrderID, v))
 }
 
 // OrderIDLTE applies the LTE predicate on the "order_id" field.
-func OrderIDLTE(v int) predicate.ProxyUserSubscribe {
+func OrderIDLTE(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldLTE(FieldOrderID, v))
 }
 
 // SubscribeIDEQ applies the EQ predicate on the "subscribe_id" field.
-func SubscribeIDEQ(v int) predicate.ProxyUserSubscribe {
+func SubscribeIDEQ(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldSubscribeID, v))
 }
 
 // SubscribeIDNEQ applies the NEQ predicate on the "subscribe_id" field.
-func SubscribeIDNEQ(v int) predicate.ProxyUserSubscribe {
+func SubscribeIDNEQ(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldNEQ(FieldSubscribeID, v))
 }
 
 // SubscribeIDIn applies the In predicate on the "subscribe_id" field.
-func SubscribeIDIn(vs ...int) predicate.ProxyUserSubscribe {
+func SubscribeIDIn(vs ...int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldIn(FieldSubscribeID, vs...))
 }
 
 // SubscribeIDNotIn applies the NotIn predicate on the "subscribe_id" field.
-func SubscribeIDNotIn(vs ...int) predicate.ProxyUserSubscribe {
+func SubscribeIDNotIn(vs ...int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldNotIn(FieldSubscribeID, vs...))
 }
 
 // SubscribeIDGT applies the GT predicate on the "subscribe_id" field.
-func SubscribeIDGT(v int) predicate.ProxyUserSubscribe {
+func SubscribeIDGT(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldGT(FieldSubscribeID, v))
 }
 
 // SubscribeIDGTE applies the GTE predicate on the "subscribe_id" field.
-func SubscribeIDGTE(v int) predicate.ProxyUserSubscribe {
+func SubscribeIDGTE(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldGTE(FieldSubscribeID, v))
 }
 
 // SubscribeIDLT applies the LT predicate on the "subscribe_id" field.
-func SubscribeIDLT(v int) predicate.ProxyUserSubscribe {
+func SubscribeIDLT(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldLT(FieldSubscribeID, v))
 }
 
 // SubscribeIDLTE applies the LTE predicate on the "subscribe_id" field.
-func SubscribeIDLTE(v int) predicate.ProxyUserSubscribe {
+func SubscribeIDLTE(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldLTE(FieldSubscribeID, v))
 }
 
@@ -685,42 +685,42 @@ func UUIDContainsFold(v string) predicate.ProxyUserSubscribe {
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v int) predicate.ProxyUserSubscribe {
+func StatusEQ(v int8) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldStatus, v))
 }
 
 // StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v int) predicate.ProxyUserSubscribe {
+func StatusNEQ(v int8) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldNEQ(FieldStatus, v))
 }
 
 // StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...int) predicate.ProxyUserSubscribe {
+func StatusIn(vs ...int8) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldIn(FieldStatus, vs...))
 }
 
 // StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...int) predicate.ProxyUserSubscribe {
+func StatusNotIn(vs ...int8) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldNotIn(FieldStatus, vs...))
 }
 
 // StatusGT applies the GT predicate on the "status" field.
-func StatusGT(v int) predicate.ProxyUserSubscribe {
+func StatusGT(v int8) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldGT(FieldStatus, v))
 }
 
 // StatusGTE applies the GTE predicate on the "status" field.
-func StatusGTE(v int) predicate.ProxyUserSubscribe {
+func StatusGTE(v int8) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldGTE(FieldStatus, v))
 }
 
 // StatusLT applies the LT predicate on the "status" field.
-func StatusLT(v int) predicate.ProxyUserSubscribe {
+func StatusLT(v int8) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldLT(FieldStatus, v))
 }
 
 // StatusLTE applies the LTE predicate on the "status" field.
-func StatusLTE(v int) predicate.ProxyUserSubscribe {
+func StatusLTE(v int8) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldLTE(FieldStatus, v))
 }
 

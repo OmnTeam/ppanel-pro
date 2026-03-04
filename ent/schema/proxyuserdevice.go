@@ -26,12 +26,12 @@ func (ProxyUserDevice) Annotations() []schema.Annotation {
 // Fields of the ProxyUserDevice
 func (ProxyUserDevice) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Positive().
 			Comment("ID"),
-		field.Int("user_id").
+		field.Int64("user_id").
 			Comment("用户ID"),
-		field.Int("subscribe_id").
+		field.Int64("subscribe_id").
 			Optional().
 			Nillable().
 			Comment("订阅ID"),

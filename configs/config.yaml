@@ -1,10 +1,35 @@
 server:
   http:
-    addr: 0.0.0.0:8010
+    addr: 0.0.0.0:8080
     timeout: 1s
   grpc:
-    addr: 0.0.0.0:9011
+    addr: 0.0.0.0:9012
     timeout: 1s
+  auth:
+    enable_jwt: true
+    jwt_secret: "your-secret-key-change-in-production"
+    no_auth_paths:
+      - "/api.public.auth.v1."
+      - "/api.public.common.v1."
+      - "/api/public/auth/"
+      - "/api/public/common/"
+  cors:
+    enable: true
+    allowed_origins:
+      - "*"
+    allowed_methods:
+      - "GET"
+      - "POST"
+      - "PUT"
+      - "DELETE"
+      - "OPTIONS"
+    allowed_headers:
+      - "*"
+    exposed_headers:
+      - "Content-Length"
+      - "Authorization"
+    allow_credentials: true
+    max_age: 86400
 data:
   database:
     driver: mysql

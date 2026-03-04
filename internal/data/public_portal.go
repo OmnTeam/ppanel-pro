@@ -51,9 +51,9 @@ func NewPublicPortalRepo(d *Data, logger log.Logger) portalBiz.PortalRepo {
 }
 
 // CheckUserExists 检查用户是否已存在
-// ⚠️ 通过authType和identifier查询，包含租户过滤
-func (r *publicPortalRepo) CheckUserExists(ctx context.Context, tenantID int64, authType, identifier string) (bool, error) {
-	r.logger.Infof("[CheckUserExists] tenantID: %d, authType: %s, identifier: %s", tenantID, authType, identifier)
+// ⚠️ 通过authType和identifier查询
+func (r *publicPortalRepo) CheckUserExists(ctx context.Context, authType, identifier string) (bool, error) {
+	r.logger.Infof("[CheckUserExists] authType: %s, identifier: %s", authType, identifier)
 
 	// 查询用户认证方法表
 	count, err := r.data.db.ProxyUserAuthMethod.Query().
@@ -74,8 +74,8 @@ func (r *publicPortalRepo) CheckUserExists(ctx context.Context, tenantID int64, 
 // GetSubscribeList 获取订阅列表
 // ⚠️ 包含租户过滤和语言过滤
 // language: 如果不为空，过滤指定语言；如果为空，返回默认语言（language=”）
-func (r *publicPortalRepo) GetSubscribeList(ctx context.Context, tenantID int64, language string) ([]*portalBiz.SubscribeInfo, error) {
-	r.logger.Infof("[GetSubscribeList] tenantID: %d, language: %s", tenantID, language)
+func (r *publicPortalRepo) GetSubscribeList(ctx context.Context, language string) ([]*portalBiz.SubscribeInfo, error) {
+	r.logger.Infof("[GetSubscribeList] language: %s", language)
 
 	// 构建查询条件
 	query := r.data.db.ProxySubscribe.Query().
@@ -109,8 +109,12 @@ func (r *publicPortalRepo) GetSubscribeList(ctx context.Context, tenantID int64,
 			_ = json.Unmarshal([]byte(*sub.Discount), &discounts)
 		}
 
-		// 解析Nodes字符串为int64数组（复刻原项目逻辑）
-		nodes := stringToInt64Slice(sub.Nodes)
+		// 解析Nodes字符串为int数组（复刻原项目逻辑）
+		nodes64 := stringToInt64Slice(sub.Nodes)
+		nodes := make([]int, len(nodes64))
+		for i, v := range nodes64 {
+			nodes[i] = int(v)
+		}
 
 		// 解析NodeTags字符串为string数组（复刻原项目逻辑）
 		var nodeTags []string
@@ -142,17 +146,17 @@ func (r *publicPortalRepo) GetSubscribeList(ctx context.Context, tenantID int64,
 			UnitPrice:      sub.UnitPrice,
 			UnitTime:       sub.UnitTime,
 			Discount:       discounts,
-			Replacement:    int64(sub.Replacement),
-			Inventory:      int64(sub.Inventory),
+			Replacement:    sub.Replacement,
+			Inventory:      sub.Inventory,
 			Traffic:        sub.Traffic,
-			SpeedLimit:     int64(sub.SpeedLimit),
-			DeviceLimit:    int64(sub.DeviceLimit),
-			Quota:          int64(sub.Quota),
+			SpeedLimit:     sub.SpeedLimit,
+			DeviceLimit:    sub.DeviceLimit,
+			Quota:          sub.Quota,
 			Nodes:          nodes,
 			NodeTags:       nodeTags,
 			Show:           sub.Show,
 			Sell:           sub.Sell,
-			Sort:           int64(sub.Sort),
+			Sort:           sub.Sort,
 			DeductionRatio: deductionRatio,
 			AllowDeduction: sub.AllowDeduction,
 			ResetCycle:     resetCycle,
@@ -168,13 +172,13 @@ func (r *publicPortalRepo) GetSubscribeList(ctx context.Context, tenantID int64,
 // CalculateOrderPrice 计算订单价格（含折扣、优惠券、手续费）
 // ⚠️ Portal订单不需要查询用户信息（userId=0）
 // ⚠️ paymentID可选，用于计算手续费
-func (r *publicPortalRepo) CalculateOrderPrice(ctx context.Context, tenantID, subscribeID, quantity int64, coupon *string, paymentID *int64) (*portalBiz.PriceInfo, error) {
-	r.logger.Infof("[CalculateOrderPrice] tenantID: %d, subscribeID: %d, quantity: %d, paymentID: %v", tenantID, subscribeID, quantity, paymentID)
+func (r *publicPortalRepo) CalculateOrderPrice(ctx context.Context, subscribeID, quantity int64, coupon *string, paymentID *int64) (*portalBiz.PriceInfo, error) {
+	r.logger.Infof("[CalculateOrderPrice] subscribeID: %d, quantity: %d, paymentID: %v", subscribeID, quantity, paymentID)
 
 	// 1. 查询订阅套餐
 	sub, err := r.data.db.ProxySubscribe.Query().
 		Where(
-			proxysubscribe.IDEQ(int(subscribeID)),
+			proxysubscribe.IDEQ(subscribeID),
 		).
 		Only(ctx)
 	if err != nil {
@@ -203,26 +207,21 @@ func (r *publicPortalRepo) CalculateOrderPrice(ctx context.Context, tenantID, su
 			).
 			Only(ctx)
 		if err != nil {
-			if ent.IsNotFound(err) {
-				r.logger.Warnf("[CalculateOrderPrice] 优惠券不存在: %s", *coupon)
-				return nil, responsecode.NewKratosError(responsecode.ErrCouponNotFound)
+			if !ent.IsNotFound(err) {
+				r.logger.Errorf("[CalculateOrderPrice] 查询优惠券失败: %v", err)
+				return nil, errors.InternalServer("DATABASE_ERROR", "查询优惠券失败")
 			}
-			r.logger.Errorf("[CalculateOrderPrice] 查询优惠券失败: %v", err)
-			return nil, errors.InternalServer("DATABASE_ERROR", "查询优惠券失败")
-		}
-
-		// 检查优惠券可用性 (简化版本，暂时跳过使用次数检查)
-		// 优惠券使用逻辑已根据当前数据结构调整
-		/*
-		if couponInfo.Count > 0 && couponInfo.Count <= couponInfo.UsedCount {
-			return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
-		}
-
-		// ⚠️ 检查优惠券的订阅限制（原项目 line 60-64）
-		if couponInfo.Subscribe != "" {
-			// 解析逗号分隔的订阅ID列表
-			allowedSubs := stringToInt64Slice(couponInfo.Subscribe)
-			if len(allowedSubs) > 0 {
+			// 优惠券不存在时，couponAmount为0
+		} else {
+			/* ⚠️ 暂未实现：优惠券使用次数检查
+			if couponInfo.Count != 0 && couponInfo.Count <= couponInfo.UsedCount {
+				r.logger.Warnf("[CalculateOrderPrice] 优惠券已用完: coupon=%s", *coupon)
+				return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
+			}
+			*/
+			/* ⚠️ 暂未实现：优惠券适用订阅检查
+			if couponInfo.Subscribe != "" {
+				allowedSubs := stringToInt64Slice(couponInfo.Subscribe)
 				allowed := false
 				for _, allowedID := range allowedSubs {
 					if allowedID == subscribeID {
@@ -235,20 +234,20 @@ func (r *publicPortalRepo) CalculateOrderPrice(ctx context.Context, tenantID, su
 					return nil, responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
 				}
 			}
-		}
-		*/
+			*/
 
-		// 计算优惠券折扣（使用helper函数）
-		couponAmount = calculateCoupon(amount, couponInfo)
+			// 计算优惠券折扣（使用helper函数）
+			couponAmount = int64(calculateCoupon(amount, couponInfo))
+		}
 	}
 	amount = amount - couponAmount
 
 	// 5. 计算手续费（如果有支付方式ID）
-	var feeAmount int64 = 0
+	var feeAmount int = 0
 	if paymentID != nil && *paymentID > 0 {
 		payment, err := r.data.db.ProxyPayment.Query().
 			Where(
-				proxypayment.IDEQ(int(*paymentID)),
+				proxypayment.IDEQ(*paymentID),
 			).
 			Only(ctx)
 		if err != nil {
@@ -265,7 +264,7 @@ func (r *publicPortalRepo) CalculateOrderPrice(ctx context.Context, tenantID, su
 
 	// 6. 计算实际支付金额（复刻原项目逻辑 - prePurchaseOrderLogic.go line 79-81）
 	// ⚠️ 关键：amount += feeAmount（原项目将手续费加到amount上）
-	amount = amount + feeAmount
+	amount = amount + int64(feeAmount)
 
 	// 处理 coupon 字段（复刻原项目 - prePurchaseOrderLogic.go line 87）
 	couponStr := ""
@@ -274,30 +273,26 @@ func (r *publicPortalRepo) CalculateOrderPrice(ctx context.Context, tenantID, su
 	}
 
 	return &portalBiz.PriceInfo{
-		Price:          price,          // 原价
-		Amount:         amount,         // 实际支付金额（含手续费）⚠️
-		Discount:       discountAmount, // 折扣金额
-		Coupon:         couponStr,      // 优惠券代码
-		CouponDiscount: couponAmount,   // 优惠券折扣金额
-		FeeAmount:      feeAmount,      // 手续费金额
+		Price:          int(price),          // 原价
+		Amount:         int(amount),         // 实际支付金额（含手续费）⚠️
+		Discount:       int(discountAmount), // 折扣金额
+		Coupon:         couponStr,           // 优惠券代码
+		CouponDiscount: int(couponAmount),   // 优惠券折扣金额
+		FeeAmount:      feeAmount,           // 手续费金额
 	}, nil
 }
 
-// CreatePortalOrder 创建Portal订单
-// ⚠️ 完整复刻原项目逻辑（purchaseLogic.go）
-// ⚠️ userId=0，is_new=true
-// ⚠️ 包含租户ID
 // ⚠️ 禁止使用余额支付
 // ⚠️ 计算手续费
 // ⚠️ 入队延迟关闭订单任务（15分钟）
-func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, tenantID int64, req *portalBiz.CreateOrderRequest) (string, error) {
-	r.logger.Infof("[CreatePortalOrder] tenantID: %d, subscribeID: %d, quantity: %d, paymentID: %d",
-		tenantID, req.SubscribeID, req.Quantity, req.PaymentID)
+func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, req *portalBiz.CreateOrderRequest) (string, error) {
+	r.logger.Infof("[CreatePortalOrder] subscribeID: %d, quantity: %d, paymentID: %d",
+		req.SubscribeID, req.Quantity, req.PaymentID)
 
 	// 1. 查询订阅计划
 	subscribe, err := r.data.db.ProxySubscribe.Query().
 		Where(
-			proxysubscribe.IDEQ(int(req.SubscribeID)),
+			proxysubscribe.IDEQ(req.SubscribeID),
 		).
 		Only(ctx)
 	if err != nil {
@@ -326,7 +321,7 @@ func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, tenantID int64
 	discountAmount := price - amount
 
 	// 5. 处理优惠券（如果有）
-	var couponAmount int64 = 0
+	var couponAmount int = 0
 	couponStr := ""
 	if req.Coupon != nil && *req.Coupon != "" {
 		couponStr = *req.Coupon
@@ -346,27 +341,27 @@ func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, tenantID int64
 		// 验证优惠券使用次数 (简化版本)
 		// 优惠券使用逻辑已根据当前数据结构调整
 		/*
-		if coupon.Count != 0 && coupon.Count <= coupon.UsedCount {
-			return "", responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
-		}
+			if coupon.Count != 0 && coupon.Count <= coupon.UsedCount {
+				return "", responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
+			}
 
-		// ⚠️ 验证优惠券是否适用于当前订阅（复刻原项目 purchaseLogic.go line 86-89）
-		if coupon.Subscribe != "" {
-			subscribes := stringToInt64Slice(coupon.Subscribe)
-			if len(subscribes) > 0 {
-				found := false
-				for _, sid := range subscribes {
-					if sid == req.SubscribeID {
-						found = true
-						break
+			// ⚠️ 验证优惠券是否适用于当前订阅（复刻原项目 purchaseLogic.go line 86-89）
+			if coupon.Subscribe != "" {
+				subscribes := stringToInt64Slice(coupon.Subscribe)
+				if len(subscribes) > 0 {
+					found := false
+					for _, sid := range subscribes {
+						if sid == req.SubscribeID {
+							found = true
+							break
+						}
+					}
+					if !found {
+						r.logger.Warnf("[CreatePortalOrder] 优惠券不适用于此订阅: coupon=%s, subscribeID=%d", couponStr, req.SubscribeID)
+						return "", responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
 					}
 				}
-				if !found {
-					r.logger.Warnf("[CreatePortalOrder] 优惠券不适用于此订阅: coupon=%s, subscribeID=%d", couponStr, req.SubscribeID)
-					return "", responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
-				}
 			}
-		}
 		*/
 
 		// 计算优惠券折扣（复刻原项目 purchaseLogic.go line 91）
@@ -374,12 +369,12 @@ func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, tenantID int64
 	}
 
 	// 6. 扣除优惠券金额
-	amount -= couponAmount
+	amount -= int64(couponAmount)
 
 	// 7. 查询支付方式
 	payment, err := r.data.db.ProxyPayment.Query().
 		Where(
-			proxypayment.IDEQ(int(req.PaymentID)),
+			proxypayment.IDEQ(int64(req.PaymentID)),
 		).
 		Only(ctx)
 
@@ -398,7 +393,7 @@ func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, tenantID int64
 	}
 
 	// 9. 计算手续费（复刻原项目 purchaseLogic.go line 106-110）
-	var feeAmount int64 = 0
+	var feeAmount int = 0
 	if amount > 0 {
 		feeAmount = calculateFee(amount, payment)
 	}
@@ -448,11 +443,11 @@ func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, tenantID int64
 		SetDiscount(discountAmount).
 		SetGiftAmount(0). // Portal订单无赠送金额
 		SetCoupon(couponStr).
-		SetCouponDiscount(couponAmount).
-		SetPaymentID(req.PaymentID).
+		SetCouponDiscount(int64(couponAmount)).
+		SetPaymentID(int64(req.PaymentID)).
 		SetMethod(payment.Platform).
-		SetFeeAmount(feeAmount). // ⚠️ 手续费单独存储
-		SetCommission(0).        // Portal订单无佣金
+		SetFeeAmount(int64(feeAmount)). // ⚠️ 手续费单独存储
+		SetCommission(0).               // Portal订单无佣金
 		SetSubscribeID(req.SubscribeID).
 		SetIsNew(true). // ⚠️ 标记为新订单
 		SetStatus(1).   // 待支付
@@ -489,9 +484,8 @@ func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, tenantID int64
 }
 
 // GetOrderByNo 根据订单号查询订单
-// ⚠️ 包含租户过滤
-func (r *publicPortalRepo) GetOrderByNo(ctx context.Context, tenantID int64, orderNo string) (*portalBiz.OrderInfo, error) {
-	r.logger.Infof("[GetOrderByNo] tenantID: %d, orderNo: %s", tenantID, orderNo)
+func (r *publicPortalRepo) GetOrderByNo(ctx context.Context, orderNo string) (*portalBiz.OrderInfo, error) {
+	r.logger.Infof("[GetOrderByNo] orderNo: %s", orderNo)
 
 	order, err := r.data.db.ProxyOrder.Query().
 		Where(
@@ -523,8 +517,8 @@ func (r *publicPortalRepo) GetOrderByNo(ctx context.Context, tenantID int64, ord
 
 // GetAvailablePaymentMethods 获取可用支付方式
 // ⚠️ 包含租户过滤
-func (r *publicPortalRepo) GetAvailablePaymentMethods(ctx context.Context, tenantID int64) ([]*portalBiz.PaymentMethod, error) {
-	r.logger.Infof("[GetAvailablePaymentMethods] tenantID: %d", tenantID)
+func (r *publicPortalRepo) GetAvailablePaymentMethods(ctx context.Context) ([]*portalBiz.PaymentMethod, error) {
+	r.logger.Infof("[GetAvailablePaymentMethods]")
 
 	payments, err := r.data.db.ProxyPayment.Query().
 		Where(
@@ -546,8 +540,8 @@ func (r *publicPortalRepo) GetAvailablePaymentMethods(ctx context.Context, tenan
 			Description: p.Description,
 			Icon:        p.Icon,
 			FeeMode:     int32(p.FeeMode),
-			FeePercent:  int64(p.FeePercent),
-			FeeAmount:   p.FeeAmount,
+			FeePercent:  int(p.FeePercent),
+			FeeAmount:   int(p.FeeAmount),
 		})
 	}
 
@@ -558,9 +552,11 @@ func (r *publicPortalRepo) GetAvailablePaymentMethods(ctx context.Context, tenan
 // ⚠️ 完整复刻原项目逻辑（purchaseCheckoutLogic.go）
 // ⚠️ 支持多种支付平台：EPay、Stripe、AlipayF2F、CryptoSaaS
 // ⚠️ 包含汇率转换逻辑
-func (r *publicPortalRepo) CreatePayment(ctx context.Context, tenantID int64, orderNo string, returnURL string) (*portalBiz.PaymentInfo, error) {
-	r.logger.Infof("[CreatePayment] tenantID: %d, orderNo: %s, returnURL: %s",
-		tenantID, orderNo, returnURL)
+func (r *publicPortalRepo) CreatePayment(ctx context.Context, orderNo string, returnURL string) (*portalBiz.PaymentInfo, error) {
+	r.logger.Infof("[CreatePayment] orderNo: %s, returnURL: %s",
+		orderNo, returnURL)
+
+	// 临时设置默认tenantID（用于内部辅助方法）
 
 	// 1. 查询订单并验证状态
 	order, err := r.data.db.ProxyOrder.Query().
@@ -586,7 +582,7 @@ func (r *publicPortalRepo) CreatePayment(ctx context.Context, tenantID int64, or
 	// 3. 查询支付方式配置
 	paymentConfig, err := r.data.db.ProxyPayment.Query().
 		Where(
-			proxypayment.IDEQ(int(order.PaymentID)),
+			proxypayment.IDEQ(order.PaymentID),
 		).
 		Only(ctx)
 
@@ -603,7 +599,7 @@ func (r *publicPortalRepo) CreatePayment(ctx context.Context, tenantID int64, or
 	switch platform {
 	case payment.EPay:
 		// EPay支付 - 生成支付URL用于重定向（复刻原项目 purchaseCheckoutLogic.go line 75-85）
-		paymentURL, err := r.epayPayment(ctx, tenantID, paymentConfig, order, returnURL)
+		paymentURL, err := r.epayPayment(ctx, paymentConfig, order, returnURL)
 		if err != nil {
 			return nil, err
 		}
@@ -615,7 +611,7 @@ func (r *publicPortalRepo) CreatePayment(ctx context.Context, tenantID int64, or
 
 	case payment.Stripe:
 		// Stripe支付 - 创建PaymentSheet（复刻原项目 purchaseCheckoutLogic.go line 87-96）
-		clientSecret, publishableKey, tradeNo, paymentMethod, err := r.stripePayment(ctx, tenantID, paymentConfig, order, "")
+		clientSecret, publishableKey, tradeNo, paymentMethod, err := r.stripePayment(ctx, paymentConfig, order, "")
 		if err != nil {
 			return nil, err
 		}
@@ -640,7 +636,7 @@ func (r *publicPortalRepo) CreatePayment(ctx context.Context, tenantID int64, or
 
 	case payment.AlipayF2F:
 		// Alipay F2F支付 - 生成二维码（复刻原项目 purchaseCheckoutLogic.go line 98-108）
-		qrCode, err := r.alipayF2fPayment(ctx, tenantID, paymentConfig, order)
+		qrCode, err := r.alipayF2fPayment(ctx, paymentConfig, order)
 		if err != nil {
 			return nil, err
 		}
@@ -652,7 +648,7 @@ func (r *publicPortalRepo) CreatePayment(ctx context.Context, tenantID int64, or
 
 	case payment.CryptoSaaS:
 		// CryptoSaaS支付 - 生成支付URL（复刻原项目 purchaseCheckoutLogic.go line 110-118）
-		paymentURL, err := r.cryptoSaaSPayment(ctx, tenantID, paymentConfig, order, returnURL)
+		paymentURL, err := r.cryptoSaaSPayment(ctx, paymentConfig, order, returnURL)
 		if err != nil {
 			return nil, err
 		}
@@ -673,7 +669,7 @@ func (r *publicPortalRepo) CreatePayment(ctx context.Context, tenantID int64, or
 		}
 
 		// 调用余额支付处理逻辑（复刻原项目 line 135-137）
-		err := r.processPortalBalancePayment(ctx, tenantID, order)
+		err := r.processPortalBalancePayment(ctx, order)
 		if err != nil {
 			r.logger.Errorf("[CreatePayment] Portal余额支付失败: %v, orderNo: %s", err, order.OrderNo)
 			return nil, err
@@ -702,8 +698,10 @@ func (r *publicPortalRepo) CreatePayment(ctx context.Context, tenantID int64, or
 //   - 生成session token并存储到Redis
 //
 // 3. 返回订单状态和token
-func (r *publicPortalRepo) CheckOrderStatus(ctx context.Context, tenantID int64, orderNo, authType, identifier string) (*portalBiz.OrderStatusInfo, string, error) {
-	r.logger.Infof("[CheckOrderStatus] tenantID: %d, orderNo: %s, authType: %s", tenantID, orderNo, authType)
+func (r *publicPortalRepo) CheckOrderStatus(ctx context.Context, orderNo, authType, identifier string) (*portalBiz.OrderStatusInfo, string, error) {
+	r.logger.Infof("[CheckOrderStatus] orderNo: %s, authType: %s", orderNo, authType)
+
+	// 临时设置默认tenantID（用于内部辅助方法）
 
 	// 1. 查询订单
 	order, err := r.data.db.ProxyOrder.Query().
@@ -722,14 +720,14 @@ func (r *publicPortalRepo) CheckOrderStatus(ctx context.Context, tenantID int64,
 	// 2. 处理临时订单（如果状态为已完成或已激活）
 	var token string
 	if order.Status == 2 || order.Status == 5 {
-		token, err = r.handleTemporaryOrder(ctx, tenantID, order, authType, identifier)
+		token, err = r.handleTemporaryOrder(ctx, order, authType, identifier)
 		if err != nil {
 			return nil, "", err
 		}
 	}
 
 	// 3. 查询订阅信息
-	subscribeInfo, err := r.GetSubscribeList(ctx, tenantID, "")
+	subscribeInfo, err := r.GetSubscribeList(ctx, "")
 	if err != nil {
 		return nil, "", err
 	}
@@ -745,7 +743,7 @@ func (r *publicPortalRepo) CheckOrderStatus(ctx context.Context, tenantID int64,
 	// 4. 查询支付方式信息
 	payment, err := r.data.db.ProxyPayment.Query().
 		Where(
-			proxypayment.IDEQ(int(order.PaymentID)),
+			proxypayment.IDEQ(order.PaymentID),
 		).
 		Only(ctx)
 	if err != nil {
@@ -761,8 +759,8 @@ func (r *publicPortalRepo) CheckOrderStatus(ctx context.Context, tenantID int64,
 		Description: payment.Description,
 		Icon:        payment.Icon,
 		FeeMode:     int32(payment.FeeMode),
-		FeePercent:  int64(payment.FeePercent),
-		FeeAmount:   payment.FeeAmount,
+		FeePercent:  int(payment.FeePercent),
+		FeeAmount:   int(payment.FeeAmount),
 	}
 
 	// 5. 返回订单状态信息（包含所有字段）
@@ -784,7 +782,7 @@ func (r *publicPortalRepo) CheckOrderStatus(ctx context.Context, tenantID int64,
 
 // handleTemporaryOrder 处理临时订单逻辑
 // ⚠️ 完整复刻原项目逻辑（queryPurchaseOrderLogic.go:handleTemporaryOrder）
-func (r *publicPortalRepo) handleTemporaryOrder(ctx context.Context, tenantID int64, order *ent.ProxyOrder, authType, identifier string) (string, error) {
+func (r *publicPortalRepo) handleTemporaryOrder(ctx context.Context, order *ent.ProxyOrder, authType, identifier string) (string, error) {
 	// 1. 从Redis获取临时订单信息
 	tempInfo, err := r.GetTempOrderInfo(ctx, order.OrderNo)
 	if err != nil {
@@ -798,24 +796,18 @@ func (r *publicPortalRepo) handleTemporaryOrder(ctx context.Context, tenantID in
 		return "", errors.BadRequest("INVALID_ORDER", "订单号不匹配")
 	}
 
-	// 3. 验证租户ID匹配
-	if tempInfo.TenantID != tenantID {
-		r.logger.Errorf("[handleTemporaryOrder] 租户ID不匹配: tempInfo.TenantID=%d, tenantID=%d", tempInfo.TenantID, tenantID)
-		return "", errors.BadRequest("INVALID_TENANT", "租户ID不匹配")
-	}
-
-	// 4. 验证用户认证信息
-	if err = r.validateUserAuth(ctx, tenantID, order.UserID, authType, identifier); err != nil {
+	// 3. 验证用户认证信息
+	if err = r.validateUserAuth(ctx, int(order.UserID), authType, identifier); err != nil {
 		return "", err
 	}
 
 	// 5. 生成session token
-	return r.generateSessionToken(ctx, tenantID, order.UserID)
+	return r.generateSessionToken(ctx, int(order.UserID))
 }
 
 // validateUserAuth 验证用户认证信息
 // ⚠️ 完整复刻原项目逻辑（queryPurchaseOrderLogic.go:validateUserAndEmail）
-func (r *publicPortalRepo) validateUserAuth(ctx context.Context, tenantID, userID int64, authType, identifier string) error {
+func (r *publicPortalRepo) validateUserAuth(ctx context.Context, userID int, authType, identifier string) error {
 	// 查询用户认证方法
 	authMethod, err := r.data.db.ProxyUserAuthMethod.Query().
 		Where(
@@ -833,7 +825,7 @@ func (r *publicPortalRepo) validateUserAuth(ctx context.Context, tenantID, userI
 	}
 
 	// 验证用户ID匹配
-	if int64(authMethod.UserID) != userID {
+	if authMethod.UserID != int64(userID) {
 		r.logger.Errorf("[validateUserAuth] 用户ID不匹配: authMethod.UserID=%d, userID=%d", authMethod.UserID, userID)
 		return errors.BadRequest("USER_MISMATCH", "用户认证信息不匹配")
 	}
@@ -843,16 +835,16 @@ func (r *publicPortalRepo) validateUserAuth(ctx context.Context, tenantID, userI
 
 // getJWTConfig 获取JWT配置（从环境变量）
 // 与auth.go中的实现保持一致
-func (r *publicPortalRepo) getJWTConfig() (string, int64) {
+func (r *publicPortalRepo) getJWTConfig() (string, int) {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
 		secret = DefaultJWTSecret
 	}
 
 	expireStr := os.Getenv("JWT_EXPIRE")
-	expire := int64(DefaultJWTExpire)
+	expire := DefaultJWTExpire
 	if expireStr != "" {
-		if exp, err := strconv.ParseInt(expireStr, 10, 64); err == nil {
+		if exp, err := strconv.Atoi(expireStr); err == nil {
 			expire = exp
 		}
 	}
@@ -862,7 +854,7 @@ func (r *publicPortalRepo) getJWTConfig() (string, int64) {
 
 // generateSessionToken 生成session token
 // ⚠️ 完整复刻原项目逻辑（queryPurchaseOrderLogic.go:generateSessionToken）
-func (r *publicPortalRepo) generateSessionToken(ctx context.Context, tenantID, userID int64) (string, error) {
+func (r *publicPortalRepo) generateSessionToken(ctx context.Context, userID int) (string, error) {
 	// 1. 生成session ID
 	sessionID := tool.GenerateUUID()
 
@@ -870,12 +862,11 @@ func (r *publicPortalRepo) generateSessionToken(ctx context.Context, tenantID, u
 	secret, expire := r.getJWTConfig()
 	claims := map[string]interface{}{
 		"user_id":    userID,
-		"tenant_id":  tenantID,
 		"session_id": sessionID,
 	}
 	token, err := tool.GenerateJWT(
 		secret,
-		expire,
+		int64(expire),
 		claims,
 	)
 	if err != nil {
@@ -911,7 +902,7 @@ func (r *publicPortalRepo) GetTempOrderInfo(ctx context.Context, orderNo string)
 	}
 
 	return &portalBiz.TempOrderInfo{
-		
+
 		OrderNo:    tempInfo.OrderNo,
 		Identifier: tempInfo.Identifier,
 		AuthType:   tempInfo.AuthType,
@@ -927,7 +918,7 @@ func (r *publicPortalRepo) GetTempOrderInfo(ctx context.Context, orderNo string)
 
 // epayPayment EPay支付处理
 // ⚠️ 完整复刻原项目逻辑（lines 260-300）
-func (r *publicPortalRepo) epayPayment(ctx context.Context, tenantID int64, paymentConfig *ent.ProxyPayment, order *ent.ProxyOrder, returnURL string) (string, error) {
+func (r *publicPortalRepo) epayPayment(ctx context.Context, paymentConfig *ent.ProxyPayment, order *ent.ProxyOrder, returnURL string) (string, error) {
 	// 1. 解析EPay配置
 	var config EPayConfig
 	if err := config.Unmarshal([]byte(paymentConfig.Config)); err != nil {
@@ -939,7 +930,7 @@ func (r *publicPortalRepo) epayPayment(ctx context.Context, tenantID int64, paym
 	client := epay.NewClient(config.Pid, config.Url, config.Key)
 
 	// 3. 汇率转换（转换为CNY）
-	amount, err := r.queryExchangeRate(ctx, tenantID, "CNY", order.Amount)
+	amount, err := r.queryExchangeRate(ctx, "CNY", int(order.Amount))
 	if err != nil {
 		return "", err
 	}
@@ -948,7 +939,7 @@ func (r *publicPortalRepo) epayPayment(ctx context.Context, tenantID int64, paym
 	notifyURL := r.buildNotifyURL(ctx, paymentConfig)
 
 	// 5. 获取站点名称
-	siteName := r.getSiteName(ctx, tenantID)
+	siteName := r.getSiteName(ctx)
 
 	// 6. 创建支付URL
 	paymentURL := client.CreatePayUrl(epay.Order{
@@ -966,7 +957,7 @@ func (r *publicPortalRepo) epayPayment(ctx context.Context, tenantID int64, paym
 
 // stripePayment Stripe支付处理
 // ⚠️ 完整复刻原项目逻辑（lines 201-257）
-func (r *publicPortalRepo) stripePayment(ctx context.Context, tenantID int64, paymentConfig *ent.ProxyPayment, order *ent.ProxyOrder, identifier string) (clientSecret, publishableKey, tradeNo, paymentMethod string, err error) {
+func (r *publicPortalRepo) stripePayment(ctx context.Context, paymentConfig *ent.ProxyPayment, order *ent.ProxyOrder, identifier string) (clientSecret, publishableKey, tradeNo, paymentMethod string, err error) {
 	// 1. 解析Stripe配置
 	var config StripeConfig
 	if err := config.Unmarshal([]byte(paymentConfig.Config)); err != nil {
@@ -982,7 +973,7 @@ func (r *publicPortalRepo) stripePayment(ctx context.Context, tenantID int64, pa
 	})
 
 	// 3. 汇率转换（转换为CNY）
-	amount, err := r.queryExchangeRate(ctx, tenantID, "CNY", order.Amount)
+	amount, err := r.queryExchangeRate(ctx, "CNY", int(order.Amount))
 	if err != nil {
 		return "", "", "", "", err
 	}
@@ -1011,7 +1002,7 @@ func (r *publicPortalRepo) stripePayment(ctx context.Context, tenantID int64, pa
 
 // alipayF2fPayment 支付宝当面付处理
 // ⚠️ 完整复刻原项目逻辑（lines 150-199）
-func (r *publicPortalRepo) alipayF2fPayment(ctx context.Context, tenantID int64, paymentConfig *ent.ProxyPayment, order *ent.ProxyOrder) (string, error) {
+func (r *publicPortalRepo) alipayF2fPayment(ctx context.Context, paymentConfig *ent.ProxyPayment, order *ent.ProxyOrder) (string, error) {
 	// 1. 解析Alipay配置
 	var config AlipayF2FConfig
 	if err := config.Unmarshal([]byte(paymentConfig.Config)); err != nil {
@@ -1038,7 +1029,7 @@ func (r *publicPortalRepo) alipayF2fPayment(ctx context.Context, tenantID int64,
 	}
 
 	// 4. 汇率转换（转换为CNY）
-	amount, err := r.queryExchangeRate(ctx, tenantID, "CNY", order.Amount)
+	amount, err := r.queryExchangeRate(ctx, "CNY", int(order.Amount))
 	if err != nil {
 		return "", err
 	}
@@ -1061,7 +1052,7 @@ func (r *publicPortalRepo) alipayF2fPayment(ctx context.Context, tenantID int64,
 
 // cryptoSaaSPayment CryptoSaaS加密货币支付处理
 // ⚠️ 完整复刻原项目逻辑（lines 302-342）
-func (r *publicPortalRepo) cryptoSaaSPayment(ctx context.Context, tenantID int64, paymentConfig *ent.ProxyPayment, order *ent.ProxyOrder, returnURL string) (string, error) {
+func (r *publicPortalRepo) cryptoSaaSPayment(ctx context.Context, paymentConfig *ent.ProxyPayment, order *ent.ProxyOrder, returnURL string) (string, error) {
 	// 1. 解析CryptoSaaS配置
 	var config CryptoSaaSConfig
 	if err := config.Unmarshal([]byte(paymentConfig.Config)); err != nil {
@@ -1073,7 +1064,7 @@ func (r *publicPortalRepo) cryptoSaaSPayment(ctx context.Context, tenantID int64
 	client := epay.NewClient(config.AccountID, config.Endpoint, config.SecretKey)
 
 	// 3. 汇率转换（转换为CNY）
-	amount, err := r.queryExchangeRate(ctx, tenantID, "CNY", order.Amount)
+	amount, err := r.queryExchangeRate(ctx, "CNY", int(order.Amount))
 	if err != nil {
 		return "", err
 	}
@@ -1082,7 +1073,7 @@ func (r *publicPortalRepo) cryptoSaaSPayment(ctx context.Context, tenantID int64
 	notifyURL := r.buildNotifyURL(ctx, paymentConfig)
 
 	// 5. 获取站点名称
-	siteName := r.getSiteName(ctx, tenantID)
+	siteName := r.getSiteName(ctx)
 
 	// 6. 创建支付URL
 	paymentURL := client.CreatePayUrl(epay.Order{
@@ -1100,7 +1091,7 @@ func (r *publicPortalRepo) cryptoSaaSPayment(ctx context.Context, tenantID int64
 
 // queryExchangeRate 汇率转换
 // ⚠️ 完整复刻原项目逻辑（lines 344-379）
-func (r *publicPortalRepo) queryExchangeRate(ctx context.Context, tenantID int64, targetCurrency string, amountInCents int64) (float64, error) {
+func (r *publicPortalRepo) queryExchangeRate(ctx context.Context, targetCurrency string, amountInCents int) (float64, error) {
 	// 1. 转换为元
 	amount := float64(amountInCents) / float64(100)
 
@@ -1173,7 +1164,7 @@ func (r *publicPortalRepo) buildNotifyURL(ctx context.Context, paymentConfig *en
 }
 
 // getSiteName 获取站点名称
-func (r *publicPortalRepo) getSiteName(ctx context.Context, tenantID int64) string {
+func (r *publicPortalRepo) getSiteName(ctx context.Context) string {
 	config, err := r.data.db.ProxySystem.Query().
 		Where(
 			proxysystem.KeyEQ("site_name"),
@@ -1202,7 +1193,7 @@ func (r *publicPortalRepo) getSiteName(ctx context.Context, tenantID int64) stri
 //   - 更新订单状态为已支付（status=2）
 //
 // 3. 将订单激活任务入队
-func (r *publicPortalRepo) processPortalBalancePayment(ctx context.Context, tenantID int64, order *ent.ProxyOrder) error {
+func (r *publicPortalRepo) processPortalBalancePayment(ctx context.Context, order *ent.ProxyOrder) error {
 	userID := order.UserID
 
 	// 1. 零金额订单处理（复刻原项目 line 386-402）
@@ -1218,7 +1209,7 @@ func (r *publicPortalRepo) processPortalBalancePayment(ctx context.Context, tena
 		}
 
 		// 跳转到激活逻辑（复刻原项目 line 401: goto activation）
-		return r.enqueueActivateOrderTask(ctx, tenantID, userID, order.OrderNo)
+		return r.enqueueActivateOrderTask(ctx, int(userID), order.OrderNo)
 	}
 
 	// 2. 在事务中处理余额支付（复刻原项目 line 404-494）
@@ -1227,7 +1218,7 @@ func (r *publicPortalRepo) processPortalBalancePayment(ctx context.Context, tena
 		// ⚠️ 关键：GORM 的 db.Model(&user.User{}).Where("id = ?", u.Id).First(&userInfo)
 		//    在事务中会自动加行锁（SELECT ... FOR UPDATE），ent 的 Query 也是如此
 		user, err := tx.ProxyUser.Query().
-			Where(proxyuser.IDEQ(int(userID))).
+			Where(proxyuser.IDEQ(userID)).
 			Only(ctx)
 		if err != nil {
 			r.logger.Errorf("[processPortalBalancePayment] 查询用户失败: %v, userID: %d", err, userID)
@@ -1285,11 +1276,11 @@ func (r *publicPortalRepo) processPortalBalancePayment(ctx context.Context, tena
 			// type Gift struct {
 			//     Type        uint16 `json:"type"`        // 342 = GiftTypeReduce
 			//     OrderNo     string `json:"order_no"`
-			//     SubscribeId int64  `json:"subscribe_id"`
-			//     Amount      int64  `json:"amount"`
-			//     Balance     int64  `json:"balance"`
+			//     SubscribeId int `json:"subscribe_id"`
+			//     Amount      int `json:"amount"`
+			//     Balance     int `json:"balance"`
 			//     Remark      string `json:"remark,omitempty"`
-			//     Timestamp   int64  `json:"timestamp"`
+			//     Timestamp   int `json:"timestamp"`
 			// }
 			giftLog := map[string]interface{}{
 				"type":         342, // GiftTypeReduce = 342（复刻原项目 line 446）
@@ -1321,10 +1312,10 @@ func (r *publicPortalRepo) processPortalBalancePayment(ctx context.Context, tena
 			// ⚠️ 老项目日志结构：
 			// type Balance struct {
 			//     Type      uint16 `json:"type"`      // 323 = BalanceTypePayment
-			//     Amount    int64  `json:"amount"`
+			//     Amount    int `json:"amount"`
 			//     OrderNo   string `json:"order_no,omitempty"`
-			//     Balance   int64  `json:"balance"`
-			//     Timestamp int64  `json:"timestamp"`
+			//     Balance   int `json:"balance"`
+			//     Timestamp int `json:"timestamp"`
 			// }
 			balanceLog := map[string]interface{}{
 				"type":      323, // BalanceTypePayment = 323（复刻原项目 line 468）
@@ -1378,7 +1369,7 @@ func (r *publicPortalRepo) processPortalBalancePayment(ctx context.Context, tena
 
 	// 4. 将订单激活任务入队（复刻原项目 line 504-525）
 	// ⚠️ 关键：老项目使用 goto activation 标签跳转到这里
-	err = r.enqueueActivateOrderTask(ctx, tenantID, userID, order.OrderNo)
+	err = r.enqueueActivateOrderTask(ctx, int(userID), order.OrderNo)
 	if err != nil {
 		// ⚠️ 注意：老项目如果入队失败会返回错误（line 518-520）
 		// 但由于支付已经完成，这里只记录警告而不回滚
@@ -1393,13 +1384,11 @@ func (r *publicPortalRepo) processPortalBalancePayment(ctx context.Context, tena
 
 // enqueueActivateOrderTask 将订单激活任务入队
 // ⚠️ 完全复刻原项目 purchaseCheckoutLogic.go line 504-525
-func (r *publicPortalRepo) enqueueActivateOrderTask(ctx context.Context, tenantID, userID int64, orderNo string) error {
+func (r *publicPortalRepo) enqueueActivateOrderTask(ctx context.Context, userID int, orderNo string) error {
 	// 1. 构建任务负载（复刻原项目 line 506-508）
 	// ⚠️ 关键：老项目只包含 OrderNo 字段！
 	payload := queueTypes.ForthwithActivateOrderPayload{
-		TenantID: tenantID, // 新项目扩展：添加 TenantID
-		UserID:   userID,   // 新项目扩展：添加 UserID
-		OrderNo:  orderNo,  // 复刻原项目 line 507
+		OrderNo: orderNo, // 复刻原项目 line 507
 	}
 
 	// 2. 序列化负载（复刻原项目 line 509-512）

@@ -29,14 +29,14 @@ func (_u *ProxyUserSubscribeUpdate) Where(ps ...predicate.ProxyUserSubscribe) *P
 }
 
 // SetUserID sets the "user_id" field.
-func (_u *ProxyUserSubscribeUpdate) SetUserID(v int) *ProxyUserSubscribeUpdate {
+func (_u *ProxyUserSubscribeUpdate) SetUserID(v int64) *ProxyUserSubscribeUpdate {
 	_u.mutation.ResetUserID()
 	_u.mutation.SetUserID(v)
 	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (_u *ProxyUserSubscribeUpdate) SetNillableUserID(v *int) *ProxyUserSubscribeUpdate {
+func (_u *ProxyUserSubscribeUpdate) SetNillableUserID(v *int64) *ProxyUserSubscribeUpdate {
 	if v != nil {
 		_u.SetUserID(*v)
 	}
@@ -44,20 +44,20 @@ func (_u *ProxyUserSubscribeUpdate) SetNillableUserID(v *int) *ProxyUserSubscrib
 }
 
 // AddUserID adds value to the "user_id" field.
-func (_u *ProxyUserSubscribeUpdate) AddUserID(v int) *ProxyUserSubscribeUpdate {
+func (_u *ProxyUserSubscribeUpdate) AddUserID(v int64) *ProxyUserSubscribeUpdate {
 	_u.mutation.AddUserID(v)
 	return _u
 }
 
 // SetOrderID sets the "order_id" field.
-func (_u *ProxyUserSubscribeUpdate) SetOrderID(v int) *ProxyUserSubscribeUpdate {
+func (_u *ProxyUserSubscribeUpdate) SetOrderID(v int64) *ProxyUserSubscribeUpdate {
 	_u.mutation.ResetOrderID()
 	_u.mutation.SetOrderID(v)
 	return _u
 }
 
 // SetNillableOrderID sets the "order_id" field if the given value is not nil.
-func (_u *ProxyUserSubscribeUpdate) SetNillableOrderID(v *int) *ProxyUserSubscribeUpdate {
+func (_u *ProxyUserSubscribeUpdate) SetNillableOrderID(v *int64) *ProxyUserSubscribeUpdate {
 	if v != nil {
 		_u.SetOrderID(*v)
 	}
@@ -65,20 +65,20 @@ func (_u *ProxyUserSubscribeUpdate) SetNillableOrderID(v *int) *ProxyUserSubscri
 }
 
 // AddOrderID adds value to the "order_id" field.
-func (_u *ProxyUserSubscribeUpdate) AddOrderID(v int) *ProxyUserSubscribeUpdate {
+func (_u *ProxyUserSubscribeUpdate) AddOrderID(v int64) *ProxyUserSubscribeUpdate {
 	_u.mutation.AddOrderID(v)
 	return _u
 }
 
 // SetSubscribeID sets the "subscribe_id" field.
-func (_u *ProxyUserSubscribeUpdate) SetSubscribeID(v int) *ProxyUserSubscribeUpdate {
+func (_u *ProxyUserSubscribeUpdate) SetSubscribeID(v int64) *ProxyUserSubscribeUpdate {
 	_u.mutation.ResetSubscribeID()
 	_u.mutation.SetSubscribeID(v)
 	return _u
 }
 
 // SetNillableSubscribeID sets the "subscribe_id" field if the given value is not nil.
-func (_u *ProxyUserSubscribeUpdate) SetNillableSubscribeID(v *int) *ProxyUserSubscribeUpdate {
+func (_u *ProxyUserSubscribeUpdate) SetNillableSubscribeID(v *int64) *ProxyUserSubscribeUpdate {
 	if v != nil {
 		_u.SetSubscribeID(*v)
 	}
@@ -86,7 +86,7 @@ func (_u *ProxyUserSubscribeUpdate) SetNillableSubscribeID(v *int) *ProxyUserSub
 }
 
 // AddSubscribeID adds value to the "subscribe_id" field.
-func (_u *ProxyUserSubscribeUpdate) AddSubscribeID(v int) *ProxyUserSubscribeUpdate {
+func (_u *ProxyUserSubscribeUpdate) AddSubscribeID(v int64) *ProxyUserSubscribeUpdate {
 	_u.mutation.AddSubscribeID(v)
 	return _u
 }
@@ -267,14 +267,14 @@ func (_u *ProxyUserSubscribeUpdate) ClearUUID() *ProxyUserSubscribeUpdate {
 }
 
 // SetStatus sets the "status" field.
-func (_u *ProxyUserSubscribeUpdate) SetStatus(v int) *ProxyUserSubscribeUpdate {
+func (_u *ProxyUserSubscribeUpdate) SetStatus(v int8) *ProxyUserSubscribeUpdate {
 	_u.mutation.ResetStatus()
 	_u.mutation.SetStatus(v)
 	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (_u *ProxyUserSubscribeUpdate) SetNillableStatus(v *int) *ProxyUserSubscribeUpdate {
+func (_u *ProxyUserSubscribeUpdate) SetNillableStatus(v *int8) *ProxyUserSubscribeUpdate {
 	if v != nil {
 		_u.SetStatus(*v)
 	}
@@ -282,7 +282,7 @@ func (_u *ProxyUserSubscribeUpdate) SetNillableStatus(v *int) *ProxyUserSubscrib
 }
 
 // AddStatus adds value to the "status" field.
-func (_u *ProxyUserSubscribeUpdate) AddStatus(v int) *ProxyUserSubscribeUpdate {
+func (_u *ProxyUserSubscribeUpdate) AddStatus(v int8) *ProxyUserSubscribeUpdate {
 	_u.mutation.AddStatus(v)
 	return _u
 }
@@ -359,7 +359,7 @@ func (_u *ProxyUserSubscribeUpdate) sqlSave(ctx context.Context) (_node int, err
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyusersubscribe.Table, proxyusersubscribe.Columns, sqlgraph.NewFieldSpec(proxyusersubscribe.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyusersubscribe.Table, proxyusersubscribe.Columns, sqlgraph.NewFieldSpec(proxyusersubscribe.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -368,22 +368,22 @@ func (_u *ProxyUserSubscribeUpdate) sqlSave(ctx context.Context) (_node int, err
 		}
 	}
 	if value, ok := _u.mutation.UserID(); ok {
-		_spec.SetField(proxyusersubscribe.FieldUserID, field.TypeInt, value)
+		_spec.SetField(proxyusersubscribe.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedUserID(); ok {
-		_spec.AddField(proxyusersubscribe.FieldUserID, field.TypeInt, value)
+		_spec.AddField(proxyusersubscribe.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.OrderID(); ok {
-		_spec.SetField(proxyusersubscribe.FieldOrderID, field.TypeInt, value)
+		_spec.SetField(proxyusersubscribe.FieldOrderID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedOrderID(); ok {
-		_spec.AddField(proxyusersubscribe.FieldOrderID, field.TypeInt, value)
+		_spec.AddField(proxyusersubscribe.FieldOrderID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.SubscribeID(); ok {
-		_spec.SetField(proxyusersubscribe.FieldSubscribeID, field.TypeInt, value)
+		_spec.SetField(proxyusersubscribe.FieldSubscribeID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedSubscribeID(); ok {
-		_spec.AddField(proxyusersubscribe.FieldSubscribeID, field.TypeInt, value)
+		_spec.AddField(proxyusersubscribe.FieldSubscribeID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.StartTime(); ok {
 		_spec.SetField(proxyusersubscribe.FieldStartTime, field.TypeTime, value)
@@ -440,13 +440,13 @@ func (_u *ProxyUserSubscribeUpdate) sqlSave(ctx context.Context) (_node int, err
 		_spec.ClearField(proxyusersubscribe.FieldUUID, field.TypeString)
 	}
 	if value, ok := _u.mutation.Status(); ok {
-		_spec.SetField(proxyusersubscribe.FieldStatus, field.TypeInt, value)
+		_spec.SetField(proxyusersubscribe.FieldStatus, field.TypeInt8, value)
 	}
 	if value, ok := _u.mutation.AddedStatus(); ok {
-		_spec.AddField(proxyusersubscribe.FieldStatus, field.TypeInt, value)
+		_spec.AddField(proxyusersubscribe.FieldStatus, field.TypeInt8, value)
 	}
 	if _u.mutation.StatusCleared() {
-		_spec.ClearField(proxyusersubscribe.FieldStatus, field.TypeInt)
+		_spec.ClearField(proxyusersubscribe.FieldStatus, field.TypeInt8)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyusersubscribe.FieldUpdatedAt, field.TypeTime, value)
@@ -472,14 +472,14 @@ type ProxyUserSubscribeUpdateOne struct {
 }
 
 // SetUserID sets the "user_id" field.
-func (_u *ProxyUserSubscribeUpdateOne) SetUserID(v int) *ProxyUserSubscribeUpdateOne {
+func (_u *ProxyUserSubscribeUpdateOne) SetUserID(v int64) *ProxyUserSubscribeUpdateOne {
 	_u.mutation.ResetUserID()
 	_u.mutation.SetUserID(v)
 	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (_u *ProxyUserSubscribeUpdateOne) SetNillableUserID(v *int) *ProxyUserSubscribeUpdateOne {
+func (_u *ProxyUserSubscribeUpdateOne) SetNillableUserID(v *int64) *ProxyUserSubscribeUpdateOne {
 	if v != nil {
 		_u.SetUserID(*v)
 	}
@@ -487,20 +487,20 @@ func (_u *ProxyUserSubscribeUpdateOne) SetNillableUserID(v *int) *ProxyUserSubsc
 }
 
 // AddUserID adds value to the "user_id" field.
-func (_u *ProxyUserSubscribeUpdateOne) AddUserID(v int) *ProxyUserSubscribeUpdateOne {
+func (_u *ProxyUserSubscribeUpdateOne) AddUserID(v int64) *ProxyUserSubscribeUpdateOne {
 	_u.mutation.AddUserID(v)
 	return _u
 }
 
 // SetOrderID sets the "order_id" field.
-func (_u *ProxyUserSubscribeUpdateOne) SetOrderID(v int) *ProxyUserSubscribeUpdateOne {
+func (_u *ProxyUserSubscribeUpdateOne) SetOrderID(v int64) *ProxyUserSubscribeUpdateOne {
 	_u.mutation.ResetOrderID()
 	_u.mutation.SetOrderID(v)
 	return _u
 }
 
 // SetNillableOrderID sets the "order_id" field if the given value is not nil.
-func (_u *ProxyUserSubscribeUpdateOne) SetNillableOrderID(v *int) *ProxyUserSubscribeUpdateOne {
+func (_u *ProxyUserSubscribeUpdateOne) SetNillableOrderID(v *int64) *ProxyUserSubscribeUpdateOne {
 	if v != nil {
 		_u.SetOrderID(*v)
 	}
@@ -508,20 +508,20 @@ func (_u *ProxyUserSubscribeUpdateOne) SetNillableOrderID(v *int) *ProxyUserSubs
 }
 
 // AddOrderID adds value to the "order_id" field.
-func (_u *ProxyUserSubscribeUpdateOne) AddOrderID(v int) *ProxyUserSubscribeUpdateOne {
+func (_u *ProxyUserSubscribeUpdateOne) AddOrderID(v int64) *ProxyUserSubscribeUpdateOne {
 	_u.mutation.AddOrderID(v)
 	return _u
 }
 
 // SetSubscribeID sets the "subscribe_id" field.
-func (_u *ProxyUserSubscribeUpdateOne) SetSubscribeID(v int) *ProxyUserSubscribeUpdateOne {
+func (_u *ProxyUserSubscribeUpdateOne) SetSubscribeID(v int64) *ProxyUserSubscribeUpdateOne {
 	_u.mutation.ResetSubscribeID()
 	_u.mutation.SetSubscribeID(v)
 	return _u
 }
 
 // SetNillableSubscribeID sets the "subscribe_id" field if the given value is not nil.
-func (_u *ProxyUserSubscribeUpdateOne) SetNillableSubscribeID(v *int) *ProxyUserSubscribeUpdateOne {
+func (_u *ProxyUserSubscribeUpdateOne) SetNillableSubscribeID(v *int64) *ProxyUserSubscribeUpdateOne {
 	if v != nil {
 		_u.SetSubscribeID(*v)
 	}
@@ -529,7 +529,7 @@ func (_u *ProxyUserSubscribeUpdateOne) SetNillableSubscribeID(v *int) *ProxyUser
 }
 
 // AddSubscribeID adds value to the "subscribe_id" field.
-func (_u *ProxyUserSubscribeUpdateOne) AddSubscribeID(v int) *ProxyUserSubscribeUpdateOne {
+func (_u *ProxyUserSubscribeUpdateOne) AddSubscribeID(v int64) *ProxyUserSubscribeUpdateOne {
 	_u.mutation.AddSubscribeID(v)
 	return _u
 }
@@ -710,14 +710,14 @@ func (_u *ProxyUserSubscribeUpdateOne) ClearUUID() *ProxyUserSubscribeUpdateOne 
 }
 
 // SetStatus sets the "status" field.
-func (_u *ProxyUserSubscribeUpdateOne) SetStatus(v int) *ProxyUserSubscribeUpdateOne {
+func (_u *ProxyUserSubscribeUpdateOne) SetStatus(v int8) *ProxyUserSubscribeUpdateOne {
 	_u.mutation.ResetStatus()
 	_u.mutation.SetStatus(v)
 	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (_u *ProxyUserSubscribeUpdateOne) SetNillableStatus(v *int) *ProxyUserSubscribeUpdateOne {
+func (_u *ProxyUserSubscribeUpdateOne) SetNillableStatus(v *int8) *ProxyUserSubscribeUpdateOne {
 	if v != nil {
 		_u.SetStatus(*v)
 	}
@@ -725,7 +725,7 @@ func (_u *ProxyUserSubscribeUpdateOne) SetNillableStatus(v *int) *ProxyUserSubsc
 }
 
 // AddStatus adds value to the "status" field.
-func (_u *ProxyUserSubscribeUpdateOne) AddStatus(v int) *ProxyUserSubscribeUpdateOne {
+func (_u *ProxyUserSubscribeUpdateOne) AddStatus(v int8) *ProxyUserSubscribeUpdateOne {
 	_u.mutation.AddStatus(v)
 	return _u
 }
@@ -815,7 +815,7 @@ func (_u *ProxyUserSubscribeUpdateOne) sqlSave(ctx context.Context) (_node *Prox
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyusersubscribe.Table, proxyusersubscribe.Columns, sqlgraph.NewFieldSpec(proxyusersubscribe.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyusersubscribe.Table, proxyusersubscribe.Columns, sqlgraph.NewFieldSpec(proxyusersubscribe.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProxyUserSubscribe.id" for update`)}
@@ -841,22 +841,22 @@ func (_u *ProxyUserSubscribeUpdateOne) sqlSave(ctx context.Context) (_node *Prox
 		}
 	}
 	if value, ok := _u.mutation.UserID(); ok {
-		_spec.SetField(proxyusersubscribe.FieldUserID, field.TypeInt, value)
+		_spec.SetField(proxyusersubscribe.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedUserID(); ok {
-		_spec.AddField(proxyusersubscribe.FieldUserID, field.TypeInt, value)
+		_spec.AddField(proxyusersubscribe.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.OrderID(); ok {
-		_spec.SetField(proxyusersubscribe.FieldOrderID, field.TypeInt, value)
+		_spec.SetField(proxyusersubscribe.FieldOrderID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedOrderID(); ok {
-		_spec.AddField(proxyusersubscribe.FieldOrderID, field.TypeInt, value)
+		_spec.AddField(proxyusersubscribe.FieldOrderID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.SubscribeID(); ok {
-		_spec.SetField(proxyusersubscribe.FieldSubscribeID, field.TypeInt, value)
+		_spec.SetField(proxyusersubscribe.FieldSubscribeID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedSubscribeID(); ok {
-		_spec.AddField(proxyusersubscribe.FieldSubscribeID, field.TypeInt, value)
+		_spec.AddField(proxyusersubscribe.FieldSubscribeID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.StartTime(); ok {
 		_spec.SetField(proxyusersubscribe.FieldStartTime, field.TypeTime, value)
@@ -913,13 +913,13 @@ func (_u *ProxyUserSubscribeUpdateOne) sqlSave(ctx context.Context) (_node *Prox
 		_spec.ClearField(proxyusersubscribe.FieldUUID, field.TypeString)
 	}
 	if value, ok := _u.mutation.Status(); ok {
-		_spec.SetField(proxyusersubscribe.FieldStatus, field.TypeInt, value)
+		_spec.SetField(proxyusersubscribe.FieldStatus, field.TypeInt8, value)
 	}
 	if value, ok := _u.mutation.AddedStatus(); ok {
-		_spec.AddField(proxyusersubscribe.FieldStatus, field.TypeInt, value)
+		_spec.AddField(proxyusersubscribe.FieldStatus, field.TypeInt8, value)
 	}
 	if _u.mutation.StatusCleared() {
-		_spec.ClearField(proxyusersubscribe.FieldStatus, field.TypeInt)
+		_spec.ClearField(proxyusersubscribe.FieldStatus, field.TypeInt8)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyusersubscribe.FieldUpdatedAt, field.TypeTime, value)

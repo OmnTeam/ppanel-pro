@@ -10,30 +10,30 @@ import (
 // MarketingRepo 营销仓库接口
 type MarketingRepo interface {
 	// CreateBatchSendEmailTask 创建批量发送邮件任务
-	CreateBatchSendEmailTask(ctx context.Context, tenantID int64, subject, content string, scope int32,
-		registerStartTime, registerEndTime int64, additional string, scheduled int64, interval int32, limit int64) error
+	CreateBatchSendEmailTask(ctx context.Context, subject, content string, scope int32,
+		registerStartTime, registerEndTime int64, additional string, scheduled int, interval int32, limit int) error
 
 	// GetBatchSendEmailTaskList 获取批量发送邮件任务列表
-	GetBatchSendEmailTaskList(ctx context.Context, tenantID int64, page, size int32, scope, status *int32) ([]*ent.ProxyTask, int64, error)
+	GetBatchSendEmailTaskList(ctx context.Context, page, size int32, scope, status *int32) ([]*ent.ProxyTask, int64, error)
 
 	// StopBatchSendEmailTask 停止批量发送邮件任务
-	StopBatchSendEmailTask(ctx context.Context, tenantID, id int64) error
+	StopBatchSendEmailTask(ctx context.Context, id int) error
 
 	// GetPreSendEmailCount 获取预发送邮件数量
-	GetPreSendEmailCount(ctx context.Context, tenantID int64, scope int32, registerStartTime, registerEndTime int64) (int64, error)
+	GetPreSendEmailCount(ctx context.Context, scope int32, registerStartTime, registerEndTime int) (int64, error)
 
 	// GetBatchSendEmailTaskStatus 获取批量发送邮件任务状态
-	GetBatchSendEmailTaskStatus(ctx context.Context, tenantID, id int64) (*ent.ProxyTask, error)
+	GetBatchSendEmailTaskStatus(ctx context.Context, id int) (*ent.ProxyTask, error)
 
 	// CreateQuotaTask 创建配额任务
-	CreateQuotaTask(ctx context.Context, tenantID int64, subscribers []int64, isActive *bool,
-		startTime, endTime int64, resetTraffic bool, days int64, giftType int32, giftValue int64) error
+	CreateQuotaTask(ctx context.Context, subscribers []int, isActive *bool,
+		startTime, endTime int64, resetTraffic bool, days int64, giftType int32, giftValue int) error
 
 	// QueryQuotaTaskPreCount 查询配额任务预计数量
-	QueryQuotaTaskPreCount(ctx context.Context, tenantID int64, subscribers []int64, isActive *bool, startTime, endTime int64) (int64, error)
+	QueryQuotaTaskPreCount(ctx context.Context, subscribers []int, isActive *bool, startTime, endTime int) (int64, error)
 
 	// QueryQuotaTaskList 查询配额任务列表
-	QueryQuotaTaskList(ctx context.Context, tenantID int64, page, size int32, status *int32) ([]*ent.ProxyTask, int64, error)
+	QueryQuotaTaskList(ctx context.Context, page, size int32, status *int32) ([]*ent.ProxyTask, int64, error)
 }
 
 // MarketingUsecase 营销用例
@@ -53,45 +53,45 @@ func NewMarketingUsecase(repo MarketingRepo, logger log.Logger) *MarketingUsecas
 // ========== Email Task Methods ==========
 
 // CreateBatchSendEmailTask 创建批量发送邮件任务
-func (uc *MarketingUsecase) CreateBatchSendEmailTask(ctx context.Context, tenantID int64, subject, content string, scope int32,
-	registerStartTime, registerEndTime int64, additional string, scheduled int64, interval int32, limit int64) error {
-	return uc.repo.CreateBatchSendEmailTask(ctx, tenantID, subject, content, scope, registerStartTime, registerEndTime, additional, scheduled, interval, limit)
+func (uc *MarketingUsecase) CreateBatchSendEmailTask(ctx context.Context, subject, content string, scope int32,
+	registerStartTime, registerEndTime int64, additional string, scheduled int, interval int32, limit int) error {
+	return uc.repo.CreateBatchSendEmailTask(ctx, subject, content, scope, registerStartTime, registerEndTime, additional, scheduled, interval, limit)
 }
 
 // GetBatchSendEmailTaskList 获取批量发送邮件任务列表
-func (uc *MarketingUsecase) GetBatchSendEmailTaskList(ctx context.Context, tenantID int64, page, size int32, scope, status *int32) ([]*ent.ProxyTask, int64, error) {
-	return uc.repo.GetBatchSendEmailTaskList(ctx, tenantID, page, size, scope, status)
+func (uc *MarketingUsecase) GetBatchSendEmailTaskList(ctx context.Context, page, size int32, scope, status *int32) ([]*ent.ProxyTask, int64, error) {
+	return uc.repo.GetBatchSendEmailTaskList(ctx, page, size, scope, status)
 }
 
 // StopBatchSendEmailTask 停止批量发送邮件任务
-func (uc *MarketingUsecase) StopBatchSendEmailTask(ctx context.Context, tenantID, id int64) error {
-	return uc.repo.StopBatchSendEmailTask(ctx, tenantID, id)
+func (uc *MarketingUsecase) StopBatchSendEmailTask(ctx context.Context, id int) error {
+	return uc.repo.StopBatchSendEmailTask(ctx, id)
 }
 
 // GetPreSendEmailCount 获取预发送邮件数量
-func (uc *MarketingUsecase) GetPreSendEmailCount(ctx context.Context, tenantID int64, scope int32, registerStartTime, registerEndTime int64) (int64, error) {
-	return uc.repo.GetPreSendEmailCount(ctx, tenantID, scope, registerStartTime, registerEndTime)
+func (uc *MarketingUsecase) GetPreSendEmailCount(ctx context.Context, scope int32, registerStartTime, registerEndTime int) (int64, error) {
+	return uc.repo.GetPreSendEmailCount(ctx, scope, registerStartTime, registerEndTime)
 }
 
 // GetBatchSendEmailTaskStatus 获取批量发送邮件任务状态
-func (uc *MarketingUsecase) GetBatchSendEmailTaskStatus(ctx context.Context, tenantID, id int64) (*ent.ProxyTask, error) {
-	return uc.repo.GetBatchSendEmailTaskStatus(ctx, tenantID, id)
+func (uc *MarketingUsecase) GetBatchSendEmailTaskStatus(ctx context.Context, id int) (*ent.ProxyTask, error) {
+	return uc.repo.GetBatchSendEmailTaskStatus(ctx, id)
 }
 
 // ========== Quota Task Methods ==========
 
 // CreateQuotaTask 创建配额任务
-func (uc *MarketingUsecase) CreateQuotaTask(ctx context.Context, tenantID int64, subscribers []int64, isActive *bool,
-	startTime, endTime int64, resetTraffic bool, days int64, giftType int32, giftValue int64) error {
-	return uc.repo.CreateQuotaTask(ctx, tenantID, subscribers, isActive, startTime, endTime, resetTraffic, days, giftType, giftValue)
+func (uc *MarketingUsecase) CreateQuotaTask(ctx context.Context, subscribers []int, isActive *bool,
+	startTime, endTime int64, resetTraffic bool, days int64, giftType int32, giftValue int) error {
+	return uc.repo.CreateQuotaTask(ctx, subscribers, isActive, startTime, endTime, resetTraffic, days, giftType, giftValue)
 }
 
 // QueryQuotaTaskPreCount 查询配额任务预计数量
-func (uc *MarketingUsecase) QueryQuotaTaskPreCount(ctx context.Context, tenantID int64, subscribers []int64, isActive *bool, startTime, endTime int64) (int64, error) {
-	return uc.repo.QueryQuotaTaskPreCount(ctx, tenantID, subscribers, isActive, startTime, endTime)
+func (uc *MarketingUsecase) QueryQuotaTaskPreCount(ctx context.Context, subscribers []int, isActive *bool, startTime, endTime int) (int64, error) {
+	return uc.repo.QueryQuotaTaskPreCount(ctx, subscribers, isActive, startTime, endTime)
 }
 
 // QueryQuotaTaskList 查询配额任务列表
-func (uc *MarketingUsecase) QueryQuotaTaskList(ctx context.Context, tenantID int64, page, size int32, status *int32) ([]*ent.ProxyTask, int64, error) {
-	return uc.repo.QueryQuotaTaskList(ctx, tenantID, page, size, status)
+func (uc *MarketingUsecase) QueryQuotaTaskList(ctx context.Context, page, size int32, status *int32) ([]*ent.ProxyTask, int64, error) {
+	return uc.repo.QueryQuotaTaskList(ctx, page, size, status)
 }

@@ -6,7 +6,6 @@ import (
 
 // OAuthParams OAuth登录参数
 type OAuthParams struct {
-	TenantID int64  // 租户ID
 	Method   string // OAuth提供商: google, apple, telegram, github, facebook
 	Redirect string // 登录成功后的重定向URL
 }
@@ -18,7 +17,6 @@ type OAuthResult struct {
 
 // OAuthTokenParams OAuth获取令牌参数
 type OAuthTokenParams struct {
-	TenantID  int64  // 租户ID
 	Method    string // OAuth提供商
 	Callback  string // OAuth回调数据（JSON格式）
 	IP        string // 客户端IP
@@ -32,10 +30,9 @@ type OAuthTokenResult struct {
 
 // AppleCallbackParams Apple回调参数
 type AppleCallbackParams struct {
-	TenantID string // 租户ID
-	Code     string // Authorization code
-	IDToken  string // ID token
-	State    string // State code
+	Code    string // Authorization code
+	IDToken string // ID token
+	State   string // State code
 }
 
 // OAuthUseCase OAuth业务用例接口
@@ -53,7 +50,7 @@ type OAuthUseCase interface {
 // OAuthRepo OAuth数据仓储接口
 type OAuthRepo interface {
 	// GetOAuthConfig 获取OAuth配置
-	GetOAuthConfig(ctx context.Context, tenantID int64, method string) (map[string]string, error)
+	GetOAuthConfig(ctx context.Context, method string) (map[string]string, error)
 
 	// SaveStateCode 保存state code到缓存
 	SaveStateCode(ctx context.Context, provider, code, redirect string) error
@@ -62,14 +59,14 @@ type OAuthRepo interface {
 	GetStateCode(ctx context.Context, provider, code string) (string, error)
 
 	// FindUserByOAuth 通过OAuth查找用户
-	FindUserByOAuth(ctx context.Context, tenantID int64, method, openID string) (int64, error)
+	FindUserByOAuth(ctx context.Context, method, openID string) (int, error)
 
 	// CreateUserWithOAuth 创建OAuth用户
-	CreateUserWithOAuth(ctx context.Context, tenantID int64, method, openID, email, avatar, ip, userAgent string) (int64, error)
+	CreateUserWithOAuth(ctx context.Context, method, openID, email, avatar, ip, userAgent string) (int, error)
 
 	// GenerateJWTToken 生成JWT令牌
-	GenerateJWTToken(ctx context.Context, tenantID, userID int64) (string, error)
+	GenerateJWTToken(ctx context.Context, userID int) (string, error)
 
 	// RecordLoginLog 记录登录日志
-	RecordLoginLog(ctx context.Context, tenantID, userID int64, method, ip, userAgent string, success bool) error
+	RecordLoginLog(ctx context.Context, userID int, method, ip, userAgent string, success bool) error
 }

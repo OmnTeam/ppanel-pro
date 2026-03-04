@@ -118,8 +118,8 @@ const (
 	EmailBindSuccess           = 2006101 // 绑定邮箱成功
 
 	// 设备管理相关 (2006268-2006270)
-	UserDeviceListQuerySuccess      = 2006268 // 查询设备列表成功
-	UserDeviceUnbindSuccess         = 2006269 // 解绑设备成功
+	UserDeviceListQuerySuccess       = 2006268 // 查询设备列表成功
+	UserDeviceUnbindSuccess          = 2006269 // 解绑设备成功
 	UserDeviceStatisticsQuerySuccess = 2006270 // 获取设备在线统计成功
 
 	// Public Order 相关 (2006102-2006109)
@@ -336,6 +336,42 @@ const (
 	AdminSetNodeMultiplierSuccess         = 2006266 // 设置节点倍率成功
 	AdminSettingTelegramBotSuccess        = 2006267 // 设置Telegram机器人成功
 
+	// Admin Redemption 相关 (2006280-2006286)
+	AdminCreateRedemptionCodeSuccess       = 2006280 // 创建兑换码成功
+	AdminUpdateRedemptionCodeSuccess       = 2006281 // 更新兑换码成功
+	AdminToggleRedemptionCodeStatusSuccess = 2006282 // 切换兑换码状态成功
+	AdminDeleteRedemptionCodeSuccess       = 2006283 // 删除兑换码成功
+	AdminBatchDeleteRedemptionCodeSuccess  = 2006284 // 批量删除兑换码成功
+	AdminGetRedemptionCodeListSuccess      = 2006285 // 获取兑换码列表成功
+	AdminGetRedemptionRecordListSuccess    = 2006286 // 获取兑换记录列表成功
+
+	// Admin Tool 相关 (2006287-2006290)
+	AdminGetSystemLogSuccess    = 2006287 // 获取系统日志成功
+	AdminRestartSystemSuccess   = 2006288 // 重启系统成功
+	AdminGetVersionSuccess      = 2006289 // 获取版本信息成功
+	AdminQueryIPLocationSuccess = 2006290 // 查询IP地理位置成功
+
+	// Admin Group 相关 (2006291-2006309)
+	AdminGetUserGroupListSuccess       = 2006291 // 获取用户组列表成功
+	AdminCreateUserGroupSuccess        = 2006292 // 创建用户组成功
+	AdminUpdateUserGroupSuccess        = 2006293 // 更新用户组成功
+	AdminDeleteUserGroupSuccess        = 2006294 // 删除用户组成功
+	AdminUpdateUserUserGroupSuccess    = 2006295 // 更新用户的用户组成功
+	AdminGetNodeGroupListSuccess       = 2006296 // 获取节点组列表成功
+	AdminCreateNodeGroupSuccess        = 2006297 // 创建节点组成功
+	AdminUpdateNodeGroupSuccess        = 2006298 // 更新节点组成功
+	AdminDeleteNodeGroupSuccess        = 2006299 // 删除节点组成功
+	AdminGetGroupConfigSuccess         = 2006300 // 获取分组配置成功
+	AdminUpdateGroupConfigSuccess      = 2006301 // 更新分组配置成功
+	AdminRecalculateGroupSuccess       = 2006302 // 重新计算分组成功
+	AdminGetRecalculationStatusSuccess = 2006303 // 获取重新计算状态成功
+	AdminGetGroupHistorySuccess        = 2006304 // 获取分组历史成功
+	AdminGetGroupHistoryDetailSuccess  = 2006305 // 获取分组历史详情成功
+	AdminExportGroupResultSuccess      = 2006306 // 导出分组结果成功
+	AdminMigrateUsersSuccess           = 2006307 // 迁移用户成功
+	AdminPreviewUserNodesSuccess       = 2006308 // 预览用户节点成功
+	AdminResetGroupsSuccess            = 2006309 // 重置所有分组成功
+
 	// ==== 业务错误码 (3006003 - 3060999) ====
 
 	// 参数验证错误
@@ -369,6 +405,8 @@ const (
 	ErrTicketNotFound               = 3006057 // 工单不存在
 	ErrSystemLogNotFound            = 3006060 // 系统日志不存在
 	ErrTaskNotFound                 = 3006064 // 任务不存在
+	ErrRedemptionCodeNotFound       = 3006072 // 兑换码不存在
+	ErrUserGroupNotFound            = 3006073 // 用户组不存在
 
 	// 业务逻辑错误
 	ErrInvalidTaskType     = 3006065 // 无效的任务类型
@@ -400,6 +438,7 @@ const (
 	ErrCouponUsedUp            = 3006045 // 优惠券已用完
 	ErrCouponUserLimitExceeded = 3006046 // 优惠券用户使用次数超限
 	ErrInsufficientBalance     = 3006047 // 余额不足
+	ErrUserCommissionNotEnough = 3006074 // 佣金不足
 	ErrOrderPaymentFailed      = 3006061 // 订单支付失败
 	ErrDeviceLimitExceeded     = 3006048 // 设备数量超限
 	ErrSubscribeExpired        = 3006049 // 订阅已过期
@@ -582,8 +621,8 @@ var CodeMessages = map[int]string{
 	EmailBindSuccess:           "绑定邮箱成功",
 
 	// 成功码消息 - 设备管理
-	UserDeviceListQuerySuccess:      "查询设备列表成功",
-	UserDeviceUnbindSuccess:         "解绑设备成功",
+	UserDeviceListQuerySuccess:       "查询设备列表成功",
+	UserDeviceUnbindSuccess:          "解绑设备成功",
 	UserDeviceStatisticsQuerySuccess: "获取设备在线统计成功",
 
 	// 成功码消息 - Public Order
@@ -775,30 +814,60 @@ var CodeMessages = map[int]string{
 	AdminGetUserLoginLogsSuccess:         "获取用户登录日志成功",
 
 	// 成功码消息 - Admin System
-	AdminGetCurrencyConfigSuccess:         "获取货币配置成功",
-	AdminUpdateCurrencyConfigSuccess:      "更新货币配置成功",
-	AdminGetInviteConfigSuccess:           "获取邀请配置成功",
-	AdminUpdateInviteConfigSuccess:        "更新邀请配置成功",
-	AdminGetNodeConfigSuccess:             "获取节点配置成功",
-	AdminUpdateNodeConfigSuccess:          "更新节点配置成功",
-	AdminGetPrivacyPolicyConfigSuccess:    "获取隐私政策配置成功",
-	AdminUpdatePrivacyPolicyConfigSuccess: "更新隐私政策配置成功",
-	AdminGetRegisterConfigSuccess:         "获取注册配置成功",
-	AdminUpdateRegisterConfigSuccess:      "更新注册配置成功",
-	AdminGetSiteConfigSuccess:             "获取站点配置成功",
-	AdminUpdateSiteConfigSuccess:          "更新站点配置成功",
-	AdminGetSubscribeConfigSuccess:        "获取订阅配置成功",
-	AdminUpdateSubscribeConfigSuccess:     "更新订阅配置成功",
-	AdminGetTosConfigSuccess:              "获取服务条款配置成功",
-	AdminUpdateTosConfigSuccess:           "更新服务条款配置成功",
-	AdminGetVerifyCodeConfigSuccess:       "获取验证码配置成功",
-	AdminUpdateVerifyCodeConfigSuccess:    "更新验证码配置成功",
-	AdminGetVerifyConfigSuccess:           "获取验证配置成功",
-	AdminUpdateVerifyConfigSuccess:        "更新验证配置成功",
-	AdminGetNodeMultiplierSuccess:         "获取节点倍率成功",
-	AdminPreViewNodeMultiplierSuccess:     "预览节点倍率成功",
-	AdminSetNodeMultiplierSuccess:         "设置节点倍率成功",
-	AdminSettingTelegramBotSuccess:        "设置Telegram机器人成功",
+	AdminGetCurrencyConfigSuccess:          "获取货币配置成功",
+	AdminUpdateCurrencyConfigSuccess:       "更新货币配置成功",
+	AdminGetInviteConfigSuccess:            "获取邀请配置成功",
+	AdminUpdateInviteConfigSuccess:         "更新邀请配置成功",
+	AdminGetNodeConfigSuccess:              "获取节点配置成功",
+	AdminUpdateNodeConfigSuccess:           "更新节点配置成功",
+	AdminGetPrivacyPolicyConfigSuccess:     "获取隐私政策配置成功",
+	AdminUpdatePrivacyPolicyConfigSuccess:  "更新隐私政策配置成功",
+	AdminGetRegisterConfigSuccess:          "获取注册配置成功",
+	AdminUpdateRegisterConfigSuccess:       "更新注册配置成功",
+	AdminGetSiteConfigSuccess:              "获取站点配置成功",
+	AdminUpdateSiteConfigSuccess:           "更新站点配置成功",
+	AdminGetSubscribeConfigSuccess:         "获取订阅配置成功",
+	AdminUpdateSubscribeConfigSuccess:      "更新订阅配置成功",
+	AdminGetTosConfigSuccess:               "获取服务条款配置成功",
+	AdminUpdateTosConfigSuccess:            "更新服务条款配置成功",
+	AdminGetVerifyCodeConfigSuccess:        "获取验证码配置成功",
+	AdminUpdateVerifyCodeConfigSuccess:     "更新验证码配置成功",
+	AdminGetVerifyConfigSuccess:            "获取验证配置成功",
+	AdminUpdateVerifyConfigSuccess:         "更新验证配置成功",
+	AdminGetNodeMultiplierSuccess:          "获取节点倍率成功",
+	AdminPreViewNodeMultiplierSuccess:      "预览节点倍率成功",
+	AdminSetNodeMultiplierSuccess:          "设置节点倍率成功",
+	AdminSettingTelegramBotSuccess:         "设置Telegram机器人成功",
+	AdminCreateRedemptionCodeSuccess:       "创建兑换码成功",
+	AdminUpdateRedemptionCodeSuccess:       "更新兑换码成功",
+	AdminToggleRedemptionCodeStatusSuccess: "切换兑换码状态成功",
+	AdminDeleteRedemptionCodeSuccess:       "删除兑换码成功",
+	AdminBatchDeleteRedemptionCodeSuccess:  "批量删除兑换码成功",
+	AdminGetRedemptionCodeListSuccess:      "获取兑换码列表成功",
+	AdminGetRedemptionRecordListSuccess:    "获取兑换记录列表成功",
+	AdminGetSystemLogSuccess:               "获取系统日志成功",
+	AdminRestartSystemSuccess:              "重启系统成功",
+	AdminGetVersionSuccess:                 "获取版本信息成功",
+	AdminQueryIPLocationSuccess:            "查询IP地理位置成功",
+	AdminGetUserGroupListSuccess:           "获取用户组列表成功",
+	AdminCreateUserGroupSuccess:            "创建用户组成功",
+	AdminUpdateUserGroupSuccess:            "更新用户组成功",
+	AdminDeleteUserGroupSuccess:            "删除用户组成功",
+	AdminUpdateUserUserGroupSuccess:        "更新用户的用户组成功",
+	AdminGetNodeGroupListSuccess:           "获取节点组列表成功",
+	AdminCreateNodeGroupSuccess:            "创建节点组成功",
+	AdminUpdateNodeGroupSuccess:            "更新节点组成功",
+	AdminDeleteNodeGroupSuccess:            "删除节点组成功",
+	AdminGetGroupConfigSuccess:             "获取分组配置成功",
+	AdminUpdateGroupConfigSuccess:          "更新分组配置成功",
+	AdminRecalculateGroupSuccess:           "重新计算分组成功",
+	AdminGetRecalculationStatusSuccess:     "获取重新计算状态成功",
+	AdminGetGroupHistorySuccess:            "获取分组历史成功",
+	AdminGetGroupHistoryDetailSuccess:      "获取分组历史详情成功",
+	AdminExportGroupResultSuccess:          "导出分组结果成功",
+	AdminMigrateUsersSuccess:               "迁移用户成功",
+	AdminPreviewUserNodesSuccess:           "预览用户节点成功",
+	AdminResetGroupsSuccess:                "重置所有分组成功",
 
 	// 业务错误码消息 - 参数验证
 	ErrInvalidUserID:        "无效的用户ID",
@@ -831,6 +900,8 @@ var CodeMessages = map[int]string{
 	ErrTicketNotFound:               "工单不存在",
 	ErrSystemLogNotFound:            "系统日志不存在",
 	ErrTaskNotFound:                 "任务不存在",
+	ErrRedemptionCodeNotFound:       "兑换码不存在",
+	ErrUserGroupNotFound:            "用户组不存在",
 	ErrInvalidTaskType:              "无效的任务类型",
 	ErrInvalidTaskStatus:            "无效的任务状态",
 	ErrTaskCannotBeStopped:          "任务无法停止（只有进行中的任务可以停止）",
@@ -860,6 +931,7 @@ var CodeMessages = map[int]string{
 	ErrCouponUsedUp:            "优惠券已用完",
 	ErrCouponUserLimitExceeded: "优惠券用户使用次数超限",
 	ErrInsufficientBalance:     "余额不足",
+	ErrUserCommissionNotEnough: "佣金不足",
 	ErrOrderPaymentFailed:      "订单支付失败",
 	ErrDeviceLimitExceeded:     "设备数量超限",
 	ErrSubscribeExpired:        "订阅已过期",

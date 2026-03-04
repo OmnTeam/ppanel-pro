@@ -10,57 +10,57 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.ProxyUserDevice {
+func ID(id int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.ProxyUserDevice {
+func IDEQ(id int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.ProxyUserDevice {
+func IDNEQ(id int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.ProxyUserDevice {
+func IDIn(ids ...int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.ProxyUserDevice {
+func IDNotIn(ids ...int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.ProxyUserDevice {
+func IDGT(id int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.ProxyUserDevice {
+func IDGTE(id int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.ProxyUserDevice {
+func IDLT(id int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.ProxyUserDevice {
+func IDLTE(id int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldLTE(FieldID, id))
 }
 
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
-func UserID(v int) predicate.ProxyUserDevice {
+func UserID(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldEQ(FieldUserID, v))
 }
 
 // SubscribeID applies equality check predicate on the "subscribe_id" field. It's identical to SubscribeIDEQ.
-func SubscribeID(v int) predicate.ProxyUserDevice {
+func SubscribeID(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldEQ(FieldSubscribeID, v))
 }
 
@@ -100,82 +100,82 @@ func UpdatedAt(v time.Time) predicate.ProxyUserDevice {
 }
 
 // UserIDEQ applies the EQ predicate on the "user_id" field.
-func UserIDEQ(v int) predicate.ProxyUserDevice {
+func UserIDEQ(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldEQ(FieldUserID, v))
 }
 
 // UserIDNEQ applies the NEQ predicate on the "user_id" field.
-func UserIDNEQ(v int) predicate.ProxyUserDevice {
+func UserIDNEQ(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldNEQ(FieldUserID, v))
 }
 
 // UserIDIn applies the In predicate on the "user_id" field.
-func UserIDIn(vs ...int) predicate.ProxyUserDevice {
+func UserIDIn(vs ...int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldIn(FieldUserID, vs...))
 }
 
 // UserIDNotIn applies the NotIn predicate on the "user_id" field.
-func UserIDNotIn(vs ...int) predicate.ProxyUserDevice {
+func UserIDNotIn(vs ...int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldNotIn(FieldUserID, vs...))
 }
 
 // UserIDGT applies the GT predicate on the "user_id" field.
-func UserIDGT(v int) predicate.ProxyUserDevice {
+func UserIDGT(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldGT(FieldUserID, v))
 }
 
 // UserIDGTE applies the GTE predicate on the "user_id" field.
-func UserIDGTE(v int) predicate.ProxyUserDevice {
+func UserIDGTE(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldGTE(FieldUserID, v))
 }
 
 // UserIDLT applies the LT predicate on the "user_id" field.
-func UserIDLT(v int) predicate.ProxyUserDevice {
+func UserIDLT(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldLT(FieldUserID, v))
 }
 
 // UserIDLTE applies the LTE predicate on the "user_id" field.
-func UserIDLTE(v int) predicate.ProxyUserDevice {
+func UserIDLTE(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldLTE(FieldUserID, v))
 }
 
 // SubscribeIDEQ applies the EQ predicate on the "subscribe_id" field.
-func SubscribeIDEQ(v int) predicate.ProxyUserDevice {
+func SubscribeIDEQ(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldEQ(FieldSubscribeID, v))
 }
 
 // SubscribeIDNEQ applies the NEQ predicate on the "subscribe_id" field.
-func SubscribeIDNEQ(v int) predicate.ProxyUserDevice {
+func SubscribeIDNEQ(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldNEQ(FieldSubscribeID, v))
 }
 
 // SubscribeIDIn applies the In predicate on the "subscribe_id" field.
-func SubscribeIDIn(vs ...int) predicate.ProxyUserDevice {
+func SubscribeIDIn(vs ...int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldIn(FieldSubscribeID, vs...))
 }
 
 // SubscribeIDNotIn applies the NotIn predicate on the "subscribe_id" field.
-func SubscribeIDNotIn(vs ...int) predicate.ProxyUserDevice {
+func SubscribeIDNotIn(vs ...int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldNotIn(FieldSubscribeID, vs...))
 }
 
 // SubscribeIDGT applies the GT predicate on the "subscribe_id" field.
-func SubscribeIDGT(v int) predicate.ProxyUserDevice {
+func SubscribeIDGT(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldGT(FieldSubscribeID, v))
 }
 
 // SubscribeIDGTE applies the GTE predicate on the "subscribe_id" field.
-func SubscribeIDGTE(v int) predicate.ProxyUserDevice {
+func SubscribeIDGTE(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldGTE(FieldSubscribeID, v))
 }
 
 // SubscribeIDLT applies the LT predicate on the "subscribe_id" field.
-func SubscribeIDLT(v int) predicate.ProxyUserDevice {
+func SubscribeIDLT(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldLT(FieldSubscribeID, v))
 }
 
 // SubscribeIDLTE applies the LTE predicate on the "subscribe_id" field.
-func SubscribeIDLTE(v int) predicate.ProxyUserDevice {
+func SubscribeIDLTE(v int64) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldLTE(FieldSubscribeID, v))
 }
 

@@ -28,6 +28,27 @@ func (_u *ProxyOrderUpdate) Where(ps ...predicate.ProxyOrder) *ProxyOrderUpdate 
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *ProxyOrderUpdate) SetTenantID(v int64) *ProxyOrderUpdate {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ProxyOrderUpdate) SetNillableTenantID(v *int64) *ProxyOrderUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *ProxyOrderUpdate) AddTenantID(v int64) *ProxyOrderUpdate {
+	_u.mutation.AddTenantID(v)
+	return _u
+}
+
 // SetParentID sets the "parent_id" field.
 func (_u *ProxyOrderUpdate) SetParentID(v int64) *ProxyOrderUpdate {
 	_u.mutation.ResetParentID()
@@ -525,6 +546,12 @@ func (_u *ProxyOrderUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(proxyorder.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(proxyorder.FieldTenantID, field.TypeInt64, value)
+	}
 	if value, ok := _u.mutation.ParentID(); ok {
 		_spec.SetField(proxyorder.FieldParentID, field.TypeInt64, value)
 	}
@@ -663,6 +690,27 @@ type ProxyOrderUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxyOrderMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *ProxyOrderUpdateOne) SetTenantID(v int64) *ProxyOrderUpdateOne {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ProxyOrderUpdateOne) SetNillableTenantID(v *int64) *ProxyOrderUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *ProxyOrderUpdateOne) AddTenantID(v int64) *ProxyOrderUpdateOne {
+	_u.mutation.AddTenantID(v)
+	return _u
 }
 
 // SetParentID sets the "parent_id" field.
@@ -1191,6 +1239,12 @@ func (_u *ProxyOrderUpdateOne) sqlSave(ctx context.Context) (_node *ProxyOrder, 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(proxyorder.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(proxyorder.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.ParentID(); ok {
 		_spec.SetField(proxyorder.FieldParentID, field.TypeInt64, value)

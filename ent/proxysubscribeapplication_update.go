@@ -28,6 +28,27 @@ func (_u *ProxySubscribeApplicationUpdate) Where(ps ...predicate.ProxySubscribeA
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *ProxySubscribeApplicationUpdate) SetTenantID(v int64) *ProxySubscribeApplicationUpdate {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ProxySubscribeApplicationUpdate) SetNillableTenantID(v *int64) *ProxySubscribeApplicationUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *ProxySubscribeApplicationUpdate) AddTenantID(v int64) *ProxySubscribeApplicationUpdate {
+	_u.mutation.AddTenantID(v)
+	return _u
+}
+
 // SetName sets the "name" field.
 func (_u *ProxySubscribeApplicationUpdate) SetName(v string) *ProxySubscribeApplicationUpdate {
 	_u.mutation.SetName(v)
@@ -258,13 +279,19 @@ func (_u *ProxySubscribeApplicationUpdate) sqlSave(ctx context.Context) (_node i
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxysubscribeapplication.Table, proxysubscribeapplication.Columns, sqlgraph.NewFieldSpec(proxysubscribeapplication.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxysubscribeapplication.Table, proxysubscribeapplication.Columns, sqlgraph.NewFieldSpec(proxysubscribeapplication.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(proxysubscribeapplication.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(proxysubscribeapplication.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxysubscribeapplication.FieldName, field.TypeString, value)
@@ -323,6 +350,27 @@ type ProxySubscribeApplicationUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxySubscribeApplicationMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *ProxySubscribeApplicationUpdateOne) SetTenantID(v int64) *ProxySubscribeApplicationUpdateOne {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ProxySubscribeApplicationUpdateOne) SetNillableTenantID(v *int64) *ProxySubscribeApplicationUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *ProxySubscribeApplicationUpdateOne) AddTenantID(v int64) *ProxySubscribeApplicationUpdateOne {
+	_u.mutation.AddTenantID(v)
+	return _u
 }
 
 // SetName sets the "name" field.
@@ -568,7 +616,7 @@ func (_u *ProxySubscribeApplicationUpdateOne) sqlSave(ctx context.Context) (_nod
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxysubscribeapplication.Table, proxysubscribeapplication.Columns, sqlgraph.NewFieldSpec(proxysubscribeapplication.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxysubscribeapplication.Table, proxysubscribeapplication.Columns, sqlgraph.NewFieldSpec(proxysubscribeapplication.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProxySubscribeApplication.id" for update`)}
@@ -592,6 +640,12 @@ func (_u *ProxySubscribeApplicationUpdateOne) sqlSave(ctx context.Context) (_nod
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(proxysubscribeapplication.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(proxysubscribeapplication.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxysubscribeapplication.FieldName, field.TypeString, value)

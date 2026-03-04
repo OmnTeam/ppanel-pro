@@ -40,6 +40,20 @@ func (_c *ProxyServerGroupCreate) SetNillableDescription(v *string) *ProxyServer
 	return _c
 }
 
+// SetSort sets the "sort" field.
+func (_c *ProxyServerGroupCreate) SetSort(v int) *ProxyServerGroupCreate {
+	_c.mutation.SetSort(v)
+	return _c
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_c *ProxyServerGroupCreate) SetNillableSort(v *int) *ProxyServerGroupCreate {
+	if v != nil {
+		_c.SetSort(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *ProxyServerGroupCreate) SetCreatedAt(v time.Time) *ProxyServerGroupCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -69,7 +83,7 @@ func (_c *ProxyServerGroupCreate) SetNillableUpdatedAt(v *time.Time) *ProxyServe
 }
 
 // SetID sets the "id" field.
-func (_c *ProxyServerGroupCreate) SetID(v int) *ProxyServerGroupCreate {
+func (_c *ProxyServerGroupCreate) SetID(v int64) *ProxyServerGroupCreate {
 	_c.mutation.SetID(v)
 	return _c
 }
@@ -113,6 +127,10 @@ func (_c *ProxyServerGroupCreate) defaults() {
 		v := proxyservergroup.DefaultDescription
 		_c.mutation.SetDescription(v)
 	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		v := proxyservergroup.DefaultSort
+		_c.mutation.SetSort(v)
+	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := proxyservergroup.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
@@ -141,6 +159,9 @@ func (_c *ProxyServerGroupCreate) check() error {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "ProxyServerGroup.description": %w`, err)}
 		}
 	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "ProxyServerGroup.sort"`)}
+	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProxyServerGroup.created_at"`)}
 	}
@@ -168,7 +189,7 @@ func (_c *ProxyServerGroupCreate) sqlSave(ctx context.Context) (*ProxyServerGrou
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = int64(id)
 	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
@@ -178,7 +199,7 @@ func (_c *ProxyServerGroupCreate) sqlSave(ctx context.Context) (*ProxyServerGrou
 func (_c *ProxyServerGroupCreate) createSpec() (*ProxyServerGroup, *sqlgraph.CreateSpec) {
 	var (
 		_node = &ProxyServerGroup{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(proxyservergroup.Table, sqlgraph.NewFieldSpec(proxyservergroup.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(proxyservergroup.Table, sqlgraph.NewFieldSpec(proxyservergroup.FieldID, field.TypeInt64))
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
@@ -191,6 +212,10 @@ func (_c *ProxyServerGroupCreate) createSpec() (*ProxyServerGroup, *sqlgraph.Cre
 	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(proxyservergroup.FieldDescription, field.TypeString, value)
 		_node.Description = value
+	}
+	if value, ok := _c.mutation.Sort(); ok {
+		_spec.SetField(proxyservergroup.FieldSort, field.TypeInt, value)
+		_node.Sort = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(proxyservergroup.FieldCreatedAt, field.TypeTime, value)
@@ -250,7 +275,7 @@ func (_c *ProxyServerGroupCreateBulk) Save(ctx context.Context) ([]*ProxyServerG
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

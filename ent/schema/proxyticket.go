@@ -27,6 +27,7 @@ func (ProxyTicket) Annotations() []schema.Annotation {
 func (ProxyTicket) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").Unique(),
+		field.Int64("tenant_id").Default(0).Comment("租户ID"),
 		field.String("title").Default("").Comment("工单标题"),
 		field.Text("description").Optional().Comment("工单描述"),
 		field.Int64("user_id").Default(0).Comment("用户ID"),

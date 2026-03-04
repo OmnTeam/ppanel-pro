@@ -27,10 +27,10 @@ func NewTicketRepo(data *Data, logger log.Logger) ticketbiz.TicketRepo {
 }
 
 // GetTicketById 获取工单基本信息（不含跟进列表）
-func (r *ticketRepo) GetTicketById(ctx context.Context, id int64) (*ticketbiz.Ticket, error) {
+func (r *ticketRepo) GetTicketById(ctx context.Context, id int) (*ticketbiz.Ticket, error) {
 	po, err := r.data.db.ProxyTicket.Query().
 		Where(
-			proxyticket.ID(id),
+			proxyticket.ID(int64(id)),
 		).
 		First(ctx)
 	if err != nil {
@@ -41,19 +41,18 @@ func (r *ticketRepo) GetTicketById(ctx context.Context, id int64) (*ticketbiz.Ti
 	}
 
 	return &ticketbiz.Ticket{
-		Id:          po.ID,
-		TenantId:    0, // No tenant field in database entity
+		Id:          int64(po.ID),
 		Title:       po.Title,
 		Description: po.Description,
-		UserId:      po.UserID,
+		UserId:      int64(po.UserID),
 		Status:      po.Status,
-		CreatedAt:   po.CreatedAt.UnixMilli(), // Convert to Unix milliseconds
-		UpdatedAt:   po.UpdatedAt.UnixMilli(), // Convert to Unix milliseconds
+		CreatedAt:   int(po.CreatedAt.UnixMilli()), // Convert to Unix milliseconds
+		UpdatedAt:   int(po.UpdatedAt.UnixMilli()), // Convert to Unix milliseconds
 	}, nil
 }
 
 // GetTicket 获取工单详情（包含跟进列表）
-func (r *ticketRepo) GetTicket(ctx context.Context, id int64) (*ticketbiz.Ticket, error) {
+func (r *ticketRepo) GetTicket(ctx context.Context, id int) (*ticketbiz.Ticket, error) {
 	// 获取工单基本信息
 	ticket, err := r.GetTicketById(ctx, id)
 	if err != nil {
@@ -63,7 +62,7 @@ func (r *ticketRepo) GetTicket(ctx context.Context, id int64) (*ticketbiz.Ticket
 	// 获取跟进列表
 	follows, err := r.data.db.ProxyTicketFollow.Query().
 		Where(
-			proxyticketfollow.TicketID(id),
+			proxyticketfollow.TicketID(int64(id)),
 		).
 		Order(ent.Asc(proxyticketfollow.FieldCreatedAt)).
 		All(ctx)
@@ -75,13 +74,12 @@ func (r *ticketRepo) GetTicket(ctx context.Context, id int64) (*ticketbiz.Ticket
 	ticket.Follow = make([]*ticketbiz.Follow, 0, len(follows))
 	for _, f := range follows {
 		ticket.Follow = append(ticket.Follow, &ticketbiz.Follow{
-			Id:        f.ID,
-			TenantId:  0, // No tenant field in database entity
-			TicketId:  f.TicketID,
+			Id:        int64(f.ID),
+			TicketId:  int64(f.TicketID),
 			From:      f.From,
 			Type:      f.Type,
 			Content:   f.Content,
-			CreatedAt: f.CreatedAt.UnixMilli(), // Convert to Unix milliseconds
+			CreatedAt: int(f.CreatedAt.UnixMilli()), // Convert to Unix milliseconds
 		})
 	}
 
@@ -91,11 +89,10 @@ func (r *ticketRepo) GetTicket(ctx context.Context, id int64) (*ticketbiz.Ticket
 // GetTicketList 获取工单列表
 func (r *ticketRepo) GetTicketList(ctx context.Context, page, size int, userId int64, status *int8, search string) (int64, []*ticketbiz.Ticket, error) {
 	query := r.data.db.ProxyTicket.Query()
-		
 
 	// 按用户ID筛选
 	if userId > 0 {
-		query = query.Where(proxyticket.UserID(userId))
+		query = query.Where(proxyticket.UserID(int64(userId)))
 	}
 
 	// 按状态筛选
@@ -140,15 +137,14 @@ func (r *ticketRepo) GetTicketList(ctx context.Context, page, size int, userId i
 	tickets := make([]*ticketbiz.Ticket, 0, len(list))
 	for _, po := range list {
 		ticket := &ticketbiz.Ticket{
-			Id:          po.ID,
-			TenantId:    0, // No tenant field in database entity
+			Id:          int64(po.ID),
 			Title:       po.Title,
 			Description: po.Description,
-			UserId:      po.UserID,
+			UserId:      int64(po.UserID),
 			Status:      po.Status,
-			CreatedAt:   po.CreatedAt.UnixMilli(), // Convert to Unix milliseconds
-			UpdatedAt:   po.UpdatedAt.UnixMilli(), // Convert to Unix milliseconds
-			Follow:      []*ticketbiz.Follow{},    // 列表接口不返回Follows，保持空数组
+			CreatedAt:   int(po.CreatedAt.UnixMilli()), // Convert to Unix milliseconds
+			UpdatedAt:   int(po.UpdatedAt.UnixMilli()), // Convert to Unix milliseconds
+			Follow:      []*ticketbiz.Follow{},         // 列表接口不返回Follows，保持空数组
 		}
 
 		tickets = append(tickets, ticket)
@@ -158,8 +154,8 @@ func (r *ticketRepo) GetTicketList(ctx context.Context, page, size int, userId i
 }
 
 // UpdateTicketStatus 更新工单状态
-func (r *ticketRepo) UpdateTicketStatus(ctx context.Context, id int64, status int8) error {
-	err := r.data.db.ProxyTicket.UpdateOneID(id).
+func (r *ticketRepo) UpdateTicketStatus(ctx context.Context, id int, status int8) error {
+	err := r.data.db.ProxyTicket.UpdateOneID(int64(id)).
 		SetStatus(status).
 		Exec(ctx)
 	if err != nil {

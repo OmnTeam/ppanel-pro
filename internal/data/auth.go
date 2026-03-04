@@ -108,7 +108,7 @@ func (r *authRepo) CheckUserExistByEmail(ctx context.Context, email string) (boo
 }
 
 // CheckUserExistByTelephone checks if user exists by telephone (E.164 format)
-func (r *authRepo) CheckUserExistByTelephone(ctx context.Context,  telephoneAreaCode, telephone string) (bool, error) {
+func (r *authRepo) CheckUserExistByTelephone(ctx context.Context, telephoneAreaCode, telephone string) (bool, error) {
 	// Format phone to E.164
 	phoneNumber, err := phone.FormatToE164(telephoneAreaCode, telephone)
 	if err != nil {
@@ -132,14 +132,14 @@ func (r *authRepo) CheckUserExistByTelephone(ctx context.Context,  telephoneArea
 }
 
 // UserLogin logs in user with email and password
-func (r *authRepo) UserLogin(ctx context.Context,  email, password, ip, userAgent string) (*v1.LoginResult, error) {
+func (r *authRepo) UserLogin(ctx context.Context, email, password, ip, userAgent string) (*v1.LoginResult, error) {
 	var userID int64
 	loginStatus := false
 
 	// Deferred login logging
 	defer func() {
 		if userID != 0 {
-			r.logLogin(ctx, userID, "email", ip, userAgent, loginStatus)
+			r.logLogin(ctx, int(userID), "email", ip, userAgent, loginStatus)
 		}
 	}()
 
@@ -160,7 +160,7 @@ func (r *authRepo) UserLogin(ctx context.Context,  email, password, ip, userAgen
 		return nil, fmt.Errorf("login failed: %w", err)
 	}
 
-	userID = int64(authMethod.UserID)
+	userID = authMethod.UserID
 
 	// Get user and verify password
 	user, err := r.data.db.ProxyUser.Get(ctx, authMethod.UserID)
@@ -210,7 +210,7 @@ func (r *authRepo) UserLogin(ctx context.Context,  email, password, ip, userAgen
 }
 
 // TelephoneLogin logs in user with telephone and password or code
-func (r *authRepo) TelephoneLogin(ctx context.Context,  telephoneAreaCode, telephone, password, telephoneCode, ip, userAgent string) (*v1.LoginResult, error) {
+func (r *authRepo) TelephoneLogin(ctx context.Context, telephoneAreaCode, telephone, password, telephoneCode, ip, userAgent string) (*v1.LoginResult, error) {
 	var userID int64
 	loginStatus := false
 
@@ -229,7 +229,7 @@ func (r *authRepo) TelephoneLogin(ctx context.Context,  telephoneAreaCode, telep
 	// Deferred login logging
 	defer func() {
 		if userID != 0 {
-			r.logLogin(ctx, userID, "mobile", ip, userAgent, loginStatus)
+			r.logLogin(ctx, int(userID), "mobile", ip, userAgent, loginStatus)
 		}
 	}()
 
@@ -250,7 +250,7 @@ func (r *authRepo) TelephoneLogin(ctx context.Context,  telephoneAreaCode, telep
 		return nil, fmt.Errorf("login failed: %w", err)
 	}
 
-	userID = int64(authMethod.UserID)
+	userID = authMethod.UserID
 
 	// Get user
 	user, err := r.data.db.ProxyUser.Get(ctx, authMethod.UserID)
@@ -329,15 +329,15 @@ func (r *authRepo) TelephoneLogin(ctx context.Context,  telephoneAreaCode, telep
 }
 
 // UserRegister registers a new user with email
-func (r *authRepo) UserRegister(ctx context.Context,  email, password, invite, code, ip, userAgent string) (*v1.LoginResult, error) {
+func (r *authRepo) UserRegister(ctx context.Context, email, password, invite, code, ip, userAgent string) (*v1.LoginResult, error) {
 	var userID int64
 	var token string
 
 	// Deferred logging
 	defer func() {
 		if userID != 0 && token != "" {
-			r.logLogin(ctx, userID, "email", ip, userAgent, true)
-			r.logRegister(ctx, userID, "email", email, ip, userAgent)
+			r.logLogin(ctx, int(userID), "email", ip, userAgent, true)
+			r.logRegister(ctx, int(userID), "email", email, ip, userAgent)
 		}
 	}()
 
@@ -415,11 +415,10 @@ func (r *authRepo) UserRegister(ctx context.Context,  email, password, invite, c
 	userCreate := tx.ProxyUser.Create().
 		SetPassword(encodedPassword).
 		SetAlgo("default").
-		SetTenantID(0).
 		SetOnlyFirstPurchase(onlyFirstPurchase)
 
 	if refererID != nil {
-		userCreate = userCreate.SetNillableRefererID(func() *int { if refererID != nil { id := int(*refererID); return &id }; return nil }())
+		userCreate = userCreate.SetNillableRefererID(refererID)
 	}
 
 	user, err := userCreate.Save(ctx)
@@ -430,7 +429,7 @@ func (r *authRepo) UserRegister(ctx context.Context,  email, password, invite, c
 	}
 
 	// Generate and update refer code
-	referCode := tool.GenerateReferCode(int64(user.ID))
+	referCode := tool.GenerateReferCode(user.ID)
 	user, err = tx.ProxyUser.UpdateOneID(user.ID).
 		SetReferCode(referCode).
 		Save(ctx)
@@ -448,7 +447,6 @@ func (r *authRepo) UserRegister(ctx context.Context,  email, password, invite, c
 
 	_, err = tx.ProxyUserAuthMethod.Create().
 		SetUserID(user.ID).
-		SetTenantID(0).
 		SetAuthType("email").
 		SetAuthIdentifier(email).
 		SetVerified(verified).
@@ -466,7 +464,7 @@ func (r *authRepo) UserRegister(ctx context.Context,  email, password, invite, c
 		return nil, fmt.Errorf("registration failed: %w", err)
 	}
 
-	userID = int64(user.ID)
+	userID = user.ID
 
 	// Generate session ID and token
 	sessionID := tool.GenerateUUID()
@@ -495,7 +493,7 @@ func (r *authRepo) UserRegister(ctx context.Context,  email, password, invite, c
 }
 
 // TelephoneRegister registers a new user with telephone
-func (r *authRepo) TelephoneRegister(ctx context.Context,  telephoneAreaCode, telephone, password, invite, code, ip, userAgent string) (*v1.LoginResult, error) {
+func (r *authRepo) TelephoneRegister(ctx context.Context, telephoneAreaCode, telephone, password, invite, code, ip, userAgent string) (*v1.LoginResult, error) {
 	var userID int64
 	var token string
 
@@ -519,8 +517,8 @@ func (r *authRepo) TelephoneRegister(ctx context.Context,  telephoneAreaCode, te
 	// Deferred logging
 	defer func() {
 		if userID != 0 && token != "" {
-			r.logLogin(ctx, userID, "mobile", ip, userAgent, true)
-			r.logRegister(ctx, userID, "mobile", phoneNumber, ip, userAgent)
+			r.logLogin(ctx, int(userID), "mobile", ip, userAgent, true)
+			r.logRegister(ctx, int(userID), "mobile", phoneNumber, ip, userAgent)
 		}
 	}()
 
@@ -594,11 +592,10 @@ func (r *authRepo) TelephoneRegister(ctx context.Context,  telephoneAreaCode, te
 	userCreate := tx.ProxyUser.Create().
 		SetPassword(encodedPassword).
 		SetAlgo("default").
-		SetTenantID(0).
 		SetOnlyFirstPurchase(onlyFirstPurchase)
 
 	if refererID != nil {
-		userCreate = userCreate.SetNillableRefererID(func() *int { if refererID != nil { id := int(*refererID); return &id }; return nil }())
+		userCreate = userCreate.SetNillableRefererID(refererID)
 	}
 
 	user, err := userCreate.Save(ctx)
@@ -609,7 +606,7 @@ func (r *authRepo) TelephoneRegister(ctx context.Context,  telephoneAreaCode, te
 	}
 
 	// Generate and update refer code
-	referCode := tool.GenerateReferCode(int64(user.ID))
+	referCode := tool.GenerateReferCode(user.ID)
 	user, err = tx.ProxyUser.UpdateOneID(user.ID).
 		SetReferCode(referCode).
 		Save(ctx)
@@ -639,7 +636,7 @@ func (r *authRepo) TelephoneRegister(ctx context.Context,  telephoneAreaCode, te
 		return nil, fmt.Errorf("registration failed: %w", err)
 	}
 
-	userID = int64(user.ID)
+	userID = user.ID
 
 	// Generate session ID and token
 	sessionID := tool.GenerateUUID()
@@ -668,14 +665,14 @@ func (r *authRepo) TelephoneRegister(ctx context.Context,  telephoneAreaCode, te
 }
 
 // ResetPassword resets user password with email
-func (r *authRepo) ResetPassword(ctx context.Context,  email, password, code, ip, userAgent string) (*v1.LoginResult, error) {
+func (r *authRepo) ResetPassword(ctx context.Context, email, password, code, ip, userAgent string) (*v1.LoginResult, error) {
 	var userID int64
 	loginStatus := false
 
 	// Deferred login logging
 	defer func() {
 		if userID != 0 && loginStatus {
-			r.logLogin(ctx, userID, "email", ip, userAgent, loginStatus)
+			r.logLogin(ctx, int(userID), "email", ip, userAgent, loginStatus)
 		}
 	}()
 
@@ -715,7 +712,7 @@ func (r *authRepo) ResetPassword(ctx context.Context,  email, password, code, ip
 		return nil, fmt.Errorf("reset password failed: %w", err)
 	}
 
-	userID = int64(authMethod.UserID)
+	userID = authMethod.UserID
 
 	// Get user
 	user, err := r.data.db.ProxyUser.Get(ctx, authMethod.UserID)
@@ -763,7 +760,7 @@ func (r *authRepo) ResetPassword(ctx context.Context,  email, password, code, ip
 }
 
 // TelephoneResetPassword resets user password with telephone
-func (r *authRepo) TelephoneResetPassword(ctx context.Context,  telephoneAreaCode, telephone, password, code, ip, userAgent string) (*v1.LoginResult, error) {
+func (r *authRepo) TelephoneResetPassword(ctx context.Context, telephoneAreaCode, telephone, password, code, ip, userAgent string) (*v1.LoginResult, error) {
 	var userID int64
 	loginStatus := false
 
@@ -782,7 +779,7 @@ func (r *authRepo) TelephoneResetPassword(ctx context.Context,  telephoneAreaCod
 	// Deferred login logging
 	defer func() {
 		if userID != 0 && loginStatus {
-			r.logLogin(ctx, userID, "mobile", ip, userAgent, loginStatus)
+			r.logLogin(ctx, int(userID), "mobile", ip, userAgent, loginStatus)
 		}
 	}()
 
@@ -822,7 +819,7 @@ func (r *authRepo) TelephoneResetPassword(ctx context.Context,  telephoneAreaCod
 		return nil, fmt.Errorf("reset password failed: %w", err)
 	}
 
-	userID = int64(authMethod.UserID)
+	userID = authMethod.UserID
 
 	// Get user
 	user, err := r.data.db.ProxyUser.Get(ctx, authMethod.UserID)
@@ -870,7 +867,7 @@ func (r *authRepo) TelephoneResetPassword(ctx context.Context,  telephoneAreaCod
 }
 
 // logLogin logs login activity (deferred)
-func (r *authRepo) logLogin(ctx context.Context, userID int64, method, ip, userAgent string, success bool) {
+func (r *authRepo) logLogin(ctx context.Context, userID int, method, ip, userAgent string, success bool) {
 	loginLog := LoginLog{
 		Method:    method,
 		LoginIP:   ip,
@@ -888,7 +885,7 @@ func (r *authRepo) logLogin(ctx context.Context, userID int64, method, ip, userA
 	_, err = r.data.db.ProxySystemLog.Create().
 		SetType(LogTypeLogin).
 		SetDate(time.Now().Format("2006-01-02")).
-		SetObjectID(userID).
+		SetObjectID(int64(userID)).
 		SetContent(string(content)).
 		Save(ctx)
 
@@ -898,7 +895,7 @@ func (r *authRepo) logLogin(ctx context.Context, userID int64, method, ip, userA
 }
 
 // logRegister logs registration activity (deferred)
-func (r *authRepo) logRegister(ctx context.Context, userID int64, authMethod, identifier, ip, userAgent string) {
+func (r *authRepo) logRegister(ctx context.Context, userID int, authMethod, identifier, ip, userAgent string) {
 	registerLog := RegisterLog{
 		AuthMethod: authMethod,
 		Identifier: identifier,
@@ -916,7 +913,7 @@ func (r *authRepo) logRegister(ctx context.Context, userID int64, authMethod, id
 	_, err = r.data.db.ProxySystemLog.Create().
 		SetType(LogTypeRegister).
 		SetDate(time.Now().Format("2006-01-02")).
-		SetObjectID(userID).
+		SetObjectID(int64(userID)).
 		SetContent(string(content)).
 		Save(ctx)
 

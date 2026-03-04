@@ -25,7 +25,7 @@ func NewPublicDocumentRepo(data *Data, logger log.Logger) documentBiz.DocumentRe
 }
 
 // QueryDocumentList 查询文档列表
-func (r *publicDocumentRepo) QueryDocumentList(ctx context.Context, tenantID int64) ([]*documentBiz.DocumentItem, int64, error) {
+func (r *publicDocumentRepo) QueryDocumentList(ctx context.Context) ([]*documentBiz.DocumentItem, int64, error) {
 	// 查询所有文档（无分页）
 	documents, err := r.data.db.ProxyDocument.Query().
 		Order(ent.Desc(proxydocument.FieldUpdatedAt)).
@@ -55,10 +55,10 @@ func (r *publicDocumentRepo) QueryDocumentList(ctx context.Context, tenantID int
 }
 
 // QueryDocumentDetail 查询文档详情
-func (r *publicDocumentRepo) QueryDocumentDetail(ctx context.Context, tenantID, id int64) (*documentBiz.DocumentDetail, error) {
+func (r *publicDocumentRepo) QueryDocumentDetail(ctx context.Context, id int) (*documentBiz.DocumentDetail, error) {
 	document, err := r.data.db.ProxyDocument.Query().
 		Where(
-			proxydocument.ID(int(id)),
+			proxydocument.ID(int64(id)),
 		).
 		Only(ctx)
 

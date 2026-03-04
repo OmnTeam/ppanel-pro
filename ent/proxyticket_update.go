@@ -28,6 +28,27 @@ func (_u *ProxyTicketUpdate) Where(ps ...predicate.ProxyTicket) *ProxyTicketUpda
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *ProxyTicketUpdate) SetTenantID(v int64) *ProxyTicketUpdate {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ProxyTicketUpdate) SetNillableTenantID(v *int64) *ProxyTicketUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *ProxyTicketUpdate) AddTenantID(v int64) *ProxyTicketUpdate {
+	_u.mutation.AddTenantID(v)
+	return _u
+}
+
 // SetTitle sets the "title" field.
 func (_u *ProxyTicketUpdate) SetTitle(v string) *ProxyTicketUpdate {
 	_u.mutation.SetTitle(v)
@@ -186,6 +207,12 @@ func (_u *ProxyTicketUpdate) sqlSave(ctx context.Context) (_node int, err error)
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(proxyticket.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(proxyticket.FieldTenantID, field.TypeInt64, value)
+	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(proxyticket.FieldTitle, field.TypeString, value)
 	}
@@ -237,6 +264,27 @@ type ProxyTicketUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxyTicketMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *ProxyTicketUpdateOne) SetTenantID(v int64) *ProxyTicketUpdateOne {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ProxyTicketUpdateOne) SetNillableTenantID(v *int64) *ProxyTicketUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *ProxyTicketUpdateOne) AddTenantID(v int64) *ProxyTicketUpdateOne {
+	_u.mutation.AddTenantID(v)
+	return _u
 }
 
 // SetTitle sets the "title" field.
@@ -426,6 +474,12 @@ func (_u *ProxyTicketUpdateOne) sqlSave(ctx context.Context) (_node *ProxyTicket
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(proxyticket.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(proxyticket.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(proxyticket.FieldTitle, field.TypeString, value)

@@ -26,10 +26,10 @@ func (ProxyUserAuthMethod) Annotations() []schema.Annotation {
 // Fields of the ProxyUserAuthMethod
 func (ProxyUserAuthMethod) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Positive().
 			Comment("ID"),
-		field.Int("user_id").
+		field.Int64("user_id").
 			Comment("用户ID"),
 		field.Int64("tenant_id").
 			Default(0).

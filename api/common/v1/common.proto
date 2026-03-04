@@ -11,7 +11,7 @@ message Response {
   // 响应码（7位数字）
   // 格式: Category(1位) + Module(3位) + File(3位)
   // Category: 2=成功, 3=业务错误, 4=权限错误, 5=系统错误, 6=网络错误, 7=数据错误, 8=配置错误, 9=第三方错误
-  int64 code = 1;
+  int32 code = 1;
 
   // 成功标识: true=成功, false=失败
   bool success = 2;

@@ -47,9 +47,9 @@ func (h *SendSmsHandler) ProcessTask(ctx context.Context, task *asynq.Task) erro
 	}
 
 	// Load mobile config from ProxySystem table based on tenant ID
-	mobileConfig, err := h.loadMobileConfig(ctx, payload.TenantID)
+	mobileConfig, err := h.loadMobileConfig(ctx)
 	if err != nil {
-		h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Load mobile config failed for tenantID %d: %v", payload.TenantID, err)
+		h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Load mobile config failed: %v", err)
 		return nil
 	}
 
@@ -61,7 +61,7 @@ func (h *SendSmsHandler) ProcessTask(ctx context.Context, task *asynq.Task) erro
 
 		// Create failed message log
 		createSms := &logmodel.Message{
-			
+
 			Platform: mobileConfig.Platform,
 			To:       fmt.Sprintf("+%s%s", payload.TelephoneArea, payload.Telephone),
 			Subject:  constant.ParseVerifyType(payload.Type).String(),
@@ -76,7 +76,7 @@ func (h *SendSmsHandler) ProcessTask(ctx context.Context, task *asynq.Task) erro
 
 	// Prepare message log
 	createSms := &logmodel.Message{
-		
+
 		Platform: mobileConfig.Platform,
 		To:       fmt.Sprintf("+%s%s", payload.TelephoneArea, payload.Telephone),
 		Subject:  constant.ParseVerifyType(payload.Type).String(),
@@ -127,7 +127,7 @@ func (h *SendSmsHandler) ProcessTask(ctx context.Context, task *asynq.Task) erro
 }
 
 // loadMobileConfig loads mobile/SMS configuration from ProxySystem table based on tenant ID
-func (h *SendSmsHandler) loadMobileConfig(ctx context.Context, tenantID int64) (*MobileSystemConfig, error) {
+func (h *SendSmsHandler) loadMobileConfig(ctx context.Context) (*MobileSystemConfig, error) {
 	// Query mobile config from ProxySystem table
 	// Category: "mobile", Key: "config"
 	config, err := h.db.ProxySystem.Query().
@@ -139,16 +139,16 @@ func (h *SendSmsHandler) loadMobileConfig(ctx context.Context, tenantID int64) (
 
 	if err != nil {
 		if ent.IsNotFound(err) {
-			h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Mobile config not found for tenantID: %d, category: mobile, key: config", tenantID)
-			return nil, fmt.Errorf("mobile config not found for tenant %d", tenantID)
+			h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Mobile config not found, category: mobile, key: config")
+			return nil, fmt.Errorf("mobile config not found")
 		}
-		h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Failed to query mobile config for tenantID: %d, error: %v", tenantID, err)
+		h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Failed to query mobile config, error: %v", err)
 		return nil, err
 	}
 
 	var mobileConfig MobileSystemConfig
 	if err := json.Unmarshal([]byte(config.Value), &mobileConfig); err != nil {
-		h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Failed to unmarshal mobile config for tenantID: %d, error: %v", tenantID, err)
+		h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Failed to unmarshal mobile config, error: %v", err)
 		return nil, err
 	}
 

@@ -18,6 +18,10 @@ type ProxyCoupon struct {
 	// ID of the ent.
 	// 优惠券ID
 	ID int64 `json:"id,omitempty"`
+	// 用户限制
+	UserLimit int64 `json:"user_limit,omitempty"`
+	// 订阅限制（逗号分隔的订阅ID）
+	Subscribe string `json:"subscribe,omitempty"`
 	// 优惠券名称
 	Name string `json:"name,omitempty"`
 	// 优惠券代码
@@ -46,9 +50,9 @@ func (*ProxyCoupon) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case proxycoupon.FieldID, proxycoupon.FieldCount, proxycoupon.FieldType, proxycoupon.FieldDiscount, proxycoupon.FieldStatus:
+		case proxycoupon.FieldID, proxycoupon.FieldUserLimit, proxycoupon.FieldCount, proxycoupon.FieldType, proxycoupon.FieldDiscount, proxycoupon.FieldStatus:
 			values[i] = new(sql.NullInt64)
-		case proxycoupon.FieldName, proxycoupon.FieldCode:
+		case proxycoupon.FieldSubscribe, proxycoupon.FieldName, proxycoupon.FieldCode:
 			values[i] = new(sql.NullString)
 		case proxycoupon.FieldStartTime, proxycoupon.FieldEndTime, proxycoupon.FieldCreatedAt, proxycoupon.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -73,6 +77,18 @@ func (_m *ProxyCoupon) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int64(value.Int64)
+		case proxycoupon.FieldUserLimit:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field user_limit", values[i])
+			} else if value.Valid {
+				_m.UserLimit = value.Int64
+			}
+		case proxycoupon.FieldSubscribe:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field subscribe", values[i])
+			} else if value.Valid {
+				_m.Subscribe = value.String
+			}
 		case proxycoupon.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -169,6 +185,12 @@ func (_m *ProxyCoupon) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProxyCoupon(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("user_limit=")
+	builder.WriteString(fmt.Sprintf("%v", _m.UserLimit))
+	builder.WriteString(", ")
+	builder.WriteString("subscribe=")
+	builder.WriteString(_m.Subscribe)
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)
 	builder.WriteString(", ")

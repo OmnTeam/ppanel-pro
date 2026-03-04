@@ -20,6 +20,20 @@ type ProxyTicketCreate struct {
 	hooks    []Hook
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_c *ProxyTicketCreate) SetTenantID(v int64) *ProxyTicketCreate {
+	_c.mutation.SetTenantID(v)
+	return _c
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_c *ProxyTicketCreate) SetNillableTenantID(v *int64) *ProxyTicketCreate {
+	if v != nil {
+		_c.SetTenantID(*v)
+	}
+	return _c
+}
+
 // SetTitle sets the "title" field.
 func (_c *ProxyTicketCreate) SetTitle(v string) *ProxyTicketCreate {
 	_c.mutation.SetTitle(v)
@@ -145,6 +159,10 @@ func (_c *ProxyTicketCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxyTicketCreate) defaults() {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		v := proxyticket.DefaultTenantID
+		_c.mutation.SetTenantID(v)
+	}
 	if _, ok := _c.mutation.Title(); !ok {
 		v := proxyticket.DefaultTitle
 		_c.mutation.SetTitle(v)
@@ -169,6 +187,9 @@ func (_c *ProxyTicketCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ProxyTicketCreate) check() error {
+	if _, ok := _c.mutation.TenantID(); !ok {
+		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "ProxyTicket.tenant_id"`)}
+	}
 	if _, ok := _c.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "ProxyTicket.title"`)}
 	}
@@ -209,6 +230,10 @@ func (_c *ProxyTicketCreate) createSpec() (*ProxyTicket, *sqlgraph.CreateSpec) {
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
+	}
+	if value, ok := _c.mutation.TenantID(); ok {
+		_spec.SetField(proxyticket.FieldTenantID, field.TypeInt64, value)
+		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.Title(); ok {
 		_spec.SetField(proxyticket.FieldTitle, field.TypeString, value)

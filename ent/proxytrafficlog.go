@@ -25,9 +25,9 @@ type ProxyTrafficLog struct {
 	// 订阅ID
 	SubscribeID int64 `json:"subscribe_id,omitempty"`
 	// 下载流量
-	Download int64 `json:"download,omitempty"`
+	Download int `json:"download,omitempty"`
 	// 上传流量
-	Upload int64 `json:"upload,omitempty"`
+	Upload int `json:"upload,omitempty"`
 	// 流量日志时间
 	Timestamp    time.Time `json:"timestamp,omitempty"`
 	selectValues sql.SelectValues
@@ -85,13 +85,13 @@ func (_m *ProxyTrafficLog) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field download", values[i])
 			} else if value.Valid {
-				_m.Download = value.Int64
+				_m.Download = int(value.Int64)
 			}
 		case proxytrafficlog.FieldUpload:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field upload", values[i])
 			} else if value.Valid {
-				_m.Upload = value.Int64
+				_m.Upload = int(value.Int64)
 			}
 		case proxytrafficlog.FieldTimestamp:
 			if value, ok := values[i].(*sql.NullTime); !ok {

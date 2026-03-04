@@ -82,8 +82,8 @@ func (_q *ProxySubscribeGroupQuery) FirstX(ctx context.Context) *ProxySubscribeG
 
 // FirstID returns the first ProxySubscribeGroup ID from the query.
 // Returns a *NotFoundError when no ProxySubscribeGroup ID was found.
-func (_q *ProxySubscribeGroupQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *ProxySubscribeGroupQuery) FirstID(ctx context.Context) (id int64, err error) {
+	var ids []int64
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -95,7 +95,7 @@ func (_q *ProxySubscribeGroupQuery) FirstID(ctx context.Context) (id int, err er
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *ProxySubscribeGroupQuery) FirstIDX(ctx context.Context) int {
+func (_q *ProxySubscribeGroupQuery) FirstIDX(ctx context.Context) int64 {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -133,8 +133,8 @@ func (_q *ProxySubscribeGroupQuery) OnlyX(ctx context.Context) *ProxySubscribeGr
 // OnlyID is like Only, but returns the only ProxySubscribeGroup ID in the query.
 // Returns a *NotSingularError when more than one ProxySubscribeGroup ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *ProxySubscribeGroupQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *ProxySubscribeGroupQuery) OnlyID(ctx context.Context) (id int64, err error) {
+	var ids []int64
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -150,7 +150,7 @@ func (_q *ProxySubscribeGroupQuery) OnlyID(ctx context.Context) (id int, err err
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *ProxySubscribeGroupQuery) OnlyIDX(ctx context.Context) int {
+func (_q *ProxySubscribeGroupQuery) OnlyIDX(ctx context.Context) int64 {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -178,7 +178,7 @@ func (_q *ProxySubscribeGroupQuery) AllX(ctx context.Context) []*ProxySubscribeG
 }
 
 // IDs executes the query and returns a list of ProxySubscribeGroup IDs.
-func (_q *ProxySubscribeGroupQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (_q *ProxySubscribeGroupQuery) IDs(ctx context.Context) (ids []int64, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
@@ -190,7 +190,7 @@ func (_q *ProxySubscribeGroupQuery) IDs(ctx context.Context) (ids []int, err err
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *ProxySubscribeGroupQuery) IDsX(ctx context.Context) []int {
+func (_q *ProxySubscribeGroupQuery) IDsX(ctx context.Context) []int64 {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -365,7 +365,7 @@ func (_q *ProxySubscribeGroupQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (_q *ProxySubscribeGroupQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(proxysubscribegroup.Table, proxysubscribegroup.Columns, sqlgraph.NewFieldSpec(proxysubscribegroup.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(proxysubscribegroup.Table, proxysubscribegroup.Columns, sqlgraph.NewFieldSpec(proxysubscribegroup.FieldID, field.TypeInt64))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

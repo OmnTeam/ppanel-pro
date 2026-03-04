@@ -29,30 +29,30 @@ func NewAdminSystemRepo(data *Data, logger log.Logger) systembiz.SystemRepo {
 }
 
 // GetConfigByCategory 根据分类获取配置
-func (r *adminSystemRepo) GetConfigByCategory(ctx context.Context, tenantID int64, category string) ([]*tool.SystemConfig, error) {
-	// Determine cache key based on category with tenant ID
+func (r *adminSystemRepo) GetConfigByCategory(ctx context.Context, category string) ([]*tool.SystemConfig, error) {
+	// Determine cache key based on category
 	var cacheKey string
 	switch category {
 	case "currency":
-		cacheKey = fmt.Sprintf("%s:%d", CurrencyConfigKey, tenantID)
+		cacheKey = CurrencyConfigKey
 	case "invite":
-		cacheKey = fmt.Sprintf("%s:%d", InviteConfigKey, tenantID)
+		cacheKey = InviteConfigKey
 	case "server":
-		cacheKey = fmt.Sprintf("%s:%d", NodeConfigKey, tenantID)
+		cacheKey = NodeConfigKey
 	case "tos":
-		cacheKey = fmt.Sprintf("%s:%d", TosConfigKey, tenantID)
+		cacheKey = TosConfigKey
 	case "register":
-		cacheKey = fmt.Sprintf("%s:%d", RegisterConfigKey, tenantID)
+		cacheKey = RegisterConfigKey
 	case "site":
-		cacheKey = fmt.Sprintf("%s:%d", SiteConfigKey, tenantID)
+		cacheKey = SiteConfigKey
 	case "subscribe":
-		cacheKey = fmt.Sprintf("%s:%d", SubscribeConfigKey, tenantID)
+		cacheKey = SubscribeConfigKey
 	case "verify_code":
-		cacheKey = fmt.Sprintf("%s:%d", VerifyCodeConfigKey, tenantID)
+		cacheKey = VerifyCodeConfigKey
 	case "verify":
-		cacheKey = fmt.Sprintf("%s:%d", VerifyConfigKey, tenantID)
+		cacheKey = VerifyConfigKey
 	default:
-		cacheKey = fmt.Sprintf("system:%s_config:%d", category, tenantID)
+		cacheKey = fmt.Sprintf("system:%s_config", category)
 	}
 
 	// Try to get from cache first
@@ -71,7 +71,7 @@ func (r *adminSystemRepo) GetConfigByCategory(ctx context.Context, tenantID int6
 		}).
 		All(ctx)
 	if err != nil {
-		r.log.Errorf("[GetConfigByCategory] Failed to query system config for tenant %d, category %s: %v", tenantID, category, err)
+		r.log.Errorf("[GetConfigByCategory] Failed to query system config for category %s: %v", category, err)
 		return nil, responsecode.NewDatabaseQueryError()
 	}
 
@@ -97,11 +97,11 @@ func (r *adminSystemRepo) GetConfigByCategory(ctx context.Context, tenantID int6
 }
 
 // UpdateConfigByCategory 根据分类更新配置
-func (r *adminSystemRepo) UpdateConfigByCategory(ctx context.Context, tenantID int64, category string, configs map[string]*tool.SystemConfig) error {
+func (r *adminSystemRepo) UpdateConfigByCategory(ctx context.Context, category string, configs map[string]*tool.SystemConfig) error {
 	// Start transaction
 	tx, err := r.data.db.Tx(ctx)
 	if err != nil {
-		r.log.Errorf("[UpdateConfigByCategory] Failed to start transaction for tenant %d, category %s: %v", tenantID, category, err)
+		r.log.Errorf("[UpdateConfigByCategory] Failed to start transaction for category %s: %v", category, err)
 		return responsecode.NewDatabaseUpdateError()
 	}
 
@@ -117,7 +117,7 @@ func (r *adminSystemRepo) UpdateConfigByCategory(ctx context.Context, tenantID i
 			}).
 			Exist(ctx)
 		if err != nil {
-			r.log.Errorf("[UpdateConfigByCategory] Failed to check config existence for tenant %d, category %s, key %s: %v", tenantID, category, key, err)
+			r.log.Errorf("[UpdateConfigByCategory] Failed to check config existence for category %s, key %s: %v", category, key, err)
 			tx.Rollback()
 			return responsecode.NewDatabaseQueryError()
 		}
@@ -135,12 +135,12 @@ func (r *adminSystemRepo) UpdateConfigByCategory(ctx context.Context, tenantID i
 				SetType(config.Type).
 				Save(ctx)
 			if err != nil {
-				r.log.Errorf("[UpdateConfigByCategory] Failed to update config for tenant %d, category %s, key %s: %v", tenantID, category, key, err)
+				r.log.Errorf("[UpdateConfigByCategory] Failed to update config for category %s, key %s: %v", category, key, err)
 				tx.Rollback()
 				return responsecode.NewDatabaseUpdateError()
 			}
 			if affected == 0 {
-				r.log.Warnf("[UpdateConfigByCategory] Config not found for tenant %d, category %s, key %s", tenantID, category, key)
+				r.log.Warnf("[UpdateConfigByCategory] Config not found for category %s, key %s", category, key)
 				tx.Rollback()
 				return responsecode.NewSystemNotFoundError()
 			}
@@ -154,7 +154,7 @@ func (r *adminSystemRepo) UpdateConfigByCategory(ctx context.Context, tenantID i
 				SetDesc("").
 				Save(ctx)
 			if err != nil {
-				r.log.Errorf("[UpdateConfigByCategory] Failed to create config for tenant %d, category %s, key %s: %v", tenantID, category, key, err)
+				r.log.Errorf("[UpdateConfigByCategory] Failed to create config for category %s, key %s: %v", category, key, err)
 				tx.Rollback()
 				return responsecode.NewDatabaseUpdateError()
 			}
@@ -163,62 +163,62 @@ func (r *adminSystemRepo) UpdateConfigByCategory(ctx context.Context, tenantID i
 
 	// Commit transaction
 	if err := tx.Commit(); err != nil {
-		r.log.Errorf("[UpdateConfigByCategory] Failed to commit transaction for tenant %d, category %s: %v", tenantID, category, err)
+		r.log.Errorf("[UpdateConfigByCategory] Failed to commit transaction for category %s: %v", category, err)
 		return responsecode.NewDatabaseUpdateError()
 	}
 
-	// Clear cache with tenant ID
+	// Clear cache
 	var cacheKeys []string
 	switch category {
 	case "currency":
 		cacheKeys = []string{
-			fmt.Sprintf("%s:%d", CurrencyConfigKey, tenantID),
-			fmt.Sprintf("%s:%d", GlobalConfigKey, tenantID),
+			CurrencyConfigKey,
+			GlobalConfigKey,
 		}
 	case "invite":
 		cacheKeys = []string{
-			fmt.Sprintf("%s:%d", InviteConfigKey, tenantID),
-			fmt.Sprintf("%s:%d", GlobalConfigKey, tenantID),
+			InviteConfigKey,
+			GlobalConfigKey,
 		}
 	case "server":
 		cacheKeys = []string{
-			fmt.Sprintf("%s:%d", NodeConfigKey, tenantID),
-			fmt.Sprintf("%s:%d", GlobalConfigKey, tenantID),
+			NodeConfigKey,
+			GlobalConfigKey,
 		}
 	case "tos":
 		cacheKeys = []string{
-			fmt.Sprintf("%s:%d", TosConfigKey, tenantID),
-			fmt.Sprintf("%s:%d", GlobalConfigKey, tenantID),
+			TosConfigKey,
+			GlobalConfigKey,
 		}
 	case "register":
 		cacheKeys = []string{
-			fmt.Sprintf("%s:%d", RegisterConfigKey, tenantID),
-			fmt.Sprintf("%s:%d", GlobalConfigKey, tenantID),
+			RegisterConfigKey,
+			GlobalConfigKey,
 		}
 	case "site":
 		cacheKeys = []string{
-			fmt.Sprintf("%s:%d", SiteConfigKey, tenantID),
-			fmt.Sprintf("%s:%d", GlobalConfigKey, tenantID),
+			SiteConfigKey,
+			GlobalConfigKey,
 		}
 	case "subscribe":
 		cacheKeys = []string{
-			fmt.Sprintf("%s:%d", SubscribeConfigKey, tenantID),
-			fmt.Sprintf("%s:%d", GlobalConfigKey, tenantID),
+			SubscribeConfigKey,
+			GlobalConfigKey,
 		}
 	case "verify_code":
 		cacheKeys = []string{
-			fmt.Sprintf("%s:%d", VerifyCodeConfigKey, tenantID),
-			fmt.Sprintf("%s:%d", GlobalConfigKey, tenantID),
+			VerifyCodeConfigKey,
+			GlobalConfigKey,
 		}
 	case "verify":
 		cacheKeys = []string{
-			fmt.Sprintf("%s:%d", VerifyConfigKey, tenantID),
-			fmt.Sprintf("%s:%d", GlobalConfigKey, tenantID),
+			VerifyConfigKey,
+			GlobalConfigKey,
 		}
 	default:
 		cacheKeys = []string{
-			fmt.Sprintf("system:%s_config:%d", category, tenantID),
-			fmt.Sprintf("%s:%d", GlobalConfigKey, tenantID),
+			fmt.Sprintf("system:%s_config", category),
+			GlobalConfigKey,
 		}
 	}
 
@@ -232,7 +232,7 @@ func (r *adminSystemRepo) UpdateConfigByCategory(ctx context.Context, tenantID i
 }
 
 // GetNodeMultiplier 获取节点倍率配置
-func (r *adminSystemRepo) GetNodeMultiplier(ctx context.Context, tenantID int64) (string, error) {
+func (r *adminSystemRepo) GetNodeMultiplier(ctx context.Context) (string, error) {
 	// Query node_multiplier config from database
 	system, err := r.data.db.ProxySystem.Query().
 		Where(func(s *sql.Selector) {
@@ -247,7 +247,7 @@ func (r *adminSystemRepo) GetNodeMultiplier(ctx context.Context, tenantID int64)
 		if ent.IsNotFound(err) {
 			return "", nil
 		}
-		r.log.Errorf("[GetNodeMultiplier] Failed to query node multiplier for tenant %d: %v", tenantID, err)
+		r.log.Errorf("[GetNodeMultiplier] Failed to query node multiplier: %v", err)
 		return "", responsecode.NewDatabaseQueryError()
 	}
 
@@ -255,7 +255,7 @@ func (r *adminSystemRepo) GetNodeMultiplier(ctx context.Context, tenantID int64)
 }
 
 // UpdateNodeMultiplier 更新节点倍率配置
-func (r *adminSystemRepo) UpdateNodeMultiplier(ctx context.Context, tenantID int64, value string) error {
+func (r *adminSystemRepo) UpdateNodeMultiplier(ctx context.Context, value string) error {
 	// Check if config exists
 	exists, err := r.data.db.ProxySystem.Query().
 		Where(func(s *sql.Selector) {
@@ -266,7 +266,7 @@ func (r *adminSystemRepo) UpdateNodeMultiplier(ctx context.Context, tenantID int
 		}).
 		Exist(ctx)
 	if err != nil {
-		r.log.Errorf("[UpdateNodeMultiplier] Failed to check node multiplier existence for tenant %d: %v", tenantID, err)
+		r.log.Errorf("[UpdateNodeMultiplier] Failed to check node multiplier existence: %v", err)
 		return responsecode.NewDatabaseQueryError()
 	}
 
@@ -282,11 +282,11 @@ func (r *adminSystemRepo) UpdateNodeMultiplier(ctx context.Context, tenantID int
 			SetValue(value).
 			Save(ctx)
 		if err != nil {
-			r.log.Errorf("[UpdateNodeMultiplier] Failed to update node multiplier for tenant %d: %v", tenantID, err)
+			r.log.Errorf("[UpdateNodeMultiplier] Failed to update node multiplier: %v", err)
 			return responsecode.NewDatabaseUpdateError()
 		}
 		if affected == 0 {
-			r.log.Warnf("[UpdateNodeMultiplier] Node multiplier not found for tenant %d", tenantID)
+			r.log.Warnf("[UpdateNodeMultiplier] Node multiplier not found")
 			return responsecode.NewSystemNotFoundError()
 		}
 	} else {
@@ -299,7 +299,7 @@ func (r *adminSystemRepo) UpdateNodeMultiplier(ctx context.Context, tenantID int
 			SetDesc("节点倍率配置").
 			Save(ctx)
 		if err != nil {
-			r.log.Errorf("[UpdateNodeMultiplier] Failed to create node multiplier for tenant %d: %v", tenantID, err)
+			r.log.Errorf("[UpdateNodeMultiplier] Failed to create node multiplier: %v", err)
 			return responsecode.NewDatabaseUpdateError()
 		}
 	}

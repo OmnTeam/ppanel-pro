@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -57,6 +58,10 @@ const (
 	FieldEnableSubscribeNotify = "enable_subscribe_notify"
 	// FieldEnableTradeNotify holds the string denoting the enable_trade_notify field in the database.
 	FieldEnableTradeNotify = "enable_trade_notify"
+	// FieldGroupID holds the string denoting the group_id field in the database.
+	FieldGroupID = "group_id"
+	// FieldGroupLocked holds the string denoting the group_locked field in the database.
+	FieldGroupLocked = "group_locked"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -65,8 +70,26 @@ const (
 	FieldDeletedAt = "deleted_at"
 	// FieldIsDel holds the string denoting the is_del field in the database.
 	FieldIsDel = "is_del"
+	// EdgeRedemptionRecords holds the string denoting the redemption_records edge name in mutations.
+	EdgeRedemptionRecords = "redemption_records"
+	// EdgeWithdrawals holds the string denoting the withdrawals edge name in mutations.
+	EdgeWithdrawals = "withdrawals"
 	// Table holds the table name of the proxyuser in the database.
 	Table = "proxy_user"
+	// RedemptionRecordsTable is the table that holds the redemption_records relation/edge.
+	RedemptionRecordsTable = "proxy_redemption_record"
+	// RedemptionRecordsInverseTable is the table name for the ProxyRedemptionRecord entity.
+	// It exists in this package in order to avoid circular dependency with the "proxyredemptionrecord" package.
+	RedemptionRecordsInverseTable = "proxy_redemption_record"
+	// RedemptionRecordsColumn is the table column denoting the redemption_records relation/edge.
+	RedemptionRecordsColumn = "user_id"
+	// WithdrawalsTable is the table that holds the withdrawals relation/edge.
+	WithdrawalsTable = "proxy_user_withdrawal"
+	// WithdrawalsInverseTable is the table name for the ProxyUserWithdrawal entity.
+	// It exists in this package in order to avoid circular dependency with the "proxyuserwithdrawal" package.
+	WithdrawalsInverseTable = "proxy_user_withdrawal"
+	// WithdrawalsColumn is the table column denoting the withdrawals relation/edge.
+	WithdrawalsColumn = "user_id"
 )
 
 // Columns holds all SQL columns for proxyuser fields.
@@ -94,6 +117,8 @@ var Columns = []string{
 	FieldEnableLoginNotify,
 	FieldEnableSubscribeNotify,
 	FieldEnableTradeNotify,
+	FieldGroupID,
+	FieldGroupLocked,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
@@ -128,7 +153,7 @@ var (
 	// DefaultCommission holds the default value on creation for the "commission" field.
 	DefaultCommission int64
 	// DefaultReferralPercentage holds the default value on creation for the "referral_percentage" field.
-	DefaultReferralPercentage int
+	DefaultReferralPercentage int8
 	// DefaultOnlyFirstPurchase holds the default value on creation for the "only_first_purchase" field.
 	DefaultOnlyFirstPurchase bool
 	// DefaultGiftAmount holds the default value on creation for the "gift_amount" field.
@@ -151,6 +176,10 @@ var (
 	DefaultEnableSubscribeNotify bool
 	// DefaultEnableTradeNotify holds the default value on creation for the "enable_trade_notify" field.
 	DefaultEnableTradeNotify bool
+	// DefaultGroupID holds the default value on creation for the "group_id" field.
+	DefaultGroupID int64
+	// DefaultGroupLocked holds the default value on creation for the "group_locked" field.
+	DefaultGroupLocked bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -160,7 +189,7 @@ var (
 	// DefaultIsDel holds the default value on creation for the "is_del" field.
 	DefaultIsDel bool
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
-	IDValidator func(int) error
+	IDValidator func(int64) error
 )
 
 // OrderOption defines the ordering options for the ProxyUser queries.
@@ -281,6 +310,16 @@ func ByEnableTradeNotify(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEnableTradeNotify, opts...).ToFunc()
 }
 
+// ByGroupID orders the results by the group_id field.
+func ByGroupID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldGroupID, opts...).ToFunc()
+}
+
+// ByGroupLocked orders the results by the group_locked field.
+func ByGroupLocked(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldGroupLocked, opts...).ToFunc()
+}
+
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
@@ -299,4 +338,46 @@ func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByIsDel orders the results by the is_del field.
 func ByIsDel(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIsDel, opts...).ToFunc()
+}
+
+// ByRedemptionRecordsCount orders the results by redemption_records count.
+func ByRedemptionRecordsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRedemptionRecordsStep(), opts...)
+	}
+}
+
+// ByRedemptionRecords orders the results by redemption_records terms.
+func ByRedemptionRecords(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRedemptionRecordsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByWithdrawalsCount orders the results by withdrawals count.
+func ByWithdrawalsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newWithdrawalsStep(), opts...)
+	}
+}
+
+// ByWithdrawals orders the results by withdrawals terms.
+func ByWithdrawals(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newWithdrawalsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newRedemptionRecordsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RedemptionRecordsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RedemptionRecordsTable, RedemptionRecordsColumn),
+	)
+}
+func newWithdrawalsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(WithdrawalsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, WithdrawalsTable, WithdrawalsColumn),
+	)
 }

@@ -17,7 +17,7 @@ type ProxyDocument struct {
 	config `json:"-"`
 	// ID of the ent.
 	// 文档ID
-	ID int `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// 文档标题
 	Title string `json:"title,omitempty"`
 	// 文档内容
@@ -66,7 +66,7 @@ func (_m *ProxyDocument) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case proxydocument.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field title", values[i])

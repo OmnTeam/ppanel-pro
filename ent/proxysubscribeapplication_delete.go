@@ -40,7 +40,7 @@ func (_d *ProxySubscribeApplicationDelete) ExecX(ctx context.Context) int {
 }
 
 func (_d *ProxySubscribeApplicationDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(proxysubscribeapplication.Table, sqlgraph.NewFieldSpec(proxysubscribeapplication.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(proxysubscribeapplication.Table, sqlgraph.NewFieldSpec(proxysubscribeapplication.FieldID, field.TypeInt64))
 	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

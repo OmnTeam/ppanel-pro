@@ -28,16 +28,16 @@ func NewOrderRepo(data *Data, logger log.Logger) order.OrderRepo {
 }
 
 // CreateOrder 创建订单
-func (r *orderRepo) CreateOrder(ctx context.Context, tenantID, userID int64, orderType int32, quantity, price, amount, discount int64,
-	coupon string, couponDiscount, commission, feeAmount, paymentID int64, tradeNo string,
-	status int32, subscribeID int64) error {
+func (r *orderRepo) CreateOrder(ctx context.Context, userID int, orderType int32, quantity, price, amount, discount int,
+	coupon string, couponDiscount, commission, feeAmount, paymentID int, tradeNo string,
+	status int32, subscribeID int) error {
 
 	// 如果paymentID > 0，验证支付方式是否存在并获取token作为method
 	var method string
 	if paymentID > 0 {
 		payment, err := r.data.db.ProxyPayment.Query().
 			Where(
-				proxypayment.ID(int(paymentID)),
+				proxypayment.ID(int64(paymentID)),
 			).
 			Only(ctx)
 		if err != nil {
@@ -52,33 +52,33 @@ func (r *orderRepo) CreateOrder(ctx context.Context, tenantID, userID int64, ord
 
 	// 创建订单
 	_, err := r.data.db.ProxyOrder.Create().
-		SetUserID(userID).
+		SetUserID(int64(userID)).
 		SetOrderNo(orderNo).
 		SetType(int8(orderType)).
-		SetQuantity(quantity).
-		SetPrice(price).
-		SetAmount(amount).
-		SetDiscount(discount).
+		SetQuantity(int64(quantity)).
+		SetPrice(int64(price)).
+		SetAmount(int64(amount)).
+		SetDiscount(int64(discount)).
 		SetCoupon(coupon).
-		SetCouponDiscount(couponDiscount).
-		SetCommission(commission).
-		SetFeeAmount(feeAmount).
-		SetPaymentID(paymentID).
+		SetCouponDiscount(int64(couponDiscount)).
+		SetCommission(int64(commission)).
+		SetFeeAmount(int64(feeAmount)).
+		SetPaymentID(int64(paymentID)).
 		SetMethod(method).
 		SetTradeNo(tradeNo).
 		SetStatus(int8(status)).
-		SetSubscribeID(subscribeID).
+		SetSubscribeID(int64(subscribeID)).
 		Save(ctx)
 
 	return err
 }
 
 // UpdateOrderStatus 更新订单状态
-func (r *orderRepo) UpdateOrderStatus(ctx context.Context, id, tenantID int64, status int32, paymentID int64, tradeNo string) error {
+func (r *orderRepo) UpdateOrderStatus(ctx context.Context, id int, status int32, paymentID int, tradeNo string) error {
 	// 查询订单
 	orderInfo, err := r.data.db.ProxyOrder.Query().
 		Where(
-			proxyorder.ID(id),
+			proxyorder.ID(int64(id)),
 		).
 		Only(ctx)
 	if err != nil {
@@ -92,7 +92,7 @@ func (r *orderRepo) UpdateOrderStatus(ctx context.Context, id, tenantID int64, s
 		return err
 	}
 
-	updater := tx.ProxyOrder.UpdateOneID(id)
+	updater := tx.ProxyOrder.UpdateOneID(int64(id))
 
 	// 更新状态
 	updater = updater.SetStatus(int8(status))
@@ -101,14 +101,14 @@ func (r *orderRepo) UpdateOrderStatus(ctx context.Context, id, tenantID int64, s
 	if paymentID > 0 {
 		payment, err := tx.ProxyPayment.Query().
 			Where(
-				proxypayment.ID(int(paymentID)),
+				proxypayment.ID(int64(paymentID)),
 			).
 			Only(ctx)
 		if err != nil {
 			r.log.Errorw("msg", "payment method not found", "error", err, "paymentID", paymentID)
 			return rollback(tx, err)
 		}
-		updater = updater.SetPaymentID(paymentID).SetMethod(payment.Token)
+		updater = updater.SetPaymentID(int64(paymentID)).SetMethod(payment.Token)
 	}
 
 	// 如果提供了tradeNo，更新交易号
@@ -136,12 +136,12 @@ func (r *orderRepo) UpdateOrderStatus(ctx context.Context, id, tenantID int64, s
 }
 
 // GetOrderList 获取订单列表
-func (r *orderRepo) GetOrderList(ctx context.Context, tenantID, page, size, userID int64, status int32, subscribeID int64, search string) ([]*ent.ProxyOrder, int64, error) {
+func (r *orderRepo) GetOrderList(ctx context.Context, page, size, userID int, status int32, subscribeID int, search string) ([]*ent.ProxyOrder, int64, error) {
 	query := r.data.db.ProxyOrder.Query()
 
 	// 用户ID筛选
 	if userID != 0 {
-		query = query.Where(proxyorder.UserID(userID))
+		query = query.Where(proxyorder.UserID(int64(userID)))
 	}
 
 	// 订单状态筛选
@@ -151,7 +151,7 @@ func (r *orderRepo) GetOrderList(ctx context.Context, tenantID, page, size, user
 
 	// 订阅ID筛选
 	if subscribeID != 0 {
-		query = query.Where(proxyorder.SubscribeID(subscribeID))
+		query = query.Where(proxyorder.SubscribeID(int64(subscribeID)))
 	}
 
 	// 搜索关键字（订单号、交易号或优惠券）

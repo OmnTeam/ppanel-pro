@@ -11,7 +11,6 @@ import (
 // Announcement 公告业务实体
 type Announcement struct {
 	ID        int64     `json:"id"`
-	TenantID  int64     `json:"tenant_id"`
 	Title     string    `json:"title"`
 	Content   *string   `json:"content"`
 	Show      bool      `json:"show"`
@@ -28,11 +27,11 @@ type AnnouncementRepo interface {
 	// Update 更新公告
 	Update(ctx context.Context, announcement *Announcement) (*Announcement, error)
 	// FindByID 根据ID查找公告
-	FindByID(ctx context.Context, tenantID, id int64) (*Announcement, error)
+	FindByID(ctx context.Context, id int64) (*Announcement, error)
 	// ListAll 获取公告列表
-	ListAll(ctx context.Context, tenantID int64, page, size int64, show, pinned, popup *bool) ([]*Announcement, int64, error)
+	ListAll(ctx context.Context, page, size int, show, pinned, popup *bool) ([]*Announcement, int64, error)
 	// Delete 删除公告
-	Delete(ctx context.Context, tenantID, id int64) error
+	Delete(ctx context.Context, id int64) error
 }
 
 // AnnouncementUsecase 公告业务用例
@@ -62,7 +61,7 @@ func (uc *AnnouncementUsecase) CreateAnnouncement(ctx context.Context, announcem
 // UpdateAnnouncement 更新公告
 func (uc *AnnouncementUsecase) UpdateAnnouncement(ctx context.Context, announcement *Announcement) (*Announcement, error) {
 	// 查找现有公告
-	info, err := uc.repo.FindByID(ctx, announcement.TenantID, announcement.ID)
+	info, err := uc.repo.FindByID(ctx, announcement.ID)
 	if err != nil {
 		uc.logger.WithContext(ctx).Errorf("get announcement error: %v", err)
 		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
@@ -84,8 +83,8 @@ func (uc *AnnouncementUsecase) UpdateAnnouncement(ctx context.Context, announcem
 }
 
 // GetAnnouncement 获取单个公告
-func (uc *AnnouncementUsecase) GetAnnouncement(ctx context.Context, tenantID, id int64) (*Announcement, error) {
-	announcement, err := uc.repo.FindByID(ctx, tenantID, id)
+func (uc *AnnouncementUsecase) GetAnnouncement(ctx context.Context, id int64) (*Announcement, error) {
+	announcement, err := uc.repo.FindByID(ctx, id)
 	if err != nil {
 		uc.logger.WithContext(ctx).Errorf("get announcement error: %v", err)
 		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
@@ -94,7 +93,7 @@ func (uc *AnnouncementUsecase) GetAnnouncement(ctx context.Context, tenantID, id
 }
 
 // ListAnnouncements 获取公告列表
-func (uc *AnnouncementUsecase) ListAnnouncements(ctx context.Context, tenantID, page, size int64, show, pinned, popup *bool) ([]*Announcement, int64, error) {
+func (uc *AnnouncementUsecase) ListAnnouncements(ctx context.Context, page, size int, show, pinned, popup *bool) ([]*Announcement, int64, error) {
 	// 参数验证和默认值
 	if page <= 0 {
 		page = 1
@@ -106,7 +105,7 @@ func (uc *AnnouncementUsecase) ListAnnouncements(ctx context.Context, tenantID, 
 		size = 100
 	}
 
-	list, total, err := uc.repo.ListAll(ctx, tenantID, page, size, show, pinned, popup)
+	list, total, err := uc.repo.ListAll(ctx, page, size, show, pinned, popup)
 	if err != nil {
 		uc.logger.WithContext(ctx).Errorf("list announcements error: %v", err)
 		return nil, 0, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
@@ -115,8 +114,8 @@ func (uc *AnnouncementUsecase) ListAnnouncements(ctx context.Context, tenantID, 
 }
 
 // DeleteAnnouncement 删除公告
-func (uc *AnnouncementUsecase) DeleteAnnouncement(ctx context.Context, tenantID, id int64) error {
-	err := uc.repo.Delete(ctx, tenantID, id)
+func (uc *AnnouncementUsecase) DeleteAnnouncement(ctx context.Context, id int64) error {
+	err := uc.repo.Delete(ctx, id)
 	if err != nil {
 		uc.logger.WithContext(ctx).Errorf("delete announcement error: %v", err)
 		return responsecode.NewKratosError(responsecode.ErrDatabaseDelete)

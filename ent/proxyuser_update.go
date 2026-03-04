@@ -12,7 +12,9 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/OmnTeam/ppanel-pro/ent/predicate"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptionrecord"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyuserwithdrawal"
 )
 
 // ProxyUserUpdate is the builder for updating ProxyUser entities.
@@ -145,14 +147,14 @@ func (_u *ProxyUserUpdate) ClearBalance() *ProxyUserUpdate {
 }
 
 // SetTelegram sets the "telegram" field.
-func (_u *ProxyUserUpdate) SetTelegram(v int64) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) SetTelegram(v int) *ProxyUserUpdate {
 	_u.mutation.ResetTelegram()
 	_u.mutation.SetTelegram(v)
 	return _u
 }
 
 // SetNillableTelegram sets the "telegram" field if the given value is not nil.
-func (_u *ProxyUserUpdate) SetNillableTelegram(v *int64) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) SetNillableTelegram(v *int) *ProxyUserUpdate {
 	if v != nil {
 		_u.SetTelegram(*v)
 	}
@@ -160,7 +162,7 @@ func (_u *ProxyUserUpdate) SetNillableTelegram(v *int64) *ProxyUserUpdate {
 }
 
 // AddTelegram adds value to the "telegram" field.
-func (_u *ProxyUserUpdate) AddTelegram(v int64) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) AddTelegram(v int) *ProxyUserUpdate {
 	_u.mutation.AddTelegram(v)
 	return _u
 }
@@ -192,14 +194,14 @@ func (_u *ProxyUserUpdate) ClearReferCode() *ProxyUserUpdate {
 }
 
 // SetRefererID sets the "referer_id" field.
-func (_u *ProxyUserUpdate) SetRefererID(v int) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) SetRefererID(v int64) *ProxyUserUpdate {
 	_u.mutation.ResetRefererID()
 	_u.mutation.SetRefererID(v)
 	return _u
 }
 
 // SetNillableRefererID sets the "referer_id" field if the given value is not nil.
-func (_u *ProxyUserUpdate) SetNillableRefererID(v *int) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) SetNillableRefererID(v *int64) *ProxyUserUpdate {
 	if v != nil {
 		_u.SetRefererID(*v)
 	}
@@ -207,7 +209,7 @@ func (_u *ProxyUserUpdate) SetNillableRefererID(v *int) *ProxyUserUpdate {
 }
 
 // AddRefererID adds value to the "referer_id" field.
-func (_u *ProxyUserUpdate) AddRefererID(v int) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) AddRefererID(v int64) *ProxyUserUpdate {
 	_u.mutation.AddRefererID(v)
 	return _u
 }
@@ -246,14 +248,14 @@ func (_u *ProxyUserUpdate) ClearCommission() *ProxyUserUpdate {
 }
 
 // SetReferralPercentage sets the "referral_percentage" field.
-func (_u *ProxyUserUpdate) SetReferralPercentage(v int) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) SetReferralPercentage(v int8) *ProxyUserUpdate {
 	_u.mutation.ResetReferralPercentage()
 	_u.mutation.SetReferralPercentage(v)
 	return _u
 }
 
 // SetNillableReferralPercentage sets the "referral_percentage" field if the given value is not nil.
-func (_u *ProxyUserUpdate) SetNillableReferralPercentage(v *int) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) SetNillableReferralPercentage(v *int8) *ProxyUserUpdate {
 	if v != nil {
 		_u.SetReferralPercentage(*v)
 	}
@@ -261,7 +263,7 @@ func (_u *ProxyUserUpdate) SetNillableReferralPercentage(v *int) *ProxyUserUpdat
 }
 
 // AddReferralPercentage adds value to the "referral_percentage" field.
-func (_u *ProxyUserUpdate) AddReferralPercentage(v int) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) AddReferralPercentage(v int8) *ProxyUserUpdate {
 	_u.mutation.AddReferralPercentage(v)
 	return _u
 }
@@ -433,6 +435,47 @@ func (_u *ProxyUserUpdate) SetNillableEnableTradeNotify(v *bool) *ProxyUserUpdat
 	return _u
 }
 
+// SetGroupID sets the "group_id" field.
+func (_u *ProxyUserUpdate) SetGroupID(v int64) *ProxyUserUpdate {
+	_u.mutation.ResetGroupID()
+	_u.mutation.SetGroupID(v)
+	return _u
+}
+
+// SetNillableGroupID sets the "group_id" field if the given value is not nil.
+func (_u *ProxyUserUpdate) SetNillableGroupID(v *int64) *ProxyUserUpdate {
+	if v != nil {
+		_u.SetGroupID(*v)
+	}
+	return _u
+}
+
+// AddGroupID adds value to the "group_id" field.
+func (_u *ProxyUserUpdate) AddGroupID(v int64) *ProxyUserUpdate {
+	_u.mutation.AddGroupID(v)
+	return _u
+}
+
+// ClearGroupID clears the value of the "group_id" field.
+func (_u *ProxyUserUpdate) ClearGroupID() *ProxyUserUpdate {
+	_u.mutation.ClearGroupID()
+	return _u
+}
+
+// SetGroupLocked sets the "group_locked" field.
+func (_u *ProxyUserUpdate) SetGroupLocked(v bool) *ProxyUserUpdate {
+	_u.mutation.SetGroupLocked(v)
+	return _u
+}
+
+// SetNillableGroupLocked sets the "group_locked" field if the given value is not nil.
+func (_u *ProxyUserUpdate) SetNillableGroupLocked(v *bool) *ProxyUserUpdate {
+	if v != nil {
+		_u.SetGroupLocked(*v)
+	}
+	return _u
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxyUserUpdate) SetUpdatedAt(v time.Time) *ProxyUserUpdate {
 	_u.mutation.SetUpdatedAt(v)
@@ -479,9 +522,81 @@ func (_u *ProxyUserUpdate) ClearIsDel() *ProxyUserUpdate {
 	return _u
 }
 
+// AddRedemptionRecordIDs adds the "redemption_records" edge to the ProxyRedemptionRecord entity by IDs.
+func (_u *ProxyUserUpdate) AddRedemptionRecordIDs(ids ...int64) *ProxyUserUpdate {
+	_u.mutation.AddRedemptionRecordIDs(ids...)
+	return _u
+}
+
+// AddRedemptionRecords adds the "redemption_records" edges to the ProxyRedemptionRecord entity.
+func (_u *ProxyUserUpdate) AddRedemptionRecords(v ...*ProxyRedemptionRecord) *ProxyUserUpdate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRedemptionRecordIDs(ids...)
+}
+
+// AddWithdrawalIDs adds the "withdrawals" edge to the ProxyUserWithdrawal entity by IDs.
+func (_u *ProxyUserUpdate) AddWithdrawalIDs(ids ...int64) *ProxyUserUpdate {
+	_u.mutation.AddWithdrawalIDs(ids...)
+	return _u
+}
+
+// AddWithdrawals adds the "withdrawals" edges to the ProxyUserWithdrawal entity.
+func (_u *ProxyUserUpdate) AddWithdrawals(v ...*ProxyUserWithdrawal) *ProxyUserUpdate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddWithdrawalIDs(ids...)
+}
+
 // Mutation returns the ProxyUserMutation object of the builder.
 func (_u *ProxyUserUpdate) Mutation() *ProxyUserMutation {
 	return _u.mutation
+}
+
+// ClearRedemptionRecords clears all "redemption_records" edges to the ProxyRedemptionRecord entity.
+func (_u *ProxyUserUpdate) ClearRedemptionRecords() *ProxyUserUpdate {
+	_u.mutation.ClearRedemptionRecords()
+	return _u
+}
+
+// RemoveRedemptionRecordIDs removes the "redemption_records" edge to ProxyRedemptionRecord entities by IDs.
+func (_u *ProxyUserUpdate) RemoveRedemptionRecordIDs(ids ...int64) *ProxyUserUpdate {
+	_u.mutation.RemoveRedemptionRecordIDs(ids...)
+	return _u
+}
+
+// RemoveRedemptionRecords removes "redemption_records" edges to ProxyRedemptionRecord entities.
+func (_u *ProxyUserUpdate) RemoveRedemptionRecords(v ...*ProxyRedemptionRecord) *ProxyUserUpdate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRedemptionRecordIDs(ids...)
+}
+
+// ClearWithdrawals clears all "withdrawals" edges to the ProxyUserWithdrawal entity.
+func (_u *ProxyUserUpdate) ClearWithdrawals() *ProxyUserUpdate {
+	_u.mutation.ClearWithdrawals()
+	return _u
+}
+
+// RemoveWithdrawalIDs removes the "withdrawals" edge to ProxyUserWithdrawal entities by IDs.
+func (_u *ProxyUserUpdate) RemoveWithdrawalIDs(ids ...int64) *ProxyUserUpdate {
+	_u.mutation.RemoveWithdrawalIDs(ids...)
+	return _u
+}
+
+// RemoveWithdrawals removes "withdrawals" edges to ProxyUserWithdrawal entities.
+func (_u *ProxyUserUpdate) RemoveWithdrawals(v ...*ProxyUserWithdrawal) *ProxyUserUpdate {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveWithdrawalIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -549,7 +664,7 @@ func (_u *ProxyUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyuser.Table, proxyuser.Columns, sqlgraph.NewFieldSpec(proxyuser.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyuser.Table, proxyuser.Columns, sqlgraph.NewFieldSpec(proxyuser.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -591,13 +706,13 @@ func (_u *ProxyUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.ClearField(proxyuser.FieldBalance, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.Telegram(); ok {
-		_spec.SetField(proxyuser.FieldTelegram, field.TypeInt64, value)
+		_spec.SetField(proxyuser.FieldTelegram, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.AddedTelegram(); ok {
-		_spec.AddField(proxyuser.FieldTelegram, field.TypeInt64, value)
+		_spec.AddField(proxyuser.FieldTelegram, field.TypeInt, value)
 	}
 	if _u.mutation.TelegramCleared() {
-		_spec.ClearField(proxyuser.FieldTelegram, field.TypeInt64)
+		_spec.ClearField(proxyuser.FieldTelegram, field.TypeInt)
 	}
 	if value, ok := _u.mutation.ReferCode(); ok {
 		_spec.SetField(proxyuser.FieldReferCode, field.TypeString, value)
@@ -606,13 +721,13 @@ func (_u *ProxyUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.ClearField(proxyuser.FieldReferCode, field.TypeString)
 	}
 	if value, ok := _u.mutation.RefererID(); ok {
-		_spec.SetField(proxyuser.FieldRefererID, field.TypeInt, value)
+		_spec.SetField(proxyuser.FieldRefererID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedRefererID(); ok {
-		_spec.AddField(proxyuser.FieldRefererID, field.TypeInt, value)
+		_spec.AddField(proxyuser.FieldRefererID, field.TypeInt64, value)
 	}
 	if _u.mutation.RefererIDCleared() {
-		_spec.ClearField(proxyuser.FieldRefererID, field.TypeInt)
+		_spec.ClearField(proxyuser.FieldRefererID, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.Commission(); ok {
 		_spec.SetField(proxyuser.FieldCommission, field.TypeInt64, value)
@@ -624,10 +739,10 @@ func (_u *ProxyUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.ClearField(proxyuser.FieldCommission, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.ReferralPercentage(); ok {
-		_spec.SetField(proxyuser.FieldReferralPercentage, field.TypeInt, value)
+		_spec.SetField(proxyuser.FieldReferralPercentage, field.TypeInt8, value)
 	}
 	if value, ok := _u.mutation.AddedReferralPercentage(); ok {
-		_spec.AddField(proxyuser.FieldReferralPercentage, field.TypeInt, value)
+		_spec.AddField(proxyuser.FieldReferralPercentage, field.TypeInt8, value)
 	}
 	if value, ok := _u.mutation.OnlyFirstPurchase(); ok {
 		_spec.SetField(proxyuser.FieldOnlyFirstPurchase, field.TypeBool, value)
@@ -668,6 +783,18 @@ func (_u *ProxyUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.EnableTradeNotify(); ok {
 		_spec.SetField(proxyuser.FieldEnableTradeNotify, field.TypeBool, value)
 	}
+	if value, ok := _u.mutation.GroupID(); ok {
+		_spec.SetField(proxyuser.FieldGroupID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedGroupID(); ok {
+		_spec.AddField(proxyuser.FieldGroupID, field.TypeInt64, value)
+	}
+	if _u.mutation.GroupIDCleared() {
+		_spec.ClearField(proxyuser.FieldGroupID, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.GroupLocked(); ok {
+		_spec.SetField(proxyuser.FieldGroupLocked, field.TypeBool, value)
+	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyuser.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -682,6 +809,96 @@ func (_u *ProxyUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if _u.mutation.IsDelCleared() {
 		_spec.ClearField(proxyuser.FieldIsDel, field.TypeBool)
+	}
+	if _u.mutation.RedemptionRecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.RedemptionRecordsTable,
+			Columns: []string{proxyuser.RedemptionRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyredemptionrecord.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRedemptionRecordsIDs(); len(nodes) > 0 && !_u.mutation.RedemptionRecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.RedemptionRecordsTable,
+			Columns: []string{proxyuser.RedemptionRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyredemptionrecord.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RedemptionRecordsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.RedemptionRecordsTable,
+			Columns: []string{proxyuser.RedemptionRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyredemptionrecord.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.WithdrawalsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.WithdrawalsTable,
+			Columns: []string{proxyuser.WithdrawalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyuserwithdrawal.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedWithdrawalsIDs(); len(nodes) > 0 && !_u.mutation.WithdrawalsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.WithdrawalsTable,
+			Columns: []string{proxyuser.WithdrawalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyuserwithdrawal.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.WithdrawalsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.WithdrawalsTable,
+			Columns: []string{proxyuser.WithdrawalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyuserwithdrawal.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -820,14 +1037,14 @@ func (_u *ProxyUserUpdateOne) ClearBalance() *ProxyUserUpdateOne {
 }
 
 // SetTelegram sets the "telegram" field.
-func (_u *ProxyUserUpdateOne) SetTelegram(v int64) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) SetTelegram(v int) *ProxyUserUpdateOne {
 	_u.mutation.ResetTelegram()
 	_u.mutation.SetTelegram(v)
 	return _u
 }
 
 // SetNillableTelegram sets the "telegram" field if the given value is not nil.
-func (_u *ProxyUserUpdateOne) SetNillableTelegram(v *int64) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) SetNillableTelegram(v *int) *ProxyUserUpdateOne {
 	if v != nil {
 		_u.SetTelegram(*v)
 	}
@@ -835,7 +1052,7 @@ func (_u *ProxyUserUpdateOne) SetNillableTelegram(v *int64) *ProxyUserUpdateOne 
 }
 
 // AddTelegram adds value to the "telegram" field.
-func (_u *ProxyUserUpdateOne) AddTelegram(v int64) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) AddTelegram(v int) *ProxyUserUpdateOne {
 	_u.mutation.AddTelegram(v)
 	return _u
 }
@@ -867,14 +1084,14 @@ func (_u *ProxyUserUpdateOne) ClearReferCode() *ProxyUserUpdateOne {
 }
 
 // SetRefererID sets the "referer_id" field.
-func (_u *ProxyUserUpdateOne) SetRefererID(v int) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) SetRefererID(v int64) *ProxyUserUpdateOne {
 	_u.mutation.ResetRefererID()
 	_u.mutation.SetRefererID(v)
 	return _u
 }
 
 // SetNillableRefererID sets the "referer_id" field if the given value is not nil.
-func (_u *ProxyUserUpdateOne) SetNillableRefererID(v *int) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) SetNillableRefererID(v *int64) *ProxyUserUpdateOne {
 	if v != nil {
 		_u.SetRefererID(*v)
 	}
@@ -882,7 +1099,7 @@ func (_u *ProxyUserUpdateOne) SetNillableRefererID(v *int) *ProxyUserUpdateOne {
 }
 
 // AddRefererID adds value to the "referer_id" field.
-func (_u *ProxyUserUpdateOne) AddRefererID(v int) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) AddRefererID(v int64) *ProxyUserUpdateOne {
 	_u.mutation.AddRefererID(v)
 	return _u
 }
@@ -921,14 +1138,14 @@ func (_u *ProxyUserUpdateOne) ClearCommission() *ProxyUserUpdateOne {
 }
 
 // SetReferralPercentage sets the "referral_percentage" field.
-func (_u *ProxyUserUpdateOne) SetReferralPercentage(v int) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) SetReferralPercentage(v int8) *ProxyUserUpdateOne {
 	_u.mutation.ResetReferralPercentage()
 	_u.mutation.SetReferralPercentage(v)
 	return _u
 }
 
 // SetNillableReferralPercentage sets the "referral_percentage" field if the given value is not nil.
-func (_u *ProxyUserUpdateOne) SetNillableReferralPercentage(v *int) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) SetNillableReferralPercentage(v *int8) *ProxyUserUpdateOne {
 	if v != nil {
 		_u.SetReferralPercentage(*v)
 	}
@@ -936,7 +1153,7 @@ func (_u *ProxyUserUpdateOne) SetNillableReferralPercentage(v *int) *ProxyUserUp
 }
 
 // AddReferralPercentage adds value to the "referral_percentage" field.
-func (_u *ProxyUserUpdateOne) AddReferralPercentage(v int) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) AddReferralPercentage(v int8) *ProxyUserUpdateOne {
 	_u.mutation.AddReferralPercentage(v)
 	return _u
 }
@@ -1108,6 +1325,47 @@ func (_u *ProxyUserUpdateOne) SetNillableEnableTradeNotify(v *bool) *ProxyUserUp
 	return _u
 }
 
+// SetGroupID sets the "group_id" field.
+func (_u *ProxyUserUpdateOne) SetGroupID(v int64) *ProxyUserUpdateOne {
+	_u.mutation.ResetGroupID()
+	_u.mutation.SetGroupID(v)
+	return _u
+}
+
+// SetNillableGroupID sets the "group_id" field if the given value is not nil.
+func (_u *ProxyUserUpdateOne) SetNillableGroupID(v *int64) *ProxyUserUpdateOne {
+	if v != nil {
+		_u.SetGroupID(*v)
+	}
+	return _u
+}
+
+// AddGroupID adds value to the "group_id" field.
+func (_u *ProxyUserUpdateOne) AddGroupID(v int64) *ProxyUserUpdateOne {
+	_u.mutation.AddGroupID(v)
+	return _u
+}
+
+// ClearGroupID clears the value of the "group_id" field.
+func (_u *ProxyUserUpdateOne) ClearGroupID() *ProxyUserUpdateOne {
+	_u.mutation.ClearGroupID()
+	return _u
+}
+
+// SetGroupLocked sets the "group_locked" field.
+func (_u *ProxyUserUpdateOne) SetGroupLocked(v bool) *ProxyUserUpdateOne {
+	_u.mutation.SetGroupLocked(v)
+	return _u
+}
+
+// SetNillableGroupLocked sets the "group_locked" field if the given value is not nil.
+func (_u *ProxyUserUpdateOne) SetNillableGroupLocked(v *bool) *ProxyUserUpdateOne {
+	if v != nil {
+		_u.SetGroupLocked(*v)
+	}
+	return _u
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxyUserUpdateOne) SetUpdatedAt(v time.Time) *ProxyUserUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
@@ -1154,9 +1412,81 @@ func (_u *ProxyUserUpdateOne) ClearIsDel() *ProxyUserUpdateOne {
 	return _u
 }
 
+// AddRedemptionRecordIDs adds the "redemption_records" edge to the ProxyRedemptionRecord entity by IDs.
+func (_u *ProxyUserUpdateOne) AddRedemptionRecordIDs(ids ...int64) *ProxyUserUpdateOne {
+	_u.mutation.AddRedemptionRecordIDs(ids...)
+	return _u
+}
+
+// AddRedemptionRecords adds the "redemption_records" edges to the ProxyRedemptionRecord entity.
+func (_u *ProxyUserUpdateOne) AddRedemptionRecords(v ...*ProxyRedemptionRecord) *ProxyUserUpdateOne {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddRedemptionRecordIDs(ids...)
+}
+
+// AddWithdrawalIDs adds the "withdrawals" edge to the ProxyUserWithdrawal entity by IDs.
+func (_u *ProxyUserUpdateOne) AddWithdrawalIDs(ids ...int64) *ProxyUserUpdateOne {
+	_u.mutation.AddWithdrawalIDs(ids...)
+	return _u
+}
+
+// AddWithdrawals adds the "withdrawals" edges to the ProxyUserWithdrawal entity.
+func (_u *ProxyUserUpdateOne) AddWithdrawals(v ...*ProxyUserWithdrawal) *ProxyUserUpdateOne {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddWithdrawalIDs(ids...)
+}
+
 // Mutation returns the ProxyUserMutation object of the builder.
 func (_u *ProxyUserUpdateOne) Mutation() *ProxyUserMutation {
 	return _u.mutation
+}
+
+// ClearRedemptionRecords clears all "redemption_records" edges to the ProxyRedemptionRecord entity.
+func (_u *ProxyUserUpdateOne) ClearRedemptionRecords() *ProxyUserUpdateOne {
+	_u.mutation.ClearRedemptionRecords()
+	return _u
+}
+
+// RemoveRedemptionRecordIDs removes the "redemption_records" edge to ProxyRedemptionRecord entities by IDs.
+func (_u *ProxyUserUpdateOne) RemoveRedemptionRecordIDs(ids ...int64) *ProxyUserUpdateOne {
+	_u.mutation.RemoveRedemptionRecordIDs(ids...)
+	return _u
+}
+
+// RemoveRedemptionRecords removes "redemption_records" edges to ProxyRedemptionRecord entities.
+func (_u *ProxyUserUpdateOne) RemoveRedemptionRecords(v ...*ProxyRedemptionRecord) *ProxyUserUpdateOne {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveRedemptionRecordIDs(ids...)
+}
+
+// ClearWithdrawals clears all "withdrawals" edges to the ProxyUserWithdrawal entity.
+func (_u *ProxyUserUpdateOne) ClearWithdrawals() *ProxyUserUpdateOne {
+	_u.mutation.ClearWithdrawals()
+	return _u
+}
+
+// RemoveWithdrawalIDs removes the "withdrawals" edge to ProxyUserWithdrawal entities by IDs.
+func (_u *ProxyUserUpdateOne) RemoveWithdrawalIDs(ids ...int64) *ProxyUserUpdateOne {
+	_u.mutation.RemoveWithdrawalIDs(ids...)
+	return _u
+}
+
+// RemoveWithdrawals removes "withdrawals" edges to ProxyUserWithdrawal entities.
+func (_u *ProxyUserUpdateOne) RemoveWithdrawals(v ...*ProxyUserWithdrawal) *ProxyUserUpdateOne {
+	ids := make([]int64, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveWithdrawalIDs(ids...)
 }
 
 // Where appends a list predicates to the ProxyUserUpdate builder.
@@ -1237,7 +1567,7 @@ func (_u *ProxyUserUpdateOne) sqlSave(ctx context.Context) (_node *ProxyUser, er
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyuser.Table, proxyuser.Columns, sqlgraph.NewFieldSpec(proxyuser.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyuser.Table, proxyuser.Columns, sqlgraph.NewFieldSpec(proxyuser.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProxyUser.id" for update`)}
@@ -1296,13 +1626,13 @@ func (_u *ProxyUserUpdateOne) sqlSave(ctx context.Context) (_node *ProxyUser, er
 		_spec.ClearField(proxyuser.FieldBalance, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.Telegram(); ok {
-		_spec.SetField(proxyuser.FieldTelegram, field.TypeInt64, value)
+		_spec.SetField(proxyuser.FieldTelegram, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.AddedTelegram(); ok {
-		_spec.AddField(proxyuser.FieldTelegram, field.TypeInt64, value)
+		_spec.AddField(proxyuser.FieldTelegram, field.TypeInt, value)
 	}
 	if _u.mutation.TelegramCleared() {
-		_spec.ClearField(proxyuser.FieldTelegram, field.TypeInt64)
+		_spec.ClearField(proxyuser.FieldTelegram, field.TypeInt)
 	}
 	if value, ok := _u.mutation.ReferCode(); ok {
 		_spec.SetField(proxyuser.FieldReferCode, field.TypeString, value)
@@ -1311,13 +1641,13 @@ func (_u *ProxyUserUpdateOne) sqlSave(ctx context.Context) (_node *ProxyUser, er
 		_spec.ClearField(proxyuser.FieldReferCode, field.TypeString)
 	}
 	if value, ok := _u.mutation.RefererID(); ok {
-		_spec.SetField(proxyuser.FieldRefererID, field.TypeInt, value)
+		_spec.SetField(proxyuser.FieldRefererID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedRefererID(); ok {
-		_spec.AddField(proxyuser.FieldRefererID, field.TypeInt, value)
+		_spec.AddField(proxyuser.FieldRefererID, field.TypeInt64, value)
 	}
 	if _u.mutation.RefererIDCleared() {
-		_spec.ClearField(proxyuser.FieldRefererID, field.TypeInt)
+		_spec.ClearField(proxyuser.FieldRefererID, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.Commission(); ok {
 		_spec.SetField(proxyuser.FieldCommission, field.TypeInt64, value)
@@ -1329,10 +1659,10 @@ func (_u *ProxyUserUpdateOne) sqlSave(ctx context.Context) (_node *ProxyUser, er
 		_spec.ClearField(proxyuser.FieldCommission, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.ReferralPercentage(); ok {
-		_spec.SetField(proxyuser.FieldReferralPercentage, field.TypeInt, value)
+		_spec.SetField(proxyuser.FieldReferralPercentage, field.TypeInt8, value)
 	}
 	if value, ok := _u.mutation.AddedReferralPercentage(); ok {
-		_spec.AddField(proxyuser.FieldReferralPercentage, field.TypeInt, value)
+		_spec.AddField(proxyuser.FieldReferralPercentage, field.TypeInt8, value)
 	}
 	if value, ok := _u.mutation.OnlyFirstPurchase(); ok {
 		_spec.SetField(proxyuser.FieldOnlyFirstPurchase, field.TypeBool, value)
@@ -1373,6 +1703,18 @@ func (_u *ProxyUserUpdateOne) sqlSave(ctx context.Context) (_node *ProxyUser, er
 	if value, ok := _u.mutation.EnableTradeNotify(); ok {
 		_spec.SetField(proxyuser.FieldEnableTradeNotify, field.TypeBool, value)
 	}
+	if value, ok := _u.mutation.GroupID(); ok {
+		_spec.SetField(proxyuser.FieldGroupID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedGroupID(); ok {
+		_spec.AddField(proxyuser.FieldGroupID, field.TypeInt64, value)
+	}
+	if _u.mutation.GroupIDCleared() {
+		_spec.ClearField(proxyuser.FieldGroupID, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.GroupLocked(); ok {
+		_spec.SetField(proxyuser.FieldGroupLocked, field.TypeBool, value)
+	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyuser.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -1387,6 +1729,96 @@ func (_u *ProxyUserUpdateOne) sqlSave(ctx context.Context) (_node *ProxyUser, er
 	}
 	if _u.mutation.IsDelCleared() {
 		_spec.ClearField(proxyuser.FieldIsDel, field.TypeBool)
+	}
+	if _u.mutation.RedemptionRecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.RedemptionRecordsTable,
+			Columns: []string{proxyuser.RedemptionRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyredemptionrecord.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedRedemptionRecordsIDs(); len(nodes) > 0 && !_u.mutation.RedemptionRecordsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.RedemptionRecordsTable,
+			Columns: []string{proxyuser.RedemptionRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyredemptionrecord.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RedemptionRecordsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.RedemptionRecordsTable,
+			Columns: []string{proxyuser.RedemptionRecordsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyredemptionrecord.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.WithdrawalsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.WithdrawalsTable,
+			Columns: []string{proxyuser.WithdrawalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyuserwithdrawal.FieldID, field.TypeInt64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedWithdrawalsIDs(); len(nodes) > 0 && !_u.mutation.WithdrawalsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.WithdrawalsTable,
+			Columns: []string{proxyuser.WithdrawalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyuserwithdrawal.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.WithdrawalsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proxyuser.WithdrawalsTable,
+			Columns: []string{proxyuser.WithdrawalsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proxyuserwithdrawal.FieldID, field.TypeInt64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &ProxyUser{config: _u.config}
 	_spec.Assign = _node.assignValues

@@ -80,25 +80,24 @@ service UserService {
 // ===== CreateUser =====
 
 message CreateUserRequest {
-  int64 tenant_id = 1;
-  string email = 2;
-  string telephone = 3;
-  string telephone_area_code = 4;
-  string password = 5;
-  int64 product_id = 6;
-  int64 duration = 7;
-  int32 referral_percentage = 8;
-  bool only_first_purchase = 9;
-  string referer_user = 10;  // 推荐人邮箱
-  string refer_code = 11;
-  int64 balance = 12;
-  int64 commission = 13;
-  int64 gift_amount = 14;
-  bool is_admin = 15;
+  string email = 1;
+  string telephone = 2;
+  string telephone_area_code = 3;
+  string password = 4;
+  string product_id = 5;
+  string duration = 6;
+  int32 referral_percentage = 7;
+  bool only_first_purchase = 8;
+  string referer_user = 9;  // 推荐人邮箱
+  string refer_code = 10;
+  string balance = 11;
+  string commission = 12;
+  string gift_amount = 13;
+  bool is_admin = 14;
 }
 
 message CreateUserData {
-  int64 user_id = 1;
+  string user_id = 1;
 }
 
 message CreateUserReply {
@@ -110,8 +109,7 @@ message CreateUserReply {
 // ===== DeleteUser =====
 
 message DeleteUserRequest {
-  int64 tenant_id = 1;
-  int64 user_id = 2;
+  string user_id = 1;
 }
 
 message DeleteUserData {
@@ -127,12 +125,11 @@ message DeleteUserReply {
 // ===== BatchDeleteUser =====
 
 message BatchDeleteUserRequest {
-  int64 tenant_id = 1;
-  repeated int64 user_ids = 2;
+  repeated string user_ids = 1;
 }
 
 message BatchDeleteUserData {
-  int64 deleted_count = 1;
+  string deleted_count = 1;
 }
 
 message BatchDeleteUserReply {
@@ -144,8 +141,7 @@ message BatchDeleteUserReply {
 // ===== CurrentUser =====
 
 message CurrentUserRequest {
-  int64 tenant_id = 1;
-  int64 user_id = 2;  // 当前登录用户ID
+  string user_id = 1;  // 当前登录用户ID
 }
 
 message CurrentUserData {
@@ -161,8 +157,7 @@ message CurrentUserReply {
 // ===== GetUserDetail =====
 
 message GetUserDetailRequest {
-  int64 tenant_id = 1;
-  int64 id = 2;  // 用户ID (与老项目保持一致，使用id而不是user_id)
+  string id = 1;  // 用户ID (与老项目保持一致，使用id而不是user_id)
 }
 
 message GetUserDetailReply {
@@ -174,17 +169,16 @@ message GetUserDetailReply {
 // ===== GetUserList =====
 
 message GetUserListRequest {
-  int64 tenant_id = 1;
-  int32 page = 2;
-  int32 size = 3;
-  string search = 4;  // 搜索关键字（邮箱、手机号等）
-  int64 user_id = 5;  // 过滤特定用户ID
-  int64 subscribe_id = 6;  // 过滤订阅套餐ID
-  int64 user_subscribe_id = 7;  // 过滤用户订阅ID
+  int32 page = 1;
+  int32 size = 2;
+  string search = 3;  // 搜索关键字（邮箱、手机号等）
+  string user_id = 4;  // 过滤特定用户ID
+  string subscribe_id = 5;  // 过滤订阅套餐ID
+  string user_subscribe_id = 6;  // 过滤用户订阅ID
 }
 
 message GetUserListData {
-  int64 total = 1;
+  string total = 1;
   repeated User list = 2;
 }
 
@@ -197,20 +191,19 @@ message GetUserListReply {
 // ===== UpdateUserBasicInfo =====
 
 message UpdateUserBasicInfoRequest {
-  int64 tenant_id = 1;              // 租户ID (内部字段，前端无需传)
-  int64 user_id = 2;                // 用户ID
-  string password = 3;              // 新密码（可选）
-  string avatar = 4;                // 头像
-  int64 balance = 5;                // 余额
-  int64 commission = 6;             // 佣金
-  int32 referral_percentage = 7;    // 推荐返利比例
-  bool only_first_purchase = 8;     // 仅首次购买返利
-  int64 gift_amount = 9;            // 赠送金额
-  int64 telegram = 10;              // Telegram ID
-  string refer_code = 11;           // 推荐码
-  int64 referer_id = 12;            // 推荐人ID
-  bool enable = 13;                 // 是否启用
-  bool is_admin = 14;               // 是否管理员
+  string user_id = 1;                // 用户ID
+  string password = 2;              // 新密码（可选）
+  string avatar = 3;                // 头像
+  string balance = 4;                // 余额
+  string commission = 5;             // 佣金
+  int32 referral_percentage = 6;    // 推荐返利比例
+  bool only_first_purchase = 7;     // 仅首次购买返利
+  string gift_amount = 8;            // 赠送金额
+  string telegram = 9;              // Telegram ID
+  string refer_code = 10;           // 推荐码
+  string referer_id = 11;            // 推荐人ID
+  bool enable = 12;                 // 是否启用
+  bool is_admin = 13;               // 是否管理员
 }
 
 message UpdateUserBasicInfoReply {
@@ -221,12 +214,11 @@ message UpdateUserBasicInfoReply {
 // ===== UpdateUserNotifySettings =====
 
 message UpdateUserNotifySettingsRequest {
-  int64 tenant_id = 1;
-  int64 user_id = 2;
-  bool enable_balance_notify = 3;
-  bool enable_login_notify = 4;
-  bool enable_subscribe_notify = 5;
-  bool enable_trade_notify = 6;
+  string user_id = 1;
+  bool enable_balance_notify = 2;
+  bool enable_login_notify = 3;
+  bool enable_subscribe_notify = 4;
+  bool enable_trade_notify = 5;
 }
 
 message UpdateUserNotifySettingsReply {
@@ -237,15 +229,14 @@ message UpdateUserNotifySettingsReply {
 // ===== GetUserLoginLogs =====
 
 message GetUserLoginLogsRequest {
-  int64 tenant_id = 1;
-  int32 page = 2;
-  int32 size = 3;
-  int64 user_id = 4;  // 可选：过滤特定用户
-  string date = 5;    // 可选：过滤日期 (YYYY-MM-DD)
+  int32 page = 1;
+  int32 size = 2;
+  string user_id = 3;  // 可选：过滤特定用户
+  string date = 4;    // 可选：过滤日期 (YYYY-MM-DD)
 }
 
 message GetUserLoginLogsData {
-  int64 total = 1;
+  string total = 1;
   repeated LoginLog list = 2;
 }
 
@@ -259,38 +250,37 @@ message GetUserLoginLogsReply {
 
 // User 用户信息
 message User {
-  int64 id = 1;
-  int64 tenant_id = 2;
-  string email = 3;
-  string telephone = 4;
-  string telephone_area_code = 5;
-  string avatar = 6;
-  int64 balance = 7;
-  string refer_code = 8;
-  int64 referer_id = 9;
-  int64 commission = 10;
-  int32 referral_percentage = 11;
-  bool only_first_purchase = 12;
-  int64 gift_amount = 13;
-  bool enable = 14;
-  bool is_admin = 15;
-  bool enable_balance_notify = 16;
-  bool enable_login_notify = 17;
-  bool enable_subscribe_notify = 18;
-  bool enable_trade_notify = 19;
-  int64 created_at = 20;  // Unix timestamp in milliseconds
-  int64 updated_at = 21;  // Unix timestamp in milliseconds
-  int64 telegram = 22;  // Telegram ID
-  repeated UserAuthMethod auth_methods = 23;  // 用户认证方法列表
-  repeated UserDevice user_devices = 24;  // 用户设备列表
+  string id = 1;
+  string email = 2;
+  string telephone = 3;
+  string telephone_area_code = 4;
+  string avatar = 5;
+  string balance = 6;
+  string refer_code = 7;
+  string referer_id = 8;
+  string commission = 9;
+  int32 referral_percentage = 10;
+  bool only_first_purchase = 11;
+  string gift_amount = 12;
+  bool enable = 13;
+  bool is_admin = 14;
+  bool enable_balance_notify = 15;
+  bool enable_login_notify = 16;
+  bool enable_subscribe_notify = 17;
+  bool enable_trade_notify = 18;
+  string created_at = 19;  // Unix timestamp in milliseconds
+  string updated_at = 20;  // Unix timestamp in milliseconds
+  string telegram = 21;  // Telegram ID
+  repeated UserAuthMethod auth_methods = 22;  // 用户认证方法列表
+  repeated UserDevice user_devices = 23;  // 用户设备列表
 }
 
 // LoginLog 登录日志
 message LoginLog {
-  int64 user_id = 1;
+  string user_id = 1;
   string method = 2;       // 登录方法
   string login_ip = 3;     // 登录IP
   string user_agent = 4;   // 用户代理
   bool success = 5;        // 是否成功
-  int64 timestamp = 6;     // Unix timestamp in milliseconds
+  string timestamp = 6;     // Unix timestamp in milliseconds
 }

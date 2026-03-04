@@ -7,10 +7,10 @@ import (
 // DocumentRepo Public Document数据仓库接口
 type DocumentRepo interface {
 	// QueryDocumentList 查询文档列表
-	QueryDocumentList(ctx context.Context, tenantID int64) ([]*DocumentItem, int64, error)
+	QueryDocumentList(ctx context.Context) ([]*DocumentItem, int64, error)
 
 	// QueryDocumentDetail 查询文档详情
-	QueryDocumentDetail(ctx context.Context, tenantID, id int64) (*DocumentDetail, error)
+	QueryDocumentDetail(ctx context.Context, id int) (*DocumentDetail, error)
 }
 
 // DocumentItem 文档项（列表）
@@ -42,11 +42,11 @@ func NewDocumentUseCase(repo DocumentRepo) *DocumentUseCase {
 }
 
 // QueryDocumentList 查询文档列表
-func (uc *DocumentUseCase) QueryDocumentList(ctx context.Context, tenantID int64) ([]*DocumentItem, int64, error) {
-	return uc.repo.QueryDocumentList(ctx, tenantID)
+func (uc *DocumentUseCase) QueryDocumentList(ctx context.Context) ([]*DocumentItem, int64, error) {
+	return uc.repo.QueryDocumentList(ctx)
 }
 
 // QueryDocumentDetail 查询文档详情
-func (uc *DocumentUseCase) QueryDocumentDetail(ctx context.Context, tenantID, id int64) (*DocumentDetail, error) {
-	return uc.repo.QueryDocumentDetail(ctx, tenantID, id)
+func (uc *DocumentUseCase) QueryDocumentDetail(ctx context.Context, id int) (*DocumentDetail, error) {
+	return uc.repo.QueryDocumentDetail(ctx, id)
 }

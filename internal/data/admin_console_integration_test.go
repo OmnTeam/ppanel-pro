@@ -73,13 +73,13 @@ func TestIntegrationQueryWaitReplyTotal(t *testing.T) {
 	tenantID := int64(1)
 
 	t.Run("查询待回复工单数量", func(t *testing.T) {
-		count, err := repo.QueryWaitReplyTotal(ctx, tenantID)
+		count, err := repo.QueryWaitReplyTotal(ctx)
 		if err != nil {
 			t.Errorf("QueryWaitReplyTotal() error = %v", err)
 			return
 		}
 
-		t.Logf("Tenant %d has %d pending tickets (status=1)", tenantID, count)
+		t.Logf("Pending tickets (status=1): %d", count)
 
 		// Verify count is non-negative
 		if count < 0 {
@@ -90,8 +90,8 @@ func TestIntegrationQueryWaitReplyTotal(t *testing.T) {
 	t.Run("验证查询使用正确的status值", func(t *testing.T) {
 		// Query all tickets to verify status values
 		tickets, err := data.db.ProxyTicket.Query()
-			Where()
-			All(ctx)
+		Where()
+		All(ctx)
 		if err != nil {
 			t.Logf("Could not query all tickets: %v", err)
 			return
@@ -101,7 +101,7 @@ func TestIntegrationQueryWaitReplyTotal(t *testing.T) {
 
 		pendingCount := 0
 		for _, ticket := range tickets {
-			if ticket.Status == 1 && ticket.TenantID == tenantID {
+			if ticket.Status == 1 {
 				pendingCount++
 			}
 		}
@@ -109,7 +109,7 @@ func TestIntegrationQueryWaitReplyTotal(t *testing.T) {
 		t.Logf("Manual count of pending tickets (status=1): %d", pendingCount)
 
 		// Query using repo method
-		repoCount, _ := repo.QueryWaitReplyTotal(ctx, tenantID)
+		repoCount, _ := repo.QueryWaitReplyTotal(ctx)
 
 		if repoCount != int64(pendingCount) {
 			t.Errorf("Count mismatch: repo returned %d, manual count is %d", repoCount, pendingCount)
@@ -132,7 +132,7 @@ func TestIntegrationQueryTodayUserTrafficRanking(t *testing.T) {
 	date := time.Now()
 
 	t.Run("查询今日用户流量Top 10", func(t *testing.T) {
-		ranking, err := repo.QueryTodayUserTrafficRanking(ctx, tenantID, date)
+		ranking, err := repo.QueryTodayUserTrafficRanking(ctx, date)
 		if err != nil {
 			t.Errorf("QueryTodayUserTrafficRanking() error = %v", err)
 			return
@@ -178,7 +178,7 @@ func TestIntegrationQueryTodayServerTrafficRanking(t *testing.T) {
 	date := time.Now()
 
 	t.Run("查询今日服务器流量Top 10", func(t *testing.T) {
-		ranking, err := repo.QueryTodayServerTrafficRanking(ctx, tenantID, date)
+		ranking, err := repo.QueryTodayServerTrafficRanking(ctx, date)
 		if err != nil {
 			t.Errorf("QueryTodayServerTrafficRanking() error = %v", err)
 			return
@@ -231,7 +231,7 @@ func TestIntegrationQueryDateOrders(t *testing.T) {
 	today := time.Now().Truncate(24 * time.Hour)
 
 	t.Run("查询今日订单统计", func(t *testing.T) {
-		result, err := repo.QueryDateOrders(ctx, tenantID, today)
+		result, err := repo.QueryDateOrders(ctx, today)
 		if err != nil {
 			t.Errorf("QueryDateOrders() error = %v", err)
 			return
@@ -251,7 +251,7 @@ func TestIntegrationQueryDateOrders(t *testing.T) {
 
 	t.Run("查询昨日订单统计", func(t *testing.T) {
 		yesterday := today.Add(-24 * time.Hour)
-		result, err := repo.QueryDateOrders(ctx, tenantID, yesterday)
+		result, err := repo.QueryDateOrders(ctx, yesterday)
 		if err != nil {
 			t.Errorf("QueryDateOrders() error = %v", err)
 			return
@@ -279,21 +279,21 @@ func TestIntegrationQueryRevenueStatistics(t *testing.T) {
 
 	t.Run("查询完整收入统计", func(t *testing.T) {
 		// Query today
-		today, err := repo.QueryDateOrders(ctx, tenantID, time.Now())
+		today, err := repo.QueryDateOrders(ctx, time.Now())
 		if err != nil {
 			t.Errorf("QueryDateOrders(today) error = %v", err)
 			return
 		}
 
 		// Query this month
-		monthly, err := repo.QueryMonthlyOrders(ctx, tenantID, time.Now())
+		monthly, err := repo.QueryMonthlyOrders(ctx, time.Now())
 		if err != nil {
 			t.Errorf("QueryMonthlyOrders() error = %v", err)
 			return
 		}
 
 		// Query all time
-		all, err := repo.QueryTotalOrders(ctx, tenantID)
+		all, err := repo.QueryTotalOrders(ctx)
 		if err != nil {
 			t.Errorf("QueryTotalOrders() error = %v", err)
 			return
@@ -330,24 +330,14 @@ func TestIntegrationMultiTenantIsolation(t *testing.T) {
 		log:  log.NewHelper(log.DefaultLogger),
 	}
 
-	t.Run("验证不同租户数据隔离", func(t *testing.T) {
-		// Query for tenant 1
-		count1, err1 := repo.QueryWaitReplyTotal(ctx, 1)
-		if err1 != nil {
-			t.Logf("Tenant 1 query error: %v", err1)
+	t.Run("验证查询功能", func(t *testing.T) {
+		// Query pending tickets
+		count, err := repo.QueryWaitReplyTotal(ctx)
+		if err != nil {
+			t.Logf("Query error: %v", err)
 		}
 
-		// Query for tenant 2 (if exists)
-		count2, err2 := repo.QueryWaitReplyTotal(ctx, 2)
-		if err2 != nil {
-			t.Logf("Tenant 2 query error: %v", err2)
-		}
-
-		t.Logf("Tenant 1 pending tickets: %d", count1)
-		t.Logf("Tenant 2 pending tickets: %d", count2)
-
-		// The counts can be different - this is expected and correct
-		t.Logf("Multi-tenant isolation: Each tenant has independent data")
+		t.Logf("Pending tickets: %d", count)
 	})
 }
 
@@ -368,13 +358,13 @@ func TestIntegrationConsoleAPIs(t *testing.T) {
 	t.Run("测试所有Console API", func(t *testing.T) {
 		// Test Revenue APIs
 		t.Log("=== Revenue Statistics ===")
-		if orders, err := repo.QueryDateOrders(ctx, tenantID, now); err == nil {
+		if orders, err := repo.QueryDateOrders(ctx, now); err == nil {
 			t.Logf("Today Orders: %+v", orders)
 		} else {
 			t.Errorf("QueryDateOrders failed: %v", err)
 		}
 
-		if orders, err := repo.QueryMonthlyOrders(ctx, tenantID, now); err == nil {
+		if orders, err := repo.QueryMonthlyOrders(ctx, now); err == nil {
 			t.Logf("Monthly Orders: %+v", orders)
 		} else {
 			t.Errorf("QueryMonthlyOrders failed: %v", err)
@@ -382,13 +372,13 @@ func TestIntegrationConsoleAPIs(t *testing.T) {
 
 		// Test User APIs
 		t.Log("\n=== User Statistics ===")
-		if count, err := repo.QueryRegisterUserTotalByDate(ctx, tenantID, now); err == nil {
+		if count, err := repo.QueryRegisterUserTotalByDate(ctx, now); err == nil {
 			t.Logf("Today Registered Users: %d", count)
 		} else {
 			t.Errorf("QueryRegisterUserTotalByDate failed: %v", err)
 		}
 
-		if count, err := repo.QueryRegisterUserTotal(ctx, tenantID); err == nil {
+		if count, err := repo.QueryRegisterUserTotal(ctx); err == nil {
 			t.Logf("Total Registered Users: %d", count)
 		} else {
 			t.Errorf("QueryRegisterUserTotal failed: %v", err)
@@ -396,7 +386,7 @@ func TestIntegrationConsoleAPIs(t *testing.T) {
 
 		// Test Ticket APIs
 		t.Log("\n=== Ticket Statistics ===")
-		if count, err := repo.QueryWaitReplyTotal(ctx, tenantID); err == nil {
+		if count, err := repo.QueryWaitReplyTotal(ctx); err == nil {
 			t.Logf("Pending Tickets (status=1): %d", count)
 		} else {
 			t.Errorf("QueryWaitReplyTotal failed: %v", err)
@@ -404,13 +394,13 @@ func TestIntegrationConsoleAPIs(t *testing.T) {
 
 		// Test Server APIs
 		t.Log("\n=== Server Statistics ===")
-		if count, err := repo.QueryOnlineServers(ctx, tenantID); err == nil {
+		if count, err := repo.QueryOnlineServers(ctx); err == nil {
 			t.Logf("Online Servers: %d", count)
 		} else {
 			t.Errorf("QueryOnlineServers failed: %v", err)
 		}
 
-		if count, err := repo.QueryOfflineServers(ctx, tenantID); err == nil {
+		if count, err := repo.QueryOfflineServers(ctx); err == nil {
 			t.Logf("Offline Servers: %d", count)
 		} else {
 			t.Errorf("QueryOfflineServers failed: %v", err)
@@ -418,20 +408,20 @@ func TestIntegrationConsoleAPIs(t *testing.T) {
 
 		// Test Traffic APIs
 		t.Log("\n=== Traffic Statistics ===")
-		if upload, download, err := repo.QueryTodayTraffic(ctx, tenantID, now); err == nil {
+		if upload, download, err := repo.QueryTodayTraffic(ctx, now); err == nil {
 			t.Logf("Today Traffic: Upload=%d, Download=%d, Total=%d",
 				upload, download, upload+download)
 		} else {
 			t.Errorf("QueryTodayTraffic failed: %v", err)
 		}
 
-		if ranking, err := repo.QueryTodayUserTrafficRanking(ctx, tenantID, now); err == nil {
+		if ranking, err := repo.QueryTodayUserTrafficRanking(ctx, now); err == nil {
 			t.Logf("Today User Traffic Top %d retrieved successfully", len(ranking))
 		} else {
 			t.Errorf("QueryTodayUserTrafficRanking failed: %v", err)
 		}
 
-		if ranking, err := repo.QueryTodayServerTrafficRanking(ctx, tenantID, now); err == nil {
+		if ranking, err := repo.QueryTodayServerTrafficRanking(ctx, now); err == nil {
 			t.Logf("Today Server Traffic Top %d retrieved successfully", len(ranking))
 		} else {
 			t.Errorf("QueryTodayServerTrafficRanking failed: %v", err)
@@ -461,8 +451,8 @@ func TestIntegrationOrderStatisticsDeep(t *testing.T) {
 	t.Run("验证订单状态过滤逻辑", func(t *testing.T) {
 		// Query all orders to analyze status distribution
 		allOrders, err := data.db.ProxyOrder.Query()
-			Where()
-			All(ctx)
+		Where()
+		All(ctx)
 		if err != nil {
 			t.Logf("Could not query all orders: %v", err)
 			return
@@ -486,7 +476,7 @@ func TestIntegrationOrderStatisticsDeep(t *testing.T) {
 		t.Logf("Valid orders (status 2 or 5): %d", validOrderCount)
 
 		// Query using repo method (filters by status 2, 5)
-		result, err := repo.QueryTotalOrders(ctx, tenantID)
+		result, err := repo.QueryTotalOrders(ctx)
 		if err != nil {
 			t.Errorf("QueryTotalOrders() error = %v", err)
 			return
@@ -499,8 +489,8 @@ func TestIntegrationOrderStatisticsDeep(t *testing.T) {
 	t.Run("验证支付方式过滤逻辑", func(t *testing.T) {
 		// Count orders by payment method
 		allOrders, err := data.db.ProxyOrder.Query()
-			Where()
-			All(ctx)
+		Where()
+		All(ctx)
 		if err != nil {
 			t.Logf("Could not query all orders: %v", err)
 			return
@@ -528,7 +518,7 @@ func TestIntegrationOrderStatisticsDeep(t *testing.T) {
 		t.Logf("Non-balance orders total amount: %d (should be counted)", nonBalanceAmount)
 
 		// Verify: balance orders should be excluded
-		result, err := repo.QueryTotalOrders(ctx, tenantID)
+		result, err := repo.QueryTotalOrders(ctx)
 		if err != nil {
 			t.Errorf("QueryTotalOrders() error = %v", err)
 			return
@@ -540,8 +530,8 @@ func TestIntegrationOrderStatisticsDeep(t *testing.T) {
 	t.Run("验证新购/续费订单区分", func(t *testing.T) {
 		// Analyze is_new field distribution
 		allOrders, err := data.db.ProxyOrder.Query()
-			Where()
-			All(ctx)
+		Where()
+		All(ctx)
 		if err != nil {
 			t.Logf("Could not query all orders: %v", err)
 			return
@@ -570,7 +560,7 @@ func TestIntegrationOrderStatisticsDeep(t *testing.T) {
 		t.Logf("  Renewal orders: %d, Amount: %d", renewalOrderCount, renewalOrderAmount)
 
 		// Compare with repo method
-		result, err := repo.QueryTotalOrders(ctx, tenantID)
+		result, err := repo.QueryTotalOrders(ctx)
 		if err != nil {
 			t.Errorf("QueryTotalOrders() error = %v", err)
 			return
@@ -593,28 +583,28 @@ func TestIntegrationOrderStatisticsDeep(t *testing.T) {
 		firstDayOfMonth := time.Date(today.Year(), today.Month(), 1, 0, 0, 0, 0, today.Location())
 
 		// Query today
-		todayResult, err := repo.QueryDateOrders(ctx, tenantID, today)
+		todayResult, err := repo.QueryDateOrders(ctx, today)
 		if err != nil {
 			t.Errorf("QueryDateOrders(today) error = %v", err)
 			return
 		}
 
 		// Query yesterday
-		yesterdayResult, err := repo.QueryDateOrders(ctx, tenantID, yesterday)
+		yesterdayResult, err := repo.QueryDateOrders(ctx, yesterday)
 		if err != nil {
 			t.Errorf("QueryDateOrders(yesterday) error = %v", err)
 			return
 		}
 
 		// Query this month
-		monthlyResult, err := repo.QueryMonthlyOrders(ctx, tenantID, today)
+		monthlyResult, err := repo.QueryMonthlyOrders(ctx, today)
 		if err != nil {
 			t.Errorf("QueryMonthlyOrders() error = %v", err)
 			return
 		}
 
 		// Query all time
-		allResult, err := repo.QueryTotalOrders(ctx, tenantID)
+		allResult, err := repo.QueryTotalOrders(ctx)
 		if err != nil {
 			t.Errorf("QueryTotalOrders() error = %v", err)
 			return
@@ -641,7 +631,7 @@ func TestIntegrationOrderStatisticsDeep(t *testing.T) {
 	t.Run("边界条件测试", func(t *testing.T) {
 		// Test with a future date (should return zero)
 		futureDate := time.Now().Add(365 * 24 * time.Hour)
-		futureResult, err := repo.QueryDateOrders(ctx, tenantID, futureDate)
+		futureResult, err := repo.QueryDateOrders(ctx, futureDate)
 		if err != nil {
 			t.Errorf("QueryDateOrders(future) error = %v", err)
 			return
@@ -655,7 +645,7 @@ func TestIntegrationOrderStatisticsDeep(t *testing.T) {
 
 		// Test with a very old date
 		oldDate := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
-		oldResult, err := repo.QueryDateOrders(ctx, tenantID, oldDate)
+		oldResult, err := repo.QueryDateOrders(ctx, oldDate)
 		if err != nil {
 			t.Errorf("QueryDateOrders(old) error = %v", err)
 			return
@@ -664,25 +654,16 @@ func TestIntegrationOrderStatisticsDeep(t *testing.T) {
 		t.Logf("Old date (%s) query result: %d", oldDate.Format("2006-01-02"), oldResult.AmountTotal)
 	})
 
-	t.Run("多租户数据隔离验证", func(t *testing.T) {
-		// Query tenant 1
-		tenant1Result, err := repo.QueryTotalOrders(ctx, 1)
+	t.Run("查询功能验证", func(t *testing.T) {
+		// Query total orders
+		result, err := repo.QueryTotalOrders(ctx)
 		if err != nil {
-			t.Errorf("QueryTotalOrders(tenant 1) error = %v", err)
+			t.Errorf("QueryTotalOrders() error = %v", err)
 			return
 		}
 
-		// Query tenant 2 (if exists)
-		tenant2Result, err := repo.QueryTotalOrders(ctx, 2)
-		if err != nil {
-			t.Logf("Tenant 2 query error (might not exist): %v", err)
-		}
-
-		t.Logf("Tenant 1 total orders: %d", tenant1Result.AmountTotal)
-		t.Logf("Tenant 2 total orders: %d", tenant2Result.AmountTotal)
-
-		// They should be independent
-		t.Log("✓ Multi-tenant data isolation working (each tenant has independent order data)")
+		t.Logf("Total orders: Total=%d, New=%d, Renewal=%d",
+			result.AmountTotal, result.NewOrderAmount, result.RenewalOrderAmount)
 	})
 }
 
@@ -702,19 +683,19 @@ func TestIntegrationRevenueStatisticsDeep(t *testing.T) {
 
 	t.Run("收入统计完整性验证", func(t *testing.T) {
 		// Query all three time ranges
-		todayResult, err := repo.QueryDateOrders(ctx, tenantID, now)
+		todayResult, err := repo.QueryDateOrders(ctx, now)
 		if err != nil {
 			t.Errorf("QueryDateOrders() error = %v", err)
 			return
 		}
 
-		monthlyResult, err := repo.QueryMonthlyOrders(ctx, tenantID, now)
+		monthlyResult, err := repo.QueryMonthlyOrders(ctx, now)
 		if err != nil {
 			t.Errorf("QueryMonthlyOrders() error = %v", err)
 			return
 		}
 
-		allResult, err := repo.QueryTotalOrders(ctx, tenantID)
+		allResult, err := repo.QueryTotalOrders(ctx)
 		if err != nil {
 			t.Errorf("QueryTotalOrders() error = %v", err)
 			return
@@ -758,8 +739,8 @@ func TestIntegrationRevenueStatisticsDeep(t *testing.T) {
 		tomorrow := today.Add(24 * time.Hour)
 
 		orders, err := data.db.ProxyOrder.Query()
-			Where()
-			All(ctx)
+		Where()
+		All(ctx)
 		if err != nil {
 			t.Logf("Could not query orders: %v", err)
 			return
@@ -770,10 +751,6 @@ func TestIntegrationRevenueStatisticsDeep(t *testing.T) {
 		manualRenewal := int64(0)
 
 		for _, order := range orders {
-			// Apply same filters as QueryDateOrders
-			if order.TenantID != tenantID {
-				continue
-			}
 			if order.Status != 2 && order.Status != 5 {
 				continue
 			}
@@ -798,7 +775,7 @@ func TestIntegrationRevenueStatisticsDeep(t *testing.T) {
 		t.Logf("  Total=%d, New=%d, Renewal=%d", manualTotal, manualNew, manualRenewal)
 
 		// Compare with repo method
-		repoResult, err := repo.QueryDateOrders(ctx, tenantID, now)
+		repoResult, err := repo.QueryDateOrders(ctx, now)
 		if err != nil {
 			t.Errorf("QueryDateOrders() error = %v", err)
 			return
@@ -829,7 +806,7 @@ func TestIntegrationRevenueStatisticsDeep(t *testing.T) {
 	t.Run("月度收入跨月边界测试", func(t *testing.T) {
 		// Test first day of month
 		firstDayOfMonth := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
-		firstDayResult, err := repo.QueryMonthlyOrders(ctx, tenantID, firstDayOfMonth)
+		firstDayResult, err := repo.QueryMonthlyOrders(ctx, firstDayOfMonth)
 		if err != nil {
 			t.Errorf("QueryMonthlyOrders(first day) error = %v", err)
 			return
@@ -837,7 +814,7 @@ func TestIntegrationRevenueStatisticsDeep(t *testing.T) {
 
 		// Test last day of previous month
 		lastDayOfPrevMonth := firstDayOfMonth.Add(-24 * time.Hour)
-		lastDayResult, err := repo.QueryMonthlyOrders(ctx, tenantID, lastDayOfPrevMonth)
+		lastDayResult, err := repo.QueryMonthlyOrders(ctx, lastDayOfPrevMonth)
 		if err != nil {
 			t.Errorf("QueryMonthlyOrders(last day of prev month) error = %v", err)
 			return
@@ -853,27 +830,10 @@ func TestIntegrationRevenueStatisticsDeep(t *testing.T) {
 		t.Log("✓ Month boundary filtering working correctly")
 	})
 
-	t.Run("零收入场景测试", func(t *testing.T) {
-		// Test with a tenant that likely has no data
-		emptyTenantID := int64(9999)
-		result, err := repo.QueryTotalOrders(ctx, emptyTenantID)
-		if err != nil {
-			t.Errorf("QueryTotalOrders(empty tenant) error = %v", err)
-			return
-		}
-
-		if result.AmountTotal == 0 && result.NewOrderAmount == 0 && result.RenewalOrderAmount == 0 {
-			t.Log("✓ Zero revenue scenario handled correctly")
-			t.Logf("  Empty tenant result: %+v", result)
-		} else {
-			t.Logf("Note: Tenant %d has data: %+v", emptyTenantID, result)
-		}
-	})
-
 	t.Run("性能和响应时间测试", func(t *testing.T) {
 		// Measure query performance
 		startTime := time.Now()
-		_, err := repo.QueryTotalOrders(ctx, tenantID)
+		_, err := repo.QueryTotalOrders(ctx)
 		elapsed := time.Since(startTime)
 
 		if err != nil {
@@ -891,7 +851,7 @@ func TestIntegrationRevenueStatisticsDeep(t *testing.T) {
 
 		// Test monthly query performance
 		startTime = time.Now()
-		_, err = repo.QueryMonthlyOrders(ctx, tenantID, now)
+		_, err = repo.QueryMonthlyOrders(ctx, now)
 		elapsed = time.Since(startTime)
 
 		if err != nil {

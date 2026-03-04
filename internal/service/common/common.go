@@ -32,17 +32,17 @@ func (s *CommonService) GetAds(ctx context.Context, req *pb.GetAdsRequest) (*pb.
 	pbAds := make([]*pb.Ads, len(adsList))
 	for i, ad := range adsList {
 		pbAds[i] = &pb.Ads{
-			Id:          ad.ID,
+			Id:          strconv.FormatInt(ad.ID, 10),
 			Title:       ad.Title,
 			Type:        ad.Type,
 			Content:     ad.Content,
 			Description: ad.Description,
 			TargetUrl:   ad.TargetURL,
-			StartTime:   ad.StartTime,
-			EndTime:     ad.EndTime,
+			StartTime:   strconv.FormatInt(ad.StartTime, 10),
+			EndTime:     int32(ad.EndTime),
 			Status:      int32(ad.Status),
-			CreatedAt:   ad.CreatedAt,
-			UpdatedAt:   ad.UpdatedAt,
+			CreatedAt:   strconv.FormatInt(ad.CreatedAt, 10),
+			UpdatedAt:   strconv.FormatInt(ad.UpdatedAt, 10),
 		}
 	}
 
@@ -66,7 +66,7 @@ func (s *CommonService) GetClient(ctx context.Context, req *pb.GetClientRequest)
 	pbClients := make([]*pb.SubscribeClient, len(clientList))
 	for i, client := range clientList {
 		pbClients[i] = &pb.SubscribeClient{
-			Id:          client.ID,
+			Id:          strconv.FormatInt(client.ID, 10),
 			Name:        client.Name,
 			Description: client.Description,
 			Icon:        client.Icon,
@@ -87,7 +87,7 @@ func (s *CommonService) GetClient(ctx context.Context, req *pb.GetClientRequest)
 		Code:    int32(responsecode.GetClientSuccess),
 		Message: responsecode.CodeMessages[responsecode.GetClientSuccess],
 		Data: &pb.GetClientData{
-			Total: total,
+			Total: int32(total),
 			List:  pbClients,
 		},
 	}, nil
@@ -132,9 +132,12 @@ func (s *CommonService) GetGlobalConfig(ctx context.Context, req *pb.GetGlobalCo
 		return nil, err
 	}
 
-	// Convert config to proto structures
-	configData := &pb.GetGlobalConfigData{
-		Site: &pb.SiteConfig{
+	// Convert config to proto structures with nil checks
+	configData := &pb.GetGlobalConfigData{}
+
+	// Site config
+	if config.Site != nil {
+		configData.Site = &pb.SiteConfig{
 			Host:       config.Site.Host,
 			SiteName:   config.Site.SiteName,
 			SiteDesc:   config.Site.SiteDesc,
@@ -142,63 +145,100 @@ func (s *CommonService) GetGlobalConfig(ctx context.Context, req *pb.GetGlobalCo
 			Keywords:   config.Site.Keywords,
 			CustomHtml: config.Site.CustomHtml,
 			CustomData: config.Site.CustomData,
-		},
-		Verify: &pb.VerifyConfig{
+		}
+	} else {
+		configData.Site = &pb.SiteConfig{}
+	}
+
+	// Verify config
+	if config.Verify != nil {
+		configData.Verify = &pb.VerifyConfig{
 			TurnstileSiteKey:          config.Verify.TurnstileSiteKey,
 			EnableLoginVerify:         config.Verify.EnableLoginVerify,
 			EnableRegisterVerify:      config.Verify.EnableRegisterVerify,
 			EnableResetPasswordVerify: config.Verify.EnableResetPasswordVerify,
-		},
-		Auth: &pb.AuthConfig{
-			Mobile: &pb.MobileAuthConfig{
+		}
+	} else {
+		configData.Verify = &pb.VerifyConfig{}
+	}
+
+	// Auth config
+	configData.Auth = &pb.AuthConfig{
+		Mobile:   &pb.MobileAuthConfig{},
+		Email:    &pb.EmailAuthConfig{},
+		Register: &pb.RegisterConfig{},
+	}
+	if config.Auth != nil {
+		if config.Auth.Mobile != nil {
+			configData.Auth.Mobile = &pb.MobileAuthConfig{
 				Enable:          config.Auth.Mobile.Enable,
 				EnableWhitelist: config.Auth.Mobile.EnableWhitelist,
 				Whitelist:       config.Auth.Mobile.Whitelist,
-			},
-			Email: &pb.EmailAuthConfig{
+			}
+		}
+		if config.Auth.Email != nil {
+			configData.Auth.Email = &pb.EmailAuthConfig{
 				Enable:             config.Auth.Email.Enable,
 				EnableVerify:       config.Auth.Email.EnableVerify,
 				EnableDomainSuffix: config.Auth.Email.EnableDomainSuffix,
 				DomainSuffixList:   config.Auth.Email.DomainSuffixList,
-			},
-			Register: &pb.RegisterConfig{
+			}
+		}
+		if config.Auth.Register != nil {
+			configData.Auth.Register = &pb.RegisterConfig{
 				StopRegister:            config.Auth.Register.StopRegister,
 				EnableIpRegisterLimit:   config.Auth.Register.EnableIpRegisterLimit,
-				IpRegisterLimit:         config.Auth.Register.IpRegisterLimit,
-				IpRegisterLimitDuration: config.Auth.Register.IpRegisterLimitDuration,
-			},
-		},
-		Invite: &pb.InviteConfig{
+				IpRegisterLimit:         int32(config.Auth.Register.IpRegisterLimit),
+				IpRegisterLimitDuration: int32(config.Auth.Register.IpRegisterLimitDuration),
+			}
+		}
+	}
+
+	// Invite config
+	if config.Invite != nil {
+		configData.Invite = &pb.InviteConfig{
 			ForcedInvite:       config.Invite.ForcedInvite,
-			ReferralPercentage: config.Invite.ReferralPercentage,
+			ReferralPercentage: int32(config.Invite.ReferralPercentage),
 			OnlyFirstPurchase:  config.Invite.OnlyFirstPurchase,
-		},
-		Currency: &pb.CurrencyConfig{
-			CurrencyUnit:   config.Currency["currency_unit"],
-			CurrencySymbol: config.Currency["currency_symbol"],
-		},
-		Subscribe: &pb.SubscribeConfig{
+		}
+	} else {
+		configData.Invite = &pb.InviteConfig{}
+	}
+
+	// Currency config
+	configData.Currency = &pb.CurrencyConfig{
+		CurrencyUnit:   config.Currency["currency_unit"],
+		CurrencySymbol: config.Currency["currency_symbol"],
+	}
+
+	// Subscribe config
+	if config.Subscribe != nil {
+		configData.Subscribe = &pb.SubscribeConfig{
 			SingleModel:     config.Subscribe.SingleModel,
 			SubscribePath:   config.Subscribe.SubscribePath,
 			SubscribeDomain: config.Subscribe.SubscribeDomain,
 			PanDomain:       config.Subscribe.PanDomain,
 			UserAgentLimit:  config.Subscribe.UserAgentLimit,
 			UserAgentList:   config.Subscribe.UserAgentList,
-		},
-		VerifyCode: &pb.PublicVerifyCodeConfig{
-			// Convert verify_code_interval from string to int64
-			VerifyCodeInterval: 60, // Default 60 seconds
-		},
-		OauthMethods: config.OAuthMethods,
-		WebAd:        config.WebAd,
+		}
+	} else {
+		configData.Subscribe = &pb.SubscribeConfig{}
+	}
+
+	// Verify code config
+	configData.VerifyCode = &pb.PublicVerifyCodeConfig{
+		VerifyCodeInterval: 60, // Default 60 seconds
 	}
 
 	// Try to parse verify_code_interval from database config
 	if interval, ok := config.VerifyCode["verify_code_interval"]; ok {
 		if val, err := strconv.ParseInt(interval, 10, 64); err == nil {
-			configData.VerifyCode.VerifyCodeInterval = val
+			configData.VerifyCode.VerifyCodeInterval = int32(val)
 		}
 	}
+
+	configData.OauthMethods = config.OAuthMethods
+	configData.WebAd = config.WebAd
 
 	return &pb.GetGlobalConfigReply{
 		Code:    int32(responsecode.GetGlobalConfigSuccess),
@@ -218,9 +258,9 @@ func (s *CommonService) GetStat(ctx context.Context, req *pb.GetStatRequest) (*p
 		Code:    int32(responsecode.GetStatSuccess),
 		Message: responsecode.CodeMessages[responsecode.GetStatSuccess],
 		Data: &pb.GetStatData{
-			User:     stat.User,
-			Node:     stat.Node,
-			Country:  stat.Country,
+			User:     int32(stat.User),
+			Node:     int32(stat.Node),
+			Country:  int32(stat.Country),
 			Protocol: stat.Protocol,
 		},
 	}, nil

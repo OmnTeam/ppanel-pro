@@ -16,20 +16,20 @@ import (
 // CacheService 缓存服务
 type CacheService struct {
 	redisClient   *redis.Client
-	db             *ent.Client
-	logger         *log.Helper
-	defaultExpiry  time.Duration
-	shortExpiry    time.Duration
+	db            *ent.Client
+	logger        *log.Helper
+	defaultExpiry time.Duration
+	shortExpiry   time.Duration
 }
 
 // NewCacheService 创建缓存服务
 func NewCacheService(redisClient *redis.Client, db *ent.Client, logger log.Logger) *CacheService {
 	return &CacheService{
 		redisClient:   redisClient,
-		db:             db,
-		logger:         log.NewHelper(logger),
-		defaultExpiry:  24 * time.Hour,    // 24小时
-		shortExpiry:    5 * time.Minute,    // 5分钟
+		db:            db,
+		logger:        log.NewHelper(logger),
+		defaultExpiry: 24 * time.Hour,  // 24小时
+		shortExpiry:   5 * time.Minute, // 5分钟
 	}
 }
 
@@ -127,10 +127,18 @@ func (cs *CacheService) GetUserFromCache(ctx context.Context, userID int64) (*Us
 
 // SetUserCache 设置用户缓存
 func (cs *CacheService) SetUserCache(ctx context.Context, user *ent.ProxyUser) error {
+	var balance, giftAmount int64
+	if user.Balance != nil {
+		balance = int64(*user.Balance)
+	}
+	if user.GiftAmount != nil {
+		giftAmount = int64(*user.GiftAmount)
+	}
+
 	userModel := &UserCacheModel{
 		ID:         int64(user.ID),
-		Balance:    user.Balance,
-		GiftAmount: user.GiftAmount,
+		Balance:    &balance,
+		GiftAmount: &giftAmount,
 	}
 
 	// 获取用户的认证方法
@@ -185,7 +193,7 @@ func (cs *CacheService) SetUserCache(ctx context.Context, user *ent.ProxyUser) e
 // ClearUserCache 清理用户相关缓存
 func (cs *CacheService) ClearUserCache(ctx context.Context, userID int64) error {
 	// 先从数据库获取用户信息，以便生成完整的缓存键
-	user, err := cs.db.ProxyUser.Get(ctx, int(userID))
+	user, err := cs.db.ProxyUser.Get(ctx, userID)
 	if err != nil {
 		cs.logger.Warnf("Failed to get user for cache clearing: userID=%d, error=%v", userID, err)
 		// 即使获取用户失败，也尝试清理基本缓存键
@@ -193,10 +201,18 @@ func (cs *CacheService) ClearUserCache(ctx context.Context, userID int64) error 
 		return cs.clearModelCache(ctx, userModel)
 	}
 
+	var balance, giftAmount int64
+	if user.Balance != nil {
+		balance = int64(*user.Balance)
+	}
+	if user.GiftAmount != nil {
+		giftAmount = int64(*user.GiftAmount)
+	}
+
 	userModel := &UserCacheModel{
 		ID:         int64(user.ID),
-		Balance:    user.Balance,
-		GiftAmount: user.GiftAmount,
+		Balance:    &balance,
+		GiftAmount: &giftAmount,
 	}
 
 	// 获取认证方法
@@ -251,12 +267,12 @@ func (cs *CacheService) GetOrderFromCache(ctx context.Context, orderNo string) (
 // SetOrderCache 设置订单缓存
 func (cs *CacheService) SetOrderCache(ctx context.Context, order *ent.ProxyOrder) error {
 	orderModel := &OrderCacheModel{
-		ID:         order.ID,
+		ID:         int64(order.ID),
 		OrderNo:    order.OrderNo,
-		UserID:     order.UserID,
+		UserID:     int64(order.UserID),
 		Status:     order.Status,
-		Amount:     order.Amount,
-		GiftAmount: 0, // Field doesn't exist in schema
+		Amount:     int64(order.Amount),
+		GiftAmount: int64(order.GiftAmount),
 	}
 
 	key := fmt.Sprintf(OrderNoKeyPrefix, order.OrderNo)
@@ -291,9 +307,9 @@ func (cs *CacheService) ClearOrderCache(ctx context.Context, orderNo string) err
 			orderModel = &OrderCacheModel{OrderNo: orderNo}
 		} else {
 			orderModel = &OrderCacheModel{
-				ID:      order.ID,
+				ID:      int64(order.ID),
 				OrderNo: order.OrderNo,
-				UserID:  order.UserID,
+				UserID:  int64(order.UserID),
 				Status:  order.Status,
 			}
 		}
@@ -329,7 +345,7 @@ func (cs *CacheService) UpdateUserBalanceCache(ctx context.Context, userID int64
 	userModel, err := cs.GetUserFromCache(ctx, userID)
 	if err != nil {
 		// 如果缓存中没有，从数据库获取并重新设置
-		user, dbErr := cs.db.ProxyUser.Get(ctx, int(userID))
+		user, dbErr := cs.db.ProxyUser.Get(ctx, userID)
 		if dbErr != nil {
 			cs.logger.Warnf("Failed to get user for balance cache update: userID=%d, error=%v", userID, dbErr)
 			return nil // 不阻止业务流程

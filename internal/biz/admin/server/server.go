@@ -18,7 +18,7 @@ type Server struct {
 	Country        string
 	City           string
 	Address        string
-	Sort           int64 // 匹配数据库 bigint 类型
+	Sort           int // 匹配数据库 bigint 类型
 	Protocols      []*server.Protocol
 	LastReportedAt int64
 	Status         *ServerStatus
@@ -70,7 +70,7 @@ type Node struct {
 // SortItem represents a sort item
 type SortItem struct {
 	ID   int64
-	Sort int64 // 使用 int64 以兼容 Server(bigint) 和 Node(uint32)
+	Sort int // 使用 int以兼容 Server(bigint) 和 Node(uint32)
 }
 
 // UserSubscribeInfo represents user subscribe information
@@ -87,16 +87,16 @@ type UserSubscribeInfo struct {
 type ServerRepo interface {
 	CreateServer(ctx context.Context, server *Server) (*Server, error)
 	UpdateServer(ctx context.Context, server *Server) (*Server, error)
-	DeleteServer(ctx context.Context, id int64) error
-	GetServerByID(ctx context.Context, id int64) (*Server, error)
+	DeleteServer(ctx context.Context, id int) error
+	GetServerByID(ctx context.Context, id int) (*Server, error)
 	FilterServerList(ctx context.Context, page, size int32, search string) (int64, []*Server, error)
-	GetServerProtocols(ctx context.Context, id int64) ([]*server.Protocol, error)
+	GetServerProtocols(ctx context.Context, id int) ([]*server.Protocol, error)
 	ResetServerSort(ctx context.Context, sortItems []*SortItem) error
 	// Redis cache methods with tenant isolation
-	GetServerStatus(ctx context.Context, serverID int64) (*ServerResourceStatus, error)
+	GetServerStatus(ctx context.Context, serverID int) (*ServerResourceStatus, error)
 	GetOnlineUsers(ctx context.Context, serverID int64, protocol string) (map[int64][]string, error)
 	// Subscribe methods with tenant isolation
-	GetUserSubscribeInfo(ctx context.Context, subscribeID int64) (*UserSubscribeInfo, error)
+	GetUserSubscribeInfo(ctx context.Context, subscribeID int) (*UserSubscribeInfo, error)
 }
 
 // ServerResourceStatus represents server resource status from cache
@@ -110,12 +110,12 @@ type ServerResourceStatus struct {
 type NodeRepo interface {
 	CreateNode(ctx context.Context, node *Node) (*Node, error)
 	UpdateNode(ctx context.Context, node *Node) (*Node, error)
-	DeleteNode(ctx context.Context, id int64) error
+	DeleteNode(ctx context.Context, id int) error
 	FilterNodeList(ctx context.Context, page, size int32, search string) (int64, []*Node, error)
-	ToggleNodeStatus(ctx context.Context, id int64, enable *bool) (*Node, error)
+	ToggleNodeStatus(ctx context.Context, id int, enable *bool) (*Node, error)
 	QueryNodeTags(ctx context.Context) ([]string, error)
 	ResetNodeSort(ctx context.Context, sortItems []*SortItem) error
-	ClearNodeCache(ctx context.Context, serverIDs []int64) error
+	ClearNodeCache(ctx context.Context, serverIDs []int) error
 }
 
 // MigrationRepo defines the interface for migration operations
@@ -218,7 +218,7 @@ func (uc *ServerUsecase) CreateServer(ctx context.Context, name, country, city, 
 		Country:   country,
 		City:      city,
 		Address:   address,
-		Sort:      sort,
+		Sort:      int(sort),
 		Protocols: processedProtocols,
 	}
 
@@ -226,7 +226,7 @@ func (uc *ServerUsecase) CreateServer(ctx context.Context, name, country, city, 
 }
 
 // UpdateServer updates an existing server
-func (uc *ServerUsecase) UpdateServer(ctx context.Context, id int64, name, country, city, address string, sort int64, protocols []*server.Protocol) (*Server, error) {
+func (uc *ServerUsecase) UpdateServer(ctx context.Context, id int, name, country, city, address string, sort int64, protocols []*server.Protocol) (*Server, error) {
 	// 1. Get existing server to check address change (matching original FindOneServer)
 	existingServer, err := uc.repo.GetServerByID(ctx, id)
 	if err != nil {
@@ -306,12 +306,12 @@ func (uc *ServerUsecase) UpdateServer(ctx context.Context, id int64, name, count
 
 	// 6. Update server
 	srv := &Server{
-		ID:        id,
+		ID:        int64(id),
 		Name:      name,
 		Country:   country,
 		City:      city,
 		Address:   address,
-		Sort:      sort,
+		Sort:      int(sort),
 		Protocols: processedProtocols,
 	}
 
@@ -321,7 +321,7 @@ func (uc *ServerUsecase) UpdateServer(ctx context.Context, id int64, name, count
 	}
 
 	// 7. Clear node cache
-	if err := uc.nodeRepo.ClearNodeCache(ctx, []int64{id}); err != nil {
+	if err := uc.nodeRepo.ClearNodeCache(ctx, []int{id}); err != nil {
 		uc.log.Warnf("Failed to clear node cache for server %d: %v", id, err)
 		// Don't return error, just log warning
 	}
@@ -330,14 +330,14 @@ func (uc *ServerUsecase) UpdateServer(ctx context.Context, id int64, name, count
 }
 
 // DeleteServer deletes a server
-func (uc *ServerUsecase) DeleteServer(ctx context.Context, id int64) error {
+func (uc *ServerUsecase) DeleteServer(ctx context.Context, id int) error {
 	// Delete the server
 	if err := uc.repo.DeleteServer(ctx, id); err != nil {
 		return err
 	}
 
 	// Clear node cache for the deleted server
-	if err := uc.nodeRepo.ClearNodeCache(ctx, []int64{id}); err != nil {
+	if err := uc.nodeRepo.ClearNodeCache(ctx, []int{id}); err != nil {
 		uc.log.Warnf("Failed to clear node cache for deleted server %d: %v", id, err)
 		// Don't return error, just log warning
 	}
@@ -361,7 +361,7 @@ func (uc *ServerUsecase) FilterServerList(ctx context.Context, page, size int32,
 }
 
 // GetServerProtocols gets server protocols
-func (uc *ServerUsecase) GetServerProtocols(ctx context.Context, id int64) ([]*server.Protocol, error) {
+func (uc *ServerUsecase) GetServerProtocols(ctx context.Context, id int) ([]*server.Protocol, error) {
 	return uc.repo.GetServerProtocols(ctx, id)
 }
 
@@ -378,11 +378,11 @@ func (uc *ServerUsecase) buildServerStatus(ctx context.Context, srv *Server) *Se
 		Disk:     0,
 		Protocol: "", // 与老项目保持一致，列表中为空字符串
 		Online:   make([]*ServerOnlineUser, 0),
-		Status:   uc.getServerStatusString(srv.LastReportedAt),
+		Status:   uc.getServerStatusString(int(srv.LastReportedAt)),
 	}
 
 	// Get server resource status from Redis with tenant isolation
-	resourceStatus, err := uc.repo.GetServerStatus(ctx, srv.ID)
+	resourceStatus, err := uc.repo.GetServerStatus(ctx, int(srv.ID))
 	if err != nil {
 		uc.log.Warnf("Failed to get server status from cache for server %d: %v", srv.ID, err)
 	} else if resourceStatus != nil {
@@ -398,13 +398,13 @@ func (uc *ServerUsecase) buildServerStatus(ctx context.Context, srv *Server) *Se
 }
 
 // getServerStatusString determines server status string based on last reported time
-func (uc *ServerUsecase) getServerStatusString(lastReportedAt int64) string {
+func (uc *ServerUsecase) getServerStatusString(lastReportedAt int) string {
 	if lastReportedAt == 0 {
 		return "offline"
 	}
 
 	// lastReportedAt 是毫秒时间戳，需要转换为秒
-	lastReported := time.Unix(lastReportedAt/1000, 0)
+	lastReported := time.Unix(int64(lastReportedAt/1000), 0)
 	elapsed := time.Since(lastReported)
 
 	if elapsed > 5*time.Minute {
@@ -463,7 +463,7 @@ func (uc *ServerUsecase) mergeOnlineUsers(ctx context.Context, users []*ServerOn
 			mergedMap[user.SubscribeID] = existing
 		} else {
 			// Fetch subscribe info with tenant isolation
-			subscribeInfo, err := uc.repo.GetUserSubscribeInfo(ctx, user.SubscribeID)
+			subscribeInfo, err := uc.repo.GetUserSubscribeInfo(ctx, int(user.SubscribeID))
 			if err != nil {
 				uc.log.Warnf("Failed to get subscribe info for subscribe %d: %v", user.SubscribeID, err)
 				continue

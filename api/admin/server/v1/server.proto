@@ -122,7 +122,7 @@ message Protocol {
   string security = 4;
   string sni = 5;
   bool allow_insecure = 6;
-  string fingerprint = 7;
+  string fingerprint32 = 7;
   string reality_server_addr = 8;
   int32 reality_server_port = 9;
   string reality_private_key = 10;
@@ -166,8 +166,8 @@ message Protocol {
 }
 
 message SortItem {
-  int64 id = 1;
-  int64 sort = 2;  // 使用 int64 以兼容 Server(bigint) 和 Node(uint32)
+  string id = 1;
+  string sort = 2;  // 使用 int32以兼容 Server(bigint) 和 Node(uint32)
 }
 
 message ServerOnlineIP {
@@ -177,11 +177,11 @@ message ServerOnlineIP {
 
 message ServerOnlineUser {
   repeated ServerOnlineIP ip = 1;
-  int64 user_id = 2;
+  string user_id = 2;
   string subscribe = 3;
-  int64 subscribe_id = 4;
-  int64 traffic = 5;
-  int64 expired_at = 6;
+  string subscribe_id = 4;
+  string traffic = 5;
+  string expired_at = 6;
 }
 
 message ServerStatus {
@@ -194,38 +194,35 @@ message ServerStatus {
 }
 
 message Server {
-  int64 id = 1;
-  int64 tenant_id = 2;
+  string id = 1;
   string name = 3;
   string country = 4;
   string city = 5;
   string address = 6;
-  int64 sort = 7;  // 匹配数据库 bigint 类型
+  string sort = 7;  // 匹配数据库 bigint32类型
   repeated Protocol protocols = 8;
-  int64 last_reported_at = 9;
+  int32 last_reported_at = 9;
   ServerStatus status = 10;
-  int64 created_at = 11;
-  int64 updated_at = 12;
+  string created_at = 11;
+  string updated_at = 12;
 }
 
 message Node {
-  int64 id = 1;
-  int64 tenant_id = 2;
+  string id = 1;
   string name = 3;
   repeated string tags = 4;
-  uint32 port = 5;  // Proto3 不支持 uint16，使用 uint32（值范围 0-65535，对应数据库 smallint unsigned）
+  uint32 port = 5;  // Proto3 不支持 uint16，使用 uint32（值范围 0-65535，对应数据库 smallint32unsigned）
   string address = 6;
-  int64 server_id = 7;
+  string server_id = 7;
   string protocol = 8;
   optional bool enabled = 9;  // 使用 optional 支持 null 和布尔值，与老项目兼容
   uint32 sort = 10;  // 匹配数据库 INT UNSIGNED 类型
-  int64 created_at = 11;
-  int64 updated_at = 12;
+  string created_at = 11;
+  string updated_at = 12;
 }
 
 // Server Requests/Replies
 message CreateServerRequest {
-  int64 tenant_id = 1;
   string name = 2;
   string country = 3;
   string city = 4;
@@ -245,8 +242,7 @@ message CreateServerReply {
 }
 
 message UpdateServerRequest {
-  int64 tenant_id = 1;
-  int64 id = 2;
+  string id = 2;
   string name = 3;
   string country = 4;
   string city = 5;
@@ -266,8 +262,7 @@ message UpdateServerReply {
 }
 
 message DeleteServerRequest {
-  int64 tenant_id = 1;
-  int64 id = 2;
+  string id = 2;
 }
 
 message DeleteServerData {
@@ -281,14 +276,13 @@ message DeleteServerReply {
 }
 
 message FilterServerListRequest {
-  int64 tenant_id = 1;
   int32 page = 2;
   int32 size = 3;
   string search = 4;
 }
 
 message FilterServerListData {
-  int64 total = 1;
+  int32 total = 1;
   repeated Server list = 2;
 }
 
@@ -299,8 +293,7 @@ message FilterServerListReply {
 }
 
 message GetServerProtocolsRequest {
-  int64 tenant_id = 1;
-  int64 id = 2;
+  string id = 2;
 }
 
 message GetServerProtocolsData {
@@ -315,12 +308,11 @@ message GetServerProtocolsReply {
 
 // Node Requests/Replies
 message CreateNodeRequest {
-  int64 tenant_id = 1;
   string name = 2;
   repeated string tags = 3;
   uint32 port = 4;  // Proto3 不支持 uint16，使用 uint32（值范围 0-65535）
   string address = 5;
-  int64 server_id = 6;
+  string server_id = 6;
   string protocol = 7;
   optional bool enabled = 8;  // 使用 optional 支持 null 和布尔值，与老项目兼容
 }
@@ -336,13 +328,12 @@ message CreateNodeReply {
 }
 
 message UpdateNodeRequest {
-  int64 tenant_id = 1;
-  int64 id = 2;
+  string id = 2;
   string name = 3;
   repeated string tags = 4;
   uint32 port = 5;  // Proto3 不支持 uint16，使用 uint32（值范围 0-65535）
   string address = 6;
-  int64 server_id = 7;
+  string server_id = 7;
   string protocol = 8;
   optional bool enabled = 9;  // 使用 optional 支持 null 和布尔值，与老项目兼容
 }
@@ -358,8 +349,7 @@ message UpdateNodeReply {
 }
 
 message DeleteNodeRequest {
-  int64 tenant_id = 1;
-  int64 id = 2;
+  string id = 2;
 }
 
 message DeleteNodeData {
@@ -373,14 +363,13 @@ message DeleteNodeReply {
 }
 
 message FilterNodeListRequest {
-  int64 tenant_id = 1;
   int32 page = 2;
   int32 size = 3;
   string search = 4;
 }
 
 message FilterNodeListData {
-  int64 total = 1;
+  int32 total = 1;
   repeated Node list = 2;
 }
 
@@ -391,8 +380,7 @@ message FilterNodeListReply {
 }
 
 message ToggleNodeStatusRequest {
-  int64 tenant_id = 1;
-  int64 id = 2;
+  string id = 2;
   optional bool enable = 3;  // 使用 optional 支持 null 和布尔值，与老项目兼容
 }
 
@@ -407,7 +395,6 @@ message ToggleNodeStatusReply {
 }
 
 message QueryNodeTagRequest {
-  int64 tenant_id = 1;
 }
 
 message QueryNodeTagData {
@@ -422,7 +409,6 @@ message QueryNodeTagReply {
 
 // Migration Requests/Replies
 message HasMigrateServerNodeRequest {
-  int64 tenant_id = 1;
 }
 
 message HasMigrateServerNodeData {
@@ -436,7 +422,6 @@ message HasMigrateServerNodeReply {
 }
 
 message MigrateServerNodeRequest {
-  int64 tenant_id = 1;
 }
 
 message MigrateServerNodeData {
@@ -452,7 +437,6 @@ message MigrateServerNodeReply {
 
 // Sort Requests/Replies
 message ResetSortRequest {
-  int64 tenant_id = 1;
   repeated SortItem sort = 2;
 }
 

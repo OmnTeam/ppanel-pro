@@ -35,7 +35,6 @@ func (d *DownloadLink) Unmarshal(data string) error {
 // SubscribeApplication 订阅应用配置
 type SubscribeApplication struct {
 	ID                int64
-	TenantID          int64
 	Name              string
 	Icon              *string
 	Description       *string

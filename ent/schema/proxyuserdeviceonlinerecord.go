@@ -26,10 +26,10 @@ func (ProxyUserDeviceOnlineRecord) Annotations() []schema.Annotation {
 // Fields of the ProxyUserDeviceOnlineRecord
 func (ProxyUserDeviceOnlineRecord) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Positive().
 			Comment("ID"),
-		field.Int("user_id").
+		field.Int64("user_id").
 			Comment("用户ID"),
 		field.String("identifier").
 			MaxLen(255).

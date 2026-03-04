@@ -85,17 +85,17 @@ message GetAdsRequest {
 
 // Ads message
 message Ads {
-  int64 id = 1;
+  string id = 1;
   string title = 2;
   string type = 3;
   string content = 4;
   string description = 5;
   string target_url = 6;
-  int64 start_time = 7;
-  int64 end_time = 8;
+  string start_time = 7;
+  int32 end_time = 8;
   int32 status = 9;
-  int64 created_at = 10;
-  int64 updated_at = 11;
+  string created_at = 10;
+  string updated_at = 11;
 }
 
 // GetAdsData 广告列表数据
@@ -125,7 +125,7 @@ message DownloadLink {
 
 // SubscribeClient message
 message SubscribeClient {
-  int64 id = 1;
+  string id = 1;
   string name = 2;
   string description = 3;
   string icon = 4;
@@ -136,7 +136,7 @@ message SubscribeClient {
 
 // GetClientData 客户端列表数据
 message GetClientData {
-  int64 total = 1;
+  int32 total = 1;
   repeated SubscribeClient list = 2;
 }
 
@@ -218,8 +218,8 @@ message EmailAuthConfig {
 message RegisterConfig {
   bool stop_register = 1;
   bool enable_ip_register_limit = 2;
-  int64 ip_register_limit = 3;
-  int64 ip_register_limit_duration = 4;
+  int32 ip_register_limit = 3;
+  int32 ip_register_limit_duration = 4;
 }
 
 // Auth configuration
@@ -232,7 +232,7 @@ message AuthConfig {
 // Invite configuration
 message InviteConfig {
   bool forced_invite = 1;
-  int64 referral_percentage = 2;
+  int32 referral_percentage = 2;
   bool only_first_purchase = 3;
 }
 
@@ -254,7 +254,7 @@ message SubscribeConfig {
 
 // Public verify code configuration
 message PublicVerifyCodeConfig {
-  int64 verify_code_interval = 1;
+  int32 verify_code_interval = 1;
 }
 
 // GetGlobalConfigData 全局配置数据
@@ -282,9 +282,9 @@ message GetStatRequest {}
 
 // GetStatData 统计数据
 message GetStatData {
-  int64 user = 1;
-  int64 node = 2;
-  int64 country = 3;
+  int32 user = 1;
+  int32 node = 2;
+  int32 country = 3;
   repeated string protocol = 4;
 }
 

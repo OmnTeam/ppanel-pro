@@ -17,11 +17,13 @@ type ProxyServerGroup struct {
 	config `json:"-"`
 	// ID of the ent.
 	// ID
-	ID int `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// Group Name
 	Name string `json:"name,omitempty"`
 	// Group Description
 	Description string `json:"description,omitempty"`
+	// Sort Order
+	Sort int `json:"sort,omitempty"`
 	// Creation Time
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Update Time
@@ -34,7 +36,7 @@ func (*ProxyServerGroup) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case proxyservergroup.FieldID:
+		case proxyservergroup.FieldID, proxyservergroup.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case proxyservergroup.FieldName, proxyservergroup.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -60,7 +62,7 @@ func (_m *ProxyServerGroup) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case proxyservergroup.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -72,6 +74,12 @@ func (_m *ProxyServerGroup) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
 				_m.Description = value.String
+			}
+		case proxyservergroup.FieldSort:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field sort", values[i])
+			} else if value.Valid {
+				_m.Sort = int(value.Int64)
 			}
 		case proxyservergroup.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -126,6 +134,9 @@ func (_m *ProxyServerGroup) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(_m.Description)
+	builder.WriteString(", ")
+	builder.WriteString("sort=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Sort))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

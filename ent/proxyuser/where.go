@@ -6,51 +6,52 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/OmnTeam/ppanel-pro/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.ProxyUser {
+func ID(id int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.ProxyUser {
+func IDEQ(id int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.ProxyUser {
+func IDNEQ(id int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.ProxyUser {
+func IDIn(ids ...int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.ProxyUser {
+func IDNotIn(ids ...int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.ProxyUser {
+func IDGT(id int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.ProxyUser {
+func IDGTE(id int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.ProxyUser {
+func IDLT(id int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.ProxyUser {
+func IDLTE(id int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldLTE(FieldID, id))
 }
 
@@ -85,7 +86,7 @@ func Balance(v int64) predicate.ProxyUser {
 }
 
 // Telegram applies equality check predicate on the "telegram" field. It's identical to TelegramEQ.
-func Telegram(v int64) predicate.ProxyUser {
+func Telegram(v int) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldTelegram, v))
 }
 
@@ -95,7 +96,7 @@ func ReferCode(v string) predicate.ProxyUser {
 }
 
 // RefererID applies equality check predicate on the "referer_id" field. It's identical to RefererIDEQ.
-func RefererID(v int) predicate.ProxyUser {
+func RefererID(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldRefererID, v))
 }
 
@@ -105,7 +106,7 @@ func Commission(v int64) predicate.ProxyUser {
 }
 
 // ReferralPercentage applies equality check predicate on the "referral_percentage" field. It's identical to ReferralPercentageEQ.
-func ReferralPercentage(v int) predicate.ProxyUser {
+func ReferralPercentage(v int8) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldReferralPercentage, v))
 }
 
@@ -162,6 +163,16 @@ func EnableSubscribeNotify(v bool) predicate.ProxyUser {
 // EnableTradeNotify applies equality check predicate on the "enable_trade_notify" field. It's identical to EnableTradeNotifyEQ.
 func EnableTradeNotify(v bool) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldEnableTradeNotify, v))
+}
+
+// GroupID applies equality check predicate on the "group_id" field. It's identical to GroupIDEQ.
+func GroupID(v int64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldEQ(FieldGroupID, v))
+}
+
+// GroupLocked applies equality check predicate on the "group_locked" field. It's identical to GroupLockedEQ.
+func GroupLocked(v bool) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldEQ(FieldGroupLocked, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -555,42 +566,42 @@ func BalanceNotNil() predicate.ProxyUser {
 }
 
 // TelegramEQ applies the EQ predicate on the "telegram" field.
-func TelegramEQ(v int64) predicate.ProxyUser {
+func TelegramEQ(v int) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldTelegram, v))
 }
 
 // TelegramNEQ applies the NEQ predicate on the "telegram" field.
-func TelegramNEQ(v int64) predicate.ProxyUser {
+func TelegramNEQ(v int) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNEQ(FieldTelegram, v))
 }
 
 // TelegramIn applies the In predicate on the "telegram" field.
-func TelegramIn(vs ...int64) predicate.ProxyUser {
+func TelegramIn(vs ...int) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldIn(FieldTelegram, vs...))
 }
 
 // TelegramNotIn applies the NotIn predicate on the "telegram" field.
-func TelegramNotIn(vs ...int64) predicate.ProxyUser {
+func TelegramNotIn(vs ...int) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNotIn(FieldTelegram, vs...))
 }
 
 // TelegramGT applies the GT predicate on the "telegram" field.
-func TelegramGT(v int64) predicate.ProxyUser {
+func TelegramGT(v int) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldGT(FieldTelegram, v))
 }
 
 // TelegramGTE applies the GTE predicate on the "telegram" field.
-func TelegramGTE(v int64) predicate.ProxyUser {
+func TelegramGTE(v int) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldGTE(FieldTelegram, v))
 }
 
 // TelegramLT applies the LT predicate on the "telegram" field.
-func TelegramLT(v int64) predicate.ProxyUser {
+func TelegramLT(v int) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldLT(FieldTelegram, v))
 }
 
 // TelegramLTE applies the LTE predicate on the "telegram" field.
-func TelegramLTE(v int64) predicate.ProxyUser {
+func TelegramLTE(v int) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldLTE(FieldTelegram, v))
 }
 
@@ -680,42 +691,42 @@ func ReferCodeContainsFold(v string) predicate.ProxyUser {
 }
 
 // RefererIDEQ applies the EQ predicate on the "referer_id" field.
-func RefererIDEQ(v int) predicate.ProxyUser {
+func RefererIDEQ(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldRefererID, v))
 }
 
 // RefererIDNEQ applies the NEQ predicate on the "referer_id" field.
-func RefererIDNEQ(v int) predicate.ProxyUser {
+func RefererIDNEQ(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNEQ(FieldRefererID, v))
 }
 
 // RefererIDIn applies the In predicate on the "referer_id" field.
-func RefererIDIn(vs ...int) predicate.ProxyUser {
+func RefererIDIn(vs ...int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldIn(FieldRefererID, vs...))
 }
 
 // RefererIDNotIn applies the NotIn predicate on the "referer_id" field.
-func RefererIDNotIn(vs ...int) predicate.ProxyUser {
+func RefererIDNotIn(vs ...int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNotIn(FieldRefererID, vs...))
 }
 
 // RefererIDGT applies the GT predicate on the "referer_id" field.
-func RefererIDGT(v int) predicate.ProxyUser {
+func RefererIDGT(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldGT(FieldRefererID, v))
 }
 
 // RefererIDGTE applies the GTE predicate on the "referer_id" field.
-func RefererIDGTE(v int) predicate.ProxyUser {
+func RefererIDGTE(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldGTE(FieldRefererID, v))
 }
 
 // RefererIDLT applies the LT predicate on the "referer_id" field.
-func RefererIDLT(v int) predicate.ProxyUser {
+func RefererIDLT(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldLT(FieldRefererID, v))
 }
 
 // RefererIDLTE applies the LTE predicate on the "referer_id" field.
-func RefererIDLTE(v int) predicate.ProxyUser {
+func RefererIDLTE(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldLTE(FieldRefererID, v))
 }
 
@@ -780,42 +791,42 @@ func CommissionNotNil() predicate.ProxyUser {
 }
 
 // ReferralPercentageEQ applies the EQ predicate on the "referral_percentage" field.
-func ReferralPercentageEQ(v int) predicate.ProxyUser {
+func ReferralPercentageEQ(v int8) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldReferralPercentage, v))
 }
 
 // ReferralPercentageNEQ applies the NEQ predicate on the "referral_percentage" field.
-func ReferralPercentageNEQ(v int) predicate.ProxyUser {
+func ReferralPercentageNEQ(v int8) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNEQ(FieldReferralPercentage, v))
 }
 
 // ReferralPercentageIn applies the In predicate on the "referral_percentage" field.
-func ReferralPercentageIn(vs ...int) predicate.ProxyUser {
+func ReferralPercentageIn(vs ...int8) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldIn(FieldReferralPercentage, vs...))
 }
 
 // ReferralPercentageNotIn applies the NotIn predicate on the "referral_percentage" field.
-func ReferralPercentageNotIn(vs ...int) predicate.ProxyUser {
+func ReferralPercentageNotIn(vs ...int8) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNotIn(FieldReferralPercentage, vs...))
 }
 
 // ReferralPercentageGT applies the GT predicate on the "referral_percentage" field.
-func ReferralPercentageGT(v int) predicate.ProxyUser {
+func ReferralPercentageGT(v int8) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldGT(FieldReferralPercentage, v))
 }
 
 // ReferralPercentageGTE applies the GTE predicate on the "referral_percentage" field.
-func ReferralPercentageGTE(v int) predicate.ProxyUser {
+func ReferralPercentageGTE(v int8) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldGTE(FieldReferralPercentage, v))
 }
 
 // ReferralPercentageLT applies the LT predicate on the "referral_percentage" field.
-func ReferralPercentageLT(v int) predicate.ProxyUser {
+func ReferralPercentageLT(v int8) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldLT(FieldReferralPercentage, v))
 }
 
 // ReferralPercentageLTE applies the LTE predicate on the "referral_percentage" field.
-func ReferralPercentageLTE(v int) predicate.ProxyUser {
+func ReferralPercentageLTE(v int8) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldLTE(FieldReferralPercentage, v))
 }
 
@@ -969,6 +980,66 @@ func EnableTradeNotifyNEQ(v bool) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNEQ(FieldEnableTradeNotify, v))
 }
 
+// GroupIDEQ applies the EQ predicate on the "group_id" field.
+func GroupIDEQ(v int64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldEQ(FieldGroupID, v))
+}
+
+// GroupIDNEQ applies the NEQ predicate on the "group_id" field.
+func GroupIDNEQ(v int64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldNEQ(FieldGroupID, v))
+}
+
+// GroupIDIn applies the In predicate on the "group_id" field.
+func GroupIDIn(vs ...int64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldIn(FieldGroupID, vs...))
+}
+
+// GroupIDNotIn applies the NotIn predicate on the "group_id" field.
+func GroupIDNotIn(vs ...int64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldNotIn(FieldGroupID, vs...))
+}
+
+// GroupIDGT applies the GT predicate on the "group_id" field.
+func GroupIDGT(v int64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldGT(FieldGroupID, v))
+}
+
+// GroupIDGTE applies the GTE predicate on the "group_id" field.
+func GroupIDGTE(v int64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldGTE(FieldGroupID, v))
+}
+
+// GroupIDLT applies the LT predicate on the "group_id" field.
+func GroupIDLT(v int64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldLT(FieldGroupID, v))
+}
+
+// GroupIDLTE applies the LTE predicate on the "group_id" field.
+func GroupIDLTE(v int64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldLTE(FieldGroupID, v))
+}
+
+// GroupIDIsNil applies the IsNil predicate on the "group_id" field.
+func GroupIDIsNil() predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldIsNull(FieldGroupID))
+}
+
+// GroupIDNotNil applies the NotNil predicate on the "group_id" field.
+func GroupIDNotNil() predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldNotNull(FieldGroupID))
+}
+
+// GroupLockedEQ applies the EQ predicate on the "group_locked" field.
+func GroupLockedEQ(v bool) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldEQ(FieldGroupLocked, v))
+}
+
+// GroupLockedNEQ applies the NEQ predicate on the "group_locked" field.
+func GroupLockedNEQ(v bool) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldNEQ(FieldGroupLocked, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldCreatedAt, v))
@@ -1117,6 +1188,52 @@ func IsDelIsNil() predicate.ProxyUser {
 // IsDelNotNil applies the NotNil predicate on the "is_del" field.
 func IsDelNotNil() predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNotNull(FieldIsDel))
+}
+
+// HasRedemptionRecords applies the HasEdge predicate on the "redemption_records" edge.
+func HasRedemptionRecords() predicate.ProxyUser {
+	return predicate.ProxyUser(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RedemptionRecordsTable, RedemptionRecordsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRedemptionRecordsWith applies the HasEdge predicate on the "redemption_records" edge with a given conditions (other predicates).
+func HasRedemptionRecordsWith(preds ...predicate.ProxyRedemptionRecord) predicate.ProxyUser {
+	return predicate.ProxyUser(func(s *sql.Selector) {
+		step := newRedemptionRecordsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasWithdrawals applies the HasEdge predicate on the "withdrawals" edge.
+func HasWithdrawals() predicate.ProxyUser {
+	return predicate.ProxyUser(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, WithdrawalsTable, WithdrawalsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasWithdrawalsWith applies the HasEdge predicate on the "withdrawals" edge with a given conditions (other predicates).
+func HasWithdrawalsWith(preds ...predicate.ProxyUserWithdrawal) predicate.ProxyUser {
+	return predicate.ProxyUser(func(s *sql.Selector) {
+		step := newWithdrawalsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

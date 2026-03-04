@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -26,6 +27,12 @@ func NewUserSubscribeService(uc *userbiz.SubscribeUsecase, logger log.Logger) *U
 	}
 }
 
+// Helper function for parsing int64 from string
+func parseInt64Helper(s string) int64 {
+	val, _ := strconv.ParseInt(s, 10, 64)
+	return val
+}
+
 // GetUserSubscribe 获取用户订阅列表
 func (s *UserSubscribeService) GetUserSubscribe(ctx context.Context, req *v1.GetUserSubscribeRequest) (*v1.GetUserSubscribeReply, error) {
 	list, total, err := s.uc.GetUserSubscribe(ctx, req)
@@ -37,30 +44,30 @@ func (s *UserSubscribeService) GetUserSubscribe(ctx context.Context, req *v1.Get
 	protoList := make([]*v1.UserSubscribe, 0, len(list))
 	for _, item := range list {
 		protoItem := &v1.UserSubscribe{
-			Id:          int64(item.ID),
-			UserId:      int64(item.UserID),
-			OrderId:     int64(item.OrderID),
-			SubscribeId: int64(item.SubscribeID),
-			StartTime:   item.StartTime.UnixMilli(),
-			CreatedAt:   item.CreatedAt.UnixMilli(),
-			UpdatedAt:   item.UpdatedAt.UnixMilli(),
+			Id:          strconv.FormatInt(int64(item.ID), 10),
+			UserId:      strconv.FormatInt(int64(item.UserID), 10),
+			OrderId:     strconv.FormatInt(int64(item.OrderID), 10),
+			SubscribeId: strconv.FormatInt(int64(item.SubscribeID), 10),
+			StartTime:   strconv.FormatInt(item.StartTime.UnixMilli(), 10),
+			CreatedAt:   strconv.FormatInt(item.CreatedAt.UnixMilli(), 10),
+			UpdatedAt:   strconv.FormatInt(item.UpdatedAt.UnixMilli(), 10),
 		}
 
 		// 处理指针字段
 		if item.ExpireTime != nil {
-			protoItem.ExpireTime = item.ExpireTime.UnixMilli()
+			protoItem.ExpireTime = strconv.FormatInt(item.ExpireTime.UnixMilli(), 10)
 		}
 		if item.FinishedAt != nil {
-			protoItem.FinishedAt = item.FinishedAt.UnixMilli()
+			protoItem.FinishedAt = strconv.FormatInt(item.FinishedAt.UnixMilli(), 10)
 		}
 		if item.Traffic != nil {
-			protoItem.Traffic = *item.Traffic
+			protoItem.Traffic = strconv.FormatInt(int64(*item.Traffic), 10)
 		}
 		if item.Download != nil {
-			protoItem.Download = *item.Download
+			protoItem.Download = strconv.FormatInt(int64(*item.Download), 10)
 		}
 		if item.Upload != nil {
-			protoItem.Upload = *item.Upload
+			protoItem.Upload = strconv.FormatInt(int64(*item.Upload), 10)
 		}
 		if item.Token != nil {
 			protoItem.Token = *item.Token
@@ -76,7 +83,7 @@ func (s *UserSubscribeService) GetUserSubscribe(ctx context.Context, req *v1.Get
 	}
 
 	return &v1.GetUserSubscribeReply{
-		Total: total,
+		Total: strconv.FormatInt(total, 10),
 		List:  protoList,
 	}, nil
 }
@@ -89,7 +96,7 @@ func (s *UserSubscribeService) CreateUserSubscribe(ctx context.Context, req *v1.
 	}
 
 	return &v1.CreateUserSubscribeReply{
-		Id: id,
+		Id: strconv.FormatInt(int64(id), 10),
 	}, nil
 }
 
@@ -105,7 +112,7 @@ func (s *UserSubscribeService) UpdateUserSubscribe(ctx context.Context, req *v1.
 
 // DeleteUserSubscribe 删除用户订阅
 func (s *UserSubscribeService) DeleteUserSubscribe(ctx context.Context, req *v1.DeleteUserSubscribeRequest) (*v1.DeleteUserSubscribeReply, error) {
-	err := s.uc.DeleteUserSubscribe(ctx, req.Id)
+	err := s.uc.DeleteUserSubscribe(ctx, parseInt64Helper(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +122,7 @@ func (s *UserSubscribeService) DeleteUserSubscribe(ctx context.Context, req *v1.
 
 // GetUserSubscribeById 根据ID获取用户订阅详情
 func (s *UserSubscribeService) GetUserSubscribeById(ctx context.Context, req *v1.GetUserSubscribeByIdRequest) (*v1.GetUserSubscribeByIdReply, error) {
-	subscribe, subscribeName, err := s.uc.GetUserSubscribeById(ctx, req.Id)
+	subscribe, subscribeName, err := s.uc.GetUserSubscribeById(ctx, parseInt64Helper(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -140,17 +147,17 @@ func (s *UserSubscribeService) GetUserSubscribeDevices(ctx context.Context, req 
 	protoList := make([]*v1.UserDevice, 0, len(list))
 	for _, item := range list {
 		protoItem := &v1.UserDevice{
-			Id:        int64(item.ID),
-			UserId:    int64(item.UserID),
+			Id:        strconv.FormatInt(int64(item.ID), 10),
+			UserId:    strconv.FormatInt(int64(item.UserID), 10),
 			Online:    item.Online,
 			Enabled:   item.Enabled,
-			CreatedAt: item.CreatedAt.UnixMilli(),
-			UpdatedAt: item.UpdatedAt.UnixMilli(),
+			CreatedAt: strconv.FormatInt(item.CreatedAt.UnixMilli(), 10),
+			UpdatedAt: strconv.FormatInt(item.UpdatedAt.UnixMilli(), 10),
 		}
 
 		// 处理指针字段
 		if item.SubscribeID != nil {
-			protoItem.SubscribeId = int64(*item.SubscribeID)
+			protoItem.SubscribeId = strconv.FormatInt(int64(*item.SubscribeID), 10)
 		}
 		if item.IP != nil {
 			protoItem.Ip = *item.IP
@@ -181,18 +188,18 @@ func (s *UserSubscribeService) GetUserSubscribeLogs(ctx context.Context, req *v1
 	protoList := make([]*v1.SubscribeLog, 0, len(list))
 	for _, item := range list {
 		protoItem := &v1.SubscribeLog{
-			Id:              item.ID,
-			UserId:          0, // 当前实现保持简化，与原项目数据结构一致
-			UserSubscribeId: item.ObjectID,
+			Id:              strconv.FormatInt(int64(item.ID), 10),
+			UserId:          "", // 当前实现保持简化，与原项目数据结构一致
+			UserSubscribeId: strconv.FormatInt(int64(item.ObjectID), 10),
 			Content:         item.Content, // 返回原始JSON内容
-			Timestamp:       item.CreatedAt.UnixMilli(),
+			Timestamp:       strconv.FormatInt(item.CreatedAt.UnixMilli(), 10),
 		}
 
 		protoList = append(protoList, protoItem)
 	}
 
 	return &v1.GetUserSubscribeLogsReply{
-		Total: total,
+		Total: strconv.FormatInt(total, 10),
 		List:  protoList,
 	}, nil
 }
@@ -208,18 +215,18 @@ func (s *UserSubscribeService) GetUserSubscribeResetTrafficLogs(ctx context.Cont
 	protoList := make([]*v1.ResetTrafficLog, 0, len(list))
 	for _, item := range list {
 		protoItem := &v1.ResetTrafficLog{
-			Id:              item.ID,
-			UserId:          0, // 当前实现保持简化，与原项目数据结构一致
-			UserSubscribeId: item.ObjectID,
+			Id:              strconv.FormatInt(int64(item.ID), 10),
+			UserId:          "", // 当前实现保持简化，与原项目数据结构一致
+			UserSubscribeId: strconv.FormatInt(int64(item.ObjectID), 10),
 			Content:         item.Content, // 返回原始JSON内容
-			Timestamp:       item.CreatedAt.UnixMilli(),
+			Timestamp:       strconv.FormatInt(item.CreatedAt.UnixMilli(), 10),
 		}
 
 		protoList = append(protoList, protoItem)
 	}
 
 	return &v1.GetUserSubscribeResetTrafficLogsReply{
-		Total: total,
+		Total: strconv.FormatInt(total, 10),
 		List:  protoList,
 	}, nil
 }
@@ -246,18 +253,18 @@ func (s *UserSubscribeService) GetUserSubscribeTrafficLogs(ctx context.Context, 
 		content := string(contentBytes)
 
 		protoItem := &v1.SubscribeTrafficLog{
-			Id:              item.ID,
-			UserId:          item.UserID,
-			UserSubscribeId: 0, // traffic_log表中只有subscribe_id，需要关联查询得到user_subscribe_id
+			Id:              strconv.FormatInt(int64(item.ID), 10),
+			UserId:          strconv.FormatInt(int64(item.UserID), 10),
+			UserSubscribeId: "", // traffic_log表中只有subscribe_id，需要关联查询得到user_subscribe_id
 			Content:         content,
-			Timestamp:       item.Timestamp.UnixMilli(),
+			Timestamp:       strconv.FormatInt(item.Timestamp.UnixMilli(), 10),
 		}
 
 		protoList = append(protoList, protoItem)
 	}
 
 	return &v1.GetUserSubscribeTrafficLogsReply{
-		Total: total,
+		Total: strconv.FormatInt(total, 10),
 		List:  protoList,
 	}, nil
 }

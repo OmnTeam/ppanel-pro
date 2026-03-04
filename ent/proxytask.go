@@ -29,9 +29,9 @@ type ProxyTask struct {
 	// 任务错误信息
 	Errors string `json:"errors,omitempty"`
 	// 总数
-	Total uint64 `json:"total,omitempty"`
+	Total uint32 `json:"total,omitempty"`
 	// 当前数量
-	Current uint64 `json:"current,omitempty"`
+	Current uint32 `json:"current,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -105,13 +105,13 @@ func (_m *ProxyTask) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field total", values[i])
 			} else if value.Valid {
-				_m.Total = uint64(value.Int64)
+				_m.Total = uint32(value.Int64)
 			}
 		case proxytask.FieldCurrent:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field current", values[i])
 			} else if value.Valid {
-				_m.Current = uint64(value.Int64)
+				_m.Current = uint32(value.Int64)
 			}
 		case proxytask.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

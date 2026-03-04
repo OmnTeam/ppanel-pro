@@ -12,7 +12,6 @@ import (
 // Document 文档业务实体
 type Document struct {
 	ID        int64
-	TenantID  int64
 	Title     string
 	Content   string
 	Tags      string // 逗号分隔的标签字符串
@@ -25,9 +24,9 @@ type Document struct {
 type DocumentRepo interface {
 	Create(ctx context.Context, doc *Document) (*Document, error)
 	Update(ctx context.Context, doc *Document) error
-	Delete(ctx context.Context, id int64) error
-	FindByID(ctx context.Context, id int64) (*Document, error)
-	List(ctx context.Context, page, size int64, tag, search string) (int64, []*Document, error)
+	Delete(ctx context.Context, id int) error
+	FindByID(ctx context.Context, id int) (*Document, error)
+	List(ctx context.Context, page, size int, tag, search string) (int64, []*Document, error)
 }
 
 // DocumentUsecase 文档用例
@@ -49,9 +48,9 @@ func NewDocumentUsecase(repo DocumentRepo, logger log.Logger) *DocumentUsecase {
 func (uc *DocumentUsecase) CreateDocument(ctx context.Context, title, content string, tags []string, show *bool) (*Document, error) {
 	// 第30-40行：构造 Document 并插入
 	doc := &Document{
-		Title:    title,
-		Content:  content,
-		Tags:     strings.Join(tags, ","), // 第34行：tags 转为逗号分隔
+		Title:   title,
+		Content: content,
+		Tags:    strings.Join(tags, ","), // 第34行：tags 转为逗号分隔
 	}
 
 	// 处理 show 字段
@@ -72,13 +71,13 @@ func (uc *DocumentUsecase) CreateDocument(ctx context.Context, title, content st
 
 // UpdateDocument 更新文档
 // 对应原项目 updateDocumentLogic.go
-func (uc *DocumentUsecase) UpdateDocument(ctx context.Context, id int64, title, content string, tags []string, show *bool) error {
+func (uc *DocumentUsecase) UpdateDocument(ctx context.Context, id int, title, content string, tags []string, show *bool) error {
 	// 第30-42行：构造 Document 并更新
 	doc := &Document{
-		ID:       id,
-		Title:    title,
-		Content:  content,
-		Tags:     strings.Join(tags, ","), // 第35行：tags 转为逗号分隔
+		ID:      int64(id),
+		Title:   title,
+		Content: content,
+		Tags:    strings.Join(tags, ","), // 第35行：tags 转为逗号分隔
 	}
 
 	// 处理 show 字段
@@ -98,7 +97,7 @@ func (uc *DocumentUsecase) UpdateDocument(ctx context.Context, id int64, title, 
 
 // DeleteDocument 删除文档
 // 对应原项目 deleteDocumentLogic.go
-func (uc *DocumentUsecase) DeleteDocument(ctx context.Context, id int64) error {
+func (uc *DocumentUsecase) DeleteDocument(ctx context.Context, id int) error {
 	// 第28-33行：删除文档
 	if err := uc.repo.Delete(ctx, id); err != nil {
 		uc.logger.WithContext(ctx).Errorw("Database Error", "error", err.Error())
@@ -109,7 +108,7 @@ func (uc *DocumentUsecase) DeleteDocument(ctx context.Context, id int64) error {
 
 // BatchDeleteDocument 批量删除文档
 // 对应原项目 batchDeleteDocumentLogic.go
-func (uc *DocumentUsecase) BatchDeleteDocument(ctx context.Context, ids []int64) error {
+func (uc *DocumentUsecase) BatchDeleteDocument(ctx context.Context, ids []int) error {
 	// 第28-35行：循环删除
 	for _, id := range ids {
 		if err := uc.repo.Delete(ctx, id); err != nil {
@@ -122,7 +121,7 @@ func (uc *DocumentUsecase) BatchDeleteDocument(ctx context.Context, ids []int64)
 
 // GetDocumentDetail 获取文档详情
 // 对应原项目 getDocumentDetailLogic.go
-func (uc *DocumentUsecase) GetDocumentDetail(ctx context.Context, id int64) (*Document, error) {
+func (uc *DocumentUsecase) GetDocumentDetail(ctx context.Context, id int) (*Document, error) {
 	// 第29-44行：查询文档详情
 	data, err := uc.repo.FindByID(ctx, id)
 	if err != nil {
@@ -135,7 +134,7 @@ func (uc *DocumentUsecase) GetDocumentDetail(ctx context.Context, id int64) (*Do
 
 // GetDocumentList 获取文档列表
 // 对应原项目 getDocumentListLogic.go
-func (uc *DocumentUsecase) GetDocumentList(ctx context.Context, page, size int64, tag, search string) (int64, []*Document, error) {
+func (uc *DocumentUsecase) GetDocumentList(ctx context.Context, page, size int, tag, search string) (int64, []*Document, error) {
 	// 第29-50行：查询文档列表
 	total, data, err := uc.repo.List(ctx, page, size, tag, search)
 	if err != nil {

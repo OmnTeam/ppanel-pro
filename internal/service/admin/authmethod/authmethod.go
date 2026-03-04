@@ -30,7 +30,7 @@ func NewAuthMethodService(uc *authmethodbiz.AuthMethodUsecase, logger log.Logger
 
 // GetAuthMethodConfig 获取认证方法配置
 func (s *AuthMethodService) GetAuthMethodConfig(ctx context.Context, req *v1.GetAuthMethodConfigRequest) (*v1.AuthMethodConfigReply, error) {
-	auth, err := s.uc.GetAuthMethodConfig(ctx, 0, req.Method)
+	auth, err := s.uc.GetAuthMethodConfig(ctx, req.Method)
 	if err != nil {
 		return nil, err
 	}
@@ -41,10 +41,10 @@ func (s *AuthMethodService) GetAuthMethodConfig(ctx context.Context, req *v1.Get
 		Message: responsecode.CodeMessages[responsecode.AdminGetAuthMethodConfigSuccess],
 		Data: &v1.AuthMethodConfigData{
 			Config: &v1.AuthMethodConfig{
-				Id:       auth.ID,
-				Method:   auth.Method,
-				Config:   config,
-				Enabled:  auth.Enabled,
+				Id:      auth.ID,
+				Method:  auth.Method,
+				Config:  config,
+				Enabled: auth.Enabled,
 			},
 		},
 	}, nil
@@ -64,7 +64,7 @@ func (s *AuthMethodService) UpdateAuthMethodConfig(ctx context.Context, req *v1.
 	}
 
 	// 调用 biz 层更新配置
-	result, err := s.uc.UpdateAuthMethodConfig(ctx, 0, bizReq)
+	result, err := s.uc.UpdateAuthMethodConfig(ctx, bizReq)
 	if err != nil {
 		return nil, err
 	}
@@ -76,10 +76,10 @@ func (s *AuthMethodService) UpdateAuthMethodConfig(ctx context.Context, req *v1.
 		Message: responsecode.CodeMessages[responsecode.AdminUpdateAuthMethodConfigSuccess],
 		Data: &v1.AuthMethodConfigData{
 			Config: &v1.AuthMethodConfig{
-				Id:       result.ID,
-				Method:   result.Method,
-				Config:   config,
-				Enabled:  result.Enabled,
+				Id:      result.ID,
+				Method:  result.Method,
+				Config:  config,
+				Enabled: result.Enabled,
 			},
 		},
 	}, nil
@@ -127,7 +127,7 @@ func (s *AuthMethodService) GetSmsPlatform(ctx context.Context, req *v1.GetSmsPl
 
 // GetAuthMethodList 获取认证方法列表
 func (s *AuthMethodService) GetAuthMethodList(ctx context.Context, req *v1.GetAuthMethodListRequest) (*v1.AuthMethodListReply, error) {
-	list, err := s.uc.GetAuthMethodList(ctx, 0)
+	list, err := s.uc.GetAuthMethodList(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -136,10 +136,10 @@ func (s *AuthMethodService) GetAuthMethodList(ctx context.Context, req *v1.GetAu
 	for _, auth := range list {
 		config, _ := s.parseConfig(auth.Config)
 		result = append(result, &v1.AuthMethodConfig{
-			Id:       auth.ID,
-			Method:   auth.Method,
-			Config:   config,
-			Enabled:  auth.Enabled,
+			Id:      auth.ID,
+			Method:  auth.Method,
+			Config:  config,
+			Enabled: auth.Enabled,
 		})
 	}
 	return &v1.AuthMethodListReply{
@@ -153,7 +153,7 @@ func (s *AuthMethodService) GetAuthMethodList(ctx context.Context, req *v1.GetAu
 
 // TestEmailSend 测试邮件发送
 func (s *AuthMethodService) TestEmailSend(ctx context.Context, req *v1.TestEmailSendRequest) (*v1.TestSendReply, error) {
-	success, message, err := s.uc.TestEmailSend(ctx, 0, req.Email)
+	success, message, err := s.uc.TestEmailSend(ctx, req.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +169,7 @@ func (s *AuthMethodService) TestEmailSend(ctx context.Context, req *v1.TestEmail
 
 // TestSmsSend 测试短信发送
 func (s *AuthMethodService) TestSmsSend(ctx context.Context, req *v1.TestSmsSendRequest) (*v1.TestSendReply, error) {
-	success, message, err := s.uc.TestSmsSend(ctx, 0, req.Mobile)
+	success, message, err := s.uc.TestSmsSend(ctx, req.Mobile)
 	if err != nil {
 		return nil, err
 	}

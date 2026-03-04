@@ -117,13 +117,13 @@ func (_c *ProxyPaymentCreate) SetNillableFeePercent(v *float64) *ProxyPaymentCre
 }
 
 // SetFeeAmount sets the "fee_amount" field.
-func (_c *ProxyPaymentCreate) SetFeeAmount(v int64) *ProxyPaymentCreate {
+func (_c *ProxyPaymentCreate) SetFeeAmount(v int) *ProxyPaymentCreate {
 	_c.mutation.SetFeeAmount(v)
 	return _c
 }
 
 // SetNillableFeeAmount sets the "fee_amount" field if the given value is not nil.
-func (_c *ProxyPaymentCreate) SetNillableFeeAmount(v *int64) *ProxyPaymentCreate {
+func (_c *ProxyPaymentCreate) SetNillableFeeAmount(v *int) *ProxyPaymentCreate {
 	if v != nil {
 		_c.SetFeeAmount(*v)
 	}
@@ -187,7 +187,7 @@ func (_c *ProxyPaymentCreate) SetNillableUpdatedAt(v *time.Time) *ProxyPaymentCr
 }
 
 // SetID sets the "id" field.
-func (_c *ProxyPaymentCreate) SetID(v int) *ProxyPaymentCreate {
+func (_c *ProxyPaymentCreate) SetID(v int64) *ProxyPaymentCreate {
 	_c.mutation.SetID(v)
 	return _c
 }
@@ -334,7 +334,7 @@ func (_c *ProxyPaymentCreate) sqlSave(ctx context.Context) (*ProxyPayment, error
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = int64(id)
 	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
@@ -344,7 +344,7 @@ func (_c *ProxyPaymentCreate) sqlSave(ctx context.Context) (*ProxyPayment, error
 func (_c *ProxyPaymentCreate) createSpec() (*ProxyPayment, *sqlgraph.CreateSpec) {
 	var (
 		_node = &ProxyPayment{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(proxypayment.Table, sqlgraph.NewFieldSpec(proxypayment.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(proxypayment.Table, sqlgraph.NewFieldSpec(proxypayment.FieldID, field.TypeInt64))
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
@@ -383,7 +383,7 @@ func (_c *ProxyPaymentCreate) createSpec() (*ProxyPayment, *sqlgraph.CreateSpec)
 		_node.FeePercent = value
 	}
 	if value, ok := _c.mutation.FeeAmount(); ok {
-		_spec.SetField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
+		_spec.SetField(proxypayment.FieldFeeAmount, field.TypeInt, value)
 		_node.FeeAmount = value
 	}
 	if value, ok := _c.mutation.Enable(); ok {
@@ -452,7 +452,7 @@ func (_c *ProxyPaymentCreateBulk) Save(ctx context.Context) ([]*ProxyPayment, er
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

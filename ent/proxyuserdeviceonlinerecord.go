@@ -17,9 +17,9 @@ type ProxyUserDeviceOnlineRecord struct {
 	config `json:"-"`
 	// ID of the ent.
 	// ID
-	ID int `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// 用户ID
-	UserID int `json:"user_id,omitempty"`
+	UserID int64 `json:"user_id,omitempty"`
 	// 设备标识符
 	Identifier string `json:"identifier,omitempty"`
 	// 上线时间
@@ -66,12 +66,12 @@ func (_m *ProxyUserDeviceOnlineRecord) assignValues(columns []string, values []a
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case proxyuserdeviceonlinerecord.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				_m.UserID = int(value.Int64)
+				_m.UserID = value.Int64
 			}
 		case proxyuserdeviceonlinerecord.FieldIdentifier:
 			if value, ok := values[i].(*sql.NullString); !ok {

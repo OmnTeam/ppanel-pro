@@ -18,7 +18,6 @@ import (
 // AuthMethod 认证方法
 type AuthMethod struct {
 	ID        int64
-	TenantID  int64
 	Method    string
 	Config    string
 	Enabled   bool
@@ -35,9 +34,9 @@ type UpdateAuthMethodRequest struct {
 
 // AuthMethodRepo 认证方法仓储接口
 type AuthMethodRepo interface {
-	FindByMethod(ctx context.Context, tenantID int64, method string) (*AuthMethod, error)
+	FindByMethod(ctx context.Context, method string) (*AuthMethod, error)
 	Update(ctx context.Context, auth *AuthMethod) (*AuthMethod, error)
-	FindAll(ctx context.Context, tenantID int64) ([]*AuthMethod, error)
+	FindAll(ctx context.Context) ([]*AuthMethod, error)
 }
 
 // AuthMethodUsecase 认证方法用例
@@ -56,9 +55,9 @@ func NewAuthMethodUsecase(repo AuthMethodRepo, logger log.Logger) *AuthMethodUse
 
 // GetAuthMethodConfig 获取认证方法配置
 // 对应原项目 getAuthMethodConfigLogic.go 第30-46行
-func (uc *AuthMethodUsecase) GetAuthMethodConfig(ctx context.Context, tenantID int64, method string) (*AuthMethod, error) {
+func (uc *AuthMethodUsecase) GetAuthMethodConfig(ctx context.Context, method string) (*AuthMethod, error) {
 	// 第31行：FindOneByMethod
-	authMethod, err := uc.repo.FindByMethod(ctx, tenantID, method)
+	authMethod, err := uc.repo.FindByMethod(ctx, method)
 	if err != nil {
 		uc.logger.WithContext(ctx).Errorf("find one by method failed: method=%s, error=%v", method, err)
 		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
@@ -72,9 +71,9 @@ func (uc *AuthMethodUsecase) GetAuthMethodConfig(ctx context.Context, tenantID i
 
 // UpdateAuthMethodConfig 更新认证方法配置
 // 完全对应原项目 updateAuthMethodConfigLogic.go 第34-86行
-func (uc *AuthMethodUsecase) UpdateAuthMethodConfig(ctx context.Context, tenantID int64, req *UpdateAuthMethodRequest) (*AuthMethod, error) {
+func (uc *AuthMethodUsecase) UpdateAuthMethodConfig(ctx context.Context, req *UpdateAuthMethodRequest) (*AuthMethod, error) {
 	// 第35-39行：FindOneByMethod
-	method, err := uc.repo.FindByMethod(ctx, tenantID, req.Method)
+	method, err := uc.repo.FindByMethod(ctx, req.Method)
 	if err != nil {
 		uc.logger.WithContext(ctx).Errorf("find one by method failed: method=%s, error=%v", req.Method, err)
 		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
@@ -152,9 +151,9 @@ func (uc *AuthMethodUsecase) UpdateGlobal(ctx context.Context, method string) {
 
 // GetAuthMethodList 获取认证方法列表
 // 对应原项目 getAuthMethodListLogic.go 第30-49行
-func (uc *AuthMethodUsecase) GetAuthMethodList(ctx context.Context, tenantID int64) ([]*AuthMethod, error) {
+func (uc *AuthMethodUsecase) GetAuthMethodList(ctx context.Context) ([]*AuthMethod, error) {
 	// 第31-35行：FindAll
-	methods, err := uc.repo.FindAll(ctx, tenantID)
+	methods, err := uc.repo.FindAll(ctx)
 	if err != nil {
 		uc.logger.WithContext(ctx).Errorf("find all failed: %v", err)
 		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
@@ -180,9 +179,9 @@ func (uc *AuthMethodUsecase) GetSmsPlatforms(ctx context.Context) []types.Platfo
 
 // TestEmailSend 测试邮件发送
 // 对应原项目 testEmailSendLogic.go 第30-41行
-func (uc *AuthMethodUsecase) TestEmailSend(ctx context.Context, tenantID int64, emailAddr string) (bool, string, error) {
+func (uc *AuthMethodUsecase) TestEmailSend(ctx context.Context, emailAddr string) (bool, string, error) {
 	// 第31-34行：获取 email 配置
-	authMethod, err := uc.repo.FindByMethod(ctx, tenantID, "email")
+	authMethod, err := uc.repo.FindByMethod(ctx, "email")
 	if err != nil || authMethod == nil {
 		uc.logger.WithContext(ctx).Errorf("find email auth method failed: %v", err)
 		return false, "", responsecode.NewKratosError(responsecode.ErrAuthMethodNotFound)
@@ -224,9 +223,9 @@ func (uc *AuthMethodUsecase) TestEmailSend(ctx context.Context, tenantID int64, 
 
 // TestSmsSend 测试短信发送
 // 对应原项目 testSmsSendLogic.go 第30-42行
-func (uc *AuthMethodUsecase) TestSmsSend(ctx context.Context, tenantID int64, mobile string) (bool, string, error) {
+func (uc *AuthMethodUsecase) TestSmsSend(ctx context.Context, mobile string) (bool, string, error) {
 	// 第31-34行：获取 mobile 配置
-	authMethod, err := uc.repo.FindByMethod(ctx, tenantID, "mobile")
+	authMethod, err := uc.repo.FindByMethod(ctx, "mobile")
 	if err != nil || authMethod == nil {
 		uc.logger.WithContext(ctx).Errorf("find mobile auth method failed: %v", err)
 		return false, "", responsecode.NewKratosError(responsecode.ErrAuthMethodNotFound)

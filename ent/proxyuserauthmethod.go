@@ -17,9 +17,9 @@ type ProxyUserAuthMethod struct {
 	config `json:"-"`
 	// ID of the ent.
 	// ID
-	ID int `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// 用户ID
-	UserID int `json:"user_id,omitempty"`
+	UserID int64 `json:"user_id,omitempty"`
 	// 租户ID
 	TenantID int64 `json:"tenant_id,omitempty"`
 	// 认证类型: apple, google, github, facebook, telegram, email, mobile
@@ -68,12 +68,12 @@ func (_m *ProxyUserAuthMethod) assignValues(columns []string, values []any) erro
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case proxyuserauthmethod.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				_m.UserID = int(value.Int64)
+				_m.UserID = value.Int64
 			}
 		case proxyuserauthmethod.FieldTenantID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {

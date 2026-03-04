@@ -34,14 +34,14 @@ type Status struct {
 	CPU       float64 `json:"cpu"`
 	Mem       float64 `json:"mem"`
 	Disk      float64 `json:"disk"`
-	UpdatedAt int64   `json:"updated_at"`
+	UpdatedAt int     `json:"updated_at"`
 }
 
 // OnlineUserSubscribe 在线用户订阅映射 map[subscribeID][]IP
 type OnlineUserSubscribe map[int64][]string
 
 // StatusCache 获取服务器状态缓存 - 严格按照原始逻辑
-func (d *Data) StatusCache(ctx context.Context, serverID int64) (*Status, error) {
+func (d *Data) StatusCache(ctx context.Context, serverID int) (*Status, error) {
 	key := fmt.Sprintf(StatusCacheKey, serverID)
 
 	result, err := d.rdb.Get(ctx, key).Result()

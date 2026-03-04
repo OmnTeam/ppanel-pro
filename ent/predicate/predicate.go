@@ -21,6 +21,9 @@ type ProxyCoupon func(*sql.Selector)
 // ProxyDocument is the predicate function for proxydocument builders.
 type ProxyDocument func(*sql.Selector)
 
+// ProxyGroupHistory is the predicate function for proxygrouphistory builders.
+type ProxyGroupHistory func(*sql.Selector)
+
 // ProxyNode is the predicate function for proxynode builders.
 type ProxyNode func(*sql.Selector)
 
@@ -29,6 +32,12 @@ type ProxyOrder func(*sql.Selector)
 
 // ProxyPayment is the predicate function for proxypayment builders.
 type ProxyPayment func(*sql.Selector)
+
+// ProxyRedemptionCode is the predicate function for proxyredemptioncode builders.
+type ProxyRedemptionCode func(*sql.Selector)
+
+// ProxyRedemptionRecord is the predicate function for proxyredemptionrecord builders.
+type ProxyRedemptionRecord func(*sql.Selector)
 
 // ProxySchemaMigrations is the predicate function for proxyschemamigrations builders.
 type ProxySchemaMigrations func(*sql.Selector)
@@ -78,5 +87,11 @@ type ProxyUserDevice func(*sql.Selector)
 // ProxyUserDeviceOnlineRecord is the predicate function for proxyuserdeviceonlinerecord builders.
 type ProxyUserDeviceOnlineRecord func(*sql.Selector)
 
+// ProxyUserGroup is the predicate function for proxyusergroup builders.
+type ProxyUserGroup func(*sql.Selector)
+
 // ProxyUserSubscribe is the predicate function for proxyusersubscribe builders.
 type ProxyUserSubscribe func(*sql.Selector)
+
+// ProxyUserWithdrawal is the predicate function for proxyuserwithdrawal builders.
+type ProxyUserWithdrawal func(*sql.Selector)

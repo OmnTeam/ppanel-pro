@@ -56,6 +56,27 @@ func (_u *ProxyServerGroupUpdate) SetNillableDescription(v *string) *ProxyServer
 	return _u
 }
 
+// SetSort sets the "sort" field.
+func (_u *ProxyServerGroupUpdate) SetSort(v int) *ProxyServerGroupUpdate {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *ProxyServerGroupUpdate) SetNillableSort(v *int) *ProxyServerGroupUpdate {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *ProxyServerGroupUpdate) AddSort(v int) *ProxyServerGroupUpdate {
+	_u.mutation.AddSort(v)
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *ProxyServerGroupUpdate) SetCreatedAt(v time.Time) *ProxyServerGroupUpdate {
 	_u.mutation.SetCreatedAt(v)
@@ -136,7 +157,7 @@ func (_u *ProxyServerGroupUpdate) sqlSave(ctx context.Context) (_node int, err e
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyservergroup.Table, proxyservergroup.Columns, sqlgraph.NewFieldSpec(proxyservergroup.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyservergroup.Table, proxyservergroup.Columns, sqlgraph.NewFieldSpec(proxyservergroup.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -149,6 +170,12 @@ func (_u *ProxyServerGroupUpdate) sqlSave(ctx context.Context) (_node int, err e
 	}
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(proxyservergroup.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(proxyservergroup.FieldSort, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(proxyservergroup.FieldSort, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxyservergroup.FieldCreatedAt, field.TypeTime, value)
@@ -201,6 +228,27 @@ func (_u *ProxyServerGroupUpdateOne) SetNillableDescription(v *string) *ProxySer
 	if v != nil {
 		_u.SetDescription(*v)
 	}
+	return _u
+}
+
+// SetSort sets the "sort" field.
+func (_u *ProxyServerGroupUpdateOne) SetSort(v int) *ProxyServerGroupUpdateOne {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *ProxyServerGroupUpdateOne) SetNillableSort(v *int) *ProxyServerGroupUpdateOne {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *ProxyServerGroupUpdateOne) AddSort(v int) *ProxyServerGroupUpdateOne {
+	_u.mutation.AddSort(v)
 	return _u
 }
 
@@ -297,7 +345,7 @@ func (_u *ProxyServerGroupUpdateOne) sqlSave(ctx context.Context) (_node *ProxyS
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyservergroup.Table, proxyservergroup.Columns, sqlgraph.NewFieldSpec(proxyservergroup.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyservergroup.Table, proxyservergroup.Columns, sqlgraph.NewFieldSpec(proxyservergroup.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProxyServerGroup.id" for update`)}
@@ -327,6 +375,12 @@ func (_u *ProxyServerGroupUpdateOne) sqlSave(ctx context.Context) (_node *ProxyS
 	}
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(proxyservergroup.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(proxyservergroup.FieldSort, field.TypeInt, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(proxyservergroup.FieldSort, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxyservergroup.FieldCreatedAt, field.TypeTime, value)

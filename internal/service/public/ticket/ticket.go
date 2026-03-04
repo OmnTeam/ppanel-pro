@@ -2,6 +2,7 @@ package ticket
 
 import (
 	"context"
+	"strconv"
 
 	pb "github.com/OmnTeam/ppanel-pro/api/public/ticket/v1"
 	ticketBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/ticket"
@@ -9,6 +10,12 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
+
+// Helper functions for type conversion
+func parseInt64(s string) int64 {
+	val, _ := strconv.ParseInt(s, 10, 64)
+	return val
+}
 
 // TicketService implements the ticket service
 type TicketService struct {
@@ -62,11 +69,11 @@ func (s *TicketService) GetUserTicketList(ctx context.Context, req *pb.GetUserTi
 
 	// 调用UseCase
 	result, err := s.uc.GetTicketList(ctx, &ticketBiz.GetTicketListParams{
-		UserID:   userID,
-		Page:     req.Page,
-		Size:     req.Size,
-		Status:   req.Status,
-		Search:   req.Search,
+		UserID: userID,
+		Page:   int64(req.Page),
+		Size:   int64(req.Size),
+		Status: req.Status,
+		Search: req.Search,
 	})
 
 	if err != nil {
@@ -78,13 +85,13 @@ func (s *TicketService) GetUserTicketList(ctx context.Context, req *pb.GetUserTi
 	list := make([]*pb.TicketInfo, 0, len(result.List))
 	for _, t := range result.List {
 		list = append(list, &pb.TicketInfo{
-			Id:          t.ID,
+			Id:          strconv.FormatInt(t.ID, 10),
 			Title:       t.Title,
 			Description: t.Description,
-			UserId:      t.UserID,
+			UserId:      strconv.FormatInt(t.UserID, 10),
 			Status:      t.Status,
-			CreatedAt:   t.CreatedAt, // Already Unix milliseconds
-			UpdatedAt:   t.UpdatedAt, // Already Unix milliseconds
+			CreatedAt:   strconv.FormatInt(int64(t.CreatedAt), 10), // Already Unix milliseconds
+			UpdatedAt:   strconv.FormatInt(int64(t.UpdatedAt), 10), // Already Unix milliseconds
 		})
 	}
 
@@ -92,7 +99,7 @@ func (s *TicketService) GetUserTicketList(ctx context.Context, req *pb.GetUserTi
 		Code:    int32(responsecode.UserTicketListQuerySuccess),
 		Message: responsecode.CodeMessages[responsecode.UserTicketListQuerySuccess],
 		Data: &pb.TicketListData{
-			Total: result.Total,
+			Total: int32(result.Total),
 			List:  list,
 		},
 	}, nil
@@ -107,9 +114,10 @@ func (s *TicketService) GetUserTicketDetails(ctx context.Context, req *pb.GetUse
 	s.logger.Infof("[GetUserTicketDetails] userID: %d", userID)
 
 	// 调用UseCase
+	id, _ := strconv.ParseInt(req.Id, 10, 64)
 	ticket, err := s.uc.GetTicketDetails(ctx, &ticketBiz.GetTicketDetailsParams{
-		UserID:   userID,
-		ID:       req.Id,
+		UserID: userID,
+		ID:     id,
 	})
 
 	if err != nil {
@@ -121,12 +129,12 @@ func (s *TicketService) GetUserTicketDetails(ctx context.Context, req *pb.GetUse
 	follows := make([]*pb.TicketFollow, 0, len(ticket.Follows))
 	for _, f := range ticket.Follows {
 		follows = append(follows, &pb.TicketFollow{
-			Id:        f.ID,
-			TicketId:  f.TicketID,
+			Id:        strconv.FormatInt(f.ID, 10),
+			TicketId:  strconv.FormatInt(f.TicketID, 10),
 			From:      f.From,
 			Type:      f.Type,
 			Content:   f.Content,
-			CreatedAt: f.CreatedAt, // Already Unix milliseconds
+			CreatedAt: strconv.FormatInt(int64(f.CreatedAt), 10), // Already Unix milliseconds
 		})
 	}
 
@@ -134,14 +142,14 @@ func (s *TicketService) GetUserTicketDetails(ctx context.Context, req *pb.GetUse
 		Code:    int32(responsecode.UserTicketDetailQuerySuccess),
 		Message: responsecode.CodeMessages[responsecode.UserTicketDetailQuerySuccess],
 		Data: &pb.TicketInfo{
-			Id:          ticket.ID,
+			Id:          strconv.FormatInt(ticket.ID, 10),
 			Title:       ticket.Title,
 			Description: ticket.Description,
-			UserId:      ticket.UserID,
+			UserId:      strconv.FormatInt(ticket.UserID, 10),
 			Follow:      follows,
 			Status:      ticket.Status,
-			CreatedAt:   ticket.CreatedAt, // Already Unix milliseconds
-			UpdatedAt:   ticket.UpdatedAt, // Already Unix milliseconds
+			CreatedAt:   strconv.FormatInt(int64(ticket.CreatedAt), 10), // Already Unix milliseconds
+			UpdatedAt:   strconv.FormatInt(int64(ticket.UpdatedAt), 10), // Already Unix milliseconds
 		},
 	}, nil
 }
@@ -156,9 +164,9 @@ func (s *TicketService) UpdateUserTicketStatus(ctx context.Context, req *pb.Upda
 
 	// 调用UseCase
 	err := s.uc.UpdateTicketStatus(ctx, &ticketBiz.UpdateTicketStatusParams{
-		UserID:   userID,
-		ID:       req.Id,
-		Status:   req.Status,
+		UserID: userID,
+		ID:     parseInt64(req.Id),
+		Status: req.Status,
 	})
 
 	if err != nil {
@@ -183,7 +191,7 @@ func (s *TicketService) CreateUserTicketFollow(ctx context.Context, req *pb.Crea
 	// 调用UseCase
 	err := s.uc.CreateTicketFollow(ctx, &ticketBiz.CreateTicketFollowParams{
 		UserID:   userID,
-		TicketID: req.TicketId,
+		TicketID: parseInt64(req.TicketId),
 		From:     req.From,
 		Type:     req.Type,
 		Content:  req.Content,

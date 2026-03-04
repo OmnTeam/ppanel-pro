@@ -50,19 +50,27 @@ service AnnouncementService {
 // 公告信息
 message Announcement {
   int64 id = 1;
-  int64 tenant_id = 2;
-  string title = 3;
-  string content = 4;
-  optional bool show = 5;
-  optional bool pinned = 6;
-  optional bool popup = 7;
-  int64 created_at = 8;  // Unix timestamp in milliseconds
-  int64 updated_at = 9;  // Unix timestamp in milliseconds
+  string title = 2;
+  string content = 3;
+  optional bool show = 4;
+  optional bool pinned = 5;
+  optional bool popup = 6;
+  int64 created_at = 7;  // Unix timestamp in seconds
+  int64 updated_at = 8;  // Unix timestamp in seconds
 }
 
 // 创建公告请求
 message CreateAnnouncementRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  string title = 1 [(validate.rules).string = {min_len: 1, max_len: 255}];
+  string content = 2;
+  bool show = 3;
+  bool pinned = 4;
+  bool popup = 5;
+}
+
+// 更新公告请求
+message UpdateAnnouncementRequest {
+  int64 id = 1;
   string title = 2 [(validate.rules).string = {min_len: 1, max_len: 255}];
   string content = 3;
   bool show = 4;
@@ -70,21 +78,9 @@ message CreateAnnouncementRequest {
   bool popup = 6;
 }
 
-// 更新公告请求
-message UpdateAnnouncementRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
-  int64 id = 2 [(validate.rules).int64.gt = 0];
-  string title = 3 [(validate.rules).string = {min_len: 1, max_len: 255}];
-  string content = 4;
-  bool show = 5;
-  bool pinned = 6;
-  bool popup = 7;
-}
-
 // 获取公告详情请求
 message GetAnnouncementRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
-  int64 id = 2 [(validate.rules).int64.gt = 0];
+  int64 id = 1;
 }
 
 // 公告数据
@@ -101,13 +97,12 @@ message AnnouncementReply {
 
 // 获取公告列表请求
 message ListAnnouncementsRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
-  int64 page = 2 [(validate.rules).int64.gte = 1];
-  int64 size = 3 [(validate.rules).int64 = {gte: 1, lte: 100}];
-  string search = 4;
-  optional bool show = 5;
-  optional bool pinned = 6;
-  optional bool popup = 7;
+  int32 page = 1;
+  int32 size = 2 [(validate.rules).int32 = {gte: 1, lte: 100}];
+  string search = 3;
+  optional bool show = 4;
+  optional bool pinned = 5;
+  optional bool popup = 6;
 }
 
 // 获取公告列表数据
@@ -125,8 +120,7 @@ message ListAnnouncementsReply {
 
 // 删除公告请求
 message DeleteAnnouncementRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
-  int64 id = 2 [(validate.rules).int64.gt = 0];
+  int64 id = 1;
 }
 
 // 删除公告数据
@@ -143,7 +137,6 @@ message DeleteAnnouncementReply {
 
 // 获取公开公告请求
 message GetPublicAnnouncementsRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
   // 可选的限制数量参数
-  optional int32 limit = 2;
+  optional int32 limit = 1;
 }

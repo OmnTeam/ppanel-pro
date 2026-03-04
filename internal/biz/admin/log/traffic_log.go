@@ -10,7 +10,7 @@ import (
 // TrafficLogRepo 流量日志仓库接口
 type TrafficLogRepo interface {
 	// FilterTrafficLogDetails 过滤流量日志详情
-	FilterTrafficLogDetails(ctx context.Context, tenantID int64, page, size int32, date string, serverID, userID, subscribeID *int64) ([]*ent.ProxyTrafficLog, int64, error)
+	FilterTrafficLogDetails(ctx context.Context, page, size int32, date string, serverID, userID, subscribeID *int64) ([]*ent.ProxyTrafficLog, int64, error)
 }
 
 // TrafficLogUsecase 流量日志用例
@@ -28,6 +28,6 @@ func NewTrafficLogUsecase(repo TrafficLogRepo, logger log.Logger) *TrafficLogUse
 }
 
 // FilterTrafficLogDetails 过滤流量日志详情
-func (uc *TrafficLogUsecase) FilterTrafficLogDetails(ctx context.Context, tenantID int64, page, size int32, date string, serverID, userID, subscribeID *int64) ([]*ent.ProxyTrafficLog, int64, error) {
-	return uc.repo.FilterTrafficLogDetails(ctx, tenantID, page, size, date, serverID, userID, subscribeID)
+func (uc *TrafficLogUsecase) FilterTrafficLogDetails(ctx context.Context, page, size int32, date string, serverID, userID, subscribeID *int64) ([]*ent.ProxyTrafficLog, int64, error) {
+	return uc.repo.FilterTrafficLogDetails(ctx, page, size, date, serverID, userID, subscribeID)
 }

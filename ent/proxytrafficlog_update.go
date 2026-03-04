@@ -92,14 +92,14 @@ func (_u *ProxyTrafficLogUpdate) AddSubscribeID(v int64) *ProxyTrafficLogUpdate 
 }
 
 // SetDownload sets the "download" field.
-func (_u *ProxyTrafficLogUpdate) SetDownload(v int64) *ProxyTrafficLogUpdate {
+func (_u *ProxyTrafficLogUpdate) SetDownload(v int) *ProxyTrafficLogUpdate {
 	_u.mutation.ResetDownload()
 	_u.mutation.SetDownload(v)
 	return _u
 }
 
 // SetNillableDownload sets the "download" field if the given value is not nil.
-func (_u *ProxyTrafficLogUpdate) SetNillableDownload(v *int64) *ProxyTrafficLogUpdate {
+func (_u *ProxyTrafficLogUpdate) SetNillableDownload(v *int) *ProxyTrafficLogUpdate {
 	if v != nil {
 		_u.SetDownload(*v)
 	}
@@ -107,20 +107,20 @@ func (_u *ProxyTrafficLogUpdate) SetNillableDownload(v *int64) *ProxyTrafficLogU
 }
 
 // AddDownload adds value to the "download" field.
-func (_u *ProxyTrafficLogUpdate) AddDownload(v int64) *ProxyTrafficLogUpdate {
+func (_u *ProxyTrafficLogUpdate) AddDownload(v int) *ProxyTrafficLogUpdate {
 	_u.mutation.AddDownload(v)
 	return _u
 }
 
 // SetUpload sets the "upload" field.
-func (_u *ProxyTrafficLogUpdate) SetUpload(v int64) *ProxyTrafficLogUpdate {
+func (_u *ProxyTrafficLogUpdate) SetUpload(v int) *ProxyTrafficLogUpdate {
 	_u.mutation.ResetUpload()
 	_u.mutation.SetUpload(v)
 	return _u
 }
 
 // SetNillableUpload sets the "upload" field if the given value is not nil.
-func (_u *ProxyTrafficLogUpdate) SetNillableUpload(v *int64) *ProxyTrafficLogUpdate {
+func (_u *ProxyTrafficLogUpdate) SetNillableUpload(v *int) *ProxyTrafficLogUpdate {
 	if v != nil {
 		_u.SetUpload(*v)
 	}
@@ -128,7 +128,7 @@ func (_u *ProxyTrafficLogUpdate) SetNillableUpload(v *int64) *ProxyTrafficLogUpd
 }
 
 // AddUpload adds value to the "upload" field.
-func (_u *ProxyTrafficLogUpdate) AddUpload(v int64) *ProxyTrafficLogUpdate {
+func (_u *ProxyTrafficLogUpdate) AddUpload(v int) *ProxyTrafficLogUpdate {
 	_u.mutation.AddUpload(v)
 	return _u
 }
@@ -207,16 +207,16 @@ func (_u *ProxyTrafficLogUpdate) sqlSave(ctx context.Context) (_node int, err er
 		_spec.AddField(proxytrafficlog.FieldSubscribeID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Download(); ok {
-		_spec.SetField(proxytrafficlog.FieldDownload, field.TypeInt64, value)
+		_spec.SetField(proxytrafficlog.FieldDownload, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.AddedDownload(); ok {
-		_spec.AddField(proxytrafficlog.FieldDownload, field.TypeInt64, value)
+		_spec.AddField(proxytrafficlog.FieldDownload, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.Upload(); ok {
-		_spec.SetField(proxytrafficlog.FieldUpload, field.TypeInt64, value)
+		_spec.SetField(proxytrafficlog.FieldUpload, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.AddedUpload(); ok {
-		_spec.AddField(proxytrafficlog.FieldUpload, field.TypeInt64, value)
+		_spec.AddField(proxytrafficlog.FieldUpload, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.Timestamp(); ok {
 		_spec.SetField(proxytrafficlog.FieldTimestamp, field.TypeTime, value)
@@ -305,14 +305,14 @@ func (_u *ProxyTrafficLogUpdateOne) AddSubscribeID(v int64) *ProxyTrafficLogUpda
 }
 
 // SetDownload sets the "download" field.
-func (_u *ProxyTrafficLogUpdateOne) SetDownload(v int64) *ProxyTrafficLogUpdateOne {
+func (_u *ProxyTrafficLogUpdateOne) SetDownload(v int) *ProxyTrafficLogUpdateOne {
 	_u.mutation.ResetDownload()
 	_u.mutation.SetDownload(v)
 	return _u
 }
 
 // SetNillableDownload sets the "download" field if the given value is not nil.
-func (_u *ProxyTrafficLogUpdateOne) SetNillableDownload(v *int64) *ProxyTrafficLogUpdateOne {
+func (_u *ProxyTrafficLogUpdateOne) SetNillableDownload(v *int) *ProxyTrafficLogUpdateOne {
 	if v != nil {
 		_u.SetDownload(*v)
 	}
@@ -320,20 +320,20 @@ func (_u *ProxyTrafficLogUpdateOne) SetNillableDownload(v *int64) *ProxyTrafficL
 }
 
 // AddDownload adds value to the "download" field.
-func (_u *ProxyTrafficLogUpdateOne) AddDownload(v int64) *ProxyTrafficLogUpdateOne {
+func (_u *ProxyTrafficLogUpdateOne) AddDownload(v int) *ProxyTrafficLogUpdateOne {
 	_u.mutation.AddDownload(v)
 	return _u
 }
 
 // SetUpload sets the "upload" field.
-func (_u *ProxyTrafficLogUpdateOne) SetUpload(v int64) *ProxyTrafficLogUpdateOne {
+func (_u *ProxyTrafficLogUpdateOne) SetUpload(v int) *ProxyTrafficLogUpdateOne {
 	_u.mutation.ResetUpload()
 	_u.mutation.SetUpload(v)
 	return _u
 }
 
 // SetNillableUpload sets the "upload" field if the given value is not nil.
-func (_u *ProxyTrafficLogUpdateOne) SetNillableUpload(v *int64) *ProxyTrafficLogUpdateOne {
+func (_u *ProxyTrafficLogUpdateOne) SetNillableUpload(v *int) *ProxyTrafficLogUpdateOne {
 	if v != nil {
 		_u.SetUpload(*v)
 	}
@@ -341,7 +341,7 @@ func (_u *ProxyTrafficLogUpdateOne) SetNillableUpload(v *int64) *ProxyTrafficLog
 }
 
 // AddUpload adds value to the "upload" field.
-func (_u *ProxyTrafficLogUpdateOne) AddUpload(v int64) *ProxyTrafficLogUpdateOne {
+func (_u *ProxyTrafficLogUpdateOne) AddUpload(v int) *ProxyTrafficLogUpdateOne {
 	_u.mutation.AddUpload(v)
 	return _u
 }
@@ -450,16 +450,16 @@ func (_u *ProxyTrafficLogUpdateOne) sqlSave(ctx context.Context) (_node *ProxyTr
 		_spec.AddField(proxytrafficlog.FieldSubscribeID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Download(); ok {
-		_spec.SetField(proxytrafficlog.FieldDownload, field.TypeInt64, value)
+		_spec.SetField(proxytrafficlog.FieldDownload, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.AddedDownload(); ok {
-		_spec.AddField(proxytrafficlog.FieldDownload, field.TypeInt64, value)
+		_spec.AddField(proxytrafficlog.FieldDownload, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.Upload(); ok {
-		_spec.SetField(proxytrafficlog.FieldUpload, field.TypeInt64, value)
+		_spec.SetField(proxytrafficlog.FieldUpload, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.AddedUpload(); ok {
-		_spec.AddField(proxytrafficlog.FieldUpload, field.TypeInt64, value)
+		_spec.AddField(proxytrafficlog.FieldUpload, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.Timestamp(); ok {
 		_spec.SetField(proxytrafficlog.FieldTimestamp, field.TypeTime, value)

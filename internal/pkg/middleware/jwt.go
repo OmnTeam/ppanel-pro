@@ -2,9 +2,9 @@ package middleware
 
 import (
 	"context"
-	"os"
 	"strings"
 
+	"github.com/OmnTeam/ppanel-pro/internal/conf"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/middleware"
@@ -21,17 +21,27 @@ const (
 )
 
 // JWTAuth returns a JWT authentication middleware
-func JWTAuth() middleware.Middleware {
+func JWTAuth(authConfig *conf.Server_Auth) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
-			// Get JWT secret from environment or use default
-			secret := os.Getenv("JWT_SECRET")
-			if secret == "" {
-				secret = DefaultJWTSecret
+			// 如果JWT认证被禁用，直接通过
+			if authConfig != nil && !authConfig.EnableJwt {
+				return handler(ctx, req)
 			}
 
-			// Extract token from Authorization header
+			// 检查是否为无需认证的路径
 			if tr, ok := transport.FromServerContext(ctx); ok {
+				operation := tr.Operation()
+				if shouldSkipAuth(operation, authConfig) {
+					return handler(ctx, req)
+				}
+
+				// Get JWT secret from config or use default
+				secret := DefaultJWTSecret
+				if authConfig != nil && authConfig.JwtSecret != "" {
+					secret = authConfig.JwtSecret
+				}
+
 				token := tr.RequestHeader().Get(authorizationHeader)
 
 				// Remove "Bearer " prefix if present
@@ -39,10 +49,9 @@ func JWTAuth() middleware.Middleware {
 					token = strings.TrimPrefix(token, bearerPrefix)
 				}
 
-				// If token is empty, continue without authentication
-				// This allows public endpoints to work
+				// 对于需要认证的路径，token不能为空
 				if token == "" {
-					return handler(ctx, req)
+					return nil, errors.Unauthorized("UNAUTHORIZED", "Authorization token required")
 				}
 
 				// Parse JWT token
@@ -69,4 +78,18 @@ func JWTAuth() middleware.Middleware {
 			return handler(ctx, req)
 		}
 	}
+}
+
+// shouldSkipAuth 检查是否应该跳过认证
+func shouldSkipAuth(operation string, authConfig *conf.Server_Auth) bool {
+	if authConfig == nil {
+		return false
+	}
+
+	for _, pathPrefix := range authConfig.NoAuthPaths {
+		if strings.HasPrefix(operation, pathPrefix) {
+			return true
+		}
+	}
+	return false
 }

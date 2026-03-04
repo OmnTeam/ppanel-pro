@@ -69,6 +69,18 @@ func (f ProxyDocumentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Valu
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyDocumentMutation", m)
 }
 
+// The ProxyGroupHistoryFunc type is an adapter to allow the use of ordinary
+// function as ProxyGroupHistory mutator.
+type ProxyGroupHistoryFunc func(context.Context, *ent.ProxyGroupHistoryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProxyGroupHistoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProxyGroupHistoryMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyGroupHistoryMutation", m)
+}
+
 // The ProxyNodeFunc type is an adapter to allow the use of ordinary
 // function as ProxyNode mutator.
 type ProxyNodeFunc func(context.Context, *ent.ProxyNodeMutation) (ent.Value, error)
@@ -103,6 +115,30 @@ func (f ProxyPaymentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyPaymentMutation", m)
+}
+
+// The ProxyRedemptionCodeFunc type is an adapter to allow the use of ordinary
+// function as ProxyRedemptionCode mutator.
+type ProxyRedemptionCodeFunc func(context.Context, *ent.ProxyRedemptionCodeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProxyRedemptionCodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProxyRedemptionCodeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyRedemptionCodeMutation", m)
+}
+
+// The ProxyRedemptionRecordFunc type is an adapter to allow the use of ordinary
+// function as ProxyRedemptionRecord mutator.
+type ProxyRedemptionRecordFunc func(context.Context, *ent.ProxyRedemptionRecordMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProxyRedemptionRecordFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProxyRedemptionRecordMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyRedemptionRecordMutation", m)
 }
 
 // The ProxySchemaMigrationsFunc type is an adapter to allow the use of ordinary
@@ -297,6 +333,18 @@ func (f ProxyUserDeviceOnlineRecordFunc) Mutate(ctx context.Context, m ent.Mutat
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyUserDeviceOnlineRecordMutation", m)
 }
 
+// The ProxyUserGroupFunc type is an adapter to allow the use of ordinary
+// function as ProxyUserGroup mutator.
+type ProxyUserGroupFunc func(context.Context, *ent.ProxyUserGroupMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProxyUserGroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProxyUserGroupMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyUserGroupMutation", m)
+}
+
 // The ProxyUserSubscribeFunc type is an adapter to allow the use of ordinary
 // function as ProxyUserSubscribe mutator.
 type ProxyUserSubscribeFunc func(context.Context, *ent.ProxyUserSubscribeMutation) (ent.Value, error)
@@ -307,6 +355,18 @@ func (f ProxyUserSubscribeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyUserSubscribeMutation", m)
+}
+
+// The ProxyUserWithdrawalFunc type is an adapter to allow the use of ordinary
+// function as ProxyUserWithdrawal mutator.
+type ProxyUserWithdrawalFunc func(context.Context, *ent.ProxyUserWithdrawalMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProxyUserWithdrawalFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProxyUserWithdrawalMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyUserWithdrawalMutation", m)
 }
 
 // Condition is a hook condition function.

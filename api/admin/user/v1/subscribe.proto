@@ -73,39 +73,61 @@ service UserSubscribeService {
       get: "/v1/admin/user/subscribe/traffic_logs"
     };
   }
+
+  // ResetUserSubscribeToken 重置用户订阅Token
+  rpc ResetUserSubscribeToken(ResetUserSubscribeTokenRequest) returns (ResetUserSubscribeTokenReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/user/subscribe/reset/token"
+      body: "*"
+    };
+  }
+
+  // ToggleUserSubscribeStatus 切换用户订阅状态
+  rpc ToggleUserSubscribeStatus(ToggleUserSubscribeStatusRequest) returns (ToggleUserSubscribeStatusReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/user/subscribe/toggle"
+      body: "*"
+    };
+  }
+
+  // ResetUserSubscribeTraffic 重置用户订阅流量
+  rpc ResetUserSubscribeTraffic(ResetUserSubscribeTrafficRequest) returns (ResetUserSubscribeTrafficReply) {
+    option (google.api.http) = {
+      post: "/v1/admin/user/subscribe/reset/traffic"
+      body: "*"
+    };
+  }
 }
 
 // ===== GetUserSubscribe =====
 
 message GetUserSubscribeRequest {
-  int64 tenant_id = 1;
-  int32 page = 2;
-  int32 size = 3;
-  int64 user_id = 4;  // 可选：过滤特定用户
-  int64 subscribe_id = 5;  // 可选：过滤特定订阅套餐
-  int32 status = 6;  // 可选：过滤订阅状态
+  int32 page = 1;
+  int32 size = 2;
+  string user_id = 3;  // 可选：过滤特定用户
+  string subscribe_id = 4;  // 可选：过滤特定订阅套餐
+  int32 status = 5;  // 可选：过滤订阅状态
 }
 
 message GetUserSubscribeReply {
-  int64 total = 1;
+  string total = 1;
   repeated UserSubscribe list = 2;
 }
 
 // ===== CreateUserSubscribe =====
 
 message CreateUserSubscribeRequest {
-  int64 tenant_id = 1;
-  int64 user_id = 2;
-  int64 order_id = 3;
-  int64 subscribe_id = 4;  // 订阅套餐ID
-  int64 start_time = 5;  // Unix timestamp in milliseconds
-  int64 expire_time = 6;  // Unix timestamp in milliseconds
-  int64 traffic = 7;  // 总流量（字节），可选，不填则使用套餐默认值
-  int32 status = 8;  // 订阅状态: 0-待激活 1-激活 2-完成 3-过期 4-已扣除
+  string user_id = 1;
+  string order_id = 2;
+  string subscribe_id = 3;  // 订阅套餐ID
+  string start_time = 4;  // Unix timestamp in milliseconds
+  string expire_time = 5;  // Unix timestamp in milliseconds
+  string traffic = 6;  // 总流量（字节），可选，不填则使用套餐默认值
+  int32 status = 7;  // 订阅状态: 0-待激活 1-激活 2-完成 3-过期 4-已扣除
 }
 
 message CreateUserSubscribeReply {
-  int64 id = 1;
+  string id = 1;
   string token = 2;  // 订阅令牌
   string uuid = 3;  // 订阅UUID
 }
@@ -113,14 +135,13 @@ message CreateUserSubscribeReply {
 // ===== UpdateUserSubscribe =====
 
 message UpdateUserSubscribeRequest {
-  int64 tenant_id = 1;
-  int64 id = 2;  // 用户订阅ID
-  int64 start_time = 3;  // Unix timestamp in milliseconds
-  int64 expire_time = 4;  // Unix timestamp in milliseconds
-  int64 traffic = 5;  // 总流量（字节）
-  int64 download = 6;  // 下载流量（字节）
-  int64 upload = 7;  // 上传流量（字节）
-  int32 status = 8;  // 订阅状态
+  string id = 1;  // 用户订阅ID
+  string start_time = 2;  // Unix timestamp in milliseconds
+  string expire_time = 3;  // Unix timestamp in milliseconds
+  string traffic = 4;  // 总流量（字节）
+  string download = 5;  // 下载流量（字节）
+  string upload = 6;  // 上传流量（字节）
+  int32 status = 7;  // 订阅状态
 }
 
 message UpdateUserSubscribeReply {}
@@ -128,8 +149,7 @@ message UpdateUserSubscribeReply {}
 // ===== DeleteUserSubscribe =====
 
 message DeleteUserSubscribeRequest {
-  int64 tenant_id = 1;
-  int64 id = 2;  // 用户订阅ID
+  string id = 1;  // 用户订阅ID
 }
 
 message DeleteUserSubscribeReply {}
@@ -137,8 +157,7 @@ message DeleteUserSubscribeReply {}
 // ===== GetUserSubscribeById =====
 
 message GetUserSubscribeByIdRequest {
-  int64 tenant_id = 1;
-  int64 id = 2;  // 用户订阅ID
+  string id = 1;  // 用户订阅ID
 }
 
 message GetUserSubscribeByIdReply {
@@ -148,8 +167,7 @@ message GetUserSubscribeByIdReply {
 // ===== GetUserSubscribeDevices =====
 
 message GetUserSubscribeDevicesRequest {
-  int64 tenant_id = 1;
-  int64 user_subscribe_id = 2;  // 用户订阅ID
+  string user_subscribe_id = 1;  // 用户订阅ID
 }
 
 message GetUserSubscribeDevicesReply {
@@ -159,48 +177,45 @@ message GetUserSubscribeDevicesReply {
 // ===== GetUserSubscribeLogs =====
 
 message GetUserSubscribeLogsRequest {
-  int64 tenant_id = 1;
-  int32 page = 2;
-  int32 size = 3;
-  int64 user_id = 4;  // 可选：过滤特定用户
-  int64 user_subscribe_id = 5;  // 可选：过滤特定用户订阅
-  string date = 6;  // 可选：过滤日期 (YYYY-MM-DD)
+  int32 page = 1;
+  int32 size = 2;
+  string user_id = 3;  // 可选：过滤特定用户
+  string user_subscribe_id = 4;  // 可选：过滤特定用户订阅
+  string date = 5;  // 可选：过滤日期 (YYYY-MM-DD)
 }
 
 message GetUserSubscribeLogsReply {
-  int64 total = 1;
+  string total = 1;
   repeated SubscribeLog list = 2;
 }
 
 // ===== GetUserSubscribeResetTrafficLogs =====
 
 message GetUserSubscribeResetTrafficLogsRequest {
-  int64 tenant_id = 1;
-  int32 page = 2;
-  int32 size = 3;
-  int64 user_id = 4;  // 可选：过滤特定用户
-  int64 user_subscribe_id = 5;  // 可选：过滤特定用户订阅
-  string date = 6;  // 可选：过滤日期 (YYYY-MM-DD)
+  int32 page = 1;
+  int32 size = 2;
+  string user_id = 3;  // 可选：过滤特定用户
+  string user_subscribe_id = 4;  // 可选：过滤特定用户订阅
+  string date = 5;  // 可选：过滤日期 (YYYY-MM-DD)
 }
 
 message GetUserSubscribeResetTrafficLogsReply {
-  int64 total = 1;
+  string total = 1;
   repeated ResetTrafficLog list = 2;
 }
 
 // ===== GetUserSubscribeTrafficLogs =====
 
 message GetUserSubscribeTrafficLogsRequest {
-  int64 tenant_id = 1;
-  int32 page = 2;
-  int32 size = 3;
-  int64 user_id = 4;  // 可选：过滤特定用户
-  int64 user_subscribe_id = 5;  // 可选：过滤特定用户订阅
-  string date = 6;  // 可选：过滤日期 (YYYY-MM-DD)
+  int32 page = 1;
+  int32 size = 2;
+  string user_id = 3;  // 可选：过滤特定用户
+  string user_subscribe_id = 4;  // 可选：过滤特定用户订阅
+  string date = 5;  // 可选：过滤日期 (YYYY-MM-DD)
 }
 
 message GetUserSubscribeTrafficLogsReply {
-  int64 total = 1;
+  string total = 1;
   repeated SubscribeTrafficLog list = 2;
 }
 
@@ -208,47 +223,76 @@ message GetUserSubscribeTrafficLogsReply {
 
 // UserSubscribe 用户订阅
 message UserSubscribe {
-  int64 id = 1;
-  int64 tenant_id = 2;
-  int64 user_id = 3;
-  int64 order_id = 4;
-  int64 subscribe_id = 5;  // 订阅套餐ID
-  int64 start_time = 6;  // Unix timestamp in milliseconds
-  int64 expire_time = 7;  // Unix timestamp in milliseconds
-  int64 finished_at = 8;  // Unix timestamp in milliseconds
-  int64 traffic = 9;  // 总流量（字节）
-  int64 download = 10;  // 下载流量（字节）
-  int64 upload = 11;  // 上传流量（字节）
-  string token = 12;  // 订阅令牌
-  string uuid = 13;  // 订阅UUID
-  int32 status = 14;  // 订阅状态: 0-待激活 1-激活 2-完成 3-过期 4-已扣除
-  int64 created_at = 15;  // Unix timestamp in milliseconds
-  int64 updated_at = 16;  // Unix timestamp in milliseconds
+  string id = 1;
+  string user_id = 2;
+  string order_id = 3;
+  string subscribe_id = 4;  // 订阅套餐ID
+  string start_time = 5;  // Unix timestamp in milliseconds
+  string expire_time = 6;  // Unix timestamp in milliseconds
+  string finished_at = 7;  // Unix timestamp in milliseconds
+  string traffic = 8;  // 总流量（字节）
+  string download = 9;  // 下载流量（字节）
+  string upload = 10;  // 上传流量（字节）
+  string token = 11;  // 订阅令牌
+  string uuid = 12;  // 订阅UUID
+  int32 status = 13;  // 订阅状态: 0-待激活 1-激活 2-完成 3-过期 4-已扣除
+  string created_at = 14;  // Unix timestamp in milliseconds
+  string updated_at = 15;  // Unix timestamp in milliseconds
 }
 
 // SubscribeLog 订阅日志（系统日志type=3）
 message SubscribeLog {
-  int64 id = 1;
-  int64 user_id = 2;
-  int64 user_subscribe_id = 3;
+  string id = 1;
+  string user_id = 2;
+  string user_subscribe_id = 3;
   string content = 4;  // JSON内容
-  int64 timestamp = 5;  // Unix timestamp in milliseconds
+  string timestamp = 5;  // Unix timestamp in milliseconds
 }
 
 // ResetTrafficLog 重置流量日志（系统日志type=10）
 message ResetTrafficLog {
-  int64 id = 1;
-  int64 user_id = 2;
-  int64 user_subscribe_id = 3;
+  string id = 1;
+  string user_id = 2;
+  string user_subscribe_id = 3;
   string content = 4;  // JSON内容
-  int64 timestamp = 5;  // Unix timestamp in milliseconds
+  string timestamp = 5;  // Unix timestamp in milliseconds
 }
 
 // SubscribeTrafficLog 订阅流量日志（系统日志type=4）
 message SubscribeTrafficLog {
-  int64 id = 1;
-  int64 user_id = 2;
-  int64 user_subscribe_id = 3;
+  string id = 1;
+  string user_id = 2;
+  string user_subscribe_id = 3;
   string content = 4;  // JSON内容
-  int64 timestamp = 5;  // Unix timestamp in milliseconds
+  string timestamp = 5;  // Unix timestamp in milliseconds
+}
+
+// ===== ResetUserSubscribeToken =====
+
+message ResetUserSubscribeTokenRequest {
+  string id = 1;  // 用户订阅ID
+}
+
+message ResetUserSubscribeTokenReply {
+  string token = 1;  // 新的订阅令牌
+}
+
+// ===== ToggleUserSubscribeStatus =====
+
+message ToggleUserSubscribeStatusRequest {
+  string id = 1;  // 用户订阅ID
+}
+
+message ToggleUserSubscribeStatusReply {
+  int32 status = 1;  // 切换后的状态
+}
+
+// ===== ResetUserSubscribeTraffic =====
+
+message ResetUserSubscribeTrafficRequest {
+  string id = 1;  // 用户订阅ID
+}
+
+message ResetUserSubscribeTrafficReply {
+  string traffic = 1;  // 重置后的流量
 }

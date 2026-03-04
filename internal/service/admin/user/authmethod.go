@@ -2,12 +2,19 @@ package user
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/user/v1"
 	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
 )
+
+// Helper functions for type conversion
+func parseInt64(s string) int64 {
+	val, _ := strconv.ParseInt(s, 10, 64)
+	return val
+}
 
 // UserAuthMethodService 用户认证方法服务
 type UserAuthMethodService struct {
@@ -33,13 +40,13 @@ func (s *UserAuthMethodService) CreateUserAuthMethod(ctx context.Context, req *v
 	}
 
 	return &v1.CreateUserAuthMethodReply{
-		Id: id,
+		Id: strconv.FormatInt(id, 10),
 	}, nil
 }
 
 // GetUserAuthMethod 获取用户认证方法
 func (s *UserAuthMethodService) GetUserAuthMethod(ctx context.Context, req *v1.GetUserAuthMethodRequest) (*v1.GetUserAuthMethodReply, error) {
-	methods, err := s.uc.GetUserAuthMethod(ctx, req.UserId, req.AuthType)
+	methods, err := s.uc.GetUserAuthMethod(ctx, parseInt64(req.UserId), req.AuthType)
 	if err != nil {
 		return nil, err
 	}
@@ -48,13 +55,13 @@ func (s *UserAuthMethodService) GetUserAuthMethod(ctx context.Context, req *v1.G
 	protoMethods := make([]*v1.UserAuthMethod, 0, len(methods))
 	for _, method := range methods {
 		protoMethod := &v1.UserAuthMethod{
-			Id:             int64(method.ID),
-			UserId:         int64(method.UserID),
+			Id:             strconv.FormatInt(int64(method.ID), 10),
+			UserId:         strconv.FormatInt(int64(method.UserID), 10),
 			AuthType:       method.AuthType,
 			AuthIdentifier: method.AuthIdentifier,
 			Verified:       method.Verified,
-			CreatedAt:      method.CreatedAt.UnixMilli(),
-			UpdatedAt:      method.UpdatedAt.UnixMilli(),
+			CreatedAt:      strconv.FormatInt(method.CreatedAt.UnixMilli(), 10),
+			UpdatedAt:      strconv.FormatInt(method.UpdatedAt.UnixMilli(), 10),
 		}
 		protoMethods = append(protoMethods, protoMethod)
 	}
@@ -76,7 +83,7 @@ func (s *UserAuthMethodService) UpdateUserAuthMethod(ctx context.Context, req *v
 
 // DeleteUserAuthMethod 删除用户认证方法
 func (s *UserAuthMethodService) DeleteUserAuthMethod(ctx context.Context, req *v1.DeleteUserAuthMethodRequest) (*v1.DeleteUserAuthMethodReply, error) {
-	err := s.uc.DeleteUserAuthMethod(ctx, req.UserId, req.AuthType)
+	err := s.uc.DeleteUserAuthMethod(ctx, parseInt64(req.UserId), req.AuthType)
 	if err != nil {
 		return nil, err
 	}

@@ -27,13 +27,12 @@ func NewPublicTicketRepo(d *Data, logger log.Logger) ticketBiz.TicketRepo {
 
 // CreateTicket creates a new ticket
 // 完整复刻原项目 createUserTicketLogic.go
-// ⚠️ 注意：当前schema暂不支持tenant_id字段
-func (r *publicTicketRepo) CreateTicket(ctx context.Context, tenantID, userID int64, title, description string) error {
-	r.logger.Infof("[CreateTicket] tenantID: %d, userID: %d, title: %s", tenantID, userID, title)
+func (r *publicTicketRepo) CreateTicket(ctx context.Context, userID int, title, description string) error {
+	r.logger.Infof("[CreateTicket] userID: %d, title: %s", userID, title)
 
 	// 创建工单
 	err := r.data.db.ProxyTicket.Create().
-		SetUserID(userID).
+		SetUserID(int64(userID)).
 		SetTitle(title).
 		SetDescription(description).
 		SetStatus(int8(ticketBiz.StatusPending)).
@@ -52,12 +51,12 @@ func (r *publicTicketRepo) CreateTicket(ctx context.Context, tenantID, userID in
 // 完整复刻原项目 getUserTicketListLogic.go
 // ⚠️ 注意：当前schema暂不支持tenant_id字段
 // 支持分页、状态过滤、搜索功能
-func (r *publicTicketRepo) GetTicketList(ctx context.Context, tenantID, userID int64, page, size int64, status *int32, search *string) (int64, []*ticketBiz.TicketInfo, error) {
-	r.logger.Infof("[GetTicketList] tenantID: %d, userID: %d, page: %d, size: %d", tenantID, userID, page, size)
+func (r *publicTicketRepo) GetTicketList(ctx context.Context, userID int, page, size int, status *int32, search *string) (int64, []*ticketBiz.TicketInfo, error) {
+	r.logger.Infof("[GetTicketList] userID: %d, page: %d, size: %d", userID, page, size)
 
 	// 构建基础查询 - 包含user_id过滤
 	query := r.data.db.ProxyTicket.Query().
-		Where(proxyticket.UserIDEQ(userID))
+		Where(proxyticket.UserIDEQ(int64(userID)))
 
 	// 状态过滤
 	// ⚠️ 重要：完整复刻原项目逻辑（model.go:68-69）
@@ -109,8 +108,8 @@ func (r *publicTicketRepo) GetTicketList(ctx context.Context, tenantID, userID i
 			Description: t.Description,
 			UserID:      t.UserID,
 			Status:      int32(t.Status),
-			CreatedAt:   t.CreatedAt.UnixMilli(), // Convert to Unix milliseconds
-			UpdatedAt:   t.UpdatedAt.UnixMilli(), // Convert to Unix milliseconds
+			CreatedAt:   int(t.CreatedAt.UnixMilli()), // Convert to Unix milliseconds
+			UpdatedAt:   int(t.UpdatedAt.UnixMilli()), // Convert to Unix milliseconds
 		})
 	}
 
@@ -119,13 +118,12 @@ func (r *publicTicketRepo) GetTicketList(ctx context.Context, tenantID, userID i
 }
 
 // GetTicketByID gets ticket by ID
-// ⚠️ 注意：当前schema暂不支持tenant_id字段
-func (r *publicTicketRepo) GetTicketByID(ctx context.Context, tenantID, ticketID int64) (*ticketBiz.TicketInfo, error) {
-	r.logger.Infof("[GetTicketByID] tenantID: %d, ticketID: %d", tenantID, ticketID)
+func (r *publicTicketRepo) GetTicketByID(ctx context.Context, ticketID int) (*ticketBiz.TicketInfo, error) {
+	r.logger.Infof("[GetTicketByID] ticketID: %d", ticketID)
 
 	// 查询工单
 	ticket, err := r.data.db.ProxyTicket.Query().
-		Where(proxyticket.IDEQ(ticketID)).
+		Where(proxyticket.IDEQ(int64(ticketID))).
 		Only(ctx)
 
 	if err != nil {
@@ -144,17 +142,17 @@ func (r *publicTicketRepo) GetTicketByID(ctx context.Context, tenantID, ticketID
 		Description: ticket.Description,
 		UserID:      ticket.UserID,
 		Status:      int32(ticket.Status),
-		CreatedAt:   ticket.CreatedAt.UnixMilli(), // Convert to Unix milliseconds
-		UpdatedAt:   ticket.UpdatedAt.UnixMilli(), // Convert to Unix milliseconds
+		CreatedAt:   int(ticket.CreatedAt.UnixMilli()), // Convert to Unix milliseconds
+		UpdatedAt:   int(ticket.UpdatedAt.UnixMilli()), // Convert to Unix milliseconds
 	}, nil
 }
 
 // UpdateTicketStatus updates ticket status
 // 完整复刻原项目 updateUserTicketStatusLogic.go
-// ⚠️ 注意：当前schema暂不支持tenant_id字段，使用user_id过滤确保权限安全
-func (r *publicTicketRepo) UpdateTicketStatus(ctx context.Context, tenantID, userID, ticketID int64, status int32) error {
-	r.logger.Infof("[UpdateTicketStatus] tenantID: %d, userID: %d, ticketID: %d, status: %d",
-		tenantID, userID, ticketID, status)
+// 使用user_id过滤确保权限安全
+func (r *publicTicketRepo) UpdateTicketStatus(ctx context.Context, userID, ticketID int64, status int32) error {
+	r.logger.Infof("[UpdateTicketStatus] userID: %d, ticketID: %d, status: %d",
+		userID, ticketID, status)
 
 	// 更新状态 - 使用user_id过滤确保安全
 	affected, err := r.data.db.ProxyTicket.Update().
@@ -179,10 +177,9 @@ func (r *publicTicketRepo) UpdateTicketStatus(ctx context.Context, tenantID, use
 
 // CreateTicketFollow creates a follow-up record
 // 完整复刻原项目 createUserTicketFollowLogic.go
-// ⚠️ 注意：当前schema暂不支持tenant_id字段
-func (r *publicTicketRepo) CreateTicketFollow(ctx context.Context, tenantID int64, ticketID int64, from string, followType int32, content string) error {
-	r.logger.Infof("[CreateTicketFollow] tenantID: %d, ticketID: %d, from: %s, type: %d",
-		tenantID, ticketID, from, followType)
+func (r *publicTicketRepo) CreateTicketFollow(ctx context.Context, ticketID int64, from string, followType int32, content string) error {
+	r.logger.Infof("[CreateTicketFollow] ticketID: %d, from: %s, type: %d",
+		ticketID, from, followType)
 
 	// 创建跟进记录
 	err := r.data.db.ProxyTicketFollow.Create().
@@ -202,13 +199,12 @@ func (r *publicTicketRepo) CreateTicketFollow(ctx context.Context, tenantID int6
 }
 
 // GetTicketFollows gets all follow-ups for a ticket
-// ⚠️ 注意：当前schema暂不支持tenant_id字段
-func (r *publicTicketRepo) GetTicketFollows(ctx context.Context, tenantID, ticketID int64) ([]*ticketBiz.TicketFollow, error) {
-	r.logger.Infof("[GetTicketFollows] tenantID: %d, ticketID: %d", tenantID, ticketID)
+func (r *publicTicketRepo) GetTicketFollows(ctx context.Context, ticketID int) ([]*ticketBiz.TicketFollow, error) {
+	r.logger.Infof("[GetTicketFollows] ticketID: %d", ticketID)
 
 	// 查询跟进记录
 	follows, err := r.data.db.ProxyTicketFollow.Query().
-		Where(proxyticketfollow.TicketIDEQ(ticketID)).
+		Where(proxyticketfollow.TicketIDEQ(int64(ticketID))).
 		Order(ent.Asc(proxyticketfollow.FieldCreatedAt)).
 		All(ctx)
 
@@ -226,7 +222,7 @@ func (r *publicTicketRepo) GetTicketFollows(ctx context.Context, tenantID, ticke
 			From:      f.From,
 			Type:      int32(f.Type),
 			Content:   f.Content,
-			CreatedAt: f.CreatedAt.UnixMilli(), // Convert to Unix milliseconds
+			CreatedAt: int(f.CreatedAt.UnixMilli()), // Convert to Unix milliseconds
 		})
 	}
 

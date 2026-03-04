@@ -262,12 +262,12 @@ func (_q *ProxyTicketQuery) Clone() *ProxyTicketQuery {
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		TenantID int64 `json:"tenant_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ProxyTicket.Query().
-//		GroupBy(proxyticket.FieldTitle).
+//		GroupBy(proxyticket.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *ProxyTicketQuery) GroupBy(field string, fields ...string) *ProxyTicketGroupBy {
@@ -285,11 +285,11 @@ func (_q *ProxyTicketQuery) GroupBy(field string, fields ...string) *ProxyTicket
 // Example:
 //
 //	var v []struct {
-//		Title string `json:"title,omitempty"`
+//		TenantID int64 `json:"tenant_id,omitempty"`
 //	}
 //
 //	client.ProxyTicket.Query().
-//		Select(proxyticket.FieldTitle).
+//		Select(proxyticket.FieldTenantID).
 //		Scan(ctx, &v)
 func (_q *ProxyTicketQuery) Select(fields ...string) *ProxyTicketSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

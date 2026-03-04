@@ -179,14 +179,14 @@ func (_u *ProxyPaymentUpdate) ClearFeePercent() *ProxyPaymentUpdate {
 }
 
 // SetFeeAmount sets the "fee_amount" field.
-func (_u *ProxyPaymentUpdate) SetFeeAmount(v int64) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) SetFeeAmount(v int) *ProxyPaymentUpdate {
 	_u.mutation.ResetFeeAmount()
 	_u.mutation.SetFeeAmount(v)
 	return _u
 }
 
 // SetNillableFeeAmount sets the "fee_amount" field if the given value is not nil.
-func (_u *ProxyPaymentUpdate) SetNillableFeeAmount(v *int64) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) SetNillableFeeAmount(v *int) *ProxyPaymentUpdate {
 	if v != nil {
 		_u.SetFeeAmount(*v)
 	}
@@ -194,7 +194,7 @@ func (_u *ProxyPaymentUpdate) SetNillableFeeAmount(v *int64) *ProxyPaymentUpdate
 }
 
 // AddFeeAmount adds value to the "fee_amount" field.
-func (_u *ProxyPaymentUpdate) AddFeeAmount(v int64) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) AddFeeAmount(v int) *ProxyPaymentUpdate {
 	_u.mutation.AddFeeAmount(v)
 	return _u
 }
@@ -325,7 +325,7 @@ func (_u *ProxyPaymentUpdate) sqlSave(ctx context.Context) (_node int, err error
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxypayment.Table, proxypayment.Columns, sqlgraph.NewFieldSpec(proxypayment.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxypayment.Table, proxypayment.Columns, sqlgraph.NewFieldSpec(proxypayment.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -376,13 +376,13 @@ func (_u *ProxyPaymentUpdate) sqlSave(ctx context.Context) (_node int, err error
 		_spec.ClearField(proxypayment.FieldFeePercent, field.TypeFloat64)
 	}
 	if value, ok := _u.mutation.FeeAmount(); ok {
-		_spec.SetField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
+		_spec.SetField(proxypayment.FieldFeeAmount, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.AddedFeeAmount(); ok {
-		_spec.AddField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
+		_spec.AddField(proxypayment.FieldFeeAmount, field.TypeInt, value)
 	}
 	if _u.mutation.FeeAmountCleared() {
-		_spec.ClearField(proxypayment.FieldFeeAmount, field.TypeInt64)
+		_spec.ClearField(proxypayment.FieldFeeAmount, field.TypeInt)
 	}
 	if value, ok := _u.mutation.Enable(); ok {
 		_spec.SetField(proxypayment.FieldEnable, field.TypeBool, value)
@@ -567,14 +567,14 @@ func (_u *ProxyPaymentUpdateOne) ClearFeePercent() *ProxyPaymentUpdateOne {
 }
 
 // SetFeeAmount sets the "fee_amount" field.
-func (_u *ProxyPaymentUpdateOne) SetFeeAmount(v int64) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) SetFeeAmount(v int) *ProxyPaymentUpdateOne {
 	_u.mutation.ResetFeeAmount()
 	_u.mutation.SetFeeAmount(v)
 	return _u
 }
 
 // SetNillableFeeAmount sets the "fee_amount" field if the given value is not nil.
-func (_u *ProxyPaymentUpdateOne) SetNillableFeeAmount(v *int64) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) SetNillableFeeAmount(v *int) *ProxyPaymentUpdateOne {
 	if v != nil {
 		_u.SetFeeAmount(*v)
 	}
@@ -582,7 +582,7 @@ func (_u *ProxyPaymentUpdateOne) SetNillableFeeAmount(v *int64) *ProxyPaymentUpd
 }
 
 // AddFeeAmount adds value to the "fee_amount" field.
-func (_u *ProxyPaymentUpdateOne) AddFeeAmount(v int64) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) AddFeeAmount(v int) *ProxyPaymentUpdateOne {
 	_u.mutation.AddFeeAmount(v)
 	return _u
 }
@@ -726,7 +726,7 @@ func (_u *ProxyPaymentUpdateOne) sqlSave(ctx context.Context) (_node *ProxyPayme
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxypayment.Table, proxypayment.Columns, sqlgraph.NewFieldSpec(proxypayment.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxypayment.Table, proxypayment.Columns, sqlgraph.NewFieldSpec(proxypayment.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProxyPayment.id" for update`)}
@@ -794,13 +794,13 @@ func (_u *ProxyPaymentUpdateOne) sqlSave(ctx context.Context) (_node *ProxyPayme
 		_spec.ClearField(proxypayment.FieldFeePercent, field.TypeFloat64)
 	}
 	if value, ok := _u.mutation.FeeAmount(); ok {
-		_spec.SetField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
+		_spec.SetField(proxypayment.FieldFeeAmount, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.AddedFeeAmount(); ok {
-		_spec.AddField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
+		_spec.AddField(proxypayment.FieldFeeAmount, field.TypeInt, value)
 	}
 	if _u.mutation.FeeAmountCleared() {
-		_spec.ClearField(proxypayment.FieldFeeAmount, field.TypeInt64)
+		_spec.ClearField(proxypayment.FieldFeeAmount, field.TypeInt)
 	}
 	if value, ok := _u.mutation.Enable(); ok {
 		_spec.SetField(proxypayment.FieldEnable, field.TypeBool, value)

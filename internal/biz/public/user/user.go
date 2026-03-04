@@ -10,67 +10,67 @@ type UserRepo interface {
 	// 从context获取当前用户
 	// 返回用户信息，AuthIdentifier需要脱敏
 	// AuthMethods需要按照email、mobile优先级排序
-	QueryUserInfo(ctx context.Context, userID int64) (*UserInfo, error)
+	QueryUserInfo(ctx context.Context, userID int) (*UserInfo, error)
 
 	// GetLoginLog 获取登录日志
 	// 从proxy_system_log表查询type=6(Login)的日志
-	GetLoginLog(ctx context.Context, userID int64, page, size int64) ([]*LoginLog, int64, error)
+	GetLoginLog(ctx context.Context, userID int, page, size int) ([]*LoginLog, int64, error)
 
 	// QueryUserBalanceLog 查询用户余额日志
 	// 从proxy_system_log表查询type=8(Balance)的日志
 	// 固定查询全部，page=1, size=99999
-	QueryUserBalanceLog(ctx context.Context, userID int64) ([]*BalanceLog, int64, error)
+	QueryUserBalanceLog(ctx context.Context, userID int) ([]*BalanceLog, int64, error)
 
 	// QueryUserCommissionLog 查询用户佣金日志
 	// 从proxy_system_log表查询type=9(Commission)的日志
-	QueryUserCommissionLog(ctx context.Context, userID int64, page, size int64) ([]*CommissionLog, int64, error)
+	QueryUserCommissionLog(ctx context.Context, userID int, page, size int) ([]*CommissionLog, int64, error)
 
 	// QueryUserAffiliate 查询用户推荐数量
 	// 查询referer_id=当前用户的用户数量
 	// 查询commission日志求和
-	QueryUserAffiliate(ctx context.Context, userID int64) (registers int64, totalCommission int64, err error)
+	QueryUserAffiliate(ctx context.Context, userID int) (registers int64, totalCommission int64, err error)
 
 	// QueryUserAffiliateList 查询用户推荐列表
 	// 查询referer_id=当前用户的用户列表
 	// 需要查询每个用户的AuthMethod并脱敏
-	QueryUserAffiliateList(ctx context.Context, userID int64, page, size int64) ([]*UserAffiliate, int64, error)
+	QueryUserAffiliateList(ctx context.Context, userID int, page, size int) ([]*UserAffiliate, int64, error)
 
 	// GetOAuthMethods 获取OAuth方法
 	// 查询当前用户的所有AuthMethods
-	GetOAuthMethods(ctx context.Context, userID int64) ([]*AuthMethod, error)
+	GetOAuthMethods(ctx context.Context, userID int) ([]*AuthMethod, error)
 
 	// QueryUserSubscribe 查询用户订阅
 	// 查询status in (0,1,2,3)的订阅
 	// 需要解析Discount字段并计算ResetTime
-	QueryUserSubscribe(ctx context.Context, userID int64) ([]*UserSubscribe, int64, error)
+	QueryUserSubscribe(ctx context.Context, userID int) ([]*UserSubscribe, int64, error)
 
 	// GetSubscribeLog 获取订阅日志
 	// 从proxy_system_log查询type=20(Subscribe)的日志
-	GetSubscribeLog(ctx context.Context, userID int64, page, size int64) ([]*UserSubscribeLog, int64, error)
+	GetSubscribeLog(ctx context.Context, userID int, page, size int) ([]*UserSubscribeLog, int64, error)
 
 	// ResetUserSubscribeToken 重置订阅令牌
 	// 验证UserSubscribeId属于当前用户
 	// 生成新Token和UUID
 	// 清除缓存
-	ResetUserSubscribeToken(ctx context.Context, userID, userSubscribeID int64) error
+	ResetUserSubscribeToken(ctx context.Context, userID, userSubscribeID int) error
 
 	// PreUnsubscribe 预退订
 	// 调用CalculateRemainingAmount计算退款金额
-	PreUnsubscribe(ctx context.Context, userID, id int64) (deductionAmount int64, err error)
+	PreUnsubscribe(ctx context.Context, userID, id int) (deductionAmount int64, err error)
 
 	// Unsubscribe 退订
 	// 验证订阅状态 status in (0,1,2)
 	// 使用事务处理退款逻辑
 	// 清除缓存
-	Unsubscribe(ctx context.Context, userID, id int64) error
+	Unsubscribe(ctx context.Context, userID, id int) error
 
 	// UpdateUserNotify 更新通知设置
 	// 更新用户的4个通知开关
-	UpdateUserNotify(ctx context.Context, userID int64, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify bool) error
+	UpdateUserNotify(ctx context.Context, userID int, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify bool) error
 
 	// UpdateUserPassword 更新密码
 	// 使用加密函数加密密码
-	UpdateUserPassword(ctx context.Context, userID int64, password string) error
+	UpdateUserPassword(ctx context.Context, userID int, password string) error
 
 	// BindTelegram 绑定Telegram
 	// 从JWT session获取，生成Telegram Bot URL
@@ -80,7 +80,7 @@ type UserRepo interface {
 	// UnbindTelegram 解绑Telegram
 	// 查询telegram AuthMethod并删除
 	// 发送Telegram通知（需要telegram bot）
-	UnbindTelegram(ctx context.Context, userID int64) error
+	UnbindTelegram(ctx context.Context, userID int) error
 
 	// BindOAuth 绑定OAuth
 	// 根据method（google/apple/github/facebook）生成OAuth URL
@@ -91,28 +91,28 @@ type UserRepo interface {
 	// 验证state code
 	// 交换token获取用户信息
 	// 创建AuthMethod记录
-	BindOAuthCallback(ctx context.Context, userID int64, method string, callback string) error
+	BindOAuthCallback(ctx context.Context, userID int, method string, callback string) error
 
 	// UnbindOAuth 解绑OAuth
 	// 验证method不能为email/mobile
 	// 删除对应AuthMethod
-	UnbindOAuth(ctx context.Context, userID int64, method string) error
+	UnbindOAuth(ctx context.Context, userID int, method string) error
 
 	// VerifyEmail 验证邮箱
 	// 从Redis验证code
 	// 设置AuthMethod.Verified=true
-	VerifyEmail(ctx context.Context, userID int64, email, code string) error
+	VerifyEmail(ctx context.Context, userID int, email, code string) error
 
 	// UpdateBindMobile 更新绑定手机
 	// 验证手机验证码
 	// 检查手机号是否已被其他用户绑定
 	// 创建或更新mobile AuthMethod
-	UpdateBindMobile(ctx context.Context, userID int64, areaCode, mobile, code string) error
+	UpdateBindMobile(ctx context.Context, userID int, areaCode, mobile, code string) error
 
 	// UpdateBindEmail 更新绑定邮箱
 	// 检查邮箱是否已被其他用户绑定
 	// 创建或更新email AuthMethod（Verified=false）
-	UpdateBindEmail(ctx context.Context, userID int64, email string) error
+	UpdateBindEmail(ctx context.Context, userID int, email string) error
 
 	// DeviceWSConnect 设备WebSocket连接
 	// 升级WebSocket连接并添加设备到管理器
@@ -120,15 +120,15 @@ type UserRepo interface {
 
 	// GetDeviceList 获取设备列表
 	// 查询用户的所有设备
-	GetDeviceList(ctx context.Context, userID int64) ([]*UserDevice, int64, error)
+	GetDeviceList(ctx context.Context, userID int) ([]*UserDevice, int64, error)
 
 	// UnbindDevice 解绑设备
 	// 验证设备属于当前用户并删除设备
-	UnbindDevice(ctx context.Context, userID, deviceID int64) error
+	UnbindDevice(ctx context.Context, userID, deviceID int) error
 
 	// GetDeviceOnlineStatistics 获取设备在线统计
 	// 获取设备连接统计信息
-	GetDeviceOnlineStatistics(ctx context.Context, userID int64) (*DeviceOnlineStatistics, error)
+	GetDeviceOnlineStatistics(ctx context.Context, userID int) (*DeviceOnlineStatistics, error)
 }
 
 // UserInfo 用户信息
@@ -283,7 +283,7 @@ type ConnectionRecords struct {
 
 // DeviceOnlineStatistics 设备在线统计
 type DeviceOnlineStatistics struct {
-	WeeklyStats      []*WeeklyStat
+	WeeklyStats       []*WeeklyStat
 	ConnectionRecords *ConnectionRecords
 }
 
@@ -298,72 +298,72 @@ func NewUserUseCase(repo UserRepo) *UserUseCase {
 }
 
 // QueryUserInfo 查询用户信息
-func (uc *UserUseCase) QueryUserInfo(ctx context.Context, userID int64) (*UserInfo, error) {
+func (uc *UserUseCase) QueryUserInfo(ctx context.Context, userID int) (*UserInfo, error) {
 	return uc.repo.QueryUserInfo(ctx, userID)
 }
 
 // GetLoginLog 获取登录日志
-func (uc *UserUseCase) GetLoginLog(ctx context.Context, userID int64, page, size int64) ([]*LoginLog, int64, error) {
+func (uc *UserUseCase) GetLoginLog(ctx context.Context, userID int, page, size int) ([]*LoginLog, int64, error) {
 	return uc.repo.GetLoginLog(ctx, userID, page, size)
 }
 
 // QueryUserBalanceLog 查询用户余额日志
-func (uc *UserUseCase) QueryUserBalanceLog(ctx context.Context, userID int64) ([]*BalanceLog, int64, error) {
+func (uc *UserUseCase) QueryUserBalanceLog(ctx context.Context, userID int) ([]*BalanceLog, int64, error) {
 	return uc.repo.QueryUserBalanceLog(ctx, userID)
 }
 
 // QueryUserCommissionLog 查询用户佣金日志
-func (uc *UserUseCase) QueryUserCommissionLog(ctx context.Context, userID int64, page, size int64) ([]*CommissionLog, int64, error) {
+func (uc *UserUseCase) QueryUserCommissionLog(ctx context.Context, userID int, page, size int) ([]*CommissionLog, int64, error) {
 	return uc.repo.QueryUserCommissionLog(ctx, userID, page, size)
 }
 
 // QueryUserAffiliate 查询用户推荐数量
-func (uc *UserUseCase) QueryUserAffiliate(ctx context.Context, userID int64) (registers int64, totalCommission int64, err error) {
+func (uc *UserUseCase) QueryUserAffiliate(ctx context.Context, userID int) (registers int64, totalCommission int64, err error) {
 	return uc.repo.QueryUserAffiliate(ctx, userID)
 }
 
 // QueryUserAffiliateList 查询用户推荐列表
-func (uc *UserUseCase) QueryUserAffiliateList(ctx context.Context, userID int64, page, size int64) ([]*UserAffiliate, int64, error) {
+func (uc *UserUseCase) QueryUserAffiliateList(ctx context.Context, userID int, page, size int) ([]*UserAffiliate, int64, error) {
 	return uc.repo.QueryUserAffiliateList(ctx, userID, page, size)
 }
 
 // GetOAuthMethods 获取OAuth方法
-func (uc *UserUseCase) GetOAuthMethods(ctx context.Context, userID int64) ([]*AuthMethod, error) {
+func (uc *UserUseCase) GetOAuthMethods(ctx context.Context, userID int) ([]*AuthMethod, error) {
 	return uc.repo.GetOAuthMethods(ctx, userID)
 }
 
 // QueryUserSubscribe 查询用户订阅
-func (uc *UserUseCase) QueryUserSubscribe(ctx context.Context, userID int64) ([]*UserSubscribe, int64, error) {
+func (uc *UserUseCase) QueryUserSubscribe(ctx context.Context, userID int) ([]*UserSubscribe, int64, error) {
 	return uc.repo.QueryUserSubscribe(ctx, userID)
 }
 
 // GetSubscribeLog 获取订阅日志
-func (uc *UserUseCase) GetSubscribeLog(ctx context.Context, userID int64, page, size int64) ([]*UserSubscribeLog, int64, error) {
+func (uc *UserUseCase) GetSubscribeLog(ctx context.Context, userID int, page, size int) ([]*UserSubscribeLog, int64, error) {
 	return uc.repo.GetSubscribeLog(ctx, userID, page, size)
 }
 
 // ResetUserSubscribeToken 重置订阅令牌
-func (uc *UserUseCase) ResetUserSubscribeToken(ctx context.Context, userID, userSubscribeID int64) error {
+func (uc *UserUseCase) ResetUserSubscribeToken(ctx context.Context, userID, userSubscribeID int) error {
 	return uc.repo.ResetUserSubscribeToken(ctx, userID, userSubscribeID)
 }
 
 // PreUnsubscribe 预退订
-func (uc *UserUseCase) PreUnsubscribe(ctx context.Context, userID, id int64) (int64, error) {
+func (uc *UserUseCase) PreUnsubscribe(ctx context.Context, userID, id int) (int64, error) {
 	return uc.repo.PreUnsubscribe(ctx, userID, id)
 }
 
 // Unsubscribe 退订
-func (uc *UserUseCase) Unsubscribe(ctx context.Context, userID, id int64) error {
+func (uc *UserUseCase) Unsubscribe(ctx context.Context, userID, id int) error {
 	return uc.repo.Unsubscribe(ctx, userID, id)
 }
 
 // UpdateUserNotify 更新通知设置
-func (uc *UserUseCase) UpdateUserNotify(ctx context.Context, userID int64, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify bool) error {
+func (uc *UserUseCase) UpdateUserNotify(ctx context.Context, userID int, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify bool) error {
 	return uc.repo.UpdateUserNotify(ctx, userID, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify)
 }
 
 // UpdateUserPassword 更新密码
-func (uc *UserUseCase) UpdateUserPassword(ctx context.Context, userID int64, password string) error {
+func (uc *UserUseCase) UpdateUserPassword(ctx context.Context, userID int, password string) error {
 	return uc.repo.UpdateUserPassword(ctx, userID, password)
 }
 
@@ -373,7 +373,7 @@ func (uc *UserUseCase) BindTelegram(ctx context.Context, session string, botName
 }
 
 // UnbindTelegram 解绑Telegram
-func (uc *UserUseCase) UnbindTelegram(ctx context.Context, userID int64) error {
+func (uc *UserUseCase) UnbindTelegram(ctx context.Context, userID int) error {
 	return uc.repo.UnbindTelegram(ctx, userID)
 }
 
@@ -383,27 +383,27 @@ func (uc *UserUseCase) BindOAuth(ctx context.Context, method, redirect string) (
 }
 
 // BindOAuthCallback OAuth回调
-func (uc *UserUseCase) BindOAuthCallback(ctx context.Context, userID int64, method string, callback string) error {
+func (uc *UserUseCase) BindOAuthCallback(ctx context.Context, userID int, method string, callback string) error {
 	return uc.repo.BindOAuthCallback(ctx, userID, method, callback)
 }
 
 // UnbindOAuth 解绑OAuth
-func (uc *UserUseCase) UnbindOAuth(ctx context.Context, userID int64, method string) error {
+func (uc *UserUseCase) UnbindOAuth(ctx context.Context, userID int, method string) error {
 	return uc.repo.UnbindOAuth(ctx, userID, method)
 }
 
 // VerifyEmail 验证邮箱
-func (uc *UserUseCase) VerifyEmail(ctx context.Context, userID int64, email, code string) error {
+func (uc *UserUseCase) VerifyEmail(ctx context.Context, userID int, email, code string) error {
 	return uc.repo.VerifyEmail(ctx, userID, email, code)
 }
 
 // UpdateBindMobile 更新绑定手机
-func (uc *UserUseCase) UpdateBindMobile(ctx context.Context, userID int64, areaCode, mobile, code string) error {
+func (uc *UserUseCase) UpdateBindMobile(ctx context.Context, userID int, areaCode, mobile, code string) error {
 	return uc.repo.UpdateBindMobile(ctx, userID, areaCode, mobile, code)
 }
 
 // UpdateBindEmail 更新绑定邮箱
-func (uc *UserUseCase) UpdateBindEmail(ctx context.Context, userID int64, email string) error {
+func (uc *UserUseCase) UpdateBindEmail(ctx context.Context, userID int, email string) error {
 	return uc.repo.UpdateBindEmail(ctx, userID, email)
 }
 
@@ -413,16 +413,16 @@ func (uc *UserUseCase) DeviceWSConnect(ctx context.Context) error {
 }
 
 // GetDeviceList 获取设备列表
-func (uc *UserUseCase) GetDeviceList(ctx context.Context, userID int64) ([]*UserDevice, int64, error) {
+func (uc *UserUseCase) GetDeviceList(ctx context.Context, userID int) ([]*UserDevice, int64, error) {
 	return uc.repo.GetDeviceList(ctx, userID)
 }
 
 // UnbindDevice 解绑设备
-func (uc *UserUseCase) UnbindDevice(ctx context.Context, userID, deviceID int64) error {
+func (uc *UserUseCase) UnbindDevice(ctx context.Context, userID, deviceID int) error {
 	return uc.repo.UnbindDevice(ctx, userID, deviceID)
 }
 
 // GetDeviceOnlineStatistics 获取设备在线统计
-func (uc *UserUseCase) GetDeviceOnlineStatistics(ctx context.Context, userID int64) (*DeviceOnlineStatistics, error) {
+func (uc *UserUseCase) GetDeviceOnlineStatistics(ctx context.Context, userID int) (*DeviceOnlineStatistics, error) {
 	return uc.repo.GetDeviceOnlineStatistics(ctx, userID)
 }

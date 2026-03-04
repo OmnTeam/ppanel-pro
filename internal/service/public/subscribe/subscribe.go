@@ -2,6 +2,7 @@ package subscribe
 
 import (
 	"context"
+	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/public/subscribe/v1"
 	subscribeBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscribe"
@@ -21,7 +22,7 @@ func NewSubscribeService(uc *subscribeBiz.SubscribeUseCase) *SubscribeService {
 
 // QuerySubscribeList 查询订阅列表
 func (s *SubscribeService) QuerySubscribeList(ctx context.Context, req *v1.QuerySubscribeListRequest) (*v1.SubscribeListReply, error) {
-	
+
 	// 调用业务层
 	subscribes, total, err := s.uc.QuerySubscribeList(ctx, req.Language)
 	if err != nil {
@@ -32,28 +33,28 @@ func (s *SubscribeService) QuerySubscribeList(ctx context.Context, req *v1.Query
 	list := make([]*v1.SubscribeItem, 0, len(subscribes))
 	for _, sub := range subscribes {
 		item := &v1.SubscribeItem{
-			Id:             sub.ID,
+			Id:             strconv.FormatInt(sub.ID, 10),
 			Name:           sub.Name,
 			Language:       sub.Language,
 			Description:    sub.Description,
-			UnitPrice:      sub.UnitPrice,
+			UnitPrice:      strconv.FormatInt(sub.UnitPrice, 10),
 			UnitTime:       sub.UnitTime,
-			Replacement:    sub.Replacement,
-			Inventory:      sub.Inventory,
-			Traffic:        sub.Traffic,
-			SpeedLimit:     sub.SpeedLimit,
-			DeviceLimit:    sub.DeviceLimit,
-			Quota:          sub.Quota,
-			Nodes:          sub.Nodes,
+			Replacement:    strconv.FormatInt(sub.Replacement, 10),
+			Inventory:      strconv.FormatInt(sub.Inventory, 10),
+			Traffic:        strconv.FormatInt(sub.Traffic, 10),
+			SpeedLimit:     strconv.FormatInt(sub.SpeedLimit, 10),
+			DeviceLimit:    strconv.FormatInt(sub.DeviceLimit, 10),
+			Quota:          strconv.FormatInt(sub.Quota, 10),
+			Nodes:          convertIntSliceToInt32Slice(sub.Nodes),
 			NodeTags:       sub.NodeTags,
 			Show:           sub.Show,
 			Sell:           sub.Sell,
-			Sort:           sub.Sort,
-			DeductionRatio: sub.DeductionRatio,
+			Sort:           strconv.FormatInt(sub.Sort, 10),
+			DeductionRatio: strconv.FormatInt(sub.DeductionRatio, 10),
 			AllowDeduction: sub.AllowDeduction,
 			ResetCycle:     sub.ResetCycle,
-			CreatedAt:      sub.CreatedAt,
-			UpdatedAt:      sub.UpdatedAt,
+			CreatedAt:      strconv.FormatInt(sub.CreatedAt, 10),
+			UpdatedAt:      strconv.FormatInt(sub.UpdatedAt, 10),
 		}
 
 		// 转换折扣信息
@@ -76,7 +77,19 @@ func (s *SubscribeService) QuerySubscribeList(ctx context.Context, req *v1.Query
 		Message: responsecode.CodeMessages[responsecode.SubscribeQuerySuccess],
 		Data: &v1.SubscribeListData{
 			List:  list,
-			Total: total,
+			Total: int32(total),
 		},
 	}, nil
+}
+
+// convertIntSliceToInt32Slice converts []int to []int32
+func convertIntSliceToInt32Slice(input []int) []int32 {
+	if input == nil {
+		return nil
+	}
+	result := make([]int32, len(input))
+	for i, v := range input {
+		result[i] = int32(v)
+	}
+	return result
 }

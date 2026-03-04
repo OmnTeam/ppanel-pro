@@ -2,11 +2,22 @@ package ticket
 
 import (
 	"context"
+	"strconv"
 
 	pb "github.com/OmnTeam/ppanel-pro/api/admin/ticket/v1"
 	ticketbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/ticket"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
+
+// Helper functions for type conversion
+func parseInt64(s string) int64 {
+	val, _ := strconv.ParseInt(s, 10, 64)
+	return val
+}
+
+func formatInt64(i int64) string {
+	return strconv.FormatInt(i, 10)
+}
 
 type TicketService struct {
 	pb.UnimplementedTicketServer
@@ -19,7 +30,7 @@ func NewTicketService(uc *ticketbiz.TicketUseCase) *TicketService {
 
 // UpdateTicketStatus 更新工单状态
 func (s *TicketService) UpdateTicketStatus(ctx context.Context, req *pb.UpdateTicketStatusRequest) (*pb.UpdateTicketStatusReply, error) {
-	err := s.uc.UpdateTicketStatus(ctx, req.Id, int8(req.Status))
+	err := s.uc.UpdateTicketStatus(ctx, int(parseInt64(req.Id)), int8(req.Status))
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +43,7 @@ func (s *TicketService) UpdateTicketStatus(ctx context.Context, req *pb.UpdateTi
 
 // GetTicket 获取工单详情
 func (s *TicketService) GetTicket(ctx context.Context, req *pb.GetTicketRequest) (*pb.GetTicketReply, error) {
-	ticket, err := s.uc.GetTicket(ctx, req.Id)
+	ticket, err := s.uc.GetTicket(ctx, int(parseInt64(req.Id)))
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +59,7 @@ func (s *TicketService) GetTicket(ctx context.Context, req *pb.GetTicketRequest)
 // CreateTicketFollow 创建工单跟进
 func (s *TicketService) CreateTicketFollow(ctx context.Context, req *pb.CreateTicketFollowRequest) (*pb.CreateTicketFollowReply, error) {
 	follow := &ticketbiz.Follow{
-		TicketId: req.TicketId,
+		TicketId: parseInt64(req.TicketId),
 		From:     req.From,
 		Type:     int8(req.Type),
 		Content:  req.Content,
@@ -83,7 +94,7 @@ func (s *TicketService) GetTicketList(ctx context.Context, req *pb.GetTicketList
 		size = 10
 	}
 
-	total, list, err := s.uc.GetTicketList(ctx, page, size, req.UserId, status, req.Search)
+	total, list, err := s.uc.GetTicketList(ctx, page, size, parseInt64(req.UserId), status, req.Search)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +109,7 @@ func (s *TicketService) GetTicketList(ctx context.Context, req *pb.GetTicketList
 		Code:    int32(responsecode.AdminGetTicketListSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetTicketListSuccess],
 		Data: &pb.GetTicketListData{
-			Total: total,
+			Total: int32(total),
 			List:  tickets,
 		},
 	}, nil
@@ -109,23 +120,23 @@ func (s *TicketService) convertTicketToProto(ticket *ticketbiz.Ticket) *pb.Ticke
 	follows := make([]*pb.TicketFollow, 0, len(ticket.Follow))
 	for _, f := range ticket.Follow {
 		follows = append(follows, &pb.TicketFollow{
-			Id:        f.Id,
-			TicketId:  f.TicketId,
+			Id:        formatInt64(int64(f.Id)),
+			TicketId:  formatInt64(int64(f.TicketId)),
 			From:      f.From,
 			Type:      int32(f.Type),
 			Content:   f.Content,
-			CreatedAt: f.CreatedAt, // Already Unix milliseconds
+			CreatedAt: formatInt64(int64(f.CreatedAt)), // Already Unix milliseconds
 		})
 	}
 
 	return &pb.TicketInfo{
-		Id:          ticket.Id,
+		Id:          formatInt64(int64(ticket.Id)),
 		Title:       ticket.Title,
 		Description: ticket.Description,
-		UserId:      ticket.UserId,
+		UserId:      formatInt64(int64(ticket.UserId)),
 		Follow:      follows,
 		Status:      int32(ticket.Status),
-		CreatedAt:   ticket.CreatedAt, // Already Unix milliseconds
-		UpdatedAt:   ticket.UpdatedAt, // Already Unix milliseconds
+		CreatedAt:   formatInt64(int64(ticket.CreatedAt)), // Already Unix milliseconds
+		UpdatedAt:   formatInt64(int64(ticket.UpdatedAt)), // Already Unix milliseconds
 	}
 }

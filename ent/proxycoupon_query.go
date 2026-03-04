@@ -262,12 +262,12 @@ func (_q *ProxyCouponQuery) Clone() *ProxyCouponQuery {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		UserLimit int64 `json:"user_limit,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ProxyCoupon.Query().
-//		GroupBy(proxycoupon.FieldName).
+//		GroupBy(proxycoupon.FieldUserLimit).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *ProxyCouponQuery) GroupBy(field string, fields ...string) *ProxyCouponGroupBy {
@@ -285,11 +285,11 @@ func (_q *ProxyCouponQuery) GroupBy(field string, fields ...string) *ProxyCoupon
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		UserLimit int64 `json:"user_limit,omitempty"`
 //	}
 //
 //	client.ProxyCoupon.Query().
-//		Select(proxycoupon.FieldName).
+//		Select(proxycoupon.FieldUserLimit).
 //		Scan(ctx, &v)
 func (_q *ProxyCouponQuery) Select(fields ...string) *ProxyCouponSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

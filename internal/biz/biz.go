@@ -10,14 +10,17 @@ import (
 	adminconsole "github.com/OmnTeam/ppanel-pro/internal/biz/admin/console"
 	admincoupon "github.com/OmnTeam/ppanel-pro/internal/biz/admin/coupon"
 	admindocument "github.com/OmnTeam/ppanel-pro/internal/biz/admin/document"
+	maingroup "github.com/OmnTeam/ppanel-pro/internal/biz/admin/group"
 	adminlog "github.com/OmnTeam/ppanel-pro/internal/biz/admin/log"
 	adminmarketing "github.com/OmnTeam/ppanel-pro/internal/biz/admin/marketing"
 	adminorder "github.com/OmnTeam/ppanel-pro/internal/biz/admin/order"
 	adminpayment "github.com/OmnTeam/ppanel-pro/internal/biz/admin/payment"
+	adminredemption "github.com/OmnTeam/ppanel-pro/internal/biz/admin/redemption"
 	adminserver "github.com/OmnTeam/ppanel-pro/internal/biz/admin/server"
 	adminsubscribe "github.com/OmnTeam/ppanel-pro/internal/biz/admin/subscribe"
 	adminsystem "github.com/OmnTeam/ppanel-pro/internal/biz/admin/system"
 	adminticket "github.com/OmnTeam/ppanel-pro/internal/biz/admin/ticket"
+	admintool "github.com/OmnTeam/ppanel-pro/internal/biz/admin/tool"
 	adminuser "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/auth"
 	authoauth "github.com/OmnTeam/ppanel-pro/internal/biz/auth/oauth"
@@ -30,6 +33,9 @@ import (
 	publicsubscribe "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscribe"
 	publicticket "github.com/OmnTeam/ppanel-pro/internal/biz/public/ticket"
 	publicuser "github.com/OmnTeam/ppanel-pro/internal/biz/public/user"
+	publicwithdrawal "github.com/OmnTeam/ppanel-pro/internal/biz/public/withdrawal"
+	// Server模块用例
+	server "github.com/OmnTeam/ppanel-pro/internal/biz/server"
 )
 
 // ProviderSet is biz providers
@@ -53,6 +59,9 @@ var ProviderSet = wire.NewSet(
 	adminsubscribe.NewSubscribeUseCase,
 	adminsystem.NewSystemUsecase,
 	adminticket.NewTicketUseCase,
+	adminredemption.NewRedemptionUseCase,
+	admintool.NewToolUseCase,
+	maingroup.NewGroupUseCase,
 	// Admin User模块用例
 	adminuser.NewUserUsecase,
 	adminuser.NewAuthMethodUsecase,
@@ -80,4 +89,8 @@ var ProviderSet = wire.NewSet(
 	publicticket.NewTicketUseCase,
 	// Public User模块用例
 	publicuser.NewUserUseCase,
+	// Public Withdrawal模块用例
+	publicwithdrawal.NewWithdrawalUsecase,
+	// Server模块用例
+	server.NewServerNodeUsecase,
 )

@@ -117,25 +117,29 @@ var (
 	// UnitTimeValidator is a validator for the "unit_time" field. It is called by the builders before save.
 	UnitTimeValidator func(string) error
 	// DefaultReplacement holds the default value on creation for the "replacement" field.
-	DefaultReplacement int
+	DefaultReplacement int64
 	// DefaultInventory holds the default value on creation for the "inventory" field.
-	DefaultInventory int
+	DefaultInventory int64
 	// DefaultTraffic holds the default value on creation for the "traffic" field.
 	DefaultTraffic int64
 	// DefaultSpeedLimit holds the default value on creation for the "speed_limit" field.
-	DefaultSpeedLimit int
+	DefaultSpeedLimit int64
 	// DefaultDeviceLimit holds the default value on creation for the "device_limit" field.
-	DefaultDeviceLimit int
+	DefaultDeviceLimit int64
 	// DefaultQuota holds the default value on creation for the "quota" field.
-	DefaultQuota int
+	DefaultQuota int64
 	// DefaultShow holds the default value on creation for the "show" field.
 	DefaultShow bool
 	// DefaultSell holds the default value on creation for the "sell" field.
 	DefaultSell bool
 	// DefaultSort holds the default value on creation for the "sort" field.
-	DefaultSort int
+	DefaultSort int64
+	// DefaultDeductionRatio holds the default value on creation for the "deduction_ratio" field.
+	DefaultDeductionRatio int64
 	// DefaultAllowDeduction holds the default value on creation for the "allow_deduction" field.
 	DefaultAllowDeduction bool
+	// DefaultResetCycle holds the default value on creation for the "reset_cycle" field.
+	DefaultResetCycle int64
 	// DefaultRenewalReset holds the default value on creation for the "renewal_reset" field.
 	DefaultRenewalReset bool
 	// DefaultNodes holds the default value on creation for the "nodes" field.
@@ -153,7 +157,7 @@ var (
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
-	IDValidator func(int) error
+	IDValidator func(int64) error
 )
 
 // OrderOption defines the ordering options for the ProxySubscribe queries.

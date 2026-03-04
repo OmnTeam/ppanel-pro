@@ -20,6 +20,34 @@ type ProxyCouponCreate struct {
 	hooks    []Hook
 }
 
+// SetUserLimit sets the "user_limit" field.
+func (_c *ProxyCouponCreate) SetUserLimit(v int64) *ProxyCouponCreate {
+	_c.mutation.SetUserLimit(v)
+	return _c
+}
+
+// SetNillableUserLimit sets the "user_limit" field if the given value is not nil.
+func (_c *ProxyCouponCreate) SetNillableUserLimit(v *int64) *ProxyCouponCreate {
+	if v != nil {
+		_c.SetUserLimit(*v)
+	}
+	return _c
+}
+
+// SetSubscribe sets the "subscribe" field.
+func (_c *ProxyCouponCreate) SetSubscribe(v string) *ProxyCouponCreate {
+	_c.mutation.SetSubscribe(v)
+	return _c
+}
+
+// SetNillableSubscribe sets the "subscribe" field if the given value is not nil.
+func (_c *ProxyCouponCreate) SetNillableSubscribe(v *string) *ProxyCouponCreate {
+	if v != nil {
+		_c.SetSubscribe(*v)
+	}
+	return _c
+}
+
 // SetName sets the "name" field.
 func (_c *ProxyCouponCreate) SetName(v string) *ProxyCouponCreate {
 	_c.mutation.SetName(v)
@@ -185,6 +213,10 @@ func (_c *ProxyCouponCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxyCouponCreate) defaults() {
+	if _, ok := _c.mutation.UserLimit(); !ok {
+		v := proxycoupon.DefaultUserLimit
+		_c.mutation.SetUserLimit(v)
+	}
 	if _, ok := _c.mutation.Count(); !ok {
 		v := proxycoupon.DefaultCount
 		_c.mutation.SetCount(v)
@@ -221,6 +253,9 @@ func (_c *ProxyCouponCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ProxyCouponCreate) check() error {
+	if _, ok := _c.mutation.UserLimit(); !ok {
+		return &ValidationError{Name: "user_limit", err: errors.New(`ent: missing required field "ProxyCoupon.user_limit"`)}
+	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "ProxyCoupon.name"`)}
 	}
@@ -292,6 +327,14 @@ func (_c *ProxyCouponCreate) createSpec() (*ProxyCoupon, *sqlgraph.CreateSpec) {
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
+	}
+	if value, ok := _c.mutation.UserLimit(); ok {
+		_spec.SetField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
+		_node.UserLimit = value
+	}
+	if value, ok := _c.mutation.Subscribe(); ok {
+		_spec.SetField(proxycoupon.FieldSubscribe, field.TypeString, value)
+		_node.Subscribe = value
 	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(proxycoupon.FieldName, field.TypeString, value)

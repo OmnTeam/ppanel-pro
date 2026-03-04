@@ -25,7 +25,7 @@ message QuerySubscribeListRequest {
 // SubscribeListData 订阅列表数据
 message SubscribeListData {
   repeated SubscribeItem list = 1;
-  int64 total = 2;
+  int32 total = 2;
 }
 
 // SubscribeListReply 查询订阅列表响应
@@ -37,29 +37,29 @@ message SubscribeListReply {
 
 // SubscribeItem 订阅项
 message SubscribeItem {
-  int64 id = 1;
+  string id = 1;
   string name = 2;
   string language = 3;
   string description = 4;
-  int64 unit_price = 5;
+  string unit_price = 5;
   string unit_time = 6;
   repeated SubscribeDiscount discount = 7;
-  int64 replacement = 8;
-  int64 inventory = 9;
-  int64 traffic = 10;
-  int64 speed_limit = 11;
-  int64 device_limit = 12;
-  int64 quota = 13;
-  repeated int64 nodes = 14;
+  string replacement = 8;
+  string inventory = 9;
+  string traffic = 10;
+  string speed_limit = 11;
+  string device_limit = 12;
+  string quota = 13;
+  repeated int32 nodes = 14;
   repeated string node_tags = 15;
   bool show = 16;
   bool sell = 17;
-  int64 sort = 18;
-  int64 deduction_ratio = 19;
+  string sort = 18;
+  string deduction_ratio = 19;
   bool allow_deduction = 20;
   int32 reset_cycle = 21;
-  int64 created_at = 22;
-  int64 updated_at = 23;
+  string created_at = 22;
+  string updated_at = 23;
 }
 
 // SubscribeDiscount 订阅折扣

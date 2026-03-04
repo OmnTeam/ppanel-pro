@@ -93,7 +93,7 @@ var (
 	// DefaultFeePercent holds the default value on creation for the "fee_percent" field.
 	DefaultFeePercent float64
 	// DefaultFeeAmount holds the default value on creation for the "fee_amount" field.
-	DefaultFeeAmount int64
+	DefaultFeeAmount int
 	// DefaultEnable holds the default value on creation for the "enable" field.
 	DefaultEnable bool
 	// TokenValidator is a validator for the "token" field. It is called by the builders before save.

@@ -23,72 +23,72 @@ func NewPublicUserRepo(d *Data, logger kratoslog.Logger) userbiz.UserRepo {
 }
 
 // QueryUserInfo 查询用户信息
-func (r *userRepo) QueryUserInfo(ctx context.Context, userID int64) (*userbiz.UserInfo, error) {
+func (r *userRepo) QueryUserInfo(ctx context.Context, userID int) (*userbiz.UserInfo, error) {
 	return &userbiz.UserInfo{}, nil
 }
 
 // GetLoginLog 获取登录日志
-func (r *userRepo) GetLoginLog(ctx context.Context, userID int64, page, size int64) ([]*userbiz.LoginLog, int64, error) {
+func (r *userRepo) GetLoginLog(ctx context.Context, userID int, page, size int) ([]*userbiz.LoginLog, int64, error) {
 	return []*userbiz.LoginLog{}, 0, nil
 }
 
 // QueryUserBalanceLog 查询用户余额日志
-func (r *userRepo) QueryUserBalanceLog(ctx context.Context, userID int64) ([]*userbiz.BalanceLog, int64, error) {
+func (r *userRepo) QueryUserBalanceLog(ctx context.Context, userID int) ([]*userbiz.BalanceLog, int64, error) {
 	return []*userbiz.BalanceLog{}, 0, nil
 }
 
 // QueryUserCommissionLog 查询用户佣金日志
-func (r *userRepo) QueryUserCommissionLog(ctx context.Context, userID int64, page, size int64) ([]*userbiz.CommissionLog, int64, error) {
+func (r *userRepo) QueryUserCommissionLog(ctx context.Context, userID int, page, size int) ([]*userbiz.CommissionLog, int64, error) {
 	return []*userbiz.CommissionLog{}, 0, nil
 }
 
 // QueryUserAffiliate 查询用户推荐数量
-func (r *userRepo) QueryUserAffiliate(ctx context.Context, userID int64) (int64, int64, error) {
+func (r *userRepo) QueryUserAffiliate(ctx context.Context, userID int) (int64, int64, error) {
 	return 0, 0, nil
 }
 
 // QueryUserAffiliateList 查询用户推荐列表
-func (r *userRepo) QueryUserAffiliateList(ctx context.Context, userID int64, page, size int64) ([]*userbiz.UserAffiliate, int64, error) {
+func (r *userRepo) QueryUserAffiliateList(ctx context.Context, userID int, page, size int) ([]*userbiz.UserAffiliate, int64, error) {
 	return []*userbiz.UserAffiliate{}, 0, nil
 }
 
 // GetOAuthMethods 获取OAuth方法
-func (r *userRepo) GetOAuthMethods(ctx context.Context, userID int64) ([]*userbiz.AuthMethod, error) {
+func (r *userRepo) GetOAuthMethods(ctx context.Context, userID int) ([]*userbiz.AuthMethod, error) {
 	return []*userbiz.AuthMethod{}, nil
 }
 
 // QueryUserSubscribe 查询用户订阅
-func (r *userRepo) QueryUserSubscribe(ctx context.Context, userID int64) ([]*userbiz.UserSubscribe, int64, error) {
+func (r *userRepo) QueryUserSubscribe(ctx context.Context, userID int) ([]*userbiz.UserSubscribe, int64, error) {
 	return []*userbiz.UserSubscribe{}, 0, nil
 }
 
 // GetSubscribeLog 获取订阅日志
-func (r *userRepo) GetSubscribeLog(ctx context.Context, userID int64, page, size int64) ([]*userbiz.UserSubscribeLog, int64, error) {
+func (r *userRepo) GetSubscribeLog(ctx context.Context, userID int, page, size int) ([]*userbiz.UserSubscribeLog, int64, error) {
 	return []*userbiz.UserSubscribeLog{}, 0, nil
 }
 
 // ResetUserSubscribeToken 重置订阅令牌
-func (r *userRepo) ResetUserSubscribeToken(ctx context.Context, userID, userSubscribeID int64) error {
+func (r *userRepo) ResetUserSubscribeToken(ctx context.Context, userID, userSubscribeID int) error {
 	return nil
 }
 
 // PreUnsubscribe 预退订
-func (r *userRepo) PreUnsubscribe(ctx context.Context, userID, id int64) (int64, error) {
+func (r *userRepo) PreUnsubscribe(ctx context.Context, userID, id int) (int64, error) {
 	return 0, nil
 }
 
 // Unsubscribe 退订
-func (r *userRepo) Unsubscribe(ctx context.Context, userID, id int64) error {
+func (r *userRepo) Unsubscribe(ctx context.Context, userID, id int) error {
 	return nil
 }
 
 // UpdateUserNotify 更新用户通知设置
-func (r *userRepo) UpdateUserNotify(ctx context.Context, userID int64, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify bool) error {
+func (r *userRepo) UpdateUserNotify(ctx context.Context, userID int, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify bool) error {
 	return nil
 }
 
 // UpdateUserPassword 更新用户密码
-func (r *userRepo) UpdateUserPassword(ctx context.Context, userID int64, password string) error {
+func (r *userRepo) UpdateUserPassword(ctx context.Context, userID int, password string) error {
 	return nil
 }
 
@@ -98,7 +98,7 @@ func (r *userRepo) BindTelegram(ctx context.Context, session string, botName str
 }
 
 // UnbindTelegram 解绑Telegram
-func (r *userRepo) UnbindTelegram(ctx context.Context, userID int64) error {
+func (r *userRepo) UnbindTelegram(ctx context.Context, userID int) error {
 	return nil
 }
 
@@ -108,27 +108,27 @@ func (r *userRepo) BindOAuth(ctx context.Context, method, redirect string) (stri
 }
 
 // BindOAuthCallback OAuth回调
-func (r *userRepo) BindOAuthCallback(ctx context.Context, userID int64, method string, callback string) error {
+func (r *userRepo) BindOAuthCallback(ctx context.Context, userID int, method string, callback string) error {
 	return nil
 }
 
 // UnbindOAuth 解绑OAuth
-func (r *userRepo) UnbindOAuth(ctx context.Context, userID int64, method string) error {
+func (r *userRepo) UnbindOAuth(ctx context.Context, userID int, method string) error {
 	return nil
 }
 
 // VerifyEmail 验证邮箱
-func (r *userRepo) VerifyEmail(ctx context.Context, userID int64, email, code string) error {
+func (r *userRepo) VerifyEmail(ctx context.Context, userID int, email, code string) error {
 	return nil
 }
 
 // UpdateBindMobile 更新绑定手机
-func (r *userRepo) UpdateBindMobile(ctx context.Context, userID int64, areaCode, mobile, code string) error {
+func (r *userRepo) UpdateBindMobile(ctx context.Context, userID int, areaCode, mobile, code string) error {
 	return nil
 }
 
 // UpdateBindEmail 更新绑定邮箱
-func (r *userRepo) UpdateBindEmail(ctx context.Context, userID int64, email string) error {
+func (r *userRepo) UpdateBindEmail(ctx context.Context, userID int, email string) error {
 	return nil
 }
 
@@ -146,13 +146,13 @@ func (r *userRepo) DeviceWSConnect(ctx context.Context) error {
 }
 
 // GetDeviceList 获取设备列表 - 完整实现
-func (r *userRepo) GetDeviceList(ctx context.Context, userID int64) ([]*userbiz.UserDevice, int64, error) {
+func (r *userRepo) GetDeviceList(ctx context.Context, userID int) ([]*userbiz.UserDevice, int64, error) {
 	if r.data.DeviceManager() == nil {
 		r.log.Errorf("DeviceManager is nil")
 		return []*userbiz.UserDevice{}, 0, nil
 	}
 
-	devices, err := r.data.DeviceManager().GetUserDevices(userID)
+	devices, err := r.data.DeviceManager().GetUserDevices(int64(userID))
 	if err != nil {
 		r.log.Errorf("Failed to get devices for user %d: %v", userID, err)
 		return nil, 0, err
@@ -177,13 +177,13 @@ func (r *userRepo) GetDeviceList(ctx context.Context, userID int64) ([]*userbiz.
 }
 
 // UnbindDevice 解绑设备 - 完整实现
-func (r *userRepo) UnbindDevice(ctx context.Context, userID, deviceID int64) error {
+func (r *userRepo) UnbindDevice(ctx context.Context, userID, deviceID int) error {
 	if r.data.DeviceManager() == nil {
 		r.log.Errorf("DeviceManager is nil")
 		return fmt.Errorf("device manager not available")
 	}
 
-	err := r.data.DeviceManager().RemoveDevice(userID, deviceID)
+	err := r.data.DeviceManager().RemoveDevice(int64(userID), int64(deviceID))
 	if err != nil {
 		r.log.Errorf("Failed to remove device %d for user %d: %v", deviceID, userID, err)
 		return err
@@ -194,13 +194,13 @@ func (r *userRepo) UnbindDevice(ctx context.Context, userID, deviceID int64) err
 }
 
 // GetDeviceOnlineStatistics 获取设备在线统计 - 完整实现
-func (r *userRepo) GetDeviceOnlineStatistics(ctx context.Context, userID int64) (*userbiz.DeviceOnlineStatistics, error) {
+func (r *userRepo) GetDeviceOnlineStatistics(ctx context.Context, userID int) (*userbiz.DeviceOnlineStatistics, error) {
 	if r.data.DeviceManager() == nil {
 		r.log.Errorf("DeviceManager is nil")
 		return &userbiz.DeviceOnlineStatistics{}, nil
 	}
 
-	stats, err := r.data.DeviceManager().GetUserDeviceStatistics(userID)
+	stats, err := r.data.DeviceManager().GetUserDeviceStatistics(int64(userID))
 	if err != nil {
 		r.log.Errorf("Failed to get device statistics for user %d: %v", userID, err)
 		return nil, err

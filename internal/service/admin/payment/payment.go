@@ -3,6 +3,7 @@ package payment
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -12,6 +13,12 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 )
+
+// Helper functions for type conversion
+func parseInt64(s string) int64 {
+	val, _ := strconv.ParseInt(s, 10, 64)
+	return val
+}
 
 // PaymentService 支付方式服务
 type PaymentService struct {
@@ -52,8 +59,8 @@ func (s *PaymentService) CreatePaymentMethod(ctx context.Context, req *v1.Create
 		req.Domain,
 		configJSON,
 		req.FeeMode,
-		req.FeePercent,
-		req.FeeAmount,
+		parseInt64(req.FeePercent),
+		parseInt64(req.FeeAmount),
 		enable,
 	)
 	if err != nil {
@@ -70,17 +77,16 @@ func (s *PaymentService) CreatePaymentMethod(ctx context.Context, req *v1.Create
 		Code:    int32(responsecode.AdminCreatePaymentMethodSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminCreatePaymentMethodSuccess],
 		Data: &v1.PaymentMethod{
-			Id:          method.ID,
-			TenantId:    method.TenantID,
+			Id:          strconv.FormatInt(method.ID, 10),
 			Name:        method.Name,
 			Platform:    method.Platform,
 			Description: method.Description,
 			Icon:        method.Icon,
 			Domain:      method.Domain,
 			Config:      configStruct,
-			FeeMode:     method.FeeMode,
-			FeePercent:  method.FeePercent,
-			FeeAmount:   method.FeeAmount,
+			FeeMode:     int32(method.FeeMode),
+			FeePercent:  strconv.FormatInt(method.FeePercent, 10),
+			FeeAmount:   strconv.FormatInt(method.FeeAmount, 10),
 			Enable:      method.Enable,
 			NotifyUrl:   method.NotifyURL,
 			Token:       method.Token,
@@ -104,7 +110,7 @@ func (s *PaymentService) UpdatePaymentMethod(ctx context.Context, req *v1.Update
 
 	method, err := s.uc.UpdatePaymentMethod(
 		ctx,
-		req.Id,
+		int(parseInt64(req.Id)),
 		req.Name,
 		req.Platform,
 		req.Description,
@@ -112,8 +118,8 @@ func (s *PaymentService) UpdatePaymentMethod(ctx context.Context, req *v1.Update
 		req.Domain,
 		configJSON,
 		req.FeeMode,
-		req.FeePercent,
-		req.FeeAmount,
+		parseInt64(req.FeePercent),
+		parseInt64(req.FeeAmount),
 		enable,
 	)
 	if err != nil {
@@ -130,17 +136,16 @@ func (s *PaymentService) UpdatePaymentMethod(ctx context.Context, req *v1.Update
 		Code:    int32(responsecode.AdminUpdatePaymentMethodSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminUpdatePaymentMethodSuccess],
 		Data: &v1.PaymentMethod{
-			Id:          method.ID,
-			TenantId:    method.TenantID,
+			Id:          strconv.FormatInt(method.ID, 10),
 			Name:        method.Name,
 			Platform:    method.Platform,
 			Description: method.Description,
 			Icon:        method.Icon,
 			Domain:      method.Domain,
 			Config:      configStruct,
-			FeeMode:     method.FeeMode,
-			FeePercent:  method.FeePercent,
-			FeeAmount:   method.FeeAmount,
+			FeeMode:     int32(method.FeeMode),
+			FeePercent:  strconv.FormatInt(method.FeePercent, 10),
+			FeeAmount:   strconv.FormatInt(method.FeeAmount, 10),
 			Enable:      method.Enable,
 			NotifyUrl:   method.NotifyURL,
 			Token:       method.Token,
@@ -150,7 +155,7 @@ func (s *PaymentService) UpdatePaymentMethod(ctx context.Context, req *v1.Update
 
 // DeletePaymentMethod 删除支付方式
 func (s *PaymentService) DeletePaymentMethod(ctx context.Context, req *v1.DeletePaymentMethodRequest) (*v1.DeletePaymentMethodReply, error) {
-	err := s.uc.DeletePaymentMethod(ctx, req.Id)
+	err := s.uc.DeletePaymentMethod(ctx, int(parseInt64(req.Id)))
 	if err != nil {
 		return nil, err
 	}
@@ -171,8 +176,8 @@ func (s *PaymentService) GetPaymentMethodList(ctx context.Context, req *v1.GetPa
 
 	total, list, err := s.uc.GetPaymentMethodList(
 		ctx,
-		req.Page,
-		req.Size,
+		int(req.Page),
+		int(req.Size),
 		req.Platform,
 		req.Search,
 		enable,
@@ -190,17 +195,16 @@ func (s *PaymentService) GetPaymentMethodList(ctx context.Context, req *v1.GetPa
 		}
 
 		methods = append(methods, &v1.PaymentMethod{
-			Id:          method.ID,
-			TenantId:    method.TenantID,
+			Id:          strconv.FormatInt(method.ID, 10),
 			Name:        method.Name,
 			Platform:    method.Platform,
 			Description: method.Description,
 			Icon:        method.Icon,
 			Domain:      method.Domain,
 			Config:      configStruct,
-			FeeMode:     method.FeeMode,
-			FeePercent:  method.FeePercent,
-			FeeAmount:   method.FeeAmount,
+			FeeMode:     int32(method.FeeMode),
+			FeePercent:  strconv.FormatInt(method.FeePercent, 10),
+			FeeAmount:   strconv.FormatInt(method.FeeAmount, 10),
 			Enable:      method.Enable,
 			NotifyUrl:   method.NotifyURL,
 			Token:       method.Token,
@@ -211,7 +215,7 @@ func (s *PaymentService) GetPaymentMethodList(ctx context.Context, req *v1.GetPa
 		Code:    int32(responsecode.AdminGetPaymentMethodListSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetPaymentMethodListSuccess],
 		Data: &v1.GetPaymentMethodListData{
-			Total: total,
+			Total: int32(total),
 			List:  methods,
 		},
 	}, nil

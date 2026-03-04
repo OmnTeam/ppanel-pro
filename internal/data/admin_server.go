@@ -42,7 +42,7 @@ func (r *adminServerRepo) CreateServer(ctx context.Context, server *serverbiz.Se
 		SetCountry(server.Country).
 		SetCity(server.City).
 		SetServerAddr(server.Address).
-		SetSort(int(server.Sort)). // convert int64 to int
+		SetSort(int(server.Sort)).
 		SetProtocol(protocolsJSON).
 		Save(ctx)
 	if err != nil {
@@ -58,13 +58,13 @@ func (r *adminServerRepo) CreateServer(ctx context.Context, server *serverbiz.Se
 	}
 
 	return &serverbiz.Server{
-		ID:             int64(created.ID),
+		ID: int64(created.ID),
 
 		Name:           created.Name,
 		Country:        created.Country,
 		City:           created.City,
 		Address:        created.ServerAddr,
-		Sort:           int64(created.Sort), // int to int64
+		Sort:           created.Sort,
 		Protocols:      protocols,
 		LastReportedAt: lastReportedAt,
 		CreatedAt:      created.CreatedAt.UnixMilli(), // 返回毫秒时间戳，与老项目保持一致
@@ -81,12 +81,12 @@ func (r *adminServerRepo) UpdateServer(ctx context.Context, server *serverbiz.Se
 	}
 
 	// Update server
-	updated, err := r.data.db.ProxyServer.UpdateOneID(int(server.ID)).
+	updated, err := r.data.db.ProxyServer.UpdateOneID(server.ID).
 		SetName(server.Name).
 		SetCountry(server.Country).
 		SetCity(server.City).
 		SetServerAddr(server.Address).
-		SetSort(int(server.Sort)). // int64 to int
+		SetSort(int(server.Sort)).
 		SetProtocol(protocolsJSON).
 		Save(ctx)
 	if err != nil {
@@ -102,13 +102,13 @@ func (r *adminServerRepo) UpdateServer(ctx context.Context, server *serverbiz.Se
 	}
 
 	return &serverbiz.Server{
-		ID:             int64(updated.ID),
+		ID: int64(updated.ID),
 
 		Name:           updated.Name,
 		Country:        updated.Country,
 		City:           updated.City,
 		Address:        updated.ServerAddr,
-		Sort:           int64(updated.Sort), // int to int64
+		Sort:           updated.Sort,
 		Protocols:      protocols,
 		LastReportedAt: lastReportedAt,
 		CreatedAt:      updated.CreatedAt.UnixMilli(), // 返回毫秒时间戳，与老项目保持一致
@@ -117,9 +117,9 @@ func (r *adminServerRepo) UpdateServer(ctx context.Context, server *serverbiz.Se
 }
 
 // DeleteServer deletes a server
-func (r *adminServerRepo) DeleteServer(ctx context.Context, id int64) error {
+func (r *adminServerRepo) DeleteServer(ctx context.Context, id int) error {
 	// Delete the server
-	err := r.data.db.ProxyServer.DeleteOneID(int(id)).Exec(ctx)
+	err := r.data.db.ProxyServer.DeleteOneID(int64(id)).Exec(ctx)
 	if err != nil {
 		return err
 	}
@@ -127,9 +127,9 @@ func (r *adminServerRepo) DeleteServer(ctx context.Context, id int64) error {
 }
 
 // GetServerByID gets a server by ID
-func (r *adminServerRepo) GetServerByID(ctx context.Context, id int64) (*serverbiz.Server, error) {
+func (r *adminServerRepo) GetServerByID(ctx context.Context, id int) (*serverbiz.Server, error) {
 	server, err := r.data.db.ProxyServer.Query().
-		Where(proxyserver.ID(int(id))).
+		Where(proxyserver.ID(int64(id))).
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -145,13 +145,13 @@ func (r *adminServerRepo) GetServerByID(ctx context.Context, id int64) (*serverb
 	}
 
 	return &serverbiz.Server{
-		ID:             int64(server.ID),
+		ID: int64(server.ID),
 
 		Name:           server.Name,
 		Country:        server.Country,
 		City:           server.City,
 		Address:        server.ServerAddr,
-		Sort:           int64(server.Sort), // int to int64
+		Sort:           server.Sort,
 		Protocols:      protocols,
 		LastReportedAt: lastReportedAt,
 		CreatedAt:      server.CreatedAt.UnixMilli(), // 返回毫秒时间戳，与老项目保持一致
@@ -196,13 +196,13 @@ func (r *adminServerRepo) FilterServerList(ctx context.Context, page, size int32
 			lastReportedAt = item.LastReportedAt.UnixMilli() // 使用毫秒时间戳，与老项目保持一致
 		}
 		servers = append(servers, &serverbiz.Server{
-			ID:             int64(item.ID),
+			ID: int64(item.ID),
 
 			Name:           item.Name,
 			Country:        item.Country,
 			City:           item.City,
 			Address:        item.ServerAddr,
-			Sort:           int64(item.Sort), // int to int64
+			Sort:           item.Sort,
 			Protocols:      protocols,
 			LastReportedAt: lastReportedAt,
 			CreatedAt:      item.CreatedAt.UnixMilli(), // 返回毫秒时间戳，与老项目保持一致
@@ -214,10 +214,10 @@ func (r *adminServerRepo) FilterServerList(ctx context.Context, page, size int32
 }
 
 // GetServerProtocols gets server protocols
-func (r *adminServerRepo) GetServerProtocols(ctx context.Context, id int64) ([]*servermodel.Protocol, error) {
+func (r *adminServerRepo) GetServerProtocols(ctx context.Context, id int) ([]*servermodel.Protocol, error) {
 	// Query server
 	server, err := r.data.db.ProxyServer.Query().
-		Where(proxyserver.ID(int(id))).
+		Where(proxyserver.ID(int64(id))).
 		Only(ctx)
 	if err != nil {
 		return nil, err
@@ -231,8 +231,8 @@ func (r *adminServerRepo) ResetServerSort(ctx context.Context, sortItems []*serv
 	for _, item := range sortItems {
 		// Update the server sort
 		affected, err := r.data.db.ProxyServer.Update().
-			Where(proxyserver.ID(int(item.ID))).
-			SetSort(int(item.Sort)). // int64 to int
+			Where(proxyserver.ID(item.ID)).
+			SetSort(int(item.Sort)).
 			Save(ctx)
 		if err != nil {
 			return err
@@ -245,7 +245,7 @@ func (r *adminServerRepo) ResetServerSort(ctx context.Context, sortItems []*serv
 }
 
 // GetServerStatus gets server status from Redis cache
-func (r *adminServerRepo) GetServerStatus(ctx context.Context, serverID int64) (*serverbiz.ServerResourceStatus, error) {
+func (r *adminServerRepo) GetServerStatus(ctx context.Context, serverID int) (*serverbiz.ServerResourceStatus, error) {
 	// Get server status from cache
 
 	key := fmt.Sprintf(StatusCacheKey, int(serverID))
@@ -297,9 +297,9 @@ func (r *adminServerRepo) GetOnlineUsers(ctx context.Context, serverID int64, pr
 }
 
 // GetUserSubscribeInfo gets user subscribe information
-func (r *adminServerRepo) GetUserSubscribeInfo(ctx context.Context, subscribeID int64) (*serverbiz.UserSubscribeInfo, error) {
+func (r *adminServerRepo) GetUserSubscribeInfo(ctx context.Context, subscribeID int) (*serverbiz.UserSubscribeInfo, error) {
 	userSubscribe, err := r.data.db.ProxyUserSubscribe.Query().
-		Where(proxyusersubscribe.ID(int(subscribeID))).
+		Where(proxyusersubscribe.ID(int64(subscribeID))).
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -320,10 +320,10 @@ func (r *adminServerRepo) GetUserSubscribeInfo(ctx context.Context, subscribeID 
 	// Handle optional fields
 	var download, upload int64
 	if userSubscribe.Download != nil {
-		download = *userSubscribe.Download
+		download = int64(*userSubscribe.Download)
 	}
 	if userSubscribe.Upload != nil {
-		upload = *userSubscribe.Upload
+		upload = int64(*userSubscribe.Upload)
 	}
 
 	var expireTime int64

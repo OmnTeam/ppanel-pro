@@ -35,9 +35,9 @@ func (uc *NodeUsecase) CreateNode(ctx context.Context, name string, tags []strin
 }
 
 // UpdateNode updates an existing node
-func (uc *NodeUsecase) UpdateNode(ctx context.Context, id int64, name string, tags []string, port uint16, address string, serverID int64, protocol string, enabled *bool) (*Node, error) {
+func (uc *NodeUsecase) UpdateNode(ctx context.Context, id int, name string, tags []string, port uint16, address string, serverID int64, protocol string, enabled *bool) (*Node, error) {
 	node := &Node{
-		ID:       id,
+		ID:       int64(id),
 		Name:     name,
 		Tags:     tags,
 		Port:     port,
@@ -53,7 +53,7 @@ func (uc *NodeUsecase) UpdateNode(ctx context.Context, id int64, name string, ta
 	}
 
 	// Clear node cache for the server
-	if err := uc.repo.ClearNodeCache(ctx, []int64{serverID}); err != nil {
+	if err := uc.repo.ClearNodeCache(ctx, []int{int(serverID)}); err != nil {
 		uc.log.Warnf("Failed to clear node cache for server %d: %v", serverID, err)
 		// Don't return error, just log warning
 	}
@@ -62,7 +62,7 @@ func (uc *NodeUsecase) UpdateNode(ctx context.Context, id int64, name string, ta
 }
 
 // DeleteNode deletes a node
-func (uc *NodeUsecase) DeleteNode(ctx context.Context, id int64) error {
+func (uc *NodeUsecase) DeleteNode(ctx context.Context, id int) error {
 	return uc.repo.DeleteNode(ctx, id)
 }
 
@@ -72,14 +72,14 @@ func (uc *NodeUsecase) FilterNodeList(ctx context.Context, page, size int32, sea
 }
 
 // ToggleNodeStatus toggles node status
-func (uc *NodeUsecase) ToggleNodeStatus(ctx context.Context, id int64, enable *bool) (*Node, error) {
+func (uc *NodeUsecase) ToggleNodeStatus(ctx context.Context, id int, enable *bool) (*Node, error) {
 	node, err := uc.repo.ToggleNodeStatus(ctx, id, enable)
 	if err != nil {
 		return nil, err
 	}
 
 	// Clear node cache for the server
-	if err := uc.repo.ClearNodeCache(ctx, []int64{node.ServerID}); err != nil {
+	if err := uc.repo.ClearNodeCache(ctx, []int{int(node.ServerID)}); err != nil {
 		uc.log.Warnf("Failed to clear node cache for server %d after toggling node %d: %v", node.ServerID, id, err)
 		// Don't return error, just log warning
 	}

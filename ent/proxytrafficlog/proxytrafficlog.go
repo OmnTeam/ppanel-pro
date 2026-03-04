@@ -52,9 +52,9 @@ func ValidColumn(column string) bool {
 
 var (
 	// DefaultDownload holds the default value on creation for the "download" field.
-	DefaultDownload int64
+	DefaultDownload int
 	// DefaultUpload holds the default value on creation for the "upload" field.
-	DefaultUpload int64
+	DefaultUpload int
 	// DefaultTimestamp holds the default value on creation for the "timestamp" field.
 	DefaultTimestamp func() time.Time
 )

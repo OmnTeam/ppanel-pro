@@ -72,7 +72,7 @@ func (r *adminAnnouncementRepo) Update(ctx context.Context, announcement *announ
 }
 
 // FindByID 根据ID查找公告
-func (r *adminAnnouncementRepo) FindByID(ctx context.Context, tenantID, id int64) (*announcementbiz.Announcement, error) {
+func (r *adminAnnouncementRepo) FindByID(ctx context.Context, id int64) (*announcementbiz.Announcement, error) {
 	po, err := r.data.db.ProxyAnnouncement.Query().
 		Where(
 			proxyannouncement.ID(id),
@@ -89,7 +89,7 @@ func (r *adminAnnouncementRepo) FindByID(ctx context.Context, tenantID, id int64
 }
 
 // ListAll 获取公告列表
-func (r *adminAnnouncementRepo) ListAll(ctx context.Context, tenantID int64, page, size int64, show, pinned, popup *bool) ([]*announcementbiz.Announcement, int64, error) {
+func (r *adminAnnouncementRepo) ListAll(ctx context.Context, page, size int, show, pinned, popup *bool) ([]*announcementbiz.Announcement, int64, error) {
 	query := r.data.db.ProxyAnnouncement.Query()
 
 	// 根据条件过滤
@@ -117,8 +117,8 @@ func (r *adminAnnouncementRepo) ListAll(ctx context.Context, tenantID int64, pag
 				sql.Desc(proxyannouncement.FieldCreatedAt), // 然后按创建时间倒序
 			)
 		}).
-		Offset(int((page - 1) * size)).
-		Limit(int(size)).
+		Offset((page - 1) * size).
+		Limit(size).
 		All(ctx)
 	if err != nil {
 		return nil, 0, err
@@ -134,7 +134,7 @@ func (r *adminAnnouncementRepo) ListAll(ctx context.Context, tenantID int64, pag
 }
 
 // Delete 删除公告
-func (r *adminAnnouncementRepo) Delete(ctx context.Context, tenantID, id int64) error {
+func (r *adminAnnouncementRepo) Delete(ctx context.Context, id int64) error {
 	deleted, err := r.data.db.ProxyAnnouncement.Delete().
 		Where(
 			proxyannouncement.ID(id),

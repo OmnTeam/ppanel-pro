@@ -29,14 +29,14 @@ func (_u *ProxyUserDeviceOnlineRecordUpdate) Where(ps ...predicate.ProxyUserDevi
 }
 
 // SetUserID sets the "user_id" field.
-func (_u *ProxyUserDeviceOnlineRecordUpdate) SetUserID(v int) *ProxyUserDeviceOnlineRecordUpdate {
+func (_u *ProxyUserDeviceOnlineRecordUpdate) SetUserID(v int64) *ProxyUserDeviceOnlineRecordUpdate {
 	_u.mutation.ResetUserID()
 	_u.mutation.SetUserID(v)
 	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (_u *ProxyUserDeviceOnlineRecordUpdate) SetNillableUserID(v *int) *ProxyUserDeviceOnlineRecordUpdate {
+func (_u *ProxyUserDeviceOnlineRecordUpdate) SetNillableUserID(v *int64) *ProxyUserDeviceOnlineRecordUpdate {
 	if v != nil {
 		_u.SetUserID(*v)
 	}
@@ -44,7 +44,7 @@ func (_u *ProxyUserDeviceOnlineRecordUpdate) SetNillableUserID(v *int) *ProxyUse
 }
 
 // AddUserID adds value to the "user_id" field.
-func (_u *ProxyUserDeviceOnlineRecordUpdate) AddUserID(v int) *ProxyUserDeviceOnlineRecordUpdate {
+func (_u *ProxyUserDeviceOnlineRecordUpdate) AddUserID(v int64) *ProxyUserDeviceOnlineRecordUpdate {
 	_u.mutation.AddUserID(v)
 	return _u
 }
@@ -203,7 +203,7 @@ func (_u *ProxyUserDeviceOnlineRecordUpdate) sqlSave(ctx context.Context) (_node
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyuserdeviceonlinerecord.Table, proxyuserdeviceonlinerecord.Columns, sqlgraph.NewFieldSpec(proxyuserdeviceonlinerecord.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyuserdeviceonlinerecord.Table, proxyuserdeviceonlinerecord.Columns, sqlgraph.NewFieldSpec(proxyuserdeviceonlinerecord.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -212,10 +212,10 @@ func (_u *ProxyUserDeviceOnlineRecordUpdate) sqlSave(ctx context.Context) (_node
 		}
 	}
 	if value, ok := _u.mutation.UserID(); ok {
-		_spec.SetField(proxyuserdeviceonlinerecord.FieldUserID, field.TypeInt, value)
+		_spec.SetField(proxyuserdeviceonlinerecord.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedUserID(); ok {
-		_spec.AddField(proxyuserdeviceonlinerecord.FieldUserID, field.TypeInt, value)
+		_spec.AddField(proxyuserdeviceonlinerecord.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Identifier(); ok {
 		_spec.SetField(proxyuserdeviceonlinerecord.FieldIdentifier, field.TypeString, value)
@@ -271,14 +271,14 @@ type ProxyUserDeviceOnlineRecordUpdateOne struct {
 }
 
 // SetUserID sets the "user_id" field.
-func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetUserID(v int) *ProxyUserDeviceOnlineRecordUpdateOne {
+func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetUserID(v int64) *ProxyUserDeviceOnlineRecordUpdateOne {
 	_u.mutation.ResetUserID()
 	_u.mutation.SetUserID(v)
 	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetNillableUserID(v *int) *ProxyUserDeviceOnlineRecordUpdateOne {
+func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetNillableUserID(v *int64) *ProxyUserDeviceOnlineRecordUpdateOne {
 	if v != nil {
 		_u.SetUserID(*v)
 	}
@@ -286,7 +286,7 @@ func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetNillableUserID(v *int) *Proxy
 }
 
 // AddUserID adds value to the "user_id" field.
-func (_u *ProxyUserDeviceOnlineRecordUpdateOne) AddUserID(v int) *ProxyUserDeviceOnlineRecordUpdateOne {
+func (_u *ProxyUserDeviceOnlineRecordUpdateOne) AddUserID(v int64) *ProxyUserDeviceOnlineRecordUpdateOne {
 	_u.mutation.AddUserID(v)
 	return _u
 }
@@ -458,7 +458,7 @@ func (_u *ProxyUserDeviceOnlineRecordUpdateOne) sqlSave(ctx context.Context) (_n
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyuserdeviceonlinerecord.Table, proxyuserdeviceonlinerecord.Columns, sqlgraph.NewFieldSpec(proxyuserdeviceonlinerecord.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyuserdeviceonlinerecord.Table, proxyuserdeviceonlinerecord.Columns, sqlgraph.NewFieldSpec(proxyuserdeviceonlinerecord.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProxyUserDeviceOnlineRecord.id" for update`)}
@@ -484,10 +484,10 @@ func (_u *ProxyUserDeviceOnlineRecordUpdateOne) sqlSave(ctx context.Context) (_n
 		}
 	}
 	if value, ok := _u.mutation.UserID(); ok {
-		_spec.SetField(proxyuserdeviceonlinerecord.FieldUserID, field.TypeInt, value)
+		_spec.SetField(proxyuserdeviceonlinerecord.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedUserID(); ok {
-		_spec.AddField(proxyuserdeviceonlinerecord.FieldUserID, field.TypeInt, value)
+		_spec.AddField(proxyuserdeviceonlinerecord.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Identifier(); ok {
 		_spec.SetField(proxyuserdeviceonlinerecord.FieldIdentifier, field.TypeString, value)

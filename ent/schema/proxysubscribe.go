@@ -26,7 +26,7 @@ func (ProxySubscribe) Annotations() []schema.Annotation {
 // Fields of the ProxySubscribe
 func (ProxySubscribe) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Positive().
 			Comment("订阅套餐ID"),
 		field.String("name").
@@ -52,22 +52,22 @@ func (ProxySubscribe) Fields() []ent.Field {
 			Optional().
 			Nillable().
 			Comment("折扣配置JSON"),
-		field.Int("replacement").
+		field.Int64("replacement").
 			Default(0).
 			Comment("替换"),
-		field.Int("inventory").
-			Default(0).
+		field.Int64("inventory").
+			Default(-1).
 			Comment("库存"),
 		field.Int64("traffic").
 			Default(0).
 			Comment("流量（字节）"),
-		field.Int("speed_limit").
+		field.Int64("speed_limit").
 			Default(0).
 			Comment("速度限制"),
-		field.Int("device_limit").
+		field.Int64("device_limit").
 			Default(0).
 			Comment("设备数限制"),
-		field.Int("quota").
+		field.Int64("quota").
 			Default(0).
 			Comment("配额"),
 		field.Bool("show").
@@ -76,20 +76,22 @@ func (ProxySubscribe) Fields() []ent.Field {
 		field.Bool("sell").
 			Default(false).
 			Comment("是否售卖"),
-		field.Int("sort").
+		field.Int64("sort").
 			Default(0).
 			Comment("排序"),
-		field.Float("deduction_ratio").
+		field.Int64("deduction_ratio").
 			Optional().
 			Nillable().
+			Default(0).
 			Comment("扣除比例"),
 		field.Bool("allow_deduction").
 			Optional().
 			Default(true).
 			Comment("允许扣除"),
-		field.Int("reset_cycle").
+		field.Int64("reset_cycle").
 			Optional().
 			Nillable().
+			Default(0).
 			Comment("重置周期: 0-不重置 1-1号 2-每月 3-每年"),
 		field.Bool("renewal_reset").
 			Optional().

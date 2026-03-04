@@ -2,6 +2,7 @@ package order
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -27,26 +28,31 @@ func NewOrderService(uc *order.OrderUseCase, logger log.Logger) *OrderService {
 // CreateOrder 创建订单
 func (s *OrderService) CreateOrder(ctx context.Context, req *v1.CreateOrderRequest) (*v1.CreateOrderReply, error) {
 	// 验证用户ID
-	if req.UserId == 0 {
+	if req.UserId == "" {
 		return nil, responsecode.ErrUserIDRequired()
 	}
 
+	// 转换参数类型
+	userId, _ := strconv.Atoi(req.UserId)
+	subscribeId, _ := strconv.Atoi(req.SubscribeId)
+	paymentId, _ := strconv.Atoi(req.PaymentId)
+
 	// 创建订单
-	err := s.uc.CreateOrder(ctx, 0,
-		req.UserId,
+	err := s.uc.CreateOrder(ctx,
+		userId,
 		req.Type,
-		req.Quantity,
-		req.Price,
-		req.Amount,
-		req.Discount,
+		int(req.Quantity),
+		int(req.Price),
+		int(req.Amount),
+		int(req.Discount),
 		req.Coupon,
-		req.CouponDiscount,
-		req.Commission,
-		req.FeeAmount,
-		req.PaymentId,
+		int(req.CouponDiscount),
+		int(req.Commission),
+		int(req.FeeAmount),
+		paymentId,
 		req.TradeNo,
 		req.Status,
-		req.SubscribeId,
+		subscribeId,
 	)
 	if err != nil {
 		s.log.Errorw("msg", "create order failed", "error", err)
@@ -62,12 +68,16 @@ func (s *OrderService) CreateOrder(ctx context.Context, req *v1.CreateOrderReque
 // UpdateOrderStatus 更新订单状态
 func (s *OrderService) UpdateOrderStatus(ctx context.Context, req *v1.UpdateOrderStatusRequest) (*v1.UpdateOrderStatusReply, error) {
 	// 验证订单ID
-	if req.Id == 0 {
+	if req.Id == "" {
 		return nil, responsecode.ErrOrderIDRequired()
 	}
 
+	// 转换参数类型
+	id, _ := strconv.Atoi(req.Id)
+	paymentId, _ := strconv.Atoi(req.PaymentId)
+
 	// 更新订单状态
-	err := s.uc.UpdateOrderStatus(ctx, 0, req.Id, req.Status, req.PaymentId, req.TradeNo)
+	err := s.uc.UpdateOrderStatus(ctx, id, req.Status, paymentId, req.TradeNo)
 	if err != nil {
 		s.log.Errorw("msg", "update order status failed", "error", err)
 		return nil, responsecode.ErrOrderUpdateFailed()
@@ -89,8 +99,12 @@ func (s *OrderService) GetOrderList(ctx context.Context, req *v1.GetOrderListReq
 		req.Size = 10
 	}
 
+	// 转换参数类型
+	userId, _ := strconv.Atoi(req.UserId)
+	subscribeId, _ := strconv.Atoi(req.SubscribeId)
+
 	// 获取订单列表
-	list, total, err := s.uc.GetOrderList(ctx, 0, req.Page, req.Size, req.UserId, req.Status, req.SubscribeId, req.Search)
+	list, total, err := s.uc.GetOrderList(ctx, int(req.Page), int(req.Size), userId, req.Status, subscribeId, req.Search)
 	if err != nil {
 		s.log.Errorw("msg", "get order list failed", "error", err)
 		return nil, responsecode.ErrOrderListFailed()
@@ -100,29 +114,29 @@ func (s *OrderService) GetOrderList(ctx context.Context, req *v1.GetOrderListReq
 	var items []*v1.OrderItem
 	for _, o := range list {
 		item := &v1.OrderItem{
-			Id:             o.ID,
-			ParentId:       o.ParentID,
-			UserId:         o.UserID,
+			Id:             strconv.Itoa(int(o.ID)),
+			ParentId:       strconv.Itoa(int(o.ParentID)),
+			UserId:         strconv.Itoa(int(o.UserID)),
 			OrderNo:        o.OrderNo,
 			Type:           int32(o.Type),
-			Quantity:       o.Quantity,
-			Price:          o.Price,
-			Amount:         o.Amount,
+			Quantity:       int32(o.Quantity),
+			Price:          int32(o.Price),
+			Amount:         int32(o.Amount),
 			GiftAmount:     0, // Field doesn't exist in schema
-			Discount:       o.Discount,
+			Discount:       int32(o.Discount),
 			Coupon:         o.Coupon,
-			CouponDiscount: o.CouponDiscount,
-			Commission:     o.Commission,
-			PaymentId:      o.PaymentID,
+			CouponDiscount: int32(o.CouponDiscount),
+			Commission:     int32(o.Commission),
+			PaymentId:      strconv.Itoa(int(o.PaymentID)),
 			Method:         o.Method,
-			FeeAmount:      o.FeeAmount,
+			FeeAmount:      int32(o.FeeAmount),
 			TradeNo:        o.TradeNo,
 			Status:         int32(o.Status),
-			SubscribeId:    o.SubscribeID,
-			SubscribeToken: "", // Field doesn't exist in schema
+			SubscribeId:    strconv.Itoa(int(o.SubscribeID)),
+			SubscribeToken: "",    // Field doesn't exist in schema
 			IsNew:          false, // Field doesn't exist in schema
-			CreatedAt:      o.CreatedAt.Unix(),
-			UpdatedAt:      o.UpdatedAt.Unix(),
+			CreatedAt:      strconv.FormatInt(o.CreatedAt.UnixMilli(), 10),
+			UpdatedAt:      strconv.FormatInt(o.UpdatedAt.UnixMilli(), 10),
 		}
 		items = append(items, item)
 	}
@@ -132,7 +146,7 @@ func (s *OrderService) GetOrderList(ctx context.Context, req *v1.GetOrderListReq
 		Message: responsecode.CodeMessages[responsecode.AdminGetOrderListSuccess],
 		Data: &v1.GetOrderListData{
 			List:  items,
-			Total: total,
+			Total: int32(total),
 		},
 	}, nil
 }

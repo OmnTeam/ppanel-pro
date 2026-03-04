@@ -52,9 +52,9 @@ func (h *SendEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) er
 	}
 
 	// Load email config from ProxySystem table based on tenant ID
-	emailConfig, err := h.loadEmailConfig(ctx, payload.TenantID)
+	emailConfig, err := h.loadEmailConfig(ctx)
 	if err != nil {
-		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Load email config failed for tenantID %d: %v", payload.TenantID, err)
+		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Load email config failed: %v", err)
 		return nil
 	}
 
@@ -68,9 +68,9 @@ func (h *SendEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) er
 	}
 
 	// Load site config from database
-	siteConfig, err := h.loadSiteConfig(ctx, payload.TenantID)
+	siteConfig, err := h.loadSiteConfig(ctx)
 	if err != nil {
-		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Load site config failed for tenantID %d: %v", payload.TenantID, err)
+		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Load site config failed: %v", err)
 		h.logMessage(ctx, &messageLog)
 		return nil
 	}
@@ -214,7 +214,7 @@ func (h *SendEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) er
 }
 
 // loadEmailConfig loads email configuration from ProxySystem table based on tenant ID
-func (h *SendEmailHandler) loadEmailConfig(ctx context.Context, tenantID int64) (*SendEmailSystemConfig, error) {
+func (h *SendEmailHandler) loadEmailConfig(ctx context.Context) (*SendEmailSystemConfig, error) {
 	// Query email config from ProxySystem table
 	// Category: "email", Key: "config"
 	config, err := h.db.ProxySystem.Query().
@@ -226,16 +226,16 @@ func (h *SendEmailHandler) loadEmailConfig(ctx context.Context, tenantID int64) 
 
 	if err != nil {
 		if ent.IsNotFound(err) {
-			h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Email config not found for tenantID: %d, category: email, key: config", tenantID)
-			return nil, fmt.Errorf("email config not found for tenant %d", tenantID)
+			h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Email config not found, category: email, key: config")
+			return nil, fmt.Errorf("email config not found")
 		}
-		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to query email config for tenantID: %d, error: %v", tenantID, err)
+		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to query email config, error: %v", err)
 		return nil, err
 	}
 
 	var emailConfig SendEmailSystemConfig
 	if err := json.Unmarshal([]byte(config.Value), &emailConfig); err != nil {
-		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to unmarshal email config for tenantID: %d, error: %v", tenantID, err)
+		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to unmarshal email config, error: %v", err)
 		return nil, err
 	}
 
@@ -248,7 +248,7 @@ type SendEmailSiteConfig struct {
 }
 
 // loadSiteConfig loads site configuration from ProxySystem table
-func (h *SendEmailHandler) loadSiteConfig(ctx context.Context, tenantID int64) (*SendEmailSiteConfig, error) {
+func (h *SendEmailHandler) loadSiteConfig(ctx context.Context) (*SendEmailSiteConfig, error) {
 	// Query site config from ProxySystem table
 	// Category: "site", Key: "config"
 	config, err := h.db.ProxySystem.Query().
@@ -260,16 +260,16 @@ func (h *SendEmailHandler) loadSiteConfig(ctx context.Context, tenantID int64) (
 
 	if err != nil {
 		if ent.IsNotFound(err) {
-			h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Site config not found for tenantID: %d, category: site, key: config", tenantID)
-			return nil, fmt.Errorf("site config not found for tenant %d", tenantID)
+			h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Site config not found, category: site, key: config")
+			return nil, fmt.Errorf("site config not found")
 		}
-		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to query site config for tenantID: %d, error: %v", tenantID, err)
+		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to query site config, error: %v", err)
 		return nil, err
 	}
 
 	var siteConfig SendEmailSiteConfig
 	if err := json.Unmarshal([]byte(config.Value), &siteConfig); err != nil {
-		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to unmarshal site config for tenantID: %d, error: %v", tenantID, err)
+		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to unmarshal site config, error: %v", err)
 		return nil, err
 	}
 

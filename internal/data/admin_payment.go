@@ -44,7 +44,7 @@ func (r *adminPaymentRepo) Create(ctx context.Context, method *paymentbiz.Paymen
 		SetConfig(method.Config).
 		SetFeeMode(int(method.FeeMode)).
 		SetFeePercent(float64(method.FeePercent)).
-		SetFeeAmount(method.FeeAmount).
+		SetFeeAmount(int(method.FeeAmount)).
 		SetEnable(method.Enable).
 		SetToken(token).
 		Save(ctx)
@@ -63,7 +63,7 @@ func (r *adminPaymentRepo) Create(ctx context.Context, method *paymentbiz.Paymen
 		Config:      created.Config,
 		FeeMode:     int32(created.FeeMode),
 		FeePercent:  int64(created.FeePercent),
-		FeeAmount:   created.FeeAmount,
+		FeeAmount:   int64(created.FeeAmount),
 		Enable:      created.Enable,
 		Token:       created.Token,
 		NotifyURL:   notifyURL,
@@ -76,7 +76,7 @@ func (r *adminPaymentRepo) Update(ctx context.Context, method *paymentbiz.Paymen
 	original, err := r.data.db.ProxyPayment.
 		Query().
 		Where(
-			proxypayment.ID(int(method.ID)),
+			proxypayment.ID(method.ID),
 		).
 		Only(ctx)
 
@@ -100,7 +100,7 @@ func (r *adminPaymentRepo) Update(ctx context.Context, method *paymentbiz.Paymen
 		SetConfig(method.Config).
 		SetFeeMode(int(method.FeeMode)).
 		SetFeePercent(float64(method.FeePercent)).
-		SetFeeAmount(method.FeeAmount).
+		SetFeeAmount(int(method.FeeAmount)).
 		SetEnable(method.Enable).
 		Save(ctx)
 
@@ -118,7 +118,7 @@ func (r *adminPaymentRepo) Update(ctx context.Context, method *paymentbiz.Paymen
 		Config:      updated.Config,
 		FeeMode:     int32(updated.FeeMode),
 		FeePercent:  int64(updated.FeePercent),
-		FeeAmount:   updated.FeeAmount,
+		FeeAmount:   int64(updated.FeeAmount),
 		Enable:      updated.Enable,
 		Token:       updated.Token,
 		NotifyURL:   notifyURL,
@@ -126,11 +126,11 @@ func (r *adminPaymentRepo) Update(ctx context.Context, method *paymentbiz.Paymen
 }
 
 // Delete 删除支付方式
-func (r *adminPaymentRepo) Delete(ctx context.Context, id int64) error {
+func (r *adminPaymentRepo) Delete(ctx context.Context, id int) error {
 	result, err := r.data.db.ProxyPayment.
 		Delete().
 		Where(
-			proxypayment.ID(int(id)),
+			proxypayment.ID(int64(id)),
 		).
 		Exec(ctx)
 
@@ -146,11 +146,11 @@ func (r *adminPaymentRepo) Delete(ctx context.Context, id int64) error {
 }
 
 // Get 获取支付方式详情
-func (r *adminPaymentRepo) Get(ctx context.Context, id int64) (*paymentbiz.PaymentMethod, error) {
+func (r *adminPaymentRepo) Get(ctx context.Context, id int) (*paymentbiz.PaymentMethod, error) {
 	payment, err := r.data.db.ProxyPayment.
 		Query().
 		Where(
-			proxypayment.ID(int(id)),
+			proxypayment.ID(int64(id)),
 		).
 		Only(ctx)
 
@@ -174,7 +174,7 @@ func (r *adminPaymentRepo) Get(ctx context.Context, id int64) (*paymentbiz.Payme
 		Config:      payment.Config,
 		FeeMode:     int32(payment.FeeMode),
 		FeePercent:  int64(payment.FeePercent),
-		FeeAmount:   payment.FeeAmount,
+		FeeAmount:   int64(payment.FeeAmount),
 		Enable:      payment.Enable,
 		Token:       payment.Token,
 		NotifyURL:   notifyURL,
@@ -182,10 +182,10 @@ func (r *adminPaymentRepo) Get(ctx context.Context, id int64) (*paymentbiz.Payme
 }
 
 // List 获取支付方式列表
-func (r *adminPaymentRepo) List(ctx context.Context, page, size int64, platform, search string, enable *bool) (int64, []*paymentbiz.PaymentMethod, error) {
+func (r *adminPaymentRepo) List(ctx context.Context, page, size int, platform, search string, enable *bool) (int64, []*paymentbiz.PaymentMethod, error) {
 	query := r.data.db.ProxyPayment.
 		Query()
-		
+
 	// 平台筛选
 	if platform != "" {
 		query = query.Where(proxypayment.Platform(platform))
@@ -238,7 +238,7 @@ func (r *adminPaymentRepo) List(ctx context.Context, page, size int64, platform,
 			Config:      p.Config,
 			FeeMode:     int32(p.FeeMode),
 			FeePercent:  int64(p.FeePercent),
-			FeeAmount:   p.FeeAmount,
+			FeeAmount:   int64(p.FeeAmount),
 			Enable:      p.Enable,
 			Token:       p.Token,
 			NotifyURL:   notifyURL,

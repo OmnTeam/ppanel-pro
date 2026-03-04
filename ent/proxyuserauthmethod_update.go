@@ -29,14 +29,14 @@ func (_u *ProxyUserAuthMethodUpdate) Where(ps ...predicate.ProxyUserAuthMethod) 
 }
 
 // SetUserID sets the "user_id" field.
-func (_u *ProxyUserAuthMethodUpdate) SetUserID(v int) *ProxyUserAuthMethodUpdate {
+func (_u *ProxyUserAuthMethodUpdate) SetUserID(v int64) *ProxyUserAuthMethodUpdate {
 	_u.mutation.ResetUserID()
 	_u.mutation.SetUserID(v)
 	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (_u *ProxyUserAuthMethodUpdate) SetNillableUserID(v *int) *ProxyUserAuthMethodUpdate {
+func (_u *ProxyUserAuthMethodUpdate) SetNillableUserID(v *int64) *ProxyUserAuthMethodUpdate {
 	if v != nil {
 		_u.SetUserID(*v)
 	}
@@ -44,7 +44,7 @@ func (_u *ProxyUserAuthMethodUpdate) SetNillableUserID(v *int) *ProxyUserAuthMet
 }
 
 // AddUserID adds value to the "user_id" field.
-func (_u *ProxyUserAuthMethodUpdate) AddUserID(v int) *ProxyUserAuthMethodUpdate {
+func (_u *ProxyUserAuthMethodUpdate) AddUserID(v int64) *ProxyUserAuthMethodUpdate {
 	_u.mutation.AddUserID(v)
 	return _u
 }
@@ -178,7 +178,7 @@ func (_u *ProxyUserAuthMethodUpdate) sqlSave(ctx context.Context) (_node int, er
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyuserauthmethod.Table, proxyuserauthmethod.Columns, sqlgraph.NewFieldSpec(proxyuserauthmethod.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyuserauthmethod.Table, proxyuserauthmethod.Columns, sqlgraph.NewFieldSpec(proxyuserauthmethod.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -187,10 +187,10 @@ func (_u *ProxyUserAuthMethodUpdate) sqlSave(ctx context.Context) (_node int, er
 		}
 	}
 	if value, ok := _u.mutation.UserID(); ok {
-		_spec.SetField(proxyuserauthmethod.FieldUserID, field.TypeInt, value)
+		_spec.SetField(proxyuserauthmethod.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedUserID(); ok {
-		_spec.AddField(proxyuserauthmethod.FieldUserID, field.TypeInt, value)
+		_spec.AddField(proxyuserauthmethod.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.TenantID(); ok {
 		_spec.SetField(proxyuserauthmethod.FieldTenantID, field.TypeInt64, value)
@@ -231,14 +231,14 @@ type ProxyUserAuthMethodUpdateOne struct {
 }
 
 // SetUserID sets the "user_id" field.
-func (_u *ProxyUserAuthMethodUpdateOne) SetUserID(v int) *ProxyUserAuthMethodUpdateOne {
+func (_u *ProxyUserAuthMethodUpdateOne) SetUserID(v int64) *ProxyUserAuthMethodUpdateOne {
 	_u.mutation.ResetUserID()
 	_u.mutation.SetUserID(v)
 	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (_u *ProxyUserAuthMethodUpdateOne) SetNillableUserID(v *int) *ProxyUserAuthMethodUpdateOne {
+func (_u *ProxyUserAuthMethodUpdateOne) SetNillableUserID(v *int64) *ProxyUserAuthMethodUpdateOne {
 	if v != nil {
 		_u.SetUserID(*v)
 	}
@@ -246,7 +246,7 @@ func (_u *ProxyUserAuthMethodUpdateOne) SetNillableUserID(v *int) *ProxyUserAuth
 }
 
 // AddUserID adds value to the "user_id" field.
-func (_u *ProxyUserAuthMethodUpdateOne) AddUserID(v int) *ProxyUserAuthMethodUpdateOne {
+func (_u *ProxyUserAuthMethodUpdateOne) AddUserID(v int64) *ProxyUserAuthMethodUpdateOne {
 	_u.mutation.AddUserID(v)
 	return _u
 }
@@ -393,7 +393,7 @@ func (_u *ProxyUserAuthMethodUpdateOne) sqlSave(ctx context.Context) (_node *Pro
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyuserauthmethod.Table, proxyuserauthmethod.Columns, sqlgraph.NewFieldSpec(proxyuserauthmethod.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyuserauthmethod.Table, proxyuserauthmethod.Columns, sqlgraph.NewFieldSpec(proxyuserauthmethod.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProxyUserAuthMethod.id" for update`)}
@@ -419,10 +419,10 @@ func (_u *ProxyUserAuthMethodUpdateOne) sqlSave(ctx context.Context) (_node *Pro
 		}
 	}
 	if value, ok := _u.mutation.UserID(); ok {
-		_spec.SetField(proxyuserauthmethod.FieldUserID, field.TypeInt, value)
+		_spec.SetField(proxyuserauthmethod.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedUserID(); ok {
-		_spec.AddField(proxyuserauthmethod.FieldUserID, field.TypeInt, value)
+		_spec.AddField(proxyuserauthmethod.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.TenantID(); ok {
 		_spec.SetField(proxyuserauthmethod.FieldTenantID, field.TypeInt64, value)

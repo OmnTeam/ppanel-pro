@@ -82,8 +82,8 @@ func (_q *ProxyServerQuery) FirstX(ctx context.Context) *ProxyServer {
 
 // FirstID returns the first ProxyServer ID from the query.
 // Returns a *NotFoundError when no ProxyServer ID was found.
-func (_q *ProxyServerQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *ProxyServerQuery) FirstID(ctx context.Context) (id int64, err error) {
+	var ids []int64
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -95,7 +95,7 @@ func (_q *ProxyServerQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *ProxyServerQuery) FirstIDX(ctx context.Context) int {
+func (_q *ProxyServerQuery) FirstIDX(ctx context.Context) int64 {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -133,8 +133,8 @@ func (_q *ProxyServerQuery) OnlyX(ctx context.Context) *ProxyServer {
 // OnlyID is like Only, but returns the only ProxyServer ID in the query.
 // Returns a *NotSingularError when more than one ProxyServer ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *ProxyServerQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *ProxyServerQuery) OnlyID(ctx context.Context) (id int64, err error) {
+	var ids []int64
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -150,7 +150,7 @@ func (_q *ProxyServerQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *ProxyServerQuery) OnlyIDX(ctx context.Context) int {
+func (_q *ProxyServerQuery) OnlyIDX(ctx context.Context) int64 {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -178,7 +178,7 @@ func (_q *ProxyServerQuery) AllX(ctx context.Context) []*ProxyServer {
 }
 
 // IDs executes the query and returns a list of ProxyServer IDs.
-func (_q *ProxyServerQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (_q *ProxyServerQuery) IDs(ctx context.Context) (ids []int64, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
@@ -190,7 +190,7 @@ func (_q *ProxyServerQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *ProxyServerQuery) IDsX(ctx context.Context) []int {
+func (_q *ProxyServerQuery) IDsX(ctx context.Context) []int64 {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -262,12 +262,12 @@ func (_q *ProxyServerQuery) Clone() *ProxyServerQuery {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		TenantID int64 `json:"tenant_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ProxyServer.Query().
-//		GroupBy(proxyserver.FieldName).
+//		GroupBy(proxyserver.FieldTenantID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *ProxyServerQuery) GroupBy(field string, fields ...string) *ProxyServerGroupBy {
@@ -285,11 +285,11 @@ func (_q *ProxyServerQuery) GroupBy(field string, fields ...string) *ProxyServer
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		TenantID int64 `json:"tenant_id,omitempty"`
 //	}
 //
 //	client.ProxyServer.Query().
-//		Select(proxyserver.FieldName).
+//		Select(proxyserver.FieldTenantID).
 //		Scan(ctx, &v)
 func (_q *ProxyServerQuery) Select(fields ...string) *ProxyServerSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
@@ -365,7 +365,7 @@ func (_q *ProxyServerQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (_q *ProxyServerQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(proxyserver.Table, proxyserver.Columns, sqlgraph.NewFieldSpec(proxyserver.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(proxyserver.Table, proxyserver.Columns, sqlgraph.NewFieldSpec(proxyserver.FieldID, field.TypeInt64))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

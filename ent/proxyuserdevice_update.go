@@ -29,14 +29,14 @@ func (_u *ProxyUserDeviceUpdate) Where(ps ...predicate.ProxyUserDevice) *ProxyUs
 }
 
 // SetUserID sets the "user_id" field.
-func (_u *ProxyUserDeviceUpdate) SetUserID(v int) *ProxyUserDeviceUpdate {
+func (_u *ProxyUserDeviceUpdate) SetUserID(v int64) *ProxyUserDeviceUpdate {
 	_u.mutation.ResetUserID()
 	_u.mutation.SetUserID(v)
 	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (_u *ProxyUserDeviceUpdate) SetNillableUserID(v *int) *ProxyUserDeviceUpdate {
+func (_u *ProxyUserDeviceUpdate) SetNillableUserID(v *int64) *ProxyUserDeviceUpdate {
 	if v != nil {
 		_u.SetUserID(*v)
 	}
@@ -44,20 +44,20 @@ func (_u *ProxyUserDeviceUpdate) SetNillableUserID(v *int) *ProxyUserDeviceUpdat
 }
 
 // AddUserID adds value to the "user_id" field.
-func (_u *ProxyUserDeviceUpdate) AddUserID(v int) *ProxyUserDeviceUpdate {
+func (_u *ProxyUserDeviceUpdate) AddUserID(v int64) *ProxyUserDeviceUpdate {
 	_u.mutation.AddUserID(v)
 	return _u
 }
 
 // SetSubscribeID sets the "subscribe_id" field.
-func (_u *ProxyUserDeviceUpdate) SetSubscribeID(v int) *ProxyUserDeviceUpdate {
+func (_u *ProxyUserDeviceUpdate) SetSubscribeID(v int64) *ProxyUserDeviceUpdate {
 	_u.mutation.ResetSubscribeID()
 	_u.mutation.SetSubscribeID(v)
 	return _u
 }
 
 // SetNillableSubscribeID sets the "subscribe_id" field if the given value is not nil.
-func (_u *ProxyUserDeviceUpdate) SetNillableSubscribeID(v *int) *ProxyUserDeviceUpdate {
+func (_u *ProxyUserDeviceUpdate) SetNillableSubscribeID(v *int64) *ProxyUserDeviceUpdate {
 	if v != nil {
 		_u.SetSubscribeID(*v)
 	}
@@ -65,7 +65,7 @@ func (_u *ProxyUserDeviceUpdate) SetNillableSubscribeID(v *int) *ProxyUserDevice
 }
 
 // AddSubscribeID adds value to the "subscribe_id" field.
-func (_u *ProxyUserDeviceUpdate) AddSubscribeID(v int) *ProxyUserDeviceUpdate {
+func (_u *ProxyUserDeviceUpdate) AddSubscribeID(v int64) *ProxyUserDeviceUpdate {
 	_u.mutation.AddSubscribeID(v)
 	return _u
 }
@@ -235,7 +235,7 @@ func (_u *ProxyUserDeviceUpdate) sqlSave(ctx context.Context) (_node int, err er
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyuserdevice.Table, proxyuserdevice.Columns, sqlgraph.NewFieldSpec(proxyuserdevice.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyuserdevice.Table, proxyuserdevice.Columns, sqlgraph.NewFieldSpec(proxyuserdevice.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -244,19 +244,19 @@ func (_u *ProxyUserDeviceUpdate) sqlSave(ctx context.Context) (_node int, err er
 		}
 	}
 	if value, ok := _u.mutation.UserID(); ok {
-		_spec.SetField(proxyuserdevice.FieldUserID, field.TypeInt, value)
+		_spec.SetField(proxyuserdevice.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedUserID(); ok {
-		_spec.AddField(proxyuserdevice.FieldUserID, field.TypeInt, value)
+		_spec.AddField(proxyuserdevice.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.SubscribeID(); ok {
-		_spec.SetField(proxyuserdevice.FieldSubscribeID, field.TypeInt, value)
+		_spec.SetField(proxyuserdevice.FieldSubscribeID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedSubscribeID(); ok {
-		_spec.AddField(proxyuserdevice.FieldSubscribeID, field.TypeInt, value)
+		_spec.AddField(proxyuserdevice.FieldSubscribeID, field.TypeInt64, value)
 	}
 	if _u.mutation.SubscribeIDCleared() {
-		_spec.ClearField(proxyuserdevice.FieldSubscribeID, field.TypeInt)
+		_spec.ClearField(proxyuserdevice.FieldSubscribeID, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.IP(); ok {
 		_spec.SetField(proxyuserdevice.FieldIP, field.TypeString, value)
@@ -306,14 +306,14 @@ type ProxyUserDeviceUpdateOne struct {
 }
 
 // SetUserID sets the "user_id" field.
-func (_u *ProxyUserDeviceUpdateOne) SetUserID(v int) *ProxyUserDeviceUpdateOne {
+func (_u *ProxyUserDeviceUpdateOne) SetUserID(v int64) *ProxyUserDeviceUpdateOne {
 	_u.mutation.ResetUserID()
 	_u.mutation.SetUserID(v)
 	return _u
 }
 
 // SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (_u *ProxyUserDeviceUpdateOne) SetNillableUserID(v *int) *ProxyUserDeviceUpdateOne {
+func (_u *ProxyUserDeviceUpdateOne) SetNillableUserID(v *int64) *ProxyUserDeviceUpdateOne {
 	if v != nil {
 		_u.SetUserID(*v)
 	}
@@ -321,20 +321,20 @@ func (_u *ProxyUserDeviceUpdateOne) SetNillableUserID(v *int) *ProxyUserDeviceUp
 }
 
 // AddUserID adds value to the "user_id" field.
-func (_u *ProxyUserDeviceUpdateOne) AddUserID(v int) *ProxyUserDeviceUpdateOne {
+func (_u *ProxyUserDeviceUpdateOne) AddUserID(v int64) *ProxyUserDeviceUpdateOne {
 	_u.mutation.AddUserID(v)
 	return _u
 }
 
 // SetSubscribeID sets the "subscribe_id" field.
-func (_u *ProxyUserDeviceUpdateOne) SetSubscribeID(v int) *ProxyUserDeviceUpdateOne {
+func (_u *ProxyUserDeviceUpdateOne) SetSubscribeID(v int64) *ProxyUserDeviceUpdateOne {
 	_u.mutation.ResetSubscribeID()
 	_u.mutation.SetSubscribeID(v)
 	return _u
 }
 
 // SetNillableSubscribeID sets the "subscribe_id" field if the given value is not nil.
-func (_u *ProxyUserDeviceUpdateOne) SetNillableSubscribeID(v *int) *ProxyUserDeviceUpdateOne {
+func (_u *ProxyUserDeviceUpdateOne) SetNillableSubscribeID(v *int64) *ProxyUserDeviceUpdateOne {
 	if v != nil {
 		_u.SetSubscribeID(*v)
 	}
@@ -342,7 +342,7 @@ func (_u *ProxyUserDeviceUpdateOne) SetNillableSubscribeID(v *int) *ProxyUserDev
 }
 
 // AddSubscribeID adds value to the "subscribe_id" field.
-func (_u *ProxyUserDeviceUpdateOne) AddSubscribeID(v int) *ProxyUserDeviceUpdateOne {
+func (_u *ProxyUserDeviceUpdateOne) AddSubscribeID(v int64) *ProxyUserDeviceUpdateOne {
 	_u.mutation.AddSubscribeID(v)
 	return _u
 }
@@ -525,7 +525,7 @@ func (_u *ProxyUserDeviceUpdateOne) sqlSave(ctx context.Context) (_node *ProxyUs
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyuserdevice.Table, proxyuserdevice.Columns, sqlgraph.NewFieldSpec(proxyuserdevice.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyuserdevice.Table, proxyuserdevice.Columns, sqlgraph.NewFieldSpec(proxyuserdevice.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProxyUserDevice.id" for update`)}
@@ -551,19 +551,19 @@ func (_u *ProxyUserDeviceUpdateOne) sqlSave(ctx context.Context) (_node *ProxyUs
 		}
 	}
 	if value, ok := _u.mutation.UserID(); ok {
-		_spec.SetField(proxyuserdevice.FieldUserID, field.TypeInt, value)
+		_spec.SetField(proxyuserdevice.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedUserID(); ok {
-		_spec.AddField(proxyuserdevice.FieldUserID, field.TypeInt, value)
+		_spec.AddField(proxyuserdevice.FieldUserID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.SubscribeID(); ok {
-		_spec.SetField(proxyuserdevice.FieldSubscribeID, field.TypeInt, value)
+		_spec.SetField(proxyuserdevice.FieldSubscribeID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedSubscribeID(); ok {
-		_spec.AddField(proxyuserdevice.FieldSubscribeID, field.TypeInt, value)
+		_spec.AddField(proxyuserdevice.FieldSubscribeID, field.TypeInt64, value)
 	}
 	if _u.mutation.SubscribeIDCleared() {
-		_spec.ClearField(proxyuserdevice.FieldSubscribeID, field.TypeInt)
+		_spec.ClearField(proxyuserdevice.FieldSubscribeID, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.IP(); ok {
 		_spec.SetField(proxyuserdevice.FieldIP, field.TypeString, value)

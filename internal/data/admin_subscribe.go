@@ -8,6 +8,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribe"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribegroup"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/subscribe"
 	"github.com/OmnTeam/ppanel-pro/internal/model"
 )
@@ -38,19 +39,19 @@ func (r *subscribeRepo) CreateSubscribe(ctx context.Context, sub *model.Subscrib
 		SetUnitPrice(sub.UnitPrice).
 		SetUnitTime(sub.UnitTime).
 		SetDiscount(sub.Discount).
-		SetReplacement(int(sub.Replacement)).
-		SetInventory(int(sub.Inventory)).
+		SetReplacement(sub.Replacement).
+		SetInventory(sub.Inventory).
 		SetTraffic(sub.Traffic).
-		SetSpeedLimit(int(sub.SpeedLimit)).
-		SetDeviceLimit(int(sub.DeviceLimit)).
-		SetQuota(int(sub.Quota)).
+		SetSpeedLimit(sub.SpeedLimit).
+		SetDeviceLimit(sub.DeviceLimit).
+		SetQuota(sub.Quota).
 		SetNodes(sub.Nodes).
 		SetNodeTags(sub.NodeTags).
 		SetShow(sub.Show).
 		SetSell(sub.Sell).
-		SetDeductionRatio(float64(sub.DeductionRatio)).
+		SetDeductionRatio(sub.DeductionRatio).
 		SetAllowDeduction(sub.AllowDeduction).
-		SetResetCycle(int(sub.ResetCycle)).
+		SetResetCycle(sub.ResetCycle).
 		SetRenewalReset(sub.RenewalReset).
 		Save(ctx)
 
@@ -58,44 +59,44 @@ func (r *subscribeRepo) CreateSubscribe(ctx context.Context, sub *model.Subscrib
 }
 
 // GetSubscribeByID get subscribe by ID
-func (r *subscribeRepo) GetSubscribeByID(ctx context.Context, id int64) (*ent.ProxySubscribe, error) {
+func (r *subscribeRepo) GetSubscribeByID(ctx context.Context, id int) (*ent.ProxySubscribe, error) {
 	return r.data.db.ProxySubscribe.Query().
-		Where(proxysubscribe.ID(int(id))).
+		Where(proxysubscribe.ID(int64(id))).
 		Only(ctx)
 }
 
 // UpdateSubscribe update subscribe
 func (r *subscribeRepo) UpdateSubscribe(ctx context.Context, sub *model.Subscribe) error {
 	return r.data.db.ProxySubscribe.Update().
-		Where(proxysubscribe.ID(int(sub.ID))).
+		Where(proxysubscribe.ID(sub.ID)).
 		SetName(sub.Name).
 		SetLanguage(sub.Language).
 		SetDescription(sub.Description).
 		SetUnitPrice(sub.UnitPrice).
 		SetUnitTime(sub.UnitTime).
 		SetDiscount(sub.Discount).
-		SetReplacement(int(sub.Replacement)).
-		SetInventory(int(sub.Inventory)).
+		SetReplacement(sub.Replacement).
+		SetInventory(sub.Inventory).
 		SetTraffic(sub.Traffic).
-		SetSpeedLimit(int(sub.SpeedLimit)).
-		SetDeviceLimit(int(sub.DeviceLimit)).
-		SetQuota(int(sub.Quota)).
+		SetSpeedLimit(sub.SpeedLimit).
+		SetDeviceLimit(sub.DeviceLimit).
+		SetQuota(sub.Quota).
 		SetNodes(sub.Nodes).
 		SetNodeTags(sub.NodeTags).
 		SetShow(sub.Show).
 		SetSell(sub.Sell).
-		SetSort(int(sub.Sort)).
-		SetDeductionRatio(float64(sub.DeductionRatio)).
+		SetSort(sub.Sort).
+		SetDeductionRatio(sub.DeductionRatio).
 		SetAllowDeduction(sub.AllowDeduction).
-		SetResetCycle(int(sub.ResetCycle)).
+		SetResetCycle(sub.ResetCycle).
 		SetRenewalReset(sub.RenewalReset).
 		Exec(ctx)
 }
 
 // DeleteSubscribe delete subscribe
-func (r *subscribeRepo) DeleteSubscribe(ctx context.Context, id int64) error {
+func (r *subscribeRepo) DeleteSubscribe(ctx context.Context, id int) error {
 	_, err := r.data.db.ProxySubscribe.Delete().
-		Where(proxysubscribe.ID(int(id))).
+		Where(proxysubscribe.ID(int64(id))).
 		Exec(ctx)
 	return err
 }
@@ -114,12 +115,7 @@ func (r *subscribeRepo) GetSubscribeList(ctx context.Context, req *model.Subscri
 	}
 
 	if len(req.IDs) > 0 {
-		// Convert int64 IDs to int for the query
-		ids := make([]int, len(req.IDs))
-		for i, id := range req.IDs {
-			ids[i] = int(id)
-		}
-		query = query.Where(proxysubscribe.IDIn(ids...))
+		query = query.Where(proxysubscribe.IDIn(req.IDs...))
 	}
 
 	// Get total count
@@ -144,7 +140,7 @@ func (r *subscribeRepo) GetSubscribeList(ctx context.Context, req *model.Subscri
 }
 
 // CheckSubscribeInUse check if subscribe is being used by active user subscriptions
-func (r *subscribeRepo) CheckSubscribeInUse(ctx context.Context, subscribeID int64) (bool, error) {
+func (r *subscribeRepo) CheckSubscribeInUse(ctx context.Context, subscribeID int) (bool, error) {
 	// Query user_subscribe table to check if there are active subscriptions
 	// Note: This assumes user_subscribe table exists and has tenant_id, subscribe_id, and status fields
 	// Status 1 means active subscription
@@ -156,29 +152,27 @@ func (r *subscribeRepo) CheckSubscribeInUse(ctx context.Context, subscribeID int
 }
 
 // BatchDeleteSubscribe batch delete subscribes
-func (r *subscribeRepo) BatchDeleteSubscribe(ctx context.Context, ids []int64) error {
-	// Convert int64 IDs to int for the query
-	intIDs := make([]int, len(ids))
+func (r *subscribeRepo) BatchDeleteSubscribe(ctx context.Context, ids []int) error {
+	// Convert []int to []int64 for the query
+	int64IDs := make([]int64, len(ids))
 	for i, id := range ids {
-		intIDs[i] = int(id)
+		int64IDs[i] = int64(id)
 	}
-
 	_, err := r.data.db.ProxySubscribe.Delete().
-		Where(proxysubscribe.IDIn(intIDs...)).
+		Where(proxysubscribe.IDIn(int64IDs...)).
 		Exec(ctx)
 	return err
 }
 
 // GetSubscribeMinSort get minimum sort value for given IDs
-func (r *subscribeRepo) GetSubscribeMinSort(ctx context.Context, ids []int64) (int64, error) {
-	// Convert int64 IDs to int for the query
-	intIDs := make([]int, len(ids))
+func (r *subscribeRepo) GetSubscribeMinSort(ctx context.Context, ids []int) (int64, error) {
+	// Convert []int to []int64 for the query
+	int64IDs := make([]int64, len(ids))
 	for i, id := range ids {
-		intIDs[i] = int(id)
+		int64IDs[i] = int64(id)
 	}
-
 	subscribes, err := r.data.db.ProxySubscribe.Query().
-		Where(proxysubscribe.IDIn(intIDs...)).
+		Where(proxysubscribe.IDIn(int64IDs...)).
 		Order(ent.Asc(proxysubscribe.FieldSort)).
 		Limit(1).
 		All(ctx)
@@ -227,25 +221,25 @@ func (r *subscribeRepo) CreateSubscribeGroup(ctx context.Context, group *model.S
 }
 
 // GetSubscribeGroupByID get subscribe group by ID
-func (r *subscribeRepo) GetSubscribeGroupByID(ctx context.Context, id int64) (*ent.ProxySubscribeGroup, error) {
+func (r *subscribeRepo) GetSubscribeGroupByID(ctx context.Context, id int) (*ent.ProxySubscribeGroup, error) {
 	return r.data.db.ProxySubscribeGroup.Query().
-		Where(proxysubscribegroup.ID(int(id))).
+		Where(proxysubscribegroup.ID(int64(id))).
 		Only(ctx)
 }
 
 // UpdateSubscribeGroup update subscribe group
 func (r *subscribeRepo) UpdateSubscribeGroup(ctx context.Context, group *model.SubscribeGroup) error {
 	return r.data.db.ProxySubscribeGroup.Update().
-		Where(proxysubscribegroup.ID(int(group.ID))).
+		Where(proxysubscribegroup.ID(group.ID)).
 		SetName(group.Name).
 		SetDescription(group.Description).
 		Exec(ctx)
 }
 
 // DeleteSubscribeGroup delete subscribe group
-func (r *subscribeRepo) DeleteSubscribeGroup(ctx context.Context, id int64) error {
+func (r *subscribeRepo) DeleteSubscribeGroup(ctx context.Context, id int) error {
 	_, err := r.data.db.ProxySubscribeGroup.Delete().
-		Where(proxysubscribegroup.ID(int(id))).
+		Where(proxysubscribegroup.ID(int64(id))).
 		Exec(ctx)
 	return err
 }
@@ -263,15 +257,14 @@ func (r *subscribeRepo) GetSubscribeGroupList(ctx context.Context) ([]*ent.Proxy
 }
 
 // BatchDeleteSubscribeGroup batch delete subscribe groups
-func (r *subscribeRepo) BatchDeleteSubscribeGroup(ctx context.Context, ids []int64) error {
-	// Convert int64 IDs to int for the query
-	intIDs := make([]int, len(ids))
+func (r *subscribeRepo) BatchDeleteSubscribeGroup(ctx context.Context, ids []int) error {
+	// Convert []int to []int64 for the query
+	int64IDs := make([]int64, len(ids))
 	for i, id := range ids {
-		intIDs[i] = int(id)
+		int64IDs[i] = int64(id)
 	}
-
 	_, err := r.data.db.ProxySubscribeGroup.Delete().
-		Where(proxysubscribegroup.IDIn(intIDs...)).
+		Where(proxysubscribegroup.IDIn(int64IDs...)).
 		Exec(ctx)
 	return err
 }
@@ -279,21 +272,41 @@ func (r *subscribeRepo) BatchDeleteSubscribeGroup(ctx context.Context, ids []int
 // ==================== User Subscription Operations ====================
 
 // GetActiveUserSubscriptionCount get active user subscription count for a subscribe
-func (r *subscribeRepo) GetActiveUserSubscriptionCount(ctx context.Context, subscribeID int64) (int64, error) {
-	// TODO: Query user_subscribe table
-	// This requires integration with user service or user_subscribe table
-	// For now, return 0
-	return 0, nil
+func (r *subscribeRepo) GetActiveUserSubscriptionCount(ctx context.Context, subscribeID int) (int64, error) {
+	// 查询ProxyUserSubscribe表，统计该订阅套餐的活跃用户数
+	// 活跃订阅：status=1（激活状态）
+	status := int8(1) // 激活状态
+	count, err := r.data.db.ProxyUserSubscribe.Query().
+		Where(
+			proxyusersubscribe.SubscribeIDEQ(int64(subscribeID)),
+			proxyusersubscribe.StatusEQ(status),
+		).
+		Count(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return int64(count), nil
 }
 
 // GetActiveUserSubscriptionCountByIDs get active user subscription counts for multiple subscribes
 func (r *subscribeRepo) GetActiveUserSubscriptionCountByIDs(ctx context.Context, subscribeIDs []int64) (map[int64]int64, error) {
-	// TODO: Query user_subscribe table
-	// This requires integration with user service or user_subscribe table
-	// For now, return empty map
+	// 查询ProxyUserSubscribe表，统计多个订阅套餐的活跃用户数
+	// 活跃订阅：status=1（激活状态）
 	result := make(map[int64]int64)
+	status := int8(1) // 激活状态
+
+	// 为每个订阅套餐ID统计用户数
 	for _, id := range subscribeIDs {
-		result[id] = 0
+		count, err := r.data.db.ProxyUserSubscribe.Query().
+			Where(
+				proxyusersubscribe.SubscribeIDEQ(id),
+				proxyusersubscribe.StatusEQ(status),
+			).
+			Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		result[id] = int64(count)
 	}
 	return result, nil
 }

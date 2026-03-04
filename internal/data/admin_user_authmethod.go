@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -27,10 +28,16 @@ func NewAdminUserAuthMethodRepo(d *Data, logger log.Logger) userbiz.AuthMethodRe
 
 // CreateUserAuthMethod 创建用户认证方法（或更新已存在的）
 func (r *adminUserAuthMethodRepo) CreateUserAuthMethod(ctx context.Context, req *v1.CreateUserAuthMethodRequest) (int64, error) {
+	// Parse user ID
+	userID, err := strconv.ParseInt(req.UserId, 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
 	// 查询是否已存在该用户的该类型认证方法
 	existing, err := r.data.db.ProxyUserAuthMethod.Query().
 		Where(
-			proxyuserauthmethod.UserIDEQ(int(req.UserId)),
+			proxyuserauthmethod.UserIDEQ(userID),
 			proxyuserauthmethod.AuthTypeEQ(req.AuthType),
 		).
 		Only(ctx)
@@ -38,7 +45,7 @@ func (r *adminUserAuthMethodRepo) CreateUserAuthMethod(ctx context.Context, req 
 	// 如果不存在，创建新记录
 	if ent.IsNotFound(err) {
 		created, createErr := r.data.db.ProxyUserAuthMethod.Create().
-			SetUserID(int(req.UserId)).
+			SetUserID(userID).
 			SetAuthType(req.AuthType).
 			SetAuthIdentifier(req.AuthIdentifier).
 			SetVerified(req.Verified).
@@ -47,7 +54,7 @@ func (r *adminUserAuthMethodRepo) CreateUserAuthMethod(ctx context.Context, req 
 			r.logger.Errorf("Failed to create auth method: %v", createErr)
 			return 0, createErr
 		}
-		return int64(created.ID), nil
+		return created.ID, nil
 	}
 
 	if err != nil {
@@ -65,14 +72,14 @@ func (r *adminUserAuthMethodRepo) CreateUserAuthMethod(ctx context.Context, req 
 		return 0, updateErr
 	}
 
-	return int64(updated.ID), nil
+	return updated.ID, nil
 }
 
 // GetUserAuthMethod 获取用户认证方法列表
 func (r *adminUserAuthMethodRepo) GetUserAuthMethod(ctx context.Context, userID int64, authType string) ([]*ent.ProxyUserAuthMethod, error) {
 	query := r.data.db.ProxyUserAuthMethod.Query().
 		Where(
-			proxyuserauthmethod.UserIDEQ(int(userID)),
+			proxyuserauthmethod.UserIDEQ(userID),
 		)
 
 	// 如果指定了认证类型，添加过滤条件
@@ -91,10 +98,16 @@ func (r *adminUserAuthMethodRepo) GetUserAuthMethod(ctx context.Context, userID 
 
 // UpdateUserAuthMethod 更新用户认证方法
 func (r *adminUserAuthMethodRepo) UpdateUserAuthMethod(ctx context.Context, req *v1.UpdateUserAuthMethodRequest) error {
+	// Parse user ID
+	userID, err := strconv.ParseInt(req.UserId, 10, 64)
+	if err != nil {
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
 	// 查找要更新的认证方法
 	authMethod, err := r.data.db.ProxyUserAuthMethod.Query().
 		Where(
-			proxyuserauthmethod.UserIDEQ(int(req.UserId)),
+			proxyuserauthmethod.UserIDEQ(userID),
 			proxyuserauthmethod.AuthTypeEQ(req.AuthType),
 		).
 		Only(ctx)
@@ -124,7 +137,7 @@ func (r *adminUserAuthMethodRepo) UpdateUserAuthMethod(ctx context.Context, req 
 func (r *adminUserAuthMethodRepo) DeleteUserAuthMethod(ctx context.Context, userID int64, authType string) error {
 	deletedCount, err := r.data.db.ProxyUserAuthMethod.Delete().
 		Where(
-			proxyuserauthmethod.UserIDEQ(int(userID)),
+			proxyuserauthmethod.UserIDEQ(userID),
 			proxyuserauthmethod.AuthTypeEQ(authType),
 		).
 		Exec(ctx)

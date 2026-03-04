@@ -45,7 +45,7 @@ func (r *adminDocumentRepo) Create(ctx context.Context, doc *documentbiz.Documen
 // 对应原项目 documentModel.Update
 func (r *adminDocumentRepo) Update(ctx context.Context, doc *documentbiz.Document) error {
 	_, err := r.data.db.ProxyDocument.
-		UpdateOneID(int(doc.ID)).
+		UpdateOneID(doc.ID).
 		SetTitle(doc.Title).
 		SetContent(doc.Content).
 		SetTags(doc.Tags).
@@ -57,11 +57,11 @@ func (r *adminDocumentRepo) Update(ctx context.Context, doc *documentbiz.Documen
 
 // Delete 删除文档
 // 对应原项目 documentModel.Delete
-func (r *adminDocumentRepo) Delete(ctx context.Context, id int64) error {
+func (r *adminDocumentRepo) Delete(ctx context.Context, id int) error {
 	_, err := r.data.db.ProxyDocument.
 		Delete().
 		Where(
-			proxydocument.ID(int(id)),
+			proxydocument.ID(int64(id)),
 		).
 		Exec(ctx)
 
@@ -70,11 +70,11 @@ func (r *adminDocumentRepo) Delete(ctx context.Context, id int64) error {
 
 // FindByID 根据ID查找文档
 // 对应原项目 documentModel.QueryDocumentDetail
-func (r *adminDocumentRepo) FindByID(ctx context.Context, id int64) (*documentbiz.Document, error) {
+func (r *adminDocumentRepo) FindByID(ctx context.Context, id int) (*documentbiz.Document, error) {
 	po, err := r.data.db.ProxyDocument.
 		Query().
 		Where(
-			proxydocument.ID(int(id)),
+			proxydocument.ID(int64(id)),
 		).
 		First(ctx)
 
@@ -90,7 +90,7 @@ func (r *adminDocumentRepo) FindByID(ctx context.Context, id int64) (*documentbi
 
 // List 获取文档列表
 // 对应原项目 documentModel.QueryDocumentList
-func (r *adminDocumentRepo) List(ctx context.Context, page, size int64, tag, search string) (int64, []*documentbiz.Document, error) {
+func (r *adminDocumentRepo) List(ctx context.Context, page, size int, tag, search string) (int64, []*documentbiz.Document, error) {
 	query := r.data.db.ProxyDocument.
 		Query()
 

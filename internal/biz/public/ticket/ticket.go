@@ -20,7 +20,6 @@ const (
 
 // CreateTicketParams contains parameters for creating a ticket
 type CreateTicketParams struct {
-	TenantID    int64
 	UserID      int64
 	Title       string
 	Description string
@@ -28,12 +27,11 @@ type CreateTicketParams struct {
 
 // GetTicketListParams contains parameters for getting ticket list
 type GetTicketListParams struct {
-	TenantID int64
-	UserID   int64
-	Page     int64
-	Size     int64
-	Status   *int32
-	Search   *string
+	UserID int64
+	Page   int64
+	Size   int64
+	Status *int32
+	Search *string
 }
 
 // GetTicketListResult contains the result of getting ticket list
@@ -44,22 +42,19 @@ type GetTicketListResult struct {
 
 // GetTicketDetailsParams contains parameters for getting ticket details
 type GetTicketDetailsParams struct {
-	TenantID int64
-	UserID   int64
-	ID       int64
+	UserID int64
+	ID     int64
 }
 
 // UpdateTicketStatusParams contains parameters for updating ticket status
 type UpdateTicketStatusParams struct {
-	TenantID int64
-	UserID   int64
-	ID       int64
-	Status   int32
+	UserID int64
+	ID     int64
+	Status int32
 }
 
 // CreateTicketFollowParams contains parameters for creating ticket follow-up
 type CreateTicketFollowParams struct {
-	TenantID int64
 	UserID   int64
 	TicketID int64
 	From     string
@@ -74,8 +69,8 @@ type TicketInfo struct {
 	Description string
 	UserID      int64
 	Status      int32
-	CreatedAt   int64 // Unix timestamp in milliseconds
-	UpdatedAt   int64 // Unix timestamp in milliseconds
+	CreatedAt   int // Unix timestamp in milliseconds
+	UpdatedAt   int // Unix timestamp in milliseconds
 	Follows     []*TicketFollow
 }
 
@@ -86,7 +81,7 @@ type TicketFollow struct {
 	From      string
 	Type      int32
 	Content   string
-	CreatedAt int64 // Unix timestamp in milliseconds
+	CreatedAt int // Unix timestamp in milliseconds
 }
 
 // TicketUseCase defines the interface for ticket business logic
@@ -110,20 +105,20 @@ type TicketUseCase interface {
 // TicketRepo defines the interface for ticket data access
 type TicketRepo interface {
 	// CreateTicket creates a new ticket
-	CreateTicket(ctx context.Context, tenantID, userID int64, title, description string) error
+	CreateTicket(ctx context.Context, userID int, title, description string) error
 
 	// GetTicketList gets user's ticket list
-	GetTicketList(ctx context.Context, tenantID, userID int64, page, size int64, status *int32, search *string) (int64, []*TicketInfo, error)
+	GetTicketList(ctx context.Context, userID int, page, size int, status *int32, search *string) (int64, []*TicketInfo, error)
 
 	// GetTicketByID gets ticket by ID
-	GetTicketByID(ctx context.Context, tenantID, ticketID int64) (*TicketInfo, error)
+	GetTicketByID(ctx context.Context, ticketID int) (*TicketInfo, error)
 
 	// UpdateTicketStatus updates ticket status
-	UpdateTicketStatus(ctx context.Context, tenantID, userID, ticketID int64, status int32) error
+	UpdateTicketStatus(ctx context.Context, userID, ticketID int64, status int32) error
 
 	// CreateTicketFollow creates a follow-up record
-	CreateTicketFollow(ctx context.Context, tenantID int64, ticketID int64, from string, followType int32, content string) error
+	CreateTicketFollow(ctx context.Context, ticketID int64, from string, followType int32, content string) error
 
 	// GetTicketFollows gets all follow-ups for a ticket
-	GetTicketFollows(ctx context.Context, tenantID, ticketID int64) ([]*TicketFollow, error)
+	GetTicketFollows(ctx context.Context, ticketID int) ([]*TicketFollow, error)
 }

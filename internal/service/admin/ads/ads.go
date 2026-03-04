@@ -39,7 +39,7 @@ func (s *AdsService) GetAdsList(ctx context.Context, req *v1.GetAdsListRequest) 
 		filter.Status = status
 	}
 
-	total, list, err := s.uc.GetAdsListByPage(ctx, 0, req.Page, req.Size, filter)
+	total, list, err := s.uc.GetAdsListByPage(ctx, int(req.Page), int(req.Size), filter)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (s *AdsService) GetAdsList(ctx context.Context, req *v1.GetAdsListRequest) 
 
 // GetAds 获取广告详情
 func (s *AdsService) GetAds(ctx context.Context, req *v1.GetAdsRequest) (*v1.GetAdsReply, error) {
-	ads, err := s.uc.GetAdsByID(ctx, 0, req.Id)
+	ads, err := s.uc.GetAdsByID(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (s *AdsService) UpdateAds(ctx context.Context, req *v1.UpdateAdsRequest) (*
 
 // DeleteAds 删除广告
 func (s *AdsService) DeleteAds(ctx context.Context, req *v1.DeleteAdsRequest) (*v1.DeleteAdsReply, error) {
-	err := s.uc.DeleteAds(ctx, 0, req.Id)
+	err := s.uc.DeleteAds(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}

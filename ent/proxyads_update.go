@@ -28,6 +28,27 @@ func (_u *ProxyAdsUpdate) Where(ps ...predicate.ProxyAds) *ProxyAdsUpdate {
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *ProxyAdsUpdate) SetTenantID(v int64) *ProxyAdsUpdate {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ProxyAdsUpdate) SetNillableTenantID(v *int64) *ProxyAdsUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *ProxyAdsUpdate) AddTenantID(v int64) *ProxyAdsUpdate {
+	_u.mutation.AddTenantID(v)
+	return _u
+}
+
 // SetTitle sets the "title" field.
 func (_u *ProxyAdsUpdate) SetTitle(v string) *ProxyAdsUpdate {
 	_u.mutation.SetTitle(v)
@@ -256,6 +277,12 @@ func (_u *ProxyAdsUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(proxyads.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(proxyads.FieldTenantID, field.TypeInt64, value)
+	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(proxyads.FieldTitle, field.TypeString, value)
 	}
@@ -319,6 +346,27 @@ type ProxyAdsUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxyAdsMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *ProxyAdsUpdateOne) SetTenantID(v int64) *ProxyAdsUpdateOne {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ProxyAdsUpdateOne) SetNillableTenantID(v *int64) *ProxyAdsUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *ProxyAdsUpdateOne) AddTenantID(v int64) *ProxyAdsUpdateOne {
+	_u.mutation.AddTenantID(v)
+	return _u
 }
 
 // SetTitle sets the "title" field.
@@ -578,6 +626,12 @@ func (_u *ProxyAdsUpdateOne) sqlSave(ctx context.Context) (_node *ProxyAds, err 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(proxyads.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(proxyads.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(proxyads.FieldTitle, field.TypeString, value)

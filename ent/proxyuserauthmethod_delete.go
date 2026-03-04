@@ -40,7 +40,7 @@ func (_d *ProxyUserAuthMethodDelete) ExecX(ctx context.Context) int {
 }
 
 func (_d *ProxyUserAuthMethodDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(proxyuserauthmethod.Table, sqlgraph.NewFieldSpec(proxyuserauthmethod.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(proxyuserauthmethod.Table, sqlgraph.NewFieldSpec(proxyuserauthmethod.FieldID, field.TypeInt64))
 	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

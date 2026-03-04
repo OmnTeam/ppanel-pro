@@ -27,7 +27,7 @@ func (ProxyPayment) Annotations() []schema.Annotation {
 // Fields of the ProxyPayment
 func (ProxyPayment) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Comment("支付ID"),
 		field.String("name").
 			MaxLen(100).
@@ -61,7 +61,7 @@ func (ProxyPayment) Fields() []ent.Field {
 			Optional().
 			Default(0).
 			Comment("费用百分比"),
-		field.Int64("fee_amount").
+		field.Int("fee_amount").
 			Optional().
 			Default(0).
 			Comment("固定费用金额"),

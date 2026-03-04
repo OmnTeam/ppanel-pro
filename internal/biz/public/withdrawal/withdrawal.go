@@ -1,0 +1,109 @@
+package withdrawal
+
+import (
+	"context"
+	"time"
+
+	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/go-kratos/kratos/v2/log"
+)
+
+// User 用户信息（简化版）
+type User struct {
+	ID         int64
+	Commission int64
+}
+
+// Withdrawal 提现记录
+type Withdrawal struct {
+	ID        int64
+	UserID    int64
+	Amount    int64
+	Content   string
+	Status    int8
+	Reason    string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+// CommissionWithdrawRequest 佣金提现请求
+type CommissionWithdrawRequest struct {
+	Amount  int64
+	Content string
+}
+
+// WithdrawalRepo 提现仓储接口
+type WithdrawalRepo interface {
+	CreateWithdrawal(ctx context.Context, userID int64, amount int64, content string) error
+	GetUserWithdrawals(ctx context.Context, userID int64, page, pageSize int32) ([]*Withdrawal, int, error)
+	GetUserByID(ctx context.Context, userID int64) (*User, error)
+	UpdateUserCommission(ctx context.Context, userID int64, commission int64) error
+}
+
+// WithdrawalUsecase 提现用例
+type WithdrawalUsecase struct {
+	repo   WithdrawalRepo
+	logger *log.Helper
+}
+
+// NewWithdrawalUsecase 创建提现用例
+func NewWithdrawalUsecase(repo WithdrawalRepo, logger log.Logger) *WithdrawalUsecase {
+	return &WithdrawalUsecase{
+		repo:   repo,
+		logger: log.NewHelper(logger),
+	}
+}
+
+// CommissionWithdraw 佣金提现
+// 对应原项目 commissionWithdrawLogic.go
+func (uc *WithdrawalUsecase) CommissionWithdraw(ctx context.Context, userID int64, req *CommissionWithdrawRequest) (*Withdrawal, error) {
+	// 获取用户信息
+	user, err := uc.repo.GetUserByID(ctx, userID)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorf("get user failed: userID=%d, error=%v", userID, err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	// 检查佣金余额
+	if user.Commission < req.Amount {
+		uc.logger.WithContext(ctx).Errorf("user %d has insufficient commission balance: %.2f, requested: %.2f",
+			userID, float64(user.Commission)/100, float64(req.Amount)/100)
+		return nil, responsecode.NewKratosError(responsecode.ErrUserCommissionNotEnough)
+	}
+
+	// 更新用户佣金余额
+	newCommission := user.Commission - req.Amount
+	if err := uc.repo.UpdateUserCommission(ctx, userID, newCommission); err != nil {
+		uc.logger.WithContext(ctx).Errorf("update user commission failed: userID=%d, error=%v", userID, err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
+	}
+
+	// 创建提现记录
+	if err := uc.repo.CreateWithdrawal(ctx, userID, req.Amount, req.Content); err != nil {
+		uc.logger.WithContext(ctx).Errorf("create withdrawal failed: userID=%d, error=%v", userID, err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseInsert)
+	}
+
+	uc.logger.WithContext(ctx).Infof("user %d commission withdraw successful: amount=%d", userID, req.Amount)
+
+	return &Withdrawal{
+		UserID:    userID,
+		Amount:    req.Amount,
+		Content:   req.Content,
+		Status:    0,
+		Reason:    "",
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}, nil
+}
+
+// QueryWithdrawalLog 查询提现日志
+func (uc *WithdrawalUsecase) QueryWithdrawalLog(ctx context.Context, userID int64, page, pageSize int32) ([]*Withdrawal, int, error) {
+	withdrawals, total, err := uc.repo.GetUserWithdrawals(ctx, userID, page, pageSize)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorf("query withdrawal log failed: userID=%d, error=%v", userID, err)
+		return nil, 0, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	return withdrawals, total, nil
+}

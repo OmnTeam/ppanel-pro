@@ -40,7 +40,7 @@ func (_d *ProxyUserDeviceOnlineRecordDelete) ExecX(ctx context.Context) int {
 }
 
 func (_d *ProxyUserDeviceOnlineRecordDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(proxyuserdeviceonlinerecord.Table, sqlgraph.NewFieldSpec(proxyuserdeviceonlinerecord.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(proxyuserdeviceonlinerecord.Table, sqlgraph.NewFieldSpec(proxyuserdeviceonlinerecord.FieldID, field.TypeInt64))
 	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

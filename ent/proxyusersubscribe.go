@@ -17,13 +17,13 @@ type ProxyUserSubscribe struct {
 	config `json:"-"`
 	// ID of the ent.
 	// ID
-	ID int `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// 用户ID
-	UserID int `json:"user_id,omitempty"`
+	UserID int64 `json:"user_id,omitempty"`
 	// 订单ID
-	OrderID int `json:"order_id,omitempty"`
+	OrderID int64 `json:"order_id,omitempty"`
 	// 订阅套餐ID
-	SubscribeID int `json:"subscribe_id,omitempty"`
+	SubscribeID int64 `json:"subscribe_id,omitempty"`
 	// 订阅开始时间
 	StartTime time.Time `json:"start_time,omitempty"`
 	// 订阅过期时间
@@ -41,7 +41,7 @@ type ProxyUserSubscribe struct {
 	// 订阅UUID
 	UUID *string `json:"uuid,omitempty"`
 	// 订阅状态: 0-待激活 1-激活 2-完成 3-过期 4-已扣除
-	Status *int `json:"status,omitempty"`
+	Status *int8 `json:"status,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -80,24 +80,24 @@ func (_m *ProxyUserSubscribe) assignValues(columns []string, values []any) error
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case proxyusersubscribe.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				_m.UserID = int(value.Int64)
+				_m.UserID = value.Int64
 			}
 		case proxyusersubscribe.FieldOrderID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field order_id", values[i])
 			} else if value.Valid {
-				_m.OrderID = int(value.Int64)
+				_m.OrderID = value.Int64
 			}
 		case proxyusersubscribe.FieldSubscribeID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field subscribe_id", values[i])
 			} else if value.Valid {
-				_m.SubscribeID = int(value.Int64)
+				_m.SubscribeID = value.Int64
 			}
 		case proxyusersubscribe.FieldStartTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -158,8 +158,8 @@ func (_m *ProxyUserSubscribe) assignValues(columns []string, values []any) error
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
 			} else if value.Valid {
-				_m.Status = new(int)
-				*_m.Status = int(value.Int64)
+				_m.Status = new(int8)
+				*_m.Status = int8(value.Int64)
 			}
 		case proxyusersubscribe.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

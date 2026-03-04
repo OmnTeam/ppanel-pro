@@ -70,7 +70,7 @@ func (r *publicSubscribeRepo) QuerySubscribeList(ctx context.Context, language s
 		}
 
 		// 处理Nodes（JSON数组）
-		var nodes []int64
+		var nodes []int
 		if s.Nodes != "" {
 			_ = json.Unmarshal([]byte(s.Nodes), &nodes)
 		}

@@ -90,7 +90,7 @@ func (l *CloseOrderLogic) CloseOrder(req *CloseOrderRequest) error {
 		// 3.3 refund deduction amount to user deduction balance (复刻原项目 line 76-126)
 		if orderInfo.GiftAmount > 0 {
 			// 3.3.1 Find user info (复刻原项目 line 77-85)
-			userInfo, err := tx.ProxyUser.Get(l.ctx, int(orderInfo.UserID))
+			userInfo, err := tx.ProxyUser.Get(l.ctx, orderInfo.UserID)
 			if err != nil {
 				l.logger.Errorw("[CloseOrder] Find user info failed", "error", err.Error(), "user_id", orderInfo.UserID)
 				return err
@@ -117,7 +117,7 @@ func (l *CloseOrderLogic) CloseOrder(req *CloseOrderRequest) error {
 				Type:        modellog.GiftTypeIncrease, // GiftTypeIncrease = 341
 				OrderNo:     orderInfo.OrderNo,
 				SubscribeId: 0,
-				Amount:      orderInfo.GiftAmount,
+				Amount:      int64(orderInfo.GiftAmount),
 				Balance:     newGiftAmount,
 				Remark:      "Order cancellation refund",
 				Timestamp:   time.Now().UnixMilli(),
@@ -131,7 +131,7 @@ func (l *CloseOrderLogic) CloseOrder(req *CloseOrderRequest) error {
 			err = tx.ProxySystemLog.Create().
 				SetType(int8(modellog.TypeGift)). // TypeGift = 34
 				SetDate(time.Now().Format(time.DateOnly)).
-				SetObjectID(int64(userInfo.ID)).
+				SetObjectID(userInfo.ID).
 				SetContent(string(content)).
 				Exec(l.ctx)
 			if err != nil {

@@ -17,11 +17,11 @@ type ProxyUserDevice struct {
 	config `json:"-"`
 	// ID of the ent.
 	// ID
-	ID int `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// 用户ID
-	UserID int `json:"user_id,omitempty"`
+	UserID int64 `json:"user_id,omitempty"`
 	// 订阅ID
-	SubscribeID *int `json:"subscribe_id,omitempty"`
+	SubscribeID *int64 `json:"subscribe_id,omitempty"`
 	// 设备IP
 	IP *string `json:"ip,omitempty"`
 	// 设备标识符
@@ -72,19 +72,19 @@ func (_m *ProxyUserDevice) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case proxyuserdevice.FieldUserID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				_m.UserID = int(value.Int64)
+				_m.UserID = value.Int64
 			}
 		case proxyuserdevice.FieldSubscribeID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field subscribe_id", values[i])
 			} else if value.Valid {
-				_m.SubscribeID = new(int)
-				*_m.SubscribeID = int(value.Int64)
+				_m.SubscribeID = new(int64)
+				*_m.SubscribeID = value.Int64
 			}
 		case proxyuserdevice.FieldIP:
 			if value, ok := values[i].(*sql.NullString); !ok {

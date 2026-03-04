@@ -63,23 +63,35 @@ message DownloadLink {
 // 订阅应用配置信息
 message SubscribeApplication {
   int64 id = 1;
-  int64 tenant_id = 2;
-  string name = 3;
-  string icon = 4;
-  string description = 5;
-  string scheme = 6;
-  string user_agent = 7;
-  bool is_default = 8;
-  string subscribe_template = 9 [json_name = "template"]; // 与老项目保持一致
-  string output_format = 10;
-  DownloadLink download_link = 11;
-  google.protobuf.Timestamp created_at = 12;
-  google.protobuf.Timestamp updated_at = 13;
+  string name = 2;
+  string icon = 3;
+  string description = 4;
+  string scheme = 5;
+  string user_agent = 6;
+  bool is_default = 7;
+  string subscribe_template = 8 [json_name = "template"]; // 与老项目保持一致
+  string output_format = 9;
+  DownloadLink download_link = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
 }
 
 // 创建订阅应用配置请求
 message CreateSubscribeApplicationRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
+  string name = 1;
+  string icon = 2;
+  string description = 3;
+  string scheme = 4;
+  string user_agent = 5;
+  bool is_default = 6;
+  string subscribe_template = 7 [json_name = "template"]; // 与老项目保持一致
+  string output_format = 8;
+  DownloadLink download_link = 9;
+}
+
+// 更新订阅应用配置请求
+message UpdateSubscribeApplicationRequest {
+  int64 id = 1;
   string name = 2;
   string icon = 3;
   string description = 4;
@@ -91,36 +103,18 @@ message CreateSubscribeApplicationRequest {
   DownloadLink download_link = 10;
 }
 
-// 更新订阅应用配置请求
-message UpdateSubscribeApplicationRequest {
-  int64 id = 1 [(validate.rules).int64.gt = 0];
-  int64 tenant_id = 2 [(validate.rules).int64.gt = 0];
-  string name = 3;
-  string icon = 4;
-  string description = 5;
-  string scheme = 6;
-  string user_agent = 7;
-  bool is_default = 8;
-  string subscribe_template = 9 [json_name = "template"]; // 与老项目保持一致
-  string output_format = 10;
-  DownloadLink download_link = 11;
-}
-
 // 删除订阅应用配置请求
 message DeleteSubscribeApplicationRequest {
-  int64 id = 1 [(validate.rules).int64.gt = 0];
-  int64 tenant_id = 2 [(validate.rules).int64.gt = 0];
+  int64 id = 1;
 }
 
 // 预览订阅模板请求
 message PreviewSubscribeTemplateRequest {
-  int64 id = 1 [(validate.rules).int64.gt = 0];
-  int64 tenant_id = 2 [(validate.rules).int64.gt = 0];
+  int64 id = 1;
 }
 
 // 获取订阅应用配置列表请求
 message GetSubscribeApplicationListRequest {
-  int64 tenant_id = 1 [(validate.rules).int64.gt = 0];
 }
 
 // 订阅应用配置数据

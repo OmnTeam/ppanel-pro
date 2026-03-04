@@ -21,19 +21,19 @@ type ProxyUserDeviceCreate struct {
 }
 
 // SetUserID sets the "user_id" field.
-func (_c *ProxyUserDeviceCreate) SetUserID(v int) *ProxyUserDeviceCreate {
+func (_c *ProxyUserDeviceCreate) SetUserID(v int64) *ProxyUserDeviceCreate {
 	_c.mutation.SetUserID(v)
 	return _c
 }
 
 // SetSubscribeID sets the "subscribe_id" field.
-func (_c *ProxyUserDeviceCreate) SetSubscribeID(v int) *ProxyUserDeviceCreate {
+func (_c *ProxyUserDeviceCreate) SetSubscribeID(v int64) *ProxyUserDeviceCreate {
 	_c.mutation.SetSubscribeID(v)
 	return _c
 }
 
 // SetNillableSubscribeID sets the "subscribe_id" field if the given value is not nil.
-func (_c *ProxyUserDeviceCreate) SetNillableSubscribeID(v *int) *ProxyUserDeviceCreate {
+func (_c *ProxyUserDeviceCreate) SetNillableSubscribeID(v *int64) *ProxyUserDeviceCreate {
 	if v != nil {
 		_c.SetSubscribeID(*v)
 	}
@@ -139,7 +139,7 @@ func (_c *ProxyUserDeviceCreate) SetNillableUpdatedAt(v *time.Time) *ProxyUserDe
 }
 
 // SetID sets the "id" field.
-func (_c *ProxyUserDeviceCreate) SetID(v int) *ProxyUserDeviceCreate {
+func (_c *ProxyUserDeviceCreate) SetID(v int64) *ProxyUserDeviceCreate {
 	_c.mutation.SetID(v)
 	return _c
 }
@@ -250,7 +250,7 @@ func (_c *ProxyUserDeviceCreate) sqlSave(ctx context.Context) (*ProxyUserDevice,
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = int64(id)
 	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
@@ -260,18 +260,18 @@ func (_c *ProxyUserDeviceCreate) sqlSave(ctx context.Context) (*ProxyUserDevice,
 func (_c *ProxyUserDeviceCreate) createSpec() (*ProxyUserDevice, *sqlgraph.CreateSpec) {
 	var (
 		_node = &ProxyUserDevice{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(proxyuserdevice.Table, sqlgraph.NewFieldSpec(proxyuserdevice.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(proxyuserdevice.Table, sqlgraph.NewFieldSpec(proxyuserdevice.FieldID, field.TypeInt64))
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
 	if value, ok := _c.mutation.UserID(); ok {
-		_spec.SetField(proxyuserdevice.FieldUserID, field.TypeInt, value)
+		_spec.SetField(proxyuserdevice.FieldUserID, field.TypeInt64, value)
 		_node.UserID = value
 	}
 	if value, ok := _c.mutation.SubscribeID(); ok {
-		_spec.SetField(proxyuserdevice.FieldSubscribeID, field.TypeInt, value)
+		_spec.SetField(proxyuserdevice.FieldSubscribeID, field.TypeInt64, value)
 		_node.SubscribeID = &value
 	}
 	if value, ok := _c.mutation.IP(); ok {
@@ -352,7 +352,7 @@ func (_c *ProxyUserDeviceCreateBulk) Save(ctx context.Context) ([]*ProxyUserDevi
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

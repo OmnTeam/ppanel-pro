@@ -28,6 +28,12 @@ func (ProxyCoupon) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").
 			Comment("优惠券ID"),
+		field.Int64("user_limit").
+			Default(0).
+			Comment("用户限制"),
+		field.String("subscribe").
+			Optional().
+			Comment("订阅限制（逗号分隔的订阅ID）"),
 		field.String("name").
 			MaxLen(255).
 			NotEmpty().

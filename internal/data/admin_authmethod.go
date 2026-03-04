@@ -24,7 +24,7 @@ func NewAdminAuthMethodRepo(data *Data, logger log.Logger) authmethodbiz.AuthMet
 }
 
 // FindByMethod 根据方法名查找
-func (r *adminAuthMethodRepo) FindByMethod(ctx context.Context, tenantID int64, method string) (*authmethodbiz.AuthMethod, error) {
+func (r *adminAuthMethodRepo) FindByMethod(ctx context.Context, method string) (*authmethodbiz.AuthMethod, error) {
 	po, err := r.data.db.ProxyAuthMethod.
 		Query().
 		Where(
@@ -84,7 +84,7 @@ func (r *adminAuthMethodRepo) Update(ctx context.Context, auth *authmethodbiz.Au
 }
 
 // FindAll 查找所有认证方法
-func (r *adminAuthMethodRepo) FindAll(ctx context.Context, tenantID int64) ([]*authmethodbiz.AuthMethod, error) {
+func (r *adminAuthMethodRepo) FindAll(ctx context.Context) ([]*authmethodbiz.AuthMethod, error) {
 	pos, err := r.data.db.ProxyAuthMethod.
 		Query().
 		All(ctx)
@@ -108,7 +108,7 @@ func (r *adminAuthMethodRepo) convertToModel(po *ent.ProxyAuthMethod) *authmetho
 	}
 
 	return &authmethodbiz.AuthMethod{
-		ID:        int64(po.ID),
+		ID:        po.ID,
 		Method:    po.Method,
 		Config:    po.Config,
 		Enabled:   po.Enabled,

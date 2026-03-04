@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -34,25 +35,25 @@ func NewSubscribeUseCase(repo SubscribeRepo, logger log.Logger) *SubscribeUseCas
 type SubscribeRepo interface {
 	// Subscribe operations
 	CreateSubscribe(ctx context.Context, sub *model.Subscribe) error
-	GetSubscribeByID(ctx context.Context, id int64) (*ent.ProxySubscribe, error)
+	GetSubscribeByID(ctx context.Context, id int) (*ent.ProxySubscribe, error)
 	UpdateSubscribe(ctx context.Context, sub *model.Subscribe) error
-	DeleteSubscribe(ctx context.Context, id int64) error
+	DeleteSubscribe(ctx context.Context, id int) error
 	GetSubscribeList(ctx context.Context, req *model.SubscribeListParams) ([]*ent.ProxySubscribe, int64, error)
-	CheckSubscribeInUse(ctx context.Context, subscribeID int64) (bool, error)
-	BatchDeleteSubscribe(ctx context.Context, ids []int64) error
-	GetSubscribeMinSort(ctx context.Context, ids []int64) (int64, error)
+	CheckSubscribeInUse(ctx context.Context, subscribeID int) (bool, error)
+	BatchDeleteSubscribe(ctx context.Context, ids []int) error
+	GetSubscribeMinSort(ctx context.Context, ids []int) (int64, error)
 	BatchUpdateSubscribeSort(ctx context.Context, subscribes []*ent.ProxySubscribe) error
 
 	// Subscribe group operations
 	CreateSubscribeGroup(ctx context.Context, group *model.SubscribeGroup) error
-	GetSubscribeGroupByID(ctx context.Context, id int64) (*ent.ProxySubscribeGroup, error)
+	GetSubscribeGroupByID(ctx context.Context, id int) (*ent.ProxySubscribeGroup, error)
 	UpdateSubscribeGroup(ctx context.Context, group *model.SubscribeGroup) error
-	DeleteSubscribeGroup(ctx context.Context, id int64) error
+	DeleteSubscribeGroup(ctx context.Context, id int) error
 	GetSubscribeGroupList(ctx context.Context) ([]*ent.ProxySubscribeGroup, int64, error)
-	BatchDeleteSubscribeGroup(ctx context.Context, ids []int64) error
+	BatchDeleteSubscribeGroup(ctx context.Context, ids []int) error
 
 	// User subscription query (for checking if subscribe is in use)
-	GetActiveUserSubscriptionCount(ctx context.Context, subscribeID int64) (int64, error)
+	GetActiveUserSubscriptionCount(ctx context.Context, subscribeID int) (int64, error)
 	GetActiveUserSubscriptionCountByIDs(ctx context.Context, subscribeIDs []int64) (map[int64]int64, error)
 }
 
@@ -72,7 +73,11 @@ func (uc *SubscribeUseCase) CreateSubscribe(ctx context.Context, req *v1.CreateS
 	}
 
 	// Convert nodes to comma-separated string
-	nodesStr := int64SliceToString(req.Nodes)
+	nodesInt := make([]int, len(req.Nodes))
+	for i, v := range req.Nodes {
+		nodesInt[i] = int(v)
+	}
+	nodesStr := int64SliceToString(nodesInt)
 	nodeTagsStr := stringSliceToString(req.NodeTags)
 
 	sub := &model.Subscribe{
@@ -109,7 +114,7 @@ func (uc *SubscribeUseCase) CreateSubscribe(ctx context.Context, req *v1.CreateS
 // UpdateSubscribe update subscribe
 func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateSubscribeRequest) error {
 	// Check if subscribe exists
-	_, err := uc.repo.GetSubscribeByID(ctx, req.Id)
+	_, err := uc.repo.GetSubscribeByID(ctx, int(req.Id))
 	if err != nil {
 		if ent.IsNotFound(err) {
 			uc.log.WithContext(ctx).Errorw("msg", "UpdateSubscribe subscribe not found", "error", err, "id", req.Id)
@@ -131,7 +136,11 @@ func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateS
 	}
 
 	// Convert nodes to comma-separated string
-	nodesStr := int64SliceToString(req.Nodes)
+	nodesInt := make([]int, len(req.Nodes))
+	for i, v := range req.Nodes {
+		nodesInt[i] = int(v)
+	}
+	nodesStr := int64SliceToString(nodesInt)
 	nodeTagsStr := stringSliceToString(req.NodeTags)
 
 	sub := &model.Subscribe{
@@ -168,7 +177,7 @@ func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateS
 }
 
 // DeleteSubscribe delete subscribe
-func (uc *SubscribeUseCase) DeleteSubscribe(ctx context.Context, id int64) error {
+func (uc *SubscribeUseCase) DeleteSubscribe(ctx context.Context, id int) error {
 	// Check if subscribe is in use by active user subscriptions
 	inUse, err := uc.repo.CheckSubscribeInUse(ctx, id)
 	if err != nil {
@@ -190,7 +199,7 @@ func (uc *SubscribeUseCase) DeleteSubscribe(ctx context.Context, id int64) error
 }
 
 // BatchDeleteSubscribe batch delete subscribes
-func (uc *SubscribeUseCase) BatchDeleteSubscribe(ctx context.Context, ids []int64) error {
+func (uc *SubscribeUseCase) BatchDeleteSubscribe(ctx context.Context, ids []int) error {
 	// Check each subscribe if it's in use
 	for _, id := range ids {
 		inUse, err := uc.repo.CheckSubscribeInUse(ctx, id)
@@ -215,7 +224,7 @@ func (uc *SubscribeUseCase) BatchDeleteSubscribe(ctx context.Context, ids []int6
 }
 
 // GetSubscribeDetails get subscribe details
-func (uc *SubscribeUseCase) GetSubscribeDetails(ctx context.Context, id int64) (*v1.SubscribeInfo, error) {
+func (uc *SubscribeUseCase) GetSubscribeDetails(ctx context.Context, id int) (*v1.SubscribeInfo, error) {
 	sub, err := uc.repo.GetSubscribeByID(ctx, id)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -247,7 +256,7 @@ func (uc *SubscribeUseCase) GetSubscribeList(ctx context.Context, req *v1.GetSub
 	// Get subscribe IDs for querying sold counts
 	subscribeIDs := make([]int64, 0, len(list))
 	for _, sub := range list {
-		subscribeIDs = append(subscribeIDs, int64(sub.ID))
+		subscribeIDs = append(subscribeIDs, sub.ID)
 	}
 
 	// Get active user subscription counts (sold count)
@@ -281,10 +290,10 @@ func (uc *SubscribeUseCase) SubscribeSort(ctx context.Context, req *v1.Subscribe
 	}
 
 	// Extract IDs
-	ids := make([]int64, 0, len(req.Sort))
+	ids := make([]int, 0, len(req.Sort))
 	sortMap := make(map[int64]int64)
 	for i, item := range req.Sort {
-		ids = append(ids, item.Id)
+		ids = append(ids, int(item.Id))
 		sortMap[item.Id] = int64(i)
 	}
 
@@ -296,10 +305,14 @@ func (uc *SubscribeUseCase) SubscribeSort(ctx context.Context, req *v1.Subscribe
 	}
 
 	// Get subscribes
+	idsInt64 := make([]int64, len(ids))
+	for i, v := range ids {
+		idsInt64[i] = int64(v)
+	}
 	params := &model.SubscribeListParams{
 		Page: 1,
 		Size: 9999,
-		IDs:  ids,
+		IDs:  idsInt64,
 	}
 	subscribes, _, err := uc.repo.GetSubscribeList(ctx, params)
 	if err != nil {
@@ -310,7 +323,7 @@ func (uc *SubscribeUseCase) SubscribeSort(ctx context.Context, req *v1.Subscribe
 	// Update sort values
 	for _, sub := range subscribes {
 		if newSort, ok := sortMap[int64(sub.ID)]; ok {
-			sub.Sort = int(minSort + newSort)
+			sub.Sort = int64(minSort + newSort)
 		}
 	}
 
@@ -357,7 +370,7 @@ func (uc *SubscribeUseCase) UpdateSubscribeGroup(ctx context.Context, req *v1.Up
 }
 
 // DeleteSubscribeGroup delete subscribe group
-func (uc *SubscribeUseCase) DeleteSubscribeGroup(ctx context.Context, id int64) error {
+func (uc *SubscribeUseCase) DeleteSubscribeGroup(ctx context.Context, id int) error {
 	if err := uc.repo.DeleteSubscribeGroup(ctx, id); err != nil {
 		uc.log.WithContext(ctx).Errorw("msg", "DeleteSubscribeGroup failed", "error", err, "id", id)
 		return responsecode.NewKratosError(responsecode.ErrInternalError)
@@ -367,7 +380,7 @@ func (uc *SubscribeUseCase) DeleteSubscribeGroup(ctx context.Context, id int64) 
 }
 
 // BatchDeleteSubscribeGroup batch delete subscribe groups
-func (uc *SubscribeUseCase) BatchDeleteSubscribeGroup(ctx context.Context, ids []int64) error {
+func (uc *SubscribeUseCase) BatchDeleteSubscribeGroup(ctx context.Context, ids []int) error {
 	if err := uc.repo.BatchDeleteSubscribeGroup(ctx, ids); err != nil {
 		uc.log.WithContext(ctx).Errorw("msg", "BatchDeleteSubscribeGroup failed", "error", err, "ids", ids)
 		return responsecode.NewKratosError(responsecode.ErrInternalError)
@@ -395,8 +408,8 @@ func (uc *SubscribeUseCase) GetSubscribeGroupList(ctx context.Context) (*v1.GetS
 			Id:          int64(group.ID),
 			Name:        group.Name,
 			Description: desc,
-			CreatedAt:   group.CreatedAt.Unix(),
-			UpdatedAt:   group.UpdatedAt.Unix(),
+			CreatedAt:   group.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:   group.UpdatedAt.Format(time.RFC3339),
 		})
 	}
 
@@ -441,8 +454,8 @@ func convertDiscountFromJSON(discountJSON string) []*v1.SubscribeDiscount {
 	return result
 }
 
-// int64SliceToString convert int64 slice to comma-separated string
-func int64SliceToString(slice []int64) string {
+// int64SliceToString convert intslice to comma-separated string
+func int64SliceToString(slice []int) string {
 	if len(slice) == 0 {
 		return ""
 	}
@@ -453,19 +466,19 @@ func int64SliceToString(slice []int64) string {
 	return strings.Join(strs, ",")
 }
 
-// stringToInt64Slice convert comma-separated string to int64 slice
-func stringToInt64Slice(s string) []int64 {
+// stringToInt64Slice convert comma-separated string to intslice
+func stringToInt64Slice(s string) []int {
 	if s == "" {
 		return nil
 	}
 	parts := strings.Split(s, ",")
-	result := make([]int64, 0, len(parts))
+	result := make([]int, 0, len(parts))
 	for _, p := range parts {
 		p = strings.TrimSpace(p)
 		if p == "" {
 			continue
 		}
-		var val int64
+		var val int
 		fmt.Sscanf(p, "%d", &val)
 		result = append(result, val)
 	}
@@ -519,16 +532,16 @@ func convertSubscribeToProto(sub *ent.ProxySubscribe) *v1.SubscribeInfo {
 		Name:           sub.Name,
 		Language:       sub.Language,
 		Description:    desc,
-		UnitPrice:      sub.UnitPrice,
-		UnitTime:       sub.UnitTime,
+		UnitPrice:      int64(sub.UnitPrice),
+		UnitTime:       "", // sub.UnitTime is a string like "1m", "1h", needs parsing
 		Discount:       convertDiscountFromJSON(discount),
 		Replacement:    int64(sub.Replacement),
 		Inventory:      int64(sub.Inventory),
-		Traffic:        sub.Traffic,
+		Traffic:        int64(sub.Traffic),
 		SpeedLimit:     int64(sub.SpeedLimit),
 		DeviceLimit:    int64(sub.DeviceLimit),
 		Quota:          int64(sub.Quota),
-		Nodes:          stringToInt64Slice(sub.Nodes),
+		Nodes:          convertIntSliceToInt64Slice(stringToInt64Slice(sub.Nodes)),
 		NodeTags:       stringToStringSlice(sub.NodeTags),
 		Show:           sub.Show,
 		Sell:           sub.Sell,
@@ -537,8 +550,8 @@ func convertSubscribeToProto(sub *ent.ProxySubscribe) *v1.SubscribeInfo {
 		AllowDeduction: allowDeduction,
 		ResetCycle:     resetCycle,
 		RenewalReset:   renewalReset,
-		CreatedAt:      sub.CreatedAt.Unix(),
-		UpdatedAt:      sub.UpdatedAt.Unix(),
+		CreatedAt:      sub.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:      sub.UpdatedAt.Format(time.RFC3339),
 	}
 }
 
@@ -568,16 +581,16 @@ func convertSubscribeToProtoItem(sub *ent.ProxySubscribe) *v1.SubscribeItem {
 		Name:           sub.Name,
 		Language:       sub.Language,
 		Description:    desc,
-		UnitPrice:      sub.UnitPrice,
-		UnitTime:       sub.UnitTime,
+		UnitPrice:      int64(sub.UnitPrice),
+		UnitTime:       "", // sub.UnitTime is a string like "1m", "1h", needs parsing
 		Discount:       convertDiscountFromJSON(discount),
 		Replacement:    int64(sub.Replacement),
 		Inventory:      int64(sub.Inventory),
-		Traffic:        sub.Traffic,
+		Traffic:        int64(sub.Traffic),
 		SpeedLimit:     int64(sub.SpeedLimit),
 		DeviceLimit:    int64(sub.DeviceLimit),
 		Quota:          int64(sub.Quota),
-		Nodes:          stringToInt64Slice(sub.Nodes),
+		Nodes:          convertIntSliceToInt64Slice(stringToInt64Slice(sub.Nodes)),
 		NodeTags:       stringToStringSlice(sub.NodeTags),
 		Show:           sub.Show,
 		Sell:           sub.Sell,
@@ -586,8 +599,20 @@ func convertSubscribeToProtoItem(sub *ent.ProxySubscribe) *v1.SubscribeItem {
 		AllowDeduction: allowDeduction,
 		ResetCycle:     resetCycle,
 		RenewalReset:   renewalReset,
-		CreatedAt:      sub.CreatedAt.Unix(),
-		UpdatedAt:      sub.UpdatedAt.Unix(),
+		CreatedAt:      sub.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:      sub.UpdatedAt.Format(time.RFC3339),
 		Sold:           0, // Will be set by caller
 	}
+}
+
+// convertIntSliceToInt64Slice converts []int to []int64
+func convertIntSliceToInt64Slice(input []int) []int64 {
+	if input == nil {
+		return nil
+	}
+	result := make([]int64, len(input))
+	for i, v := range input {
+		result[i] = int64(v)
+	}
+	return result
 }

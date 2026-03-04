@@ -51,7 +51,7 @@ func (r *subscribeApplicationRepo) Update(ctx context.Context, app *applicationb
 	existing, err := r.data.db.ProxySubscribeApplication.
 		Query().
 		Where(
-			proxysubscribeapplication.ID(int(app.ID)),
+			proxysubscribeapplication.ID(app.ID),
 		).
 		Only(ctx)
 
@@ -85,7 +85,7 @@ func (r *subscribeApplicationRepo) FindByID(ctx context.Context, id int64) (*app
 	po, err := r.data.db.ProxySubscribeApplication.
 		Query().
 		Where(
-			proxysubscribeapplication.ID(int(id)),
+			proxysubscribeapplication.ID(id),
 		).
 		First(ctx)
 
@@ -127,7 +127,7 @@ func (r *subscribeApplicationRepo) Delete(ctx context.Context, id int64) error {
 	_, err := r.data.db.ProxySubscribeApplication.
 		Delete().
 		Where(
-			proxysubscribeapplication.ID(int(id)),
+			proxysubscribeapplication.ID(id),
 		).
 		Exec(ctx)
 	return err
@@ -140,8 +140,7 @@ func (r *subscribeApplicationRepo) convertToModel(po *ent.ProxySubscribeApplicat
 	}
 
 	return &applicationbiz.SubscribeApplication{
-		ID:                int64(po.ID),
-		
+		ID:                po.ID,
 		Name:              po.Name,
 		Icon:              po.Icon,
 		Description:       po.Description,

@@ -10,52 +10,52 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.ProxyUserAuthMethod {
+func ID(id int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.ProxyUserAuthMethod {
+func IDEQ(id int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.ProxyUserAuthMethod {
+func IDNEQ(id int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.ProxyUserAuthMethod {
+func IDIn(ids ...int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.ProxyUserAuthMethod {
+func IDNotIn(ids ...int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.ProxyUserAuthMethod {
+func IDGT(id int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.ProxyUserAuthMethod {
+func IDGTE(id int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.ProxyUserAuthMethod {
+func IDLT(id int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.ProxyUserAuthMethod {
+func IDLTE(id int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldLTE(FieldID, id))
 }
 
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
-func UserID(v int) predicate.ProxyUserAuthMethod {
+func UserID(v int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldEQ(FieldUserID, v))
 }
 
@@ -90,42 +90,42 @@ func UpdatedAt(v time.Time) predicate.ProxyUserAuthMethod {
 }
 
 // UserIDEQ applies the EQ predicate on the "user_id" field.
-func UserIDEQ(v int) predicate.ProxyUserAuthMethod {
+func UserIDEQ(v int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldEQ(FieldUserID, v))
 }
 
 // UserIDNEQ applies the NEQ predicate on the "user_id" field.
-func UserIDNEQ(v int) predicate.ProxyUserAuthMethod {
+func UserIDNEQ(v int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldNEQ(FieldUserID, v))
 }
 
 // UserIDIn applies the In predicate on the "user_id" field.
-func UserIDIn(vs ...int) predicate.ProxyUserAuthMethod {
+func UserIDIn(vs ...int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldIn(FieldUserID, vs...))
 }
 
 // UserIDNotIn applies the NotIn predicate on the "user_id" field.
-func UserIDNotIn(vs ...int) predicate.ProxyUserAuthMethod {
+func UserIDNotIn(vs ...int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldNotIn(FieldUserID, vs...))
 }
 
 // UserIDGT applies the GT predicate on the "user_id" field.
-func UserIDGT(v int) predicate.ProxyUserAuthMethod {
+func UserIDGT(v int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldGT(FieldUserID, v))
 }
 
 // UserIDGTE applies the GTE predicate on the "user_id" field.
-func UserIDGTE(v int) predicate.ProxyUserAuthMethod {
+func UserIDGTE(v int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldGTE(FieldUserID, v))
 }
 
 // UserIDLT applies the LT predicate on the "user_id" field.
-func UserIDLT(v int) predicate.ProxyUserAuthMethod {
+func UserIDLT(v int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldLT(FieldUserID, v))
 }
 
 // UserIDLTE applies the LTE predicate on the "user_id" field.
-func UserIDLTE(v int) predicate.ProxyUserAuthMethod {
+func UserIDLTE(v int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldLTE(FieldUserID, v))
 }
 

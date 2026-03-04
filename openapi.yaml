@@ -3,37 +3,141 @@
 
 openapi: 3.0.3
 info:
-    title: Greeter API
-    description: The greeting service definition.
+    title: OAuth API
+    description: OAuth认证服务
     version: 0.0.1
 paths:
-    /helloworld/{name}:
-        get:
+    /v1/auth/oauth/callback/apple:
+        post:
             tags:
-                - Greeter
-                - subgroup
-            description: Sends a greeting
-            operationId: Greeter_SayHello
-            parameters:
-                - name: name
-                  in: path
-                  required: true
-                  schema:
-                    type: string
+                - OAuth
+            description: Apple登录回调处理
+            operationId: OAuth_AppleLoginCallback
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.auth.oauth.v1.AppleLoginCallbackRequest'
+                required: true
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/helloworld.v1.HelloReply'
+                                $ref: '#/components/schemas/api.auth.oauth.v1.CallbackReply'
+    /v1/auth/oauth/login:
+        post:
+            tags:
+                - OAuth
+            description: OAuth登录 - 获取OAuth提供商的授权URL
+            operationId: OAuth_OAuthLogin
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.auth.oauth.v1.OAuthLoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.auth.oauth.v1.LoginRedirectReply'
+    /v1/auth/oauth/login/token:
+        post:
+            tags:
+                - OAuth
+            description: OAuth登录获取令牌 - 处理OAuth回调并返回JWT token
+            operationId: OAuth_OAuthLoginGetToken
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.auth.oauth.v1.OAuthLoginGetTokenRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.auth.oauth.v1.LoginTokenReply'
 components:
     schemas:
-        helloworld.v1.HelloReply:
+        api.auth.oauth.v1.AppleLoginCallbackRequest:
             type: object
             properties:
+                code:
+                    type: string
+                idToken:
+                    type: string
+                state:
+                    type: string
+            description: Apple登录回调请求
+        api.auth.oauth.v1.CallbackReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
                 message:
                     type: string
-            description: The response message containing the greetings
+            description: CallbackReply 回调响应
+        api.auth.oauth.v1.LoginRedirectData:
+            type: object
+            properties:
+                redirect:
+                    type: string
+            description: LoginRedirectData OAuth登录重定向数据
+        api.auth.oauth.v1.LoginRedirectReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.auth.oauth.v1.LoginRedirectData'
+            description: LoginRedirectReply OAuth登录响应
+        api.auth.oauth.v1.LoginTokenData:
+            type: object
+            properties:
+                token:
+                    type: string
+            description: LoginTokenData 登录令牌数据
+        api.auth.oauth.v1.LoginTokenReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.auth.oauth.v1.LoginTokenData'
+            description: LoginTokenReply OAuth登录获取令牌响应
+        api.auth.oauth.v1.OAuthLoginGetTokenRequest:
+            type: object
+            properties:
+                method:
+                    type: string
+                callback:
+                    type: string
+                ip:
+                    type: string
+                userAgent:
+                    type: string
+            description: OAuth登录获取令牌请求
+        api.auth.oauth.v1.OAuthLoginRequest:
+            type: object
+            properties:
+                method:
+                    type: string
+                redirect:
+                    type: string
+            description: OAuth登录请求
 tags:
-    - name: Greeter
+    - name: OAuth

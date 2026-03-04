@@ -82,13 +82,13 @@ func (h *CheckSubscriptionHandler) checkTrafficExceeded(ctx context.Context) err
 		}
 		used := int64(0)
 		if sub.Upload != nil {
-			used += *sub.Upload
+			used += int64(*sub.Upload)
 		}
 		if sub.Download != nil {
-			used += *sub.Download
+			used += int64(*sub.Download)
 		}
 		// 已用流量 >= 总流量
-		if used >= *sub.Traffic {
+		if used >= int64(*sub.Traffic) {
 			trafficExceededSubs = append(trafficExceededSubs, sub)
 		}
 	}
@@ -99,7 +99,7 @@ func (h *CheckSubscriptionHandler) checkTrafficExceeded(ctx context.Context) err
 	}
 
 	// 收集ID
-	var ids []int
+	var ids []int64
 	for _, sub := range trafficExceededSubs {
 		ids = append(ids, sub.ID)
 	}
@@ -173,7 +173,7 @@ func (h *CheckSubscriptionHandler) checkExpired(ctx context.Context) error {
 	}
 
 	// 收集ID
-	var ids []int
+	var ids []int64
 	for _, sub := range list {
 		ids = append(ids, sub.ID)
 	}
@@ -230,7 +230,7 @@ func (h *CheckSubscriptionHandler) sendTrafficNotify(ctx context.Context, subs [
 		}
 
 		// 2. 查询站点配置
-		siteConfig, err := h.loadSiteConfig(ctx, 0)
+		siteConfig, err := h.loadSiteConfig(ctx)
 		if err != nil {
 			h.logger.Warnf("[CheckSubscription] 查询站点配置失败: error=%v", err)
 			// 配置加载失败时使用空字符串，不阻断发送
@@ -239,10 +239,9 @@ func (h *CheckSubscriptionHandler) sendTrafficNotify(ctx context.Context, subs [
 
 		// 3. 构建邮件任务payload（复刻原项目 line 171-178）
 		payload := queueTypes.SendEmailPayload{
-			TenantID: 0,
-			Type:     "traffic_exceed", // EmailTypeTrafficExceed
-			Email:    method.AuthIdentifier,
-			Subject:  "Subscription Traffic Exceed",
+			Type:    "traffic_exceed", // EmailTypeTrafficExceed
+			Email:   method.AuthIdentifier,
+			Subject: "Subscription Traffic Exceed",
 			Content: map[string]interface{}{
 				"SiteLogo": siteConfig["SiteLogo"],
 				"SiteName": siteConfig["SiteName"],
@@ -287,7 +286,7 @@ func (h *CheckSubscriptionHandler) sendExpiredNotify(ctx context.Context, subs [
 		}
 
 		// 2. 查询站点配置
-		siteConfig, err := h.loadSiteConfig(ctx, 0)
+		siteConfig, err := h.loadSiteConfig(ctx)
 		if err != nil {
 			h.logger.Warnf("[CheckSubscription] 查询站点配置失败: error=%v", err)
 			// 配置加载失败时使用空字符串，不阻断发送
@@ -302,10 +301,9 @@ func (h *CheckSubscriptionHandler) sendExpiredNotify(ctx context.Context, subs [
 
 		// 4. 构建邮件任务payload（复刻原项目 line 131-139）
 		payload := queueTypes.SendEmailPayload{
-			TenantID: 0,
-			Type:     "expiration", // EmailTypeExpiration
-			Email:    method.AuthIdentifier,
-			Subject:  "Subscription Expired",
+			Type:    "expiration", // EmailTypeExpiration
+			Email:   method.AuthIdentifier,
+			Subject: "Subscription Expired",
 			Content: map[string]interface{}{
 				"SiteLogo":   siteConfig["SiteLogo"],
 				"SiteName":   siteConfig["SiteName"],
@@ -336,7 +334,7 @@ func (h *CheckSubscriptionHandler) sendExpiredNotify(ctx context.Context, subs [
 
 // loadSiteConfig 加载站点配置
 // 从proxy_system表读取Site.SiteLogo和Site.SiteName配置
-func (h *CheckSubscriptionHandler) loadSiteConfig(ctx context.Context, tenantID int64) (map[string]string, error) {
+func (h *CheckSubscriptionHandler) loadSiteConfig(ctx context.Context) (map[string]string, error) {
 	result := map[string]string{
 		"SiteLogo": "",
 		"SiteName": "",
@@ -370,7 +368,7 @@ func (h *CheckSubscriptionHandler) clearServerCache(ctx context.Context, userSub
 	}
 
 	// Collect unique subscribe_ids
-	subs := make(map[int]bool)
+	subs := make(map[int64]bool)
 	for _, sub := range userSubs {
 		if sub.SubscribeID > 0 {
 			if _, ok := subs[sub.SubscribeID]; !ok {

@@ -96,14 +96,14 @@ func (h *QuotaTaskHandler) ProcessTask(ctx context.Context, task *asynq.Task) er
 			h.log.WithContext(ctx).Infof("[QuotaTaskHandler] Worker stopped by context cancellation, taskID: %d", taskID)
 			// 更新任务状态
 			_ = h.db.ProxyTask.UpdateOneID(taskID).
-				SetCurrent(count).
+				SetCurrent(uint32(count)).
 				Exec(ctx)
 			return nil
 		default:
 		}
 
 		// 查询用户订阅
-		userSub, err := h.db.ProxyUserSubscribe.Get(ctx, int(subID))
+		userSub, err := h.db.ProxyUserSubscribe.Get(ctx, subID)
 		if err != nil {
 			h.log.WithContext(ctx).Errorf("[QuotaTaskHandler] Failed to get user subscribe %d: %v", subID, err)
 			errors = append(errors, fmt.Sprintf("subscribe_id:%d, error:%v", subID, err))
@@ -127,7 +127,7 @@ func (h *QuotaTaskHandler) ProcessTask(ctx context.Context, task *asynq.Task) er
 		}
 
 		err = h.db.ProxyTask.UpdateOneID(taskID).
-			SetCurrent(count).
+			SetCurrent(uint32(count)).
 			SetErrors(errorJSON).
 			Exec(ctx)
 		if err != nil {
@@ -162,7 +162,7 @@ func (h *QuotaTaskHandler) ProcessTask(ctx context.Context, task *asynq.Task) er
 	// 标记任务为完成
 	err = h.db.ProxyTask.UpdateOneID(taskID).
 		SetStatus(int8(taskmodel.StatusCompleted)).
-		SetCurrent(count).
+		SetCurrent(uint32(count)).
 		Exec(ctx)
 	if err != nil {
 		h.log.WithContext(ctx).Errorf("[QuotaTaskHandler] Failed to update task status to Completed: %v", err)
@@ -198,7 +198,7 @@ func (h *QuotaTaskHandler) processQuotaOperations(ctx context.Context, userSub *
 		}
 
 		// 记录流量重置日志
-		if err := h.logTrafficReset(ctx, 0, int64(userSub.ID), int64(userSub.UserID)); err != nil {
+		if err := h.logTrafficReset(ctx, userSub.ID, userSub.UserID); err != nil {
 			h.log.Warnf("[QuotaTaskHandler] Failed to log traffic reset: %v", err)
 		}
 
@@ -243,7 +243,7 @@ func (h *QuotaTaskHandler) processQuotaOperations(ctx context.Context, userSub *
 			// 3.2 更新用户的gift_amount（余额）
 			currentGiftAmount := int64(0)
 			if user.GiftAmount != nil {
-				currentGiftAmount = *user.GiftAmount
+				currentGiftAmount = int64(*user.GiftAmount)
 			}
 			newGiftAmount := currentGiftAmount + giftAmount
 
@@ -271,7 +271,7 @@ func (h *QuotaTaskHandler) processQuotaOperations(ctx context.Context, userSub *
 				_, err = h.db.ProxySystemLog.Create().
 					SetType(int8(34)). // TypeGift = 34
 					SetDate(time.Now().Format(time.DateOnly)).
-					SetObjectID(int64(user.ID)). // 注意：object_id是user_id，不是subscribe_id
+					SetObjectID(user.ID). // 注意：object_id是user_id，不是subscribe_id
 					SetContent(string(giftLogJSON)).
 					Save(ctx)
 
@@ -292,7 +292,7 @@ func (h *QuotaTaskHandler) processQuotaOperations(ctx context.Context, userSub *
 }
 
 // logTrafficReset 记录流量重置日志
-func (h *QuotaTaskHandler) logTrafficReset(ctx context.Context, tenantID, subscribeID, userID int64) error {
+func (h *QuotaTaskHandler) logTrafficReset(ctx context.Context, subscribeID, userID int64) error {
 	logContent := map[string]interface{}{
 		"type":         "reset_traffic",
 		"subscribe_id": subscribeID,

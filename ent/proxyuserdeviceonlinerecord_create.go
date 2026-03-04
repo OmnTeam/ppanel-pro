@@ -21,7 +21,7 @@ type ProxyUserDeviceOnlineRecordCreate struct {
 }
 
 // SetUserID sets the "user_id" field.
-func (_c *ProxyUserDeviceOnlineRecordCreate) SetUserID(v int) *ProxyUserDeviceOnlineRecordCreate {
+func (_c *ProxyUserDeviceOnlineRecordCreate) SetUserID(v int64) *ProxyUserDeviceOnlineRecordCreate {
 	_c.mutation.SetUserID(v)
 	return _c
 }
@@ -103,7 +103,7 @@ func (_c *ProxyUserDeviceOnlineRecordCreate) SetNillableCreatedAt(v *time.Time) 
 }
 
 // SetID sets the "id" field.
-func (_c *ProxyUserDeviceOnlineRecordCreate) SetID(v int) *ProxyUserDeviceOnlineRecordCreate {
+func (_c *ProxyUserDeviceOnlineRecordCreate) SetID(v int64) *ProxyUserDeviceOnlineRecordCreate {
 	_c.mutation.SetID(v)
 	return _c
 }
@@ -186,7 +186,7 @@ func (_c *ProxyUserDeviceOnlineRecordCreate) sqlSave(ctx context.Context) (*Prox
 	}
 	if _spec.ID.Value != _node.ID {
 		id := _spec.ID.Value.(int64)
-		_node.ID = int(id)
+		_node.ID = int64(id)
 	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
@@ -196,14 +196,14 @@ func (_c *ProxyUserDeviceOnlineRecordCreate) sqlSave(ctx context.Context) (*Prox
 func (_c *ProxyUserDeviceOnlineRecordCreate) createSpec() (*ProxyUserDeviceOnlineRecord, *sqlgraph.CreateSpec) {
 	var (
 		_node = &ProxyUserDeviceOnlineRecord{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(proxyuserdeviceonlinerecord.Table, sqlgraph.NewFieldSpec(proxyuserdeviceonlinerecord.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(proxyuserdeviceonlinerecord.Table, sqlgraph.NewFieldSpec(proxyuserdeviceonlinerecord.FieldID, field.TypeInt64))
 	)
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
 	if value, ok := _c.mutation.UserID(); ok {
-		_spec.SetField(proxyuserdeviceonlinerecord.FieldUserID, field.TypeInt, value)
+		_spec.SetField(proxyuserdeviceonlinerecord.FieldUserID, field.TypeInt64, value)
 		_node.UserID = value
 	}
 	if value, ok := _c.mutation.Identifier(); ok {
@@ -280,7 +280,7 @@ func (_c *ProxyUserDeviceOnlineRecordCreateBulk) Save(ctx context.Context) ([]*P
 				mutation.id = &nodes[i].ID
 				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

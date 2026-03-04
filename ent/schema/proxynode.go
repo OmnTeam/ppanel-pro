@@ -26,7 +26,7 @@ func (ProxyNode) Annotations() []schema.Annotation {
 // Fields of the ProxyNode
 func (ProxyNode) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").
+		field.Int64("id").
 			Comment("节点ID"),
 		field.String("name").
 			MaxLen(100).
@@ -43,7 +43,7 @@ func (ProxyNode) Fields() []ent.Field {
 			MaxLen(255).
 			Default("").
 			Comment("连接地址"),
-		field.Int("server_id").
+		field.Int64("server_id").
 			Default(0).
 			Comment("服务器ID"),
 		field.String("protocol").
@@ -56,6 +56,14 @@ func (ProxyNode) Fields() []ent.Field {
 		field.Int("sort").
 			Default(0).
 			Comment("排序"),
+		field.Int64("group_id").
+			Optional().
+			Nillable().
+			Default(0).
+			Comment("节点分组ID"),
+		field.Bool("group_locked").
+			Default(false).
+			Comment("是否锁定分组"),
 		field.Time("created_at").
 			Default(time.Now).
 			Optional().

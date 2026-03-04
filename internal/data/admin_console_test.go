@@ -34,13 +34,13 @@ func seedConsoleTestData(t *testing.T, client *ent.Client, ctx context.Context) 
 	users := make([]*ent.ProxyUser, 10)
 	for i := 0; i < 10; i++ {
 		user, err := client.ProxyUser.Create()
-			SetTenantID(tenantID)
-			SetPassword("password")
-			SetEnable(true)
-			SetIsAdmin(false)
-			SetBalance(0)
-			SetCreatedAt(time.Now().Add(-time.Duration(i) * 24 * time.Hour))
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetPassword("password")
+		SetEnable(true)
+		SetIsAdmin(false)
+		SetBalance(0)
+		SetCreatedAt(time.Now().Add(-time.Duration(i) * 24 * time.Hour))
+		Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create user %d: %v", i, err)
 		}
@@ -49,12 +49,12 @@ func seedConsoleTestData(t *testing.T, client *ent.Client, ctx context.Context) 
 
 	// Create subscribe plans
 	subscribe, err := client.ProxySubscribe.Create()
-		SetTenantID(tenantID)
-		SetName("Test Subscribe Plan")
-		SetTraffic(10000000000). // 10GB
-		SetShow(true)
-		SetSell(true)
-		Save(ctx)
+	SetTenantID(tenantID)
+	SetName("Test Subscribe Plan")
+	SetTraffic(10000000000). // 10GB
+					SetShow(true)
+	SetSell(true)
+	Save(ctx)
 	if err != nil {
 		t.Fatalf("Failed to create subscribe: %v", err)
 	}
@@ -74,16 +74,16 @@ func seedConsoleTestData(t *testing.T, client *ent.Client, ctx context.Context) 
 
 		orderNo := fmt.Sprintf("ORDER-TODAY-%d-%d", tenantID, i)
 		_, err := client.ProxyOrder.Create()
-			SetTenantID(tenantID)
-			SetUserID(users[i].ID)
-			SetSubscribeID(subscribe.ID)
-			SetOrderNo(orderNo)
-			SetIsNew(isNew)
-			SetAmount(int64(100 * (i + 1))). // 100, 200, 300, 400, 500
-			SetStatus(status)
-			SetMethod("alipay")
-			SetCreatedAt(today.Add(time.Duration(i) * time.Hour))
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetUserID(users[i].ID)
+		SetSubscribeID(subscribe.ID)
+		SetOrderNo(orderNo)
+		SetIsNew(isNew)
+		SetAmount(int64(100 * (i + 1))). // 100, 200, 300, 400, 500
+							SetStatus(status)
+		SetMethod("alipay")
+		SetCreatedAt(today.Add(time.Duration(i) * time.Hour))
+		Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create today's order %d: %v", i, err)
 		}
@@ -93,16 +93,16 @@ func seedConsoleTestData(t *testing.T, client *ent.Client, ctx context.Context) 
 	for i := 0; i < 3; i++ {
 		orderNo := fmt.Sprintf("ORDER-YESTERDAY-%d-%d", tenantID, i)
 		_, err := client.ProxyOrder.Create()
-			SetTenantID(tenantID)
-			SetUserID(users[i].ID)
-			SetSubscribeID(subscribe.ID)
-			SetOrderNo(orderNo)
-			SetIsNew(i == 0)
-			SetAmount(int64(150 * (i + 1))). // 150, 300, 450
-			SetStatus(2)
-			SetMethod("alipay")
-			SetCreatedAt(yesterday.Add(time.Duration(i) * time.Hour))
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetUserID(users[i].ID)
+		SetSubscribeID(subscribe.ID)
+		SetOrderNo(orderNo)
+		SetIsNew(i == 0)
+		SetAmount(int64(150 * (i + 1))). // 150, 300, 450
+							SetStatus(2)
+		SetMethod("alipay")
+		SetCreatedAt(yesterday.Add(time.Duration(i) * time.Hour))
+		Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create yesterday's order %d: %v", i, err)
 		}
@@ -112,13 +112,13 @@ func seedConsoleTestData(t *testing.T, client *ent.Client, ctx context.Context) 
 	ticketStatuses := []int8{1, 1, 1, 2, 3, 4} // 3 Pending, 1 Waiting, 1 Processed, 1 Closed
 	for i, status := range ticketStatuses {
 		_, err := client.ProxyTicket.Create()
-			SetTenantID(tenantID)
-			SetUserID(users[i].ID)
-			SetTitle("Test Ticket " + string(rune('A'+i)))
-			SetDescription("Test Description")
-			SetStatus(status)
-			SetCreatedAt(now.Add(-time.Duration(i) * time.Hour))
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetUserID(users[i].ID)
+		SetTitle("Test Ticket " + string(rune('A'+i)))
+		SetDescription("Test Description")
+		SetStatus(status)
+		SetCreatedAt(now.Add(-time.Duration(i) * time.Hour))
+		Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create ticket %d: %v", i, err)
 		}
@@ -128,15 +128,15 @@ func seedConsoleTestData(t *testing.T, client *ent.Client, ctx context.Context) 
 	servers := make([]*ent.ProxyServer, 5)
 	for i := 0; i < 5; i++ {
 		server, err := client.ProxyServer.Create()
-			SetTenantID(tenantID)
-			SetName("Server-" + string(rune('A'+i)))
-			SetTags("tag1,tag2")
-			SetCountry("US")
-			SetCity("New York")
-			SetServerAddr("server" + string(rune('a'+i)) + ".example.com:443")
-			SetProtocol("vmess")
-			SetEnable(true)
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetName("Server-" + string(rune('A'+i)))
+		SetTags("tag1,tag2")
+		SetCountry("US")
+		SetCity("New York")
+		SetServerAddr("server" + string(rune('a'+i)) + ".example.com:443")
+		SetProtocol("vmess")
+		SetEnable(true)
+		Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create server %d: %v", i, err)
 		}
@@ -147,15 +147,15 @@ func seedConsoleTestData(t *testing.T, client *ent.Client, ctx context.Context) 
 	userSubscribes := make([]*ent.ProxyUserSubscribe, 10)
 	for i := 0; i < 10; i++ {
 		userSub, err := client.ProxyUserSubscribe.Create()
-			SetTenantID(tenantID)
-			SetUserID(users[i].ID)
-			SetOrderID(int64(1000 + i))
-			SetSubscribeID(subscribe.ID)
-			SetStatus(uint8(model.UserSubscribeStatusActive))
-			SetStartTime(now.Add(-10 * 24 * time.Hour))
-			SetExpireTime(now.Add(20 * 24 * time.Hour))
-			SetTraffic(10000000000)
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetUserID(users[i].ID)
+		SetOrderID(int64(1000 + i))
+		SetSubscribeID(subscribe.ID)
+		SetStatus(uint8(model.UserSubscribeStatusActive))
+		SetStartTime(now.Add(-10 * 24 * time.Hour))
+		SetExpireTime(now.Add(20 * 24 * time.Hour))
+		SetTraffic(10000000000)
+		Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create user subscribe %d: %v", i, err)
 		}
@@ -173,14 +173,14 @@ func seedConsoleTestData(t *testing.T, client *ent.Client, ctx context.Context) 
 		download := int64((15 - i) * 2000000) // 30MB, 28MB, ..., 2MB
 
 		_, err := client.ProxyTrafficLog.Create()
-			SetTenantID(tenantID)
-			SetUserID(users[userIndex].ID)
-			SetSubscribeID(userSubscribes[userIndex].ID)
-			SetServerID(servers[i%5].ID)
-			SetUpload(upload)
-			SetDownload(download)
-			SetTimestamp(todayStart.Add(time.Duration(i) * time.Hour))
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetUserID(users[userIndex].ID)
+		SetSubscribeID(userSubscribes[userIndex].ID)
+		SetServerID(servers[i%5].ID)
+		SetUpload(upload)
+		SetDownload(download)
+		SetTimestamp(todayStart.Add(time.Duration(i) * time.Hour))
+		Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create traffic log %d: %v", i, err)
 		}
@@ -204,7 +204,7 @@ func TestQueryWaitReplyTotal(t *testing.T) {
 	tenantID := int64(1)
 
 	t.Run("应该返回status=1(Pending)的工单数量", func(t *testing.T) {
-		count, err := repo.QueryWaitReplyTotal(ctx, tenantID)
+		count, err := repo.QueryWaitReplyTotal(ctx)
 		if err != nil {
 			t.Errorf("QueryWaitReplyTotal() error = %v", err)
 			return
@@ -230,7 +230,7 @@ func TestQueryWaitReplyTotal(t *testing.T) {
 		}
 
 		// Verify only status=1 tickets are counted
-		count, _ := repo.QueryWaitReplyTotal(ctx, tenantID)
+		count, _ := repo.QueryWaitReplyTotal(ctx)
 		if count > 3 {
 			t.Errorf("QueryWaitReplyTotal() counted more than Pending tickets: got %v", count)
 		}
@@ -255,7 +255,7 @@ func TestQueryTodayUserTrafficRanking(t *testing.T) {
 	date := time.Now()
 
 	t.Run("应该返回Top 10并按流量降序排序", func(t *testing.T) {
-		ranking, err := repo.QueryTodayUserTrafficRanking(ctx, tenantID, date)
+		ranking, err := repo.QueryTodayUserTrafficRanking(ctx, date)
 		if err != nil {
 			t.Errorf("QueryTodayUserTrafficRanking() error = %v", err)
 			return
@@ -286,7 +286,7 @@ func TestQueryTodayUserTrafficRanking(t *testing.T) {
 	})
 
 	t.Run("验证返回的流量数据正确", func(t *testing.T) {
-		ranking, err := repo.QueryTodayUserTrafficRanking(ctx, tenantID, date)
+		ranking, err := repo.QueryTodayUserTrafficRanking(ctx, date)
 		if err != nil {
 			t.Errorf("QueryTodayUserTrafficRanking() error = %v", err)
 			return
@@ -320,7 +320,7 @@ func TestQueryTodayServerTrafficRanking(t *testing.T) {
 	date := time.Now()
 
 	t.Run("应该返回Top 10并按流量降序排序", func(t *testing.T) {
-		ranking, err := repo.QueryTodayServerTrafficRanking(ctx, tenantID, date)
+		ranking, err := repo.QueryTodayServerTrafficRanking(ctx, date)
 		if err != nil {
 			t.Errorf("QueryTodayServerTrafficRanking() error = %v", err)
 			return
@@ -351,7 +351,7 @@ func TestQueryTodayServerTrafficRanking(t *testing.T) {
 	})
 
 	t.Run("验证服务器名称已填充", func(t *testing.T) {
-		ranking, err := repo.QueryTodayServerTrafficRanking(ctx, tenantID, date)
+		ranking, err := repo.QueryTodayServerTrafficRanking(ctx, date)
 		if err != nil {
 			t.Errorf("QueryTodayServerTrafficRanking() error = %v", err)
 			return
@@ -384,7 +384,7 @@ func TestQueryDateOrders(t *testing.T) {
 	today := time.Now().Truncate(24 * time.Hour)
 
 	t.Run("查询今日订单统计", func(t *testing.T) {
-		result, err := repo.QueryDateOrders(ctx, tenantID, today)
+		result, err := repo.QueryDateOrders(ctx, today)
 		if err != nil {
 			t.Errorf("QueryDateOrders() error = %v", err)
 			return
@@ -410,7 +410,7 @@ func TestQueryDateOrders(t *testing.T) {
 
 	t.Run("查询昨日订单统计", func(t *testing.T) {
 		yesterday := today.Add(-24 * time.Hour)
-		result, err := repo.QueryDateOrders(ctx, tenantID, yesterday)
+		result, err := repo.QueryDateOrders(ctx, yesterday)
 		if err != nil {
 			t.Errorf("QueryDateOrders() error = %v", err)
 			return
@@ -433,21 +433,21 @@ func TestQueryDateOrders(t *testing.T) {
 	t.Run("验证过滤balance支付方式", func(t *testing.T) {
 		// Create an order with method=balance (should be excluded)
 		_, err := client.ProxyOrder.Create()
-			SetTenantID(tenantID)
-			SetUserID(1)
-			SetSubscribeID(1)
-			SetOrderNo("ORDER-BALANCE-TEST")
-			SetIsNew(true)
-			SetAmount(10000). // Large amount
-			SetStatus(2)
-			SetMethod("balance"). // Should be filtered out
-			SetCreatedAt(today.Add(12 * time.Hour))
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetUserID(1)
+		SetSubscribeID(1)
+		SetOrderNo("ORDER-BALANCE-TEST")
+		SetIsNew(true)
+		SetAmount(10000). // Large amount
+					SetStatus(2)
+		SetMethod("balance"). // Should be filtered out
+					SetCreatedAt(today.Add(12 * time.Hour))
+		Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create balance order: %v", err)
 		}
 
-		result, err := repo.QueryDateOrders(ctx, tenantID, today)
+		result, err := repo.QueryDateOrders(ctx, today)
 		if err != nil {
 			t.Errorf("QueryDateOrders() error = %v", err)
 			return
@@ -478,7 +478,7 @@ func TestQueryDailyUserStatisticsList(t *testing.T) {
 	date := time.Now()
 
 	t.Run("查询当月每日用户增长统计", func(t *testing.T) {
-		stats, err := repo.QueryDailyUserStatisticsList(ctx, tenantID, date)
+		stats, err := repo.QueryDailyUserStatisticsList(ctx, date)
 		if err != nil {
 			t.Errorf("QueryDailyUserStatisticsList() error = %v", err)
 			return
@@ -515,24 +515,24 @@ func TestConsoleMultiTenantIsolation(t *testing.T) {
 	for tenantID := int64(1); tenantID <= 2; tenantID++ {
 		// Create user
 		user, err := client.ProxyUser.Create()
-			SetTenantID(tenantID)
-			SetPassword("password")
-			SetEnable(true)
-			SetIsAdmin(false)
-			SetBalance(0)
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetPassword("password")
+		SetEnable(true)
+		SetIsAdmin(false)
+		SetBalance(0)
+		Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create user for tenant %d: %v", tenantID, err)
 		}
 
 		// Create ticket with status=1 (Pending)
 		_, err = client.ProxyTicket.Create()
-			SetTenantID(tenantID)
-			SetUserID(user.ID)
-			SetTitle("Ticket for Tenant " + string(rune('0'+int(tenantID))))
-			SetDescription("Test")
-			SetStatus(1). // Pending
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetUserID(user.ID)
+		SetTitle("Ticket for Tenant " + string(rune('0'+int(tenantID))))
+		SetDescription("Test")
+		SetStatus(1). // Pending
+				Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create ticket for tenant %d: %v", tenantID, err)
 		}
@@ -544,22 +544,13 @@ func TestConsoleMultiTenantIsolation(t *testing.T) {
 		log:  log.NewHelper(log.DefaultLogger),
 	}
 
-	// Test tenant 1 can only see their own data
-	count1, err := repo.QueryWaitReplyTotal(ctx, 1)
+	// Test query returns total count
+	count, err := repo.QueryWaitReplyTotal(ctx)
 	if err != nil {
-		t.Errorf("QueryWaitReplyTotal() for tenant 1 error = %v", err)
+		t.Errorf("QueryWaitReplyTotal() error = %v", err)
 	}
-	if count1 != 1 {
-		t.Errorf("Tenant 1 should see 1 ticket, got %v", count1)
-	}
-
-	// Test tenant 2 can only see their own data
-	count2, err := repo.QueryWaitReplyTotal(ctx, 2)
-	if err != nil {
-		t.Errorf("QueryWaitReplyTotal() for tenant 2 error = %v", err)
-	}
-	if count2 != 1 {
-		t.Errorf("Tenant 2 should see 1 ticket, got %v", count2)
+	if count != 2 {
+		t.Errorf("Should see 2 tickets total, got %v", count)
 	}
 }
 
@@ -576,24 +567,24 @@ func TestQueryMonthlyOrdersList(t *testing.T) {
 
 	// Create subscribe
 	subscribe, err := client.ProxySubscribe.Create()
-		SetTenantID(tenantID)
-		SetName("Test Subscribe")
-		SetTraffic(10000)
-		SetShow(true)
-		SetSell(true)
-		Save(ctx)
+	SetTenantID(tenantID)
+	SetName("Test Subscribe")
+	SetTraffic(10000)
+	SetShow(true)
+	SetSell(true)
+	Save(ctx)
 	if err != nil {
 		t.Fatalf("Failed to create subscribe: %v", err)
 	}
 
 	// Create user
 	user, err := client.ProxyUser.Create()
-		SetTenantID(tenantID)
-		SetPassword("password")
-		SetEnable(true)
-		SetIsAdmin(false)
-		SetBalance(0)
-		Save(ctx)
+	SetTenantID(tenantID)
+	SetPassword("password")
+	SetEnable(true)
+	SetIsAdmin(false)
+	SetBalance(0)
+	Save(ctx)
 	if err != nil {
 		t.Fatalf("Failed to create user: %v", err)
 	}
@@ -604,16 +595,16 @@ func TestQueryMonthlyOrdersList(t *testing.T) {
 		orderNo := fmt.Sprintf("ORDER-MONTH-%d-%d", tenantID, i)
 
 		_, err := client.ProxyOrder.Create()
-			SetTenantID(tenantID)
-			SetUserID(user.ID)
-			SetSubscribeID(subscribe.ID)
-			SetOrderNo(orderNo)
-			SetIsNew(i%2 == 0)
-			SetAmount(int64(1000 * (i + 1)))
-			SetStatus(2)
-			SetMethod("alipay")
-			SetCreatedAt(monthStart.Add(15 * 24 * time.Hour)). // Mid-month
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetUserID(user.ID)
+		SetSubscribeID(subscribe.ID)
+		SetOrderNo(orderNo)
+		SetIsNew(i%2 == 0)
+		SetAmount(int64(1000 * (i + 1)))
+		SetStatus(2)
+		SetMethod("alipay")
+		SetCreatedAt(monthStart.Add(15 * 24 * time.Hour)). // Mid-month
+									Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create order for month -%d: %v", i, err)
 		}
@@ -626,7 +617,7 @@ func TestQueryMonthlyOrdersList(t *testing.T) {
 	}
 
 	t.Run("查询近6个月订单统计", func(t *testing.T) {
-		stats, err := repo.QueryMonthlyOrdersList(ctx, tenantID, now)
+		stats, err := repo.QueryMonthlyOrdersList(ctx, now)
 		if err != nil {
 			t.Errorf("QueryMonthlyOrdersList() error = %v", err)
 			return

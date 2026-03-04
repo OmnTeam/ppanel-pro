@@ -17,7 +17,7 @@ type ProxyUser struct {
 	config `json:"-"`
 	// ID of the ent.
 	// 用户ID
-	ID int `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// 用户密码
 	Password string `json:"password,omitempty"`
 	// 加密算法
@@ -31,15 +31,15 @@ type ProxyUser struct {
 	// 用户余额（单位：分）
 	Balance *int64 `json:"balance,omitempty"`
 	// Telegram账号
-	Telegram *int64 `json:"telegram,omitempty"`
+	Telegram *int `json:"telegram,omitempty"`
 	// 推荐码
 	ReferCode *string `json:"refer_code,omitempty"`
 	// 推荐人ID
-	RefererID *int `json:"referer_id,omitempty"`
+	RefererID *int64 `json:"referer_id,omitempty"`
 	// 佣金（单位：分）
 	Commission *int64 `json:"commission,omitempty"`
 	// 推荐百分比
-	ReferralPercentage int `json:"referral_percentage,omitempty"`
+	ReferralPercentage int8 `json:"referral_percentage,omitempty"`
 	// 仅首次购买
 	OnlyFirstPurchase bool `json:"only_first_purchase,omitempty"`
 	// 用户礼品金额（单位：分）
@@ -62,6 +62,10 @@ type ProxyUser struct {
 	EnableSubscribeNotify bool `json:"enable_subscribe_notify,omitempty"`
 	// 启用交易通知
 	EnableTradeNotify bool `json:"enable_trade_notify,omitempty"`
+	// 用户分组ID
+	GroupID *int64 `json:"group_id,omitempty"`
+	// 是否锁定分组
+	GroupLocked bool `json:"group_locked,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -69,8 +73,40 @@ type ProxyUser struct {
 	// 删除时间
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// 1：正常 0：已删除
-	IsDel        *bool `json:"is_del,omitempty"`
+	IsDel *bool `json:"is_del,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ProxyUserQuery when eager-loading is set.
+	Edges        ProxyUserEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// ProxyUserEdges holds the relations/edges for other nodes in the graph.
+type ProxyUserEdges struct {
+	// RedemptionRecords holds the value of the redemption_records edge.
+	RedemptionRecords []*ProxyRedemptionRecord `json:"redemption_records,omitempty"`
+	// Withdrawals holds the value of the withdrawals edge.
+	Withdrawals []*ProxyUserWithdrawal `json:"withdrawals,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// RedemptionRecordsOrErr returns the RedemptionRecords value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProxyUserEdges) RedemptionRecordsOrErr() ([]*ProxyRedemptionRecord, error) {
+	if e.loadedTypes[0] {
+		return e.RedemptionRecords, nil
+	}
+	return nil, &NotLoadedError{edge: "redemption_records"}
+}
+
+// WithdrawalsOrErr returns the Withdrawals value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProxyUserEdges) WithdrawalsOrErr() ([]*ProxyUserWithdrawal, error) {
+	if e.loadedTypes[1] {
+		return e.Withdrawals, nil
+	}
+	return nil, &NotLoadedError{edge: "withdrawals"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -78,9 +114,9 @@ func (*ProxyUser) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case proxyuser.FieldOnlyFirstPurchase, proxyuser.FieldEnable, proxyuser.FieldIsAdmin, proxyuser.FieldValidEmail, proxyuser.FieldEnableEmailNotify, proxyuser.FieldEnableTelegramNotify, proxyuser.FieldEnableBalanceNotify, proxyuser.FieldEnableLoginNotify, proxyuser.FieldEnableSubscribeNotify, proxyuser.FieldEnableTradeNotify, proxyuser.FieldIsDel:
+		case proxyuser.FieldOnlyFirstPurchase, proxyuser.FieldEnable, proxyuser.FieldIsAdmin, proxyuser.FieldValidEmail, proxyuser.FieldEnableEmailNotify, proxyuser.FieldEnableTelegramNotify, proxyuser.FieldEnableBalanceNotify, proxyuser.FieldEnableLoginNotify, proxyuser.FieldEnableSubscribeNotify, proxyuser.FieldEnableTradeNotify, proxyuser.FieldGroupLocked, proxyuser.FieldIsDel:
 			values[i] = new(sql.NullBool)
-		case proxyuser.FieldID, proxyuser.FieldTenantID, proxyuser.FieldBalance, proxyuser.FieldTelegram, proxyuser.FieldRefererID, proxyuser.FieldCommission, proxyuser.FieldReferralPercentage, proxyuser.FieldGiftAmount:
+		case proxyuser.FieldID, proxyuser.FieldTenantID, proxyuser.FieldBalance, proxyuser.FieldTelegram, proxyuser.FieldRefererID, proxyuser.FieldCommission, proxyuser.FieldReferralPercentage, proxyuser.FieldGiftAmount, proxyuser.FieldGroupID:
 			values[i] = new(sql.NullInt64)
 		case proxyuser.FieldPassword, proxyuser.FieldAlgo, proxyuser.FieldSalt, proxyuser.FieldAvatar, proxyuser.FieldReferCode:
 			values[i] = new(sql.NullString)
@@ -106,7 +142,7 @@ func (_m *ProxyUser) assignValues(columns []string, values []any) error {
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
+			_m.ID = int64(value.Int64)
 		case proxyuser.FieldPassword:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field password", values[i])
@@ -150,8 +186,8 @@ func (_m *ProxyUser) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field telegram", values[i])
 			} else if value.Valid {
-				_m.Telegram = new(int64)
-				*_m.Telegram = value.Int64
+				_m.Telegram = new(int)
+				*_m.Telegram = int(value.Int64)
 			}
 		case proxyuser.FieldReferCode:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -164,8 +200,8 @@ func (_m *ProxyUser) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field referer_id", values[i])
 			} else if value.Valid {
-				_m.RefererID = new(int)
-				*_m.RefererID = int(value.Int64)
+				_m.RefererID = new(int64)
+				*_m.RefererID = value.Int64
 			}
 		case proxyuser.FieldCommission:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -178,7 +214,7 @@ func (_m *ProxyUser) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field referral_percentage", values[i])
 			} else if value.Valid {
-				_m.ReferralPercentage = int(value.Int64)
+				_m.ReferralPercentage = int8(value.Int64)
 			}
 		case proxyuser.FieldOnlyFirstPurchase:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -247,6 +283,19 @@ func (_m *ProxyUser) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.EnableTradeNotify = value.Bool
 			}
+		case proxyuser.FieldGroupID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field group_id", values[i])
+			} else if value.Valid {
+				_m.GroupID = new(int64)
+				*_m.GroupID = value.Int64
+			}
+		case proxyuser.FieldGroupLocked:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field group_locked", values[i])
+			} else if value.Valid {
+				_m.GroupLocked = value.Bool
+			}
 		case proxyuser.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -284,6 +333,16 @@ func (_m *ProxyUser) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (_m *ProxyUser) Value(name string) (ent.Value, error) {
 	return _m.selectValues.Get(name)
+}
+
+// QueryRedemptionRecords queries the "redemption_records" edge of the ProxyUser entity.
+func (_m *ProxyUser) QueryRedemptionRecords() *ProxyRedemptionRecordQuery {
+	return NewProxyUserClient(_m.config).QueryRedemptionRecords(_m)
+}
+
+// QueryWithdrawals queries the "withdrawals" edge of the ProxyUser entity.
+func (_m *ProxyUser) QueryWithdrawals() *ProxyUserWithdrawalQuery {
+	return NewProxyUserClient(_m.config).QueryWithdrawals(_m)
 }
 
 // Update returns a builder for updating this ProxyUser.
@@ -390,6 +449,14 @@ func (_m *ProxyUser) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("enable_trade_notify=")
 	builder.WriteString(fmt.Sprintf("%v", _m.EnableTradeNotify))
+	builder.WriteString(", ")
+	if v := _m.GroupID; v != nil {
+		builder.WriteString("group_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("group_locked=")
+	builder.WriteString(fmt.Sprintf("%v", _m.GroupLocked))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

@@ -10,52 +10,52 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.ProxyUserDeviceOnlineRecord {
+func ID(id int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.ProxyUserDeviceOnlineRecord {
+func IDEQ(id int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.ProxyUserDeviceOnlineRecord {
+func IDNEQ(id int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.ProxyUserDeviceOnlineRecord {
+func IDIn(ids ...int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.ProxyUserDeviceOnlineRecord {
+func IDNotIn(ids ...int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.ProxyUserDeviceOnlineRecord {
+func IDGT(id int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.ProxyUserDeviceOnlineRecord {
+func IDGTE(id int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.ProxyUserDeviceOnlineRecord {
+func IDLT(id int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.ProxyUserDeviceOnlineRecord {
+func IDLTE(id int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldLTE(FieldID, id))
 }
 
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
-func UserID(v int) predicate.ProxyUserDeviceOnlineRecord {
+func UserID(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldEQ(FieldUserID, v))
 }
 
@@ -90,42 +90,42 @@ func CreatedAt(v time.Time) predicate.ProxyUserDeviceOnlineRecord {
 }
 
 // UserIDEQ applies the EQ predicate on the "user_id" field.
-func UserIDEQ(v int) predicate.ProxyUserDeviceOnlineRecord {
+func UserIDEQ(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldEQ(FieldUserID, v))
 }
 
 // UserIDNEQ applies the NEQ predicate on the "user_id" field.
-func UserIDNEQ(v int) predicate.ProxyUserDeviceOnlineRecord {
+func UserIDNEQ(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldNEQ(FieldUserID, v))
 }
 
 // UserIDIn applies the In predicate on the "user_id" field.
-func UserIDIn(vs ...int) predicate.ProxyUserDeviceOnlineRecord {
+func UserIDIn(vs ...int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldIn(FieldUserID, vs...))
 }
 
 // UserIDNotIn applies the NotIn predicate on the "user_id" field.
-func UserIDNotIn(vs ...int) predicate.ProxyUserDeviceOnlineRecord {
+func UserIDNotIn(vs ...int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldNotIn(FieldUserID, vs...))
 }
 
 // UserIDGT applies the GT predicate on the "user_id" field.
-func UserIDGT(v int) predicate.ProxyUserDeviceOnlineRecord {
+func UserIDGT(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldGT(FieldUserID, v))
 }
 
 // UserIDGTE applies the GTE predicate on the "user_id" field.
-func UserIDGTE(v int) predicate.ProxyUserDeviceOnlineRecord {
+func UserIDGTE(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldGTE(FieldUserID, v))
 }
 
 // UserIDLT applies the LT predicate on the "user_id" field.
-func UserIDLT(v int) predicate.ProxyUserDeviceOnlineRecord {
+func UserIDLT(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldLT(FieldUserID, v))
 }
 
 // UserIDLTE applies the LTE predicate on the "user_id" field.
-func UserIDLTE(v int) predicate.ProxyUserDeviceOnlineRecord {
+func UserIDLTE(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldLTE(FieldUserID, v))
 }
 

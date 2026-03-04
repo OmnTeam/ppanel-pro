@@ -28,6 +28,27 @@ func (_u *ProxyAuthMethodUpdate) Where(ps ...predicate.ProxyAuthMethod) *ProxyAu
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *ProxyAuthMethodUpdate) SetTenantID(v int64) *ProxyAuthMethodUpdate {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ProxyAuthMethodUpdate) SetNillableTenantID(v *int64) *ProxyAuthMethodUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *ProxyAuthMethodUpdate) AddTenantID(v int64) *ProxyAuthMethodUpdate {
+	_u.mutation.AddTenantID(v)
+	return _u
+}
+
 // SetMethod sets the "method" field.
 func (_u *ProxyAuthMethodUpdate) SetMethod(v string) *ProxyAuthMethodUpdate {
 	_u.mutation.SetMethod(v)
@@ -136,13 +157,19 @@ func (_u *ProxyAuthMethodUpdate) sqlSave(ctx context.Context) (_node int, err er
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyauthmethod.Table, proxyauthmethod.Columns, sqlgraph.NewFieldSpec(proxyauthmethod.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyauthmethod.Table, proxyauthmethod.Columns, sqlgraph.NewFieldSpec(proxyauthmethod.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(proxyauthmethod.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(proxyauthmethod.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Method(); ok {
 		_spec.SetField(proxyauthmethod.FieldMethod, field.TypeString, value)
@@ -174,6 +201,27 @@ type ProxyAuthMethodUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxyAuthMethodMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *ProxyAuthMethodUpdateOne) SetTenantID(v int64) *ProxyAuthMethodUpdateOne {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ProxyAuthMethodUpdateOne) SetNillableTenantID(v *int64) *ProxyAuthMethodUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *ProxyAuthMethodUpdateOne) AddTenantID(v int64) *ProxyAuthMethodUpdateOne {
+	_u.mutation.AddTenantID(v)
+	return _u
 }
 
 // SetMethod sets the "method" field.
@@ -297,7 +345,7 @@ func (_u *ProxyAuthMethodUpdateOne) sqlSave(ctx context.Context) (_node *ProxyAu
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyauthmethod.Table, proxyauthmethod.Columns, sqlgraph.NewFieldSpec(proxyauthmethod.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyauthmethod.Table, proxyauthmethod.Columns, sqlgraph.NewFieldSpec(proxyauthmethod.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProxyAuthMethod.id" for update`)}
@@ -321,6 +369,12 @@ func (_u *ProxyAuthMethodUpdateOne) sqlSave(ctx context.Context) (_node *ProxyAu
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(proxyauthmethod.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(proxyauthmethod.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Method(); ok {
 		_spec.SetField(proxyauthmethod.FieldMethod, field.TypeString, value)

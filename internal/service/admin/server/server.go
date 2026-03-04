@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/server/v1"
 	serverbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/server"
@@ -9,6 +10,12 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
+
+// Helper functions for type conversion
+func parseInt64(s string) int64 {
+	val, _ := strconv.ParseInt(s, 10, 64)
+	return val
+}
 
 // ServerService is the server service
 type ServerService struct {
@@ -52,7 +59,7 @@ func (s *ServerService) CreateServer(ctx context.Context, req *v1.CreateServerRe
 func (s *ServerService) UpdateServer(ctx context.Context, req *v1.UpdateServerRequest) (*v1.UpdateServerReply, error) {
 	protocols := protosToModelProtocols(req.Protocols)
 
-	server, err := s.serverUc.UpdateServer(ctx, req.Id, req.Name, req.Country, req.City, req.Address, int64(req.Sort), protocols)
+	server, err := s.serverUc.UpdateServer(ctx, int(parseInt64(req.Id)), req.Name, req.Country, req.City, req.Address, int64(req.Sort), protocols)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +75,7 @@ func (s *ServerService) UpdateServer(ctx context.Context, req *v1.UpdateServerRe
 
 // DeleteServer deletes a server
 func (s *ServerService) DeleteServer(ctx context.Context, req *v1.DeleteServerRequest) (*v1.DeleteServerReply, error) {
-	err := s.serverUc.DeleteServer(ctx, req.Id)
+	err := s.serverUc.DeleteServer(ctx, int(parseInt64(req.Id)))
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +91,7 @@ func (s *ServerService) DeleteServer(ctx context.Context, req *v1.DeleteServerRe
 
 // FilterServerList filters server list
 func (s *ServerService) FilterServerList(ctx context.Context, req *v1.FilterServerListRequest) (*v1.FilterServerListReply, error) {
-	total, servers, err := s.serverUc.FilterServerList(ctx, req.Page, req.Size, req.Search)
+	total, servers, err := s.serverUc.FilterServerList(ctx, int32(req.Page), int32(req.Size), req.Search)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +105,7 @@ func (s *ServerService) FilterServerList(ctx context.Context, req *v1.FilterServ
 		Code:    responsecode.AdminFilterServerListSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminFilterServerListSuccess],
 		Data: &v1.FilterServerListData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -106,7 +113,7 @@ func (s *ServerService) FilterServerList(ctx context.Context, req *v1.FilterServ
 
 // GetServerProtocols gets server protocols
 func (s *ServerService) GetServerProtocols(ctx context.Context, req *v1.GetServerProtocolsRequest) (*v1.GetServerProtocolsReply, error) {
-	protocols, err := s.serverUc.GetServerProtocols(ctx, req.Id)
+	protocols, err := s.serverUc.GetServerProtocols(ctx, int(parseInt64(req.Id)))
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +131,7 @@ func (s *ServerService) GetServerProtocols(ctx context.Context, req *v1.GetServe
 
 // CreateNode creates a new node
 func (s *ServerService) CreateNode(ctx context.Context, req *v1.CreateNodeRequest) (*v1.CreateNodeReply, error) {
-	node, err := s.nodeUc.CreateNode(ctx, req.Name, req.Tags, uint16(req.Port), req.Address, req.ServerId, req.Protocol, req.Enabled)
+	node, err := s.nodeUc.CreateNode(ctx, req.Name, req.Tags, uint16(req.Port), req.Address, parseInt64(req.ServerId), req.Protocol, req.Enabled)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +147,7 @@ func (s *ServerService) CreateNode(ctx context.Context, req *v1.CreateNodeReques
 
 // UpdateNode updates an existing node
 func (s *ServerService) UpdateNode(ctx context.Context, req *v1.UpdateNodeRequest) (*v1.UpdateNodeReply, error) {
-	node, err := s.nodeUc.UpdateNode(ctx, req.Id, req.Name, req.Tags, uint16(req.Port), req.Address, req.ServerId, req.Protocol, req.Enabled)
+	node, err := s.nodeUc.UpdateNode(ctx, int(parseInt64(req.Id)), req.Name, req.Tags, uint16(req.Port), req.Address, parseInt64(req.ServerId), req.Protocol, req.Enabled)
 	if err != nil {
 		return nil, err
 	}
@@ -156,7 +163,7 @@ func (s *ServerService) UpdateNode(ctx context.Context, req *v1.UpdateNodeReques
 
 // DeleteNode deletes a node
 func (s *ServerService) DeleteNode(ctx context.Context, req *v1.DeleteNodeRequest) (*v1.DeleteNodeReply, error) {
-	err := s.nodeUc.DeleteNode(ctx, req.Id)
+	err := s.nodeUc.DeleteNode(ctx, int(parseInt64(req.Id)))
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +179,7 @@ func (s *ServerService) DeleteNode(ctx context.Context, req *v1.DeleteNodeReques
 
 // FilterNodeList filters node list
 func (s *ServerService) FilterNodeList(ctx context.Context, req *v1.FilterNodeListRequest) (*v1.FilterNodeListReply, error) {
-	total, nodes, err := s.nodeUc.FilterNodeList(ctx, req.Page, req.Size, req.Search)
+	total, nodes, err := s.nodeUc.FilterNodeList(ctx, int32(req.Page), int32(req.Size), req.Search)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +193,7 @@ func (s *ServerService) FilterNodeList(ctx context.Context, req *v1.FilterNodeLi
 		Code:    responsecode.AdminFilterNodeListSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminFilterNodeListSuccess],
 		Data: &v1.FilterNodeListData{
-			Total: total,
+			Total: int32(total),
 			List:  list,
 		},
 	}, nil
@@ -194,7 +201,7 @@ func (s *ServerService) FilterNodeList(ctx context.Context, req *v1.FilterNodeLi
 
 // ToggleNodeStatus toggles node status
 func (s *ServerService) ToggleNodeStatus(ctx context.Context, req *v1.ToggleNodeStatusRequest) (*v1.ToggleNodeStatusReply, error) {
-	node, err := s.nodeUc.ToggleNodeStatus(ctx, req.Id, req.Enable)
+	node, err := s.nodeUc.ToggleNodeStatus(ctx, int(parseInt64(req.Id)), req.Enable)
 	if err != nil {
 		return nil, err
 	}
@@ -262,8 +269,8 @@ func (s *ServerService) ResetSortWithServer(ctx context.Context, req *v1.ResetSo
 	sortItems := make([]*serverbiz.SortItem, 0, len(req.Sort))
 	for _, item := range req.Sort {
 		sortItems = append(sortItems, &serverbiz.SortItem{
-			ID:   item.Id,
-			Sort: int64(item.Sort),
+			ID:   parseInt64(item.Id),
+			Sort: int(parseInt64(item.Sort)),
 		})
 	}
 
@@ -286,8 +293,8 @@ func (s *ServerService) ResetSortWithNode(ctx context.Context, req *v1.ResetSort
 	sortItems := make([]*serverbiz.SortItem, 0, len(req.Sort))
 	for _, item := range req.Sort {
 		sortItems = append(sortItems, &serverbiz.SortItem{
-			ID:   item.Id,
-			Sort: int64(item.Sort),
+			ID:   parseInt64(item.Id),
+			Sort: int(parseInt64(item.Sort)),
 		})
 	}
 
@@ -325,11 +332,11 @@ func serverToProto(s *serverbiz.Server) *v1.Server {
 			}
 			onlineUsers = append(onlineUsers, &v1.ServerOnlineUser{
 				Ip:          ips,
-				UserId:      user.UserID,
+				UserId:      strconv.FormatInt(user.UserID, 10),
 				Subscribe:   user.Subscribe,
-				SubscribeId: user.SubscribeID,
-				Traffic:     user.Traffic,
-				ExpiredAt:   user.ExpiredAt,
+				SubscribeId: strconv.FormatInt(user.SubscribeID, 10),
+				Traffic:     strconv.FormatInt(user.Traffic, 10),
+				ExpiredAt:   strconv.FormatInt(user.ExpiredAt, 10),
 			})
 		}
 
@@ -343,17 +350,17 @@ func serverToProto(s *serverbiz.Server) *v1.Server {
 	}
 
 	return &v1.Server{
-		Id:             s.ID,
+		Id:             strconv.FormatInt(s.ID, 10),
 		Name:           s.Name,
 		Country:        s.Country,
 		City:           s.City,
 		Address:        s.Address,
-		Sort:           s.Sort,
+		Sort:           strconv.FormatInt(int64(s.Sort), 10),
 		Protocols:      modelProtocolsToProtos(s.Protocols),
-		LastReportedAt: s.LastReportedAt,
+		LastReportedAt: int32(s.LastReportedAt),
 		Status:         status,
-		CreatedAt:      s.CreatedAt,
-		UpdatedAt:      s.UpdatedAt,
+		CreatedAt:      strconv.FormatInt(s.CreatedAt, 10),
+		UpdatedAt:      strconv.FormatInt(s.UpdatedAt, 10),
 	}
 }
 
@@ -363,17 +370,17 @@ func nodeToProto(n *serverbiz.Node) *v1.Node {
 	}
 
 	return &v1.Node{
-		Id:        n.ID,
+		Id:        strconv.FormatInt(n.ID, 10),
 		Name:      n.Name,
 		Tags:      n.Tags,
 		Port:      uint32(n.Port), // Convert uint16 to uint32 for Proto
 		Address:   n.Address,
-		ServerId:  n.ServerID,
+		ServerId:  strconv.FormatInt(n.ServerID, 10),
 		Protocol:  n.Protocol,
 		Enabled:   n.Enabled, // 直接使用 *bool，与老项目一致
 		Sort:      n.Sort,
-		CreatedAt: n.CreatedAt,
-		UpdatedAt: n.UpdatedAt,
+		CreatedAt: strconv.FormatInt(n.CreatedAt, 10),
+		UpdatedAt: strconv.FormatInt(n.UpdatedAt, 10),
 	}
 }
 
@@ -401,7 +408,7 @@ func protoToModelProtocol(p *v1.Protocol) *servermodel.Protocol {
 		Security:                p.Security,
 		SNI:                     p.Sni,
 		AllowInsecure:           p.AllowInsecure,
-		Fingerprint:             p.Fingerprint,
+		Fingerprint:             p.Fingerprint32,
 		RealityServerAddr:       p.RealityServerAddr,
 		RealityServerPort:       p.RealityServerPort,
 		RealityPrivateKey:       p.RealityPrivateKey,
@@ -469,7 +476,7 @@ func modelProtocolToProto(m *servermodel.Protocol) *v1.Protocol {
 		Security:                m.Security,
 		Sni:                     m.SNI,
 		AllowInsecure:           m.AllowInsecure,
-		Fingerprint:             m.Fingerprint,
+		Fingerprint32:           m.Fingerprint,
 		RealityServerAddr:       m.RealityServerAddr,
 		RealityServerPort:       m.RealityServerPort,
 		RealityPrivateKey:       m.RealityPrivateKey,

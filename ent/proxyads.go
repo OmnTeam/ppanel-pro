@@ -18,6 +18,8 @@ type ProxyAds struct {
 	// ID of the ent.
 	// 广告ID
 	ID int64 `json:"id,omitempty"`
+	// 租户ID
+	TenantID int64 `json:"tenant_id,omitempty"`
 	// 广告标题
 	Title string `json:"title,omitempty"`
 	// 广告类型
@@ -46,7 +48,7 @@ func (*ProxyAds) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case proxyads.FieldID, proxyads.FieldStatus:
+		case proxyads.FieldID, proxyads.FieldTenantID, proxyads.FieldStatus:
 			values[i] = new(sql.NullInt64)
 		case proxyads.FieldTitle, proxyads.FieldType, proxyads.FieldContent, proxyads.FieldDescription, proxyads.FieldTargetURL:
 			values[i] = new(sql.NullString)
@@ -73,6 +75,12 @@ func (_m *ProxyAds) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int64(value.Int64)
+		case proxyads.FieldTenantID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
+			} else if value.Valid {
+				_m.TenantID = value.Int64
+			}
 		case proxyads.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field title", values[i])
@@ -169,6 +177,9 @@ func (_m *ProxyAds) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProxyAds(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
+	builder.WriteString("tenant_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
+	builder.WriteString(", ")
 	builder.WriteString("title=")
 	builder.WriteString(_m.Title)
 	builder.WriteString(", ")

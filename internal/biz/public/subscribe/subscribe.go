@@ -25,7 +25,7 @@ type Subscribe struct {
 	SpeedLimit     int64
 	DeviceLimit    int64
 	Quota          int64
-	Nodes          []int64
+	Nodes          []int
 	NodeTags       []string
 	Show           bool
 	Sell           bool

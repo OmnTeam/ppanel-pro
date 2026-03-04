@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -27,10 +28,16 @@ func NewAdminUserDeviceRepo(d *Data, logger log.Logger) userbiz.DeviceRepo {
 
 // UpdateUserDevice 更新用户设备
 func (r *adminUserDeviceRepo) UpdateUserDevice(ctx context.Context, req *v1.UpdateUserDeviceRequest) error {
+	// Parse device ID
+	deviceID, err := strconv.ParseInt(req.Id, 10, 64)
+	if err != nil {
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
 	// 查找设备
 	device, err := r.data.db.ProxyUserDevice.Query().
 		Where(
-			proxyuserdevice.IDEQ(int(req.Id)),
+			proxyuserdevice.IDEQ(deviceID),
 		).
 		Only(ctx)
 
@@ -59,7 +66,7 @@ func (r *adminUserDeviceRepo) UpdateUserDevice(ctx context.Context, req *v1.Upda
 func (r *adminUserDeviceRepo) DeleteUserDevice(ctx context.Context, deviceID int64) error {
 	deletedCount, err := r.data.db.ProxyUserDevice.Delete().
 		Where(
-			proxyuserdevice.IDEQ(int(deviceID)),
+			proxyuserdevice.IDEQ(deviceID),
 		).
 		Exec(ctx)
 
@@ -80,7 +87,7 @@ func (r *adminUserDeviceRepo) KickOfflineByUserDevice(ctx context.Context, devic
 	// 查找设备
 	device, err := r.data.db.ProxyUserDevice.Query().
 		Where(
-			proxyuserdevice.IDEQ(int(deviceID)),
+			proxyuserdevice.IDEQ(deviceID),
 		).
 		Only(ctx)
 

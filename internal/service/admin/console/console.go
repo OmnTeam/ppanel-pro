@@ -77,7 +77,7 @@ func (s *ConsoleService) QueryTicketWaitReply(ctx context.Context, req *v1.Query
 		Code:    int32(responsecode.QueryTicketWaitReplySuccess),
 		Message: responsecode.CodeMessages[responsecode.QueryTicketWaitReplySuccess],
 		Data: &v1.QueryTicketWaitReplyData{
-			Count: resp.Count,
+			Count: int64(resp.Count),
 		},
 	}, nil
 }
@@ -92,13 +92,13 @@ func (s *ConsoleService) QueryServerTotalData(ctx context.Context, req *v1.Query
 
 	// 转换为 proto message
 	data := &v1.QueryServerTotalDataData{
-		OnlineUsers:     resp.OnlineUsers,
-		OnlineServers:   resp.OnlineServers,
-		OfflineServers:  resp.OfflineServers,
-		TodayUpload:     resp.TodayUpload,
-		TodayDownload:   resp.TodayDownload,
-		MonthlyUpload:   resp.MonthlyUpload,
-		MonthlyDownload: resp.MonthlyDownload,
+		OnlineUsers:     int64(resp.OnlineUsers),
+		OnlineServers:   int64(resp.OnlineServers),
+		OfflineServers:  int64(resp.OfflineServers),
+		TodayUpload:     int64(resp.TodayUpload),
+		TodayDownload:   int64(resp.TodayDownload),
+		MonthlyUpload:   int64(resp.MonthlyUpload),
+		MonthlyDownload: int64(resp.MonthlyDownload),
 		UpdatedAt:       resp.UpdatedAt,
 	}
 
@@ -107,10 +107,10 @@ func (s *ConsoleService) QueryServerTotalData(ctx context.Context, req *v1.Query
 		data.ServerTrafficRankingToday = make([]*v1.ServerTrafficData, 0, len(resp.ServerTrafficRankingToday))
 		for _, item := range resp.ServerTrafficRankingToday {
 			data.ServerTrafficRankingToday = append(data.ServerTrafficRankingToday, &v1.ServerTrafficData{
-				ServerId: item.ServerID,
+				ServerId: int64(item.ServerID),
 				Name:     item.Name,
-				Upload:   item.Upload,
-				Download: item.Download,
+				Upload:   int64(item.Upload),
+				Download: int64(item.Download),
 			})
 		}
 	}
@@ -119,10 +119,10 @@ func (s *ConsoleService) QueryServerTotalData(ctx context.Context, req *v1.Query
 		data.ServerTrafficRankingYesterday = make([]*v1.ServerTrafficData, 0, len(resp.ServerTrafficRankingYesterday))
 		for _, item := range resp.ServerTrafficRankingYesterday {
 			data.ServerTrafficRankingYesterday = append(data.ServerTrafficRankingYesterday, &v1.ServerTrafficData{
-				ServerId: item.ServerID,
+				ServerId: int64(item.ServerID),
 				Name:     item.Name,
-				Upload:   item.Upload,
-				Download: item.Download,
+				Upload:   int64(item.Upload),
+				Download: int64(item.Download),
 			})
 		}
 	}
@@ -132,9 +132,9 @@ func (s *ConsoleService) QueryServerTotalData(ctx context.Context, req *v1.Query
 		data.UserTrafficRankingToday = make([]*v1.UserTrafficData, 0, len(resp.UserTrafficRankingToday))
 		for _, item := range resp.UserTrafficRankingToday {
 			data.UserTrafficRankingToday = append(data.UserTrafficRankingToday, &v1.UserTrafficData{
-				Sid:      item.SID,
-				Upload:   item.Upload,
-				Download: item.Download,
+				Sid:      int64(item.SID),
+				Upload:   int64(item.Upload),
+				Download: int64(item.Download),
 			})
 		}
 	}
@@ -143,9 +143,9 @@ func (s *ConsoleService) QueryServerTotalData(ctx context.Context, req *v1.Query
 		data.UserTrafficRankingYesterday = make([]*v1.UserTrafficData, 0, len(resp.UserTrafficRankingYesterday))
 		for _, item := range resp.UserTrafficRankingYesterday {
 			data.UserTrafficRankingYesterday = append(data.UserTrafficRankingYesterday, &v1.UserTrafficData{
-				Sid:      item.SID,
-				Upload:   item.Upload,
-				Download: item.Download,
+				Sid:      int64(item.SID),
+				Upload:   int64(item.Upload),
+				Download: int64(item.Download),
 			})
 		}
 	}
@@ -165,9 +165,9 @@ func convertOrdersTotal(orders *consolebiz.OrdersTotal) *v1.OrdersStatistics {
 	}
 
 	result := &v1.OrdersStatistics{
-		AmountTotal:        orders.AmountTotal,
-		NewOrderAmount:     orders.NewOrderAmount,
-		RenewalOrderAmount: orders.RenewalOrderAmount,
+		AmountTotal:        int64(orders.AmountTotal),
+		NewOrderAmount:     int64(orders.NewOrderAmount),
+		RenewalOrderAmount: int64(orders.RenewalOrderAmount),
 	}
 
 	if len(orders.List) > 0 {
@@ -175,9 +175,9 @@ func convertOrdersTotal(orders *consolebiz.OrdersTotal) *v1.OrdersStatistics {
 		for _, item := range orders.List {
 			result.List = append(result.List, &v1.OrdersStatisticsWithDate{
 				Date:               item.Date,
-				AmountTotal:        item.AmountTotal,
-				NewOrderAmount:     item.NewOrderAmount,
-				RenewalOrderAmount: item.RenewalOrderAmount,
+				AmountTotal:        int64(item.AmountTotal),
+				NewOrderAmount:     int64(item.NewOrderAmount),
+				RenewalOrderAmount: int64(item.RenewalOrderAmount),
 			})
 		}
 	}
@@ -192,9 +192,9 @@ func convertUserStatistics(stats *consolebiz.UserStatistics) *v1.UserStatistics 
 
 	result := &v1.UserStatistics{
 		Date:              stats.Date,
-		Register:          stats.Register,
-		NewOrderUsers:     stats.NewOrderUsers,
-		RenewalOrderUsers: stats.RenewalOrderUsers,
+		Register:          int64(stats.Register),
+		NewOrderUsers:     int64(stats.NewOrderUsers),
+		RenewalOrderUsers: int64(stats.RenewalOrderUsers),
 	}
 
 	if len(stats.List) > 0 {
@@ -202,9 +202,9 @@ func convertUserStatistics(stats *consolebiz.UserStatistics) *v1.UserStatistics 
 		for _, item := range stats.List {
 			result.List = append(result.List, &v1.UserStatistics{
 				Date:              item.Date,
-				Register:          item.Register,
-				NewOrderUsers:     item.NewOrderUsers,
-				RenewalOrderUsers: item.RenewalOrderUsers,
+				Register:          int64(item.Register),
+				NewOrderUsers:     int64(item.NewOrderUsers),
+				RenewalOrderUsers: int64(item.RenewalOrderUsers),
 			})
 		}
 	}

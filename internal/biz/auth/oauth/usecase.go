@@ -51,9 +51,8 @@ func NewOAuthUseCase(repo OAuthRepo, logger log.Logger) OAuthUseCase {
 // OAuthLogin 获取OAuth登录URL
 // 完整复刻原项目 OAuthLoginLogic（oAuthLoginLogic.go）
 // 包含：获取配置、生成state code、保存到Redis、构建OAuth URL
-// ⚠️ 所有操作包含tenant_id
 func (uc *oauthUseCase) OAuthLogin(ctx context.Context, params *OAuthParams) (*OAuthResult, error) {
-	uc.logger.Infof("[OAuthLogin] tenantID: %d, method: %s", params.TenantID, params.Method)
+	uc.logger.Infof("[OAuthLogin] method: %s", params.Method)
 
 	// 根据不同的OAuth提供商生成登录URL
 	var uri string
@@ -87,12 +86,11 @@ func (uc *oauthUseCase) OAuthLogin(ctx context.Context, params *OAuthParams) (*O
 
 // googleLogin Google OAuth登录
 // 完整复刻原项目 google() 函数（oAuthLoginLogic.go Line 60-84）
-// ⚠️ 添加tenant_id过滤
 func (uc *oauthUseCase) googleLogin(ctx context.Context, params *OAuthParams) (string, error) {
-	uc.logger.Infof("[googleLogin] tenantID: %d, redirect: %s", params.TenantID, params.Redirect)
+	uc.logger.Infof("[googleLogin] redirect: %s", params.Redirect)
 
-	// 1. 从数据库获取Google OAuth配置（包含tenant_id过滤）
-	config, err := uc.repo.GetOAuthConfig(ctx, params.TenantID, OAuthGoogle)
+	// 1. 从数据库获取Google OAuth配置
+	config, err := uc.repo.GetOAuthConfig(ctx, OAuthGoogle)
 	if err != nil {
 		uc.logger.Errorf("[googleLogin] 获取Google配置失败: %v", err)
 		return "", err
@@ -125,12 +123,11 @@ func (uc *oauthUseCase) googleLogin(ctx context.Context, params *OAuthParams) (s
 
 // appleLogin Apple OAuth登录
 // 完整复刻原项目 apple() 函数（oAuthLoginLogic.go Line 90-110）
-// ⚠️ 添加tenant_id过滤
 func (uc *oauthUseCase) appleLogin(ctx context.Context, params *OAuthParams) (string, error) {
-	uc.logger.Infof("[appleLogin] tenantID: %d, redirect: %s", params.TenantID, params.Redirect)
+	uc.logger.Infof("[appleLogin] redirect: %s", params.Redirect)
 
-	// 1. 从数据库获取Apple OAuth配置（包含tenant_id过滤）
-	config, err := uc.repo.GetOAuthConfig(ctx, params.TenantID, OAuthApple)
+	// 1. 从数据库获取Apple OAuth配置
+	config, err := uc.repo.GetOAuthConfig(ctx, OAuthApple)
 	if err != nil {
 		uc.logger.Errorf("[appleLogin] 获取Apple配置失败: %v", err)
 		return "", err
@@ -163,12 +160,11 @@ func (uc *oauthUseCase) appleLogin(ctx context.Context, params *OAuthParams) (st
 
 // telegramLogin Telegram OAuth登录
 // 完整复刻原项目 telegram() 函数（oAuthLoginLogic.go Line 114-134）
-// ⚠️ 添加tenant_id过滤
 func (uc *oauthUseCase) telegramLogin(ctx context.Context, params *OAuthParams) (string, error) {
-	uc.logger.Infof("[telegramLogin] tenantID: %d, redirect: %s", params.TenantID, params.Redirect)
+	uc.logger.Infof("[telegramLogin] redirect: %s", params.Redirect)
 
-	// 1. 从数据库获取Telegram OAuth配置（包含tenant_id过滤）
-	config, err := uc.repo.GetOAuthConfig(ctx, params.TenantID, OAuthTelegram)
+	// 1. 从数据库获取Telegram OAuth配置
+	config, err := uc.repo.GetOAuthConfig(ctx, OAuthTelegram)
 	if err != nil {
 		uc.logger.Errorf("[telegramLogin] 获取Telegram配置失败: %v", err)
 		return "", err
@@ -208,10 +204,10 @@ func (uc *oauthUseCase) facebookLogin(ctx context.Context, params *OAuthParams) 
 // 包含：验证state、换取token、获取用户信息、查找或创建用户、生成JWT、记录登录日志
 // ⚠️ 所有操作包含tenant_id
 func (uc *oauthUseCase) OAuthLoginGetToken(ctx context.Context, params *OAuthTokenParams) (*OAuthTokenResult, error) {
-	uc.logger.Infof("[OAuthLoginGetToken] tenantID: %d, method: %s", params.TenantID, params.Method)
+	uc.logger.Infof("[OAuthLoginGetToken] method: %s", params.Method)
 
 	// 初始化登录状态（默认为失败）
-	var userID int64
+	var userID int
 	loginSuccess := false
 
 	// defer记录登录日志（不管成功还是失败）
@@ -223,21 +219,22 @@ func (uc *oauthUseCase) OAuthLoginGetToken(ctx context.Context, params *OAuthTok
 			logUserID = 0
 		}
 		// 记录登录日志（失败不影响主流程）
-		if err := uc.repo.RecordLoginLog(context.Background(), params.TenantID, logUserID, params.Method, params.IP, params.UserAgent, loginSuccess); err != nil {
+		if err := uc.repo.RecordLoginLog(context.Background(), logUserID, params.Method, params.IP, params.UserAgent, loginSuccess); err != nil {
 			uc.logger.Errorf("[OAuthLoginGetToken] 记录登录日志失败: %v (不影响登录)", err)
 		}
 	}()
 
 	// 根据不同的OAuth提供商处理token获取
 	var err error
+	var userIDInt64 int64
 
 	switch params.Method {
 	case OAuthGoogle:
-		userID, err = uc.googleGetToken(ctx, params)
+		userIDInt64, err = uc.googleGetToken(ctx, params)
 	case OAuthApple:
-		userID, err = uc.appleGetToken(ctx, params)
+		userIDInt64, err = uc.appleGetToken(ctx, params)
 	case OAuthTelegram:
-		userID, err = uc.telegramGetToken(ctx, params)
+		userIDInt64, err = uc.telegramGetToken(ctx, params)
 	default:
 		return nil, errors.BadRequest("UNSUPPORTED_OAUTH_METHOD", fmt.Sprintf("不支持的OAuth方法: %s", params.Method))
 	}
@@ -247,8 +244,10 @@ func (uc *oauthUseCase) OAuthLoginGetToken(ctx context.Context, params *OAuthTok
 		return nil, err
 	}
 
-	// 生成JWT token（包含TenantId, UserId, SessionId）
-	token, err := uc.repo.GenerateJWTToken(ctx, params.TenantID, userID)
+	userID = int(userIDInt64)
+
+	// 生成JWT token（包含UserId, SessionId）
+	token, err := uc.repo.GenerateJWTToken(ctx, int(userID))
 	if err != nil {
 		uc.logger.Errorf("[OAuthLoginGetToken] 生成JWT token失败: %v", err)
 		return nil, err
@@ -267,7 +266,7 @@ func (uc *oauthUseCase) OAuthLoginGetToken(ctx context.Context, params *OAuthTok
 // 完整复刻原项目 google() 函数（oAuthLoginGetTokenLogic.go Line 85-161）
 // ⚠️ 添加tenant_id到所有数据库操作
 func (uc *oauthUseCase) googleGetToken(ctx context.Context, params *OAuthTokenParams) (int64, error) {
-	uc.logger.Infof("[googleGetToken] tenantID: %d", params.TenantID)
+	uc.logger.Infof("[googleGetToken] method: google")
 
 	// 1. 解析callback数据
 	var request oauthRequest
@@ -285,8 +284,8 @@ func (uc *oauthUseCase) googleGetToken(ctx context.Context, params *OAuthTokenPa
 		return 0, err
 	}
 
-	// 3. 获取Google OAuth配置（包含tenant_id过滤）
-	config, err := uc.repo.GetOAuthConfig(ctx, params.TenantID, OAuthGoogle)
+	// 3. 获取Google OAuth配置
+	config, err := uc.repo.GetOAuthConfig(ctx, OAuthGoogle)
 	if err != nil {
 		uc.logger.Errorf("[googleGetToken] 获取Google配置失败: %v", err)
 		return 0, err
@@ -319,8 +318,8 @@ func (uc *oauthUseCase) googleGetToken(ctx context.Context, params *OAuthTokenPa
 
 	uc.logger.Infof("[googleGetToken] Google用户信息: openID=%s, email=%s", googleUserInfo.OpenID, googleUserInfo.Email)
 
-	// 7. 查找或注册用户（包含tenant_id、ip、userAgent）
-	userID, err := uc.findOrRegisterUser(ctx, params.TenantID, OAuthGoogle, googleUserInfo.OpenID, googleUserInfo.Email, googleUserInfo.Picture, params.IP, params.UserAgent)
+	// 7. 查找或注册用户（包含ip、userAgent）
+	userID, err := uc.findOrRegisterUser(ctx, OAuthGoogle, googleUserInfo.OpenID, googleUserInfo.Email, googleUserInfo.Picture, params.IP, params.UserAgent)
 	if err != nil {
 		uc.logger.Errorf("[googleGetToken] 查找或注册用户失败: %v", err)
 		return 0, err
@@ -334,7 +333,7 @@ func (uc *oauthUseCase) googleGetToken(ctx context.Context, params *OAuthTokenPa
 // 完整复刻原项目 apple() 函数（oAuthLoginGetTokenLogic.go Line 163-261）
 // ⚠️ 添加tenant_id到所有数据库操作
 func (uc *oauthUseCase) appleGetToken(ctx context.Context, params *OAuthTokenParams) (int64, error) {
-	uc.logger.Infof("[appleGetToken] tenantID: %d", params.TenantID)
+	uc.logger.Infof("[appleGetToken] method: apple")
 
 	// 1. 解析callback数据
 	var callback map[string]interface{}
@@ -355,8 +354,8 @@ func (uc *oauthUseCase) appleGetToken(ctx context.Context, params *OAuthTokenPar
 		return 0, err
 	}
 
-	// 3. 获取Apple OAuth配置（包含tenant_id过滤）
-	config, err := uc.repo.GetOAuthConfig(ctx, params.TenantID, OAuthApple)
+	// 3. 获取Apple OAuth配置
+	config, err := uc.repo.GetOAuthConfig(ctx, OAuthApple)
 	if err != nil {
 		uc.logger.Errorf("[appleGetToken] 获取Apple配置失败: %v", err)
 		return 0, err
@@ -411,8 +410,8 @@ func (uc *oauthUseCase) appleGetToken(ctx context.Context, params *OAuthTokenPar
 
 	uc.logger.Infof("[appleGetToken] Apple用户信息: uniqueID=%s, email=%s", appleUnique, email)
 
-	// 9. 查找或注册用户（包含tenant_id）
-	userID, err := uc.findOrRegisterUser(ctx, params.TenantID, OAuthApple, appleUnique, email, "", params.IP, params.UserAgent)
+	// 9. 查找或注册用户
+	userID, err := uc.findOrRegisterUser(ctx, OAuthApple, appleUnique, email, "", params.IP, params.UserAgent)
 	if err != nil {
 		uc.logger.Errorf("[appleGetToken] 查找或注册用户失败: %v", err)
 		return 0, err
@@ -426,10 +425,10 @@ func (uc *oauthUseCase) appleGetToken(ctx context.Context, params *OAuthTokenPar
 // 完整复刻原项目 telegram() 函数（oAuthLoginGetTokenLogic.go Line 263-324）
 // ⚠️ 添加tenant_id到所有数据库操作
 func (uc *oauthUseCase) telegramGetToken(ctx context.Context, params *OAuthTokenParams) (int64, error) {
-	uc.logger.Infof("[telegramGetToken] tenantID: %d", params.TenantID)
+	uc.logger.Infof("[telegramGetToken] method: telegram")
 
-	// 1. 获取Telegram OAuth配置（包含tenant_id过滤）
-	config, err := uc.repo.GetOAuthConfig(ctx, params.TenantID, OAuthTelegram)
+	// 1. 获取Telegram OAuth配置
+	config, err := uc.repo.GetOAuthConfig(ctx, OAuthTelegram)
 	if err != nil {
 		uc.logger.Errorf("[telegramGetToken] 获取Telegram配置失败: %v", err)
 		return 0, err
@@ -469,8 +468,8 @@ func (uc *oauthUseCase) telegramGetToken(ctx context.Context, params *OAuthToken
 
 	uc.logger.Infof("[telegramGetToken] Telegram用户信息: userID=%s, email=%s", userIDStr, email)
 
-	// 6. 查找或注册用户（包含tenant_id）
-	userID, err := uc.findOrRegisterUser(ctx, params.TenantID, OAuthTelegram, userIDStr, email, avatar, params.IP, params.UserAgent)
+	// 6. 查找或注册用户
+	userID, err := uc.findOrRegisterUser(ctx, OAuthTelegram, userIDStr, email, avatar, params.IP, params.UserAgent)
 	if err != nil {
 		uc.logger.Errorf("[telegramGetToken] 查找或注册用户失败: %v", err)
 		return 0, err
@@ -482,27 +481,26 @@ func (uc *oauthUseCase) telegramGetToken(ctx context.Context, params *OAuthToken
 
 // findOrRegisterUser 查找或注册用户
 // 完整复刻原项目 findOrRegisterUser() 函数（oAuthLoginGetTokenLogic.go Line 743-794）
-// ⚠️ 包含tenant_id过滤
-func (uc *oauthUseCase) findOrRegisterUser(ctx context.Context, tenantID int64, authType, openID, email, avatar, ip, userAgent string) (int64, error) {
-	uc.logger.Infof("[findOrRegisterUser] tenantID: %d, authType: %s, openID: %s, email: %s",
-		tenantID, authType, openID, email)
+func (uc *oauthUseCase) findOrRegisterUser(ctx context.Context, authType, openID, email, avatar, ip, userAgent string) (int64, error) {
+	uc.logger.Infof("[findOrRegisterUser] authType: %s, openID: %s, email: %s",
+		authType, openID, email)
 
-	// 1. 通过OAuth查找用户（包含tenant_id过滤）
-	userID, err := uc.repo.FindUserByOAuth(ctx, tenantID, authType, openID)
+	// 1. 通过OAuth查找用户
+	userID, err := uc.repo.FindUserByOAuth(ctx, authType, openID)
 	if err != nil {
 		// 用户不存在，需要注册
 		if errors.IsNotFound(err) {
 			uc.logger.Infof("[findOrRegisterUser] 用户不存在，开始注册")
 
-			// 2. 创建新用户（包含tenant_id、ip、userAgent）
-			userID, err = uc.repo.CreateUserWithOAuth(ctx, tenantID, authType, openID, email, avatar, ip, userAgent)
+			// 2. 创建新用户（包含ip、userAgent）
+			userID, err = uc.repo.CreateUserWithOAuth(ctx, authType, openID, email, avatar, ip, userAgent)
 			if err != nil {
 				uc.logger.Errorf("[findOrRegisterUser] 创建用户失败: %v", err)
 				return 0, err
 			}
 
 			uc.logger.Infof("[findOrRegisterUser] 用户注册成功, userID: %d", userID)
-			return userID, nil
+			return int64(userID), nil
 		}
 
 		// 其他数据库错误
@@ -512,7 +510,7 @@ func (uc *oauthUseCase) findOrRegisterUser(ctx context.Context, tenantID int64, 
 
 	// 用户已存在
 	uc.logger.Infof("[findOrRegisterUser] 找到已存在用户, userID: %d", userID)
-	return userID, nil
+	return int64(userID), nil
 }
 
 // AppleLoginCallback 处理Apple登录回调

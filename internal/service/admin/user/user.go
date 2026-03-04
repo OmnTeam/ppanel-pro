@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -43,14 +44,14 @@ func (s *UserService) CreateUser(ctx context.Context, req *v1.CreateUserRequest)
 		Code:    responsecode.AdminCreateUserSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminCreateUserSuccess],
 		Data: &v1.CreateUserData{
-			UserId: userID,
+			UserId: strconv.FormatInt(userID, 10),
 		},
 	}, nil
 }
 
 // DeleteUser 删除用户
 func (s *UserService) DeleteUser(ctx context.Context, req *v1.DeleteUserRequest) (*v1.DeleteUserReply, error) {
-		err := s.uc.DeleteUser(ctx,  req.UserId)
+	err := s.uc.DeleteUser(ctx, int(parseInt64(req.UserId)))
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +67,11 @@ func (s *UserService) DeleteUser(ctx context.Context, req *v1.DeleteUserRequest)
 
 // BatchDeleteUser 批量删除用户
 func (s *UserService) BatchDeleteUser(ctx context.Context, req *v1.BatchDeleteUserRequest) (*v1.BatchDeleteUserReply, error) {
-		deletedCount, err := s.uc.BatchDeleteUser(ctx,  req.UserIds)
+	idsInt := make([]int, len(req.UserIds))
+	for i, v := range req.UserIds {
+		idsInt[i] = int(parseInt64(v))
+	}
+	deletedCount, err := s.uc.BatchDeleteUser(ctx, idsInt)
 	if err != nil {
 		return nil, err
 	}
@@ -75,14 +80,14 @@ func (s *UserService) BatchDeleteUser(ctx context.Context, req *v1.BatchDeleteUs
 		Code:    responsecode.AdminBatchDeleteUserSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminBatchDeleteUserSuccess],
 		Data: &v1.BatchDeleteUserData{
-			DeletedCount: deletedCount,
+			DeletedCount: strconv.FormatInt(int64(deletedCount), 10),
 		},
 	}, nil
 }
 
 // CurrentUser 获取当前用户
 func (s *UserService) CurrentUser(ctx context.Context, req *v1.CurrentUserRequest) (*v1.CurrentUserReply, error) {
-		user, err := s.uc.CurrentUser(ctx,  req.UserId)
+	user, err := s.uc.CurrentUser(ctx, int(parseInt64(req.UserId)))
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +109,7 @@ func (s *UserService) CurrentUser(ctx context.Context, req *v1.CurrentUserReques
 
 // GetUserDetail 获取用户详情
 func (s *UserService) GetUserDetail(ctx context.Context, req *v1.GetUserDetailRequest) (*v1.GetUserDetailReply, error) {
-		user, err := s.uc.GetUserDetail(ctx,  req.Id)
+	user, err := s.uc.GetUserDetail(ctx, int(parseInt64(req.Id)))
 	if err != nil {
 		return nil, err
 	}
@@ -124,19 +129,22 @@ func (s *UserService) GetUserDetail(ctx context.Context, req *v1.GetUserDetailRe
 
 // GetUserList 获取用户列表
 func (s *UserService) GetUserList(ctx context.Context, req *v1.GetUserListRequest) (*v1.GetUserListReply, error) {
-	
+
 	var userID, subscribeID, userSubscribeID *int64
-	if req.UserId > 0 {
-		userID = &req.UserId
+	if req.UserId != "" {
+		parsedID := parseInt64(req.UserId)
+		userID = &parsedID
 	}
-	if req.SubscribeId > 0 {
-		subscribeID = &req.SubscribeId
+	if req.SubscribeId != "" {
+		parsedID := parseInt64(req.SubscribeId)
+		subscribeID = &parsedID
 	}
-	if req.UserSubscribeId > 0 {
-		userSubscribeID = &req.UserSubscribeId
+	if req.UserSubscribeId != "" {
+		parsedID := parseInt64(req.UserSubscribeId)
+		userSubscribeID = &parsedID
 	}
 
-	users, total, err := s.uc.GetUserList(ctx,  req.Page, req.Size, req.Search, userID, subscribeID, userSubscribeID)
+	users, total, err := s.uc.GetUserList(ctx, req.Page, req.Size, req.Search, userID, subscribeID, userSubscribeID)
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +163,7 @@ func (s *UserService) GetUserList(ctx context.Context, req *v1.GetUserListReques
 		Code:    responsecode.AdminGetUserListSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminGetUserListSuccess],
 		Data: &v1.GetUserListData{
-			Total: total,
+			Total: strconv.FormatInt(total, 10),
 			List:  protoUsers,
 		},
 	}, nil
@@ -189,13 +197,14 @@ func (s *UserService) UpdateUserNotifySettings(ctx context.Context, req *v1.Upda
 
 // GetUserLoginLogs 获取用户登录日志
 func (s *UserService) GetUserLoginLogs(ctx context.Context, req *v1.GetUserLoginLogsRequest) (*v1.GetUserLoginLogsReply, error) {
-	
+
 	var userID *int64
-	if req.UserId > 0 {
-		userID = &req.UserId
+	if req.UserId != "" {
+		parsedID := parseInt64(req.UserId)
+		userID = &parsedID
 	}
 
-	logs, total, err := s.uc.GetUserLoginLogs(ctx,  req.Page, req.Size, userID, req.Date)
+	logs, total, err := s.uc.GetUserLoginLogs(ctx, req.Page, req.Size, userID, req.Date)
 	if err != nil {
 		return nil, err
 	}
@@ -211,12 +220,12 @@ func (s *UserService) GetUserLoginLogs(ctx context.Context, req *v1.GetUserLogin
 		}
 
 		protoLog := &v1.LoginLog{
-			UserId:    logEntry.ObjectID,
+			UserId:    strconv.FormatInt(int64(logEntry.ObjectID), 10),
 			Method:    loginLog.Method,
 			LoginIp:   loginLog.LoginIP,
 			UserAgent: loginLog.UserAgent,
 			Success:   loginLog.Success,
-			Timestamp: loginLog.Timestamp,
+			Timestamp: strconv.FormatInt(loginLog.Timestamp, 10),
 		}
 
 		protoLogs = append(protoLogs, protoLog)
@@ -226,7 +235,7 @@ func (s *UserService) GetUserLoginLogs(ctx context.Context, req *v1.GetUserLogin
 		Code:    responsecode.AdminGetUserLoginLogsSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminGetUserLoginLogsSuccess],
 		Data: &v1.GetUserLoginLogsData{
-			Total: total,
+			Total: strconv.FormatInt(total, 10),
 			List:  protoLogs,
 		},
 	}, nil
@@ -274,13 +283,13 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 	protoAuthMethods := make([]*v1.UserAuthMethod, 0, len(authMethods))
 	for _, am := range authMethods {
 		protoAuthMethods = append(protoAuthMethods, &v1.UserAuthMethod{
-			Id:             int64(am.ID),
-			UserId:         int64(am.UserID),
+			Id:             strconv.FormatInt(int64(am.ID), 10),
+			UserId:         strconv.FormatInt(int64(am.UserID), 10),
 			AuthType:       am.AuthType,
 			AuthIdentifier: am.AuthIdentifier,
 			Verified:       am.Verified,
-			CreatedAt:      am.CreatedAt.UnixMilli(),
-			UpdatedAt:      am.UpdatedAt.UnixMilli(),
+			CreatedAt:      strconv.FormatInt(am.CreatedAt.UnixMilli(), 10),
+			UpdatedAt:      strconv.FormatInt(am.UpdatedAt.UnixMilli(), 10),
 		})
 	}
 
@@ -288,9 +297,9 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 	protoUserDevices := make([]*v1.UserDevice, 0, len(userDevices))
 	for _, ud := range userDevices {
 		// 处理设备的指针字段
-		subscribeID := int64(0)
+		subscribeID := ""
 		if ud.SubscribeID != nil {
-			subscribeID = int64(*ud.SubscribeID)
+			subscribeID = strconv.FormatInt(int64(*ud.SubscribeID), 10)
 		}
 		ip := ""
 		if ud.IP != nil {
@@ -306,39 +315,39 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 		}
 
 		protoUserDevices = append(protoUserDevices, &v1.UserDevice{
-			Id:          int64(ud.ID),
-			UserId:      int64(ud.UserID),
+			Id:          strconv.FormatInt(int64(ud.ID), 10),
+			UserId:      strconv.FormatInt(int64(ud.UserID), 10),
 			SubscribeId: subscribeID,
 			Ip:          ip,
 			Identifier:  identifier,
 			UserAgent:   userAgent,
 			Online:      ud.Online,
 			Enabled:     ud.Enabled,
-			CreatedAt:   ud.CreatedAt.UnixMilli(),
-			UpdatedAt:   ud.UpdatedAt.UnixMilli(),
+			CreatedAt:   strconv.FormatInt(ud.CreatedAt.UnixMilli(), 10),
+			UpdatedAt:   strconv.FormatInt(ud.UpdatedAt.UnixMilli(), 10),
 		})
 	}
 
 	// 处理指针字段
-	balance := int64(0)
+	balance := "0"
 	if user.Balance != nil {
-		balance = *user.Balance
+		balance = strconv.FormatInt(int64(*user.Balance), 10)
 	}
 	referCode := ""
 	if user.ReferCode != nil {
 		referCode = *user.ReferCode
 	}
-	refererID := int64(0)
+	refererID := ""
 	if user.RefererID != nil {
-		refererID = int64(*user.RefererID)
+		refererID = strconv.FormatInt(int64(*user.RefererID), 10)
 	}
-	commission := int64(0)
+	commission := "0"
 	if user.Commission != nil {
-		commission = *user.Commission
+		commission = strconv.FormatInt(int64(*user.Commission), 10)
 	}
-	giftAmount := int64(0)
+	giftAmount := "0"
 	if user.GiftAmount != nil {
-		giftAmount = *user.GiftAmount
+		giftAmount = strconv.FormatInt(int64(*user.GiftAmount), 10)
 	}
 	avatar := ""
 	if user.Avatar != nil {
@@ -346,7 +355,7 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 	}
 
 	protoUser := &v1.User{
-		Id:                    int64(user.ID),
+		Id:                    strconv.FormatInt(int64(user.ID), 10),
 		Email:                 email,
 		Telephone:             telephone,
 		TelephoneAreaCode:     telephoneAreaCode,
@@ -364,9 +373,9 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 		EnableSubscribeNotify: user.EnableSubscribeNotify,
 		EnableTradeNotify:     user.EnableTradeNotify,
 		Avatar:                avatar,
-		CreatedAt:             user.CreatedAt.UnixMilli(),
-		UpdatedAt:             user.UpdatedAt.UnixMilli(),
-		Telegram:              telegram,
+		CreatedAt:             strconv.FormatInt(user.CreatedAt.UnixMilli(), 10),
+		UpdatedAt:             strconv.FormatInt(user.UpdatedAt.UnixMilli(), 10),
+		Telegram:              strconv.FormatInt(telegram, 10),
 		AuthMethods:           protoAuthMethods,
 		UserDevices:           protoUserDevices,
 	}

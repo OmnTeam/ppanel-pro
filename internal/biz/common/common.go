@@ -189,22 +189,62 @@ func (uc *CommonUsecase) GetGlobalConfig(ctx context.Context) (*GlobalConfig, er
 		webAd = false
 	}
 
+	// Build auth config with nil checks
+	authConfig := &AuthConfig{}
+	if uc.conf != nil {
+		if uc.conf.Mobile != nil {
+			authConfig.Mobile = uc.conf.Mobile
+		}
+		if uc.conf.Email != nil {
+			authConfig.Email = uc.conf.Email
+		}
+		if uc.conf.Register != nil {
+			authConfig.Register = uc.conf.Register
+		}
+	}
+
 	// Combine config file data with database data
 	return &GlobalConfig{
-		Site:   uc.conf.Site,
-		Verify: uc.conf.Verify,
-		Auth: &AuthConfig{
-			Mobile:   uc.conf.Mobile,
-			Email:    uc.conf.Email,
-			Register: uc.conf.Register,
-		},
-		Invite:       uc.conf.Invite,
+		Site:         getSiteConfig(uc.conf),
+		Verify:       getVerifyConfig(uc.conf),
+		Auth:         authConfig,
+		Invite:       getInviteConfig(uc.conf),
 		Currency:     currency,
-		Subscribe:    uc.conf.Subscribe,
+		Subscribe:    getSubscribeConfig(uc.conf),
 		VerifyCode:   verifyCode,
 		OAuthMethods: oauthMethods,
 		WebAd:        webAd,
 	}, nil
+}
+
+// Helper functions to safely get config with defaults
+
+func getSiteConfig(conf *conf.Application) *conf.Site {
+	if conf == nil {
+		return nil
+	}
+	return conf.Site
+}
+
+func getVerifyConfig(conf *conf.Application) *conf.Verify {
+	if conf == nil {
+		return nil
+	}
+	return conf.Verify
+}
+
+func getInviteConfig(conf *conf.Application) *conf.Invite {
+	if conf == nil {
+		return nil
+	}
+	return conf.Invite
+}
+
+func getSubscribeConfig(conf *conf.Application) *conf.Subscribe {
+	if conf == nil {
+		return nil
+	}
+	return conf.Subscribe
 }
 
 // GetStat gets system statistics

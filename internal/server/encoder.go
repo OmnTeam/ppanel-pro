@@ -3,6 +3,7 @@ package server
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"reflect"
@@ -318,6 +319,15 @@ func CustomResponseEncoder(w http.ResponseWriter, r *http.Request, v interface{}
 	data, err := marshalWithRequiredFields(v)
 	if err != nil {
 		return err
+	}
+	jsonData := make(map[string]interface{})
+	err = json.Unmarshal(data, &jsonData)
+	if err == nil {
+		sprintf := fmt.Sprintf("%v", jsonData["code"])
+		if len(sprintf) > 1 && sprintf[0] == '2' {
+			jsonData["code"] = 200
+			data, err = json.Marshal(jsonData)
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")

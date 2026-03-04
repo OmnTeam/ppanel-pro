@@ -28,6 +28,47 @@ func (_u *ProxyCouponUpdate) Where(ps ...predicate.ProxyCoupon) *ProxyCouponUpda
 	return _u
 }
 
+// SetUserLimit sets the "user_limit" field.
+func (_u *ProxyCouponUpdate) SetUserLimit(v int64) *ProxyCouponUpdate {
+	_u.mutation.ResetUserLimit()
+	_u.mutation.SetUserLimit(v)
+	return _u
+}
+
+// SetNillableUserLimit sets the "user_limit" field if the given value is not nil.
+func (_u *ProxyCouponUpdate) SetNillableUserLimit(v *int64) *ProxyCouponUpdate {
+	if v != nil {
+		_u.SetUserLimit(*v)
+	}
+	return _u
+}
+
+// AddUserLimit adds value to the "user_limit" field.
+func (_u *ProxyCouponUpdate) AddUserLimit(v int64) *ProxyCouponUpdate {
+	_u.mutation.AddUserLimit(v)
+	return _u
+}
+
+// SetSubscribe sets the "subscribe" field.
+func (_u *ProxyCouponUpdate) SetSubscribe(v string) *ProxyCouponUpdate {
+	_u.mutation.SetSubscribe(v)
+	return _u
+}
+
+// SetNillableSubscribe sets the "subscribe" field if the given value is not nil.
+func (_u *ProxyCouponUpdate) SetNillableSubscribe(v *string) *ProxyCouponUpdate {
+	if v != nil {
+		_u.SetSubscribe(*v)
+	}
+	return _u
+}
+
+// ClearSubscribe clears the value of the "subscribe" field.
+func (_u *ProxyCouponUpdate) ClearSubscribe() *ProxyCouponUpdate {
+	_u.mutation.ClearSubscribe()
+	return _u
+}
+
 // SetName sets the "name" field.
 func (_u *ProxyCouponUpdate) SetName(v string) *ProxyCouponUpdate {
 	_u.mutation.SetName(v)
@@ -242,6 +283,18 @@ func (_u *ProxyCouponUpdate) sqlSave(ctx context.Context) (_node int, err error)
 			}
 		}
 	}
+	if value, ok := _u.mutation.UserLimit(); ok {
+		_spec.SetField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedUserLimit(); ok {
+		_spec.AddField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.Subscribe(); ok {
+		_spec.SetField(proxycoupon.FieldSubscribe, field.TypeString, value)
+	}
+	if _u.mutation.SubscribeCleared() {
+		_spec.ClearField(proxycoupon.FieldSubscribe, field.TypeString)
+	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxycoupon.FieldName, field.TypeString, value)
 	}
@@ -299,6 +352,47 @@ type ProxyCouponUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxyCouponMutation
+}
+
+// SetUserLimit sets the "user_limit" field.
+func (_u *ProxyCouponUpdateOne) SetUserLimit(v int64) *ProxyCouponUpdateOne {
+	_u.mutation.ResetUserLimit()
+	_u.mutation.SetUserLimit(v)
+	return _u
+}
+
+// SetNillableUserLimit sets the "user_limit" field if the given value is not nil.
+func (_u *ProxyCouponUpdateOne) SetNillableUserLimit(v *int64) *ProxyCouponUpdateOne {
+	if v != nil {
+		_u.SetUserLimit(*v)
+	}
+	return _u
+}
+
+// AddUserLimit adds value to the "user_limit" field.
+func (_u *ProxyCouponUpdateOne) AddUserLimit(v int64) *ProxyCouponUpdateOne {
+	_u.mutation.AddUserLimit(v)
+	return _u
+}
+
+// SetSubscribe sets the "subscribe" field.
+func (_u *ProxyCouponUpdateOne) SetSubscribe(v string) *ProxyCouponUpdateOne {
+	_u.mutation.SetSubscribe(v)
+	return _u
+}
+
+// SetNillableSubscribe sets the "subscribe" field if the given value is not nil.
+func (_u *ProxyCouponUpdateOne) SetNillableSubscribe(v *string) *ProxyCouponUpdateOne {
+	if v != nil {
+		_u.SetSubscribe(*v)
+	}
+	return _u
+}
+
+// ClearSubscribe clears the value of the "subscribe" field.
+func (_u *ProxyCouponUpdateOne) ClearSubscribe() *ProxyCouponUpdateOne {
+	_u.mutation.ClearSubscribe()
+	return _u
 }
 
 // SetName sets the "name" field.
@@ -544,6 +638,18 @@ func (_u *ProxyCouponUpdateOne) sqlSave(ctx context.Context) (_node *ProxyCoupon
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.UserLimit(); ok {
+		_spec.SetField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedUserLimit(); ok {
+		_spec.AddField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.Subscribe(); ok {
+		_spec.SetField(proxycoupon.FieldSubscribe, field.TypeString, value)
+	}
+	if _u.mutation.SubscribeCleared() {
+		_spec.ClearField(proxycoupon.FieldSubscribe, field.TypeString)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxycoupon.FieldName, field.TypeString, value)

@@ -11,7 +11,6 @@ import (
 // Ads 广告实体
 type Ads struct {
 	ID          int64     `json:"id"`
-	TenantID    int64     `json:"tenant_id"`
 	Title       string    `json:"title"`
 	Type        string    `json:"type"`
 	Content     string    `json:"content"`
@@ -26,18 +25,17 @@ type Ads struct {
 
 // AdsFilter 广告过滤条件
 type AdsFilter struct {
-	Search   string `json:"search"`
-	Status   *int8  `json:"status"`
-	TenantID int64  `json:"tenant_id"`
+	Search string `json:"search"`
+	Status *int8  `json:"status"`
 }
 
 // AdsRepo 广告数据仓库接口
 type AdsRepo interface {
-	GetAdsListByPage(ctx context.Context, page, size int64, filter AdsFilter) (total int64, list []*Ads, err error)
-	GetAdsByID(ctx context.Context, tenantID, id int64) (*Ads, error)
+	GetAdsListByPage(ctx context.Context, page, size int, filter AdsFilter) (total int64, list []*Ads, err error)
+	GetAdsByID(ctx context.Context, id int64) (*Ads, error)
 	CreateAds(ctx context.Context, ads *Ads) (*Ads, error)
 	UpdateAds(ctx context.Context, ads *Ads) (*Ads, error)
-	DeleteAds(ctx context.Context, tenantID, id int64) error
+	DeleteAds(ctx context.Context, id int64) error
 }
 
 // AdsUsecase 广告用例
@@ -55,9 +53,7 @@ func NewAdsUsecase(repo AdsRepo, logger log.Logger) *AdsUsecase {
 }
 
 // GetAdsListByPage 分页获取广告列表
-func (uc *AdsUsecase) GetAdsListByPage(ctx context.Context, tenantID, page, size int64, filter AdsFilter) (total int64, list []*Ads, err error) {
-	filter.TenantID = tenantID
-
+func (uc *AdsUsecase) GetAdsListByPage(ctx context.Context, page, size int, filter AdsFilter) (total int64, list []*Ads, err error) {
 	if page <= 0 {
 		page = 1
 	}
@@ -75,12 +71,12 @@ func (uc *AdsUsecase) GetAdsListByPage(ctx context.Context, tenantID, page, size
 }
 
 // GetAdsByID 根据ID获取广告详情
-func (uc *AdsUsecase) GetAdsByID(ctx context.Context, tenantID, id int64) (*Ads, error) {
+func (uc *AdsUsecase) GetAdsByID(ctx context.Context, id int64) (*Ads, error) {
 	if id <= 0 {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	ads, err := uc.repo.GetAdsByID(ctx, tenantID, id)
+	ads, err := uc.repo.GetAdsByID(ctx, id)
 	if err != nil {
 		uc.log.WithContext(ctx).Errorf("Failed to get ads by id %d: %v", id, err)
 		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
@@ -114,7 +110,7 @@ func (uc *AdsUsecase) CreateAds(ctx context.Context, ads *Ads) (*Ads, error) {
 		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseInsert)
 	}
 
-	uc.log.WithContext(ctx).Infof("Created ads successfully, tenant_id: %d, ads_id: %d", ads.TenantID, result.ID)
+	uc.log.WithContext(ctx).Infof("Created ads successfully, ads_id: %d", result.ID)
 	return result, nil
 }
 
@@ -138,7 +134,7 @@ func (uc *AdsUsecase) UpdateAds(ctx context.Context, ads *Ads) (*Ads, error) {
 	}
 
 	// 先查询现有数据
-	data, err := uc.repo.GetAdsByID(ctx, ads.TenantID, ads.ID)
+	data, err := uc.repo.GetAdsByID(ctx, ads.ID)
 	if err != nil {
 		uc.log.WithContext(ctx).Errorf("find ads error: %v", err)
 		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
@@ -164,22 +160,22 @@ func (uc *AdsUsecase) UpdateAds(ctx context.Context, ads *Ads) (*Ads, error) {
 		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
 	}
 
-	uc.log.WithContext(ctx).Infof("Updated ads successfully, tenant_id: %d, ads_id: %d", ads.TenantID, ads.ID)
+	uc.log.WithContext(ctx).Infof("Updated ads successfully, ads_id: %d", ads.ID)
 	return result, nil
 }
 
 // DeleteAds 删除广告
-func (uc *AdsUsecase) DeleteAds(ctx context.Context, tenantID, id int64) error {
+func (uc *AdsUsecase) DeleteAds(ctx context.Context, id int64) error {
 	if id <= 0 {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	err := uc.repo.DeleteAds(ctx, tenantID, id)
+	err := uc.repo.DeleteAds(ctx, id)
 	if err != nil {
 		uc.log.WithContext(ctx).Errorf("delete ads error: %v", err)
 		return responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
 	}
 
-	uc.log.WithContext(ctx).Infof("Deleted ads successfully, tenant_id: %d, ads_id: %d", tenantID, id)
+	uc.log.WithContext(ctx).Infof("Deleted ads successfully, ads_id: %d", id)
 	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -67,7 +68,7 @@ func (r *adminUserRepo) CreateUser(ctx context.Context, req *v1.CreateUserReques
 			return 0, err
 		}
 		refererID = new(int64)
-	*refererID = int64(authMethod.UserID)
+		*refererID = authMethod.UserID
 	}
 
 	// 检查邮箱是否已存在
@@ -109,19 +110,24 @@ func (r *adminUserRepo) CreateUser(ctx context.Context, req *v1.CreateUserReques
 		return 0, err
 	}
 
+	// Parse string fields to int64
+	balance, _ := strconv.ParseInt(req.Balance, 10, 64)
+	commission, _ := strconv.ParseInt(req.Commission, 10, 64)
+	giftAmount, _ := strconv.ParseInt(req.GiftAmount, 10, 64)
+
 	// 创建用户
 	builder := tx.ProxyUser.Create().
 		SetPassword(encodedPwd).
 		SetReferCode(referCode).
-		SetBalance(req.Balance).
-		SetCommission(req.Commission).
-		SetGiftAmount(req.GiftAmount).
-		SetReferralPercentage(int(req.ReferralPercentage)).
+		SetBalance(balance).
+		SetCommission(commission).
+		SetGiftAmount(giftAmount).
+		SetReferralPercentage(int8(req.ReferralPercentage)).
 		SetOnlyFirstPurchase(req.OnlyFirstPurchase).
 		SetIsAdmin(req.IsAdmin)
 
 	if refererID != nil {
-		builder.SetRefererID(int(*refererID))
+		builder.SetRefererID(*refererID)
 	}
 
 	user, err := builder.Save(ctx)
@@ -168,7 +174,7 @@ func (r *adminUserRepo) CreateUser(ctx context.Context, req *v1.CreateUserReques
 }
 
 // DeleteUser 删除用户
-func (r *adminUserRepo) DeleteUser(ctx context.Context, userID int64) error {
+func (r *adminUserRepo) DeleteUser(ctx context.Context, userID int) error {
 	// Demo模式保护
 	isDemo := strings.ToLower(os.Getenv("PPANEL_MODE")) == "demo"
 	if userID == 2 && isDemo {
@@ -178,7 +184,7 @@ func (r *adminUserRepo) DeleteUser(ctx context.Context, userID int64) error {
 	// 验证用户存在
 	deleted, err := r.data.db.ProxyUser.Delete().
 		Where(
-			proxyuser.IDEQ(int(userID)),
+			proxyuser.IDEQ(int64(userID)),
 		).
 		Exec(ctx)
 	if err != nil {
@@ -193,7 +199,7 @@ func (r *adminUserRepo) DeleteUser(ctx context.Context, userID int64) error {
 }
 
 // BatchDeleteUser 批量删除用户
-func (r *adminUserRepo) BatchDeleteUser(ctx context.Context, userIDs []int64) (int64, error) {
+func (r *adminUserRepo) BatchDeleteUser(ctx context.Context, userIDs []int) (int64, error) {
 	// Demo模式保护
 	isDemo := strings.ToLower(os.Getenv("PPANEL_MODE")) == "demo"
 	if isDemo {
@@ -204,14 +210,15 @@ func (r *adminUserRepo) BatchDeleteUser(ctx context.Context, userIDs []int64) (i
 		}
 	}
 
-	intUserIDs := make([]int, len(userIDs))
+	// Convert []int to []int64 for the query
+	int64IDs := make([]int64, len(userIDs))
 	for i, id := range userIDs {
-		intUserIDs[i] = int(id)
+		int64IDs[i] = int64(id)
 	}
 
 	deleted, err := r.data.db.ProxyUser.Delete().
 		Where(
-			proxyuser.IDIn(intUserIDs...),
+			proxyuser.IDIn(int64IDs...),
 		).
 		Exec(ctx)
 	if err != nil {
@@ -222,10 +229,10 @@ func (r *adminUserRepo) BatchDeleteUser(ctx context.Context, userIDs []int64) (i
 }
 
 // GetUserByID 根据ID获取用户
-func (r *adminUserRepo) GetUserByID(ctx context.Context, userID int64) (*ent.ProxyUser, error) {
+func (r *adminUserRepo) GetUserByID(ctx context.Context, userID int) (*ent.ProxyUser, error) {
 	user, err := r.data.db.ProxyUser.Query().
 		Where(
-			proxyuser.IDEQ(int(userID)),
+			proxyuser.IDEQ(int64(userID)),
 		).
 		Only(ctx)
 	if err != nil {
@@ -244,7 +251,7 @@ func (r *adminUserRepo) GetUserList(ctx context.Context, page, size int32, searc
 
 	// 按用户ID过滤
 	if userID != nil && *userID > 0 {
-		query = query.Where(proxyuser.IDEQ(int(*userID)))
+		query = query.Where(proxyuser.IDEQ(*userID))
 	}
 
 	// 按搜索关键字过滤（邮箱或手机号）
@@ -260,11 +267,11 @@ func (r *adminUserRepo) GetUserList(ctx context.Context, page, size int32, searc
 		}
 
 		if len(authMethods) > 0 {
-			intUserIDs := make([]int, 0, len(authMethods))
+			userIDs := make([]int64, 0, len(authMethods))
 			for _, am := range authMethods {
-				intUserIDs = append(intUserIDs, int(am.UserID))
+				userIDs = append(userIDs, am.UserID)
 			}
-			query = query.Where(proxyuser.IDIn(intUserIDs...))
+			query = query.Where(proxyuser.IDIn(userIDs...))
 		} else {
 			// 如果没有匹配的认证方法，返回空结果
 			return []*ent.ProxyUser{}, 0, nil
@@ -297,10 +304,16 @@ func (r *adminUserRepo) GetUserList(ctx context.Context, page, size int32, searc
 
 // UpdateUserBasicInfo 更新用户基本信息
 func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateUserBasicInfoRequest) error {
+	// Parse user ID
+	userID, err := strconv.ParseInt(req.UserId, 10, 64)
+	if err != nil {
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
 	// 先查询用户当前信息
 	userInfo, err := r.data.db.ProxyUser.Query().
 		Where(
-			proxyuser.IDEQ(int(req.UserId)),
+			proxyuser.IDEQ(userID),
 		).
 		Only(ctx)
 	if err != nil {
@@ -317,19 +330,26 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	// 余额变更日志
-	if req.Balance > 0 {
+	// Parse balance if provided
+	var balance int64
+	if req.Balance != "" {
+		balance, err = strconv.ParseInt(req.Balance, 10, 64)
+		if err != nil {
+			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+
+		// 余额变更日志
 		currentBalance := int64(0)
 		if userInfo.Balance != nil {
-			currentBalance = *userInfo.Balance
+			currentBalance = int64(*userInfo.Balance)
 		}
-		if currentBalance != req.Balance {
-			change := req.Balance - currentBalance
+		if currentBalance != balance {
+			change := balance - currentBalance
 			balanceLog := logmodel.Balance{
 				Type:      logmodel.BalanceTypeAdjust,
 				Amount:    change,
 				OrderNo:   "",
-				Balance:   req.Balance,
+				Balance:   balance,
 				Timestamp: time.Now().UnixMilli(),
 			}
 			content, _ := balanceLog.Marshal()
@@ -337,7 +357,7 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 			err = r.data.db.ProxySystemLog.Create().
 				SetType(int8(logmodel.TypeBalance)).
 				SetDate(time.Now().Format(time.DateOnly)).
-				SetObjectID(req.UserId).
+				SetObjectID(userID).
 				SetContent(string(content)).
 				Exec(ctx)
 			if err != nil {
@@ -347,16 +367,22 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 	}
 
 	// 赠送金额变更日志
-	if req.GiftAmount > 0 {
+	var giftAmount int64
+	if req.GiftAmount != "" {
+		giftAmount, err = strconv.ParseInt(req.GiftAmount, 10, 64)
+		if err != nil {
+			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+
 		currentGiftAmount := int64(0)
 		if userInfo.GiftAmount != nil {
-			currentGiftAmount = *userInfo.GiftAmount
+			currentGiftAmount = int64(*userInfo.GiftAmount)
 		}
-		if currentGiftAmount != req.GiftAmount {
-			change := req.GiftAmount - currentGiftAmount
+		if currentGiftAmount != giftAmount {
+			change := giftAmount - currentGiftAmount
 			if change != 0 {
 				var changeType uint16
-				if currentGiftAmount < req.GiftAmount {
+				if currentGiftAmount < giftAmount {
 					changeType = logmodel.GiftTypeIncrease
 				} else {
 					changeType = logmodel.GiftTypeReduce
@@ -364,7 +390,7 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 				giftLog := logmodel.Gift{
 					Type:      changeType,
 					Amount:    change,
-					Balance:   req.GiftAmount,
+					Balance:   giftAmount,
 					Remark:    "Admin adjustment",
 					Timestamp: time.Now().UnixMilli(),
 				}
@@ -373,7 +399,7 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 				err = r.data.db.ProxySystemLog.Create().
 					SetType(int8(logmodel.TypeGift)).
 					SetDate(time.Now().Format(time.DateOnly)).
-					SetObjectID(req.UserId).
+					SetObjectID(userID).
 					SetContent(string(content)).
 					Exec(ctx)
 				if err != nil {
@@ -384,15 +410,21 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 	}
 
 	// 佣金变更日志
-	if req.Commission > 0 {
+	var commission int64
+	if req.Commission != "" {
+		commission, err = strconv.ParseInt(req.Commission, 10, 64)
+		if err != nil {
+			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+
 		currentCommission := int64(0)
 		if userInfo.Commission != nil {
-			currentCommission = *userInfo.Commission
+			currentCommission = int64(*userInfo.Commission)
 		}
-		if req.Commission != currentCommission {
+		if commission != currentCommission {
 			commissionLog := logmodel.Commission{
 				Type:      logmodel.CommissionTypeAdjust,
-				Amount:    req.Commission - currentCommission,
+				Amount:    commission - currentCommission,
 				Timestamp: time.Now().UnixMilli(),
 			}
 			content, _ := commissionLog.Marshal()
@@ -400,7 +432,7 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 			err = r.data.db.ProxySystemLog.Create().
 				SetType(int8(logmodel.TypeCommission)).
 				SetDate(time.Now().Format(time.DateOnly)).
-				SetObjectID(req.UserId).
+				SetObjectID(userID).
 				SetContent(string(content)).
 				Exec(ctx)
 			if err != nil {
@@ -410,8 +442,8 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 	}
 
 	// 构建更新
-	builder := r.data.db.ProxyUser.UpdateOneID(int(req.UserId)).
-				SetUpdatedAt(time.Now())
+	builder := r.data.db.ProxyUser.UpdateOneID(userID).
+		SetUpdatedAt(time.Now())
 
 	// Demo模式密码保护
 	if req.Password != "" {
@@ -422,18 +454,33 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 		builder.SetPassword(encodedPwd)
 	}
 
+	// Parse telegram ID if provided
+	var telegramID int64
+	if req.Telegram != "" {
+		telegramID, _ = strconv.ParseInt(req.Telegram, 10, 64)
+	}
+
 	// 无条件更新所有数值字段（允许设置为0）
-	builder.SetBalance(req.Balance)
-	builder.SetCommission(req.Commission)
-	builder.SetGiftAmount(req.GiftAmount)
-	builder.SetRefererID(int(req.RefererId))
-	builder.SetReferralPercentage(int(req.ReferralPercentage))
+	if req.Balance != "" {
+		builder.SetBalance(balance)
+	}
+	if req.Commission != "" {
+		builder.SetCommission(commission)
+	}
+	if req.GiftAmount != "" {
+		builder.SetGiftAmount(giftAmount)
+	}
+	if req.RefererId != "" {
+		refererID, _ := strconv.ParseInt(req.RefererId, 10, 64)
+		builder.SetRefererID(refererID)
+	}
+	builder.SetReferralPercentage(int8(req.ReferralPercentage))
 	builder.SetOnlyFirstPurchase(req.OnlyFirstPurchase)
 	builder.SetEnable(req.Enable)
 	builder.SetIsAdmin(req.IsAdmin)
-	if req.Telegram > 0 {
-			builder.SetTelegram(req.Telegram)
-		}
+	if telegramID > 0 {
+		builder.SetTelegram(int(telegramID))
+	}
 
 	// 字符串字段：仅在非空时更新（避免清空重要字段）
 	if req.Avatar != "" {
@@ -457,8 +504,13 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 
 // UpdateUserNotifySettings 更新用户通知设置
 func (r *adminUserRepo) UpdateUserNotifySettings(ctx context.Context, req *v1.UpdateUserNotifySettingsRequest) error {
-	err := r.data.db.ProxyUser.UpdateOneID(int(req.UserId)).
-				SetEnableBalanceNotify(req.EnableBalanceNotify).
+	userID, err := strconv.ParseInt(req.UserId, 10, 64)
+	if err != nil {
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	err = r.data.db.ProxyUser.UpdateOneID(userID).
+		SetEnableBalanceNotify(req.EnableBalanceNotify).
 		SetEnableLoginNotify(req.EnableLoginNotify).
 		SetEnableSubscribeNotify(req.EnableSubscribeNotify).
 		SetEnableTradeNotify(req.EnableTradeNotify).

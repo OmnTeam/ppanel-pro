@@ -10,47 +10,47 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.ProxyServerGroup {
+func ID(id int64) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.ProxyServerGroup {
+func IDEQ(id int64) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.ProxyServerGroup {
+func IDNEQ(id int64) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.ProxyServerGroup {
+func IDIn(ids ...int64) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.ProxyServerGroup {
+func IDNotIn(ids ...int64) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.ProxyServerGroup {
+func IDGT(id int64) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.ProxyServerGroup {
+func IDGTE(id int64) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.ProxyServerGroup {
+func IDLT(id int64) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.ProxyServerGroup {
+func IDLTE(id int64) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldLTE(FieldID, id))
 }
 
@@ -62,6 +62,11 @@ func Name(v string) predicate.ProxyServerGroup {
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
 func Description(v string) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldEQ(FieldDescription, v))
+}
+
+// Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
+func Sort(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldSort, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -202,6 +207,46 @@ func DescriptionEqualFold(v string) predicate.ProxyServerGroup {
 // DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
 func DescriptionContainsFold(v string) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldContainsFold(FieldDescription, v))
+}
+
+// SortEQ applies the EQ predicate on the "sort" field.
+func SortEQ(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldSort, v))
+}
+
+// SortNEQ applies the NEQ predicate on the "sort" field.
+func SortNEQ(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNEQ(FieldSort, v))
+}
+
+// SortIn applies the In predicate on the "sort" field.
+func SortIn(vs ...int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldIn(FieldSort, vs...))
+}
+
+// SortNotIn applies the NotIn predicate on the "sort" field.
+func SortNotIn(vs ...int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNotIn(FieldSort, vs...))
+}
+
+// SortGT applies the GT predicate on the "sort" field.
+func SortGT(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGT(FieldSort, v))
+}
+
+// SortGTE applies the GTE predicate on the "sort" field.
+func SortGTE(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGTE(FieldSort, v))
+}
+
+// SortLT applies the LT predicate on the "sort" field.
+func SortLT(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLT(FieldSort, v))
+}
+
+// SortLTE applies the LTE predicate on the "sort" field.
+func SortLTE(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLTE(FieldSort, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

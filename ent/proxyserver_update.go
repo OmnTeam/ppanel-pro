@@ -28,6 +28,27 @@ func (_u *ProxyServerUpdate) Where(ps ...predicate.ProxyServer) *ProxyServerUpda
 	return _u
 }
 
+// SetTenantID sets the "tenant_id" field.
+func (_u *ProxyServerUpdate) SetTenantID(v int64) *ProxyServerUpdate {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ProxyServerUpdate) SetNillableTenantID(v *int64) *ProxyServerUpdate {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *ProxyServerUpdate) AddTenantID(v int64) *ProxyServerUpdate {
+	_u.mutation.AddTenantID(v)
+	return _u
+}
+
 // SetName sets the "name" field.
 func (_u *ProxyServerUpdate) SetName(v string) *ProxyServerUpdate {
 	_u.mutation.SetName(v)
@@ -247,13 +268,19 @@ func (_u *ProxyServerUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyserver.Table, proxyserver.Columns, sqlgraph.NewFieldSpec(proxyserver.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyserver.Table, proxyserver.Columns, sqlgraph.NewFieldSpec(proxyserver.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(proxyserver.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(proxyserver.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxyserver.FieldName, field.TypeString, value)
@@ -315,6 +342,27 @@ type ProxyServerUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxyServerMutation
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (_u *ProxyServerUpdateOne) SetTenantID(v int64) *ProxyServerUpdateOne {
+	_u.mutation.ResetTenantID()
+	_u.mutation.SetTenantID(v)
+	return _u
+}
+
+// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
+func (_u *ProxyServerUpdateOne) SetNillableTenantID(v *int64) *ProxyServerUpdateOne {
+	if v != nil {
+		_u.SetTenantID(*v)
+	}
+	return _u
+}
+
+// AddTenantID adds value to the "tenant_id" field.
+func (_u *ProxyServerUpdateOne) AddTenantID(v int64) *ProxyServerUpdateOne {
+	_u.mutation.AddTenantID(v)
+	return _u
 }
 
 // SetName sets the "name" field.
@@ -549,7 +597,7 @@ func (_u *ProxyServerUpdateOne) sqlSave(ctx context.Context) (_node *ProxyServer
 	if err := _u.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(proxyserver.Table, proxyserver.Columns, sqlgraph.NewFieldSpec(proxyserver.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyserver.Table, proxyserver.Columns, sqlgraph.NewFieldSpec(proxyserver.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProxyServer.id" for update`)}
@@ -573,6 +621,12 @@ func (_u *ProxyServerUpdateOne) sqlSave(ctx context.Context) (_node *ProxyServer
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.TenantID(); ok {
+		_spec.SetField(proxyserver.FieldTenantID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedTenantID(); ok {
+		_spec.AddField(proxyserver.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxyserver.FieldName, field.TypeString, value)

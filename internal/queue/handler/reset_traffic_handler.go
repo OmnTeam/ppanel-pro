@@ -87,7 +87,7 @@ func (h *ResetTrafficHandler) ProcessTask(ctx context.Context, _ *asynq.Task) er
 				h.setRetryCount(ctx, retryCount+1)
 
 				// Schedule retry with delay
-				task := asynq.NewTask(queueTypes.ScheduledResetTraffic, nil)
+				task := asynq.NewTask(queueTypes.SchedulerResetTraffic, nil)
 				_, retryErr := h.queue.Enqueue(task, asynq.ProcessIn(retryDelay))
 				if retryErr != nil {
 					h.logger.Errorf("[ResetTraffic] Failed to enqueue retry task: %v, retryCount=%d", retryErr, retryCount)
@@ -198,7 +198,7 @@ func (h *ResetTrafficHandler) resetMonth(ctx context.Context) error {
 		return nil
 	}
 
-	var resetMonthSubIds []int
+	var resetMonthSubIds []int64
 	for _, sub := range resetMonthSubs {
 		resetMonthSubIds = append(resetMonthSubIds, sub.ID)
 	}
@@ -229,7 +229,7 @@ func (h *ResetTrafficHandler) resetMonth(ctx context.Context) error {
 	}
 
 	// 应用层过滤：检查expire_time和当前时间的关系
-	var monthlyResetSubIDs []int
+	var monthlyResetSubIDs []int64
 	for _, sub := range allSubs {
 		if sub.ExpireTime == nil {
 			continue
@@ -335,7 +335,7 @@ func (h *ResetTrafficHandler) reset1st(ctx context.Context, cache resetTrafficCa
 		return nil
 	}
 
-	var reset1stSubIds []int
+	var reset1stSubIds []int64
 	for _, sub := range reset1stSubs {
 		reset1stSubIds = append(reset1stSubIds, sub.ID)
 	}
@@ -354,7 +354,7 @@ func (h *ResetTrafficHandler) reset1st(ctx context.Context, cache resetTrafficCa
 	}
 
 	if len(users1stReset) > 0 {
-		var userIDs []int
+		var userIDs []int64
 		for _, user := range users1stReset {
 			userIDs = append(userIDs, user.ID)
 		}
@@ -413,7 +413,7 @@ func (h *ResetTrafficHandler) resetYear(ctx context.Context) error {
 		return nil
 	}
 
-	var resetYearSubIds []int
+	var resetYearSubIds []int64
 	for _, sub := range resetYearSubs {
 		resetYearSubIds = append(resetYearSubIds, sub.ID)
 	}
@@ -435,7 +435,7 @@ func (h *ResetTrafficHandler) resetYear(ctx context.Context) error {
 	}
 
 	// 应用层过滤：检查月份、日期和年份差异
-	var usersYearReset []int
+	var usersYearReset []int64
 	for _, sub := range allYearSubs {
 		if sub.ExpireTime == nil {
 			continue
@@ -648,7 +648,7 @@ func (h *ResetTrafficHandler) clearCache(ctx context.Context, list []*ent.ProxyU
 		return
 	}
 
-	subs := make(map[int]bool)
+	subs := make(map[int64]bool)
 
 	for _, sub := range list {
 		if sub.SubscribeID > 0 {
@@ -660,7 +660,7 @@ func (h *ResetTrafficHandler) clearCache(ctx context.Context, list []*ent.ProxyU
 			}
 		}
 		// Insert traffic reset log (复刻原项目 line 595)
-		h.insertLog(ctx, 0, sub.ID, sub.UserID)
+		h.insertLog(ctx, sub.ID, sub.UserID)
 	}
 
 	// TODO: Clear subscription cache for all affected subscribe_ids (复刻原项目 line 598-605)
@@ -670,7 +670,7 @@ func (h *ResetTrafficHandler) clearCache(ctx context.Context, list []*ent.ProxyU
 }
 
 // insertLog inserts a reset traffic log entry (复刻原项目 line 610-625)
-func (h *ResetTrafficHandler) insertLog(ctx context.Context, tenantID, subID, userID int) {
+func (h *ResetTrafficHandler) insertLog(ctx context.Context, subID, userID int64) {
 	trafficLog := map[string]interface{}{
 		"type":      "reset_traffic", // ResetSubscribeTypeAuto
 		"user_id":   userID,
@@ -680,7 +680,7 @@ func (h *ResetTrafficHandler) insertLog(ctx context.Context, tenantID, subID, us
 
 	_, err := h.db.ProxySystemLog.Create().
 		SetType(int8(logmodel.TypeResetSubscribe)).
-		SetObjectID(int64(subID)).
+		SetObjectID(subID).
 		SetDate(time.Now().Format(time.DateOnly)).
 		SetContent(string(content)).
 		Save(ctx)
