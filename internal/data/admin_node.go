@@ -33,7 +33,7 @@ func (r *adminNodeRepo) CreateNode(ctx context.Context, node *serverbiz.Node) (*
 	builder := r.data.db.ProxyNode.Create().
 		SetName(node.Name).
 		SetTags(tagsStr).
-		SetPort(int(node.Port)). // uint16 to int
+		SetPort(node.Port).
 		SetAddress(node.Address).
 		SetServerID(node.ServerID).
 		SetProtocol(node.Protocol).
@@ -77,7 +77,7 @@ func (r *adminNodeRepo) UpdateNode(ctx context.Context, node *serverbiz.Node) (*
 	builder := r.data.db.ProxyNode.UpdateOneID(node.ID).
 		SetName(node.Name).
 		SetTags(tagsStr).
-		SetPort(int(node.Port)). // uint16 to int
+		SetPort(node.Port).
 		SetAddress(node.Address).
 		SetServerID(node.ServerID).
 		SetProtocol(node.Protocol).

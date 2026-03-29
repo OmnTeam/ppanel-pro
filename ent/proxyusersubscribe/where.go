@@ -69,6 +69,16 @@ func SubscribeID(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldSubscribeID, v))
 }
 
+// NodeGroupID applies equality check predicate on the "node_group_id" field. It's identical to NodeGroupIDEQ.
+func NodeGroupID(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldNodeGroupID, v))
+}
+
+// GroupLocked applies equality check predicate on the "group_locked" field. It's identical to GroupLockedEQ.
+func GroupLocked(v bool) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldGroupLocked, v))
+}
+
 // StartTime applies equality check predicate on the "start_time" field. It's identical to StartTimeEQ.
 func StartTime(v time.Time) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldStartTime, v))
@@ -99,6 +109,16 @@ func Upload(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldUpload, v))
 }
 
+// ExpiredDownload applies equality check predicate on the "expired_download" field. It's identical to ExpiredDownloadEQ.
+func ExpiredDownload(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldExpiredDownload, v))
+}
+
+// ExpiredUpload applies equality check predicate on the "expired_upload" field. It's identical to ExpiredUploadEQ.
+func ExpiredUpload(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldExpiredUpload, v))
+}
+
 // Token applies equality check predicate on the "token" field. It's identical to TokenEQ.
 func Token(v string) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldToken, v))
@@ -112,6 +132,11 @@ func UUID(v string) predicate.ProxyUserSubscribe {
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
 func Status(v int8) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldStatus, v))
+}
+
+// Note applies equality check predicate on the "note" field. It's identical to NoteEQ.
+func Note(v string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldNote, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -242,6 +267,56 @@ func SubscribeIDLT(v int64) predicate.ProxyUserSubscribe {
 // SubscribeIDLTE applies the LTE predicate on the "subscribe_id" field.
 func SubscribeIDLTE(v int64) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldLTE(FieldSubscribeID, v))
+}
+
+// NodeGroupIDEQ applies the EQ predicate on the "node_group_id" field.
+func NodeGroupIDEQ(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldNodeGroupID, v))
+}
+
+// NodeGroupIDNEQ applies the NEQ predicate on the "node_group_id" field.
+func NodeGroupIDNEQ(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldNEQ(FieldNodeGroupID, v))
+}
+
+// NodeGroupIDIn applies the In predicate on the "node_group_id" field.
+func NodeGroupIDIn(vs ...int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldIn(FieldNodeGroupID, vs...))
+}
+
+// NodeGroupIDNotIn applies the NotIn predicate on the "node_group_id" field.
+func NodeGroupIDNotIn(vs ...int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldNotIn(FieldNodeGroupID, vs...))
+}
+
+// NodeGroupIDGT applies the GT predicate on the "node_group_id" field.
+func NodeGroupIDGT(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldGT(FieldNodeGroupID, v))
+}
+
+// NodeGroupIDGTE applies the GTE predicate on the "node_group_id" field.
+func NodeGroupIDGTE(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldGTE(FieldNodeGroupID, v))
+}
+
+// NodeGroupIDLT applies the LT predicate on the "node_group_id" field.
+func NodeGroupIDLT(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldLT(FieldNodeGroupID, v))
+}
+
+// NodeGroupIDLTE applies the LTE predicate on the "node_group_id" field.
+func NodeGroupIDLTE(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldLTE(FieldNodeGroupID, v))
+}
+
+// GroupLockedEQ applies the EQ predicate on the "group_locked" field.
+func GroupLockedEQ(v bool) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldGroupLocked, v))
+}
+
+// GroupLockedNEQ applies the NEQ predicate on the "group_locked" field.
+func GroupLockedNEQ(v bool) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldNEQ(FieldGroupLocked, v))
 }
 
 // StartTimeEQ applies the EQ predicate on the "start_time" field.
@@ -534,6 +609,106 @@ func UploadNotNil() predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldNotNull(FieldUpload))
 }
 
+// ExpiredDownloadEQ applies the EQ predicate on the "expired_download" field.
+func ExpiredDownloadEQ(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldExpiredDownload, v))
+}
+
+// ExpiredDownloadNEQ applies the NEQ predicate on the "expired_download" field.
+func ExpiredDownloadNEQ(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldNEQ(FieldExpiredDownload, v))
+}
+
+// ExpiredDownloadIn applies the In predicate on the "expired_download" field.
+func ExpiredDownloadIn(vs ...int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldIn(FieldExpiredDownload, vs...))
+}
+
+// ExpiredDownloadNotIn applies the NotIn predicate on the "expired_download" field.
+func ExpiredDownloadNotIn(vs ...int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldNotIn(FieldExpiredDownload, vs...))
+}
+
+// ExpiredDownloadGT applies the GT predicate on the "expired_download" field.
+func ExpiredDownloadGT(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldGT(FieldExpiredDownload, v))
+}
+
+// ExpiredDownloadGTE applies the GTE predicate on the "expired_download" field.
+func ExpiredDownloadGTE(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldGTE(FieldExpiredDownload, v))
+}
+
+// ExpiredDownloadLT applies the LT predicate on the "expired_download" field.
+func ExpiredDownloadLT(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldLT(FieldExpiredDownload, v))
+}
+
+// ExpiredDownloadLTE applies the LTE predicate on the "expired_download" field.
+func ExpiredDownloadLTE(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldLTE(FieldExpiredDownload, v))
+}
+
+// ExpiredDownloadIsNil applies the IsNil predicate on the "expired_download" field.
+func ExpiredDownloadIsNil() predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldIsNull(FieldExpiredDownload))
+}
+
+// ExpiredDownloadNotNil applies the NotNil predicate on the "expired_download" field.
+func ExpiredDownloadNotNil() predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldNotNull(FieldExpiredDownload))
+}
+
+// ExpiredUploadEQ applies the EQ predicate on the "expired_upload" field.
+func ExpiredUploadEQ(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldExpiredUpload, v))
+}
+
+// ExpiredUploadNEQ applies the NEQ predicate on the "expired_upload" field.
+func ExpiredUploadNEQ(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldNEQ(FieldExpiredUpload, v))
+}
+
+// ExpiredUploadIn applies the In predicate on the "expired_upload" field.
+func ExpiredUploadIn(vs ...int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldIn(FieldExpiredUpload, vs...))
+}
+
+// ExpiredUploadNotIn applies the NotIn predicate on the "expired_upload" field.
+func ExpiredUploadNotIn(vs ...int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldNotIn(FieldExpiredUpload, vs...))
+}
+
+// ExpiredUploadGT applies the GT predicate on the "expired_upload" field.
+func ExpiredUploadGT(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldGT(FieldExpiredUpload, v))
+}
+
+// ExpiredUploadGTE applies the GTE predicate on the "expired_upload" field.
+func ExpiredUploadGTE(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldGTE(FieldExpiredUpload, v))
+}
+
+// ExpiredUploadLT applies the LT predicate on the "expired_upload" field.
+func ExpiredUploadLT(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldLT(FieldExpiredUpload, v))
+}
+
+// ExpiredUploadLTE applies the LTE predicate on the "expired_upload" field.
+func ExpiredUploadLTE(v int64) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldLTE(FieldExpiredUpload, v))
+}
+
+// ExpiredUploadIsNil applies the IsNil predicate on the "expired_upload" field.
+func ExpiredUploadIsNil() predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldIsNull(FieldExpiredUpload))
+}
+
+// ExpiredUploadNotNil applies the NotNil predicate on the "expired_upload" field.
+func ExpiredUploadNotNil() predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldNotNull(FieldExpiredUpload))
+}
+
 // TokenEQ applies the EQ predicate on the "token" field.
 func TokenEQ(v string) predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldToken, v))
@@ -732,6 +907,81 @@ func StatusIsNil() predicate.ProxyUserSubscribe {
 // StatusNotNil applies the NotNil predicate on the "status" field.
 func StatusNotNil() predicate.ProxyUserSubscribe {
 	return predicate.ProxyUserSubscribe(sql.FieldNotNull(FieldStatus))
+}
+
+// NoteEQ applies the EQ predicate on the "note" field.
+func NoteEQ(v string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldEQ(FieldNote, v))
+}
+
+// NoteNEQ applies the NEQ predicate on the "note" field.
+func NoteNEQ(v string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldNEQ(FieldNote, v))
+}
+
+// NoteIn applies the In predicate on the "note" field.
+func NoteIn(vs ...string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldIn(FieldNote, vs...))
+}
+
+// NoteNotIn applies the NotIn predicate on the "note" field.
+func NoteNotIn(vs ...string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldNotIn(FieldNote, vs...))
+}
+
+// NoteGT applies the GT predicate on the "note" field.
+func NoteGT(v string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldGT(FieldNote, v))
+}
+
+// NoteGTE applies the GTE predicate on the "note" field.
+func NoteGTE(v string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldGTE(FieldNote, v))
+}
+
+// NoteLT applies the LT predicate on the "note" field.
+func NoteLT(v string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldLT(FieldNote, v))
+}
+
+// NoteLTE applies the LTE predicate on the "note" field.
+func NoteLTE(v string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldLTE(FieldNote, v))
+}
+
+// NoteContains applies the Contains predicate on the "note" field.
+func NoteContains(v string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldContains(FieldNote, v))
+}
+
+// NoteHasPrefix applies the HasPrefix predicate on the "note" field.
+func NoteHasPrefix(v string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldHasPrefix(FieldNote, v))
+}
+
+// NoteHasSuffix applies the HasSuffix predicate on the "note" field.
+func NoteHasSuffix(v string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldHasSuffix(FieldNote, v))
+}
+
+// NoteIsNil applies the IsNil predicate on the "note" field.
+func NoteIsNil() predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldIsNull(FieldNote))
+}
+
+// NoteNotNil applies the NotNil predicate on the "note" field.
+func NoteNotNil() predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldNotNull(FieldNote))
+}
+
+// NoteEqualFold applies the EqualFold predicate on the "note" field.
+func NoteEqualFold(v string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldEqualFold(FieldNote, v))
+}
+
+// NoteContainsFold applies the ContainsFold predicate on the "note" field.
+func NoteContainsFold(v string) predicate.ProxyUserSubscribe {
+	return predicate.ProxyUserSubscribe(sql.FieldContainsFold(FieldNote, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

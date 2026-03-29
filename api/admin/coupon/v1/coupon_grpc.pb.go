@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v3.19.4
-// source: admin/coupon/v1/coupon.proto
+// source: api/admin/coupon/v1/coupon.proto
 
 package v1
 
@@ -279,5 +279,5 @@ var CouponService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "admin/coupon/v1/coupon.proto",
+	Metadata: "api/admin/coupon/v1/coupon.proto",
 }

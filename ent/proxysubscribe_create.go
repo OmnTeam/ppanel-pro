@@ -188,6 +188,68 @@ func (_c *ProxySubscribeCreate) SetNillableQuota(v *int64) *ProxySubscribeCreate
 	return _c
 }
 
+// SetNodes sets the "nodes" field.
+func (_c *ProxySubscribeCreate) SetNodes(v string) *ProxySubscribeCreate {
+	_c.mutation.SetNodes(v)
+	return _c
+}
+
+// SetNillableNodes sets the "nodes" field if the given value is not nil.
+func (_c *ProxySubscribeCreate) SetNillableNodes(v *string) *ProxySubscribeCreate {
+	if v != nil {
+		_c.SetNodes(*v)
+	}
+	return _c
+}
+
+// SetNodeTags sets the "node_tags" field.
+func (_c *ProxySubscribeCreate) SetNodeTags(v string) *ProxySubscribeCreate {
+	_c.mutation.SetNodeTags(v)
+	return _c
+}
+
+// SetNillableNodeTags sets the "node_tags" field if the given value is not nil.
+func (_c *ProxySubscribeCreate) SetNillableNodeTags(v *string) *ProxySubscribeCreate {
+	if v != nil {
+		_c.SetNodeTags(*v)
+	}
+	return _c
+}
+
+// SetNodeGroupIds sets the "node_group_ids" field.
+func (_c *ProxySubscribeCreate) SetNodeGroupIds(v []int64) *ProxySubscribeCreate {
+	_c.mutation.SetNodeGroupIds(v)
+	return _c
+}
+
+// SetNodeGroupID sets the "node_group_id" field.
+func (_c *ProxySubscribeCreate) SetNodeGroupID(v int64) *ProxySubscribeCreate {
+	_c.mutation.SetNodeGroupID(v)
+	return _c
+}
+
+// SetNillableNodeGroupID sets the "node_group_id" field if the given value is not nil.
+func (_c *ProxySubscribeCreate) SetNillableNodeGroupID(v *int64) *ProxySubscribeCreate {
+	if v != nil {
+		_c.SetNodeGroupID(*v)
+	}
+	return _c
+}
+
+// SetTrafficLimit sets the "traffic_limit" field.
+func (_c *ProxySubscribeCreate) SetTrafficLimit(v string) *ProxySubscribeCreate {
+	_c.mutation.SetTrafficLimit(v)
+	return _c
+}
+
+// SetNillableTrafficLimit sets the "traffic_limit" field if the given value is not nil.
+func (_c *ProxySubscribeCreate) SetNillableTrafficLimit(v *string) *ProxySubscribeCreate {
+	if v != nil {
+		_c.SetTrafficLimit(*v)
+	}
+	return _c
+}
+
 // SetShow sets the "show" field.
 func (_c *ProxySubscribeCreate) SetShow(v bool) *ProxySubscribeCreate {
 	_c.mutation.SetShow(v)
@@ -286,30 +348,16 @@ func (_c *ProxySubscribeCreate) SetNillableRenewalReset(v *bool) *ProxySubscribe
 	return _c
 }
 
-// SetNodes sets the "nodes" field.
-func (_c *ProxySubscribeCreate) SetNodes(v string) *ProxySubscribeCreate {
-	_c.mutation.SetNodes(v)
+// SetShowOriginalPrice sets the "show_original_price" field.
+func (_c *ProxySubscribeCreate) SetShowOriginalPrice(v bool) *ProxySubscribeCreate {
+	_c.mutation.SetShowOriginalPrice(v)
 	return _c
 }
 
-// SetNillableNodes sets the "nodes" field if the given value is not nil.
-func (_c *ProxySubscribeCreate) SetNillableNodes(v *string) *ProxySubscribeCreate {
+// SetNillableShowOriginalPrice sets the "show_original_price" field if the given value is not nil.
+func (_c *ProxySubscribeCreate) SetNillableShowOriginalPrice(v *bool) *ProxySubscribeCreate {
 	if v != nil {
-		_c.SetNodes(*v)
-	}
-	return _c
-}
-
-// SetNodeTags sets the "node_tags" field.
-func (_c *ProxySubscribeCreate) SetNodeTags(v string) *ProxySubscribeCreate {
-	_c.mutation.SetNodeTags(v)
-	return _c
-}
-
-// SetNillableNodeTags sets the "node_tags" field if the given value is not nil.
-func (_c *ProxySubscribeCreate) SetNillableNodeTags(v *string) *ProxySubscribeCreate {
-	if v != nil {
-		_c.SetNodeTags(*v)
+		_c.SetShowOriginalPrice(*v)
 	}
 	return _c
 }
@@ -423,6 +471,18 @@ func (_c *ProxySubscribeCreate) defaults() {
 		v := proxysubscribe.DefaultQuota
 		_c.mutation.SetQuota(v)
 	}
+	if _, ok := _c.mutation.Nodes(); !ok {
+		v := proxysubscribe.DefaultNodes
+		_c.mutation.SetNodes(v)
+	}
+	if _, ok := _c.mutation.NodeTags(); !ok {
+		v := proxysubscribe.DefaultNodeTags
+		_c.mutation.SetNodeTags(v)
+	}
+	if _, ok := _c.mutation.NodeGroupID(); !ok {
+		v := proxysubscribe.DefaultNodeGroupID
+		_c.mutation.SetNodeGroupID(v)
+	}
 	if _, ok := _c.mutation.Show(); !ok {
 		v := proxysubscribe.DefaultShow
 		_c.mutation.SetShow(v)
@@ -451,13 +511,9 @@ func (_c *ProxySubscribeCreate) defaults() {
 		v := proxysubscribe.DefaultRenewalReset
 		_c.mutation.SetRenewalReset(v)
 	}
-	if _, ok := _c.mutation.Nodes(); !ok {
-		v := proxysubscribe.DefaultNodes
-		_c.mutation.SetNodes(v)
-	}
-	if _, ok := _c.mutation.NodeTags(); !ok {
-		v := proxysubscribe.DefaultNodeTags
-		_c.mutation.SetNodeTags(v)
+	if _, ok := _c.mutation.ShowOriginalPrice(); !ok {
+		v := proxysubscribe.DefaultShowOriginalPrice
+		_c.mutation.SetShowOriginalPrice(v)
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := proxysubscribe.DefaultCreatedAt()
@@ -516,15 +572,6 @@ func (_c *ProxySubscribeCreate) check() error {
 	if _, ok := _c.mutation.Quota(); !ok {
 		return &ValidationError{Name: "quota", err: errors.New(`ent: missing required field "ProxySubscribe.quota"`)}
 	}
-	if _, ok := _c.mutation.Show(); !ok {
-		return &ValidationError{Name: "show", err: errors.New(`ent: missing required field "ProxySubscribe.show"`)}
-	}
-	if _, ok := _c.mutation.Sell(); !ok {
-		return &ValidationError{Name: "sell", err: errors.New(`ent: missing required field "ProxySubscribe.sell"`)}
-	}
-	if _, ok := _c.mutation.Sort(); !ok {
-		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "ProxySubscribe.sort"`)}
-	}
 	if _, ok := _c.mutation.Nodes(); !ok {
 		return &ValidationError{Name: "nodes", err: errors.New(`ent: missing required field "ProxySubscribe.nodes"`)}
 	}
@@ -540,6 +587,24 @@ func (_c *ProxySubscribeCreate) check() error {
 		if err := proxysubscribe.NodeTagsValidator(v); err != nil {
 			return &ValidationError{Name: "node_tags", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribe.node_tags": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.Show(); !ok {
+		return &ValidationError{Name: "show", err: errors.New(`ent: missing required field "ProxySubscribe.show"`)}
+	}
+	if _, ok := _c.mutation.Sell(); !ok {
+		return &ValidationError{Name: "sell", err: errors.New(`ent: missing required field "ProxySubscribe.sell"`)}
+	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "ProxySubscribe.sort"`)}
+	}
+	if _, ok := _c.mutation.AllowDeduction(); !ok {
+		return &ValidationError{Name: "allow_deduction", err: errors.New(`ent: missing required field "ProxySubscribe.allow_deduction"`)}
+	}
+	if _, ok := _c.mutation.RenewalReset(); !ok {
+		return &ValidationError{Name: "renewal_reset", err: errors.New(`ent: missing required field "ProxySubscribe.renewal_reset"`)}
+	}
+	if _, ok := _c.mutation.ShowOriginalPrice(); !ok {
+		return &ValidationError{Name: "show_original_price", err: errors.New(`ent: missing required field "ProxySubscribe.show_original_price"`)}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProxySubscribe.created_at"`)}
@@ -632,6 +697,26 @@ func (_c *ProxySubscribeCreate) createSpec() (*ProxySubscribe, *sqlgraph.CreateS
 		_spec.SetField(proxysubscribe.FieldQuota, field.TypeInt64, value)
 		_node.Quota = value
 	}
+	if value, ok := _c.mutation.Nodes(); ok {
+		_spec.SetField(proxysubscribe.FieldNodes, field.TypeString, value)
+		_node.Nodes = value
+	}
+	if value, ok := _c.mutation.NodeTags(); ok {
+		_spec.SetField(proxysubscribe.FieldNodeTags, field.TypeString, value)
+		_node.NodeTags = value
+	}
+	if value, ok := _c.mutation.NodeGroupIds(); ok {
+		_spec.SetField(proxysubscribe.FieldNodeGroupIds, field.TypeJSON, value)
+		_node.NodeGroupIds = value
+	}
+	if value, ok := _c.mutation.NodeGroupID(); ok {
+		_spec.SetField(proxysubscribe.FieldNodeGroupID, field.TypeInt64, value)
+		_node.NodeGroupID = &value
+	}
+	if value, ok := _c.mutation.TrafficLimit(); ok {
+		_spec.SetField(proxysubscribe.FieldTrafficLimit, field.TypeString, value)
+		_node.TrafficLimit = &value
+	}
 	if value, ok := _c.mutation.Show(); ok {
 		_spec.SetField(proxysubscribe.FieldShow, field.TypeBool, value)
 		_node.Show = value
@@ -660,13 +745,9 @@ func (_c *ProxySubscribeCreate) createSpec() (*ProxySubscribe, *sqlgraph.CreateS
 		_spec.SetField(proxysubscribe.FieldRenewalReset, field.TypeBool, value)
 		_node.RenewalReset = value
 	}
-	if value, ok := _c.mutation.Nodes(); ok {
-		_spec.SetField(proxysubscribe.FieldNodes, field.TypeString, value)
-		_node.Nodes = value
-	}
-	if value, ok := _c.mutation.NodeTags(); ok {
-		_spec.SetField(proxysubscribe.FieldNodeTags, field.TypeString, value)
-		_node.NodeTags = value
+	if value, ok := _c.mutation.ShowOriginalPrice(); ok {
+		_spec.SetField(proxysubscribe.FieldShowOriginalPrice, field.TypeBool, value)
+		_node.ShowOriginalPrice = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(proxysubscribe.FieldCreatedAt, field.TypeTime, value)

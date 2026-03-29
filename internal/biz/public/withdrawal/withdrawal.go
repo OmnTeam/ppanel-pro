@@ -35,6 +35,7 @@ type CommissionWithdrawRequest struct {
 // WithdrawalRepo 提现仓储接口
 type WithdrawalRepo interface {
 	CreateWithdrawal(ctx context.Context, userID int64, amount int64, content string) error
+	ProcessCommissionWithdraw(ctx context.Context, userID int64, amount int64, content string, commission int64) error
 	GetUserWithdrawals(ctx context.Context, userID int64, page, pageSize int32) ([]*Withdrawal, int, error)
 	GetUserByID(ctx context.Context, userID int64) (*User, error)
 	UpdateUserCommission(ctx context.Context, userID int64, commission int64) error
@@ -73,15 +74,9 @@ func (uc *WithdrawalUsecase) CommissionWithdraw(ctx context.Context, userID int6
 
 	// 更新用户佣金余额
 	newCommission := user.Commission - req.Amount
-	if err := uc.repo.UpdateUserCommission(ctx, userID, newCommission); err != nil {
-		uc.logger.WithContext(ctx).Errorf("update user commission failed: userID=%d, error=%v", userID, err)
-		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
-	}
-
-	// 创建提现记录
-	if err := uc.repo.CreateWithdrawal(ctx, userID, req.Amount, req.Content); err != nil {
-		uc.logger.WithContext(ctx).Errorf("create withdrawal failed: userID=%d, error=%v", userID, err)
-		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseInsert)
+	if err := uc.repo.ProcessCommissionWithdraw(ctx, userID, req.Amount, req.Content, newCommission); err != nil {
+		uc.logger.WithContext(ctx).Errorf("process commission withdraw failed: userID=%d, error=%v", userID, err)
+		return nil, err
 	}
 
 	uc.logger.WithContext(ctx).Infof("user %d commission withdraw successful: amount=%d", userID, req.Amount)

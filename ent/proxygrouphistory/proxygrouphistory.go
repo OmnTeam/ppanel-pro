@@ -17,22 +17,26 @@ const (
 	FieldGroupMode = "group_mode"
 	// FieldTriggerType holds the string denoting the trigger_type field in the database.
 	FieldTriggerType = "trigger_type"
-	// FieldStatus holds the string denoting the status field in the database.
-	FieldStatus = "status"
-	// FieldProgress holds the string denoting the progress field in the database.
-	FieldProgress = "progress"
-	// FieldTotal holds the string denoting the total field in the database.
-	FieldTotal = "total"
-	// FieldResult holds the string denoting the result field in the database.
-	FieldResult = "result"
-	// FieldError holds the string denoting the error field in the database.
-	FieldError = "error"
+	// FieldState holds the string denoting the state field in the database.
+	FieldState = "state"
+	// FieldTotalUsers holds the string denoting the total_users field in the database.
+	FieldTotalUsers = "total_users"
+	// FieldSuccessCount holds the string denoting the success_count field in the database.
+	FieldSuccessCount = "success_count"
+	// FieldFailedCount holds the string denoting the failed_count field in the database.
+	FieldFailedCount = "failed_count"
+	// FieldStartTime holds the string denoting the start_time field in the database.
+	FieldStartTime = "start_time"
+	// FieldEndTime holds the string denoting the end_time field in the database.
+	FieldEndTime = "end_time"
+	// FieldOperator holds the string denoting the operator field in the database.
+	FieldOperator = "operator"
+	// FieldErrorMessage holds the string denoting the error_message field in the database.
+	FieldErrorMessage = "error_message"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
-	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
-	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxygrouphistory in the database.
-	Table = "proxy_group_history"
+	Table = "group_history"
 )
 
 // Columns holds all SQL columns for proxygrouphistory fields.
@@ -40,13 +44,15 @@ var Columns = []string{
 	FieldID,
 	FieldGroupMode,
 	FieldTriggerType,
-	FieldStatus,
-	FieldProgress,
-	FieldTotal,
-	FieldResult,
-	FieldError,
+	FieldState,
+	FieldTotalUsers,
+	FieldSuccessCount,
+	FieldFailedCount,
+	FieldStartTime,
+	FieldEndTime,
+	FieldOperator,
+	FieldErrorMessage,
 	FieldCreatedAt,
-	FieldUpdatedAt,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -68,20 +74,20 @@ var (
 	DefaultTriggerType string
 	// TriggerTypeValidator is a validator for the "trigger_type" field. It is called by the builders before save.
 	TriggerTypeValidator func(string) error
-	// DefaultStatus holds the default value on creation for the "status" field.
-	DefaultStatus string
-	// StatusValidator is a validator for the "status" field. It is called by the builders before save.
-	StatusValidator func(string) error
-	// DefaultProgress holds the default value on creation for the "progress" field.
-	DefaultProgress int
-	// DefaultTotal holds the default value on creation for the "total" field.
-	DefaultTotal int
+	// DefaultState holds the default value on creation for the "state" field.
+	DefaultState string
+	// StateValidator is a validator for the "state" field. It is called by the builders before save.
+	StateValidator func(string) error
+	// DefaultTotalUsers holds the default value on creation for the "total_users" field.
+	DefaultTotalUsers int
+	// DefaultSuccessCount holds the default value on creation for the "success_count" field.
+	DefaultSuccessCount int
+	// DefaultFailedCount holds the default value on creation for the "failed_count" field.
+	DefaultFailedCount int
+	// OperatorValidator is a validator for the "operator" field. It is called by the builders before save.
+	OperatorValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
-	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
-	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
-	UpdateDefaultUpdatedAt func() time.Time
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(int64) error
 )
@@ -104,37 +110,47 @@ func ByTriggerType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTriggerType, opts...).ToFunc()
 }
 
-// ByStatus orders the results by the status field.
-func ByStatus(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+// ByState orders the results by the state field.
+func ByState(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldState, opts...).ToFunc()
 }
 
-// ByProgress orders the results by the progress field.
-func ByProgress(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldProgress, opts...).ToFunc()
+// ByTotalUsers orders the results by the total_users field.
+func ByTotalUsers(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTotalUsers, opts...).ToFunc()
 }
 
-// ByTotal orders the results by the total field.
-func ByTotal(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTotal, opts...).ToFunc()
+// BySuccessCount orders the results by the success_count field.
+func BySuccessCount(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSuccessCount, opts...).ToFunc()
 }
 
-// ByResult orders the results by the result field.
-func ByResult(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldResult, opts...).ToFunc()
+// ByFailedCount orders the results by the failed_count field.
+func ByFailedCount(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFailedCount, opts...).ToFunc()
 }
 
-// ByError orders the results by the error field.
-func ByError(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldError, opts...).ToFunc()
+// ByStartTime orders the results by the start_time field.
+func ByStartTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStartTime, opts...).ToFunc()
+}
+
+// ByEndTime orders the results by the end_time field.
+func ByEndTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEndTime, opts...).ToFunc()
+}
+
+// ByOperator orders the results by the operator field.
+func ByOperator(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOperator, opts...).ToFunc()
+}
+
+// ByErrorMessage orders the results by the error_message field.
+func ByErrorMessage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldErrorMessage, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
-}
-
-// ByUpdatedAt orders the results by the updated_at field.
-func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }

@@ -42,9 +42,9 @@ func (r *adminPaymentRepo) Create(ctx context.Context, method *paymentbiz.Paymen
 		SetIcon(method.Icon).
 		SetDomain(method.Domain).
 		SetConfig(method.Config).
-		SetFeeMode(int(method.FeeMode)).
-		SetFeePercent(float64(method.FeePercent)).
-		SetFeeAmount(int(method.FeeAmount)).
+		SetFeeMode(uint(method.FeeMode)).
+		SetFeePercent(method.FeePercent).
+		SetFeeAmount(method.FeeAmount).
 		SetEnable(method.Enable).
 		SetToken(token).
 		Save(ctx)
@@ -62,8 +62,8 @@ func (r *adminPaymentRepo) Create(ctx context.Context, method *paymentbiz.Paymen
 		Domain:      created.Domain,
 		Config:      created.Config,
 		FeeMode:     int32(created.FeeMode),
-		FeePercent:  int64(created.FeePercent),
-		FeeAmount:   int64(created.FeeAmount),
+		FeePercent:  created.FeePercent,
+		FeeAmount:   created.FeeAmount,
 		Enable:      created.Enable,
 		Token:       created.Token,
 		NotifyURL:   notifyURL,
@@ -98,9 +98,9 @@ func (r *adminPaymentRepo) Update(ctx context.Context, method *paymentbiz.Paymen
 		SetIcon(method.Icon).
 		SetDomain(method.Domain).
 		SetConfig(method.Config).
-		SetFeeMode(int(method.FeeMode)).
-		SetFeePercent(float64(method.FeePercent)).
-		SetFeeAmount(int(method.FeeAmount)).
+		SetFeeMode(uint(method.FeeMode)).
+		SetFeePercent(method.FeePercent).
+		SetFeeAmount(method.FeeAmount).
 		SetEnable(method.Enable).
 		Save(ctx)
 
@@ -117,8 +117,8 @@ func (r *adminPaymentRepo) Update(ctx context.Context, method *paymentbiz.Paymen
 		Domain:      updated.Domain,
 		Config:      updated.Config,
 		FeeMode:     int32(updated.FeeMode),
-		FeePercent:  int64(updated.FeePercent),
-		FeeAmount:   int64(updated.FeeAmount),
+		FeePercent:  updated.FeePercent,
+		FeeAmount:   updated.FeeAmount,
 		Enable:      updated.Enable,
 		Token:       updated.Token,
 		NotifyURL:   notifyURL,
@@ -173,8 +173,8 @@ func (r *adminPaymentRepo) Get(ctx context.Context, id int) (*paymentbiz.Payment
 		Domain:      payment.Domain,
 		Config:      payment.Config,
 		FeeMode:     int32(payment.FeeMode),
-		FeePercent:  int64(payment.FeePercent),
-		FeeAmount:   int64(payment.FeeAmount),
+		FeePercent:  payment.FeePercent,
+		FeeAmount:   payment.FeeAmount,
 		Enable:      payment.Enable,
 		Token:       payment.Token,
 		NotifyURL:   notifyURL,
@@ -237,8 +237,8 @@ func (r *adminPaymentRepo) List(ctx context.Context, page, size int, platform, s
 			Domain:      p.Domain,
 			Config:      p.Config,
 			FeeMode:     int32(p.FeeMode),
-			FeePercent:  int64(p.FeePercent),
-			FeeAmount:   int64(p.FeeAmount),
+			FeePercent:  p.FeePercent,
+			FeeAmount:   p.FeeAmount,
 			Enable:      p.Enable,
 			Token:       p.Token,
 			NotifyURL:   notifyURL,

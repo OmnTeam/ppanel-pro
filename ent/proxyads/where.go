@@ -54,11 +54,6 @@ func IDLTE(id int64) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldLTE(FieldID, id))
 }
 
-// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
-func TenantID(v int64) predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldEQ(FieldTenantID, v))
-}
-
 // Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
 func Title(v string) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldEQ(FieldTitle, v))
@@ -95,7 +90,7 @@ func EndTime(v time.Time) predicate.ProxyAds {
 }
 
 // Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
-func Status(v int8) predicate.ProxyAds {
+func Status(v int) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldEQ(FieldStatus, v))
 }
 
@@ -107,46 +102,6 @@ func CreatedAt(v time.Time) predicate.ProxyAds {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldEQ(FieldUpdatedAt, v))
-}
-
-// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
-func TenantIDEQ(v int64) predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldEQ(FieldTenantID, v))
-}
-
-// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
-func TenantIDNEQ(v int64) predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldNEQ(FieldTenantID, v))
-}
-
-// TenantIDIn applies the In predicate on the "tenant_id" field.
-func TenantIDIn(vs ...int64) predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldIn(FieldTenantID, vs...))
-}
-
-// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
-func TenantIDNotIn(vs ...int64) predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldNotIn(FieldTenantID, vs...))
-}
-
-// TenantIDGT applies the GT predicate on the "tenant_id" field.
-func TenantIDGT(v int64) predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldGT(FieldTenantID, v))
-}
-
-// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
-func TenantIDGTE(v int64) predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldGTE(FieldTenantID, v))
-}
-
-// TenantIDLT applies the LT predicate on the "tenant_id" field.
-func TenantIDLT(v int64) predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldLT(FieldTenantID, v))
-}
-
-// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
-func TenantIDLTE(v int64) predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldLTE(FieldTenantID, v))
 }
 
 // TitleEQ applies the EQ predicate on the "title" field.
@@ -534,16 +489,6 @@ func StartTimeLTE(v time.Time) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldLTE(FieldStartTime, v))
 }
 
-// StartTimeIsNil applies the IsNil predicate on the "start_time" field.
-func StartTimeIsNil() predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldIsNull(FieldStartTime))
-}
-
-// StartTimeNotNil applies the NotNil predicate on the "start_time" field.
-func StartTimeNotNil() predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldNotNull(FieldStartTime))
-}
-
 // EndTimeEQ applies the EQ predicate on the "end_time" field.
 func EndTimeEQ(v time.Time) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldEQ(FieldEndTime, v))
@@ -584,64 +529,44 @@ func EndTimeLTE(v time.Time) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldLTE(FieldEndTime, v))
 }
 
-// EndTimeIsNil applies the IsNil predicate on the "end_time" field.
-func EndTimeIsNil() predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldIsNull(FieldEndTime))
-}
-
-// EndTimeNotNil applies the NotNil predicate on the "end_time" field.
-func EndTimeNotNil() predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldNotNull(FieldEndTime))
-}
-
 // StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v int8) predicate.ProxyAds {
+func StatusEQ(v int) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldEQ(FieldStatus, v))
 }
 
 // StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v int8) predicate.ProxyAds {
+func StatusNEQ(v int) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldNEQ(FieldStatus, v))
 }
 
 // StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...int8) predicate.ProxyAds {
+func StatusIn(vs ...int) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldIn(FieldStatus, vs...))
 }
 
 // StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...int8) predicate.ProxyAds {
+func StatusNotIn(vs ...int) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldNotIn(FieldStatus, vs...))
 }
 
 // StatusGT applies the GT predicate on the "status" field.
-func StatusGT(v int8) predicate.ProxyAds {
+func StatusGT(v int) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldGT(FieldStatus, v))
 }
 
 // StatusGTE applies the GTE predicate on the "status" field.
-func StatusGTE(v int8) predicate.ProxyAds {
+func StatusGTE(v int) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldGTE(FieldStatus, v))
 }
 
 // StatusLT applies the LT predicate on the "status" field.
-func StatusLT(v int8) predicate.ProxyAds {
+func StatusLT(v int) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldLT(FieldStatus, v))
 }
 
 // StatusLTE applies the LTE predicate on the "status" field.
-func StatusLTE(v int8) predicate.ProxyAds {
+func StatusLTE(v int) predicate.ProxyAds {
 	return predicate.ProxyAds(sql.FieldLTE(FieldStatus, v))
-}
-
-// StatusIsNil applies the IsNil predicate on the "status" field.
-func StatusIsNil() predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldIsNull(FieldStatus))
-}
-
-// StatusNotNil applies the NotNil predicate on the "status" field.
-func StatusNotNil() predicate.ProxyAds {
-	return predicate.ProxyAds(sql.FieldNotNull(FieldStatus))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

@@ -28,27 +28,6 @@ func (_u *ProxyServerUpdate) Where(ps ...predicate.ProxyServer) *ProxyServerUpda
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyServerUpdate) SetTenantID(v int64) *ProxyServerUpdate {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyServerUpdate) SetNillableTenantID(v *int64) *ProxyServerUpdate {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyServerUpdate) AddTenantID(v int64) *ProxyServerUpdate {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
 // SetName sets the "name" field.
 func (_u *ProxyServerUpdate) SetName(v string) *ProxyServerUpdate {
 	_u.mutation.SetName(v)
@@ -166,6 +145,62 @@ func (_u *ProxyServerUpdate) ClearLastReportedAt() *ProxyServerUpdate {
 	return _u
 }
 
+// SetLongitude sets the "longitude" field.
+func (_u *ProxyServerUpdate) SetLongitude(v string) *ProxyServerUpdate {
+	_u.mutation.SetLongitude(v)
+	return _u
+}
+
+// SetNillableLongitude sets the "longitude" field if the given value is not nil.
+func (_u *ProxyServerUpdate) SetNillableLongitude(v *string) *ProxyServerUpdate {
+	if v != nil {
+		_u.SetLongitude(*v)
+	}
+	return _u
+}
+
+// SetLatitude sets the "latitude" field.
+func (_u *ProxyServerUpdate) SetLatitude(v string) *ProxyServerUpdate {
+	_u.mutation.SetLatitude(v)
+	return _u
+}
+
+// SetNillableLatitude sets the "latitude" field if the given value is not nil.
+func (_u *ProxyServerUpdate) SetNillableLatitude(v *string) *ProxyServerUpdate {
+	if v != nil {
+		_u.SetLatitude(*v)
+	}
+	return _u
+}
+
+// SetLongitudeCenter sets the "longitude_center" field.
+func (_u *ProxyServerUpdate) SetLongitudeCenter(v string) *ProxyServerUpdate {
+	_u.mutation.SetLongitudeCenter(v)
+	return _u
+}
+
+// SetNillableLongitudeCenter sets the "longitude_center" field if the given value is not nil.
+func (_u *ProxyServerUpdate) SetNillableLongitudeCenter(v *string) *ProxyServerUpdate {
+	if v != nil {
+		_u.SetLongitudeCenter(*v)
+	}
+	return _u
+}
+
+// SetLatitudeCenter sets the "latitude_center" field.
+func (_u *ProxyServerUpdate) SetLatitudeCenter(v string) *ProxyServerUpdate {
+	_u.mutation.SetLatitudeCenter(v)
+	return _u
+}
+
+// SetNillableLatitudeCenter sets the "latitude_center" field if the given value is not nil.
+func (_u *ProxyServerUpdate) SetNillableLatitudeCenter(v *string) *ProxyServerUpdate {
+	if v != nil {
+		_u.SetLatitudeCenter(*v)
+	}
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *ProxyServerUpdate) SetCreatedAt(v time.Time) *ProxyServerUpdate {
 	_u.mutation.SetCreatedAt(v)
@@ -180,21 +215,9 @@ func (_u *ProxyServerUpdate) SetNillableCreatedAt(v *time.Time) *ProxyServerUpda
 	return _u
 }
 
-// ClearCreatedAt clears the value of the "created_at" field.
-func (_u *ProxyServerUpdate) ClearCreatedAt() *ProxyServerUpdate {
-	_u.mutation.ClearCreatedAt()
-	return _u
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxyServerUpdate) SetUpdatedAt(v time.Time) *ProxyServerUpdate {
 	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// ClearUpdatedAt clears the value of the "updated_at" field.
-func (_u *ProxyServerUpdate) ClearUpdatedAt() *ProxyServerUpdate {
-	_u.mutation.ClearUpdatedAt()
 	return _u
 }
 
@@ -233,7 +256,7 @@ func (_u *ProxyServerUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_u *ProxyServerUpdate) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := proxyserver.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
@@ -261,6 +284,26 @@ func (_u *ProxyServerUpdate) check() error {
 			return &ValidationError{Name: "server_addr", err: fmt.Errorf(`ent: validator failed for field "ProxyServer.server_addr": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Longitude(); ok {
+		if err := proxyserver.LongitudeValidator(v); err != nil {
+			return &ValidationError{Name: "longitude", err: fmt.Errorf(`ent: validator failed for field "ProxyServer.longitude": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.Latitude(); ok {
+		if err := proxyserver.LatitudeValidator(v); err != nil {
+			return &ValidationError{Name: "latitude", err: fmt.Errorf(`ent: validator failed for field "ProxyServer.latitude": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.LongitudeCenter(); ok {
+		if err := proxyserver.LongitudeCenterValidator(v); err != nil {
+			return &ValidationError{Name: "longitude_center", err: fmt.Errorf(`ent: validator failed for field "ProxyServer.longitude_center": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.LatitudeCenter(); ok {
+		if err := proxyserver.LatitudeCenterValidator(v); err != nil {
+			return &ValidationError{Name: "latitude_center", err: fmt.Errorf(`ent: validator failed for field "ProxyServer.latitude_center": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -275,12 +318,6 @@ func (_u *ProxyServerUpdate) sqlSave(ctx context.Context) (_node int, err error)
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyserver.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyserver.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxyserver.FieldName, field.TypeString, value)
@@ -312,17 +349,23 @@ func (_u *ProxyServerUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	if _u.mutation.LastReportedAtCleared() {
 		_spec.ClearField(proxyserver.FieldLastReportedAt, field.TypeTime)
 	}
+	if value, ok := _u.mutation.Longitude(); ok {
+		_spec.SetField(proxyserver.FieldLongitude, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Latitude(); ok {
+		_spec.SetField(proxyserver.FieldLatitude, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.LongitudeCenter(); ok {
+		_spec.SetField(proxyserver.FieldLongitudeCenter, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.LatitudeCenter(); ok {
+		_spec.SetField(proxyserver.FieldLatitudeCenter, field.TypeString, value)
+	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxyserver.FieldCreatedAt, field.TypeTime, value)
 	}
-	if _u.mutation.CreatedAtCleared() {
-		_spec.ClearField(proxyserver.FieldCreatedAt, field.TypeTime)
-	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyserver.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if _u.mutation.UpdatedAtCleared() {
-		_spec.ClearField(proxyserver.FieldUpdatedAt, field.TypeTime)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -342,27 +385,6 @@ type ProxyServerUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxyServerMutation
-}
-
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyServerUpdateOne) SetTenantID(v int64) *ProxyServerUpdateOne {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyServerUpdateOne) SetNillableTenantID(v *int64) *ProxyServerUpdateOne {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyServerUpdateOne) AddTenantID(v int64) *ProxyServerUpdateOne {
-	_u.mutation.AddTenantID(v)
-	return _u
 }
 
 // SetName sets the "name" field.
@@ -482,6 +504,62 @@ func (_u *ProxyServerUpdateOne) ClearLastReportedAt() *ProxyServerUpdateOne {
 	return _u
 }
 
+// SetLongitude sets the "longitude" field.
+func (_u *ProxyServerUpdateOne) SetLongitude(v string) *ProxyServerUpdateOne {
+	_u.mutation.SetLongitude(v)
+	return _u
+}
+
+// SetNillableLongitude sets the "longitude" field if the given value is not nil.
+func (_u *ProxyServerUpdateOne) SetNillableLongitude(v *string) *ProxyServerUpdateOne {
+	if v != nil {
+		_u.SetLongitude(*v)
+	}
+	return _u
+}
+
+// SetLatitude sets the "latitude" field.
+func (_u *ProxyServerUpdateOne) SetLatitude(v string) *ProxyServerUpdateOne {
+	_u.mutation.SetLatitude(v)
+	return _u
+}
+
+// SetNillableLatitude sets the "latitude" field if the given value is not nil.
+func (_u *ProxyServerUpdateOne) SetNillableLatitude(v *string) *ProxyServerUpdateOne {
+	if v != nil {
+		_u.SetLatitude(*v)
+	}
+	return _u
+}
+
+// SetLongitudeCenter sets the "longitude_center" field.
+func (_u *ProxyServerUpdateOne) SetLongitudeCenter(v string) *ProxyServerUpdateOne {
+	_u.mutation.SetLongitudeCenter(v)
+	return _u
+}
+
+// SetNillableLongitudeCenter sets the "longitude_center" field if the given value is not nil.
+func (_u *ProxyServerUpdateOne) SetNillableLongitudeCenter(v *string) *ProxyServerUpdateOne {
+	if v != nil {
+		_u.SetLongitudeCenter(*v)
+	}
+	return _u
+}
+
+// SetLatitudeCenter sets the "latitude_center" field.
+func (_u *ProxyServerUpdateOne) SetLatitudeCenter(v string) *ProxyServerUpdateOne {
+	_u.mutation.SetLatitudeCenter(v)
+	return _u
+}
+
+// SetNillableLatitudeCenter sets the "latitude_center" field if the given value is not nil.
+func (_u *ProxyServerUpdateOne) SetNillableLatitudeCenter(v *string) *ProxyServerUpdateOne {
+	if v != nil {
+		_u.SetLatitudeCenter(*v)
+	}
+	return _u
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_u *ProxyServerUpdateOne) SetCreatedAt(v time.Time) *ProxyServerUpdateOne {
 	_u.mutation.SetCreatedAt(v)
@@ -496,21 +574,9 @@ func (_u *ProxyServerUpdateOne) SetNillableCreatedAt(v *time.Time) *ProxyServerU
 	return _u
 }
 
-// ClearCreatedAt clears the value of the "created_at" field.
-func (_u *ProxyServerUpdateOne) ClearCreatedAt() *ProxyServerUpdateOne {
-	_u.mutation.ClearCreatedAt()
-	return _u
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxyServerUpdateOne) SetUpdatedAt(v time.Time) *ProxyServerUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// ClearUpdatedAt clears the value of the "updated_at" field.
-func (_u *ProxyServerUpdateOne) ClearUpdatedAt() *ProxyServerUpdateOne {
-	_u.mutation.ClearUpdatedAt()
 	return _u
 }
 
@@ -562,7 +628,7 @@ func (_u *ProxyServerUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_u *ProxyServerUpdateOne) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := proxyserver.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
@@ -588,6 +654,26 @@ func (_u *ProxyServerUpdateOne) check() error {
 	if v, ok := _u.mutation.ServerAddr(); ok {
 		if err := proxyserver.ServerAddrValidator(v); err != nil {
 			return &ValidationError{Name: "server_addr", err: fmt.Errorf(`ent: validator failed for field "ProxyServer.server_addr": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.Longitude(); ok {
+		if err := proxyserver.LongitudeValidator(v); err != nil {
+			return &ValidationError{Name: "longitude", err: fmt.Errorf(`ent: validator failed for field "ProxyServer.longitude": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.Latitude(); ok {
+		if err := proxyserver.LatitudeValidator(v); err != nil {
+			return &ValidationError{Name: "latitude", err: fmt.Errorf(`ent: validator failed for field "ProxyServer.latitude": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.LongitudeCenter(); ok {
+		if err := proxyserver.LongitudeCenterValidator(v); err != nil {
+			return &ValidationError{Name: "longitude_center", err: fmt.Errorf(`ent: validator failed for field "ProxyServer.longitude_center": %w`, err)}
+		}
+	}
+	if v, ok := _u.mutation.LatitudeCenter(); ok {
+		if err := proxyserver.LatitudeCenterValidator(v); err != nil {
+			return &ValidationError{Name: "latitude_center", err: fmt.Errorf(`ent: validator failed for field "ProxyServer.latitude_center": %w`, err)}
 		}
 	}
 	return nil
@@ -622,12 +708,6 @@ func (_u *ProxyServerUpdateOne) sqlSave(ctx context.Context) (_node *ProxyServer
 			}
 		}
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyserver.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyserver.FieldTenantID, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxyserver.FieldName, field.TypeString, value)
 	}
@@ -658,17 +738,23 @@ func (_u *ProxyServerUpdateOne) sqlSave(ctx context.Context) (_node *ProxyServer
 	if _u.mutation.LastReportedAtCleared() {
 		_spec.ClearField(proxyserver.FieldLastReportedAt, field.TypeTime)
 	}
+	if value, ok := _u.mutation.Longitude(); ok {
+		_spec.SetField(proxyserver.FieldLongitude, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Latitude(); ok {
+		_spec.SetField(proxyserver.FieldLatitude, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.LongitudeCenter(); ok {
+		_spec.SetField(proxyserver.FieldLongitudeCenter, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.LatitudeCenter(); ok {
+		_spec.SetField(proxyserver.FieldLatitudeCenter, field.TypeString, value)
+	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxyserver.FieldCreatedAt, field.TypeTime, value)
 	}
-	if _u.mutation.CreatedAtCleared() {
-		_spec.ClearField(proxyserver.FieldCreatedAt, field.TypeTime)
-	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyserver.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if _u.mutation.UpdatedAtCleared() {
-		_spec.ClearField(proxyserver.FieldUpdatedAt, field.TypeTime)
 	}
 	_node = &ProxyServer{config: _u.config}
 	_spec.Assign = _node.assignValues

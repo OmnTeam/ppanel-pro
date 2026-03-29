@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/OmnTeam/ppanel-pro/ent/predicate"
 	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
@@ -57,14 +58,14 @@ func (_u *ProxyNodeUpdate) SetNillableTags(v *string) *ProxyNodeUpdate {
 }
 
 // SetPort sets the "port" field.
-func (_u *ProxyNodeUpdate) SetPort(v int) *ProxyNodeUpdate {
+func (_u *ProxyNodeUpdate) SetPort(v uint16) *ProxyNodeUpdate {
 	_u.mutation.ResetPort()
 	_u.mutation.SetPort(v)
 	return _u
 }
 
 // SetNillablePort sets the "port" field if the given value is not nil.
-func (_u *ProxyNodeUpdate) SetNillablePort(v *int) *ProxyNodeUpdate {
+func (_u *ProxyNodeUpdate) SetNillablePort(v *uint16) *ProxyNodeUpdate {
 	if v != nil {
 		_u.SetPort(*v)
 	}
@@ -72,7 +73,7 @@ func (_u *ProxyNodeUpdate) SetNillablePort(v *int) *ProxyNodeUpdate {
 }
 
 // AddPort adds value to the "port" field.
-func (_u *ProxyNodeUpdate) AddPort(v int) *ProxyNodeUpdate {
+func (_u *ProxyNodeUpdate) AddPort(v int16) *ProxyNodeUpdate {
 	_u.mutation.AddPort(v)
 	return _u
 }
@@ -161,44 +162,21 @@ func (_u *ProxyNodeUpdate) AddSort(v int) *ProxyNodeUpdate {
 	return _u
 }
 
-// SetGroupID sets the "group_id" field.
-func (_u *ProxyNodeUpdate) SetGroupID(v int64) *ProxyNodeUpdate {
-	_u.mutation.ResetGroupID()
-	_u.mutation.SetGroupID(v)
+// SetNodeGroupIds sets the "node_group_ids" field.
+func (_u *ProxyNodeUpdate) SetNodeGroupIds(v []int64) *ProxyNodeUpdate {
+	_u.mutation.SetNodeGroupIds(v)
 	return _u
 }
 
-// SetNillableGroupID sets the "group_id" field if the given value is not nil.
-func (_u *ProxyNodeUpdate) SetNillableGroupID(v *int64) *ProxyNodeUpdate {
-	if v != nil {
-		_u.SetGroupID(*v)
-	}
+// AppendNodeGroupIds appends value to the "node_group_ids" field.
+func (_u *ProxyNodeUpdate) AppendNodeGroupIds(v []int64) *ProxyNodeUpdate {
+	_u.mutation.AppendNodeGroupIds(v)
 	return _u
 }
 
-// AddGroupID adds value to the "group_id" field.
-func (_u *ProxyNodeUpdate) AddGroupID(v int64) *ProxyNodeUpdate {
-	_u.mutation.AddGroupID(v)
-	return _u
-}
-
-// ClearGroupID clears the value of the "group_id" field.
-func (_u *ProxyNodeUpdate) ClearGroupID() *ProxyNodeUpdate {
-	_u.mutation.ClearGroupID()
-	return _u
-}
-
-// SetGroupLocked sets the "group_locked" field.
-func (_u *ProxyNodeUpdate) SetGroupLocked(v bool) *ProxyNodeUpdate {
-	_u.mutation.SetGroupLocked(v)
-	return _u
-}
-
-// SetNillableGroupLocked sets the "group_locked" field if the given value is not nil.
-func (_u *ProxyNodeUpdate) SetNillableGroupLocked(v *bool) *ProxyNodeUpdate {
-	if v != nil {
-		_u.SetGroupLocked(*v)
-	}
+// ClearNodeGroupIds clears the value of the "node_group_ids" field.
+func (_u *ProxyNodeUpdate) ClearNodeGroupIds() *ProxyNodeUpdate {
+	_u.mutation.ClearNodeGroupIds()
 	return _u
 }
 
@@ -216,21 +194,9 @@ func (_u *ProxyNodeUpdate) SetNillableCreatedAt(v *time.Time) *ProxyNodeUpdate {
 	return _u
 }
 
-// ClearCreatedAt clears the value of the "created_at" field.
-func (_u *ProxyNodeUpdate) ClearCreatedAt() *ProxyNodeUpdate {
-	_u.mutation.ClearCreatedAt()
-	return _u
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxyNodeUpdate) SetUpdatedAt(v time.Time) *ProxyNodeUpdate {
 	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// ClearUpdatedAt clears the value of the "updated_at" field.
-func (_u *ProxyNodeUpdate) ClearUpdatedAt() *ProxyNodeUpdate {
-	_u.mutation.ClearUpdatedAt()
 	return _u
 }
 
@@ -269,7 +235,7 @@ func (_u *ProxyNodeUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_u *ProxyNodeUpdate) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := proxynode.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
@@ -319,10 +285,10 @@ func (_u *ProxyNodeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.SetField(proxynode.FieldTags, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Port(); ok {
-		_spec.SetField(proxynode.FieldPort, field.TypeInt, value)
+		_spec.SetField(proxynode.FieldPort, field.TypeUint16, value)
 	}
 	if value, ok := _u.mutation.AddedPort(); ok {
-		_spec.AddField(proxynode.FieldPort, field.TypeInt, value)
+		_spec.AddField(proxynode.FieldPort, field.TypeUint16, value)
 	}
 	if value, ok := _u.mutation.Address(); ok {
 		_spec.SetField(proxynode.FieldAddress, field.TypeString, value)
@@ -345,29 +311,22 @@ func (_u *ProxyNodeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.AddedSort(); ok {
 		_spec.AddField(proxynode.FieldSort, field.TypeInt, value)
 	}
-	if value, ok := _u.mutation.GroupID(); ok {
-		_spec.SetField(proxynode.FieldGroupID, field.TypeInt64, value)
+	if value, ok := _u.mutation.NodeGroupIds(); ok {
+		_spec.SetField(proxynode.FieldNodeGroupIds, field.TypeJSON, value)
 	}
-	if value, ok := _u.mutation.AddedGroupID(); ok {
-		_spec.AddField(proxynode.FieldGroupID, field.TypeInt64, value)
+	if value, ok := _u.mutation.AppendedNodeGroupIds(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, proxynode.FieldNodeGroupIds, value)
+		})
 	}
-	if _u.mutation.GroupIDCleared() {
-		_spec.ClearField(proxynode.FieldGroupID, field.TypeInt64)
-	}
-	if value, ok := _u.mutation.GroupLocked(); ok {
-		_spec.SetField(proxynode.FieldGroupLocked, field.TypeBool, value)
+	if _u.mutation.NodeGroupIdsCleared() {
+		_spec.ClearField(proxynode.FieldNodeGroupIds, field.TypeJSON)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxynode.FieldCreatedAt, field.TypeTime, value)
 	}
-	if _u.mutation.CreatedAtCleared() {
-		_spec.ClearField(proxynode.FieldCreatedAt, field.TypeTime)
-	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxynode.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if _u.mutation.UpdatedAtCleared() {
-		_spec.ClearField(proxynode.FieldUpdatedAt, field.TypeTime)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -418,14 +377,14 @@ func (_u *ProxyNodeUpdateOne) SetNillableTags(v *string) *ProxyNodeUpdateOne {
 }
 
 // SetPort sets the "port" field.
-func (_u *ProxyNodeUpdateOne) SetPort(v int) *ProxyNodeUpdateOne {
+func (_u *ProxyNodeUpdateOne) SetPort(v uint16) *ProxyNodeUpdateOne {
 	_u.mutation.ResetPort()
 	_u.mutation.SetPort(v)
 	return _u
 }
 
 // SetNillablePort sets the "port" field if the given value is not nil.
-func (_u *ProxyNodeUpdateOne) SetNillablePort(v *int) *ProxyNodeUpdateOne {
+func (_u *ProxyNodeUpdateOne) SetNillablePort(v *uint16) *ProxyNodeUpdateOne {
 	if v != nil {
 		_u.SetPort(*v)
 	}
@@ -433,7 +392,7 @@ func (_u *ProxyNodeUpdateOne) SetNillablePort(v *int) *ProxyNodeUpdateOne {
 }
 
 // AddPort adds value to the "port" field.
-func (_u *ProxyNodeUpdateOne) AddPort(v int) *ProxyNodeUpdateOne {
+func (_u *ProxyNodeUpdateOne) AddPort(v int16) *ProxyNodeUpdateOne {
 	_u.mutation.AddPort(v)
 	return _u
 }
@@ -522,44 +481,21 @@ func (_u *ProxyNodeUpdateOne) AddSort(v int) *ProxyNodeUpdateOne {
 	return _u
 }
 
-// SetGroupID sets the "group_id" field.
-func (_u *ProxyNodeUpdateOne) SetGroupID(v int64) *ProxyNodeUpdateOne {
-	_u.mutation.ResetGroupID()
-	_u.mutation.SetGroupID(v)
+// SetNodeGroupIds sets the "node_group_ids" field.
+func (_u *ProxyNodeUpdateOne) SetNodeGroupIds(v []int64) *ProxyNodeUpdateOne {
+	_u.mutation.SetNodeGroupIds(v)
 	return _u
 }
 
-// SetNillableGroupID sets the "group_id" field if the given value is not nil.
-func (_u *ProxyNodeUpdateOne) SetNillableGroupID(v *int64) *ProxyNodeUpdateOne {
-	if v != nil {
-		_u.SetGroupID(*v)
-	}
+// AppendNodeGroupIds appends value to the "node_group_ids" field.
+func (_u *ProxyNodeUpdateOne) AppendNodeGroupIds(v []int64) *ProxyNodeUpdateOne {
+	_u.mutation.AppendNodeGroupIds(v)
 	return _u
 }
 
-// AddGroupID adds value to the "group_id" field.
-func (_u *ProxyNodeUpdateOne) AddGroupID(v int64) *ProxyNodeUpdateOne {
-	_u.mutation.AddGroupID(v)
-	return _u
-}
-
-// ClearGroupID clears the value of the "group_id" field.
-func (_u *ProxyNodeUpdateOne) ClearGroupID() *ProxyNodeUpdateOne {
-	_u.mutation.ClearGroupID()
-	return _u
-}
-
-// SetGroupLocked sets the "group_locked" field.
-func (_u *ProxyNodeUpdateOne) SetGroupLocked(v bool) *ProxyNodeUpdateOne {
-	_u.mutation.SetGroupLocked(v)
-	return _u
-}
-
-// SetNillableGroupLocked sets the "group_locked" field if the given value is not nil.
-func (_u *ProxyNodeUpdateOne) SetNillableGroupLocked(v *bool) *ProxyNodeUpdateOne {
-	if v != nil {
-		_u.SetGroupLocked(*v)
-	}
+// ClearNodeGroupIds clears the value of the "node_group_ids" field.
+func (_u *ProxyNodeUpdateOne) ClearNodeGroupIds() *ProxyNodeUpdateOne {
+	_u.mutation.ClearNodeGroupIds()
 	return _u
 }
 
@@ -577,21 +513,9 @@ func (_u *ProxyNodeUpdateOne) SetNillableCreatedAt(v *time.Time) *ProxyNodeUpdat
 	return _u
 }
 
-// ClearCreatedAt clears the value of the "created_at" field.
-func (_u *ProxyNodeUpdateOne) ClearCreatedAt() *ProxyNodeUpdateOne {
-	_u.mutation.ClearCreatedAt()
-	return _u
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxyNodeUpdateOne) SetUpdatedAt(v time.Time) *ProxyNodeUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// ClearUpdatedAt clears the value of the "updated_at" field.
-func (_u *ProxyNodeUpdateOne) ClearUpdatedAt() *ProxyNodeUpdateOne {
-	_u.mutation.ClearUpdatedAt()
 	return _u
 }
 
@@ -643,7 +567,7 @@ func (_u *ProxyNodeUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_u *ProxyNodeUpdateOne) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := proxynode.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
@@ -710,10 +634,10 @@ func (_u *ProxyNodeUpdateOne) sqlSave(ctx context.Context) (_node *ProxyNode, er
 		_spec.SetField(proxynode.FieldTags, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Port(); ok {
-		_spec.SetField(proxynode.FieldPort, field.TypeInt, value)
+		_spec.SetField(proxynode.FieldPort, field.TypeUint16, value)
 	}
 	if value, ok := _u.mutation.AddedPort(); ok {
-		_spec.AddField(proxynode.FieldPort, field.TypeInt, value)
+		_spec.AddField(proxynode.FieldPort, field.TypeUint16, value)
 	}
 	if value, ok := _u.mutation.Address(); ok {
 		_spec.SetField(proxynode.FieldAddress, field.TypeString, value)
@@ -736,29 +660,22 @@ func (_u *ProxyNodeUpdateOne) sqlSave(ctx context.Context) (_node *ProxyNode, er
 	if value, ok := _u.mutation.AddedSort(); ok {
 		_spec.AddField(proxynode.FieldSort, field.TypeInt, value)
 	}
-	if value, ok := _u.mutation.GroupID(); ok {
-		_spec.SetField(proxynode.FieldGroupID, field.TypeInt64, value)
+	if value, ok := _u.mutation.NodeGroupIds(); ok {
+		_spec.SetField(proxynode.FieldNodeGroupIds, field.TypeJSON, value)
 	}
-	if value, ok := _u.mutation.AddedGroupID(); ok {
-		_spec.AddField(proxynode.FieldGroupID, field.TypeInt64, value)
+	if value, ok := _u.mutation.AppendedNodeGroupIds(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, proxynode.FieldNodeGroupIds, value)
+		})
 	}
-	if _u.mutation.GroupIDCleared() {
-		_spec.ClearField(proxynode.FieldGroupID, field.TypeInt64)
-	}
-	if value, ok := _u.mutation.GroupLocked(); ok {
-		_spec.SetField(proxynode.FieldGroupLocked, field.TypeBool, value)
+	if _u.mutation.NodeGroupIdsCleared() {
+		_spec.ClearField(proxynode.FieldNodeGroupIds, field.TypeJSON)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxynode.FieldCreatedAt, field.TypeTime, value)
 	}
-	if _u.mutation.CreatedAtCleared() {
-		_spec.ClearField(proxynode.FieldCreatedAt, field.TypeTime)
-	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxynode.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if _u.mutation.UpdatedAtCleared() {
-		_spec.ClearField(proxynode.FieldUpdatedAt, field.TypeTime)
 	}
 	_node = &ProxyNode{config: _u.config}
 	_spec.Assign = _node.assignValues

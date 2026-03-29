@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/OmnTeam/ppanel-pro/ent/predicate"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribe"
@@ -257,6 +258,99 @@ func (_u *ProxySubscribeUpdate) AddQuota(v int64) *ProxySubscribeUpdate {
 	return _u
 }
 
+// SetNodes sets the "nodes" field.
+func (_u *ProxySubscribeUpdate) SetNodes(v string) *ProxySubscribeUpdate {
+	_u.mutation.SetNodes(v)
+	return _u
+}
+
+// SetNillableNodes sets the "nodes" field if the given value is not nil.
+func (_u *ProxySubscribeUpdate) SetNillableNodes(v *string) *ProxySubscribeUpdate {
+	if v != nil {
+		_u.SetNodes(*v)
+	}
+	return _u
+}
+
+// SetNodeTags sets the "node_tags" field.
+func (_u *ProxySubscribeUpdate) SetNodeTags(v string) *ProxySubscribeUpdate {
+	_u.mutation.SetNodeTags(v)
+	return _u
+}
+
+// SetNillableNodeTags sets the "node_tags" field if the given value is not nil.
+func (_u *ProxySubscribeUpdate) SetNillableNodeTags(v *string) *ProxySubscribeUpdate {
+	if v != nil {
+		_u.SetNodeTags(*v)
+	}
+	return _u
+}
+
+// SetNodeGroupIds sets the "node_group_ids" field.
+func (_u *ProxySubscribeUpdate) SetNodeGroupIds(v []int64) *ProxySubscribeUpdate {
+	_u.mutation.SetNodeGroupIds(v)
+	return _u
+}
+
+// AppendNodeGroupIds appends value to the "node_group_ids" field.
+func (_u *ProxySubscribeUpdate) AppendNodeGroupIds(v []int64) *ProxySubscribeUpdate {
+	_u.mutation.AppendNodeGroupIds(v)
+	return _u
+}
+
+// ClearNodeGroupIds clears the value of the "node_group_ids" field.
+func (_u *ProxySubscribeUpdate) ClearNodeGroupIds() *ProxySubscribeUpdate {
+	_u.mutation.ClearNodeGroupIds()
+	return _u
+}
+
+// SetNodeGroupID sets the "node_group_id" field.
+func (_u *ProxySubscribeUpdate) SetNodeGroupID(v int64) *ProxySubscribeUpdate {
+	_u.mutation.ResetNodeGroupID()
+	_u.mutation.SetNodeGroupID(v)
+	return _u
+}
+
+// SetNillableNodeGroupID sets the "node_group_id" field if the given value is not nil.
+func (_u *ProxySubscribeUpdate) SetNillableNodeGroupID(v *int64) *ProxySubscribeUpdate {
+	if v != nil {
+		_u.SetNodeGroupID(*v)
+	}
+	return _u
+}
+
+// AddNodeGroupID adds value to the "node_group_id" field.
+func (_u *ProxySubscribeUpdate) AddNodeGroupID(v int64) *ProxySubscribeUpdate {
+	_u.mutation.AddNodeGroupID(v)
+	return _u
+}
+
+// ClearNodeGroupID clears the value of the "node_group_id" field.
+func (_u *ProxySubscribeUpdate) ClearNodeGroupID() *ProxySubscribeUpdate {
+	_u.mutation.ClearNodeGroupID()
+	return _u
+}
+
+// SetTrafficLimit sets the "traffic_limit" field.
+func (_u *ProxySubscribeUpdate) SetTrafficLimit(v string) *ProxySubscribeUpdate {
+	_u.mutation.SetTrafficLimit(v)
+	return _u
+}
+
+// SetNillableTrafficLimit sets the "traffic_limit" field if the given value is not nil.
+func (_u *ProxySubscribeUpdate) SetNillableTrafficLimit(v *string) *ProxySubscribeUpdate {
+	if v != nil {
+		_u.SetTrafficLimit(*v)
+	}
+	return _u
+}
+
+// ClearTrafficLimit clears the value of the "traffic_limit" field.
+func (_u *ProxySubscribeUpdate) ClearTrafficLimit() *ProxySubscribeUpdate {
+	_u.mutation.ClearTrafficLimit()
+	return _u
+}
+
 // SetShow sets the "show" field.
 func (_u *ProxySubscribeUpdate) SetShow(v bool) *ProxySubscribeUpdate {
 	_u.mutation.SetShow(v)
@@ -347,12 +441,6 @@ func (_u *ProxySubscribeUpdate) SetNillableAllowDeduction(v *bool) *ProxySubscri
 	return _u
 }
 
-// ClearAllowDeduction clears the value of the "allow_deduction" field.
-func (_u *ProxySubscribeUpdate) ClearAllowDeduction() *ProxySubscribeUpdate {
-	_u.mutation.ClearAllowDeduction()
-	return _u
-}
-
 // SetResetCycle sets the "reset_cycle" field.
 func (_u *ProxySubscribeUpdate) SetResetCycle(v int64) *ProxySubscribeUpdate {
 	_u.mutation.ResetResetCycle()
@@ -394,36 +482,16 @@ func (_u *ProxySubscribeUpdate) SetNillableRenewalReset(v *bool) *ProxySubscribe
 	return _u
 }
 
-// ClearRenewalReset clears the value of the "renewal_reset" field.
-func (_u *ProxySubscribeUpdate) ClearRenewalReset() *ProxySubscribeUpdate {
-	_u.mutation.ClearRenewalReset()
+// SetShowOriginalPrice sets the "show_original_price" field.
+func (_u *ProxySubscribeUpdate) SetShowOriginalPrice(v bool) *ProxySubscribeUpdate {
+	_u.mutation.SetShowOriginalPrice(v)
 	return _u
 }
 
-// SetNodes sets the "nodes" field.
-func (_u *ProxySubscribeUpdate) SetNodes(v string) *ProxySubscribeUpdate {
-	_u.mutation.SetNodes(v)
-	return _u
-}
-
-// SetNillableNodes sets the "nodes" field if the given value is not nil.
-func (_u *ProxySubscribeUpdate) SetNillableNodes(v *string) *ProxySubscribeUpdate {
+// SetNillableShowOriginalPrice sets the "show_original_price" field if the given value is not nil.
+func (_u *ProxySubscribeUpdate) SetNillableShowOriginalPrice(v *bool) *ProxySubscribeUpdate {
 	if v != nil {
-		_u.SetNodes(*v)
-	}
-	return _u
-}
-
-// SetNodeTags sets the "node_tags" field.
-func (_u *ProxySubscribeUpdate) SetNodeTags(v string) *ProxySubscribeUpdate {
-	_u.mutation.SetNodeTags(v)
-	return _u
-}
-
-// SetNillableNodeTags sets the "node_tags" field if the given value is not nil.
-func (_u *ProxySubscribeUpdate) SetNillableNodeTags(v *string) *ProxySubscribeUpdate {
-	if v != nil {
-		_u.SetNodeTags(*v)
+		_u.SetShowOriginalPrice(*v)
 	}
 	return _u
 }
@@ -580,6 +648,38 @@ func (_u *ProxySubscribeUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if value, ok := _u.mutation.AddedQuota(); ok {
 		_spec.AddField(proxysubscribe.FieldQuota, field.TypeInt64, value)
 	}
+	if value, ok := _u.mutation.Nodes(); ok {
+		_spec.SetField(proxysubscribe.FieldNodes, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.NodeTags(); ok {
+		_spec.SetField(proxysubscribe.FieldNodeTags, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.NodeGroupIds(); ok {
+		_spec.SetField(proxysubscribe.FieldNodeGroupIds, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedNodeGroupIds(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, proxysubscribe.FieldNodeGroupIds, value)
+		})
+	}
+	if _u.mutation.NodeGroupIdsCleared() {
+		_spec.ClearField(proxysubscribe.FieldNodeGroupIds, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.NodeGroupID(); ok {
+		_spec.SetField(proxysubscribe.FieldNodeGroupID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedNodeGroupID(); ok {
+		_spec.AddField(proxysubscribe.FieldNodeGroupID, field.TypeInt64, value)
+	}
+	if _u.mutation.NodeGroupIDCleared() {
+		_spec.ClearField(proxysubscribe.FieldNodeGroupID, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.TrafficLimit(); ok {
+		_spec.SetField(proxysubscribe.FieldTrafficLimit, field.TypeString, value)
+	}
+	if _u.mutation.TrafficLimitCleared() {
+		_spec.ClearField(proxysubscribe.FieldTrafficLimit, field.TypeString)
+	}
 	if value, ok := _u.mutation.Show(); ok {
 		_spec.SetField(proxysubscribe.FieldShow, field.TypeBool, value)
 	}
@@ -604,9 +704,6 @@ func (_u *ProxySubscribeUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if value, ok := _u.mutation.AllowDeduction(); ok {
 		_spec.SetField(proxysubscribe.FieldAllowDeduction, field.TypeBool, value)
 	}
-	if _u.mutation.AllowDeductionCleared() {
-		_spec.ClearField(proxysubscribe.FieldAllowDeduction, field.TypeBool)
-	}
 	if value, ok := _u.mutation.ResetCycle(); ok {
 		_spec.SetField(proxysubscribe.FieldResetCycle, field.TypeInt64, value)
 	}
@@ -619,14 +716,8 @@ func (_u *ProxySubscribeUpdate) sqlSave(ctx context.Context) (_node int, err err
 	if value, ok := _u.mutation.RenewalReset(); ok {
 		_spec.SetField(proxysubscribe.FieldRenewalReset, field.TypeBool, value)
 	}
-	if _u.mutation.RenewalResetCleared() {
-		_spec.ClearField(proxysubscribe.FieldRenewalReset, field.TypeBool)
-	}
-	if value, ok := _u.mutation.Nodes(); ok {
-		_spec.SetField(proxysubscribe.FieldNodes, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.NodeTags(); ok {
-		_spec.SetField(proxysubscribe.FieldNodeTags, field.TypeString, value)
+	if value, ok := _u.mutation.ShowOriginalPrice(); ok {
+		_spec.SetField(proxysubscribe.FieldShowOriginalPrice, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxysubscribe.FieldUpdatedAt, field.TypeTime, value)
@@ -880,6 +971,99 @@ func (_u *ProxySubscribeUpdateOne) AddQuota(v int64) *ProxySubscribeUpdateOne {
 	return _u
 }
 
+// SetNodes sets the "nodes" field.
+func (_u *ProxySubscribeUpdateOne) SetNodes(v string) *ProxySubscribeUpdateOne {
+	_u.mutation.SetNodes(v)
+	return _u
+}
+
+// SetNillableNodes sets the "nodes" field if the given value is not nil.
+func (_u *ProxySubscribeUpdateOne) SetNillableNodes(v *string) *ProxySubscribeUpdateOne {
+	if v != nil {
+		_u.SetNodes(*v)
+	}
+	return _u
+}
+
+// SetNodeTags sets the "node_tags" field.
+func (_u *ProxySubscribeUpdateOne) SetNodeTags(v string) *ProxySubscribeUpdateOne {
+	_u.mutation.SetNodeTags(v)
+	return _u
+}
+
+// SetNillableNodeTags sets the "node_tags" field if the given value is not nil.
+func (_u *ProxySubscribeUpdateOne) SetNillableNodeTags(v *string) *ProxySubscribeUpdateOne {
+	if v != nil {
+		_u.SetNodeTags(*v)
+	}
+	return _u
+}
+
+// SetNodeGroupIds sets the "node_group_ids" field.
+func (_u *ProxySubscribeUpdateOne) SetNodeGroupIds(v []int64) *ProxySubscribeUpdateOne {
+	_u.mutation.SetNodeGroupIds(v)
+	return _u
+}
+
+// AppendNodeGroupIds appends value to the "node_group_ids" field.
+func (_u *ProxySubscribeUpdateOne) AppendNodeGroupIds(v []int64) *ProxySubscribeUpdateOne {
+	_u.mutation.AppendNodeGroupIds(v)
+	return _u
+}
+
+// ClearNodeGroupIds clears the value of the "node_group_ids" field.
+func (_u *ProxySubscribeUpdateOne) ClearNodeGroupIds() *ProxySubscribeUpdateOne {
+	_u.mutation.ClearNodeGroupIds()
+	return _u
+}
+
+// SetNodeGroupID sets the "node_group_id" field.
+func (_u *ProxySubscribeUpdateOne) SetNodeGroupID(v int64) *ProxySubscribeUpdateOne {
+	_u.mutation.ResetNodeGroupID()
+	_u.mutation.SetNodeGroupID(v)
+	return _u
+}
+
+// SetNillableNodeGroupID sets the "node_group_id" field if the given value is not nil.
+func (_u *ProxySubscribeUpdateOne) SetNillableNodeGroupID(v *int64) *ProxySubscribeUpdateOne {
+	if v != nil {
+		_u.SetNodeGroupID(*v)
+	}
+	return _u
+}
+
+// AddNodeGroupID adds value to the "node_group_id" field.
+func (_u *ProxySubscribeUpdateOne) AddNodeGroupID(v int64) *ProxySubscribeUpdateOne {
+	_u.mutation.AddNodeGroupID(v)
+	return _u
+}
+
+// ClearNodeGroupID clears the value of the "node_group_id" field.
+func (_u *ProxySubscribeUpdateOne) ClearNodeGroupID() *ProxySubscribeUpdateOne {
+	_u.mutation.ClearNodeGroupID()
+	return _u
+}
+
+// SetTrafficLimit sets the "traffic_limit" field.
+func (_u *ProxySubscribeUpdateOne) SetTrafficLimit(v string) *ProxySubscribeUpdateOne {
+	_u.mutation.SetTrafficLimit(v)
+	return _u
+}
+
+// SetNillableTrafficLimit sets the "traffic_limit" field if the given value is not nil.
+func (_u *ProxySubscribeUpdateOne) SetNillableTrafficLimit(v *string) *ProxySubscribeUpdateOne {
+	if v != nil {
+		_u.SetTrafficLimit(*v)
+	}
+	return _u
+}
+
+// ClearTrafficLimit clears the value of the "traffic_limit" field.
+func (_u *ProxySubscribeUpdateOne) ClearTrafficLimit() *ProxySubscribeUpdateOne {
+	_u.mutation.ClearTrafficLimit()
+	return _u
+}
+
 // SetShow sets the "show" field.
 func (_u *ProxySubscribeUpdateOne) SetShow(v bool) *ProxySubscribeUpdateOne {
 	_u.mutation.SetShow(v)
@@ -970,12 +1154,6 @@ func (_u *ProxySubscribeUpdateOne) SetNillableAllowDeduction(v *bool) *ProxySubs
 	return _u
 }
 
-// ClearAllowDeduction clears the value of the "allow_deduction" field.
-func (_u *ProxySubscribeUpdateOne) ClearAllowDeduction() *ProxySubscribeUpdateOne {
-	_u.mutation.ClearAllowDeduction()
-	return _u
-}
-
 // SetResetCycle sets the "reset_cycle" field.
 func (_u *ProxySubscribeUpdateOne) SetResetCycle(v int64) *ProxySubscribeUpdateOne {
 	_u.mutation.ResetResetCycle()
@@ -1017,36 +1195,16 @@ func (_u *ProxySubscribeUpdateOne) SetNillableRenewalReset(v *bool) *ProxySubscr
 	return _u
 }
 
-// ClearRenewalReset clears the value of the "renewal_reset" field.
-func (_u *ProxySubscribeUpdateOne) ClearRenewalReset() *ProxySubscribeUpdateOne {
-	_u.mutation.ClearRenewalReset()
+// SetShowOriginalPrice sets the "show_original_price" field.
+func (_u *ProxySubscribeUpdateOne) SetShowOriginalPrice(v bool) *ProxySubscribeUpdateOne {
+	_u.mutation.SetShowOriginalPrice(v)
 	return _u
 }
 
-// SetNodes sets the "nodes" field.
-func (_u *ProxySubscribeUpdateOne) SetNodes(v string) *ProxySubscribeUpdateOne {
-	_u.mutation.SetNodes(v)
-	return _u
-}
-
-// SetNillableNodes sets the "nodes" field if the given value is not nil.
-func (_u *ProxySubscribeUpdateOne) SetNillableNodes(v *string) *ProxySubscribeUpdateOne {
+// SetNillableShowOriginalPrice sets the "show_original_price" field if the given value is not nil.
+func (_u *ProxySubscribeUpdateOne) SetNillableShowOriginalPrice(v *bool) *ProxySubscribeUpdateOne {
 	if v != nil {
-		_u.SetNodes(*v)
-	}
-	return _u
-}
-
-// SetNodeTags sets the "node_tags" field.
-func (_u *ProxySubscribeUpdateOne) SetNodeTags(v string) *ProxySubscribeUpdateOne {
-	_u.mutation.SetNodeTags(v)
-	return _u
-}
-
-// SetNillableNodeTags sets the "node_tags" field if the given value is not nil.
-func (_u *ProxySubscribeUpdateOne) SetNillableNodeTags(v *string) *ProxySubscribeUpdateOne {
-	if v != nil {
-		_u.SetNodeTags(*v)
+		_u.SetShowOriginalPrice(*v)
 	}
 	return _u
 }
@@ -1233,6 +1391,38 @@ func (_u *ProxySubscribeUpdateOne) sqlSave(ctx context.Context) (_node *ProxySub
 	if value, ok := _u.mutation.AddedQuota(); ok {
 		_spec.AddField(proxysubscribe.FieldQuota, field.TypeInt64, value)
 	}
+	if value, ok := _u.mutation.Nodes(); ok {
+		_spec.SetField(proxysubscribe.FieldNodes, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.NodeTags(); ok {
+		_spec.SetField(proxysubscribe.FieldNodeTags, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.NodeGroupIds(); ok {
+		_spec.SetField(proxysubscribe.FieldNodeGroupIds, field.TypeJSON, value)
+	}
+	if value, ok := _u.mutation.AppendedNodeGroupIds(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, proxysubscribe.FieldNodeGroupIds, value)
+		})
+	}
+	if _u.mutation.NodeGroupIdsCleared() {
+		_spec.ClearField(proxysubscribe.FieldNodeGroupIds, field.TypeJSON)
+	}
+	if value, ok := _u.mutation.NodeGroupID(); ok {
+		_spec.SetField(proxysubscribe.FieldNodeGroupID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedNodeGroupID(); ok {
+		_spec.AddField(proxysubscribe.FieldNodeGroupID, field.TypeInt64, value)
+	}
+	if _u.mutation.NodeGroupIDCleared() {
+		_spec.ClearField(proxysubscribe.FieldNodeGroupID, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.TrafficLimit(); ok {
+		_spec.SetField(proxysubscribe.FieldTrafficLimit, field.TypeString, value)
+	}
+	if _u.mutation.TrafficLimitCleared() {
+		_spec.ClearField(proxysubscribe.FieldTrafficLimit, field.TypeString)
+	}
 	if value, ok := _u.mutation.Show(); ok {
 		_spec.SetField(proxysubscribe.FieldShow, field.TypeBool, value)
 	}
@@ -1257,9 +1447,6 @@ func (_u *ProxySubscribeUpdateOne) sqlSave(ctx context.Context) (_node *ProxySub
 	if value, ok := _u.mutation.AllowDeduction(); ok {
 		_spec.SetField(proxysubscribe.FieldAllowDeduction, field.TypeBool, value)
 	}
-	if _u.mutation.AllowDeductionCleared() {
-		_spec.ClearField(proxysubscribe.FieldAllowDeduction, field.TypeBool)
-	}
 	if value, ok := _u.mutation.ResetCycle(); ok {
 		_spec.SetField(proxysubscribe.FieldResetCycle, field.TypeInt64, value)
 	}
@@ -1272,14 +1459,8 @@ func (_u *ProxySubscribeUpdateOne) sqlSave(ctx context.Context) (_node *ProxySub
 	if value, ok := _u.mutation.RenewalReset(); ok {
 		_spec.SetField(proxysubscribe.FieldRenewalReset, field.TypeBool, value)
 	}
-	if _u.mutation.RenewalResetCleared() {
-		_spec.ClearField(proxysubscribe.FieldRenewalReset, field.TypeBool)
-	}
-	if value, ok := _u.mutation.Nodes(); ok {
-		_spec.SetField(proxysubscribe.FieldNodes, field.TypeString, value)
-	}
-	if value, ok := _u.mutation.NodeTags(); ok {
-		_spec.SetField(proxysubscribe.FieldNodeTags, field.TypeString, value)
+	if value, ok := _u.mutation.ShowOriginalPrice(); ok {
+		_spec.SetField(proxysubscribe.FieldShowOriginalPrice, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxysubscribe.FieldUpdatedAt, field.TypeTime, value)

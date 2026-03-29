@@ -2,8 +2,12 @@ package payment
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
+	"github.com/OmnTeam/ppanel-pro/pkg/payment/alipay"
+	"github.com/OmnTeam/ppanel-pro/pkg/payment/epay"
+	"github.com/OmnTeam/ppanel-pro/pkg/payment/stripe"
 	"github.com/go-kratos/kratos/v2/log"
 )
 
@@ -76,32 +80,36 @@ func (uc *PaymentUseCase) AlipayNotify(ctx context.Context, token string, params
 	// 验证平台是否匹配
 	if config.Platform != "alipay" {
 		uc.log.Errorf("Platform mismatch: expected alipay, got %s", config.Platform)
+		return false, "failure", fmt.Errorf("platform mismatch")
+	}
+
+	// 使用pkg/payment/alipay验证签名
+	alipayClient := alipay.NewClient(alipay.Config{
+		AppId:       config.AppID,
+		PrivateKey:  config.PrivateKey,
+		PublicKey:   config.PublicKey,
+		InvoiceName: config.InvoiceName,
+		NotifyURL:   config.NotifyURL,
+		Sandbox:     config.Sandbox,
+	})
+
+	notify, err := alipayClient.DecodeNotification(params)
+	if err != nil {
+		uc.log.Errorf("Alipay DecodeNotification failed: %v", err)
 		return false, "failure", err
 	}
 
-	// TODO: 使用pkg/payment/alipay验证签名
-	// 这里需要调用 alipay client 的 DecodeNotification 方法验证签名
-
-	// 提取订单信息
-	orderNo := params.Get("out_trade_no")
-	tradeNo := params.Get("trade_no")
-	totalAmount := params.Get("total_amount")
-	tradeStatus := params.Get("trade_status")
-
-	uc.log.Infof("Alipay notify: orderNo=%s, tradeNo=%s, amount=%s, status=%s",
-		orderNo, tradeNo, totalAmount, tradeStatus)
+	uc.log.Infof("Alipay notify: orderNo=%s, tradeNo=%s, amount=%d, status=%s",
+		notify.OrderNo, notify.Amount, notify.Amount, notify.Status)
 
 	// 验证交易状态
-	if tradeStatus != "TRADE_SUCCESS" && tradeStatus != "TRADE_FINISHED" {
-		uc.log.Warnf("Alipay trade status not success: %s", tradeStatus)
+	if notify.Status != alipay.Success {
+		uc.log.Warnf("Alipay trade status not success: %s", notify.Status)
 		return false, "success", nil // 返回success避免重复通知
 	}
 
-	// 转换金额（分）
-	// amount := int64(float64(totalAmount) * 100)
-
 	// 激活订单
-	err = uc.repo.ActivateOrder(ctx, orderNo, "alipay", tradeNo, 0)
+	err = uc.repo.ActivateOrder(ctx, notify.OrderNo, "alipay", "", notify.Amount)
 	if err != nil {
 		uc.log.Errorf("ActivateOrder failed: %v", err)
 		return false, "failure", err
@@ -122,11 +130,15 @@ func (uc *PaymentUseCase) EPayNotify(ctx context.Context, token string, params m
 	// 验证平台是否匹配
 	if config.Platform != "epay" {
 		uc.log.Errorf("Platform mismatch: expected epay, got %s", config.Platform)
-		return false, "failure", err
+		return false, "failure", fmt.Errorf("platform mismatch")
 	}
 
-	// TODO: 使用pkg/payment/epay验证签名
-	// 这里需要调用 epay client 的 VerifySign 方法验证签名
+	// 使用pkg/payment/epay验证签名
+	epayClient := epay.NewClient(config.EPayPid, config.EPayURL, config.EPayKey)
+	if !epayClient.VerifySign(params) {
+		uc.log.Errorf("EPay VerifySign failed")
+		return false, "success", nil
+	}
 
 	// 提取订单信息
 	orderNo := params["out_trade_no"]
@@ -165,25 +177,37 @@ func (uc *PaymentUseCase) StripeNotify(ctx context.Context, token string, payloa
 	// 验证平台是否匹配
 	if config.Platform != "stripe" {
 		uc.log.Errorf("Platform mismatch: expected stripe, got %s", config.Platform)
+		return false, fmt.Errorf("platform mismatch")
+	}
+
+	// 使用pkg/payment/stripe验证签名
+	stripeClient := stripe.NewClient(stripe.Config{
+		PublicKey:     config.PublicKey,
+		SecretKey:     config.PrivateKey,
+		WebhookSecret: config.WebhookSecret,
+	})
+
+	notify, err := stripeClient.ParseNotify(payload, signature)
+	if err != nil {
+		uc.log.Errorf("Stripe ParseNotify failed: %v", err)
 		return false, err
 	}
 
-	// TODO: 使用pkg/payment/stripe验证签名
-	// 这里需要调用 stripe client 的 ParseNotify 方法验证签名
+	uc.log.Infof("Stripe notify: eventType=%s, orderNo=%s, tradeNo=%s, amount=%d",
+		notify.EventType, notify.OrderNo, notify.TradeNo, notify.Amount)
 
-	// 临时实现：从payload解析事件类型
-	// 实际应该使用 stripe.ParseNotify
+	// 验证事件类型
+	if notify.EventType != "payment_intent.succeeded" {
+		uc.log.Warnf("Stripe event type not success: %s", notify.EventType)
+		return true, nil // 返回true避免重复通知
+	}
 
-	uc.log.Infof("Stripe notify: token=%s, signature=%s", token, signature)
-
-	// TODO: 解析订单信息和金额
-	// 然后调用 ActivateOrder
-
-	// err = uc.repo.ActivateOrder(ctx, orderNo, "stripe", tradeNo, amount)
-	// if err != nil {
-	// 	uc.log.Errorf("ActivateOrder failed: %v", err)
-	// 	return false, err
-	// }
+	// 激活订单
+	err = uc.repo.ActivateOrder(ctx, notify.OrderNo, "stripe", notify.TradeNo, notify.Amount)
+	if err != nil {
+		uc.log.Errorf("ActivateOrder failed: %v", err)
+		return false, err
+	}
 
 	return true, nil
 }

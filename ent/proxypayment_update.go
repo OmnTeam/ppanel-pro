@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -56,6 +55,48 @@ func (_u *ProxyPaymentUpdate) SetNillablePlatform(v *string) *ProxyPaymentUpdate
 	return _u
 }
 
+// SetIcon sets the "icon" field.
+func (_u *ProxyPaymentUpdate) SetIcon(v string) *ProxyPaymentUpdate {
+	_u.mutation.SetIcon(v)
+	return _u
+}
+
+// SetNillableIcon sets the "icon" field if the given value is not nil.
+func (_u *ProxyPaymentUpdate) SetNillableIcon(v *string) *ProxyPaymentUpdate {
+	if v != nil {
+		_u.SetIcon(*v)
+	}
+	return _u
+}
+
+// SetDomain sets the "domain" field.
+func (_u *ProxyPaymentUpdate) SetDomain(v string) *ProxyPaymentUpdate {
+	_u.mutation.SetDomain(v)
+	return _u
+}
+
+// SetNillableDomain sets the "domain" field if the given value is not nil.
+func (_u *ProxyPaymentUpdate) SetNillableDomain(v *string) *ProxyPaymentUpdate {
+	if v != nil {
+		_u.SetDomain(*v)
+	}
+	return _u
+}
+
+// SetConfig sets the "config" field.
+func (_u *ProxyPaymentUpdate) SetConfig(v string) *ProxyPaymentUpdate {
+	_u.mutation.SetConfig(v)
+	return _u
+}
+
+// SetNillableConfig sets the "config" field if the given value is not nil.
+func (_u *ProxyPaymentUpdate) SetNillableConfig(v *string) *ProxyPaymentUpdate {
+	if v != nil {
+		_u.SetConfig(*v)
+	}
+	return _u
+}
+
 // SetDescription sets the "description" field.
 func (_u *ProxyPaymentUpdate) SetDescription(v string) *ProxyPaymentUpdate {
 	_u.mutation.SetDescription(v)
@@ -76,69 +117,15 @@ func (_u *ProxyPaymentUpdate) ClearDescription() *ProxyPaymentUpdate {
 	return _u
 }
 
-// SetIcon sets the "icon" field.
-func (_u *ProxyPaymentUpdate) SetIcon(v string) *ProxyPaymentUpdate {
-	_u.mutation.SetIcon(v)
-	return _u
-}
-
-// SetNillableIcon sets the "icon" field if the given value is not nil.
-func (_u *ProxyPaymentUpdate) SetNillableIcon(v *string) *ProxyPaymentUpdate {
-	if v != nil {
-		_u.SetIcon(*v)
-	}
-	return _u
-}
-
-// ClearIcon clears the value of the "icon" field.
-func (_u *ProxyPaymentUpdate) ClearIcon() *ProxyPaymentUpdate {
-	_u.mutation.ClearIcon()
-	return _u
-}
-
-// SetDomain sets the "domain" field.
-func (_u *ProxyPaymentUpdate) SetDomain(v string) *ProxyPaymentUpdate {
-	_u.mutation.SetDomain(v)
-	return _u
-}
-
-// SetNillableDomain sets the "domain" field if the given value is not nil.
-func (_u *ProxyPaymentUpdate) SetNillableDomain(v *string) *ProxyPaymentUpdate {
-	if v != nil {
-		_u.SetDomain(*v)
-	}
-	return _u
-}
-
-// ClearDomain clears the value of the "domain" field.
-func (_u *ProxyPaymentUpdate) ClearDomain() *ProxyPaymentUpdate {
-	_u.mutation.ClearDomain()
-	return _u
-}
-
-// SetConfig sets the "config" field.
-func (_u *ProxyPaymentUpdate) SetConfig(v string) *ProxyPaymentUpdate {
-	_u.mutation.SetConfig(v)
-	return _u
-}
-
-// SetNillableConfig sets the "config" field if the given value is not nil.
-func (_u *ProxyPaymentUpdate) SetNillableConfig(v *string) *ProxyPaymentUpdate {
-	if v != nil {
-		_u.SetConfig(*v)
-	}
-	return _u
-}
-
 // SetFeeMode sets the "fee_mode" field.
-func (_u *ProxyPaymentUpdate) SetFeeMode(v int) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) SetFeeMode(v uint) *ProxyPaymentUpdate {
 	_u.mutation.ResetFeeMode()
 	_u.mutation.SetFeeMode(v)
 	return _u
 }
 
 // SetNillableFeeMode sets the "fee_mode" field if the given value is not nil.
-func (_u *ProxyPaymentUpdate) SetNillableFeeMode(v *int) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) SetNillableFeeMode(v *uint) *ProxyPaymentUpdate {
 	if v != nil {
 		_u.SetFeeMode(*v)
 	}
@@ -152,14 +139,14 @@ func (_u *ProxyPaymentUpdate) AddFeeMode(v int) *ProxyPaymentUpdate {
 }
 
 // SetFeePercent sets the "fee_percent" field.
-func (_u *ProxyPaymentUpdate) SetFeePercent(v float64) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) SetFeePercent(v int64) *ProxyPaymentUpdate {
 	_u.mutation.ResetFeePercent()
 	_u.mutation.SetFeePercent(v)
 	return _u
 }
 
 // SetNillableFeePercent sets the "fee_percent" field if the given value is not nil.
-func (_u *ProxyPaymentUpdate) SetNillableFeePercent(v *float64) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) SetNillableFeePercent(v *int64) *ProxyPaymentUpdate {
 	if v != nil {
 		_u.SetFeePercent(*v)
 	}
@@ -167,26 +154,20 @@ func (_u *ProxyPaymentUpdate) SetNillableFeePercent(v *float64) *ProxyPaymentUpd
 }
 
 // AddFeePercent adds value to the "fee_percent" field.
-func (_u *ProxyPaymentUpdate) AddFeePercent(v float64) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) AddFeePercent(v int64) *ProxyPaymentUpdate {
 	_u.mutation.AddFeePercent(v)
 	return _u
 }
 
-// ClearFeePercent clears the value of the "fee_percent" field.
-func (_u *ProxyPaymentUpdate) ClearFeePercent() *ProxyPaymentUpdate {
-	_u.mutation.ClearFeePercent()
-	return _u
-}
-
 // SetFeeAmount sets the "fee_amount" field.
-func (_u *ProxyPaymentUpdate) SetFeeAmount(v int) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) SetFeeAmount(v int64) *ProxyPaymentUpdate {
 	_u.mutation.ResetFeeAmount()
 	_u.mutation.SetFeeAmount(v)
 	return _u
 }
 
 // SetNillableFeeAmount sets the "fee_amount" field if the given value is not nil.
-func (_u *ProxyPaymentUpdate) SetNillableFeeAmount(v *int) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) SetNillableFeeAmount(v *int64) *ProxyPaymentUpdate {
 	if v != nil {
 		_u.SetFeeAmount(*v)
 	}
@@ -194,14 +175,8 @@ func (_u *ProxyPaymentUpdate) SetNillableFeeAmount(v *int) *ProxyPaymentUpdate {
 }
 
 // AddFeeAmount adds value to the "fee_amount" field.
-func (_u *ProxyPaymentUpdate) AddFeeAmount(v int) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) AddFeeAmount(v int64) *ProxyPaymentUpdate {
 	_u.mutation.AddFeeAmount(v)
-	return _u
-}
-
-// ClearFeeAmount clears the value of the "fee_amount" field.
-func (_u *ProxyPaymentUpdate) ClearFeeAmount() *ProxyPaymentUpdate {
-	_u.mutation.ClearFeeAmount()
 	return _u
 }
 
@@ -233,18 +208,6 @@ func (_u *ProxyPaymentUpdate) SetNillableToken(v *string) *ProxyPaymentUpdate {
 	return _u
 }
 
-// ClearToken clears the value of the "token" field.
-func (_u *ProxyPaymentUpdate) ClearToken() *ProxyPaymentUpdate {
-	_u.mutation.ClearToken()
-	return _u
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *ProxyPaymentUpdate) SetUpdatedAt(v time.Time) *ProxyPaymentUpdate {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
 // Mutation returns the ProxyPaymentMutation object of the builder.
 func (_u *ProxyPaymentUpdate) Mutation() *ProxyPaymentMutation {
 	return _u.mutation
@@ -252,7 +215,6 @@ func (_u *ProxyPaymentUpdate) Mutation() *ProxyPaymentMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (_u *ProxyPaymentUpdate) Save(ctx context.Context) (int, error) {
-	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -275,14 +237,6 @@ func (_u *ProxyPaymentUpdate) Exec(ctx context.Context) error {
 func (_u *ProxyPaymentUpdate) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (_u *ProxyPaymentUpdate) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := proxypayment.UpdateDefaultUpdatedAt()
-		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -339,62 +293,44 @@ func (_u *ProxyPaymentUpdate) sqlSave(ctx context.Context) (_node int, err error
 	if value, ok := _u.mutation.Platform(); ok {
 		_spec.SetField(proxypayment.FieldPlatform, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.Icon(); ok {
+		_spec.SetField(proxypayment.FieldIcon, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Domain(); ok {
+		_spec.SetField(proxypayment.FieldDomain, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Config(); ok {
+		_spec.SetField(proxypayment.FieldConfig, field.TypeString, value)
+	}
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(proxypayment.FieldDescription, field.TypeString, value)
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(proxypayment.FieldDescription, field.TypeString)
 	}
-	if value, ok := _u.mutation.Icon(); ok {
-		_spec.SetField(proxypayment.FieldIcon, field.TypeString, value)
-	}
-	if _u.mutation.IconCleared() {
-		_spec.ClearField(proxypayment.FieldIcon, field.TypeString)
-	}
-	if value, ok := _u.mutation.Domain(); ok {
-		_spec.SetField(proxypayment.FieldDomain, field.TypeString, value)
-	}
-	if _u.mutation.DomainCleared() {
-		_spec.ClearField(proxypayment.FieldDomain, field.TypeString)
-	}
-	if value, ok := _u.mutation.Config(); ok {
-		_spec.SetField(proxypayment.FieldConfig, field.TypeString, value)
-	}
 	if value, ok := _u.mutation.FeeMode(); ok {
-		_spec.SetField(proxypayment.FieldFeeMode, field.TypeInt, value)
+		_spec.SetField(proxypayment.FieldFeeMode, field.TypeUint, value)
 	}
 	if value, ok := _u.mutation.AddedFeeMode(); ok {
-		_spec.AddField(proxypayment.FieldFeeMode, field.TypeInt, value)
+		_spec.AddField(proxypayment.FieldFeeMode, field.TypeUint, value)
 	}
 	if value, ok := _u.mutation.FeePercent(); ok {
-		_spec.SetField(proxypayment.FieldFeePercent, field.TypeFloat64, value)
+		_spec.SetField(proxypayment.FieldFeePercent, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedFeePercent(); ok {
-		_spec.AddField(proxypayment.FieldFeePercent, field.TypeFloat64, value)
-	}
-	if _u.mutation.FeePercentCleared() {
-		_spec.ClearField(proxypayment.FieldFeePercent, field.TypeFloat64)
+		_spec.AddField(proxypayment.FieldFeePercent, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.FeeAmount(); ok {
-		_spec.SetField(proxypayment.FieldFeeAmount, field.TypeInt, value)
+		_spec.SetField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedFeeAmount(); ok {
-		_spec.AddField(proxypayment.FieldFeeAmount, field.TypeInt, value)
-	}
-	if _u.mutation.FeeAmountCleared() {
-		_spec.ClearField(proxypayment.FieldFeeAmount, field.TypeInt)
+		_spec.AddField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Enable(); ok {
 		_spec.SetField(proxypayment.FieldEnable, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.Token(); ok {
 		_spec.SetField(proxypayment.FieldToken, field.TypeString, value)
-	}
-	if _u.mutation.TokenCleared() {
-		_spec.ClearField(proxypayment.FieldToken, field.TypeString)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(proxypayment.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -444,6 +380,48 @@ func (_u *ProxyPaymentUpdateOne) SetNillablePlatform(v *string) *ProxyPaymentUpd
 	return _u
 }
 
+// SetIcon sets the "icon" field.
+func (_u *ProxyPaymentUpdateOne) SetIcon(v string) *ProxyPaymentUpdateOne {
+	_u.mutation.SetIcon(v)
+	return _u
+}
+
+// SetNillableIcon sets the "icon" field if the given value is not nil.
+func (_u *ProxyPaymentUpdateOne) SetNillableIcon(v *string) *ProxyPaymentUpdateOne {
+	if v != nil {
+		_u.SetIcon(*v)
+	}
+	return _u
+}
+
+// SetDomain sets the "domain" field.
+func (_u *ProxyPaymentUpdateOne) SetDomain(v string) *ProxyPaymentUpdateOne {
+	_u.mutation.SetDomain(v)
+	return _u
+}
+
+// SetNillableDomain sets the "domain" field if the given value is not nil.
+func (_u *ProxyPaymentUpdateOne) SetNillableDomain(v *string) *ProxyPaymentUpdateOne {
+	if v != nil {
+		_u.SetDomain(*v)
+	}
+	return _u
+}
+
+// SetConfig sets the "config" field.
+func (_u *ProxyPaymentUpdateOne) SetConfig(v string) *ProxyPaymentUpdateOne {
+	_u.mutation.SetConfig(v)
+	return _u
+}
+
+// SetNillableConfig sets the "config" field if the given value is not nil.
+func (_u *ProxyPaymentUpdateOne) SetNillableConfig(v *string) *ProxyPaymentUpdateOne {
+	if v != nil {
+		_u.SetConfig(*v)
+	}
+	return _u
+}
+
 // SetDescription sets the "description" field.
 func (_u *ProxyPaymentUpdateOne) SetDescription(v string) *ProxyPaymentUpdateOne {
 	_u.mutation.SetDescription(v)
@@ -464,69 +442,15 @@ func (_u *ProxyPaymentUpdateOne) ClearDescription() *ProxyPaymentUpdateOne {
 	return _u
 }
 
-// SetIcon sets the "icon" field.
-func (_u *ProxyPaymentUpdateOne) SetIcon(v string) *ProxyPaymentUpdateOne {
-	_u.mutation.SetIcon(v)
-	return _u
-}
-
-// SetNillableIcon sets the "icon" field if the given value is not nil.
-func (_u *ProxyPaymentUpdateOne) SetNillableIcon(v *string) *ProxyPaymentUpdateOne {
-	if v != nil {
-		_u.SetIcon(*v)
-	}
-	return _u
-}
-
-// ClearIcon clears the value of the "icon" field.
-func (_u *ProxyPaymentUpdateOne) ClearIcon() *ProxyPaymentUpdateOne {
-	_u.mutation.ClearIcon()
-	return _u
-}
-
-// SetDomain sets the "domain" field.
-func (_u *ProxyPaymentUpdateOne) SetDomain(v string) *ProxyPaymentUpdateOne {
-	_u.mutation.SetDomain(v)
-	return _u
-}
-
-// SetNillableDomain sets the "domain" field if the given value is not nil.
-func (_u *ProxyPaymentUpdateOne) SetNillableDomain(v *string) *ProxyPaymentUpdateOne {
-	if v != nil {
-		_u.SetDomain(*v)
-	}
-	return _u
-}
-
-// ClearDomain clears the value of the "domain" field.
-func (_u *ProxyPaymentUpdateOne) ClearDomain() *ProxyPaymentUpdateOne {
-	_u.mutation.ClearDomain()
-	return _u
-}
-
-// SetConfig sets the "config" field.
-func (_u *ProxyPaymentUpdateOne) SetConfig(v string) *ProxyPaymentUpdateOne {
-	_u.mutation.SetConfig(v)
-	return _u
-}
-
-// SetNillableConfig sets the "config" field if the given value is not nil.
-func (_u *ProxyPaymentUpdateOne) SetNillableConfig(v *string) *ProxyPaymentUpdateOne {
-	if v != nil {
-		_u.SetConfig(*v)
-	}
-	return _u
-}
-
 // SetFeeMode sets the "fee_mode" field.
-func (_u *ProxyPaymentUpdateOne) SetFeeMode(v int) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) SetFeeMode(v uint) *ProxyPaymentUpdateOne {
 	_u.mutation.ResetFeeMode()
 	_u.mutation.SetFeeMode(v)
 	return _u
 }
 
 // SetNillableFeeMode sets the "fee_mode" field if the given value is not nil.
-func (_u *ProxyPaymentUpdateOne) SetNillableFeeMode(v *int) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) SetNillableFeeMode(v *uint) *ProxyPaymentUpdateOne {
 	if v != nil {
 		_u.SetFeeMode(*v)
 	}
@@ -540,14 +464,14 @@ func (_u *ProxyPaymentUpdateOne) AddFeeMode(v int) *ProxyPaymentUpdateOne {
 }
 
 // SetFeePercent sets the "fee_percent" field.
-func (_u *ProxyPaymentUpdateOne) SetFeePercent(v float64) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) SetFeePercent(v int64) *ProxyPaymentUpdateOne {
 	_u.mutation.ResetFeePercent()
 	_u.mutation.SetFeePercent(v)
 	return _u
 }
 
 // SetNillableFeePercent sets the "fee_percent" field if the given value is not nil.
-func (_u *ProxyPaymentUpdateOne) SetNillableFeePercent(v *float64) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) SetNillableFeePercent(v *int64) *ProxyPaymentUpdateOne {
 	if v != nil {
 		_u.SetFeePercent(*v)
 	}
@@ -555,26 +479,20 @@ func (_u *ProxyPaymentUpdateOne) SetNillableFeePercent(v *float64) *ProxyPayment
 }
 
 // AddFeePercent adds value to the "fee_percent" field.
-func (_u *ProxyPaymentUpdateOne) AddFeePercent(v float64) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) AddFeePercent(v int64) *ProxyPaymentUpdateOne {
 	_u.mutation.AddFeePercent(v)
 	return _u
 }
 
-// ClearFeePercent clears the value of the "fee_percent" field.
-func (_u *ProxyPaymentUpdateOne) ClearFeePercent() *ProxyPaymentUpdateOne {
-	_u.mutation.ClearFeePercent()
-	return _u
-}
-
 // SetFeeAmount sets the "fee_amount" field.
-func (_u *ProxyPaymentUpdateOne) SetFeeAmount(v int) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) SetFeeAmount(v int64) *ProxyPaymentUpdateOne {
 	_u.mutation.ResetFeeAmount()
 	_u.mutation.SetFeeAmount(v)
 	return _u
 }
 
 // SetNillableFeeAmount sets the "fee_amount" field if the given value is not nil.
-func (_u *ProxyPaymentUpdateOne) SetNillableFeeAmount(v *int) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) SetNillableFeeAmount(v *int64) *ProxyPaymentUpdateOne {
 	if v != nil {
 		_u.SetFeeAmount(*v)
 	}
@@ -582,14 +500,8 @@ func (_u *ProxyPaymentUpdateOne) SetNillableFeeAmount(v *int) *ProxyPaymentUpdat
 }
 
 // AddFeeAmount adds value to the "fee_amount" field.
-func (_u *ProxyPaymentUpdateOne) AddFeeAmount(v int) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) AddFeeAmount(v int64) *ProxyPaymentUpdateOne {
 	_u.mutation.AddFeeAmount(v)
-	return _u
-}
-
-// ClearFeeAmount clears the value of the "fee_amount" field.
-func (_u *ProxyPaymentUpdateOne) ClearFeeAmount() *ProxyPaymentUpdateOne {
-	_u.mutation.ClearFeeAmount()
 	return _u
 }
 
@@ -621,18 +533,6 @@ func (_u *ProxyPaymentUpdateOne) SetNillableToken(v *string) *ProxyPaymentUpdate
 	return _u
 }
 
-// ClearToken clears the value of the "token" field.
-func (_u *ProxyPaymentUpdateOne) ClearToken() *ProxyPaymentUpdateOne {
-	_u.mutation.ClearToken()
-	return _u
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (_u *ProxyPaymentUpdateOne) SetUpdatedAt(v time.Time) *ProxyPaymentUpdateOne {
-	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
 // Mutation returns the ProxyPaymentMutation object of the builder.
 func (_u *ProxyPaymentUpdateOne) Mutation() *ProxyPaymentMutation {
 	return _u.mutation
@@ -653,7 +553,6 @@ func (_u *ProxyPaymentUpdateOne) Select(field string, fields ...string) *ProxyPa
 
 // Save executes the query and returns the updated ProxyPayment entity.
 func (_u *ProxyPaymentUpdateOne) Save(ctx context.Context) (*ProxyPayment, error) {
-	_u.defaults()
 	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
@@ -676,14 +575,6 @@ func (_u *ProxyPaymentUpdateOne) Exec(ctx context.Context) error {
 func (_u *ProxyPaymentUpdateOne) ExecX(ctx context.Context) {
 	if err := _u.Exec(ctx); err != nil {
 		panic(err)
-	}
-}
-
-// defaults sets the default values of the builder before save.
-func (_u *ProxyPaymentUpdateOne) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
-		v := proxypayment.UpdateDefaultUpdatedAt()
-		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -757,62 +648,44 @@ func (_u *ProxyPaymentUpdateOne) sqlSave(ctx context.Context) (_node *ProxyPayme
 	if value, ok := _u.mutation.Platform(); ok {
 		_spec.SetField(proxypayment.FieldPlatform, field.TypeString, value)
 	}
+	if value, ok := _u.mutation.Icon(); ok {
+		_spec.SetField(proxypayment.FieldIcon, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Domain(); ok {
+		_spec.SetField(proxypayment.FieldDomain, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.Config(); ok {
+		_spec.SetField(proxypayment.FieldConfig, field.TypeString, value)
+	}
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(proxypayment.FieldDescription, field.TypeString, value)
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(proxypayment.FieldDescription, field.TypeString)
 	}
-	if value, ok := _u.mutation.Icon(); ok {
-		_spec.SetField(proxypayment.FieldIcon, field.TypeString, value)
-	}
-	if _u.mutation.IconCleared() {
-		_spec.ClearField(proxypayment.FieldIcon, field.TypeString)
-	}
-	if value, ok := _u.mutation.Domain(); ok {
-		_spec.SetField(proxypayment.FieldDomain, field.TypeString, value)
-	}
-	if _u.mutation.DomainCleared() {
-		_spec.ClearField(proxypayment.FieldDomain, field.TypeString)
-	}
-	if value, ok := _u.mutation.Config(); ok {
-		_spec.SetField(proxypayment.FieldConfig, field.TypeString, value)
-	}
 	if value, ok := _u.mutation.FeeMode(); ok {
-		_spec.SetField(proxypayment.FieldFeeMode, field.TypeInt, value)
+		_spec.SetField(proxypayment.FieldFeeMode, field.TypeUint, value)
 	}
 	if value, ok := _u.mutation.AddedFeeMode(); ok {
-		_spec.AddField(proxypayment.FieldFeeMode, field.TypeInt, value)
+		_spec.AddField(proxypayment.FieldFeeMode, field.TypeUint, value)
 	}
 	if value, ok := _u.mutation.FeePercent(); ok {
-		_spec.SetField(proxypayment.FieldFeePercent, field.TypeFloat64, value)
+		_spec.SetField(proxypayment.FieldFeePercent, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedFeePercent(); ok {
-		_spec.AddField(proxypayment.FieldFeePercent, field.TypeFloat64, value)
-	}
-	if _u.mutation.FeePercentCleared() {
-		_spec.ClearField(proxypayment.FieldFeePercent, field.TypeFloat64)
+		_spec.AddField(proxypayment.FieldFeePercent, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.FeeAmount(); ok {
-		_spec.SetField(proxypayment.FieldFeeAmount, field.TypeInt, value)
+		_spec.SetField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedFeeAmount(); ok {
-		_spec.AddField(proxypayment.FieldFeeAmount, field.TypeInt, value)
-	}
-	if _u.mutation.FeeAmountCleared() {
-		_spec.ClearField(proxypayment.FieldFeeAmount, field.TypeInt)
+		_spec.AddField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Enable(); ok {
 		_spec.SetField(proxypayment.FieldEnable, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.Token(); ok {
 		_spec.SetField(proxypayment.FieldToken, field.TypeString, value)
-	}
-	if _u.mutation.TokenCleared() {
-		_spec.ClearField(proxypayment.FieldToken, field.TypeString)
-	}
-	if value, ok := _u.mutation.UpdatedAt(); ok {
-		_spec.SetField(proxypayment.FieldUpdatedAt, field.TypeTime, value)
 	}
 	_node = &ProxyPayment{config: _u.config}
 	_spec.Assign = _node.assignValues

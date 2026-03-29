@@ -20,7 +20,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/order"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/payment"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/redemption"
-	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/server"
+	server2 "github.com/OmnTeam/ppanel-pro/internal/biz/admin/server"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/subscribe"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/system"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/ticket"
@@ -34,14 +34,16 @@ import (
 	document3 "github.com/OmnTeam/ppanel-pro/internal/biz/public/document"
 	payment3 "github.com/OmnTeam/ppanel-pro/internal/biz/public/payment"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/public/portal"
+	redemption3 "github.com/OmnTeam/ppanel-pro/internal/biz/public/redemption"
 	subscribe3 "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscribe"
+	"github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
 	ticket3 "github.com/OmnTeam/ppanel-pro/internal/biz/public/ticket"
 	user3 "github.com/OmnTeam/ppanel-pro/internal/biz/public/user"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/public/withdrawal"
 	server4 "github.com/OmnTeam/ppanel-pro/internal/biz/server"
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
 	"github.com/OmnTeam/ppanel-pro/internal/data"
-	server3 "github.com/OmnTeam/ppanel-pro/internal/server"
+	"github.com/OmnTeam/ppanel-pro/internal/server"
 	ads2 "github.com/OmnTeam/ppanel-pro/internal/service/admin/ads"
 	announcement2 "github.com/OmnTeam/ppanel-pro/internal/service/admin/announcement"
 	application2 "github.com/OmnTeam/ppanel-pro/internal/service/admin/application"
@@ -55,7 +57,7 @@ import (
 	order2 "github.com/OmnTeam/ppanel-pro/internal/service/admin/order"
 	payment2 "github.com/OmnTeam/ppanel-pro/internal/service/admin/payment"
 	redemption2 "github.com/OmnTeam/ppanel-pro/internal/service/admin/redemption"
-	server2 "github.com/OmnTeam/ppanel-pro/internal/service/admin/server"
+	server3 "github.com/OmnTeam/ppanel-pro/internal/service/admin/server"
 	subscribe2 "github.com/OmnTeam/ppanel-pro/internal/service/admin/subscribe"
 	system2 "github.com/OmnTeam/ppanel-pro/internal/service/admin/system"
 	ticket2 "github.com/OmnTeam/ppanel-pro/internal/service/admin/ticket"
@@ -69,7 +71,9 @@ import (
 	document4 "github.com/OmnTeam/ppanel-pro/internal/service/public/document"
 	payment4 "github.com/OmnTeam/ppanel-pro/internal/service/public/payment"
 	portal2 "github.com/OmnTeam/ppanel-pro/internal/service/public/portal"
+	redemption4 "github.com/OmnTeam/ppanel-pro/internal/service/public/redemption"
 	subscribe4 "github.com/OmnTeam/ppanel-pro/internal/service/public/subscribe"
+	subscription2 "github.com/OmnTeam/ppanel-pro/internal/service/public/subscription"
 	ticket4 "github.com/OmnTeam/ppanel-pro/internal/service/public/ticket"
 	user4 "github.com/OmnTeam/ppanel-pro/internal/service/public/user"
 	server5 "github.com/OmnTeam/ppanel-pro/internal/service/server"
@@ -85,10 +89,11 @@ import (
 
 // wireApp init kratos application
 func wireApp(confServer *conf.Server, confData *conf.Data, confApplication *conf.Application, logger log.Logger) (*kratos.App, func(), error) {
-	dataData, cleanup, err := data.NewData(confData, confApplication, logger)
+	dataData, cleanup, err := data.NewData(confData, confServer, confApplication, logger)
 	if err != nil {
 		return nil, nil, err
 	}
+	serviceContext := server.NewMiddlewareServiceContext(confServer, confApplication, dataData)
 	adsRepo := data.NewAdsRepo(dataData, logger)
 	adsUsecase := ads.NewAdsUsecase(adsRepo, logger)
 	adsService := ads2.NewAdsService(adsUsecase, logger)
@@ -128,11 +133,11 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confApplication *conf
 	paymentService := payment2.NewPaymentService(paymentUsecase, logger)
 	serverRepo := data.NewAdminServerRepo(dataData, logger)
 	nodeRepo := data.NewAdminNodeRepo(dataData, logger)
-	serverUsecase := server.NewServerUsecase(serverRepo, nodeRepo, logger)
-	nodeUsecase := server.NewNodeUsecase(nodeRepo, logger)
+	serverUsecase := server2.NewServerUsecase(serverRepo, nodeRepo, logger)
+	nodeUsecase := server2.NewNodeUsecase(nodeRepo, logger)
 	migrationRepo := data.NewAdminMigrationRepo(dataData, logger)
-	migrationUsecase := server.NewMigrationUsecase(migrationRepo, logger)
-	serverService := server2.NewServerService(serverUsecase, nodeUsecase, migrationUsecase, logger)
+	migrationUsecase := server2.NewMigrationUsecase(migrationRepo, logger)
+	serverService := server3.NewServerService(serverUsecase, nodeUsecase, migrationUsecase, logger)
 	subscribeRepo := data.NewSubscribeRepo(dataData, logger)
 	subscribeUseCase := subscribe.NewSubscribeUseCase(subscribeRepo, logger)
 	subscribeService := subscribe2.NewSubscribeService(subscribeUseCase)
@@ -186,7 +191,8 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confApplication *conf
 	withdrawalRepo := data.NewWithdrawalRepo(dataData, logger)
 	withdrawalUsecase := withdrawal.NewWithdrawalUsecase(withdrawalRepo, logger)
 	userUserService := user4.NewUserService(userUseCase, withdrawalUsecase)
-	grpcServer := server3.NewGRPCServer(confServer, adsService, announcementService, subscribeApplicationService, authMethodService, consoleService, couponService, documentService, logService, marketingService, orderService, paymentService, serverService, subscribeService, systemService, ticketService, redemptionService, toolService, groupService, userService, userAuthMethodService, userDeviceService, userSubscribeService, authService, oAuthService, commonService, publicOrderService, portalService, ticketTicketService, userUserService)
+	grpcServer := server.NewGRPCServer(confServer, serviceContext, adsService, announcementService, subscribeApplicationService, authMethodService, consoleService, couponService, documentService, logService, marketingService, orderService, paymentService, serverService, subscribeService, systemService, ticketService, redemptionService, toolService, groupService, userService, userAuthMethodService, userDeviceService, userSubscribeService, authService, oAuthService, commonService, publicOrderService, portalService, ticketTicketService, userUserService)
+	authCompat := data.NewAuthCompat(dataData, confApplication, logger)
 	announcementAnnouncementRepo := data.NewPublicAnnouncementRepo(dataData, logger)
 	announcementUseCase := announcement3.NewAnnouncementUseCase(announcementAnnouncementRepo)
 	announcementAnnouncementService := announcement4.NewAnnouncementService(announcementUseCase)
@@ -196,13 +202,19 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confApplication *conf
 	paymentPaymentRepo := data.NewPublicPaymentRepo(dataData, logger)
 	paymentUseCase := payment3.NewPaymentUseCase(paymentPaymentRepo, logger)
 	paymentPaymentService := payment4.NewPaymentService(paymentUseCase)
+	redemptionRedemptionRepo := data.NewPublicRedemptionRepo(dataData, logger)
+	redemptionRedemptionUseCase := redemption3.NewRedemptionUseCase(redemptionRedemptionRepo, logger)
+	redemptionRedemptionService := redemption4.NewRedemptionService(redemptionRedemptionUseCase)
 	subscribeSubscribeRepo := data.NewPublicSubscribeRepo(dataData, logger)
 	subscribeSubscribeUseCase := subscribe3.NewSubscribeUseCase(subscribeSubscribeRepo)
 	subscribeSubscribeService := subscribe4.NewSubscribeService(subscribeSubscribeUseCase)
+	subscriptionRepo := data.NewPublicSubscriptionRepo(dataData, logger)
+	subscriptionUseCase := subscription.NewSubscriptionUseCase(subscriptionRepo)
+	publicSubscriptionService := subscription2.NewPublicSubscriptionService(subscriptionUseCase)
 	serverNodeRepo := data.NewServerNodeRepo(dataData, logger)
 	serverNodeUsecase := server4.NewServerNodeUsecase(serverNodeRepo, logger)
 	serverServerService := server5.NewServerService(serverNodeUsecase, logger)
-	httpServer := server3.NewHTTPServer(confServer, adsService, announcementService, subscribeApplicationService, authMethodService, consoleService, couponService, documentService, logService, marketingService, orderService, paymentService, serverService, subscribeService, systemService, ticketService, redemptionService, toolService, groupService, userService, userAuthMethodService, userDeviceService, userSubscribeService, authService, oAuthService, commonService, publicOrderService, announcementAnnouncementService, documentDocumentService, paymentPaymentService, portalService, subscribeSubscribeService, ticketTicketService, userUserService, serverServerService, logger)
+	httpServer := server.NewHTTPServer(confServer, confApplication, serviceContext, authCompat, dataData, adsService, announcementService, subscribeApplicationService, authMethodService, consoleService, couponService, documentService, logService, marketingService, orderService, paymentService, serverService, subscribeService, systemService, ticketService, redemptionService, toolService, groupService, userService, userAuthMethodService, userDeviceService, userSubscribeService, authService, oAuthService, commonService, publicOrderService, announcementAnnouncementService, documentDocumentService, paymentPaymentService, portalService, redemptionRedemptionService, subscribeSubscribeService, publicSubscriptionService, ticketTicketService, userUserService, serverServerService, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()

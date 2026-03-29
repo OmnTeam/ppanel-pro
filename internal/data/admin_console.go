@@ -668,18 +668,18 @@ func (r *adminConsoleRepo) QueryTodayUserTrafficRanking(ctx context.Context, dat
 	}
 
 	// Group by user and calculate totals in Go
-	userTrafficMap := make(map[int]*v1.UserTrafficData)
+	userTrafficMap := make(map[int64]*v1.UserTrafficData)
 	for _, log := range trafficLogs {
-		subscribeID := int(log.SubscribeID)
+		subscribeID := log.SubscribeID
 		if _, exists := userTrafficMap[subscribeID]; !exists {
 			userTrafficMap[subscribeID] = &v1.UserTrafficData{
-				SID:      subscribeID,
+				SID:      int(subscribeID),
 				Upload:   0,
 				Download: 0,
 			}
 		}
-		userTrafficMap[subscribeID].Upload += log.Upload
-		userTrafficMap[subscribeID].Download += log.Download
+		userTrafficMap[subscribeID].Upload += int(log.Upload)
+		userTrafficMap[subscribeID].Download += int(log.Download)
 	}
 
 	// Convert to slice and sort by total traffic
@@ -761,26 +761,26 @@ func (r *adminConsoleRepo) QueryTodayServerTrafficRanking(ctx context.Context, d
 	}
 
 	// Group by server and calculate totals in Go
-	serverTrafficMap := make(map[int]*v1.ServerTrafficData)
+	serverTrafficMap := make(map[int64]*v1.ServerTrafficData)
 	for _, log := range trafficLogs {
-		serverID := int(log.ServerID)
+		serverID := log.ServerID
 		if _, exists := serverTrafficMap[serverID]; !exists {
 			serverTrafficMap[serverID] = &v1.ServerTrafficData{
-				ServerID: serverID,
+				ServerID: int(serverID),
 				Name:     fmt.Sprintf("Server %d", serverID),
 				Upload:   0,
 				Download: 0,
 			}
 		}
-		serverTrafficMap[serverID].Upload += log.Upload
-		serverTrafficMap[serverID].Download += log.Download
+		serverTrafficMap[serverID].Upload += int(log.Upload)
+		serverTrafficMap[serverID].Download += int(log.Download)
 	}
 
 	// Get server names
 	for serverID, data := range serverTrafficMap {
 		server, err := r.data.db.ProxyServer.Query().
 			Where(
-				proxyserver.IDEQ(int64(serverID)),
+				proxyserver.IDEQ(serverID),
 			).
 			Only(ctx)
 

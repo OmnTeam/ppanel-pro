@@ -24,24 +24,34 @@ type ProxyUserSubscribe struct {
 	OrderID int64 `json:"order_id,omitempty"`
 	// 订阅套餐ID
 	SubscribeID int64 `json:"subscribe_id,omitempty"`
+	// 节点组ID
+	NodeGroupID int64 `json:"node_group_id,omitempty"`
+	// 分组是否锁定
+	GroupLocked bool `json:"group_locked,omitempty"`
 	// 订阅开始时间
 	StartTime time.Time `json:"start_time,omitempty"`
 	// 订阅过期时间
 	ExpireTime *time.Time `json:"expire_time,omitempty"`
 	// 订阅完成时间
 	FinishedAt *time.Time `json:"finished_at,omitempty"`
-	// 总流量（字节）
+	// 总流量
 	Traffic *int64 `json:"traffic,omitempty"`
-	// 下载流量（字节）
+	// 下载流量
 	Download *int64 `json:"download,omitempty"`
-	// 上传流量（字节）
+	// 上传流量
 	Upload *int64 `json:"upload,omitempty"`
+	// 过期下载流量
+	ExpiredDownload *int64 `json:"expired_download,omitempty"`
+	// 过期上传流量
+	ExpiredUpload *int64 `json:"expired_upload,omitempty"`
 	// 订阅令牌
 	Token *string `json:"token,omitempty"`
 	// 订阅UUID
 	UUID *string `json:"uuid,omitempty"`
-	// 订阅状态: 0-待激活 1-激活 2-完成 3-过期 4-已扣除
+	// 订阅状态
 	Status *int8 `json:"status,omitempty"`
+	// 用户备注
+	Note *string `json:"note,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -54,9 +64,11 @@ func (*ProxyUserSubscribe) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case proxyusersubscribe.FieldID, proxyusersubscribe.FieldUserID, proxyusersubscribe.FieldOrderID, proxyusersubscribe.FieldSubscribeID, proxyusersubscribe.FieldTraffic, proxyusersubscribe.FieldDownload, proxyusersubscribe.FieldUpload, proxyusersubscribe.FieldStatus:
+		case proxyusersubscribe.FieldGroupLocked:
+			values[i] = new(sql.NullBool)
+		case proxyusersubscribe.FieldID, proxyusersubscribe.FieldUserID, proxyusersubscribe.FieldOrderID, proxyusersubscribe.FieldSubscribeID, proxyusersubscribe.FieldNodeGroupID, proxyusersubscribe.FieldTraffic, proxyusersubscribe.FieldDownload, proxyusersubscribe.FieldUpload, proxyusersubscribe.FieldExpiredDownload, proxyusersubscribe.FieldExpiredUpload, proxyusersubscribe.FieldStatus:
 			values[i] = new(sql.NullInt64)
-		case proxyusersubscribe.FieldToken, proxyusersubscribe.FieldUUID:
+		case proxyusersubscribe.FieldToken, proxyusersubscribe.FieldUUID, proxyusersubscribe.FieldNote:
 			values[i] = new(sql.NullString)
 		case proxyusersubscribe.FieldStartTime, proxyusersubscribe.FieldExpireTime, proxyusersubscribe.FieldFinishedAt, proxyusersubscribe.FieldCreatedAt, proxyusersubscribe.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -99,6 +111,18 @@ func (_m *ProxyUserSubscribe) assignValues(columns []string, values []any) error
 			} else if value.Valid {
 				_m.SubscribeID = value.Int64
 			}
+		case proxyusersubscribe.FieldNodeGroupID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field node_group_id", values[i])
+			} else if value.Valid {
+				_m.NodeGroupID = value.Int64
+			}
+		case proxyusersubscribe.FieldGroupLocked:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field group_locked", values[i])
+			} else if value.Valid {
+				_m.GroupLocked = value.Bool
+			}
 		case proxyusersubscribe.FieldStartTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field start_time", values[i])
@@ -140,6 +164,20 @@ func (_m *ProxyUserSubscribe) assignValues(columns []string, values []any) error
 				_m.Upload = new(int64)
 				*_m.Upload = value.Int64
 			}
+		case proxyusersubscribe.FieldExpiredDownload:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field expired_download", values[i])
+			} else if value.Valid {
+				_m.ExpiredDownload = new(int64)
+				*_m.ExpiredDownload = value.Int64
+			}
+		case proxyusersubscribe.FieldExpiredUpload:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field expired_upload", values[i])
+			} else if value.Valid {
+				_m.ExpiredUpload = new(int64)
+				*_m.ExpiredUpload = value.Int64
+			}
 		case proxyusersubscribe.FieldToken:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field token", values[i])
@@ -160,6 +198,13 @@ func (_m *ProxyUserSubscribe) assignValues(columns []string, values []any) error
 			} else if value.Valid {
 				_m.Status = new(int8)
 				*_m.Status = int8(value.Int64)
+			}
+		case proxyusersubscribe.FieldNote:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field note", values[i])
+			} else if value.Valid {
+				_m.Note = new(string)
+				*_m.Note = value.String
 			}
 		case proxyusersubscribe.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -218,6 +263,12 @@ func (_m *ProxyUserSubscribe) String() string {
 	builder.WriteString("subscribe_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.SubscribeID))
 	builder.WriteString(", ")
+	builder.WriteString("node_group_id=")
+	builder.WriteString(fmt.Sprintf("%v", _m.NodeGroupID))
+	builder.WriteString(", ")
+	builder.WriteString("group_locked=")
+	builder.WriteString(fmt.Sprintf("%v", _m.GroupLocked))
+	builder.WriteString(", ")
 	builder.WriteString("start_time=")
 	builder.WriteString(_m.StartTime.Format(time.ANSIC))
 	builder.WriteString(", ")
@@ -246,6 +297,16 @@ func (_m *ProxyUserSubscribe) String() string {
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
+	if v := _m.ExpiredDownload; v != nil {
+		builder.WriteString("expired_download=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.ExpiredUpload; v != nil {
+		builder.WriteString("expired_upload=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
 	if v := _m.Token; v != nil {
 		builder.WriteString("token=")
 		builder.WriteString(*v)
@@ -259,6 +320,11 @@ func (_m *ProxyUserSubscribe) String() string {
 	if v := _m.Status; v != nil {
 		builder.WriteString("status=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.Note; v != nil {
+		builder.WriteString("note=")
+		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")

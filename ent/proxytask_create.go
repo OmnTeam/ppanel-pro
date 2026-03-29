@@ -83,13 +83,13 @@ func (_c *ProxyTaskCreate) SetNillableErrors(v *string) *ProxyTaskCreate {
 }
 
 // SetTotal sets the "total" field.
-func (_c *ProxyTaskCreate) SetTotal(v uint32) *ProxyTaskCreate {
+func (_c *ProxyTaskCreate) SetTotal(v uint64) *ProxyTaskCreate {
 	_c.mutation.SetTotal(v)
 	return _c
 }
 
 // SetNillableTotal sets the "total" field if the given value is not nil.
-func (_c *ProxyTaskCreate) SetNillableTotal(v *uint32) *ProxyTaskCreate {
+func (_c *ProxyTaskCreate) SetNillableTotal(v *uint64) *ProxyTaskCreate {
 	if v != nil {
 		_c.SetTotal(*v)
 	}
@@ -97,13 +97,13 @@ func (_c *ProxyTaskCreate) SetNillableTotal(v *uint32) *ProxyTaskCreate {
 }
 
 // SetCurrent sets the "current" field.
-func (_c *ProxyTaskCreate) SetCurrent(v uint32) *ProxyTaskCreate {
+func (_c *ProxyTaskCreate) SetCurrent(v uint64) *ProxyTaskCreate {
 	_c.mutation.SetCurrent(v)
 	return _c
 }
 
 // SetNillableCurrent sets the "current" field if the given value is not nil.
-func (_c *ProxyTaskCreate) SetNillableCurrent(v *uint32) *ProxyTaskCreate {
+func (_c *ProxyTaskCreate) SetNillableCurrent(v *uint64) *ProxyTaskCreate {
 	if v != nil {
 		_c.SetCurrent(*v)
 	}
@@ -274,11 +274,11 @@ func (_c *ProxyTaskCreate) createSpec() (*ProxyTask, *sqlgraph.CreateSpec) {
 		_node.Errors = value
 	}
 	if value, ok := _c.mutation.Total(); ok {
-		_spec.SetField(proxytask.FieldTotal, field.TypeUint32, value)
+		_spec.SetField(proxytask.FieldTotal, field.TypeUint64, value)
 		_node.Total = value
 	}
 	if value, ok := _c.mutation.Current(); ok {
-		_spec.SetField(proxytask.FieldCurrent, field.TypeUint32, value)
+		_spec.SetField(proxytask.FieldCurrent, field.TypeUint64, value)
 		_node.Current = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {

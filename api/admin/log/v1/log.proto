@@ -106,31 +106,31 @@ service LogService {
 
 // Common filter parameters
 message FilterLogParams {
-  int32 page = 2;
-  int32 size = 3;
-  string date = 4;      // 日期过滤，格式如 "2025-01-01"
-  string search = 5;    // 搜索关键词
+  int32 page = 1;
+  int32 size = 2;
+  string date = 3;      // 日期过滤，格式如 "2025-01-01"
+  string search = 4;    // 搜索关键词
 }
 
 // ==================== Balance Log ====================
 message FilterBalanceLogRequest {
-  int32 page = 2;
-  int32 size = 3;
-  string date = 4;
-  string user_id = 5;    // 可选，过滤特定用户
+  int32 page = 1;
+  int32 size = 2;
+  string date = 3;
+  int64 user_id = 4;    // 可选，过滤特定用户
 }
 
 message BalanceLog {
   int32 type = 1;
-  string user_id = 2;
-  string amount = 3;
+  int64 user_id = 2;
+  int64 amount = 3;
   string order_no = 4;
-  string balance = 5;
-  string timestamp = 6;
+  int64 balance = 5;
+  int64 timestamp = 6;
 }
 
 message FilterBalanceLogData {
-  int32 total = 1;
+  int64 total = 1;
   repeated BalanceLog list = 2;
 }
 
@@ -142,22 +142,22 @@ message FilterBalanceLogReply {
 
 // ==================== Commission Log ====================
 message FilterCommissionLogRequest {
-  int32 page = 2;
-  int32 size = 3;
-  string date = 4;
-  string user_id = 5;
+  int32 page = 1;
+  int32 size = 2;
+  string date = 3;
+  int64 user_id = 4;
 }
 
 message CommissionLog {
   int32 type = 1;
-  string user_id = 2;
-  string amount = 3;
+  int64 user_id = 2;
+  int64 amount = 3;
   string order_no = 4;
-  string timestamp = 5;
+  int64 timestamp = 5;
 }
 
 message FilterCommissionLogData {
-  int32 total = 1;
+  int64 total = 1;
   repeated CommissionLog list = 2;
 }
 
@@ -169,25 +169,25 @@ message FilterCommissionLogReply {
 
 // ==================== Email Log ====================
 message FilterEmailLogRequest {
-  int32 page = 2;
-  int32 size = 3;
-  string date = 4;
-  string search = 5;
+  int32 page = 1;
+  int32 size = 2;
+  string date = 3;
+  string search = 4;
 }
 
 message EmailLog {
-  string id = 1;
+  int64 id = 1;
   int32 type = 2;
   string platform = 3;
   string to = 4;
   string subject = 5;
   string content = 6;
   int32 status = 7;
-  string created_at = 8;
+  int64 created_at = 8;
 }
 
 message FilterEmailLogData {
-  int32 total = 1;
+  int64 total = 1;
   repeated EmailLog list = 2;
 }
 
@@ -199,25 +199,25 @@ message FilterEmailLogReply {
 
 // ==================== Gift Log ====================
 message FilterGiftLogRequest {
-  int32 page = 2;
-  int32 size = 3;
-  string date = 4;
-  string user_id = 5;
+  int32 page = 1;
+  int32 size = 2;
+  string date = 3;
+  int64 user_id = 4;
 }
 
 message GiftLog {
   int32 type = 1;
-  string user_id = 2;
+  int64 user_id = 2;
   string order_no = 3;
-  string subscribe_id = 4;
-string amount = 5;
-string balance = 6;
+  int64 subscribe_id = 4;
+  int64 amount = 5;
+  int64 balance = 6;
   string remark = 7;
-  string timestamp = 8;
+  int64 timestamp = 8;
 }
 
 message FilterGiftLogData {
-  int32 total = 1;
+  int64 total = 1;
   repeated GiftLog list = 2;
 }
 
@@ -229,23 +229,23 @@ message FilterGiftLogReply {
 
 // ==================== Login Log ====================
 message FilterLoginLogRequest {
-  int32 page = 2;
-  int32 size = 3;
-  string date = 4;
-  string user_id = 5;
+  int32 page = 1;
+  int32 size = 2;
+  string date = 3;
+  int64 user_id = 4;
 }
 
 message LoginLog {
-  string user_id = 1;
+  int64 user_id = 1;
   string method = 2;
   string login_ip = 3;
   string user_agent = 4;
   bool success = 5;
-  string timestamp = 6;
+  int64 timestamp = 6;
 }
 
 message FilterLoginLogData {
-  int32 total = 1;
+  int64 total = 1;
   repeated LoginLog list = 2;
 }
 
@@ -257,25 +257,25 @@ message FilterLoginLogReply {
 
 // ==================== Message Log ====================
 message GetMessageLogListRequest {
-  int32 page = 2;
-  int32 size = 3;
-  int32 type = 4;       // 1: Email, 2: Mobile
-  string search = 5;
+  int32 page = 1;
+  int32 size = 2;
+  int32 type = 3;       // 1: Email, 2: Mobile
+  string search = 4;
 }
 
 message MessageLog {
-  string id = 1;
+  int64 id = 1;
   int32 type = 2;
   string platform = 3;
   string to = 4;
   string subject = 5;
   string content = 6;
   int32 status = 7;
-  string created_at = 8;
+  int64 created_at = 8;
 }
 
 message GetMessageLogListData {
-  int32 total = 1;
+  int64 total = 1;
   repeated MessageLog list = 2;
 }
 
@@ -287,25 +287,25 @@ message GetMessageLogListReply {
 
 // ==================== Mobile Log ====================
 message FilterMobileLogRequest {
-  int32 page = 2;
-  int32 size = 3;
-  string date = 4;
-  string search = 5;
+  int32 page = 1;
+  int32 size = 2;
+  string date = 3;
+  string search = 4;
 }
 
 message MobileLog {
-  string id = 1;
+  int64 id = 1;
   int32 type = 2;
   string platform = 3;
   string to = 4;
   string subject = 5;
   string content = 6;
   int32 status = 7;
-  string created_at = 8;
+  int64 created_at = 8;
 }
 
 message FilterMobileLogData {
-  int32 total = 1;
+  int64 total = 1;
   repeated MobileLog list = 2;
 }
 
@@ -317,23 +317,23 @@ message FilterMobileLogReply {
 
 // ==================== Register Log ====================
 message FilterRegisterLogRequest {
-  int32 page = 2;
-  int32 size = 3;
-  string date = 4;
-  string user_id = 5;
+  int32 page = 1;
+  int32 size = 2;
+  string date = 3;
+  int64 user_id = 4;
 }
 
 message RegisterLog {
-  string user_id = 1;
+  int64 user_id = 1;
   string auth_method = 2;
   string identifier = 3;
   string register_ip = 4;
   string user_agent = 5;
-  string timestamp = 6;
+  int64 timestamp = 6;
 }
 
 message FilterRegisterLogData {
-  int32 total = 1;
+  int64 total = 1;
   repeated RegisterLog list = 2;
 }
 
@@ -345,21 +345,23 @@ message FilterRegisterLogReply {
 
 // ==================== Server Traffic Log ====================
 message FilterServerTrafficLogRequest {
-  int32 page = 2;
-  int32 size = 3;
-  string date = 4;
-string server_id = 5;
+  int32 page = 1;
+  int32 size = 2;
+  string date = 3;
+  int64 server_id = 4;
 }
 
 message ServerTrafficLog {
-  string server_id = 1;
-  string upload = 2;
-  string download = 3;
-  string timestamp = 4;
+  int64 server_id = 1;
+  int64 upload = 2;
+  int64 download = 3;
+  int64 total = 4;
+  string date = 5;
+  bool details = 6;
 }
 
 message FilterServerTrafficLogData {
-  int32 total = 1;
+  int64 total = 1;
   repeated ServerTrafficLog list = 2;
 }
 
@@ -371,23 +373,24 @@ message FilterServerTrafficLogReply {
 
 // ==================== Subscribe Log ====================
 message FilterSubscribeLogRequest {
-  int32 page = 2;
-  int32 size = 3;
-  string date = 4;
-  string user_id = 5;
+  int32 page = 1;
+  int32 size = 2;
+  string date = 3;
+  int64 user_id = 4;
+  int64 user_subscribe_id = 5;
 }
 
 message SubscribeLog {
-  string user_id = 1;
+  int64 user_id = 1;
   string token = 2;
   string user_agent = 3;
   string client_ip = 4;
-  int32 user_subscribe_id = 5;
-  string timestamp = 6;
+  int64 user_subscribe_id = 5;
+  int64 timestamp = 6;
 }
 
 message FilterSubscribeLogData {
-  int32 total = 1;
+  int64 total = 1;
   repeated SubscribeLog list = 2;
 }
 
@@ -399,22 +402,22 @@ message FilterSubscribeLogReply {
 
 // ==================== Reset Subscribe Log ====================
 message FilterResetSubscribeLogRequest {
-  int32 page = 2;
-  int32 size = 3;
-  string date = 4;
-  string user_id = 5;
+  int32 page = 1;
+  int32 size = 2;
+  string date = 3;
+  int64 user_subscribe_id = 4;
 }
 
 message ResetSubscribeLog {
   int32 type = 1;
-  string user_id = 2;
-  int32 user_subscribe_id = 3;
+  int64 user_id = 2;
+  int64 user_subscribe_id = 3;
   string order_no = 4;
-  string timestamp = 5;
+  int64 timestamp = 5;
 }
 
 message FilterResetSubscribeLogData {
-  int32 total = 1;
+  int64 total = 1;
   repeated ResetSubscribeLog list = 2;
 }
 
@@ -426,23 +429,25 @@ message FilterResetSubscribeLogReply {
 
 // ==================== User Subscribe Traffic Log ====================
 message FilterUserSubscribeTrafficLogRequest {
-  int32 page = 2;
-  int32 size = 3;
-  string date = 4;
-  string user_id = 5;
-  string subscribe_id = 6;
+  int32 page = 1;
+  int32 size = 2;
+  string date = 3;
+  int64 user_id = 4;
+  int64 user_subscribe_id = 5;
 }
 
 message UserSubscribeTrafficLog {
-  string user_id = 1;
-  string subscribe_id = 2;
-string upload = 3;
-string download = 4;
-  string timestamp = 5;
+  int64 subscribe_id = 1;
+  int64 user_id = 2;
+  int64 upload = 3;
+  int64 download = 4;
+  int64 total = 5;
+  string date = 6;
+  bool details = 7;
 }
 
 message FilterUserSubscribeTrafficLogData {
-  int32 total = 1;
+  int64 total = 1;
   repeated UserSubscribeTrafficLog list = 2;
 }
 
@@ -454,27 +459,27 @@ message FilterUserSubscribeTrafficLogReply {
 
 // ==================== Traffic Log Details ====================
 message FilterTrafficLogDetailsRequest {
-  int32 page = 2;
-  int32 size = 3;
-  string server_id = 4;
-  string user_id = 5;
-  string subscribe_id = 6;
-  string start_time = 7;   // Unix timestamp in milliseconds
-  int32 end_time = 8;     // Unix timestamp in milliseconds
+  int32 page = 1;
+  int32 size = 2;
+  int64 server_id = 3;
+  int64 user_id = 4;
+  int64 subscribe_id = 5;
+  int64 start_time = 6;   // Unix timestamp in seconds
+  int64 end_time = 7;     // Unix timestamp in seconds
 }
 
 message TrafficLogDetail {
-  string id = 1;
-  string server_id = 2;
-  string user_id = 3;
-  string subscribe_id = 4;
-  string download = 5;
-  string upload = 6;
-  string timestamp = 7;
+  int64 id = 1;
+  int64 server_id = 2;
+  int64 user_id = 3;
+  int64 subscribe_id = 4;
+  int64 download = 5;
+  int64 upload = 6;
+  int64 timestamp = 7;
 }
 
 message FilterTrafficLogDetailsData {
-  int32 total = 1;
+  int64 total = 1;
   repeated TrafficLogDetail list = 2;
 }
 
@@ -486,13 +491,13 @@ message FilterTrafficLogDetailsReply {
 
 // ==================== Log Setting ====================
 message GetLogSettingRequest {
-  // ⚠️ Admin API: tenant_id 从 JWT middleware 获取，不需要请求参数
+  // 管理端日志配置查询无需额外请求参数
 }
 
-// ⚠️ 复刻原项目：日志自动清理设置（types.go LogSetting）
+// 复刻原项目：日志自动清理设置（types.go LogSetting）
 message LogSetting {
-  bool auto_clear = 1;    // 是否自动清理日志
-  int32 clear_days = 2;   // 清理天数
+  optional bool auto_clear = 1;    // 是否自动清理日志
+  int64 clear_days = 2;             // 清理天数
 }
 
 message GetLogSettingReply {
@@ -502,9 +507,9 @@ message GetLogSettingReply {
 }
 
 message UpdateLogSettingRequest {
-  // ⚠️ Admin API: tenant_id 从 JWT middleware 获取，不需要请求参数
-  bool auto_clear = 1;    // 是否自动清理日志
-  int32 clear_days = 2;   // 清理天数
+  // 管理端日志配置更新请求
+  optional bool auto_clear = 1;    // 是否自动清理日志
+  int64 clear_days = 2;             // 清理天数
 }
 
 message UpdateLogSettingReply {

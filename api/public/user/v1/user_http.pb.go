@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.8.4
 // - protoc             v3.19.4
-// source: public/user/v1/user.proto
+// source: api/public/user/v1/user.proto
 
 package v1
 
@@ -119,7 +119,7 @@ func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r.GET("/v1/public/user/oauth_methods", _User_GetOAuthMethods0_HTTP_Handler(srv))
 	r.GET("/v1/public/user/subscribe", _User_QueryUserSubscribe0_HTTP_Handler(srv))
 	r.GET("/v1/public/user/subscribe_log", _User_GetSubscribeLog0_HTTP_Handler(srv))
-	r.PUT("/v1/public/user/subscribe_token", _User_ResetUserSubscribeToken1_HTTP_Handler(srv))
+	r.PUT("/v1/public/user/subscribe_token", _User_ResetUserSubscribeToken0_HTTP_Handler(srv))
 	r.POST("/v1/public/user/unsubscribe/pre", _User_PreUnsubscribe0_HTTP_Handler(srv))
 	r.POST("/v1/public/user/unsubscribe", _User_Unsubscribe0_HTTP_Handler(srv))
 	r.PUT("/v1/public/user/notify", _User_UpdateUserNotify0_HTTP_Handler(srv))
@@ -311,7 +311,7 @@ func _User_GetSubscribeLog0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Conte
 	}
 }
 
-func _User_ResetUserSubscribeToken1_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _User_ResetUserSubscribeToken0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in ResetUserSubscribeTokenRequest
 		if err := ctx.Bind(&in); err != nil {

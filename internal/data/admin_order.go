@@ -2,28 +2,33 @@ package data
 
 import (
 	"context"
-
-	"github.com/go-kratos/kratos/v2/log"
+	"encoding/json"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyorder"
 	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/order"
+	"github.com/OmnTeam/ppanel-pro/internal/queue/types"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+
+	"github.com/go-kratos/kratos/v2/log"
+	"github.com/hibiken/asynq"
 )
 
 const orderModule = "data/admin_order"
 
 type orderRepo struct {
-	data *Data
-	log  *log.Helper
+	data  *Data
+	log   *log.Helper
+	queue *asynq.Client
 }
 
 // NewOrderRepo create order repository
 func NewOrderRepo(data *Data, logger log.Logger) order.OrderRepo {
 	return &orderRepo{
-		data: data,
-		log:  log.NewHelper(log.With(logger, "module", orderModule)),
+		data:  data,
+		log:   log.NewHelper(log.With(logger, "module", orderModule)),
+		queue: data.queue,
 	}
 }
 
@@ -122,14 +127,31 @@ func (r *orderRepo) UpdateOrderStatus(ctx context.Context, id int, status int32,
 		return rollback(tx, err)
 	}
 
-	// TODO: 如果订单状态变为2(已付款)，需要入队ForthwithActivateOrder任务
-	// 任务负载: {"order_no": orderInfo.OrderNo}
-	// 任务类型: forthwith:activate:order
+	// 如果订单状态变为2(已付款)，需要入队ForthwithActivateOrder任务
 	if status == 2 {
-		r.log.Infow("msg", "order status changed to paid, should enqueue activate task", "orderNo", orderInfo.OrderNo)
-		// payload := map[string]string{"order_no": orderInfo.OrderNo}
-		// task := asynq.NewTask(types.ForthwithActivateOrder, jsonPayload)
-		// r.data.queue.EnqueueContext(ctx, task)
+		r.log.Infow("msg", "order status changed to paid, enqueue activate task", "orderNo", orderInfo.OrderNo)
+
+		// 构建任务负载
+		payload := types.ForthwithActivateOrderPayload{
+			OrderNo: orderInfo.OrderNo,
+		}
+
+		// 序列化负载
+		payloadBytes, err := json.Marshal(payload)
+		if err != nil {
+			r.log.Errorw("msg", "failed to marshal activate order payload", "error", err, "orderNo", orderInfo.OrderNo)
+			return rollback(tx, err)
+		}
+
+		// 创建任务并入队
+		task := asynq.NewTask(types.ForthwithActivateOrder, payloadBytes)
+		_, err = r.queue.Enqueue(task)
+		if err != nil {
+			r.log.Errorw("msg", "failed to enqueue activate order task", "error", err, "orderNo", orderInfo.OrderNo)
+			return rollback(tx, err)
+		}
+
+		r.log.Infow("msg", "activate order task enqueued successfully", "orderNo", orderInfo.OrderNo)
 	}
 
 	return tx.Commit()

@@ -48,72 +48,114 @@ func (_c *ProxyGroupHistoryCreate) SetNillableTriggerType(v *string) *ProxyGroup
 	return _c
 }
 
-// SetStatus sets the "status" field.
-func (_c *ProxyGroupHistoryCreate) SetStatus(v string) *ProxyGroupHistoryCreate {
-	_c.mutation.SetStatus(v)
+// SetState sets the "state" field.
+func (_c *ProxyGroupHistoryCreate) SetState(v string) *ProxyGroupHistoryCreate {
+	_c.mutation.SetState(v)
 	return _c
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (_c *ProxyGroupHistoryCreate) SetNillableStatus(v *string) *ProxyGroupHistoryCreate {
+// SetNillableState sets the "state" field if the given value is not nil.
+func (_c *ProxyGroupHistoryCreate) SetNillableState(v *string) *ProxyGroupHistoryCreate {
 	if v != nil {
-		_c.SetStatus(*v)
+		_c.SetState(*v)
 	}
 	return _c
 }
 
-// SetProgress sets the "progress" field.
-func (_c *ProxyGroupHistoryCreate) SetProgress(v int) *ProxyGroupHistoryCreate {
-	_c.mutation.SetProgress(v)
+// SetTotalUsers sets the "total_users" field.
+func (_c *ProxyGroupHistoryCreate) SetTotalUsers(v int) *ProxyGroupHistoryCreate {
+	_c.mutation.SetTotalUsers(v)
 	return _c
 }
 
-// SetNillableProgress sets the "progress" field if the given value is not nil.
-func (_c *ProxyGroupHistoryCreate) SetNillableProgress(v *int) *ProxyGroupHistoryCreate {
+// SetNillableTotalUsers sets the "total_users" field if the given value is not nil.
+func (_c *ProxyGroupHistoryCreate) SetNillableTotalUsers(v *int) *ProxyGroupHistoryCreate {
 	if v != nil {
-		_c.SetProgress(*v)
+		_c.SetTotalUsers(*v)
 	}
 	return _c
 }
 
-// SetTotal sets the "total" field.
-func (_c *ProxyGroupHistoryCreate) SetTotal(v int) *ProxyGroupHistoryCreate {
-	_c.mutation.SetTotal(v)
+// SetSuccessCount sets the "success_count" field.
+func (_c *ProxyGroupHistoryCreate) SetSuccessCount(v int) *ProxyGroupHistoryCreate {
+	_c.mutation.SetSuccessCount(v)
 	return _c
 }
 
-// SetNillableTotal sets the "total" field if the given value is not nil.
-func (_c *ProxyGroupHistoryCreate) SetNillableTotal(v *int) *ProxyGroupHistoryCreate {
+// SetNillableSuccessCount sets the "success_count" field if the given value is not nil.
+func (_c *ProxyGroupHistoryCreate) SetNillableSuccessCount(v *int) *ProxyGroupHistoryCreate {
 	if v != nil {
-		_c.SetTotal(*v)
+		_c.SetSuccessCount(*v)
 	}
 	return _c
 }
 
-// SetResult sets the "result" field.
-func (_c *ProxyGroupHistoryCreate) SetResult(v string) *ProxyGroupHistoryCreate {
-	_c.mutation.SetResult(v)
+// SetFailedCount sets the "failed_count" field.
+func (_c *ProxyGroupHistoryCreate) SetFailedCount(v int) *ProxyGroupHistoryCreate {
+	_c.mutation.SetFailedCount(v)
 	return _c
 }
 
-// SetNillableResult sets the "result" field if the given value is not nil.
-func (_c *ProxyGroupHistoryCreate) SetNillableResult(v *string) *ProxyGroupHistoryCreate {
+// SetNillableFailedCount sets the "failed_count" field if the given value is not nil.
+func (_c *ProxyGroupHistoryCreate) SetNillableFailedCount(v *int) *ProxyGroupHistoryCreate {
 	if v != nil {
-		_c.SetResult(*v)
+		_c.SetFailedCount(*v)
 	}
 	return _c
 }
 
-// SetError sets the "error" field.
-func (_c *ProxyGroupHistoryCreate) SetError(v string) *ProxyGroupHistoryCreate {
-	_c.mutation.SetError(v)
+// SetStartTime sets the "start_time" field.
+func (_c *ProxyGroupHistoryCreate) SetStartTime(v time.Time) *ProxyGroupHistoryCreate {
+	_c.mutation.SetStartTime(v)
 	return _c
 }
 
-// SetNillableError sets the "error" field if the given value is not nil.
-func (_c *ProxyGroupHistoryCreate) SetNillableError(v *string) *ProxyGroupHistoryCreate {
+// SetNillableStartTime sets the "start_time" field if the given value is not nil.
+func (_c *ProxyGroupHistoryCreate) SetNillableStartTime(v *time.Time) *ProxyGroupHistoryCreate {
 	if v != nil {
-		_c.SetError(*v)
+		_c.SetStartTime(*v)
+	}
+	return _c
+}
+
+// SetEndTime sets the "end_time" field.
+func (_c *ProxyGroupHistoryCreate) SetEndTime(v time.Time) *ProxyGroupHistoryCreate {
+	_c.mutation.SetEndTime(v)
+	return _c
+}
+
+// SetNillableEndTime sets the "end_time" field if the given value is not nil.
+func (_c *ProxyGroupHistoryCreate) SetNillableEndTime(v *time.Time) *ProxyGroupHistoryCreate {
+	if v != nil {
+		_c.SetEndTime(*v)
+	}
+	return _c
+}
+
+// SetOperator sets the "operator" field.
+func (_c *ProxyGroupHistoryCreate) SetOperator(v string) *ProxyGroupHistoryCreate {
+	_c.mutation.SetOperator(v)
+	return _c
+}
+
+// SetNillableOperator sets the "operator" field if the given value is not nil.
+func (_c *ProxyGroupHistoryCreate) SetNillableOperator(v *string) *ProxyGroupHistoryCreate {
+	if v != nil {
+		_c.SetOperator(*v)
+	}
+	return _c
+}
+
+// SetErrorMessage sets the "error_message" field.
+func (_c *ProxyGroupHistoryCreate) SetErrorMessage(v string) *ProxyGroupHistoryCreate {
+	_c.mutation.SetErrorMessage(v)
+	return _c
+}
+
+// SetNillableErrorMessage sets the "error_message" field if the given value is not nil.
+func (_c *ProxyGroupHistoryCreate) SetNillableErrorMessage(v *string) *ProxyGroupHistoryCreate {
+	if v != nil {
+		_c.SetErrorMessage(*v)
 	}
 	return _c
 }
@@ -128,20 +170,6 @@ func (_c *ProxyGroupHistoryCreate) SetCreatedAt(v time.Time) *ProxyGroupHistoryC
 func (_c *ProxyGroupHistoryCreate) SetNillableCreatedAt(v *time.Time) *ProxyGroupHistoryCreate {
 	if v != nil {
 		_c.SetCreatedAt(*v)
-	}
-	return _c
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (_c *ProxyGroupHistoryCreate) SetUpdatedAt(v time.Time) *ProxyGroupHistoryCreate {
-	_c.mutation.SetUpdatedAt(v)
-	return _c
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (_c *ProxyGroupHistoryCreate) SetNillableUpdatedAt(v *time.Time) *ProxyGroupHistoryCreate {
-	if v != nil {
-		_c.SetUpdatedAt(*v)
 	}
 	return _c
 }
@@ -195,25 +223,25 @@ func (_c *ProxyGroupHistoryCreate) defaults() {
 		v := proxygrouphistory.DefaultTriggerType
 		_c.mutation.SetTriggerType(v)
 	}
-	if _, ok := _c.mutation.Status(); !ok {
-		v := proxygrouphistory.DefaultStatus
-		_c.mutation.SetStatus(v)
+	if _, ok := _c.mutation.State(); !ok {
+		v := proxygrouphistory.DefaultState
+		_c.mutation.SetState(v)
 	}
-	if _, ok := _c.mutation.Progress(); !ok {
-		v := proxygrouphistory.DefaultProgress
-		_c.mutation.SetProgress(v)
+	if _, ok := _c.mutation.TotalUsers(); !ok {
+		v := proxygrouphistory.DefaultTotalUsers
+		_c.mutation.SetTotalUsers(v)
 	}
-	if _, ok := _c.mutation.Total(); !ok {
-		v := proxygrouphistory.DefaultTotal
-		_c.mutation.SetTotal(v)
+	if _, ok := _c.mutation.SuccessCount(); !ok {
+		v := proxygrouphistory.DefaultSuccessCount
+		_c.mutation.SetSuccessCount(v)
+	}
+	if _, ok := _c.mutation.FailedCount(); !ok {
+		v := proxygrouphistory.DefaultFailedCount
+		_c.mutation.SetFailedCount(v)
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := proxygrouphistory.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
-	}
-	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		v := proxygrouphistory.DefaultUpdatedAt()
-		_c.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -235,25 +263,30 @@ func (_c *ProxyGroupHistoryCreate) check() error {
 			return &ValidationError{Name: "trigger_type", err: fmt.Errorf(`ent: validator failed for field "ProxyGroupHistory.trigger_type": %w`, err)}
 		}
 	}
-	if _, ok := _c.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "ProxyGroupHistory.status"`)}
+	if _, ok := _c.mutation.State(); !ok {
+		return &ValidationError{Name: "state", err: errors.New(`ent: missing required field "ProxyGroupHistory.state"`)}
 	}
-	if v, ok := _c.mutation.Status(); ok {
-		if err := proxygrouphistory.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "ProxyGroupHistory.status": %w`, err)}
+	if v, ok := _c.mutation.State(); ok {
+		if err := proxygrouphistory.StateValidator(v); err != nil {
+			return &ValidationError{Name: "state", err: fmt.Errorf(`ent: validator failed for field "ProxyGroupHistory.state": %w`, err)}
 		}
 	}
-	if _, ok := _c.mutation.Progress(); !ok {
-		return &ValidationError{Name: "progress", err: errors.New(`ent: missing required field "ProxyGroupHistory.progress"`)}
+	if _, ok := _c.mutation.TotalUsers(); !ok {
+		return &ValidationError{Name: "total_users", err: errors.New(`ent: missing required field "ProxyGroupHistory.total_users"`)}
 	}
-	if _, ok := _c.mutation.Total(); !ok {
-		return &ValidationError{Name: "total", err: errors.New(`ent: missing required field "ProxyGroupHistory.total"`)}
+	if _, ok := _c.mutation.SuccessCount(); !ok {
+		return &ValidationError{Name: "success_count", err: errors.New(`ent: missing required field "ProxyGroupHistory.success_count"`)}
+	}
+	if _, ok := _c.mutation.FailedCount(); !ok {
+		return &ValidationError{Name: "failed_count", err: errors.New(`ent: missing required field "ProxyGroupHistory.failed_count"`)}
+	}
+	if v, ok := _c.mutation.Operator(); ok {
+		if err := proxygrouphistory.OperatorValidator(v); err != nil {
+			return &ValidationError{Name: "operator", err: fmt.Errorf(`ent: validator failed for field "ProxyGroupHistory.operator": %w`, err)}
+		}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProxyGroupHistory.created_at"`)}
-	}
-	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ProxyGroupHistory.updated_at"`)}
 	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := proxygrouphistory.IDValidator(v); err != nil {
@@ -300,33 +333,41 @@ func (_c *ProxyGroupHistoryCreate) createSpec() (*ProxyGroupHistory, *sqlgraph.C
 		_spec.SetField(proxygrouphistory.FieldTriggerType, field.TypeString, value)
 		_node.TriggerType = value
 	}
-	if value, ok := _c.mutation.Status(); ok {
-		_spec.SetField(proxygrouphistory.FieldStatus, field.TypeString, value)
-		_node.Status = value
+	if value, ok := _c.mutation.State(); ok {
+		_spec.SetField(proxygrouphistory.FieldState, field.TypeString, value)
+		_node.State = value
 	}
-	if value, ok := _c.mutation.Progress(); ok {
-		_spec.SetField(proxygrouphistory.FieldProgress, field.TypeInt, value)
-		_node.Progress = value
+	if value, ok := _c.mutation.TotalUsers(); ok {
+		_spec.SetField(proxygrouphistory.FieldTotalUsers, field.TypeInt, value)
+		_node.TotalUsers = value
 	}
-	if value, ok := _c.mutation.Total(); ok {
-		_spec.SetField(proxygrouphistory.FieldTotal, field.TypeInt, value)
-		_node.Total = value
+	if value, ok := _c.mutation.SuccessCount(); ok {
+		_spec.SetField(proxygrouphistory.FieldSuccessCount, field.TypeInt, value)
+		_node.SuccessCount = value
 	}
-	if value, ok := _c.mutation.Result(); ok {
-		_spec.SetField(proxygrouphistory.FieldResult, field.TypeString, value)
-		_node.Result = value
+	if value, ok := _c.mutation.FailedCount(); ok {
+		_spec.SetField(proxygrouphistory.FieldFailedCount, field.TypeInt, value)
+		_node.FailedCount = value
 	}
-	if value, ok := _c.mutation.Error(); ok {
-		_spec.SetField(proxygrouphistory.FieldError, field.TypeString, value)
-		_node.Error = value
+	if value, ok := _c.mutation.StartTime(); ok {
+		_spec.SetField(proxygrouphistory.FieldStartTime, field.TypeTime, value)
+		_node.StartTime = &value
+	}
+	if value, ok := _c.mutation.EndTime(); ok {
+		_spec.SetField(proxygrouphistory.FieldEndTime, field.TypeTime, value)
+		_node.EndTime = &value
+	}
+	if value, ok := _c.mutation.Operator(); ok {
+		_spec.SetField(proxygrouphistory.FieldOperator, field.TypeString, value)
+		_node.Operator = &value
+	}
+	if value, ok := _c.mutation.ErrorMessage(); ok {
+		_spec.SetField(proxygrouphistory.FieldErrorMessage, field.TypeString, value)
+		_node.ErrorMessage = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(proxygrouphistory.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
-	}
-	if value, ok := _c.mutation.UpdatedAt(); ok {
-		_spec.SetField(proxygrouphistory.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
 	}
 	return _node, _spec
 }

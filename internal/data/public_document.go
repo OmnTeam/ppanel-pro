@@ -4,7 +4,6 @@ import (
 	"context"
 	"strings"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxydocument"
 	documentBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/document"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
@@ -26,9 +25,16 @@ func NewPublicDocumentRepo(data *Data, logger log.Logger) documentBiz.DocumentRe
 
 // QueryDocumentList 查询文档列表
 func (r *publicDocumentRepo) QueryDocumentList(ctx context.Context) ([]*documentBiz.DocumentItem, int64, error) {
-	// 查询所有文档（无分页）
-	documents, err := r.data.db.ProxyDocument.Query().
-		Order(ent.Desc(proxydocument.FieldUpdatedAt)).
+	query := r.data.db.ProxyDocument.Query().
+		Where(proxydocument.ShowEQ(true))
+
+	total, err := query.Count(ctx)
+	if err != nil {
+		r.log.Errorf("QueryDocumentList count error: %v", err)
+		return nil, 0, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	documents, err := query.
 		All(ctx)
 
 	if err != nil {
@@ -36,7 +42,6 @@ func (r *publicDocumentRepo) QueryDocumentList(ctx context.Context) ([]*document
 		return nil, 0, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
 
-	total := int64(len(documents))
 	result := make([]*documentBiz.DocumentItem, 0, len(documents))
 
 	for _, d := range documents {
@@ -51,7 +56,7 @@ func (r *publicDocumentRepo) QueryDocumentList(ctx context.Context) ([]*document
 		})
 	}
 
-	return result, total, nil
+	return result, int64(total), nil
 }
 
 // QueryDocumentDetail 查询文档详情
@@ -63,10 +68,6 @@ func (r *publicDocumentRepo) QueryDocumentDetail(ctx context.Context, id int) (*
 		Only(ctx)
 
 	if err != nil {
-		if ent.IsNotFound(err) {
-			r.log.Errorf("Document not found: id=%d", id)
-			return nil, responsecode.NewKratosError(responsecode.ErrDocumentNotFound)
-		}
 		r.log.Errorf("QueryDocumentDetail query error: %v", err)
 		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}

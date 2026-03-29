@@ -69,14 +69,19 @@ func IP(v string) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldEQ(FieldIP, v))
 }
 
+// UserAgent applies equality check predicate on the "user_agent" field. It's identical to UserAgentEQ.
+func UserAgent(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldEQ(FieldUserAgent, v))
+}
+
 // Identifier applies equality check predicate on the "identifier" field. It's identical to IdentifierEQ.
 func Identifier(v string) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldEQ(FieldIdentifier, v))
 }
 
-// UserAgent applies equality check predicate on the "user_agent" field. It's identical to UserAgentEQ.
-func UserAgent(v string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldEQ(FieldUserAgent, v))
+// ShortCode applies equality check predicate on the "short_code" field. It's identical to ShortCodeEQ.
+func ShortCode(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldEQ(FieldShortCode, v))
 }
 
 // Online applies equality check predicate on the "online" field. It's identical to OnlineEQ.
@@ -264,6 +269,81 @@ func IPContainsFold(v string) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldContainsFold(FieldIP, v))
 }
 
+// UserAgentEQ applies the EQ predicate on the "user_agent" field.
+func UserAgentEQ(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldEQ(FieldUserAgent, v))
+}
+
+// UserAgentNEQ applies the NEQ predicate on the "user_agent" field.
+func UserAgentNEQ(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldNEQ(FieldUserAgent, v))
+}
+
+// UserAgentIn applies the In predicate on the "user_agent" field.
+func UserAgentIn(vs ...string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldIn(FieldUserAgent, vs...))
+}
+
+// UserAgentNotIn applies the NotIn predicate on the "user_agent" field.
+func UserAgentNotIn(vs ...string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldNotIn(FieldUserAgent, vs...))
+}
+
+// UserAgentGT applies the GT predicate on the "user_agent" field.
+func UserAgentGT(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldGT(FieldUserAgent, v))
+}
+
+// UserAgentGTE applies the GTE predicate on the "user_agent" field.
+func UserAgentGTE(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldGTE(FieldUserAgent, v))
+}
+
+// UserAgentLT applies the LT predicate on the "user_agent" field.
+func UserAgentLT(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldLT(FieldUserAgent, v))
+}
+
+// UserAgentLTE applies the LTE predicate on the "user_agent" field.
+func UserAgentLTE(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldLTE(FieldUserAgent, v))
+}
+
+// UserAgentContains applies the Contains predicate on the "user_agent" field.
+func UserAgentContains(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldContains(FieldUserAgent, v))
+}
+
+// UserAgentHasPrefix applies the HasPrefix predicate on the "user_agent" field.
+func UserAgentHasPrefix(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldHasPrefix(FieldUserAgent, v))
+}
+
+// UserAgentHasSuffix applies the HasSuffix predicate on the "user_agent" field.
+func UserAgentHasSuffix(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldHasSuffix(FieldUserAgent, v))
+}
+
+// UserAgentIsNil applies the IsNil predicate on the "user_agent" field.
+func UserAgentIsNil() predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldIsNull(FieldUserAgent))
+}
+
+// UserAgentNotNil applies the NotNil predicate on the "user_agent" field.
+func UserAgentNotNil() predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldNotNull(FieldUserAgent))
+}
+
+// UserAgentEqualFold applies the EqualFold predicate on the "user_agent" field.
+func UserAgentEqualFold(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldEqualFold(FieldUserAgent, v))
+}
+
+// UserAgentContainsFold applies the ContainsFold predicate on the "user_agent" field.
+func UserAgentContainsFold(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldContainsFold(FieldUserAgent, v))
+}
+
 // IdentifierEQ applies the EQ predicate on the "identifier" field.
 func IdentifierEQ(v string) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldEQ(FieldIdentifier, v))
@@ -339,79 +419,69 @@ func IdentifierContainsFold(v string) predicate.ProxyUserDevice {
 	return predicate.ProxyUserDevice(sql.FieldContainsFold(FieldIdentifier, v))
 }
 
-// UserAgentEQ applies the EQ predicate on the "user_agent" field.
-func UserAgentEQ(v string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldEQ(FieldUserAgent, v))
+// ShortCodeEQ applies the EQ predicate on the "short_code" field.
+func ShortCodeEQ(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldEQ(FieldShortCode, v))
 }
 
-// UserAgentNEQ applies the NEQ predicate on the "user_agent" field.
-func UserAgentNEQ(v string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldNEQ(FieldUserAgent, v))
+// ShortCodeNEQ applies the NEQ predicate on the "short_code" field.
+func ShortCodeNEQ(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldNEQ(FieldShortCode, v))
 }
 
-// UserAgentIn applies the In predicate on the "user_agent" field.
-func UserAgentIn(vs ...string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldIn(FieldUserAgent, vs...))
+// ShortCodeIn applies the In predicate on the "short_code" field.
+func ShortCodeIn(vs ...string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldIn(FieldShortCode, vs...))
 }
 
-// UserAgentNotIn applies the NotIn predicate on the "user_agent" field.
-func UserAgentNotIn(vs ...string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldNotIn(FieldUserAgent, vs...))
+// ShortCodeNotIn applies the NotIn predicate on the "short_code" field.
+func ShortCodeNotIn(vs ...string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldNotIn(FieldShortCode, vs...))
 }
 
-// UserAgentGT applies the GT predicate on the "user_agent" field.
-func UserAgentGT(v string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldGT(FieldUserAgent, v))
+// ShortCodeGT applies the GT predicate on the "short_code" field.
+func ShortCodeGT(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldGT(FieldShortCode, v))
 }
 
-// UserAgentGTE applies the GTE predicate on the "user_agent" field.
-func UserAgentGTE(v string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldGTE(FieldUserAgent, v))
+// ShortCodeGTE applies the GTE predicate on the "short_code" field.
+func ShortCodeGTE(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldGTE(FieldShortCode, v))
 }
 
-// UserAgentLT applies the LT predicate on the "user_agent" field.
-func UserAgentLT(v string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldLT(FieldUserAgent, v))
+// ShortCodeLT applies the LT predicate on the "short_code" field.
+func ShortCodeLT(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldLT(FieldShortCode, v))
 }
 
-// UserAgentLTE applies the LTE predicate on the "user_agent" field.
-func UserAgentLTE(v string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldLTE(FieldUserAgent, v))
+// ShortCodeLTE applies the LTE predicate on the "short_code" field.
+func ShortCodeLTE(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldLTE(FieldShortCode, v))
 }
 
-// UserAgentContains applies the Contains predicate on the "user_agent" field.
-func UserAgentContains(v string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldContains(FieldUserAgent, v))
+// ShortCodeContains applies the Contains predicate on the "short_code" field.
+func ShortCodeContains(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldContains(FieldShortCode, v))
 }
 
-// UserAgentHasPrefix applies the HasPrefix predicate on the "user_agent" field.
-func UserAgentHasPrefix(v string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldHasPrefix(FieldUserAgent, v))
+// ShortCodeHasPrefix applies the HasPrefix predicate on the "short_code" field.
+func ShortCodeHasPrefix(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldHasPrefix(FieldShortCode, v))
 }
 
-// UserAgentHasSuffix applies the HasSuffix predicate on the "user_agent" field.
-func UserAgentHasSuffix(v string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldHasSuffix(FieldUserAgent, v))
+// ShortCodeHasSuffix applies the HasSuffix predicate on the "short_code" field.
+func ShortCodeHasSuffix(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldHasSuffix(FieldShortCode, v))
 }
 
-// UserAgentIsNil applies the IsNil predicate on the "user_agent" field.
-func UserAgentIsNil() predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldIsNull(FieldUserAgent))
+// ShortCodeEqualFold applies the EqualFold predicate on the "short_code" field.
+func ShortCodeEqualFold(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldEqualFold(FieldShortCode, v))
 }
 
-// UserAgentNotNil applies the NotNil predicate on the "user_agent" field.
-func UserAgentNotNil() predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldNotNull(FieldUserAgent))
-}
-
-// UserAgentEqualFold applies the EqualFold predicate on the "user_agent" field.
-func UserAgentEqualFold(v string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldEqualFold(FieldUserAgent, v))
-}
-
-// UserAgentContainsFold applies the ContainsFold predicate on the "user_agent" field.
-func UserAgentContainsFold(v string) predicate.ProxyUserDevice {
-	return predicate.ProxyUserDevice(sql.FieldContainsFold(FieldUserAgent, v))
+// ShortCodeContainsFold applies the ContainsFold predicate on the "short_code" field.
+func ShortCodeContainsFold(v string) predicate.ProxyUserDevice {
+	return predicate.ProxyUserDevice(sql.FieldContainsFold(FieldShortCode, v))
 }
 
 // OnlineEQ applies the EQ predicate on the "online" field.

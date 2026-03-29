@@ -54,6 +54,104 @@ func (_c *ProxyServerGroupCreate) SetNillableSort(v *int) *ProxyServerGroupCreat
 	return _c
 }
 
+// SetForCalculation sets the "for_calculation" field.
+func (_c *ProxyServerGroupCreate) SetForCalculation(v bool) *ProxyServerGroupCreate {
+	_c.mutation.SetForCalculation(v)
+	return _c
+}
+
+// SetNillableForCalculation sets the "for_calculation" field if the given value is not nil.
+func (_c *ProxyServerGroupCreate) SetNillableForCalculation(v *bool) *ProxyServerGroupCreate {
+	if v != nil {
+		_c.SetForCalculation(*v)
+	}
+	return _c
+}
+
+// SetIsExpiredGroup sets the "is_expired_group" field.
+func (_c *ProxyServerGroupCreate) SetIsExpiredGroup(v bool) *ProxyServerGroupCreate {
+	_c.mutation.SetIsExpiredGroup(v)
+	return _c
+}
+
+// SetNillableIsExpiredGroup sets the "is_expired_group" field if the given value is not nil.
+func (_c *ProxyServerGroupCreate) SetNillableIsExpiredGroup(v *bool) *ProxyServerGroupCreate {
+	if v != nil {
+		_c.SetIsExpiredGroup(*v)
+	}
+	return _c
+}
+
+// SetExpiredDaysLimit sets the "expired_days_limit" field.
+func (_c *ProxyServerGroupCreate) SetExpiredDaysLimit(v int) *ProxyServerGroupCreate {
+	_c.mutation.SetExpiredDaysLimit(v)
+	return _c
+}
+
+// SetNillableExpiredDaysLimit sets the "expired_days_limit" field if the given value is not nil.
+func (_c *ProxyServerGroupCreate) SetNillableExpiredDaysLimit(v *int) *ProxyServerGroupCreate {
+	if v != nil {
+		_c.SetExpiredDaysLimit(*v)
+	}
+	return _c
+}
+
+// SetMaxTrafficGBExpired sets the "max_traffic_gb_expired" field.
+func (_c *ProxyServerGroupCreate) SetMaxTrafficGBExpired(v int64) *ProxyServerGroupCreate {
+	_c.mutation.SetMaxTrafficGBExpired(v)
+	return _c
+}
+
+// SetNillableMaxTrafficGBExpired sets the "max_traffic_gb_expired" field if the given value is not nil.
+func (_c *ProxyServerGroupCreate) SetNillableMaxTrafficGBExpired(v *int64) *ProxyServerGroupCreate {
+	if v != nil {
+		_c.SetMaxTrafficGBExpired(*v)
+	}
+	return _c
+}
+
+// SetSpeedLimit sets the "speed_limit" field.
+func (_c *ProxyServerGroupCreate) SetSpeedLimit(v int) *ProxyServerGroupCreate {
+	_c.mutation.SetSpeedLimit(v)
+	return _c
+}
+
+// SetNillableSpeedLimit sets the "speed_limit" field if the given value is not nil.
+func (_c *ProxyServerGroupCreate) SetNillableSpeedLimit(v *int) *ProxyServerGroupCreate {
+	if v != nil {
+		_c.SetSpeedLimit(*v)
+	}
+	return _c
+}
+
+// SetMinTrafficGB sets the "min_traffic_gb" field.
+func (_c *ProxyServerGroupCreate) SetMinTrafficGB(v int64) *ProxyServerGroupCreate {
+	_c.mutation.SetMinTrafficGB(v)
+	return _c
+}
+
+// SetNillableMinTrafficGB sets the "min_traffic_gb" field if the given value is not nil.
+func (_c *ProxyServerGroupCreate) SetNillableMinTrafficGB(v *int64) *ProxyServerGroupCreate {
+	if v != nil {
+		_c.SetMinTrafficGB(*v)
+	}
+	return _c
+}
+
+// SetMaxTrafficGB sets the "max_traffic_gb" field.
+func (_c *ProxyServerGroupCreate) SetMaxTrafficGB(v int64) *ProxyServerGroupCreate {
+	_c.mutation.SetMaxTrafficGB(v)
+	return _c
+}
+
+// SetNillableMaxTrafficGB sets the "max_traffic_gb" field if the given value is not nil.
+func (_c *ProxyServerGroupCreate) SetNillableMaxTrafficGB(v *int64) *ProxyServerGroupCreate {
+	if v != nil {
+		_c.SetMaxTrafficGB(*v)
+	}
+	return _c
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (_c *ProxyServerGroupCreate) SetCreatedAt(v time.Time) *ProxyServerGroupCreate {
 	_c.mutation.SetCreatedAt(v)
@@ -123,13 +221,25 @@ func (_c *ProxyServerGroupCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxyServerGroupCreate) defaults() {
-	if _, ok := _c.mutation.Description(); !ok {
-		v := proxyservergroup.DefaultDescription
-		_c.mutation.SetDescription(v)
-	}
 	if _, ok := _c.mutation.Sort(); !ok {
 		v := proxyservergroup.DefaultSort
 		_c.mutation.SetSort(v)
+	}
+	if _, ok := _c.mutation.ForCalculation(); !ok {
+		v := proxyservergroup.DefaultForCalculation
+		_c.mutation.SetForCalculation(v)
+	}
+	if _, ok := _c.mutation.IsExpiredGroup(); !ok {
+		v := proxyservergroup.DefaultIsExpiredGroup
+		_c.mutation.SetIsExpiredGroup(v)
+	}
+	if _, ok := _c.mutation.ExpiredDaysLimit(); !ok {
+		v := proxyservergroup.DefaultExpiredDaysLimit
+		_c.mutation.SetExpiredDaysLimit(v)
+	}
+	if _, ok := _c.mutation.SpeedLimit(); !ok {
+		v := proxyservergroup.DefaultSpeedLimit
+		_c.mutation.SetSpeedLimit(v)
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := proxyservergroup.DefaultCreatedAt()
@@ -151,9 +261,6 @@ func (_c *ProxyServerGroupCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "ProxyServerGroup.name": %w`, err)}
 		}
 	}
-	if _, ok := _c.mutation.Description(); !ok {
-		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "ProxyServerGroup.description"`)}
-	}
 	if v, ok := _c.mutation.Description(); ok {
 		if err := proxyservergroup.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "ProxyServerGroup.description": %w`, err)}
@@ -161,6 +268,18 @@ func (_c *ProxyServerGroupCreate) check() error {
 	}
 	if _, ok := _c.mutation.Sort(); !ok {
 		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "ProxyServerGroup.sort"`)}
+	}
+	if _, ok := _c.mutation.ForCalculation(); !ok {
+		return &ValidationError{Name: "for_calculation", err: errors.New(`ent: missing required field "ProxyServerGroup.for_calculation"`)}
+	}
+	if _, ok := _c.mutation.IsExpiredGroup(); !ok {
+		return &ValidationError{Name: "is_expired_group", err: errors.New(`ent: missing required field "ProxyServerGroup.is_expired_group"`)}
+	}
+	if _, ok := _c.mutation.ExpiredDaysLimit(); !ok {
+		return &ValidationError{Name: "expired_days_limit", err: errors.New(`ent: missing required field "ProxyServerGroup.expired_days_limit"`)}
+	}
+	if _, ok := _c.mutation.SpeedLimit(); !ok {
+		return &ValidationError{Name: "speed_limit", err: errors.New(`ent: missing required field "ProxyServerGroup.speed_limit"`)}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProxyServerGroup.created_at"`)}
@@ -216,6 +335,34 @@ func (_c *ProxyServerGroupCreate) createSpec() (*ProxyServerGroup, *sqlgraph.Cre
 	if value, ok := _c.mutation.Sort(); ok {
 		_spec.SetField(proxyservergroup.FieldSort, field.TypeInt, value)
 		_node.Sort = value
+	}
+	if value, ok := _c.mutation.ForCalculation(); ok {
+		_spec.SetField(proxyservergroup.FieldForCalculation, field.TypeBool, value)
+		_node.ForCalculation = value
+	}
+	if value, ok := _c.mutation.IsExpiredGroup(); ok {
+		_spec.SetField(proxyservergroup.FieldIsExpiredGroup, field.TypeBool, value)
+		_node.IsExpiredGroup = value
+	}
+	if value, ok := _c.mutation.ExpiredDaysLimit(); ok {
+		_spec.SetField(proxyservergroup.FieldExpiredDaysLimit, field.TypeInt, value)
+		_node.ExpiredDaysLimit = value
+	}
+	if value, ok := _c.mutation.MaxTrafficGBExpired(); ok {
+		_spec.SetField(proxyservergroup.FieldMaxTrafficGBExpired, field.TypeInt64, value)
+		_node.MaxTrafficGBExpired = &value
+	}
+	if value, ok := _c.mutation.SpeedLimit(); ok {
+		_spec.SetField(proxyservergroup.FieldSpeedLimit, field.TypeInt, value)
+		_node.SpeedLimit = value
+	}
+	if value, ok := _c.mutation.MinTrafficGB(); ok {
+		_spec.SetField(proxyservergroup.FieldMinTrafficGB, field.TypeInt64, value)
+		_node.MinTrafficGB = &value
+	}
+	if value, ok := _c.mutation.MaxTrafficGB(); ok {
+		_spec.SetField(proxyservergroup.FieldMaxTrafficGB, field.TypeInt64, value)
+		_node.MaxTrafficGB = &value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(proxyservergroup.FieldCreatedAt, field.TypeTime, value)

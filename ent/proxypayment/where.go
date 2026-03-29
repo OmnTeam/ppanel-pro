@@ -3,8 +3,6 @@
 package proxypayment
 
 import (
-	"time"
-
 	"entgo.io/ent/dialect/sql"
 	"github.com/OmnTeam/ppanel-pro/ent/predicate"
 )
@@ -64,11 +62,6 @@ func Platform(v string) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldPlatform, v))
 }
 
-// Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
-func Description(v string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldEQ(FieldDescription, v))
-}
-
 // Icon applies equality check predicate on the "icon" field. It's identical to IconEQ.
 func Icon(v string) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldIcon, v))
@@ -84,18 +77,23 @@ func Config(v string) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldConfig, v))
 }
 
+// Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
+func Description(v string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldEQ(FieldDescription, v))
+}
+
 // FeeMode applies equality check predicate on the "fee_mode" field. It's identical to FeeModeEQ.
-func FeeMode(v int) predicate.ProxyPayment {
+func FeeMode(v uint) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldFeeMode, v))
 }
 
 // FeePercent applies equality check predicate on the "fee_percent" field. It's identical to FeePercentEQ.
-func FeePercent(v float64) predicate.ProxyPayment {
+func FeePercent(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldFeePercent, v))
 }
 
 // FeeAmount applies equality check predicate on the "fee_amount" field. It's identical to FeeAmountEQ.
-func FeeAmount(v int) predicate.ProxyPayment {
+func FeeAmount(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldFeeAmount, v))
 }
 
@@ -107,16 +105,6 @@ func Enable(v bool) predicate.ProxyPayment {
 // Token applies equality check predicate on the "token" field. It's identical to TokenEQ.
 func Token(v string) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldToken, v))
-}
-
-// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldEQ(FieldCreatedAt, v))
-}
-
-// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
-func UpdatedAt(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -249,81 +237,6 @@ func PlatformContainsFold(v string) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldContainsFold(FieldPlatform, v))
 }
 
-// DescriptionEQ applies the EQ predicate on the "description" field.
-func DescriptionEQ(v string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldEQ(FieldDescription, v))
-}
-
-// DescriptionNEQ applies the NEQ predicate on the "description" field.
-func DescriptionNEQ(v string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldNEQ(FieldDescription, v))
-}
-
-// DescriptionIn applies the In predicate on the "description" field.
-func DescriptionIn(vs ...string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldIn(FieldDescription, vs...))
-}
-
-// DescriptionNotIn applies the NotIn predicate on the "description" field.
-func DescriptionNotIn(vs ...string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldNotIn(FieldDescription, vs...))
-}
-
-// DescriptionGT applies the GT predicate on the "description" field.
-func DescriptionGT(v string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldGT(FieldDescription, v))
-}
-
-// DescriptionGTE applies the GTE predicate on the "description" field.
-func DescriptionGTE(v string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldGTE(FieldDescription, v))
-}
-
-// DescriptionLT applies the LT predicate on the "description" field.
-func DescriptionLT(v string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldLT(FieldDescription, v))
-}
-
-// DescriptionLTE applies the LTE predicate on the "description" field.
-func DescriptionLTE(v string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldLTE(FieldDescription, v))
-}
-
-// DescriptionContains applies the Contains predicate on the "description" field.
-func DescriptionContains(v string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldContains(FieldDescription, v))
-}
-
-// DescriptionHasPrefix applies the HasPrefix predicate on the "description" field.
-func DescriptionHasPrefix(v string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldHasPrefix(FieldDescription, v))
-}
-
-// DescriptionHasSuffix applies the HasSuffix predicate on the "description" field.
-func DescriptionHasSuffix(v string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldHasSuffix(FieldDescription, v))
-}
-
-// DescriptionIsNil applies the IsNil predicate on the "description" field.
-func DescriptionIsNil() predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldIsNull(FieldDescription))
-}
-
-// DescriptionNotNil applies the NotNil predicate on the "description" field.
-func DescriptionNotNil() predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldNotNull(FieldDescription))
-}
-
-// DescriptionEqualFold applies the EqualFold predicate on the "description" field.
-func DescriptionEqualFold(v string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldEqualFold(FieldDescription, v))
-}
-
-// DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
-func DescriptionContainsFold(v string) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldContainsFold(FieldDescription, v))
-}
-
 // IconEQ applies the EQ predicate on the "icon" field.
 func IconEQ(v string) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldIcon, v))
@@ -377,16 +290,6 @@ func IconHasPrefix(v string) predicate.ProxyPayment {
 // IconHasSuffix applies the HasSuffix predicate on the "icon" field.
 func IconHasSuffix(v string) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldHasSuffix(FieldIcon, v))
-}
-
-// IconIsNil applies the IsNil predicate on the "icon" field.
-func IconIsNil() predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldIsNull(FieldIcon))
-}
-
-// IconNotNil applies the NotNil predicate on the "icon" field.
-func IconNotNil() predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldNotNull(FieldIcon))
 }
 
 // IconEqualFold applies the EqualFold predicate on the "icon" field.
@@ -452,16 +355,6 @@ func DomainHasPrefix(v string) predicate.ProxyPayment {
 // DomainHasSuffix applies the HasSuffix predicate on the "domain" field.
 func DomainHasSuffix(v string) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldHasSuffix(FieldDomain, v))
-}
-
-// DomainIsNil applies the IsNil predicate on the "domain" field.
-func DomainIsNil() predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldIsNull(FieldDomain))
-}
-
-// DomainNotNil applies the NotNil predicate on the "domain" field.
-func DomainNotNil() predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldNotNull(FieldDomain))
 }
 
 // DomainEqualFold applies the EqualFold predicate on the "domain" field.
@@ -539,144 +432,199 @@ func ConfigContainsFold(v string) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldContainsFold(FieldConfig, v))
 }
 
+// DescriptionEQ applies the EQ predicate on the "description" field.
+func DescriptionEQ(v string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldEQ(FieldDescription, v))
+}
+
+// DescriptionNEQ applies the NEQ predicate on the "description" field.
+func DescriptionNEQ(v string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldNEQ(FieldDescription, v))
+}
+
+// DescriptionIn applies the In predicate on the "description" field.
+func DescriptionIn(vs ...string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldIn(FieldDescription, vs...))
+}
+
+// DescriptionNotIn applies the NotIn predicate on the "description" field.
+func DescriptionNotIn(vs ...string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldNotIn(FieldDescription, vs...))
+}
+
+// DescriptionGT applies the GT predicate on the "description" field.
+func DescriptionGT(v string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldGT(FieldDescription, v))
+}
+
+// DescriptionGTE applies the GTE predicate on the "description" field.
+func DescriptionGTE(v string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldGTE(FieldDescription, v))
+}
+
+// DescriptionLT applies the LT predicate on the "description" field.
+func DescriptionLT(v string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldLT(FieldDescription, v))
+}
+
+// DescriptionLTE applies the LTE predicate on the "description" field.
+func DescriptionLTE(v string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldLTE(FieldDescription, v))
+}
+
+// DescriptionContains applies the Contains predicate on the "description" field.
+func DescriptionContains(v string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldContains(FieldDescription, v))
+}
+
+// DescriptionHasPrefix applies the HasPrefix predicate on the "description" field.
+func DescriptionHasPrefix(v string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldHasPrefix(FieldDescription, v))
+}
+
+// DescriptionHasSuffix applies the HasSuffix predicate on the "description" field.
+func DescriptionHasSuffix(v string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldHasSuffix(FieldDescription, v))
+}
+
+// DescriptionIsNil applies the IsNil predicate on the "description" field.
+func DescriptionIsNil() predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldIsNull(FieldDescription))
+}
+
+// DescriptionNotNil applies the NotNil predicate on the "description" field.
+func DescriptionNotNil() predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldNotNull(FieldDescription))
+}
+
+// DescriptionEqualFold applies the EqualFold predicate on the "description" field.
+func DescriptionEqualFold(v string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldEqualFold(FieldDescription, v))
+}
+
+// DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
+func DescriptionContainsFold(v string) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldContainsFold(FieldDescription, v))
+}
+
 // FeeModeEQ applies the EQ predicate on the "fee_mode" field.
-func FeeModeEQ(v int) predicate.ProxyPayment {
+func FeeModeEQ(v uint) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldFeeMode, v))
 }
 
 // FeeModeNEQ applies the NEQ predicate on the "fee_mode" field.
-func FeeModeNEQ(v int) predicate.ProxyPayment {
+func FeeModeNEQ(v uint) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldNEQ(FieldFeeMode, v))
 }
 
 // FeeModeIn applies the In predicate on the "fee_mode" field.
-func FeeModeIn(vs ...int) predicate.ProxyPayment {
+func FeeModeIn(vs ...uint) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldIn(FieldFeeMode, vs...))
 }
 
 // FeeModeNotIn applies the NotIn predicate on the "fee_mode" field.
-func FeeModeNotIn(vs ...int) predicate.ProxyPayment {
+func FeeModeNotIn(vs ...uint) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldNotIn(FieldFeeMode, vs...))
 }
 
 // FeeModeGT applies the GT predicate on the "fee_mode" field.
-func FeeModeGT(v int) predicate.ProxyPayment {
+func FeeModeGT(v uint) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldGT(FieldFeeMode, v))
 }
 
 // FeeModeGTE applies the GTE predicate on the "fee_mode" field.
-func FeeModeGTE(v int) predicate.ProxyPayment {
+func FeeModeGTE(v uint) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldGTE(FieldFeeMode, v))
 }
 
 // FeeModeLT applies the LT predicate on the "fee_mode" field.
-func FeeModeLT(v int) predicate.ProxyPayment {
+func FeeModeLT(v uint) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldLT(FieldFeeMode, v))
 }
 
 // FeeModeLTE applies the LTE predicate on the "fee_mode" field.
-func FeeModeLTE(v int) predicate.ProxyPayment {
+func FeeModeLTE(v uint) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldLTE(FieldFeeMode, v))
 }
 
 // FeePercentEQ applies the EQ predicate on the "fee_percent" field.
-func FeePercentEQ(v float64) predicate.ProxyPayment {
+func FeePercentEQ(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldFeePercent, v))
 }
 
 // FeePercentNEQ applies the NEQ predicate on the "fee_percent" field.
-func FeePercentNEQ(v float64) predicate.ProxyPayment {
+func FeePercentNEQ(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldNEQ(FieldFeePercent, v))
 }
 
 // FeePercentIn applies the In predicate on the "fee_percent" field.
-func FeePercentIn(vs ...float64) predicate.ProxyPayment {
+func FeePercentIn(vs ...int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldIn(FieldFeePercent, vs...))
 }
 
 // FeePercentNotIn applies the NotIn predicate on the "fee_percent" field.
-func FeePercentNotIn(vs ...float64) predicate.ProxyPayment {
+func FeePercentNotIn(vs ...int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldNotIn(FieldFeePercent, vs...))
 }
 
 // FeePercentGT applies the GT predicate on the "fee_percent" field.
-func FeePercentGT(v float64) predicate.ProxyPayment {
+func FeePercentGT(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldGT(FieldFeePercent, v))
 }
 
 // FeePercentGTE applies the GTE predicate on the "fee_percent" field.
-func FeePercentGTE(v float64) predicate.ProxyPayment {
+func FeePercentGTE(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldGTE(FieldFeePercent, v))
 }
 
 // FeePercentLT applies the LT predicate on the "fee_percent" field.
-func FeePercentLT(v float64) predicate.ProxyPayment {
+func FeePercentLT(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldLT(FieldFeePercent, v))
 }
 
 // FeePercentLTE applies the LTE predicate on the "fee_percent" field.
-func FeePercentLTE(v float64) predicate.ProxyPayment {
+func FeePercentLTE(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldLTE(FieldFeePercent, v))
 }
 
-// FeePercentIsNil applies the IsNil predicate on the "fee_percent" field.
-func FeePercentIsNil() predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldIsNull(FieldFeePercent))
-}
-
-// FeePercentNotNil applies the NotNil predicate on the "fee_percent" field.
-func FeePercentNotNil() predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldNotNull(FieldFeePercent))
-}
-
 // FeeAmountEQ applies the EQ predicate on the "fee_amount" field.
-func FeeAmountEQ(v int) predicate.ProxyPayment {
+func FeeAmountEQ(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldFeeAmount, v))
 }
 
 // FeeAmountNEQ applies the NEQ predicate on the "fee_amount" field.
-func FeeAmountNEQ(v int) predicate.ProxyPayment {
+func FeeAmountNEQ(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldNEQ(FieldFeeAmount, v))
 }
 
 // FeeAmountIn applies the In predicate on the "fee_amount" field.
-func FeeAmountIn(vs ...int) predicate.ProxyPayment {
+func FeeAmountIn(vs ...int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldIn(FieldFeeAmount, vs...))
 }
 
 // FeeAmountNotIn applies the NotIn predicate on the "fee_amount" field.
-func FeeAmountNotIn(vs ...int) predicate.ProxyPayment {
+func FeeAmountNotIn(vs ...int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldNotIn(FieldFeeAmount, vs...))
 }
 
 // FeeAmountGT applies the GT predicate on the "fee_amount" field.
-func FeeAmountGT(v int) predicate.ProxyPayment {
+func FeeAmountGT(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldGT(FieldFeeAmount, v))
 }
 
 // FeeAmountGTE applies the GTE predicate on the "fee_amount" field.
-func FeeAmountGTE(v int) predicate.ProxyPayment {
+func FeeAmountGTE(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldGTE(FieldFeeAmount, v))
 }
 
 // FeeAmountLT applies the LT predicate on the "fee_amount" field.
-func FeeAmountLT(v int) predicate.ProxyPayment {
+func FeeAmountLT(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldLT(FieldFeeAmount, v))
 }
 
 // FeeAmountLTE applies the LTE predicate on the "fee_amount" field.
-func FeeAmountLTE(v int) predicate.ProxyPayment {
+func FeeAmountLTE(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldLTE(FieldFeeAmount, v))
-}
-
-// FeeAmountIsNil applies the IsNil predicate on the "fee_amount" field.
-func FeeAmountIsNil() predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldIsNull(FieldFeeAmount))
-}
-
-// FeeAmountNotNil applies the NotNil predicate on the "fee_amount" field.
-func FeeAmountNotNil() predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldNotNull(FieldFeeAmount))
 }
 
 // EnableEQ applies the EQ predicate on the "enable" field.
@@ -744,16 +692,6 @@ func TokenHasSuffix(v string) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldHasSuffix(FieldToken, v))
 }
 
-// TokenIsNil applies the IsNil predicate on the "token" field.
-func TokenIsNil() predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldIsNull(FieldToken))
-}
-
-// TokenNotNil applies the NotNil predicate on the "token" field.
-func TokenNotNil() predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldNotNull(FieldToken))
-}
-
 // TokenEqualFold applies the EqualFold predicate on the "token" field.
 func TokenEqualFold(v string) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEqualFold(FieldToken, v))
@@ -762,86 +700,6 @@ func TokenEqualFold(v string) predicate.ProxyPayment {
 // TokenContainsFold applies the ContainsFold predicate on the "token" field.
 func TokenContainsFold(v string) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldContainsFold(FieldToken, v))
-}
-
-// CreatedAtEQ applies the EQ predicate on the "created_at" field.
-func CreatedAtEQ(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldEQ(FieldCreatedAt, v))
-}
-
-// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
-func CreatedAtNEQ(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldNEQ(FieldCreatedAt, v))
-}
-
-// CreatedAtIn applies the In predicate on the "created_at" field.
-func CreatedAtIn(vs ...time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldIn(FieldCreatedAt, vs...))
-}
-
-// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldNotIn(FieldCreatedAt, vs...))
-}
-
-// CreatedAtGT applies the GT predicate on the "created_at" field.
-func CreatedAtGT(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldGT(FieldCreatedAt, v))
-}
-
-// CreatedAtGTE applies the GTE predicate on the "created_at" field.
-func CreatedAtGTE(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldGTE(FieldCreatedAt, v))
-}
-
-// CreatedAtLT applies the LT predicate on the "created_at" field.
-func CreatedAtLT(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldLT(FieldCreatedAt, v))
-}
-
-// CreatedAtLTE applies the LTE predicate on the "created_at" field.
-func CreatedAtLTE(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldLTE(FieldCreatedAt, v))
-}
-
-// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
-func UpdatedAtEQ(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldEQ(FieldUpdatedAt, v))
-}
-
-// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
-func UpdatedAtNEQ(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldNEQ(FieldUpdatedAt, v))
-}
-
-// UpdatedAtIn applies the In predicate on the "updated_at" field.
-func UpdatedAtIn(vs ...time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldIn(FieldUpdatedAt, vs...))
-}
-
-// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
-func UpdatedAtNotIn(vs ...time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldNotIn(FieldUpdatedAt, vs...))
-}
-
-// UpdatedAtGT applies the GT predicate on the "updated_at" field.
-func UpdatedAtGT(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldGT(FieldUpdatedAt, v))
-}
-
-// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
-func UpdatedAtGTE(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldGTE(FieldUpdatedAt, v))
-}
-
-// UpdatedAtLT applies the LT predicate on the "updated_at" field.
-func UpdatedAtLT(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldLT(FieldUpdatedAt, v))
-}
-
-// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
-func UpdatedAtLTE(v time.Time) predicate.ProxyPayment {
-	return predicate.ProxyPayment(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
 // And groups predicates with the AND operator between them.

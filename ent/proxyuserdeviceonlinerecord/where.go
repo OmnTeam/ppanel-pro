@@ -75,12 +75,12 @@ func OfflineTime(v time.Time) predicate.ProxyUserDeviceOnlineRecord {
 }
 
 // OnlineSeconds applies equality check predicate on the "online_seconds" field. It's identical to OnlineSecondsEQ.
-func OnlineSeconds(v int) predicate.ProxyUserDeviceOnlineRecord {
+func OnlineSeconds(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldEQ(FieldOnlineSeconds, v))
 }
 
 // DurationDays applies equality check predicate on the "duration_days" field. It's identical to DurationDaysEQ.
-func DurationDays(v int) predicate.ProxyUserDeviceOnlineRecord {
+func DurationDays(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldEQ(FieldDurationDays, v))
 }
 
@@ -295,42 +295,42 @@ func OfflineTimeNotNil() predicate.ProxyUserDeviceOnlineRecord {
 }
 
 // OnlineSecondsEQ applies the EQ predicate on the "online_seconds" field.
-func OnlineSecondsEQ(v int) predicate.ProxyUserDeviceOnlineRecord {
+func OnlineSecondsEQ(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldEQ(FieldOnlineSeconds, v))
 }
 
 // OnlineSecondsNEQ applies the NEQ predicate on the "online_seconds" field.
-func OnlineSecondsNEQ(v int) predicate.ProxyUserDeviceOnlineRecord {
+func OnlineSecondsNEQ(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldNEQ(FieldOnlineSeconds, v))
 }
 
 // OnlineSecondsIn applies the In predicate on the "online_seconds" field.
-func OnlineSecondsIn(vs ...int) predicate.ProxyUserDeviceOnlineRecord {
+func OnlineSecondsIn(vs ...int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldIn(FieldOnlineSeconds, vs...))
 }
 
 // OnlineSecondsNotIn applies the NotIn predicate on the "online_seconds" field.
-func OnlineSecondsNotIn(vs ...int) predicate.ProxyUserDeviceOnlineRecord {
+func OnlineSecondsNotIn(vs ...int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldNotIn(FieldOnlineSeconds, vs...))
 }
 
 // OnlineSecondsGT applies the GT predicate on the "online_seconds" field.
-func OnlineSecondsGT(v int) predicate.ProxyUserDeviceOnlineRecord {
+func OnlineSecondsGT(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldGT(FieldOnlineSeconds, v))
 }
 
 // OnlineSecondsGTE applies the GTE predicate on the "online_seconds" field.
-func OnlineSecondsGTE(v int) predicate.ProxyUserDeviceOnlineRecord {
+func OnlineSecondsGTE(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldGTE(FieldOnlineSeconds, v))
 }
 
 // OnlineSecondsLT applies the LT predicate on the "online_seconds" field.
-func OnlineSecondsLT(v int) predicate.ProxyUserDeviceOnlineRecord {
+func OnlineSecondsLT(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldLT(FieldOnlineSeconds, v))
 }
 
 // OnlineSecondsLTE applies the LTE predicate on the "online_seconds" field.
-func OnlineSecondsLTE(v int) predicate.ProxyUserDeviceOnlineRecord {
+func OnlineSecondsLTE(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldLTE(FieldOnlineSeconds, v))
 }
 
@@ -345,42 +345,42 @@ func OnlineSecondsNotNil() predicate.ProxyUserDeviceOnlineRecord {
 }
 
 // DurationDaysEQ applies the EQ predicate on the "duration_days" field.
-func DurationDaysEQ(v int) predicate.ProxyUserDeviceOnlineRecord {
+func DurationDaysEQ(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldEQ(FieldDurationDays, v))
 }
 
 // DurationDaysNEQ applies the NEQ predicate on the "duration_days" field.
-func DurationDaysNEQ(v int) predicate.ProxyUserDeviceOnlineRecord {
+func DurationDaysNEQ(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldNEQ(FieldDurationDays, v))
 }
 
 // DurationDaysIn applies the In predicate on the "duration_days" field.
-func DurationDaysIn(vs ...int) predicate.ProxyUserDeviceOnlineRecord {
+func DurationDaysIn(vs ...int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldIn(FieldDurationDays, vs...))
 }
 
 // DurationDaysNotIn applies the NotIn predicate on the "duration_days" field.
-func DurationDaysNotIn(vs ...int) predicate.ProxyUserDeviceOnlineRecord {
+func DurationDaysNotIn(vs ...int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldNotIn(FieldDurationDays, vs...))
 }
 
 // DurationDaysGT applies the GT predicate on the "duration_days" field.
-func DurationDaysGT(v int) predicate.ProxyUserDeviceOnlineRecord {
+func DurationDaysGT(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldGT(FieldDurationDays, v))
 }
 
 // DurationDaysGTE applies the GTE predicate on the "duration_days" field.
-func DurationDaysGTE(v int) predicate.ProxyUserDeviceOnlineRecord {
+func DurationDaysGTE(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldGTE(FieldDurationDays, v))
 }
 
 // DurationDaysLT applies the LT predicate on the "duration_days" field.
-func DurationDaysLT(v int) predicate.ProxyUserDeviceOnlineRecord {
+func DurationDaysLT(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldLT(FieldDurationDays, v))
 }
 
 // DurationDaysLTE applies the LTE predicate on the "duration_days" field.
-func DurationDaysLTE(v int) predicate.ProxyUserDeviceOnlineRecord {
+func DurationDaysLTE(v int64) predicate.ProxyUserDeviceOnlineRecord {
 	return predicate.ProxyUserDeviceOnlineRecord(sql.FieldLTE(FieldDurationDays, v))
 }
 

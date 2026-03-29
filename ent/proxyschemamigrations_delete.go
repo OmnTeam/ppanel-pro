@@ -40,7 +40,7 @@ func (_d *ProxySchemaMigrationsDelete) ExecX(ctx context.Context) int {
 }
 
 func (_d *ProxySchemaMigrationsDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(proxyschemamigrations.Table, sqlgraph.NewFieldSpec(proxyschemamigrations.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(proxyschemamigrations.Table, sqlgraph.NewFieldSpec(proxyschemamigrations.FieldID, field.TypeInt64))
 	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

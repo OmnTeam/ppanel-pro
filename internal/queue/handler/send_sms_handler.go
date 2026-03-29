@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
 	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
 	queueTypes "github.com/OmnTeam/ppanel-pro/internal/queue/types"
 	"github.com/OmnTeam/ppanel-pro/pkg/constant"
@@ -28,8 +27,7 @@ type SendSmsHandler struct {
 	logger *log.Helper
 }
 
-// NewSendSmsHandler creates a new SMS sending handler
-// 所有配置从数据库根据租户ID获取
+// NewSendSmsHandler creates a new SMS sending handler.
 func NewSendSmsHandler(db *ent.Client, logger log.Logger) *SendSmsHandler {
 	return &SendSmsHandler{
 		db:     db,
@@ -46,7 +44,7 @@ func (h *SendSmsHandler) ProcessTask(ctx context.Context, task *asynq.Task) erro
 		return nil // Return nil to skip retry
 	}
 
-	// Load mobile config from ProxySystem table based on tenant ID
+	// Load mobile config from ProxySystem table
 	mobileConfig, err := h.loadMobileConfig(ctx)
 	if err != nil {
 		h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Load mobile config failed: %v", err)
@@ -126,33 +124,21 @@ func (h *SendSmsHandler) ProcessTask(ctx context.Context, task *asynq.Task) erro
 	return nil
 }
 
-// loadMobileConfig loads mobile/SMS configuration from ProxySystem table based on tenant ID
+// loadMobileConfig loads mobile/SMS configuration from ProxySystem table.
 func (h *SendSmsHandler) loadMobileConfig(ctx context.Context) (*MobileSystemConfig, error) {
-	// Query mobile config from ProxySystem table
-	// Category: "mobile", Key: "config"
-	config, err := h.db.ProxySystem.Query().
-		Where(
-			proxysystem.CategoryEQ("mobile"),
-			proxysystem.KeyEQ("config"),
-		).
-		Only(ctx)
-
+	config, err := loadQueueMobileConfig(ctx, h.db)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Mobile config not found, category: mobile, key: config")
+			h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Mobile auth method config not found")
 			return nil, fmt.Errorf("mobile config not found")
 		}
-		h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Failed to query mobile config, error: %v", err)
+		h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Failed to load mobile config, error: %v", err)
 		return nil, err
 	}
-
-	var mobileConfig MobileSystemConfig
-	if err := json.Unmarshal([]byte(config.Value), &mobileConfig); err != nil {
-		h.logger.WithContext(ctx).Errorf("[SendSmsHandler] Failed to unmarshal mobile config, error: %v", err)
-		return nil, err
-	}
-
-	return &mobileConfig, nil
+	return &MobileSystemConfig{
+		Platform:       config.Platform,
+		PlatformConfig: config.PlatformConfig,
+	}, nil
 }
 
 // logMessage logs the SMS message to ProxySystemLog

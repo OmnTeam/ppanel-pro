@@ -40,6 +40,14 @@ func (_c *ProxySystemCreate) SetKey(v string) *ProxySystemCreate {
 	return _c
 }
 
+// SetNillableKey sets the "key" field if the given value is not nil.
+func (_c *ProxySystemCreate) SetNillableKey(v *string) *ProxySystemCreate {
+	if v != nil {
+		_c.SetKey(*v)
+	}
+	return _c
+}
+
 // SetValue sets the "value" field.
 func (_c *ProxySystemCreate) SetValue(v string) *ProxySystemCreate {
 	_c.mutation.SetValue(v)
@@ -138,6 +146,10 @@ func (_c *ProxySystemCreate) defaults() {
 	if _, ok := _c.mutation.Category(); !ok {
 		v := proxysystem.DefaultCategory
 		_c.mutation.SetCategory(v)
+	}
+	if _, ok := _c.mutation.Key(); !ok {
+		v := proxysystem.DefaultKey
+		_c.mutation.SetKey(v)
 	}
 	if _, ok := _c.mutation.GetType(); !ok {
 		v := proxysystem.DefaultType

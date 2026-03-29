@@ -54,11 +54,6 @@ func IDLTE(id int64) predicate.ProxyTicket {
 	return predicate.ProxyTicket(sql.FieldLTE(FieldID, id))
 }
 
-// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
-func TenantID(v int64) predicate.ProxyTicket {
-	return predicate.ProxyTicket(sql.FieldEQ(FieldTenantID, v))
-}
-
 // Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
 func Title(v string) predicate.ProxyTicket {
 	return predicate.ProxyTicket(sql.FieldEQ(FieldTitle, v))
@@ -87,46 +82,6 @@ func CreatedAt(v time.Time) predicate.ProxyTicket {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.ProxyTicket {
 	return predicate.ProxyTicket(sql.FieldEQ(FieldUpdatedAt, v))
-}
-
-// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
-func TenantIDEQ(v int64) predicate.ProxyTicket {
-	return predicate.ProxyTicket(sql.FieldEQ(FieldTenantID, v))
-}
-
-// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
-func TenantIDNEQ(v int64) predicate.ProxyTicket {
-	return predicate.ProxyTicket(sql.FieldNEQ(FieldTenantID, v))
-}
-
-// TenantIDIn applies the In predicate on the "tenant_id" field.
-func TenantIDIn(vs ...int64) predicate.ProxyTicket {
-	return predicate.ProxyTicket(sql.FieldIn(FieldTenantID, vs...))
-}
-
-// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
-func TenantIDNotIn(vs ...int64) predicate.ProxyTicket {
-	return predicate.ProxyTicket(sql.FieldNotIn(FieldTenantID, vs...))
-}
-
-// TenantIDGT applies the GT predicate on the "tenant_id" field.
-func TenantIDGT(v int64) predicate.ProxyTicket {
-	return predicate.ProxyTicket(sql.FieldGT(FieldTenantID, v))
-}
-
-// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
-func TenantIDGTE(v int64) predicate.ProxyTicket {
-	return predicate.ProxyTicket(sql.FieldGTE(FieldTenantID, v))
-}
-
-// TenantIDLT applies the LT predicate on the "tenant_id" field.
-func TenantIDLT(v int64) predicate.ProxyTicket {
-	return predicate.ProxyTicket(sql.FieldLT(FieldTenantID, v))
-}
-
-// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
-func TenantIDLTE(v int64) predicate.ProxyTicket {
-	return predicate.ProxyTicket(sql.FieldLTE(FieldTenantID, v))
 }
 
 // TitleEQ applies the EQ predicate on the "title" field.
@@ -389,16 +344,6 @@ func CreatedAtLTE(v time.Time) predicate.ProxyTicket {
 	return predicate.ProxyTicket(sql.FieldLTE(FieldCreatedAt, v))
 }
 
-// CreatedAtIsNil applies the IsNil predicate on the "created_at" field.
-func CreatedAtIsNil() predicate.ProxyTicket {
-	return predicate.ProxyTicket(sql.FieldIsNull(FieldCreatedAt))
-}
-
-// CreatedAtNotNil applies the NotNil predicate on the "created_at" field.
-func CreatedAtNotNil() predicate.ProxyTicket {
-	return predicate.ProxyTicket(sql.FieldNotNull(FieldCreatedAt))
-}
-
 // UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
 func UpdatedAtEQ(v time.Time) predicate.ProxyTicket {
 	return predicate.ProxyTicket(sql.FieldEQ(FieldUpdatedAt, v))
@@ -437,16 +382,6 @@ func UpdatedAtLT(v time.Time) predicate.ProxyTicket {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.ProxyTicket {
 	return predicate.ProxyTicket(sql.FieldLTE(FieldUpdatedAt, v))
-}
-
-// UpdatedAtIsNil applies the IsNil predicate on the "updated_at" field.
-func UpdatedAtIsNil() predicate.ProxyTicket {
-	return predicate.ProxyTicket(sql.FieldIsNull(FieldUpdatedAt))
-}
-
-// UpdatedAtNotNil applies the NotNil predicate on the "updated_at" field.
-func UpdatedAtNotNil() predicate.ProxyTicket {
-	return predicate.ProxyTicket(sql.FieldNotNull(FieldUpdatedAt))
 }
 
 // And groups predicates with the AND operator between them.

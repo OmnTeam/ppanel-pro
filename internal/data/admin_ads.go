@@ -40,7 +40,7 @@ func (r *adsRepo) GetAdsListByPage(ctx context.Context, page, size int, filter a
 
 	// 应用状态过滤
 	if filter.Status != nil {
-		query = query.Where(proxyads.Status(*filter.Status))
+		query = query.Where(proxyads.Status(int(*filter.Status)))
 	}
 
 	// 获取总数
@@ -97,7 +97,7 @@ func (r *adsRepo) CreateAds(ctx context.Context, ads *adsbiz.Ads) (*adsbiz.Ads, 
 		SetContent(ads.Content).
 		SetDescription(ads.Description).
 		SetTargetURL(ads.TargetURL).
-		SetStatus(ads.Status)
+		SetStatus(int(ads.Status))
 
 	// 设置时间字段（如果不为零值）
 	if !ads.StartTime.IsZero() {
@@ -124,7 +124,7 @@ func (r *adsRepo) UpdateAds(ctx context.Context, ads *adsbiz.Ads) (*adsbiz.Ads, 
 		SetContent(ads.Content).
 		SetDescription(ads.Description).
 		SetTargetURL(ads.TargetURL).
-		SetStatus(ads.Status).
+		SetStatus(int(ads.Status)).
 		SetUpdatedAt(time.Now())
 
 	// 设置时间字段（如果不为零值）
@@ -171,7 +171,7 @@ func (r *adsRepo) entAdsToBiz(entAd *ent.ProxyAds) *adsbiz.Ads {
 		TargetURL:   entAd.TargetURL,
 		StartTime:   entAd.StartTime,
 		EndTime:     entAd.EndTime,
-		Status:      entAd.Status,
+		Status:      int8(entAd.Status),
 		CreatedAt:   entAd.CreatedAt,
 		UpdatedAt:   entAd.UpdatedAt,
 	}

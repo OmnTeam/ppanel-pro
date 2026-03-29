@@ -299,8 +299,8 @@ func (r *adminTrafficLogRepo) CreateTrafficLog(ctx context.Context, serverID, us
 		SetServerID(serverID).
 		SetUserID(userID).
 		SetSubscribeID(subscribeID).
-		SetUpload(int(upload)).
-		SetDownload(int(download)).
+		SetUpload(upload).
+		SetDownload(download).
 		SetTimestamp(timestamp).
 		Save(ctx)
 	return err

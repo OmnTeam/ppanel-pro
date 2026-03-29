@@ -207,8 +207,8 @@ func (s *CommonService) GetGlobalConfig(ctx context.Context, req *pb.GetGlobalCo
 
 	// Currency config
 	configData.Currency = &pb.CurrencyConfig{
-		CurrencyUnit:   config.Currency["currency_unit"],
-		CurrencySymbol: config.Currency["currency_symbol"],
+		CurrencyUnit:   getMapValue(config.Currency, "CurrencyUnit", "currency_unit"),
+		CurrencySymbol: getMapValue(config.Currency, "CurrencySymbol", "currency_symbol"),
 	}
 
 	// Subscribe config
@@ -231,7 +231,7 @@ func (s *CommonService) GetGlobalConfig(ctx context.Context, req *pb.GetGlobalCo
 	}
 
 	// Try to parse verify_code_interval from database config
-	if interval, ok := config.VerifyCode["verify_code_interval"]; ok {
+	if interval := getMapValue(config.VerifyCode, "VerifyCodeInterval", "verify_code_interval"); interval != "" {
 		if val, err := strconv.ParseInt(interval, 10, 64); err == nil {
 			configData.VerifyCode.VerifyCodeInterval = int32(val)
 		}
@@ -245,6 +245,15 @@ func (s *CommonService) GetGlobalConfig(ctx context.Context, req *pb.GetGlobalCo
 		Message: responsecode.CodeMessages[responsecode.GetGlobalConfigSuccess],
 		Data:    configData,
 	}, nil
+}
+
+func getMapValue(values map[string]string, keys ...string) string {
+	for _, key := range keys {
+		if value, ok := values[key]; ok && value != "" {
+			return value
+		}
+	}
+	return ""
 }
 
 // GetStat gets system statistics

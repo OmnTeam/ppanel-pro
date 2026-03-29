@@ -131,14 +131,14 @@ func (_u *ProxyTaskUpdate) ClearErrors() *ProxyTaskUpdate {
 }
 
 // SetTotal sets the "total" field.
-func (_u *ProxyTaskUpdate) SetTotal(v uint32) *ProxyTaskUpdate {
+func (_u *ProxyTaskUpdate) SetTotal(v uint64) *ProxyTaskUpdate {
 	_u.mutation.ResetTotal()
 	_u.mutation.SetTotal(v)
 	return _u
 }
 
 // SetNillableTotal sets the "total" field if the given value is not nil.
-func (_u *ProxyTaskUpdate) SetNillableTotal(v *uint32) *ProxyTaskUpdate {
+func (_u *ProxyTaskUpdate) SetNillableTotal(v *uint64) *ProxyTaskUpdate {
 	if v != nil {
 		_u.SetTotal(*v)
 	}
@@ -146,20 +146,20 @@ func (_u *ProxyTaskUpdate) SetNillableTotal(v *uint32) *ProxyTaskUpdate {
 }
 
 // AddTotal adds value to the "total" field.
-func (_u *ProxyTaskUpdate) AddTotal(v int32) *ProxyTaskUpdate {
+func (_u *ProxyTaskUpdate) AddTotal(v int64) *ProxyTaskUpdate {
 	_u.mutation.AddTotal(v)
 	return _u
 }
 
 // SetCurrent sets the "current" field.
-func (_u *ProxyTaskUpdate) SetCurrent(v uint32) *ProxyTaskUpdate {
+func (_u *ProxyTaskUpdate) SetCurrent(v uint64) *ProxyTaskUpdate {
 	_u.mutation.ResetCurrent()
 	_u.mutation.SetCurrent(v)
 	return _u
 }
 
 // SetNillableCurrent sets the "current" field if the given value is not nil.
-func (_u *ProxyTaskUpdate) SetNillableCurrent(v *uint32) *ProxyTaskUpdate {
+func (_u *ProxyTaskUpdate) SetNillableCurrent(v *uint64) *ProxyTaskUpdate {
 	if v != nil {
 		_u.SetCurrent(*v)
 	}
@@ -167,7 +167,7 @@ func (_u *ProxyTaskUpdate) SetNillableCurrent(v *uint32) *ProxyTaskUpdate {
 }
 
 // AddCurrent adds value to the "current" field.
-func (_u *ProxyTaskUpdate) AddCurrent(v int32) *ProxyTaskUpdate {
+func (_u *ProxyTaskUpdate) AddCurrent(v int64) *ProxyTaskUpdate {
 	_u.mutation.AddCurrent(v)
 	return _u
 }
@@ -273,16 +273,16 @@ func (_u *ProxyTaskUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.ClearField(proxytask.FieldErrors, field.TypeString)
 	}
 	if value, ok := _u.mutation.Total(); ok {
-		_spec.SetField(proxytask.FieldTotal, field.TypeUint32, value)
+		_spec.SetField(proxytask.FieldTotal, field.TypeUint64, value)
 	}
 	if value, ok := _u.mutation.AddedTotal(); ok {
-		_spec.AddField(proxytask.FieldTotal, field.TypeUint32, value)
+		_spec.AddField(proxytask.FieldTotal, field.TypeUint64, value)
 	}
 	if value, ok := _u.mutation.Current(); ok {
-		_spec.SetField(proxytask.FieldCurrent, field.TypeUint32, value)
+		_spec.SetField(proxytask.FieldCurrent, field.TypeUint64, value)
 	}
 	if value, ok := _u.mutation.AddedCurrent(); ok {
-		_spec.AddField(proxytask.FieldCurrent, field.TypeUint32, value)
+		_spec.AddField(proxytask.FieldCurrent, field.TypeUint64, value)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxytask.FieldCreatedAt, field.TypeTime, value)
@@ -413,14 +413,14 @@ func (_u *ProxyTaskUpdateOne) ClearErrors() *ProxyTaskUpdateOne {
 }
 
 // SetTotal sets the "total" field.
-func (_u *ProxyTaskUpdateOne) SetTotal(v uint32) *ProxyTaskUpdateOne {
+func (_u *ProxyTaskUpdateOne) SetTotal(v uint64) *ProxyTaskUpdateOne {
 	_u.mutation.ResetTotal()
 	_u.mutation.SetTotal(v)
 	return _u
 }
 
 // SetNillableTotal sets the "total" field if the given value is not nil.
-func (_u *ProxyTaskUpdateOne) SetNillableTotal(v *uint32) *ProxyTaskUpdateOne {
+func (_u *ProxyTaskUpdateOne) SetNillableTotal(v *uint64) *ProxyTaskUpdateOne {
 	if v != nil {
 		_u.SetTotal(*v)
 	}
@@ -428,20 +428,20 @@ func (_u *ProxyTaskUpdateOne) SetNillableTotal(v *uint32) *ProxyTaskUpdateOne {
 }
 
 // AddTotal adds value to the "total" field.
-func (_u *ProxyTaskUpdateOne) AddTotal(v int32) *ProxyTaskUpdateOne {
+func (_u *ProxyTaskUpdateOne) AddTotal(v int64) *ProxyTaskUpdateOne {
 	_u.mutation.AddTotal(v)
 	return _u
 }
 
 // SetCurrent sets the "current" field.
-func (_u *ProxyTaskUpdateOne) SetCurrent(v uint32) *ProxyTaskUpdateOne {
+func (_u *ProxyTaskUpdateOne) SetCurrent(v uint64) *ProxyTaskUpdateOne {
 	_u.mutation.ResetCurrent()
 	_u.mutation.SetCurrent(v)
 	return _u
 }
 
 // SetNillableCurrent sets the "current" field if the given value is not nil.
-func (_u *ProxyTaskUpdateOne) SetNillableCurrent(v *uint32) *ProxyTaskUpdateOne {
+func (_u *ProxyTaskUpdateOne) SetNillableCurrent(v *uint64) *ProxyTaskUpdateOne {
 	if v != nil {
 		_u.SetCurrent(*v)
 	}
@@ -449,7 +449,7 @@ func (_u *ProxyTaskUpdateOne) SetNillableCurrent(v *uint32) *ProxyTaskUpdateOne 
 }
 
 // AddCurrent adds value to the "current" field.
-func (_u *ProxyTaskUpdateOne) AddCurrent(v int32) *ProxyTaskUpdateOne {
+func (_u *ProxyTaskUpdateOne) AddCurrent(v int64) *ProxyTaskUpdateOne {
 	_u.mutation.AddCurrent(v)
 	return _u
 }
@@ -585,16 +585,16 @@ func (_u *ProxyTaskUpdateOne) sqlSave(ctx context.Context) (_node *ProxyTask, er
 		_spec.ClearField(proxytask.FieldErrors, field.TypeString)
 	}
 	if value, ok := _u.mutation.Total(); ok {
-		_spec.SetField(proxytask.FieldTotal, field.TypeUint32, value)
+		_spec.SetField(proxytask.FieldTotal, field.TypeUint64, value)
 	}
 	if value, ok := _u.mutation.AddedTotal(); ok {
-		_spec.AddField(proxytask.FieldTotal, field.TypeUint32, value)
+		_spec.AddField(proxytask.FieldTotal, field.TypeUint64, value)
 	}
 	if value, ok := _u.mutation.Current(); ok {
-		_spec.SetField(proxytask.FieldCurrent, field.TypeUint32, value)
+		_spec.SetField(proxytask.FieldCurrent, field.TypeUint64, value)
 	}
 	if value, ok := _u.mutation.AddedCurrent(); ok {
-		_spec.AddField(proxytask.FieldCurrent, field.TypeUint32, value)
+		_spec.AddField(proxytask.FieldCurrent, field.TypeUint64, value)
 	}
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxytask.FieldCreatedAt, field.TypeTime, value)

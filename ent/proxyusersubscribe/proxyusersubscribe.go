@@ -19,6 +19,10 @@ const (
 	FieldOrderID = "order_id"
 	// FieldSubscribeID holds the string denoting the subscribe_id field in the database.
 	FieldSubscribeID = "subscribe_id"
+	// FieldNodeGroupID holds the string denoting the node_group_id field in the database.
+	FieldNodeGroupID = "node_group_id"
+	// FieldGroupLocked holds the string denoting the group_locked field in the database.
+	FieldGroupLocked = "group_locked"
 	// FieldStartTime holds the string denoting the start_time field in the database.
 	FieldStartTime = "start_time"
 	// FieldExpireTime holds the string denoting the expire_time field in the database.
@@ -31,18 +35,24 @@ const (
 	FieldDownload = "download"
 	// FieldUpload holds the string denoting the upload field in the database.
 	FieldUpload = "upload"
+	// FieldExpiredDownload holds the string denoting the expired_download field in the database.
+	FieldExpiredDownload = "expired_download"
+	// FieldExpiredUpload holds the string denoting the expired_upload field in the database.
+	FieldExpiredUpload = "expired_upload"
 	// FieldToken holds the string denoting the token field in the database.
 	FieldToken = "token"
 	// FieldUUID holds the string denoting the uuid field in the database.
 	FieldUUID = "uuid"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// FieldNote holds the string denoting the note field in the database.
+	FieldNote = "note"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxyusersubscribe in the database.
-	Table = "proxy_user_subscribe"
+	Table = "user_subscribe"
 )
 
 // Columns holds all SQL columns for proxyusersubscribe fields.
@@ -51,15 +61,20 @@ var Columns = []string{
 	FieldUserID,
 	FieldOrderID,
 	FieldSubscribeID,
+	FieldNodeGroupID,
+	FieldGroupLocked,
 	FieldStartTime,
 	FieldExpireTime,
 	FieldFinishedAt,
 	FieldTraffic,
 	FieldDownload,
 	FieldUpload,
+	FieldExpiredDownload,
+	FieldExpiredUpload,
 	FieldToken,
 	FieldUUID,
 	FieldStatus,
+	FieldNote,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -75,10 +90,28 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// DefaultNodeGroupID holds the default value on creation for the "node_group_id" field.
+	DefaultNodeGroupID int64
+	// DefaultGroupLocked holds the default value on creation for the "group_locked" field.
+	DefaultGroupLocked bool
+	// DefaultTraffic holds the default value on creation for the "traffic" field.
+	DefaultTraffic int64
+	// DefaultDownload holds the default value on creation for the "download" field.
+	DefaultDownload int64
+	// DefaultUpload holds the default value on creation for the "upload" field.
+	DefaultUpload int64
+	// DefaultExpiredDownload holds the default value on creation for the "expired_download" field.
+	DefaultExpiredDownload int64
+	// DefaultExpiredUpload holds the default value on creation for the "expired_upload" field.
+	DefaultExpiredUpload int64
 	// TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	TokenValidator func(string) error
 	// UUIDValidator is a validator for the "uuid" field. It is called by the builders before save.
 	UUIDValidator func(string) error
+	// DefaultStatus holds the default value on creation for the "status" field.
+	DefaultStatus int8
+	// NoteValidator is a validator for the "note" field. It is called by the builders before save.
+	NoteValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -112,6 +145,16 @@ func BySubscribeID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSubscribeID, opts...).ToFunc()
 }
 
+// ByNodeGroupID orders the results by the node_group_id field.
+func ByNodeGroupID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNodeGroupID, opts...).ToFunc()
+}
+
+// ByGroupLocked orders the results by the group_locked field.
+func ByGroupLocked(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldGroupLocked, opts...).ToFunc()
+}
+
 // ByStartTime orders the results by the start_time field.
 func ByStartTime(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStartTime, opts...).ToFunc()
@@ -142,6 +185,16 @@ func ByUpload(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpload, opts...).ToFunc()
 }
 
+// ByExpiredDownload orders the results by the expired_download field.
+func ByExpiredDownload(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExpiredDownload, opts...).ToFunc()
+}
+
+// ByExpiredUpload orders the results by the expired_upload field.
+func ByExpiredUpload(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExpiredUpload, opts...).ToFunc()
+}
+
 // ByToken orders the results by the token field.
 func ByToken(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldToken, opts...).ToFunc()
@@ -155,6 +208,11 @@ func ByUUID(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByNote orders the results by the note field.
+func ByNote(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNote, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

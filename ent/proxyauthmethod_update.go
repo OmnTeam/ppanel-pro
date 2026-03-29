@@ -28,27 +28,6 @@ func (_u *ProxyAuthMethodUpdate) Where(ps ...predicate.ProxyAuthMethod) *ProxyAu
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyAuthMethodUpdate) SetTenantID(v int64) *ProxyAuthMethodUpdate {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyAuthMethodUpdate) SetNillableTenantID(v *int64) *ProxyAuthMethodUpdate {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyAuthMethodUpdate) AddTenantID(v int64) *ProxyAuthMethodUpdate {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
 // SetMethod sets the "method" field.
 func (_u *ProxyAuthMethodUpdate) SetMethod(v string) *ProxyAuthMethodUpdate {
 	_u.mutation.SetMethod(v)
@@ -97,6 +76,12 @@ func (_u *ProxyAuthMethodUpdate) SetUpdatedAt(v time.Time) *ProxyAuthMethodUpdat
 	return _u
 }
 
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (_u *ProxyAuthMethodUpdate) ClearUpdatedAt() *ProxyAuthMethodUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
+}
+
 // Mutation returns the ProxyAuthMethodMutation object of the builder.
 func (_u *ProxyAuthMethodUpdate) Mutation() *ProxyAuthMethodMutation {
 	return _u.mutation
@@ -132,7 +117,7 @@ func (_u *ProxyAuthMethodUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_u *ProxyAuthMethodUpdate) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
+	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
 		v := proxyauthmethod.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
@@ -165,12 +150,6 @@ func (_u *ProxyAuthMethodUpdate) sqlSave(ctx context.Context) (_node int, err er
 			}
 		}
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyauthmethod.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyauthmethod.FieldTenantID, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.Method(); ok {
 		_spec.SetField(proxyauthmethod.FieldMethod, field.TypeString, value)
 	}
@@ -180,8 +159,14 @@ func (_u *ProxyAuthMethodUpdate) sqlSave(ctx context.Context) (_node int, err er
 	if value, ok := _u.mutation.Enabled(); ok {
 		_spec.SetField(proxyauthmethod.FieldEnabled, field.TypeBool, value)
 	}
+	if _u.mutation.CreatedAtCleared() {
+		_spec.ClearField(proxyauthmethod.FieldCreatedAt, field.TypeTime)
+	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyauthmethod.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if _u.mutation.UpdatedAtCleared() {
+		_spec.ClearField(proxyauthmethod.FieldUpdatedAt, field.TypeTime)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -201,27 +186,6 @@ type ProxyAuthMethodUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxyAuthMethodMutation
-}
-
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyAuthMethodUpdateOne) SetTenantID(v int64) *ProxyAuthMethodUpdateOne {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyAuthMethodUpdateOne) SetNillableTenantID(v *int64) *ProxyAuthMethodUpdateOne {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyAuthMethodUpdateOne) AddTenantID(v int64) *ProxyAuthMethodUpdateOne {
-	_u.mutation.AddTenantID(v)
-	return _u
 }
 
 // SetMethod sets the "method" field.
@@ -269,6 +233,12 @@ func (_u *ProxyAuthMethodUpdateOne) SetNillableEnabled(v *bool) *ProxyAuthMethod
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxyAuthMethodUpdateOne) SetUpdatedAt(v time.Time) *ProxyAuthMethodUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
+	return _u
+}
+
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (_u *ProxyAuthMethodUpdateOne) ClearUpdatedAt() *ProxyAuthMethodUpdateOne {
+	_u.mutation.ClearUpdatedAt()
 	return _u
 }
 
@@ -320,7 +290,7 @@ func (_u *ProxyAuthMethodUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_u *ProxyAuthMethodUpdateOne) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
+	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
 		v := proxyauthmethod.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
@@ -370,12 +340,6 @@ func (_u *ProxyAuthMethodUpdateOne) sqlSave(ctx context.Context) (_node *ProxyAu
 			}
 		}
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyauthmethod.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyauthmethod.FieldTenantID, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.Method(); ok {
 		_spec.SetField(proxyauthmethod.FieldMethod, field.TypeString, value)
 	}
@@ -385,8 +349,14 @@ func (_u *ProxyAuthMethodUpdateOne) sqlSave(ctx context.Context) (_node *ProxyAu
 	if value, ok := _u.mutation.Enabled(); ok {
 		_spec.SetField(proxyauthmethod.FieldEnabled, field.TypeBool, value)
 	}
+	if _u.mutation.CreatedAtCleared() {
+		_spec.ClearField(proxyauthmethod.FieldCreatedAt, field.TypeTime)
+	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyauthmethod.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if _u.mutation.UpdatedAtCleared() {
+		_spec.ClearField(proxyauthmethod.FieldUpdatedAt, field.TypeTime)
 	}
 	_node = &ProxyAuthMethod{config: _u.config}
 	_spec.Assign = _node.assignValues

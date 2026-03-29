@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v3.19.4
-// source: admin/group/v1/group.proto
+// source: api/admin/group/v1/group.proto
 
 package v1
 
@@ -19,42 +19,27 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Group_GetUserGroupList_FullMethodName       = "/api.admin.group.v1.Group/GetUserGroupList"
-	Group_CreateUserGroup_FullMethodName        = "/api.admin.group.v1.Group/CreateUserGroup"
-	Group_UpdateUserGroup_FullMethodName        = "/api.admin.group.v1.Group/UpdateUserGroup"
-	Group_DeleteUserGroup_FullMethodName        = "/api.admin.group.v1.Group/DeleteUserGroup"
-	Group_UpdateUserUserGroup_FullMethodName    = "/api.admin.group.v1.Group/UpdateUserUserGroup"
-	Group_GetNodeGroupList_FullMethodName       = "/api.admin.group.v1.Group/GetNodeGroupList"
-	Group_CreateNodeGroup_FullMethodName        = "/api.admin.group.v1.Group/CreateNodeGroup"
-	Group_UpdateNodeGroup_FullMethodName        = "/api.admin.group.v1.Group/UpdateNodeGroup"
-	Group_DeleteNodeGroup_FullMethodName        = "/api.admin.group.v1.Group/DeleteNodeGroup"
-	Group_GetGroupConfig_FullMethodName         = "/api.admin.group.v1.Group/GetGroupConfig"
-	Group_UpdateGroupConfig_FullMethodName      = "/api.admin.group.v1.Group/UpdateGroupConfig"
-	Group_RecalculateGroup_FullMethodName       = "/api.admin.group.v1.Group/RecalculateGroup"
-	Group_GetRecalculationStatus_FullMethodName = "/api.admin.group.v1.Group/GetRecalculationStatus"
-	Group_GetGroupHistory_FullMethodName        = "/api.admin.group.v1.Group/GetGroupHistory"
-	Group_GetGroupHistoryDetail_FullMethodName  = "/api.admin.group.v1.Group/GetGroupHistoryDetail"
-	Group_ExportGroupResult_FullMethodName      = "/api.admin.group.v1.Group/ExportGroupResult"
-	Group_MigrateUsers_FullMethodName           = "/api.admin.group.v1.Group/MigrateUsers"
-	Group_PreviewUserNodes_FullMethodName       = "/api.admin.group.v1.Group/PreviewUserNodes"
-	Group_ResetGroups_FullMethodName            = "/api.admin.group.v1.Group/ResetGroups"
+	Group_GetNodeGroupList_FullMethodName         = "/api.admin.group.v1.Group/GetNodeGroupList"
+	Group_CreateNodeGroup_FullMethodName          = "/api.admin.group.v1.Group/CreateNodeGroup"
+	Group_UpdateNodeGroup_FullMethodName          = "/api.admin.group.v1.Group/UpdateNodeGroup"
+	Group_DeleteNodeGroup_FullMethodName          = "/api.admin.group.v1.Group/DeleteNodeGroup"
+	Group_GetGroupConfig_FullMethodName           = "/api.admin.group.v1.Group/GetGroupConfig"
+	Group_UpdateGroupConfig_FullMethodName        = "/api.admin.group.v1.Group/UpdateGroupConfig"
+	Group_RecalculateGroup_FullMethodName         = "/api.admin.group.v1.Group/RecalculateGroup"
+	Group_GetRecalculationStatus_FullMethodName   = "/api.admin.group.v1.Group/GetRecalculationStatus"
+	Group_GetGroupHistory_FullMethodName          = "/api.admin.group.v1.Group/GetGroupHistory"
+	Group_GetGroupHistoryDetail_FullMethodName    = "/api.admin.group.v1.Group/GetGroupHistoryDetail"
+	Group_ExportGroupResult_FullMethodName        = "/api.admin.group.v1.Group/ExportGroupResult"
+	Group_MigrateUsers_FullMethodName             = "/api.admin.group.v1.Group/MigrateUsers"
+	Group_PreviewUserNodes_FullMethodName         = "/api.admin.group.v1.Group/PreviewUserNodes"
+	Group_ResetGroups_FullMethodName              = "/api.admin.group.v1.Group/ResetGroups"
+	Group_GetSubscribeGroupMapping_FullMethodName = "/api.admin.group.v1.Group/GetSubscribeGroupMapping"
 )
 
 // GroupClient is the client API for Group service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GroupClient interface {
-	// ===== 用户组管理 =====
-	// GetUserGroupList 获取用户组列表
-	GetUserGroupList(ctx context.Context, in *GetUserGroupListRequest, opts ...grpc.CallOption) (*GetUserGroupListReply, error)
-	// CreateUserGroup 创建用户组
-	CreateUserGroup(ctx context.Context, in *CreateUserGroupRequest, opts ...grpc.CallOption) (*CreateUserGroupReply, error)
-	// UpdateUserGroup 更新用户组
-	UpdateUserGroup(ctx context.Context, in *UpdateUserGroupRequest, opts ...grpc.CallOption) (*UpdateUserGroupReply, error)
-	// DeleteUserGroup 删除用户组
-	DeleteUserGroup(ctx context.Context, in *DeleteUserGroupRequest, opts ...grpc.CallOption) (*DeleteUserGroupReply, error)
-	// UpdateUserUserGroup 更新用户的用户组
-	UpdateUserUserGroup(ctx context.Context, in *UpdateUserUserGroupRequest, opts ...grpc.CallOption) (*UpdateUserUserGroupReply, error)
 	// ===== 节点组管理 =====
 	// GetNodeGroupList 获取节点组列表
 	GetNodeGroupList(ctx context.Context, in *GetNodeGroupListRequest, opts ...grpc.CallOption) (*GetNodeGroupListReply, error)
@@ -86,6 +71,8 @@ type GroupClient interface {
 	PreviewUserNodes(ctx context.Context, in *PreviewUserNodesRequest, opts ...grpc.CallOption) (*PreviewUserNodesReply, error)
 	// ResetGroups 重置所有分组
 	ResetGroups(ctx context.Context, in *ResetGroupsRequest, opts ...grpc.CallOption) (*ResetGroupsReply, error)
+	// GetSubscribeGroupMapping 获取订阅组映射
+	GetSubscribeGroupMapping(ctx context.Context, in *GetSubscribeGroupMappingRequest, opts ...grpc.CallOption) (*GetSubscribeGroupMappingReply, error)
 }
 
 type groupClient struct {
@@ -94,56 +81,6 @@ type groupClient struct {
 
 func NewGroupClient(cc grpc.ClientConnInterface) GroupClient {
 	return &groupClient{cc}
-}
-
-func (c *groupClient) GetUserGroupList(ctx context.Context, in *GetUserGroupListRequest, opts ...grpc.CallOption) (*GetUserGroupListReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetUserGroupListReply)
-	err := c.cc.Invoke(ctx, Group_GetUserGroupList_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *groupClient) CreateUserGroup(ctx context.Context, in *CreateUserGroupRequest, opts ...grpc.CallOption) (*CreateUserGroupReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateUserGroupReply)
-	err := c.cc.Invoke(ctx, Group_CreateUserGroup_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *groupClient) UpdateUserGroup(ctx context.Context, in *UpdateUserGroupRequest, opts ...grpc.CallOption) (*UpdateUserGroupReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateUserGroupReply)
-	err := c.cc.Invoke(ctx, Group_UpdateUserGroup_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *groupClient) DeleteUserGroup(ctx context.Context, in *DeleteUserGroupRequest, opts ...grpc.CallOption) (*DeleteUserGroupReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteUserGroupReply)
-	err := c.cc.Invoke(ctx, Group_DeleteUserGroup_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *groupClient) UpdateUserUserGroup(ctx context.Context, in *UpdateUserUserGroupRequest, opts ...grpc.CallOption) (*UpdateUserUserGroupReply, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UpdateUserUserGroupReply)
-	err := c.cc.Invoke(ctx, Group_UpdateUserUserGroup_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *groupClient) GetNodeGroupList(ctx context.Context, in *GetNodeGroupListRequest, opts ...grpc.CallOption) (*GetNodeGroupListReply, error) {
@@ -286,21 +223,20 @@ func (c *groupClient) ResetGroups(ctx context.Context, in *ResetGroupsRequest, o
 	return out, nil
 }
 
+func (c *groupClient) GetSubscribeGroupMapping(ctx context.Context, in *GetSubscribeGroupMappingRequest, opts ...grpc.CallOption) (*GetSubscribeGroupMappingReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSubscribeGroupMappingReply)
+	err := c.cc.Invoke(ctx, Group_GetSubscribeGroupMapping_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GroupServer is the server API for Group service.
 // All implementations must embed UnimplementedGroupServer
 // for forward compatibility.
 type GroupServer interface {
-	// ===== 用户组管理 =====
-	// GetUserGroupList 获取用户组列表
-	GetUserGroupList(context.Context, *GetUserGroupListRequest) (*GetUserGroupListReply, error)
-	// CreateUserGroup 创建用户组
-	CreateUserGroup(context.Context, *CreateUserGroupRequest) (*CreateUserGroupReply, error)
-	// UpdateUserGroup 更新用户组
-	UpdateUserGroup(context.Context, *UpdateUserGroupRequest) (*UpdateUserGroupReply, error)
-	// DeleteUserGroup 删除用户组
-	DeleteUserGroup(context.Context, *DeleteUserGroupRequest) (*DeleteUserGroupReply, error)
-	// UpdateUserUserGroup 更新用户的用户组
-	UpdateUserUserGroup(context.Context, *UpdateUserUserGroupRequest) (*UpdateUserUserGroupReply, error)
 	// ===== 节点组管理 =====
 	// GetNodeGroupList 获取节点组列表
 	GetNodeGroupList(context.Context, *GetNodeGroupListRequest) (*GetNodeGroupListReply, error)
@@ -332,6 +268,8 @@ type GroupServer interface {
 	PreviewUserNodes(context.Context, *PreviewUserNodesRequest) (*PreviewUserNodesReply, error)
 	// ResetGroups 重置所有分组
 	ResetGroups(context.Context, *ResetGroupsRequest) (*ResetGroupsReply, error)
+	// GetSubscribeGroupMapping 获取订阅组映射
+	GetSubscribeGroupMapping(context.Context, *GetSubscribeGroupMappingRequest) (*GetSubscribeGroupMappingReply, error)
 	mustEmbedUnimplementedGroupServer()
 }
 
@@ -342,21 +280,6 @@ type GroupServer interface {
 // pointer dereference when methods are called.
 type UnimplementedGroupServer struct{}
 
-func (UnimplementedGroupServer) GetUserGroupList(context.Context, *GetUserGroupListRequest) (*GetUserGroupListReply, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetUserGroupList not implemented")
-}
-func (UnimplementedGroupServer) CreateUserGroup(context.Context, *CreateUserGroupRequest) (*CreateUserGroupReply, error) {
-	return nil, status.Error(codes.Unimplemented, "method CreateUserGroup not implemented")
-}
-func (UnimplementedGroupServer) UpdateUserGroup(context.Context, *UpdateUserGroupRequest) (*UpdateUserGroupReply, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpdateUserGroup not implemented")
-}
-func (UnimplementedGroupServer) DeleteUserGroup(context.Context, *DeleteUserGroupRequest) (*DeleteUserGroupReply, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeleteUserGroup not implemented")
-}
-func (UnimplementedGroupServer) UpdateUserUserGroup(context.Context, *UpdateUserUserGroupRequest) (*UpdateUserUserGroupReply, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpdateUserUserGroup not implemented")
-}
 func (UnimplementedGroupServer) GetNodeGroupList(context.Context, *GetNodeGroupListRequest) (*GetNodeGroupListReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetNodeGroupList not implemented")
 }
@@ -399,6 +322,9 @@ func (UnimplementedGroupServer) PreviewUserNodes(context.Context, *PreviewUserNo
 func (UnimplementedGroupServer) ResetGroups(context.Context, *ResetGroupsRequest) (*ResetGroupsReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method ResetGroups not implemented")
 }
+func (UnimplementedGroupServer) GetSubscribeGroupMapping(context.Context, *GetSubscribeGroupMappingRequest) (*GetSubscribeGroupMappingReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSubscribeGroupMapping not implemented")
+}
 func (UnimplementedGroupServer) mustEmbedUnimplementedGroupServer() {}
 func (UnimplementedGroupServer) testEmbeddedByValue()               {}
 
@@ -418,96 +344,6 @@ func RegisterGroupServer(s grpc.ServiceRegistrar, srv GroupServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&Group_ServiceDesc, srv)
-}
-
-func _Group_GetUserGroupList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUserGroupListRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GroupServer).GetUserGroupList(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Group_GetUserGroupList_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GroupServer).GetUserGroupList(ctx, req.(*GetUserGroupListRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Group_CreateUserGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateUserGroupRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GroupServer).CreateUserGroup(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Group_CreateUserGroup_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GroupServer).CreateUserGroup(ctx, req.(*CreateUserGroupRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Group_UpdateUserGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserGroupRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GroupServer).UpdateUserGroup(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Group_UpdateUserGroup_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GroupServer).UpdateUserGroup(ctx, req.(*UpdateUserGroupRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Group_DeleteUserGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteUserGroupRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GroupServer).DeleteUserGroup(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Group_DeleteUserGroup_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GroupServer).DeleteUserGroup(ctx, req.(*DeleteUserGroupRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Group_UpdateUserUserGroup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateUserUserGroupRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GroupServer).UpdateUserUserGroup(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Group_UpdateUserUserGroup_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GroupServer).UpdateUserUserGroup(ctx, req.(*UpdateUserUserGroupRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _Group_GetNodeGroupList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -762,6 +598,24 @@ func _Group_ResetGroups_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Group_GetSubscribeGroupMapping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSubscribeGroupMappingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GroupServer).GetSubscribeGroupMapping(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Group_GetSubscribeGroupMapping_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GroupServer).GetSubscribeGroupMapping(ctx, req.(*GetSubscribeGroupMappingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Group_ServiceDesc is the grpc.ServiceDesc for Group service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -769,26 +623,6 @@ var Group_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "api.admin.group.v1.Group",
 	HandlerType: (*GroupServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "GetUserGroupList",
-			Handler:    _Group_GetUserGroupList_Handler,
-		},
-		{
-			MethodName: "CreateUserGroup",
-			Handler:    _Group_CreateUserGroup_Handler,
-		},
-		{
-			MethodName: "UpdateUserGroup",
-			Handler:    _Group_UpdateUserGroup_Handler,
-		},
-		{
-			MethodName: "DeleteUserGroup",
-			Handler:    _Group_DeleteUserGroup_Handler,
-		},
-		{
-			MethodName: "UpdateUserUserGroup",
-			Handler:    _Group_UpdateUserUserGroup_Handler,
-		},
 		{
 			MethodName: "GetNodeGroupList",
 			Handler:    _Group_GetNodeGroupList_Handler,
@@ -845,7 +679,11 @@ var Group_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "ResetGroups",
 			Handler:    _Group_ResetGroups_Handler,
 		},
+		{
+			MethodName: "GetSubscribeGroupMapping",
+			Handler:    _Group_GetSubscribeGroupMapping_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "admin/group/v1/group.proto",
+	Metadata: "api/admin/group/v1/group.proto",
 }

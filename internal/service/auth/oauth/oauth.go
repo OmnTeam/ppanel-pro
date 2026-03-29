@@ -2,11 +2,13 @@ package oauth
 
 import (
 	"context"
+	"strings"
 
 	pb "github.com/OmnTeam/ppanel-pro/api/auth/oauth/v1"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/auth/oauth"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/go-kratos/kratos/v2/transport"
 )
 
 // OAuthService OAuth服务实现
@@ -51,13 +53,14 @@ func (s *OAuthService) OAuthLogin(ctx context.Context, req *pb.OAuthLoginRequest
 
 // OAuthLoginGetToken OAuth登录获取令牌 - 处理OAuth回调并返回JWT token
 func (s *OAuthService) OAuthLoginGetToken(ctx context.Context, req *pb.OAuthLoginGetTokenRequest) (*pb.LoginTokenReply, error) {
-	s.logger.Infof("[OAuthLoginGetToken] method: %s, ip: %s", req.Method, req.Ip)
+	ip, userAgent := buildOAuthMeta(ctx, req.Ip, req.UserAgent)
+	s.logger.Infof("[OAuthLoginGetToken] method: %s, ip: %s", req.Method, ip)
 
 	params := &oauth.OAuthTokenParams{
 		Method:    req.Method,
 		Callback:  req.Callback,
-		IP:        req.Ip,
-		UserAgent: req.UserAgent,
+		IP:        ip,
+		UserAgent: userAgent,
 	}
 
 	result, err := s.uc.OAuthLoginGetToken(ctx, params)
@@ -80,9 +83,9 @@ func (s *OAuthService) AppleLoginCallback(ctx context.Context, req *pb.AppleLogi
 	s.logger.Infof("[AppleLoginCallback] code: %s, state: %s", req.Code, req.State)
 
 	params := &oauth.AppleCallbackParams{
-		Code:     req.Code,
-		IDToken:  req.IdToken,
-		State:    req.State,
+		Code:    req.Code,
+		IDToken: req.IdToken,
+		State:   req.State,
 	}
 
 	err := s.uc.AppleLoginCallback(ctx, params)
@@ -95,4 +98,31 @@ func (s *OAuthService) AppleLoginCallback(ctx context.Context, req *pb.AppleLogi
 		Code:    int32(responsecode.AppleCallbackSuccess),
 		Message: responsecode.CodeMessages[responsecode.AppleCallbackSuccess],
 	}, nil
+}
+
+func buildOAuthMeta(ctx context.Context, fallbackIP, fallbackUserAgent string) (string, string) {
+	ip := fallbackIP
+	userAgent := fallbackUserAgent
+
+	if tr, ok := transport.FromServerContext(ctx); ok {
+		if value := strings.TrimSpace(tr.RequestHeader().Get("User-Agent")); value != "" {
+			userAgent = value
+		}
+		for _, key := range []string{"X-Original-Forwarded-For", "X-Forwarded-For", "X-Real-IP"} {
+			if value := firstForwardedIP(strings.TrimSpace(tr.RequestHeader().Get(key))); value != "" {
+				ip = value
+				break
+			}
+		}
+	}
+
+	return ip, userAgent
+}
+
+func firstForwardedIP(raw string) string {
+	if raw == "" {
+		return ""
+	}
+	parts := strings.Split(raw, ",")
+	return strings.TrimSpace(parts[0])
 }

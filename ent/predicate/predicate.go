@@ -24,6 +24,9 @@ type ProxyDocument func(*sql.Selector)
 // ProxyGroupHistory is the predicate function for proxygrouphistory builders.
 type ProxyGroupHistory func(*sql.Selector)
 
+// ProxyGroupHistoryDetail is the predicate function for proxygrouphistorydetail builders.
+type ProxyGroupHistoryDetail func(*sql.Selector)
+
 // ProxyNode is the predicate function for proxynode builders.
 type ProxyNode func(*sql.Selector)
 
@@ -86,9 +89,6 @@ type ProxyUserDevice func(*sql.Selector)
 
 // ProxyUserDeviceOnlineRecord is the predicate function for proxyuserdeviceonlinerecord builders.
 type ProxyUserDeviceOnlineRecord func(*sql.Selector)
-
-// ProxyUserGroup is the predicate function for proxyusergroup builders.
-type ProxyUserGroup func(*sql.Selector)
 
 // ProxyUserSubscribe is the predicate function for proxyusersubscribe builders.
 type ProxyUserSubscribe func(*sql.Selector)

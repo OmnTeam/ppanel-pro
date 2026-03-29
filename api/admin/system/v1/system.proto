@@ -200,7 +200,7 @@ message CurrencyConfig {
 // InviteConfig 邀请配置
 message InviteConfig {
   bool forced_invite = 1;         // 是否强制邀请
-  int32 referral_percentage = 2;  // 返利百分比
+  int64 referral_percentage = 2;  // 返利百分比
   bool only_first_purchase = 3;   // 是否仅首次购买
 }
 
@@ -242,7 +242,7 @@ message GetInviteConfigReply {
 // UpdateInviteConfig
 message UpdateInviteConfigRequest {
   bool forced_invite = 1;
-  int32 referral_percentage = 2;
+  int64 referral_percentage = 2;
   bool only_first_purchase = 3;
 }
 
@@ -268,7 +268,7 @@ message NodeOutbound {
   string name = 1;              // 名称
   string protocol = 2;          // 协议
   string address = 3;           // 地址
-  int32 port = 4;               // 端口
+  int64 port = 4;               // 端口
   string password = 5;          // 密码
   repeated string rules = 6;    // 规则列表
 }
@@ -276,9 +276,9 @@ message NodeOutbound {
 // NodeConfig 节点配置
 message NodeConfig {
   string node_secret = 1;                 // 节点密钥
-  int32 node_pull_interval = 2;          // 节点拉取间隔
-  int32 node_push_interval = 3;          // 节点推送间隔
-  int32 traffic_report_threshold = 4;    // 流量报告阈值
+  int64 node_pull_interval = 2;           // 节点拉取间隔
+  int64 node_push_interval = 3;           // 节点推送间隔
+  int64 traffic_report_threshold = 4;     // 流量报告阈值
   string ip_strategy = 5;                // IP策略
   repeated NodeDNS dns = 6;              // DNS配置
   repeated string block = 7;             // 屏蔽列表
@@ -302,9 +302,9 @@ message GetNodeConfigReply {
 // UpdateNodeConfig
 message UpdateNodeConfigRequest {
   string node_secret = 1;
-  int32 node_pull_interval = 2;
-  int32 node_push_interval = 3;
-  int32 traffic_report_threshold = 4;
+  int64 node_pull_interval = 2;
+  int64 node_push_interval = 3;
+  int64 traffic_report_threshold = 4;
   string ip_strategy = 5;
   repeated NodeDNS dns = 6;
   repeated string block = 7;
@@ -499,9 +499,9 @@ message UpdateTosConfigReply {
 
 // VerifyCodeConfig 验证码配置
 message VerifyCodeConfig {
-  int32 verify_code_expire_time = 1;  // 验证码过期时间
-  int32 verify_code_limit = 2;        // 验证码限制
-  int32 verify_code_interval = 3;     // 验证码间隔
+  int64 verify_code_expire_time = 1;  // 验证码过期时间
+  int64 verify_code_limit = 2;        // 验证码限制
+  int64 verify_code_interval = 3;     // 验证码间隔
 }
 
 // GetVerifyCodeConfig
@@ -515,9 +515,9 @@ message GetVerifyCodeConfigReply {
 
 // UpdateVerifyCodeConfig
 message UpdateVerifyCodeConfigRequest {
-  int32 verify_code_expire_time = 1;
-  int32 verify_code_limit = 2;
-  int32 verify_code_interval = 3;
+  int64 verify_code_expire_time = 1;
+  int64 verify_code_limit = 2;
+  int64 verify_code_interval = 3;
 }
 
 message UpdateVerifyCodeConfigData {
@@ -532,11 +532,16 @@ message UpdateVerifyCodeConfigReply {
 
 // VerifyConfig 验证配置
 message VerifyConfig {
-  string turnstile_site_key = 1;           // Turnstile站点密钥
-  string turnstile_secret = 2;             // Turnstile密钥
-  bool enable_login_verify = 3;            // 是否启用登录验证
-  bool enable_register_verify = 4;         // 是否启用注册验证
-  bool enable_reset_password_verify = 5;   // 是否启用重置密码验证
+  string turnstile_site_key = 1;                 // Turnstile站点密钥
+  string turnstile_secret = 2;                   // Turnstile密钥
+  bool enable_user_login_captcha = 3;           // 是否启用用户登录验证码
+  bool enable_user_register_captcha = 4;        // 是否启用用户注册验证码
+  bool enable_user_reset_password_captcha = 5;  // 是否启用用户重置密码验证码
+  string captcha_type = 6;                       // 验证码类型: local/slider/turnstile
+  bool enable_admin_login_captcha = 7;          // 是否启用管理员登录验证码
+  bool enable_login_verify = 8;                  // 兼容旧字段
+  bool enable_register_verify = 9;               // 兼容旧字段
+  bool enable_reset_password_verify = 10;        // 兼容旧字段
 }
 
 // GetVerifyConfig
@@ -552,9 +557,14 @@ message GetVerifyConfigReply {
 message UpdateVerifyConfigRequest {
   string turnstile_site_key = 1;
   string turnstile_secret = 2;
-  bool enable_login_verify = 3;
-  bool enable_register_verify = 4;
-  bool enable_reset_password_verify = 5;
+  bool enable_user_login_captcha = 3;
+  bool enable_user_register_captcha = 4;
+  bool enable_user_reset_password_captcha = 5;
+  string captcha_type = 6;
+  bool enable_admin_login_captcha = 7;
+  bool enable_login_verify = 8;
+  bool enable_register_verify = 9;
+  bool enable_reset_password_verify = 10;
 }
 
 message UpdateVerifyConfigData {

@@ -54,16 +54,6 @@ func IDLTE(id int64) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldLTE(FieldID, id))
 }
 
-// UserLimit applies equality check predicate on the "user_limit" field. It's identical to UserLimitEQ.
-func UserLimit(v int64) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldEQ(FieldUserLimit, v))
-}
-
-// Subscribe applies equality check predicate on the "subscribe" field. It's identical to SubscribeEQ.
-func Subscribe(v string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldEQ(FieldSubscribe, v))
-}
-
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldEQ(FieldName, v))
@@ -90,18 +80,33 @@ func Discount(v int64) predicate.ProxyCoupon {
 }
 
 // StartTime applies equality check predicate on the "start_time" field. It's identical to StartTimeEQ.
-func StartTime(v time.Time) predicate.ProxyCoupon {
+func StartTime(v int64) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldEQ(FieldStartTime, v))
 }
 
-// EndTime applies equality check predicate on the "end_time" field. It's identical to EndTimeEQ.
-func EndTime(v time.Time) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldEQ(FieldEndTime, v))
+// ExpireTime applies equality check predicate on the "expire_time" field. It's identical to ExpireTimeEQ.
+func ExpireTime(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldEQ(FieldExpireTime, v))
 }
 
-// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
-func Status(v int8) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldEQ(FieldStatus, v))
+// UserLimit applies equality check predicate on the "user_limit" field. It's identical to UserLimitEQ.
+func UserLimit(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldEQ(FieldUserLimit, v))
+}
+
+// Subscribe applies equality check predicate on the "subscribe" field. It's identical to SubscribeEQ.
+func Subscribe(v string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldEQ(FieldSubscribe, v))
+}
+
+// UsedCount applies equality check predicate on the "used_count" field. It's identical to UsedCountEQ.
+func UsedCount(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldEQ(FieldUsedCount, v))
+}
+
+// Enable applies equality check predicate on the "enable" field. It's identical to EnableEQ.
+func Enable(v bool) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldEQ(FieldEnable, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -112,121 +117,6 @@ func CreatedAt(v time.Time) predicate.ProxyCoupon {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldEQ(FieldUpdatedAt, v))
-}
-
-// UserLimitEQ applies the EQ predicate on the "user_limit" field.
-func UserLimitEQ(v int64) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldEQ(FieldUserLimit, v))
-}
-
-// UserLimitNEQ applies the NEQ predicate on the "user_limit" field.
-func UserLimitNEQ(v int64) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldNEQ(FieldUserLimit, v))
-}
-
-// UserLimitIn applies the In predicate on the "user_limit" field.
-func UserLimitIn(vs ...int64) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldIn(FieldUserLimit, vs...))
-}
-
-// UserLimitNotIn applies the NotIn predicate on the "user_limit" field.
-func UserLimitNotIn(vs ...int64) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldNotIn(FieldUserLimit, vs...))
-}
-
-// UserLimitGT applies the GT predicate on the "user_limit" field.
-func UserLimitGT(v int64) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldGT(FieldUserLimit, v))
-}
-
-// UserLimitGTE applies the GTE predicate on the "user_limit" field.
-func UserLimitGTE(v int64) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldGTE(FieldUserLimit, v))
-}
-
-// UserLimitLT applies the LT predicate on the "user_limit" field.
-func UserLimitLT(v int64) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldLT(FieldUserLimit, v))
-}
-
-// UserLimitLTE applies the LTE predicate on the "user_limit" field.
-func UserLimitLTE(v int64) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldLTE(FieldUserLimit, v))
-}
-
-// SubscribeEQ applies the EQ predicate on the "subscribe" field.
-func SubscribeEQ(v string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldEQ(FieldSubscribe, v))
-}
-
-// SubscribeNEQ applies the NEQ predicate on the "subscribe" field.
-func SubscribeNEQ(v string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldNEQ(FieldSubscribe, v))
-}
-
-// SubscribeIn applies the In predicate on the "subscribe" field.
-func SubscribeIn(vs ...string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldIn(FieldSubscribe, vs...))
-}
-
-// SubscribeNotIn applies the NotIn predicate on the "subscribe" field.
-func SubscribeNotIn(vs ...string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldNotIn(FieldSubscribe, vs...))
-}
-
-// SubscribeGT applies the GT predicate on the "subscribe" field.
-func SubscribeGT(v string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldGT(FieldSubscribe, v))
-}
-
-// SubscribeGTE applies the GTE predicate on the "subscribe" field.
-func SubscribeGTE(v string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldGTE(FieldSubscribe, v))
-}
-
-// SubscribeLT applies the LT predicate on the "subscribe" field.
-func SubscribeLT(v string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldLT(FieldSubscribe, v))
-}
-
-// SubscribeLTE applies the LTE predicate on the "subscribe" field.
-func SubscribeLTE(v string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldLTE(FieldSubscribe, v))
-}
-
-// SubscribeContains applies the Contains predicate on the "subscribe" field.
-func SubscribeContains(v string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldContains(FieldSubscribe, v))
-}
-
-// SubscribeHasPrefix applies the HasPrefix predicate on the "subscribe" field.
-func SubscribeHasPrefix(v string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldHasPrefix(FieldSubscribe, v))
-}
-
-// SubscribeHasSuffix applies the HasSuffix predicate on the "subscribe" field.
-func SubscribeHasSuffix(v string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldHasSuffix(FieldSubscribe, v))
-}
-
-// SubscribeIsNil applies the IsNil predicate on the "subscribe" field.
-func SubscribeIsNil() predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldIsNull(FieldSubscribe))
-}
-
-// SubscribeNotNil applies the NotNil predicate on the "subscribe" field.
-func SubscribeNotNil() predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldNotNull(FieldSubscribe))
-}
-
-// SubscribeEqualFold applies the EqualFold predicate on the "subscribe" field.
-func SubscribeEqualFold(v string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldEqualFold(FieldSubscribe, v))
-}
-
-// SubscribeContainsFold applies the ContainsFold predicate on the "subscribe" field.
-func SubscribeContainsFold(v string) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldContainsFold(FieldSubscribe, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -480,123 +370,238 @@ func DiscountLTE(v int64) predicate.ProxyCoupon {
 }
 
 // StartTimeEQ applies the EQ predicate on the "start_time" field.
-func StartTimeEQ(v time.Time) predicate.ProxyCoupon {
+func StartTimeEQ(v int64) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldEQ(FieldStartTime, v))
 }
 
 // StartTimeNEQ applies the NEQ predicate on the "start_time" field.
-func StartTimeNEQ(v time.Time) predicate.ProxyCoupon {
+func StartTimeNEQ(v int64) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldNEQ(FieldStartTime, v))
 }
 
 // StartTimeIn applies the In predicate on the "start_time" field.
-func StartTimeIn(vs ...time.Time) predicate.ProxyCoupon {
+func StartTimeIn(vs ...int64) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldIn(FieldStartTime, vs...))
 }
 
 // StartTimeNotIn applies the NotIn predicate on the "start_time" field.
-func StartTimeNotIn(vs ...time.Time) predicate.ProxyCoupon {
+func StartTimeNotIn(vs ...int64) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldNotIn(FieldStartTime, vs...))
 }
 
 // StartTimeGT applies the GT predicate on the "start_time" field.
-func StartTimeGT(v time.Time) predicate.ProxyCoupon {
+func StartTimeGT(v int64) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldGT(FieldStartTime, v))
 }
 
 // StartTimeGTE applies the GTE predicate on the "start_time" field.
-func StartTimeGTE(v time.Time) predicate.ProxyCoupon {
+func StartTimeGTE(v int64) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldGTE(FieldStartTime, v))
 }
 
 // StartTimeLT applies the LT predicate on the "start_time" field.
-func StartTimeLT(v time.Time) predicate.ProxyCoupon {
+func StartTimeLT(v int64) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldLT(FieldStartTime, v))
 }
 
 // StartTimeLTE applies the LTE predicate on the "start_time" field.
-func StartTimeLTE(v time.Time) predicate.ProxyCoupon {
+func StartTimeLTE(v int64) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldLTE(FieldStartTime, v))
 }
 
-// EndTimeEQ applies the EQ predicate on the "end_time" field.
-func EndTimeEQ(v time.Time) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldEQ(FieldEndTime, v))
+// ExpireTimeEQ applies the EQ predicate on the "expire_time" field.
+func ExpireTimeEQ(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldEQ(FieldExpireTime, v))
 }
 
-// EndTimeNEQ applies the NEQ predicate on the "end_time" field.
-func EndTimeNEQ(v time.Time) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldNEQ(FieldEndTime, v))
+// ExpireTimeNEQ applies the NEQ predicate on the "expire_time" field.
+func ExpireTimeNEQ(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldNEQ(FieldExpireTime, v))
 }
 
-// EndTimeIn applies the In predicate on the "end_time" field.
-func EndTimeIn(vs ...time.Time) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldIn(FieldEndTime, vs...))
+// ExpireTimeIn applies the In predicate on the "expire_time" field.
+func ExpireTimeIn(vs ...int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldIn(FieldExpireTime, vs...))
 }
 
-// EndTimeNotIn applies the NotIn predicate on the "end_time" field.
-func EndTimeNotIn(vs ...time.Time) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldNotIn(FieldEndTime, vs...))
+// ExpireTimeNotIn applies the NotIn predicate on the "expire_time" field.
+func ExpireTimeNotIn(vs ...int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldNotIn(FieldExpireTime, vs...))
 }
 
-// EndTimeGT applies the GT predicate on the "end_time" field.
-func EndTimeGT(v time.Time) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldGT(FieldEndTime, v))
+// ExpireTimeGT applies the GT predicate on the "expire_time" field.
+func ExpireTimeGT(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldGT(FieldExpireTime, v))
 }
 
-// EndTimeGTE applies the GTE predicate on the "end_time" field.
-func EndTimeGTE(v time.Time) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldGTE(FieldEndTime, v))
+// ExpireTimeGTE applies the GTE predicate on the "expire_time" field.
+func ExpireTimeGTE(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldGTE(FieldExpireTime, v))
 }
 
-// EndTimeLT applies the LT predicate on the "end_time" field.
-func EndTimeLT(v time.Time) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldLT(FieldEndTime, v))
+// ExpireTimeLT applies the LT predicate on the "expire_time" field.
+func ExpireTimeLT(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldLT(FieldExpireTime, v))
 }
 
-// EndTimeLTE applies the LTE predicate on the "end_time" field.
-func EndTimeLTE(v time.Time) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldLTE(FieldEndTime, v))
+// ExpireTimeLTE applies the LTE predicate on the "expire_time" field.
+func ExpireTimeLTE(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldLTE(FieldExpireTime, v))
 }
 
-// StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v int8) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldEQ(FieldStatus, v))
+// UserLimitEQ applies the EQ predicate on the "user_limit" field.
+func UserLimitEQ(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldEQ(FieldUserLimit, v))
 }
 
-// StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v int8) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldNEQ(FieldStatus, v))
+// UserLimitNEQ applies the NEQ predicate on the "user_limit" field.
+func UserLimitNEQ(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldNEQ(FieldUserLimit, v))
 }
 
-// StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...int8) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldIn(FieldStatus, vs...))
+// UserLimitIn applies the In predicate on the "user_limit" field.
+func UserLimitIn(vs ...int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldIn(FieldUserLimit, vs...))
 }
 
-// StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...int8) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldNotIn(FieldStatus, vs...))
+// UserLimitNotIn applies the NotIn predicate on the "user_limit" field.
+func UserLimitNotIn(vs ...int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldNotIn(FieldUserLimit, vs...))
 }
 
-// StatusGT applies the GT predicate on the "status" field.
-func StatusGT(v int8) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldGT(FieldStatus, v))
+// UserLimitGT applies the GT predicate on the "user_limit" field.
+func UserLimitGT(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldGT(FieldUserLimit, v))
 }
 
-// StatusGTE applies the GTE predicate on the "status" field.
-func StatusGTE(v int8) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldGTE(FieldStatus, v))
+// UserLimitGTE applies the GTE predicate on the "user_limit" field.
+func UserLimitGTE(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldGTE(FieldUserLimit, v))
 }
 
-// StatusLT applies the LT predicate on the "status" field.
-func StatusLT(v int8) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldLT(FieldStatus, v))
+// UserLimitLT applies the LT predicate on the "user_limit" field.
+func UserLimitLT(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldLT(FieldUserLimit, v))
 }
 
-// StatusLTE applies the LTE predicate on the "status" field.
-func StatusLTE(v int8) predicate.ProxyCoupon {
-	return predicate.ProxyCoupon(sql.FieldLTE(FieldStatus, v))
+// UserLimitLTE applies the LTE predicate on the "user_limit" field.
+func UserLimitLTE(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldLTE(FieldUserLimit, v))
+}
+
+// SubscribeEQ applies the EQ predicate on the "subscribe" field.
+func SubscribeEQ(v string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldEQ(FieldSubscribe, v))
+}
+
+// SubscribeNEQ applies the NEQ predicate on the "subscribe" field.
+func SubscribeNEQ(v string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldNEQ(FieldSubscribe, v))
+}
+
+// SubscribeIn applies the In predicate on the "subscribe" field.
+func SubscribeIn(vs ...string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldIn(FieldSubscribe, vs...))
+}
+
+// SubscribeNotIn applies the NotIn predicate on the "subscribe" field.
+func SubscribeNotIn(vs ...string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldNotIn(FieldSubscribe, vs...))
+}
+
+// SubscribeGT applies the GT predicate on the "subscribe" field.
+func SubscribeGT(v string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldGT(FieldSubscribe, v))
+}
+
+// SubscribeGTE applies the GTE predicate on the "subscribe" field.
+func SubscribeGTE(v string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldGTE(FieldSubscribe, v))
+}
+
+// SubscribeLT applies the LT predicate on the "subscribe" field.
+func SubscribeLT(v string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldLT(FieldSubscribe, v))
+}
+
+// SubscribeLTE applies the LTE predicate on the "subscribe" field.
+func SubscribeLTE(v string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldLTE(FieldSubscribe, v))
+}
+
+// SubscribeContains applies the Contains predicate on the "subscribe" field.
+func SubscribeContains(v string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldContains(FieldSubscribe, v))
+}
+
+// SubscribeHasPrefix applies the HasPrefix predicate on the "subscribe" field.
+func SubscribeHasPrefix(v string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldHasPrefix(FieldSubscribe, v))
+}
+
+// SubscribeHasSuffix applies the HasSuffix predicate on the "subscribe" field.
+func SubscribeHasSuffix(v string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldHasSuffix(FieldSubscribe, v))
+}
+
+// SubscribeEqualFold applies the EqualFold predicate on the "subscribe" field.
+func SubscribeEqualFold(v string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldEqualFold(FieldSubscribe, v))
+}
+
+// SubscribeContainsFold applies the ContainsFold predicate on the "subscribe" field.
+func SubscribeContainsFold(v string) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldContainsFold(FieldSubscribe, v))
+}
+
+// UsedCountEQ applies the EQ predicate on the "used_count" field.
+func UsedCountEQ(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldEQ(FieldUsedCount, v))
+}
+
+// UsedCountNEQ applies the NEQ predicate on the "used_count" field.
+func UsedCountNEQ(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldNEQ(FieldUsedCount, v))
+}
+
+// UsedCountIn applies the In predicate on the "used_count" field.
+func UsedCountIn(vs ...int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldIn(FieldUsedCount, vs...))
+}
+
+// UsedCountNotIn applies the NotIn predicate on the "used_count" field.
+func UsedCountNotIn(vs ...int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldNotIn(FieldUsedCount, vs...))
+}
+
+// UsedCountGT applies the GT predicate on the "used_count" field.
+func UsedCountGT(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldGT(FieldUsedCount, v))
+}
+
+// UsedCountGTE applies the GTE predicate on the "used_count" field.
+func UsedCountGTE(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldGTE(FieldUsedCount, v))
+}
+
+// UsedCountLT applies the LT predicate on the "used_count" field.
+func UsedCountLT(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldLT(FieldUsedCount, v))
+}
+
+// UsedCountLTE applies the LTE predicate on the "used_count" field.
+func UsedCountLTE(v int64) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldLTE(FieldUsedCount, v))
+}
+
+// EnableEQ applies the EQ predicate on the "enable" field.
+func EnableEQ(v bool) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldEQ(FieldEnable, v))
+}
+
+// EnableNEQ applies the NEQ predicate on the "enable" field.
+func EnableNEQ(v bool) predicate.ProxyCoupon {
+	return predicate.ProxyCoupon(sql.FieldNEQ(FieldEnable, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

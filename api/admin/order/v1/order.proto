@@ -35,20 +35,20 @@ service OrderService {
 
 // CreateOrderRequest 创建订单请求
 message CreateOrderRequest {
-  string user_id = 1;            // 用户ID
+  int64 user_id = 1;            // 用户ID
   int32 type = 2;               // 订单类型：1:订阅 2:续费 3:重置流量 4:充值
-  int32 quantity = 3;           // 数量
-  int32 price = 4;              // 原价
-  int32 amount = 5;             // 订单金额
-  int32 discount = 6;           // 折扣金额
+  int64 quantity = 3;           // 数量
+  int64 price = 4;              // 原价（分）
+  int64 amount = 5;             // 订单金额（分）
+  int64 discount = 6;           // 折扣金额（分）
   string coupon = 7;            // 优惠券
-  int32 coupon_discount = 8;    // 优惠券折扣金额
-  int32 commission = 9;        // 订单佣金
-  int32 fee_amount = 10;        // 手续费金额
-  string payment_id = 11;        // 支付ID
+  int64 coupon_discount = 8;    // 优惠券折扣金额（分）
+  int64 commission = 9;         // 订单佣金（分）
+  int64 fee_amount = 10;        // 手续费金额（分）
+  int64 payment_id = 11;        // 支付方式ID
   string trade_no = 12;         // 交易号
   int32 status = 13;            // 订单状态：1:待付款 2:已付款 3:关闭 4:失败 5:已完成
-  string subscribe_id = 14;      // 订阅ID
+  int64 subscribe_id = 14;      // 订阅ID
 }
 
 // CreateOrderReply 创建订单响应
@@ -59,10 +59,10 @@ message CreateOrderReply {
 
 // UpdateOrderStatusRequest 更新订单状态请求
 message UpdateOrderStatusRequest {
-  string id = 1;           // 订单ID
-  int32 status = 2;       // 订单状态
-  string payment_id = 3;   // 支付ID（可选）
-  string trade_no = 4;    // 交易号（可选）
+  int64 id = 1;            // 订单ID
+  int32 status = 2;        // 订单状态
+  int64 payment_id = 3;    // 支付方式ID（可选）
+  string trade_no = 4;     // 交易号（可选）
 }
 
 // UpdateOrderStatusReply 更新订单状态响应
@@ -73,50 +73,50 @@ message UpdateOrderStatusReply {
 
 // GetOrderListRequest 获取订单列表请求
 message GetOrderListRequest {
-  int32 page = 1;          // 页码
-  int32 size = 2;          // 每页数量
-  string user_id = 3;       // 用户ID（可选）
+  int64 page = 1;          // 页码
+  int64 size = 2;          // 每页数量
+  int64 user_id = 3;       // 用户ID（可选）
   int32 status = 4;        // 订单状态（可选）
-  string subscribe_id = 5;  // 订阅ID（可选）
-  string search = 6;       // 搜索关键字（可选）
+  int64 subscribe_id = 5;  // 订阅ID（可选）
+  string search = 6;       // 搜索关键字
 }
 
-// GetOrderListData 订单列表数据
+// GetOrderListData 获取订单列表数据
 message GetOrderListData {
-  repeated OrderItem list = 1;  // 订单列表
-  int32 total = 2;              // 总数
+  int64 total = 1;           // 总数
+  repeated OrderItem list = 2; // 订单列表
 }
 
 // GetOrderListReply 获取订单列表响应
 message GetOrderListReply {
-  int32 code = 1;             // 状态码
-  string message = 2;         // 消息内容
-  GetOrderListData data = 3;  // 响应数据
+  int32 code = 1;            // 状态码
+  string message = 2;        // 消息内容
+  GetOrderListData data = 3; // 响应数据
 }
 
 // OrderItem 订单项
 message OrderItem {
-  string id = 1;                 // 订单ID
-  string parent_id = 2;          // 父订单ID
-  string user_id = 3;            // 用户ID
+  int64 id = 1;                 // 订单ID
+  string parent_id = 2;         // 父订单ID
+  int64 user_id = 3;            // 用户ID
   string order_no = 4;          // 订单号
   int32 type = 5;               // 订单类型
-  int32 quantity = 6;           // 数量
-  int32 price = 7;              // 原价
-  int32 amount = 8;             // 订单金额
-  int32 gift_amount = 9;        // 用户礼品金额
-  int32 discount = 10;          // 折扣金额
+  int64 quantity = 6;           // 数量
+  int64 price = 7;              // 原价（分）
+  int64 amount = 8;             // 订单金额（分）
+  int64 gift_amount = 9;        // 礼品金额（分）
+  int64 discount = 10;          // 折扣金额（分）
   string coupon = 11;           // 优惠券
-  int32 coupon_discount = 12;   // 优惠券折扣金额
-  int32 commission = 13;        // 订单佣金
-  string payment_id = 14;        // 支付ID
-  string method = 15;           // 支付方式
-  int32 fee_amount = 16;        // 手续费金额
+  int64 coupon_discount = 12;   // 优惠券折扣金额（分）
+  int64 commission = 13;        // 订单佣金（分）
+  int64 payment_id = 14;        // 支付方式ID
+  string method = 15;           // 支付方式名称
+  int64 fee_amount = 16;        // 手续费金额（分）
   string trade_no = 17;         // 交易号
   int32 status = 18;            // 订单状态
-  string subscribe_id = 19;      // 订阅ID
+  int64 subscribe_id = 19;      // 订阅ID
   string subscribe_token = 20;  // 续费订阅令牌
   bool is_new = 21;             // 是否新订单
-  string created_at = 22;        // 创建时间
-  string updated_at = 23;        // 更新时间
+  int64 created_at = 22;        // 创建时间（Unix时间戳，秒）
+  int64 updated_at = 23;        // 更新时间（Unix时间戳，秒）
 }

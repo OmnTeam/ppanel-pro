@@ -9,31 +9,29 @@ import (
 )
 
 var (
-	// ProxyAdsColumns holds the columns for the "proxy_ads" table.
-	ProxyAdsColumns = []*schema.Column{
+	// AdsColumns holds the columns for the "ads" table.
+	AdsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "广告ID"},
-		{Name: "tenant_id", Type: field.TypeInt64, Comment: "租户ID", Default: 0},
-		{Name: "title", Type: field.TypeString, Comment: "广告标题", Default: ""},
-		{Name: "type", Type: field.TypeString, Comment: "广告类型", Default: ""},
+		{Name: "title", Type: field.TypeString, Size: 255, Comment: "广告标题", Default: ""},
+		{Name: "type", Type: field.TypeString, Size: 255, Comment: "广告类型", Default: ""},
 		{Name: "content", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "广告内容"},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "广告描述"},
 		{Name: "target_url", Type: field.TypeString, Size: 512, Comment: "广告目标链接", Default: ""},
-		{Name: "start_time", Type: field.TypeTime, Nullable: true, Comment: "广告开始时间"},
-		{Name: "end_time", Type: field.TypeTime, Nullable: true, Comment: "广告结束时间"},
-		{Name: "status", Type: field.TypeInt8, Nullable: true, Comment: "广告状态，0禁用，1启用", Default: 0},
+		{Name: "start_time", Type: field.TypeTime, Comment: "广告开始时间"},
+		{Name: "end_time", Type: field.TypeTime, Comment: "广告结束时间"},
+		{Name: "status", Type: field.TypeInt, Comment: "广告状态，0禁用，1启用", Default: 0},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxyAdsTable holds the schema information for the "proxy_ads" table.
-	ProxyAdsTable = &schema.Table{
-		Name:       "proxy_ads",
-		Columns:    ProxyAdsColumns,
-		PrimaryKey: []*schema.Column{ProxyAdsColumns[0]},
+	// AdsTable holds the schema information for the "ads" table.
+	AdsTable = &schema.Table{
+		Name:       "ads",
+		Columns:    AdsColumns,
+		PrimaryKey: []*schema.Column{AdsColumns[0]},
 	}
-	// ProxyAnnouncementColumns holds the columns for the "proxy_announcement" table.
-	ProxyAnnouncementColumns = []*schema.Column{
+	// AnnouncementColumns holds the columns for the "announcement" table.
+	AnnouncementColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "公告ID"},
-		{Name: "tenant_id", Type: field.TypeInt64, Comment: "租户ID", Default: 0},
 		{Name: "title", Type: field.TypeString, Size: 255, Comment: "公告标题", Default: ""},
 		{Name: "content", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "公告内容"},
 		{Name: "show", Type: field.TypeBool, Comment: "是否显示", Default: false},
@@ -42,196 +40,205 @@ var (
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxyAnnouncementTable holds the schema information for the "proxy_announcement" table.
-	ProxyAnnouncementTable = &schema.Table{
-		Name:       "proxy_announcement",
-		Columns:    ProxyAnnouncementColumns,
-		PrimaryKey: []*schema.Column{ProxyAnnouncementColumns[0]},
+	// AnnouncementTable holds the schema information for the "announcement" table.
+	AnnouncementTable = &schema.Table{
+		Name:       "announcement",
+		Columns:    AnnouncementColumns,
+		PrimaryKey: []*schema.Column{AnnouncementColumns[0]},
 	}
-	// ProxyAuthMethodColumns holds the columns for the "proxy_auth_method" table.
-	ProxyAuthMethodColumns = []*schema.Column{
+	// AuthMethodColumns holds the columns for the "auth_method" table.
+	AuthMethodColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "认证方法ID"},
-		{Name: "tenant_id", Type: field.TypeInt64, Comment: "租户ID", Default: 0},
-		{Name: "method", Type: field.TypeString, Size: 255, Comment: "认证方法"},
+		{Name: "method", Type: field.TypeString, Size: 255, Comment: "认证方法", Default: ""},
 		{Name: "config", Type: field.TypeString, Size: 2147483647, Comment: "OAuth配置"},
 		{Name: "enabled", Type: field.TypeBool, Comment: "是否启用", Default: false},
-		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
 	}
-	// ProxyAuthMethodTable holds the schema information for the "proxy_auth_method" table.
-	ProxyAuthMethodTable = &schema.Table{
-		Name:       "proxy_auth_method",
-		Columns:    ProxyAuthMethodColumns,
-		PrimaryKey: []*schema.Column{ProxyAuthMethodColumns[0]},
+	// AuthMethodTable holds the schema information for the "auth_method" table.
+	AuthMethodTable = &schema.Table{
+		Name:       "auth_method",
+		Columns:    AuthMethodColumns,
+		PrimaryKey: []*schema.Column{AuthMethodColumns[0]},
 		Indexes: []*schema.Index{
 			{
 				Name:    "proxyauthmethod_method",
 				Unique:  true,
-				Columns: []*schema.Column{ProxyAuthMethodColumns[2]},
+				Columns: []*schema.Column{AuthMethodColumns[1]},
 			},
 		},
 	}
-	// ProxyCouponColumns holds the columns for the "proxy_coupon" table.
-	ProxyCouponColumns = []*schema.Column{
+	// CouponColumns holds the columns for the "coupon" table.
+	CouponColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "优惠券ID"},
-		{Name: "user_limit", Type: field.TypeInt64, Comment: "用户限制", Default: 0},
-		{Name: "subscribe", Type: field.TypeString, Nullable: true, Comment: "订阅限制（逗号分隔的订阅ID）"},
-		{Name: "name", Type: field.TypeString, Size: 255, Comment: "优惠券名称"},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "优惠券名称", Default: ""},
 		{Name: "code", Type: field.TypeString, Unique: true, Size: 255, Comment: "优惠券代码"},
 		{Name: "count", Type: field.TypeInt64, Comment: "数量限制", Default: 0},
 		{Name: "type", Type: field.TypeInt8, Comment: "优惠券类型：1：百分比 2：固定金额", Default: 1},
 		{Name: "discount", Type: field.TypeInt64, Comment: "优惠券折扣", Default: 0},
-		{Name: "start_time", Type: field.TypeTime, Comment: "开始时间"},
-		{Name: "end_time", Type: field.TypeTime, Comment: "结束时间"},
-		{Name: "status", Type: field.TypeInt8, Comment: "优惠券状态，0禁用，1启用", Default: 0},
+		{Name: "start_time", Type: field.TypeInt64, Comment: "开始时间", Default: 0},
+		{Name: "expire_time", Type: field.TypeInt64, Comment: "结束时间", Default: 0},
+		{Name: "user_limit", Type: field.TypeInt64, Comment: "用户限制", Default: 0},
+		{Name: "subscribe", Type: field.TypeString, Size: 255, Comment: "订阅限制", Default: ""},
+		{Name: "used_count", Type: field.TypeInt64, Comment: "已使用次数", Default: 0},
+		{Name: "enable", Type: field.TypeBool, Comment: "是否启用", Default: true},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxyCouponTable holds the schema information for the "proxy_coupon" table.
-	ProxyCouponTable = &schema.Table{
-		Name:       "proxy_coupon",
-		Columns:    ProxyCouponColumns,
-		PrimaryKey: []*schema.Column{ProxyCouponColumns[0]},
+	// CouponTable holds the schema information for the "coupon" table.
+	CouponTable = &schema.Table{
+		Name:       "coupon",
+		Columns:    CouponColumns,
+		PrimaryKey: []*schema.Column{CouponColumns[0]},
 	}
-	// ProxyDocumentColumns holds the columns for the "proxy_document" table.
-	ProxyDocumentColumns = []*schema.Column{
+	// DocumentColumns holds the columns for the "document" table.
+	DocumentColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "文档ID"},
 		{Name: "title", Type: field.TypeString, Size: 255, Comment: "文档标题", Default: ""},
 		{Name: "content", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "文档内容"},
 		{Name: "tags", Type: field.TypeString, Size: 255, Comment: "文档标签", Default: ""},
 		{Name: "show", Type: field.TypeBool, Comment: "显示", Default: true},
-		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxyDocumentTable holds the schema information for the "proxy_document" table.
-	ProxyDocumentTable = &schema.Table{
-		Name:       "proxy_document",
-		Columns:    ProxyDocumentColumns,
-		PrimaryKey: []*schema.Column{ProxyDocumentColumns[0]},
+	// DocumentTable holds the schema information for the "document" table.
+	DocumentTable = &schema.Table{
+		Name:       "document",
+		Columns:    DocumentColumns,
+		PrimaryKey: []*schema.Column{DocumentColumns[0]},
 		Indexes: []*schema.Index{
 			{
 				Name:    "proxydocument_show",
 				Unique:  false,
-				Columns: []*schema.Column{ProxyDocumentColumns[4]},
+				Columns: []*schema.Column{DocumentColumns[4]},
 			},
 		},
 	}
-	// ProxyGroupHistoryColumns holds the columns for the "proxy_group_history" table.
-	ProxyGroupHistoryColumns = []*schema.Column{
+	// GroupHistoryColumns holds the columns for the "group_history" table.
+	GroupHistoryColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "历史记录ID"},
-		{Name: "group_mode", Type: field.TypeString, Size: 50, Comment: "分组模式: user/node", Default: "user"},
-		{Name: "trigger_type", Type: field.TypeString, Size: 50, Comment: "触发类型: manual/auto", Default: "manual"},
-		{Name: "status", Type: field.TypeString, Size: 50, Comment: "状态: pending/running/completed/failed", Default: "pending"},
-		{Name: "progress", Type: field.TypeInt, Comment: "进度", Default: 0},
-		{Name: "total", Type: field.TypeInt, Comment: "总数", Default: 0},
-		{Name: "result", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "结果详情JSON"},
-		{Name: "error", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "错误信息"},
+		{Name: "group_mode", Type: field.TypeString, Size: 50, Comment: "分组模式", Default: ""},
+		{Name: "trigger_type", Type: field.TypeString, Size: 50, Comment: "触发类型", Default: ""},
+		{Name: "state", Type: field.TypeString, Size: 50, Comment: "状态", Default: ""},
+		{Name: "total_users", Type: field.TypeInt, Comment: "总用户数", Default: 0},
+		{Name: "success_count", Type: field.TypeInt, Comment: "成功数量", Default: 0},
+		{Name: "failed_count", Type: field.TypeInt, Comment: "失败数量", Default: 0},
+		{Name: "start_time", Type: field.TypeTime, Nullable: true, Comment: "开始时间"},
+		{Name: "end_time", Type: field.TypeTime, Nullable: true, Comment: "结束时间"},
+		{Name: "operator", Type: field.TypeString, Nullable: true, Size: 100, Comment: "操作人"},
+		{Name: "error_message", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "错误信息"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxyGroupHistoryTable holds the schema information for the "proxy_group_history" table.
-	ProxyGroupHistoryTable = &schema.Table{
-		Name:       "proxy_group_history",
-		Columns:    ProxyGroupHistoryColumns,
-		PrimaryKey: []*schema.Column{ProxyGroupHistoryColumns[0]},
+	// GroupHistoryTable holds the schema information for the "group_history" table.
+	GroupHistoryTable = &schema.Table{
+		Name:       "group_history",
+		Columns:    GroupHistoryColumns,
+		PrimaryKey: []*schema.Column{GroupHistoryColumns[0]},
 	}
-	// ProxyNodesColumns holds the columns for the "proxy_nodes" table.
-	ProxyNodesColumns = []*schema.Column{
+	// GroupHistoryDetailColumns holds the columns for the "group_history_detail" table.
+	GroupHistoryDetailColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "详情记录ID"},
+		{Name: "history_id", Type: field.TypeInt64, Comment: "历史记录ID"},
+		{Name: "node_group_id", Type: field.TypeInt64, Comment: "节点组ID"},
+		{Name: "user_count", Type: field.TypeInt, Comment: "用户数量", Default: 0},
+		{Name: "node_count", Type: field.TypeInt, Comment: "节点数量", Default: 0},
+		{Name: "user_data", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "用户数据"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+	}
+	// GroupHistoryDetailTable holds the schema information for the "group_history_detail" table.
+	GroupHistoryDetailTable = &schema.Table{
+		Name:       "group_history_detail",
+		Columns:    GroupHistoryDetailColumns,
+		PrimaryKey: []*schema.Column{GroupHistoryDetailColumns[0]},
+	}
+	// NodesColumns holds the columns for the "nodes" table.
+	NodesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "节点ID"},
 		{Name: "name", Type: field.TypeString, Size: 100, Comment: "节点名称", Default: ""},
 		{Name: "tags", Type: field.TypeString, Size: 255, Comment: "标签", Default: ""},
-		{Name: "port", Type: field.TypeInt, Comment: "连接端口", Default: 0},
+		{Name: "port", Type: field.TypeUint16, Comment: "连接端口", Default: 0},
 		{Name: "address", Type: field.TypeString, Size: 255, Comment: "连接地址", Default: ""},
 		{Name: "server_id", Type: field.TypeInt64, Comment: "服务器ID", Default: 0},
 		{Name: "protocol", Type: field.TypeString, Size: 100, Comment: "协议", Default: ""},
 		{Name: "enabled", Type: field.TypeBool, Comment: "启用", Default: true},
 		{Name: "sort", Type: field.TypeInt, Comment: "排序", Default: 0},
-		{Name: "group_id", Type: field.TypeInt64, Nullable: true, Comment: "节点分组ID", Default: 0},
-		{Name: "group_locked", Type: field.TypeBool, Comment: "是否锁定分组", Default: false},
-		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "node_group_ids", Type: field.TypeJSON, Nullable: true, Comment: "节点组ID列表"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxyNodesTable holds the schema information for the "proxy_nodes" table.
-	ProxyNodesTable = &schema.Table{
-		Name:       "proxy_nodes",
-		Columns:    ProxyNodesColumns,
-		PrimaryKey: []*schema.Column{ProxyNodesColumns[0]},
+	// NodesTable holds the schema information for the "nodes" table.
+	NodesTable = &schema.Table{
+		Name:       "nodes",
+		Columns:    NodesColumns,
+		PrimaryKey: []*schema.Column{NodesColumns[0]},
 	}
-	// ProxyOrderColumns holds the columns for the "proxy_order" table.
-	ProxyOrderColumns = []*schema.Column{
+	// OrderColumns holds the columns for the "order" table.
+	OrderColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "订单ID"},
-		{Name: "tenant_id", Type: field.TypeInt64, Comment: "租户ID", Default: 0},
 		{Name: "parent_id", Type: field.TypeInt64, Nullable: true, Comment: "父订单ID"},
 		{Name: "user_id", Type: field.TypeInt64, Comment: "用户ID", Default: 0},
-		{Name: "order_no", Type: field.TypeString, Unique: true, Comment: "订单号"},
-		{Name: "type", Type: field.TypeInt8, Comment: "订单类型：1:订阅 2:续费 3:重置流量 4:充值", Default: 1},
+		{Name: "order_no", Type: field.TypeString, Unique: true, Size: 255, Comment: "订单号"},
+		{Name: "type", Type: field.TypeInt8, Comment: "订单类型", Default: 1},
 		{Name: "quantity", Type: field.TypeInt64, Comment: "数量", Default: 1},
 		{Name: "price", Type: field.TypeInt64, Comment: "原价", Default: 0},
 		{Name: "amount", Type: field.TypeInt64, Comment: "实付金额", Default: 0},
+		{Name: "gift_amount", Type: field.TypeInt64, Comment: "赠送金额", Default: 0},
 		{Name: "discount", Type: field.TypeInt64, Comment: "折扣金额", Default: 0},
 		{Name: "coupon", Type: field.TypeString, Nullable: true, Size: 255, Comment: "优惠券代码"},
 		{Name: "coupon_discount", Type: field.TypeInt64, Comment: "优惠券折扣金额", Default: 0},
 		{Name: "commission", Type: field.TypeInt64, Comment: "佣金金额", Default: 0},
-		{Name: "fee_amount", Type: field.TypeInt64, Comment: "手续费金额", Default: 0},
-		{Name: "gift_amount", Type: field.TypeInt64, Comment: "赠送金额", Default: 0},
 		{Name: "payment_id", Type: field.TypeInt64, Comment: "支付方式ID", Default: 0},
-		{Name: "method", Type: field.TypeString, Nullable: true, Size: 255, Comment: "支付方式标识"},
+		{Name: "method", Type: field.TypeString, Size: 255, Comment: "支付方式标识", Default: ""},
+		{Name: "fee_amount", Type: field.TypeInt64, Comment: "手续费金额", Default: 0},
 		{Name: "trade_no", Type: field.TypeString, Nullable: true, Size: 255, Comment: "第三方交易号"},
-		{Name: "status", Type: field.TypeInt8, Comment: "订单状态：0待支付 1已支付 2已取消 3已退款", Default: 0},
+		{Name: "status", Type: field.TypeInt8, Comment: "订单状态", Default: 1},
 		{Name: "subscribe_id", Type: field.TypeInt64, Comment: "关联订阅ID", Default: 0},
 		{Name: "subscribe_token", Type: field.TypeString, Nullable: true, Size: 255, Comment: "续费订阅Token"},
 		{Name: "is_new", Type: field.TypeBool, Comment: "是否新订单", Default: false},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxyOrderTable holds the schema information for the "proxy_order" table.
-	ProxyOrderTable = &schema.Table{
-		Name:       "proxy_order",
-		Columns:    ProxyOrderColumns,
-		PrimaryKey: []*schema.Column{ProxyOrderColumns[0]},
+	// OrderTable holds the schema information for the "order" table.
+	OrderTable = &schema.Table{
+		Name:       "order",
+		Columns:    OrderColumns,
+		PrimaryKey: []*schema.Column{OrderColumns[0]},
 	}
-	// ProxyPaymentColumns holds the columns for the "proxy_payment" table.
-	ProxyPaymentColumns = []*schema.Column{
+	// PaymentColumns holds the columns for the "payment" table.
+	PaymentColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "支付ID"},
 		{Name: "name", Type: field.TypeString, Size: 100, Comment: "支付名称", Default: ""},
 		{Name: "platform", Type: field.TypeString, Size: 100, Comment: "支付平台"},
-		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "支付描述"},
-		{Name: "icon", Type: field.TypeString, Nullable: true, Size: 255, Comment: "支付图标", Default: ""},
-		{Name: "domain", Type: field.TypeString, Nullable: true, Size: 255, Comment: "通知域名", Default: ""},
+		{Name: "icon", Type: field.TypeString, Size: 255, Comment: "支付图标", Default: ""},
+		{Name: "domain", Type: field.TypeString, Size: 255, Comment: "通知域名", Default: ""},
 		{Name: "config", Type: field.TypeString, Size: 2147483647, Comment: "支付配置"},
-		{Name: "fee_mode", Type: field.TypeInt, Comment: "费用模式：0：无费用 1：百分比 2：固定金额 3：百分比+固定金额", Default: 0},
-		{Name: "fee_percent", Type: field.TypeFloat64, Nullable: true, Comment: "费用百分比", Default: 0},
-		{Name: "fee_amount", Type: field.TypeInt, Nullable: true, Comment: "固定费用金额", Default: 0},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "支付描述"},
+		{Name: "fee_mode", Type: field.TypeUint, Comment: "费用模式", Default: 0},
+		{Name: "fee_percent", Type: field.TypeInt64, Comment: "费用百分比", Default: 0},
+		{Name: "fee_amount", Type: field.TypeInt64, Comment: "固定费用金额", Default: 0},
 		{Name: "enable", Type: field.TypeBool, Comment: "是否启用", Default: false},
-		{Name: "token", Type: field.TypeString, Unique: true, Nullable: true, Size: 255, Comment: "支付令牌"},
-		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "token", Type: field.TypeString, Unique: true, Size: 255, Comment: "支付令牌"},
 	}
-	// ProxyPaymentTable holds the schema information for the "proxy_payment" table.
-	ProxyPaymentTable = &schema.Table{
-		Name:       "proxy_payment",
-		Columns:    ProxyPaymentColumns,
-		PrimaryKey: []*schema.Column{ProxyPaymentColumns[0]},
+	// PaymentTable holds the schema information for the "payment" table.
+	PaymentTable = &schema.Table{
+		Name:       "payment",
+		Columns:    PaymentColumns,
+		PrimaryKey: []*schema.Column{PaymentColumns[0]},
 		Indexes: []*schema.Index{
 			{
 				Name:    "proxypayment_platform",
 				Unique:  false,
-				Columns: []*schema.Column{ProxyPaymentColumns[2]},
+				Columns: []*schema.Column{PaymentColumns[2]},
 			},
 			{
 				Name:    "proxypayment_enable",
 				Unique:  false,
-				Columns: []*schema.Column{ProxyPaymentColumns[10]},
-			},
-			{
-				Name:    "proxypayment_platform_enable",
-				Unique:  false,
-				Columns: []*schema.Column{ProxyPaymentColumns[2], ProxyPaymentColumns[10]},
+				Columns: []*schema.Column{PaymentColumns[10]},
 			},
 		},
 	}
-	// ProxyRedemptionCodeColumns holds the columns for the "proxy_redemption_code" table.
-	ProxyRedemptionCodeColumns = []*schema.Column{
+	// RedemptionCodeColumns holds the columns for the "redemption_code" table.
+	RedemptionCodeColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "兑换码ID"},
 		{Name: "code", Type: field.TypeString, Unique: true, Size: 255, Comment: "兑换码"},
 		{Name: "total_count", Type: field.TypeInt64, Comment: "总兑换次数", Default: 0},
@@ -242,15 +249,16 @@ var (
 		{Name: "status", Type: field.TypeInt8, Comment: "状态", Default: 1},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
 	}
-	// ProxyRedemptionCodeTable holds the schema information for the "proxy_redemption_code" table.
-	ProxyRedemptionCodeTable = &schema.Table{
-		Name:       "proxy_redemption_code",
-		Columns:    ProxyRedemptionCodeColumns,
-		PrimaryKey: []*schema.Column{ProxyRedemptionCodeColumns[0]},
+	// RedemptionCodeTable holds the schema information for the "redemption_code" table.
+	RedemptionCodeTable = &schema.Table{
+		Name:       "redemption_code",
+		Columns:    RedemptionCodeColumns,
+		PrimaryKey: []*schema.Column{RedemptionCodeColumns[0]},
 	}
-	// ProxyRedemptionRecordColumns holds the columns for the "proxy_redemption_record" table.
-	ProxyRedemptionRecordColumns = []*schema.Column{
+	// RedemptionRecordColumns holds the columns for the "redemption_record" table.
+	RedemptionRecordColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "兑换记录ID"},
 		{Name: "subscribe_id", Type: field.TypeInt64, Comment: "订阅ID"},
 		{Name: "unit_time", Type: field.TypeString, Size: 50, Comment: "时间单位", Default: "month"},
@@ -260,380 +268,379 @@ var (
 		{Name: "redemption_code_id", Type: field.TypeInt64, Comment: "兑换码ID"},
 		{Name: "user_id", Type: field.TypeInt64, Comment: "用户ID"},
 	}
-	// ProxyRedemptionRecordTable holds the schema information for the "proxy_redemption_record" table.
-	ProxyRedemptionRecordTable = &schema.Table{
-		Name:       "proxy_redemption_record",
-		Columns:    ProxyRedemptionRecordColumns,
-		PrimaryKey: []*schema.Column{ProxyRedemptionRecordColumns[0]},
+	// RedemptionRecordTable holds the schema information for the "redemption_record" table.
+	RedemptionRecordTable = &schema.Table{
+		Name:       "redemption_record",
+		Columns:    RedemptionRecordColumns,
+		PrimaryKey: []*schema.Column{RedemptionRecordColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "proxy_redemption_record_proxy_redemption_code_records",
-				Columns:    []*schema.Column{ProxyRedemptionRecordColumns[6]},
-				RefColumns: []*schema.Column{ProxyRedemptionCodeColumns[0]},
+				Symbol:     "redemption_record_redemption_code_records",
+				Columns:    []*schema.Column{RedemptionRecordColumns[6]},
+				RefColumns: []*schema.Column{RedemptionCodeColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "proxy_redemption_record_proxy_user_redemption_records",
-				Columns:    []*schema.Column{ProxyRedemptionRecordColumns[7]},
-				RefColumns: []*schema.Column{ProxyUserColumns[0]},
+				Symbol:     "redemption_record_user_redemption_records",
+				Columns:    []*schema.Column{RedemptionRecordColumns[7]},
+				RefColumns: []*schema.Column{UserColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
 	}
-	// ProxySchemaMigrationsColumns holds the columns for the "proxy_schema_migrations" table.
-	ProxySchemaMigrationsColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "version", Type: field.TypeString, Unique: true, Comment: "迁移版本号"},
-		{Name: "dirty", Type: field.TypeBool, Comment: "是否脏数据", Default: false},
+	// SchemaMigrationsColumns holds the columns for the "schema_migrations" table.
+	SchemaMigrationsColumns = []*schema.Column{
+		{Name: "version", Type: field.TypeInt64, Comment: "迁移版本号"},
+		{Name: "dirty", Type: field.TypeBool, Comment: "是否脏数据"},
 	}
-	// ProxySchemaMigrationsTable holds the schema information for the "proxy_schema_migrations" table.
-	ProxySchemaMigrationsTable = &schema.Table{
-		Name:       "proxy_schema_migrations",
-		Columns:    ProxySchemaMigrationsColumns,
-		PrimaryKey: []*schema.Column{ProxySchemaMigrationsColumns[0]},
+	// SchemaMigrationsTable holds the schema information for the "schema_migrations" table.
+	SchemaMigrationsTable = &schema.Table{
+		Name:       "schema_migrations",
+		Columns:    SchemaMigrationsColumns,
+		PrimaryKey: []*schema.Column{SchemaMigrationsColumns[0]},
 	}
-	// ProxyServerColumns holds the columns for the "proxy_server" table.
-	ProxyServerColumns = []*schema.Column{
+	// ServersColumns holds the columns for the "servers" table.
+	ServersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "服务器ID"},
-		{Name: "tenant_id", Type: field.TypeInt64, Comment: "租户ID", Default: 0},
 		{Name: "name", Type: field.TypeString, Size: 100, Comment: "服务器名称", Default: ""},
 		{Name: "country", Type: field.TypeString, Size: 128, Comment: "国家", Default: ""},
 		{Name: "city", Type: field.TypeString, Size: 128, Comment: "城市", Default: ""},
-		{Name: "server_addr", Type: field.TypeString, Size: 100, Comment: "服务器地址", Default: ""},
+		{Name: "address", Type: field.TypeString, Size: 100, Comment: "服务器地址", Default: ""},
 		{Name: "sort", Type: field.TypeInt, Comment: "排序", Default: 0},
-		{Name: "protocol", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "协议配置JSON"},
+		{Name: "protocols", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "协议配置JSON"},
 		{Name: "last_reported_at", Type: field.TypeTime, Nullable: true, Comment: "最后报告时间"},
-		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "longitude", Type: field.TypeString, Size: 50, Comment: "经度", Default: "0.0"},
+		{Name: "latitude", Type: field.TypeString, Size: 50, Comment: "纬度", Default: "0.0"},
+		{Name: "longitude_center", Type: field.TypeString, Size: 50, Comment: "中心经度", Default: "0.0"},
+		{Name: "latitude_center", Type: field.TypeString, Size: 50, Comment: "中心纬度", Default: "0.0"},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxyServerTable holds the schema information for the "proxy_server" table.
-	ProxyServerTable = &schema.Table{
-		Name:       "proxy_server",
-		Columns:    ProxyServerColumns,
-		PrimaryKey: []*schema.Column{ProxyServerColumns[0]},
+	// ServersTable holds the schema information for the "servers" table.
+	ServersTable = &schema.Table{
+		Name:       "servers",
+		Columns:    ServersColumns,
+		PrimaryKey: []*schema.Column{ServersColumns[0]},
 	}
-	// ProxyServerGroupColumns holds the columns for the "proxy_server_group" table.
-	ProxyServerGroupColumns = []*schema.Column{
+	// NodeGroupColumns holds the columns for the "node_group" table.
+	NodeGroupColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "ID"},
-		{Name: "name", Type: field.TypeString, Size: 100, Comment: "Group Name"},
-		{Name: "description", Type: field.TypeString, Size: 255, Comment: "Group Description", Default: ""},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "Group Name"},
+		{Name: "description", Type: field.TypeString, Nullable: true, Size: 500, Comment: "Group Description"},
 		{Name: "sort", Type: field.TypeInt, Comment: "Sort Order", Default: 0},
+		{Name: "for_calculation", Type: field.TypeBool, Comment: "For Calculation", Default: true},
+		{Name: "is_expired_group", Type: field.TypeBool, Comment: "Is Expired Group", Default: false},
+		{Name: "expired_days_limit", Type: field.TypeInt, Comment: "Expired Days Limit", Default: 7},
+		{Name: "max_traffic_gb_expired", Type: field.TypeInt64, Nullable: true, Comment: "Max Traffic GB for Expired Users"},
+		{Name: "speed_limit", Type: field.TypeInt, Comment: "Speed Limit", Default: 0},
+		{Name: "min_traffic_gb", Type: field.TypeInt64, Nullable: true, Comment: "Minimum Traffic"},
+		{Name: "max_traffic_gb", Type: field.TypeInt64, Nullable: true, Comment: "Maximum Traffic"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "Creation Time"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "Update Time"},
 	}
-	// ProxyServerGroupTable holds the schema information for the "proxy_server_group" table.
-	ProxyServerGroupTable = &schema.Table{
-		Name:       "proxy_server_group",
-		Columns:    ProxyServerGroupColumns,
-		PrimaryKey: []*schema.Column{ProxyServerGroupColumns[0]},
+	// NodeGroupTable holds the schema information for the "node_group" table.
+	NodeGroupTable = &schema.Table{
+		Name:       "node_group",
+		Columns:    NodeGroupColumns,
+		PrimaryKey: []*schema.Column{NodeGroupColumns[0]},
 	}
-	// ProxySubscribeColumns holds the columns for the "proxy_subscribe" table.
-	ProxySubscribeColumns = []*schema.Column{
+	// SubscribeColumns holds the columns for the "subscribe" table.
+	SubscribeColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "订阅套餐ID"},
 		{Name: "name", Type: field.TypeString, Size: 255, Comment: "订阅套餐名称", Default: ""},
 		{Name: "language", Type: field.TypeString, Size: 255, Comment: "语言", Default: ""},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "订阅套餐描述"},
-		{Name: "unit_price", Type: field.TypeInt64, Comment: "单位价格（单位：分）", Default: 0},
+		{Name: "unit_price", Type: field.TypeInt64, Comment: "单位价格", Default: 0},
 		{Name: "unit_time", Type: field.TypeString, Size: 255, Comment: "单位时间", Default: ""},
-		{Name: "discount", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "折扣配置JSON"},
+		{Name: "discount", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "折扣配置"},
 		{Name: "replacement", Type: field.TypeInt64, Comment: "替换", Default: 0},
 		{Name: "inventory", Type: field.TypeInt64, Comment: "库存", Default: -1},
-		{Name: "traffic", Type: field.TypeInt64, Comment: "流量（字节）", Default: 0},
+		{Name: "traffic", Type: field.TypeInt64, Comment: "流量", Default: 0},
 		{Name: "speed_limit", Type: field.TypeInt64, Comment: "速度限制", Default: 0},
 		{Name: "device_limit", Type: field.TypeInt64, Comment: "设备数限制", Default: 0},
 		{Name: "quota", Type: field.TypeInt64, Comment: "配额", Default: 0},
-		{Name: "show", Type: field.TypeBool, Comment: "是否在门户页面显示", Default: false},
+		{Name: "nodes", Type: field.TypeString, Size: 255, Comment: "节点IDs", Default: ""},
+		{Name: "node_tags", Type: field.TypeString, Size: 255, Comment: "节点标签", Default: ""},
+		{Name: "node_group_ids", Type: field.TypeJSON, Nullable: true, Comment: "节点组ID列表"},
+		{Name: "node_group_id", Type: field.TypeInt64, Nullable: true, Comment: "默认节点组ID", Default: 0},
+		{Name: "traffic_limit", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "流量限制规则"},
+		{Name: "show", Type: field.TypeBool, Comment: "是否显示", Default: false},
 		{Name: "sell", Type: field.TypeBool, Comment: "是否售卖", Default: false},
 		{Name: "sort", Type: field.TypeInt64, Comment: "排序", Default: 0},
 		{Name: "deduction_ratio", Type: field.TypeInt64, Nullable: true, Comment: "扣除比例", Default: 0},
-		{Name: "allow_deduction", Type: field.TypeBool, Nullable: true, Comment: "允许扣除", Default: true},
-		{Name: "reset_cycle", Type: field.TypeInt64, Nullable: true, Comment: "重置周期: 0-不重置 1-1号 2-每月 3-每年", Default: 0},
-		{Name: "renewal_reset", Type: field.TypeBool, Nullable: true, Comment: "续费重置", Default: false},
-		{Name: "nodes", Type: field.TypeString, Size: 255, Comment: "节点IDs", Default: ""},
-		{Name: "node_tags", Type: field.TypeString, Size: 255, Comment: "节点标签", Default: ""},
+		{Name: "allow_deduction", Type: field.TypeBool, Comment: "允许扣除", Default: true},
+		{Name: "reset_cycle", Type: field.TypeInt64, Nullable: true, Comment: "重置周期", Default: 0},
+		{Name: "renewal_reset", Type: field.TypeBool, Comment: "续费重置", Default: false},
+		{Name: "show_original_price", Type: field.TypeBool, Comment: "显示原价", Default: true},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxySubscribeTable holds the schema information for the "proxy_subscribe" table.
-	ProxySubscribeTable = &schema.Table{
-		Name:       "proxy_subscribe",
-		Columns:    ProxySubscribeColumns,
-		PrimaryKey: []*schema.Column{ProxySubscribeColumns[0]},
+	// SubscribeTable holds the schema information for the "subscribe" table.
+	SubscribeTable = &schema.Table{
+		Name:       "subscribe",
+		Columns:    SubscribeColumns,
+		PrimaryKey: []*schema.Column{SubscribeColumns[0]},
 	}
-	// ProxySubscribeApplicationColumns holds the columns for the "proxy_subscribe_application" table.
-	ProxySubscribeApplicationColumns = []*schema.Column{
+	// SubscribeApplicationColumns holds the columns for the "subscribe_application" table.
+	SubscribeApplicationColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "应用配置ID"},
-		{Name: "tenant_id", Type: field.TypeInt64, Comment: "租户ID", Default: 0},
-		{Name: "name", Type: field.TypeString, Size: 255, Comment: "应用名称"},
-		{Name: "icon", Type: field.TypeString, Nullable: true, Comment: "应用图标"},
+		{Name: "name", Type: field.TypeString, Size: 255, Comment: "应用名称", Default: ""},
+		{Name: "icon", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "应用图标", SchemaType: map[string]string{"mysql": "mediumtext"}},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 255, Comment: "应用描述"},
-		{Name: "scheme", Type: field.TypeString, Size: 255, Comment: "应用Scheme"},
-		{Name: "user_agent", Type: field.TypeString, Size: 255, Comment: "User Agent"},
+		{Name: "scheme", Type: field.TypeString, Size: 255, Comment: "应用Scheme", Default: ""},
+		{Name: "user_agent", Type: field.TypeString, Size: 255, Comment: "User Agent", Default: ""},
 		{Name: "is_default", Type: field.TypeBool, Comment: "是否默认应用", Default: false},
-		{Name: "subscribe_template", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "订阅模板"},
+		{Name: "subscribe_template", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "订阅模板", SchemaType: map[string]string{"mysql": "mediumtext"}},
 		{Name: "output_format", Type: field.TypeString, Size: 50, Comment: "输出格式", Default: "yaml"},
-		{Name: "download_link", Type: field.TypeString, Comment: "下载链接"},
-		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
+		{Name: "download_link", Type: field.TypeString, Size: 2147483647, Comment: "下载链接"},
+		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
 	}
-	// ProxySubscribeApplicationTable holds the schema information for the "proxy_subscribe_application" table.
-	ProxySubscribeApplicationTable = &schema.Table{
-		Name:       "proxy_subscribe_application",
-		Columns:    ProxySubscribeApplicationColumns,
-		PrimaryKey: []*schema.Column{ProxySubscribeApplicationColumns[0]},
+	// SubscribeApplicationTable holds the schema information for the "subscribe_application" table.
+	SubscribeApplicationTable = &schema.Table{
+		Name:       "subscribe_application",
+		Columns:    SubscribeApplicationColumns,
+		PrimaryKey: []*schema.Column{SubscribeApplicationColumns[0]},
 	}
-	// ProxySubscribeGroupColumns holds the columns for the "proxy_subscribe_group" table.
-	ProxySubscribeGroupColumns = []*schema.Column{
+	// SubscribeGroupColumns holds the columns for the "subscribe_group" table.
+	SubscribeGroupColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "订阅组ID"},
 		{Name: "name", Type: field.TypeString, Size: 255, Comment: "订阅组名称", Default: ""},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "订阅组描述"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxySubscribeGroupTable holds the schema information for the "proxy_subscribe_group" table.
-	ProxySubscribeGroupTable = &schema.Table{
-		Name:       "proxy_subscribe_group",
-		Columns:    ProxySubscribeGroupColumns,
-		PrimaryKey: []*schema.Column{ProxySubscribeGroupColumns[0]},
+	// SubscribeGroupTable holds the schema information for the "subscribe_group" table.
+	SubscribeGroupTable = &schema.Table{
+		Name:       "subscribe_group",
+		Columns:    SubscribeGroupColumns,
+		PrimaryKey: []*schema.Column{SubscribeGroupColumns[0]},
 	}
-	// ProxySystemColumns holds the columns for the "proxy_system" table.
-	ProxySystemColumns = []*schema.Column{
+	// SystemColumns holds the columns for the "system" table.
+	SystemColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "category", Type: field.TypeString, Size: 100, Comment: "分类", Default: ""},
-		{Name: "key", Type: field.TypeString, Size: 100, Comment: "键名"},
+		{Name: "key", Type: field.TypeString, Size: 100, Comment: "键名", Default: ""},
 		{Name: "value", Type: field.TypeString, Size: 2147483647, Comment: "键值"},
 		{Name: "type", Type: field.TypeString, Size: 50, Comment: "类型", Default: ""},
 		{Name: "desc", Type: field.TypeString, Size: 2147483647, Comment: "描述"},
 		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
 	}
-	// ProxySystemTable holds the schema information for the "proxy_system" table.
-	ProxySystemTable = &schema.Table{
-		Name:       "proxy_system",
-		Columns:    ProxySystemColumns,
-		PrimaryKey: []*schema.Column{ProxySystemColumns[0]},
+	// SystemTable holds the schema information for the "system" table.
+	SystemTable = &schema.Table{
+		Name:       "system",
+		Columns:    SystemColumns,
+		PrimaryKey: []*schema.Column{SystemColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "proxysystem_category_key",
+				Name:    "proxysystem_key",
 				Unique:  true,
-				Columns: []*schema.Column{ProxySystemColumns[1], ProxySystemColumns[2]},
+				Columns: []*schema.Column{SystemColumns[2]},
 			},
 		},
 	}
-	// ProxySystemLogColumns holds the columns for the "proxy_system_log" table.
-	ProxySystemLogColumns = []*schema.Column{
+	// SystemLogsColumns holds the columns for the "system_logs" table.
+	SystemLogsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "type", Type: field.TypeInt8, Comment: "日志类型: 10=Email, 11=Mobile, 20=Subscribe, 21=SubscribeTraffic, 22=ServerTraffic, 23=ResetSubscribe, 30=Login, 31=Register, 32=Balance, 33=Commission, 34=Gift"},
+		{Name: "type", Type: field.TypeInt8, Comment: "日志类型"},
 		{Name: "date", Type: field.TypeString, Nullable: true, Size: 20, Comment: "日志日期"},
-		{Name: "object_id", Type: field.TypeInt64, Comment: "对象ID（用户ID或其他关联对象ID）", Default: 0},
-		{Name: "content", Type: field.TypeString, Size: 2147483647, Comment: "日志内容（JSON格式）"},
+		{Name: "object_id", Type: field.TypeInt64, Comment: "对象ID", Default: 0},
+		{Name: "content", Type: field.TypeString, Size: 2147483647, Comment: "日志内容"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 	}
-	// ProxySystemLogTable holds the schema information for the "proxy_system_log" table.
-	ProxySystemLogTable = &schema.Table{
-		Name:       "proxy_system_log",
-		Columns:    ProxySystemLogColumns,
-		PrimaryKey: []*schema.Column{ProxySystemLogColumns[0]},
+	// SystemLogsTable holds the schema information for the "system_logs" table.
+	SystemLogsTable = &schema.Table{
+		Name:       "system_logs",
+		Columns:    SystemLogsColumns,
+		PrimaryKey: []*schema.Column{SystemLogsColumns[0]},
 	}
-	// ProxyTaskColumns holds the columns for the "proxy_task" table.
-	ProxyTaskColumns = []*schema.Column{
+	// TaskColumns holds the columns for the "task" table.
+	TaskColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "ID"},
-		{Name: "type", Type: field.TypeInt8, Comment: "任务类型: 0:Email, 1:Quota"},
-		{Name: "scope", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "任务范围（JSON格式）"},
-		{Name: "content", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "任务内容（JSON格式）"},
-		{Name: "status", Type: field.TypeInt8, Comment: "任务状态: 0:Pending, 1:In Progress, 2:Completed, 3:Failed", Default: 0},
+		{Name: "type", Type: field.TypeInt8, Comment: "任务类型"},
+		{Name: "scope", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "任务范围"},
+		{Name: "content", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "任务内容"},
+		{Name: "status", Type: field.TypeInt8, Comment: "任务状态", Default: 0},
 		{Name: "errors", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "任务错误信息"},
-		{Name: "total", Type: field.TypeUint32, Comment: "总数", Default: 0},
-		{Name: "current", Type: field.TypeUint32, Comment: "当前数量", Default: 0},
+		{Name: "total", Type: field.TypeUint64, Comment: "总数", Default: 0},
+		{Name: "current", Type: field.TypeUint64, Comment: "当前数量", Default: 0},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxyTaskTable holds the schema information for the "proxy_task" table.
-	ProxyTaskTable = &schema.Table{
-		Name:       "proxy_task",
-		Columns:    ProxyTaskColumns,
-		PrimaryKey: []*schema.Column{ProxyTaskColumns[0]},
+	// TaskTable holds the schema information for the "task" table.
+	TaskTable = &schema.Table{
+		Name:       "task",
+		Columns:    TaskColumns,
+		PrimaryKey: []*schema.Column{TaskColumns[0]},
 	}
-	// ProxyTicketColumns holds the columns for the "proxy_ticket" table.
-	ProxyTicketColumns = []*schema.Column{
+	// TicketColumns holds the columns for the "ticket" table.
+	TicketColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
-		{Name: "tenant_id", Type: field.TypeInt64, Comment: "租户ID", Default: 0},
-		{Name: "title", Type: field.TypeString, Comment: "工单标题", Default: ""},
+		{Name: "title", Type: field.TypeString, Size: 255, Comment: "工单标题", Default: ""},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "工单描述"},
 		{Name: "user_id", Type: field.TypeInt64, Comment: "用户ID", Default: 0},
-		{Name: "status", Type: field.TypeInt8, Comment: "工单状态: 1=Pending, 2=Waiting, 3=Processed, 4=Closed", Default: 1},
-		{Name: "created_at", Type: field.TypeTime, Nullable: true, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Nullable: true, Comment: "更新时间"},
+		{Name: "status", Type: field.TypeInt8, Comment: "工单状态", Default: 1},
+		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
+		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxyTicketTable holds the schema information for the "proxy_ticket" table.
-	ProxyTicketTable = &schema.Table{
-		Name:       "proxy_ticket",
-		Columns:    ProxyTicketColumns,
-		PrimaryKey: []*schema.Column{ProxyTicketColumns[0]},
+	// TicketTable holds the schema information for the "ticket" table.
+	TicketTable = &schema.Table{
+		Name:       "ticket",
+		Columns:    TicketColumns,
+		PrimaryKey: []*schema.Column{TicketColumns[0]},
 	}
-	// ProxyTicketFollowColumns holds the columns for the "proxy_ticket_follow" table.
-	ProxyTicketFollowColumns = []*schema.Column{
+	// TicketFollowColumns holds the columns for the "ticket_follow" table.
+	TicketFollowColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true},
 		{Name: "ticket_id", Type: field.TypeInt64, Comment: "工单ID", Default: 0},
-		{Name: "from", Type: field.TypeString, Comment: "来源/操作人", Default: ""},
-		{Name: "type", Type: field.TypeInt8, Comment: "类型: 1=文本, 2=图片", Default: 1},
+		{Name: "from", Type: field.TypeString, Size: 255, Comment: "来源/操作人", Default: ""},
+		{Name: "type", Type: field.TypeInt8, Comment: "类型", Default: 1},
 		{Name: "content", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "跟进内容"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 	}
-	// ProxyTicketFollowTable holds the schema information for the "proxy_ticket_follow" table.
-	ProxyTicketFollowTable = &schema.Table{
-		Name:       "proxy_ticket_follow",
-		Columns:    ProxyTicketFollowColumns,
-		PrimaryKey: []*schema.Column{ProxyTicketFollowColumns[0]},
+	// TicketFollowTable holds the schema information for the "ticket_follow" table.
+	TicketFollowTable = &schema.Table{
+		Name:       "ticket_follow",
+		Columns:    TicketFollowColumns,
+		PrimaryKey: []*schema.Column{TicketFollowColumns[0]},
 	}
-	// ProxyTrafficLogColumns holds the columns for the "proxy_traffic_log" table.
-	ProxyTrafficLogColumns = []*schema.Column{
+	// TrafficLogColumns holds the columns for the "traffic_log" table.
+	TrafficLogColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "ID"},
 		{Name: "server_id", Type: field.TypeInt64, Comment: "服务器ID"},
 		{Name: "user_id", Type: field.TypeInt64, Comment: "用户ID"},
 		{Name: "subscribe_id", Type: field.TypeInt64, Comment: "订阅ID"},
-		{Name: "download", Type: field.TypeInt, Comment: "下载流量", Default: 0},
-		{Name: "upload", Type: field.TypeInt, Comment: "上传流量", Default: 0},
+		{Name: "download", Type: field.TypeInt64, Comment: "下载流量", Default: 0},
+		{Name: "upload", Type: field.TypeInt64, Comment: "上传流量", Default: 0},
 		{Name: "timestamp", Type: field.TypeTime, Comment: "流量日志时间"},
 	}
-	// ProxyTrafficLogTable holds the schema information for the "proxy_traffic_log" table.
-	ProxyTrafficLogTable = &schema.Table{
-		Name:       "proxy_traffic_log",
-		Columns:    ProxyTrafficLogColumns,
-		PrimaryKey: []*schema.Column{ProxyTrafficLogColumns[0]},
+	// TrafficLogTable holds the schema information for the "traffic_log" table.
+	TrafficLogTable = &schema.Table{
+		Name:       "traffic_log",
+		Columns:    TrafficLogColumns,
+		PrimaryKey: []*schema.Column{TrafficLogColumns[0]},
 	}
-	// ProxyUserColumns holds the columns for the "proxy_user" table.
-	ProxyUserColumns = []*schema.Column{
+	// UserColumns holds the columns for the "user" table.
+	UserColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "用户ID"},
 		{Name: "password", Type: field.TypeString, Size: 100, Comment: "用户密码"},
 		{Name: "algo", Type: field.TypeString, Size: 20, Comment: "加密算法", Default: "default"},
 		{Name: "salt", Type: field.TypeString, Nullable: true, Size: 20, Comment: "密码盐值"},
 		{Name: "avatar", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "用户头像"},
-		{Name: "tenant_id", Type: field.TypeInt64, Comment: "租户ID", Default: 0},
-		{Name: "balance", Type: field.TypeInt64, Nullable: true, Comment: "用户余额（单位：分）", Default: 0},
-		{Name: "telegram", Type: field.TypeInt, Nullable: true, Comment: "Telegram账号"},
+		{Name: "balance", Type: field.TypeInt64, Nullable: true, Comment: "用户余额", Default: 0},
+		{Name: "telegram", Type: field.TypeInt64, Nullable: true, Comment: "Telegram 账号"},
 		{Name: "refer_code", Type: field.TypeString, Nullable: true, Size: 20, Comment: "推荐码"},
 		{Name: "referer_id", Type: field.TypeInt64, Nullable: true, Comment: "推荐人ID"},
-		{Name: "commission", Type: field.TypeInt64, Nullable: true, Comment: "佣金（单位：分）", Default: 0},
+		{Name: "commission", Type: field.TypeInt64, Nullable: true, Comment: "佣金", Default: 0},
 		{Name: "referral_percentage", Type: field.TypeInt8, Comment: "推荐百分比", Default: 0},
 		{Name: "only_first_purchase", Type: field.TypeBool, Comment: "仅首次购买", Default: true},
-		{Name: "gift_amount", Type: field.TypeInt64, Nullable: true, Comment: "用户礼品金额（单位：分）", Default: 0},
+		{Name: "gift_amount", Type: field.TypeInt64, Nullable: true, Comment: "礼品金额", Default: 0},
 		{Name: "enable", Type: field.TypeBool, Comment: "账号是否启用", Default: true},
 		{Name: "is_admin", Type: field.TypeBool, Comment: "是否管理员", Default: false},
-		{Name: "valid_email", Type: field.TypeBool, Comment: "邮箱是否验证", Default: false},
+		{Name: "valid_email", Type: field.TypeBool, Comment: "邮箱是否已验证", Default: false},
 		{Name: "enable_email_notify", Type: field.TypeBool, Comment: "启用邮件通知", Default: false},
-		{Name: "enable_telegram_notify", Type: field.TypeBool, Comment: "启用Telegram通知", Default: false},
+		{Name: "enable_telegram_notify", Type: field.TypeBool, Comment: "启用 Telegram 通知", Default: false},
 		{Name: "enable_balance_notify", Type: field.TypeBool, Comment: "启用余额变动通知", Default: false},
 		{Name: "enable_login_notify", Type: field.TypeBool, Comment: "启用登录通知", Default: false},
 		{Name: "enable_subscribe_notify", Type: field.TypeBool, Comment: "启用订阅通知", Default: false},
 		{Name: "enable_trade_notify", Type: field.TypeBool, Comment: "启用交易通知", Default: false},
-		{Name: "group_id", Type: field.TypeInt64, Nullable: true, Comment: "用户分组ID", Default: 0},
-		{Name: "group_locked", Type: field.TypeBool, Comment: "是否锁定分组", Default: false},
+		{Name: "rules", Type: field.TypeString, Nullable: true, Comment: "用户规则"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true, Comment: "删除时间"},
-		{Name: "is_del", Type: field.TypeBool, Nullable: true, Comment: "1：正常 0：已删除", Default: false},
+		{Name: "is_del", Type: field.TypeUint64, Nullable: true, Comment: "1: 正常 0: 删除"},
 	}
-	// ProxyUserTable holds the schema information for the "proxy_user" table.
-	ProxyUserTable = &schema.Table{
-		Name:       "proxy_user",
-		Columns:    ProxyUserColumns,
-		PrimaryKey: []*schema.Column{ProxyUserColumns[0]},
+	// UserTable holds the schema information for the "user" table.
+	UserTable = &schema.Table{
+		Name:       "user",
+		Columns:    UserColumns,
+		PrimaryKey: []*schema.Column{UserColumns[0]},
 	}
-	// ProxyUserAuthMethodColumns holds the columns for the "proxy_user_auth_method" table.
-	ProxyUserAuthMethodColumns = []*schema.Column{
+	// UserAuthMethodsColumns holds the columns for the "user_auth_methods" table.
+	UserAuthMethodsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "ID"},
 		{Name: "user_id", Type: field.TypeInt64, Comment: "用户ID"},
-		{Name: "tenant_id", Type: field.TypeInt64, Comment: "租户ID", Default: 0},
-		{Name: "auth_type", Type: field.TypeString, Size: 255, Comment: "认证类型: apple, google, github, facebook, telegram, email, mobile"},
-		{Name: "auth_identifier", Type: field.TypeString, Size: 255, Comment: "认证标识"},
+		{Name: "auth_type", Type: field.TypeString, Size: 255, Comment: "认证类型"},
+		{Name: "auth_identifier", Type: field.TypeString, Unique: true, Size: 255, Comment: "认证标识"},
 		{Name: "verified", Type: field.TypeBool, Comment: "是否已验证", Default: false},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxyUserAuthMethodTable holds the schema information for the "proxy_user_auth_method" table.
-	ProxyUserAuthMethodTable = &schema.Table{
-		Name:       "proxy_user_auth_method",
-		Columns:    ProxyUserAuthMethodColumns,
-		PrimaryKey: []*schema.Column{ProxyUserAuthMethodColumns[0]},
+	// UserAuthMethodsTable holds the schema information for the "user_auth_methods" table.
+	UserAuthMethodsTable = &schema.Table{
+		Name:       "user_auth_methods",
+		Columns:    UserAuthMethodsColumns,
+		PrimaryKey: []*schema.Column{UserAuthMethodsColumns[0]},
 	}
-	// ProxyUserDeviceColumns holds the columns for the "proxy_user_device" table.
-	ProxyUserDeviceColumns = []*schema.Column{
+	// UserDeviceColumns holds the columns for the "user_device" table.
+	UserDeviceColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "ID"},
 		{Name: "user_id", Type: field.TypeInt64, Comment: "用户ID"},
 		{Name: "subscribe_id", Type: field.TypeInt64, Nullable: true, Comment: "订阅ID"},
 		{Name: "ip", Type: field.TypeString, Nullable: true, Size: 191, Comment: "设备IP"},
-		{Name: "identifier", Type: field.TypeString, Nullable: true, Size: 191, Comment: "设备标识符"},
 		{Name: "user_agent", Type: field.TypeString, Nullable: true, Size: 64, Comment: "设备User Agent"},
+		{Name: "Identifier", Type: field.TypeString, Nullable: true, Size: 191, Comment: "设备标识符"},
+		{Name: "short_code", Type: field.TypeString, Size: 255, Comment: "短码", Default: ""},
 		{Name: "online", Type: field.TypeBool, Comment: "是否在线", Default: false},
 		{Name: "enabled", Type: field.TypeBool, Comment: "是否启用", Default: true},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxyUserDeviceTable holds the schema information for the "proxy_user_device" table.
-	ProxyUserDeviceTable = &schema.Table{
-		Name:       "proxy_user_device",
-		Columns:    ProxyUserDeviceColumns,
-		PrimaryKey: []*schema.Column{ProxyUserDeviceColumns[0]},
+	// UserDeviceTable holds the schema information for the "user_device" table.
+	UserDeviceTable = &schema.Table{
+		Name:       "user_device",
+		Columns:    UserDeviceColumns,
+		PrimaryKey: []*schema.Column{UserDeviceColumns[0]},
 	}
-	// ProxyUserDeviceOnlineRecordColumns holds the columns for the "proxy_user_device_online_record" table.
-	ProxyUserDeviceOnlineRecordColumns = []*schema.Column{
+	// UserDeviceOnlineRecordColumns holds the columns for the "user_device_online_record" table.
+	UserDeviceOnlineRecordColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "ID"},
 		{Name: "user_id", Type: field.TypeInt64, Comment: "用户ID"},
 		{Name: "identifier", Type: field.TypeString, Size: 255, Comment: "设备标识符"},
 		{Name: "online_time", Type: field.TypeTime, Nullable: true, Comment: "上线时间"},
 		{Name: "offline_time", Type: field.TypeTime, Nullable: true, Comment: "下线时间"},
-		{Name: "online_seconds", Type: field.TypeInt, Nullable: true, Comment: "在线秒数"},
-		{Name: "duration_days", Type: field.TypeInt, Nullable: true, Comment: "持续天数"},
+		{Name: "online_seconds", Type: field.TypeInt64, Nullable: true, Comment: "在线秒数"},
+		{Name: "duration_days", Type: field.TypeInt64, Nullable: true, Comment: "持续天数"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 	}
-	// ProxyUserDeviceOnlineRecordTable holds the schema information for the "proxy_user_device_online_record" table.
-	ProxyUserDeviceOnlineRecordTable = &schema.Table{
-		Name:       "proxy_user_device_online_record",
-		Columns:    ProxyUserDeviceOnlineRecordColumns,
-		PrimaryKey: []*schema.Column{ProxyUserDeviceOnlineRecordColumns[0]},
+	// UserDeviceOnlineRecordTable holds the schema information for the "user_device_online_record" table.
+	UserDeviceOnlineRecordTable = &schema.Table{
+		Name:       "user_device_online_record",
+		Columns:    UserDeviceOnlineRecordColumns,
+		PrimaryKey: []*schema.Column{UserDeviceOnlineRecordColumns[0]},
 	}
-	// ProxyUserGroupColumns holds the columns for the "proxy_user_group" table.
-	ProxyUserGroupColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "用户组ID"},
-		{Name: "name", Type: field.TypeString, Size: 255, Comment: "用户组名称"},
-		{Name: "description", Type: field.TypeString, Size: 500, Comment: "用户组描述", Default: ""},
-		{Name: "sort", Type: field.TypeInt, Comment: "排序", Default: 0},
-		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
-		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
-	}
-	// ProxyUserGroupTable holds the schema information for the "proxy_user_group" table.
-	ProxyUserGroupTable = &schema.Table{
-		Name:       "proxy_user_group",
-		Columns:    ProxyUserGroupColumns,
-		PrimaryKey: []*schema.Column{ProxyUserGroupColumns[0]},
-	}
-	// ProxyUserSubscribeColumns holds the columns for the "proxy_user_subscribe" table.
-	ProxyUserSubscribeColumns = []*schema.Column{
+	// UserSubscribeColumns holds the columns for the "user_subscribe" table.
+	UserSubscribeColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "ID"},
 		{Name: "user_id", Type: field.TypeInt64, Comment: "用户ID"},
 		{Name: "order_id", Type: field.TypeInt64, Comment: "订单ID"},
 		{Name: "subscribe_id", Type: field.TypeInt64, Comment: "订阅套餐ID"},
+		{Name: "node_group_id", Type: field.TypeInt64, Comment: "节点组ID", Default: 0},
+		{Name: "group_locked", Type: field.TypeBool, Comment: "分组是否锁定", Default: false},
 		{Name: "start_time", Type: field.TypeTime, Comment: "订阅开始时间"},
 		{Name: "expire_time", Type: field.TypeTime, Nullable: true, Comment: "订阅过期时间"},
 		{Name: "finished_at", Type: field.TypeTime, Nullable: true, Comment: "订阅完成时间"},
-		{Name: "traffic", Type: field.TypeInt64, Nullable: true, Comment: "总流量（字节）"},
-		{Name: "download", Type: field.TypeInt64, Nullable: true, Comment: "下载流量（字节）"},
-		{Name: "upload", Type: field.TypeInt64, Nullable: true, Comment: "上传流量（字节）"},
-		{Name: "token", Type: field.TypeString, Nullable: true, Size: 255, Comment: "订阅令牌"},
-		{Name: "uuid", Type: field.TypeString, Nullable: true, Size: 255, Comment: "订阅UUID"},
-		{Name: "status", Type: field.TypeInt8, Nullable: true, Comment: "订阅状态: 0-待激活 1-激活 2-完成 3-过期 4-已扣除"},
+		{Name: "traffic", Type: field.TypeInt64, Nullable: true, Comment: "总流量", Default: 0},
+		{Name: "download", Type: field.TypeInt64, Nullable: true, Comment: "下载流量", Default: 0},
+		{Name: "upload", Type: field.TypeInt64, Nullable: true, Comment: "上传流量", Default: 0},
+		{Name: "expired_download", Type: field.TypeInt64, Nullable: true, Comment: "过期下载流量", Default: 0},
+		{Name: "expired_upload", Type: field.TypeInt64, Nullable: true, Comment: "过期上传流量", Default: 0},
+		{Name: "token", Type: field.TypeString, Unique: true, Nullable: true, Size: 255, Comment: "订阅令牌"},
+		{Name: "uuid", Type: field.TypeString, Unique: true, Nullable: true, Size: 255, Comment: "订阅UUID"},
+		{Name: "status", Type: field.TypeInt8, Nullable: true, Comment: "订阅状态", Default: 0},
+		{Name: "note", Type: field.TypeString, Nullable: true, Size: 500, Comment: "用户备注"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}
-	// ProxyUserSubscribeTable holds the schema information for the "proxy_user_subscribe" table.
-	ProxyUserSubscribeTable = &schema.Table{
-		Name:       "proxy_user_subscribe",
-		Columns:    ProxyUserSubscribeColumns,
-		PrimaryKey: []*schema.Column{ProxyUserSubscribeColumns[0]},
+	// UserSubscribeTable holds the schema information for the "user_subscribe" table.
+	UserSubscribeTable = &schema.Table{
+		Name:       "user_subscribe",
+		Columns:    UserSubscribeColumns,
+		PrimaryKey: []*schema.Column{UserSubscribeColumns[0]},
 	}
-	// ProxyUserWithdrawalColumns holds the columns for the "proxy_user_withdrawal" table.
-	ProxyUserWithdrawalColumns = []*schema.Column{
+	// UserWithdrawalColumns holds the columns for the "user_withdrawal" table.
+	UserWithdrawalColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "提现ID"},
 		{Name: "amount", Type: field.TypeInt64, Comment: "提现金额"},
 		{Name: "content", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "提现内容"},
@@ -643,147 +650,147 @@ var (
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 		{Name: "user_id", Type: field.TypeInt64, Comment: "用户ID"},
 	}
-	// ProxyUserWithdrawalTable holds the schema information for the "proxy_user_withdrawal" table.
-	ProxyUserWithdrawalTable = &schema.Table{
-		Name:       "proxy_user_withdrawal",
-		Columns:    ProxyUserWithdrawalColumns,
-		PrimaryKey: []*schema.Column{ProxyUserWithdrawalColumns[0]},
+	// UserWithdrawalTable holds the schema information for the "user_withdrawal" table.
+	UserWithdrawalTable = &schema.Table{
+		Name:       "user_withdrawal",
+		Columns:    UserWithdrawalColumns,
+		PrimaryKey: []*schema.Column{UserWithdrawalColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "proxy_user_withdrawal_proxy_user_withdrawals",
-				Columns:    []*schema.Column{ProxyUserWithdrawalColumns[7]},
-				RefColumns: []*schema.Column{ProxyUserColumns[0]},
+				Symbol:     "user_withdrawal_user_withdrawals",
+				Columns:    []*schema.Column{UserWithdrawalColumns[7]},
+				RefColumns: []*schema.Column{UserColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		ProxyAdsTable,
-		ProxyAnnouncementTable,
-		ProxyAuthMethodTable,
-		ProxyCouponTable,
-		ProxyDocumentTable,
-		ProxyGroupHistoryTable,
-		ProxyNodesTable,
-		ProxyOrderTable,
-		ProxyPaymentTable,
-		ProxyRedemptionCodeTable,
-		ProxyRedemptionRecordTable,
-		ProxySchemaMigrationsTable,
-		ProxyServerTable,
-		ProxyServerGroupTable,
-		ProxySubscribeTable,
-		ProxySubscribeApplicationTable,
-		ProxySubscribeGroupTable,
-		ProxySystemTable,
-		ProxySystemLogTable,
-		ProxyTaskTable,
-		ProxyTicketTable,
-		ProxyTicketFollowTable,
-		ProxyTrafficLogTable,
-		ProxyUserTable,
-		ProxyUserAuthMethodTable,
-		ProxyUserDeviceTable,
-		ProxyUserDeviceOnlineRecordTable,
-		ProxyUserGroupTable,
-		ProxyUserSubscribeTable,
-		ProxyUserWithdrawalTable,
+		AdsTable,
+		AnnouncementTable,
+		AuthMethodTable,
+		CouponTable,
+		DocumentTable,
+		GroupHistoryTable,
+		GroupHistoryDetailTable,
+		NodesTable,
+		OrderTable,
+		PaymentTable,
+		RedemptionCodeTable,
+		RedemptionRecordTable,
+		SchemaMigrationsTable,
+		ServersTable,
+		NodeGroupTable,
+		SubscribeTable,
+		SubscribeApplicationTable,
+		SubscribeGroupTable,
+		SystemTable,
+		SystemLogsTable,
+		TaskTable,
+		TicketTable,
+		TicketFollowTable,
+		TrafficLogTable,
+		UserTable,
+		UserAuthMethodsTable,
+		UserDeviceTable,
+		UserDeviceOnlineRecordTable,
+		UserSubscribeTable,
+		UserWithdrawalTable,
 	}
 )
 
 func init() {
-	ProxyAdsTable.Annotation = &entsql.Annotation{
-		Table: "proxy_ads",
+	AdsTable.Annotation = &entsql.Annotation{
+		Table: "ads",
 	}
-	ProxyAnnouncementTable.Annotation = &entsql.Annotation{
-		Table: "proxy_announcement",
+	AnnouncementTable.Annotation = &entsql.Annotation{
+		Table: "announcement",
 	}
-	ProxyAuthMethodTable.Annotation = &entsql.Annotation{
-		Table: "proxy_auth_method",
+	AuthMethodTable.Annotation = &entsql.Annotation{
+		Table: "auth_method",
 	}
-	ProxyCouponTable.Annotation = &entsql.Annotation{
-		Table: "proxy_coupon",
+	CouponTable.Annotation = &entsql.Annotation{
+		Table: "coupon",
 	}
-	ProxyDocumentTable.Annotation = &entsql.Annotation{
-		Table: "proxy_document",
+	DocumentTable.Annotation = &entsql.Annotation{
+		Table: "document",
 	}
-	ProxyGroupHistoryTable.Annotation = &entsql.Annotation{
-		Table: "proxy_group_history",
+	GroupHistoryTable.Annotation = &entsql.Annotation{
+		Table: "group_history",
 	}
-	ProxyNodesTable.Annotation = &entsql.Annotation{
-		Table: "proxy_nodes",
+	GroupHistoryDetailTable.Annotation = &entsql.Annotation{
+		Table: "group_history_detail",
 	}
-	ProxyOrderTable.Annotation = &entsql.Annotation{
-		Table: "proxy_order",
+	NodesTable.Annotation = &entsql.Annotation{
+		Table: "nodes",
 	}
-	ProxyPaymentTable.Annotation = &entsql.Annotation{
-		Table: "proxy_payment",
+	OrderTable.Annotation = &entsql.Annotation{
+		Table: "order",
 	}
-	ProxyRedemptionCodeTable.Annotation = &entsql.Annotation{
-		Table: "proxy_redemption_code",
+	PaymentTable.Annotation = &entsql.Annotation{
+		Table: "payment",
 	}
-	ProxyRedemptionRecordTable.ForeignKeys[0].RefTable = ProxyRedemptionCodeTable
-	ProxyRedemptionRecordTable.ForeignKeys[1].RefTable = ProxyUserTable
-	ProxyRedemptionRecordTable.Annotation = &entsql.Annotation{
-		Table: "proxy_redemption_record",
+	RedemptionCodeTable.Annotation = &entsql.Annotation{
+		Table: "redemption_code",
 	}
-	ProxySchemaMigrationsTable.Annotation = &entsql.Annotation{
-		Table: "proxy_schema_migrations",
+	RedemptionRecordTable.ForeignKeys[0].RefTable = RedemptionCodeTable
+	RedemptionRecordTable.ForeignKeys[1].RefTable = UserTable
+	RedemptionRecordTable.Annotation = &entsql.Annotation{
+		Table: "redemption_record",
 	}
-	ProxyServerTable.Annotation = &entsql.Annotation{
-		Table: "proxy_server",
+	SchemaMigrationsTable.Annotation = &entsql.Annotation{
+		Table: "schema_migrations",
 	}
-	ProxyServerGroupTable.Annotation = &entsql.Annotation{
-		Table: "proxy_server_group",
+	ServersTable.Annotation = &entsql.Annotation{
+		Table: "servers",
 	}
-	ProxySubscribeTable.Annotation = &entsql.Annotation{
-		Table: "proxy_subscribe",
+	NodeGroupTable.Annotation = &entsql.Annotation{
+		Table: "node_group",
 	}
-	ProxySubscribeApplicationTable.Annotation = &entsql.Annotation{
-		Table: "proxy_subscribe_application",
+	SubscribeTable.Annotation = &entsql.Annotation{
+		Table: "subscribe",
 	}
-	ProxySubscribeGroupTable.Annotation = &entsql.Annotation{
-		Table: "proxy_subscribe_group",
+	SubscribeApplicationTable.Annotation = &entsql.Annotation{
+		Table: "subscribe_application",
 	}
-	ProxySystemTable.Annotation = &entsql.Annotation{
-		Table: "proxy_system",
+	SubscribeGroupTable.Annotation = &entsql.Annotation{
+		Table: "subscribe_group",
 	}
-	ProxySystemLogTable.Annotation = &entsql.Annotation{
-		Table: "proxy_system_log",
+	SystemTable.Annotation = &entsql.Annotation{
+		Table: "system",
 	}
-	ProxyTaskTable.Annotation = &entsql.Annotation{
-		Table: "proxy_task",
+	SystemLogsTable.Annotation = &entsql.Annotation{
+		Table: "system_logs",
 	}
-	ProxyTicketTable.Annotation = &entsql.Annotation{
-		Table: "proxy_ticket",
+	TaskTable.Annotation = &entsql.Annotation{
+		Table: "task",
 	}
-	ProxyTicketFollowTable.Annotation = &entsql.Annotation{
-		Table: "proxy_ticket_follow",
+	TicketTable.Annotation = &entsql.Annotation{
+		Table: "ticket",
 	}
-	ProxyTrafficLogTable.Annotation = &entsql.Annotation{
-		Table: "proxy_traffic_log",
+	TicketFollowTable.Annotation = &entsql.Annotation{
+		Table: "ticket_follow",
 	}
-	ProxyUserTable.Annotation = &entsql.Annotation{
-		Table: "proxy_user",
+	TrafficLogTable.Annotation = &entsql.Annotation{
+		Table: "traffic_log",
 	}
-	ProxyUserAuthMethodTable.Annotation = &entsql.Annotation{
-		Table: "proxy_user_auth_method",
+	UserTable.Annotation = &entsql.Annotation{
+		Table: "user",
 	}
-	ProxyUserDeviceTable.Annotation = &entsql.Annotation{
-		Table: "proxy_user_device",
+	UserAuthMethodsTable.Annotation = &entsql.Annotation{
+		Table: "user_auth_methods",
 	}
-	ProxyUserDeviceOnlineRecordTable.Annotation = &entsql.Annotation{
-		Table: "proxy_user_device_online_record",
+	UserDeviceTable.Annotation = &entsql.Annotation{
+		Table: "user_device",
 	}
-	ProxyUserGroupTable.Annotation = &entsql.Annotation{
-		Table: "proxy_user_group",
+	UserDeviceOnlineRecordTable.Annotation = &entsql.Annotation{
+		Table: "user_device_online_record",
 	}
-	ProxyUserSubscribeTable.Annotation = &entsql.Annotation{
-		Table: "proxy_user_subscribe",
+	UserSubscribeTable.Annotation = &entsql.Annotation{
+		Table: "user_subscribe",
 	}
-	ProxyUserWithdrawalTable.ForeignKeys[0].RefTable = ProxyUserTable
-	ProxyUserWithdrawalTable.Annotation = &entsql.Annotation{
-		Table: "proxy_user_withdrawal",
+	UserWithdrawalTable.ForeignKeys[0].RefTable = UserTable
+	UserWithdrawalTable.Annotation = &entsql.Annotation{
+		Table: "user_withdrawal",
 	}
 }

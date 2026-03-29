@@ -28,7 +28,7 @@ const (
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// Table holds the table name of the proxyuserdeviceonlinerecord in the database.
-	Table = "proxy_user_device_online_record"
+	Table = "user_device_online_record"
 )
 
 // Columns holds all SQL columns for proxyuserdeviceonlinerecord fields.

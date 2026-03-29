@@ -19,6 +19,9 @@ const (
 	// SchedulerExchangeRate 定时获取汇率任务
 	SchedulerExchangeRate = "scheduler:exchange:rate"
 
+	// SchedulerRecalculateGroup 定时分组重算任务
+	SchedulerRecalculateGroup = "scheduler:recalculate:group"
+
 	// ForthwithQuotaTask 配额任务（立即执行）
 	ForthwithQuotaTask = "forthwith:quota:task"
 

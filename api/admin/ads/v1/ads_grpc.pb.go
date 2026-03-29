@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v3.19.4
-// source: admin/ads/v1/ads.proto
+// source: api/admin/ads/v1/ads.proto
 
 package v1
 
@@ -283,5 +283,5 @@ var AdsService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "admin/ads/v1/ads.proto",
+	Metadata: "api/admin/ads/v1/ads.proto",
 }

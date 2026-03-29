@@ -20,20 +20,6 @@ type ProxyAdsCreate struct {
 	hooks    []Hook
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_c *ProxyAdsCreate) SetTenantID(v int64) *ProxyAdsCreate {
-	_c.mutation.SetTenantID(v)
-	return _c
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_c *ProxyAdsCreate) SetNillableTenantID(v *int64) *ProxyAdsCreate {
-	if v != nil {
-		_c.SetTenantID(*v)
-	}
-	return _c
-}
-
 // SetTitle sets the "title" field.
 func (_c *ProxyAdsCreate) SetTitle(v string) *ProxyAdsCreate {
 	_c.mutation.SetTitle(v)
@@ -110,36 +96,20 @@ func (_c *ProxyAdsCreate) SetStartTime(v time.Time) *ProxyAdsCreate {
 	return _c
 }
 
-// SetNillableStartTime sets the "start_time" field if the given value is not nil.
-func (_c *ProxyAdsCreate) SetNillableStartTime(v *time.Time) *ProxyAdsCreate {
-	if v != nil {
-		_c.SetStartTime(*v)
-	}
-	return _c
-}
-
 // SetEndTime sets the "end_time" field.
 func (_c *ProxyAdsCreate) SetEndTime(v time.Time) *ProxyAdsCreate {
 	_c.mutation.SetEndTime(v)
 	return _c
 }
 
-// SetNillableEndTime sets the "end_time" field if the given value is not nil.
-func (_c *ProxyAdsCreate) SetNillableEndTime(v *time.Time) *ProxyAdsCreate {
-	if v != nil {
-		_c.SetEndTime(*v)
-	}
-	return _c
-}
-
 // SetStatus sets the "status" field.
-func (_c *ProxyAdsCreate) SetStatus(v int8) *ProxyAdsCreate {
+func (_c *ProxyAdsCreate) SetStatus(v int) *ProxyAdsCreate {
 	_c.mutation.SetStatus(v)
 	return _c
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (_c *ProxyAdsCreate) SetNillableStatus(v *int8) *ProxyAdsCreate {
+func (_c *ProxyAdsCreate) SetNillableStatus(v *int) *ProxyAdsCreate {
 	if v != nil {
 		_c.SetStatus(*v)
 	}
@@ -215,10 +185,6 @@ func (_c *ProxyAdsCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxyAdsCreate) defaults() {
-	if _, ok := _c.mutation.TenantID(); !ok {
-		v := proxyads.DefaultTenantID
-		_c.mutation.SetTenantID(v)
-	}
 	if _, ok := _c.mutation.Title(); !ok {
 		v := proxyads.DefaultTitle
 		_c.mutation.SetTitle(v)
@@ -247,9 +213,6 @@ func (_c *ProxyAdsCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ProxyAdsCreate) check() error {
-	if _, ok := _c.mutation.TenantID(); !ok {
-		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "ProxyAds.tenant_id"`)}
-	}
 	if _, ok := _c.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "ProxyAds.title"`)}
 	}
@@ -273,6 +236,15 @@ func (_c *ProxyAdsCreate) check() error {
 		if err := proxyads.TargetURLValidator(v); err != nil {
 			return &ValidationError{Name: "target_url", err: fmt.Errorf(`ent: validator failed for field "ProxyAds.target_url": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.StartTime(); !ok {
+		return &ValidationError{Name: "start_time", err: errors.New(`ent: missing required field "ProxyAds.start_time"`)}
+	}
+	if _, ok := _c.mutation.EndTime(); !ok {
+		return &ValidationError{Name: "end_time", err: errors.New(`ent: missing required field "ProxyAds.end_time"`)}
+	}
+	if _, ok := _c.mutation.Status(); !ok {
+		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "ProxyAds.status"`)}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProxyAds.created_at"`)}
@@ -312,10 +284,6 @@ func (_c *ProxyAdsCreate) createSpec() (*ProxyAds, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := _c.mutation.TenantID(); ok {
-		_spec.SetField(proxyads.FieldTenantID, field.TypeInt64, value)
-		_node.TenantID = value
-	}
 	if value, ok := _c.mutation.Title(); ok {
 		_spec.SetField(proxyads.FieldTitle, field.TypeString, value)
 		_node.Title = value
@@ -345,7 +313,7 @@ func (_c *ProxyAdsCreate) createSpec() (*ProxyAds, *sqlgraph.CreateSpec) {
 		_node.EndTime = value
 	}
 	if value, ok := _c.mutation.Status(); ok {
-		_spec.SetField(proxyads.FieldStatus, field.TypeInt8, value)
+		_spec.SetField(proxyads.FieldStatus, field.TypeInt, value)
 		_node.Status = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {

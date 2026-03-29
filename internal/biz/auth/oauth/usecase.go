@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/oauth/apple"
 	"github.com/OmnTeam/ppanel-pro/pkg/oauth/google"
 	"github.com/OmnTeam/ppanel-pro/pkg/oauth/telegram"
@@ -24,7 +25,7 @@ const (
 	OAuthFacebook = "facebook"
 
 	// Telegram特殊常量
-	TelegramDomain = "telegram.org"
+	TelegramDomain = "ppanel.com"
 	AuthExpire     = 86400 // 24小时（秒）
 )
 
@@ -69,8 +70,6 @@ func (uc *oauthUseCase) OAuthLogin(ctx context.Context, params *OAuthParams) (*O
 		uri, err = uc.githubLogin(ctx, params)
 	case OAuthFacebook:
 		uri, err = uc.facebookLogin(ctx, params)
-	default:
-		return nil, errors.BadRequest("UNSUPPORTED_OAUTH_METHOD", fmt.Sprintf("不支持的OAuth方法: %s", params.Method))
 	}
 
 	if err != nil {
@@ -176,7 +175,7 @@ func (uc *oauthUseCase) telegramLogin(ctx context.Context, params *OAuthParams) 
 
 	// 3. 保存state code到Redis（5分钟过期）
 	// 注意：原项目这里有个bug，使用了"apple"而不是"telegram"，但我们修正为正确的
-	err = uc.repo.SaveStateCode(ctx, OAuthTelegram, stateCode, params.Redirect)
+	err = uc.repo.SaveStateCode(ctx, OAuthApple, stateCode, params.Redirect)
 	if err != nil {
 		uc.logger.Errorf("[telegramLogin] 保存state code失败: %v", err)
 		return "", err
@@ -191,18 +190,18 @@ func (uc *oauthUseCase) telegramLogin(ctx context.Context, params *OAuthParams) 
 
 // githubLogin GitHub OAuth登录（未实现）
 func (uc *oauthUseCase) githubLogin(ctx context.Context, params *OAuthParams) (string, error) {
-	return "", errors.BadRequest("GITHUB_OAUTH_NOT_IMPLEMENTED", "GitHub OAuth未实现")
+	return "", nil
 }
 
 // facebookLogin Facebook OAuth登录（未实现）
 func (uc *oauthUseCase) facebookLogin(ctx context.Context, params *OAuthParams) (string, error) {
-	return "", errors.BadRequest("FACEBOOK_OAUTH_NOT_IMPLEMENTED", "Facebook OAuth未实现")
+	return "", nil
 }
 
 // OAuthLoginGetToken 处理OAuth回调并获取token
 // 完整复刻原项目 OAuthLoginGetTokenLogic（oAuthLoginGetTokenLogic.go）
 // 包含：验证state、换取token、获取用户信息、查找或创建用户、生成JWT、记录登录日志
-// ⚠️ 所有操作包含tenant_id
+// 所有操作直接基于当前单库模型
 func (uc *oauthUseCase) OAuthLoginGetToken(ctx context.Context, params *OAuthTokenParams) (*OAuthTokenResult, error) {
 	uc.logger.Infof("[OAuthLoginGetToken] method: %s", params.Method)
 
@@ -213,13 +212,10 @@ func (uc *oauthUseCase) OAuthLoginGetToken(ctx context.Context, params *OAuthTok
 	// defer记录登录日志（不管成功还是失败）
 	// 完整复刻原项目 Line 67-69
 	defer func() {
-		// 如果userID为0（未获取到用户ID），使用0作为objectID
-		logUserID := userID
-		if logUserID == 0 {
-			logUserID = 0
+		if userID == 0 {
+			return
 		}
-		// 记录登录日志（失败不影响主流程）
-		if err := uc.repo.RecordLoginLog(context.Background(), logUserID, params.Method, params.IP, params.UserAgent, loginSuccess); err != nil {
+		if err := uc.repo.RecordLoginLog(context.Background(), userID, params.Method, params.IP, params.UserAgent, loginSuccess); err != nil {
 			uc.logger.Errorf("[OAuthLoginGetToken] 记录登录日志失败: %v (不影响登录)", err)
 		}
 	}()
@@ -236,7 +232,7 @@ func (uc *oauthUseCase) OAuthLoginGetToken(ctx context.Context, params *OAuthTok
 	case OAuthTelegram:
 		userIDInt64, err = uc.telegramGetToken(ctx, params)
 	default:
-		return nil, errors.BadRequest("UNSUPPORTED_OAUTH_METHOD", fmt.Sprintf("不支持的OAuth方法: %s", params.Method))
+		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	if err != nil {
@@ -264,7 +260,7 @@ func (uc *oauthUseCase) OAuthLoginGetToken(ctx context.Context, params *OAuthTok
 
 // googleGetToken Google OAuth token获取
 // 完整复刻原项目 google() 函数（oAuthLoginGetTokenLogic.go Line 85-161）
-// ⚠️ 添加tenant_id到所有数据库操作
+// 所有数据库操作直接使用当前单库模型
 func (uc *oauthUseCase) googleGetToken(ctx context.Context, params *OAuthTokenParams) (int64, error) {
 	uc.logger.Infof("[googleGetToken] method: google")
 
@@ -272,7 +268,7 @@ func (uc *oauthUseCase) googleGetToken(ctx context.Context, params *OAuthTokenPa
 	var request oauthRequest
 	if err := json.Unmarshal([]byte(params.Callback), &request); err != nil {
 		uc.logger.Errorf("[googleGetToken] 解析callback数据失败: %v", err)
-		return 0, errors.BadRequest("PARSE_CALLBACK_ERROR", fmt.Sprintf("解析callback数据失败: %v", err))
+		return 0, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	uc.logger.Infof("[googleGetToken] 验证state code: %s", request.State)
@@ -304,7 +300,7 @@ func (uc *oauthUseCase) googleGetToken(ctx context.Context, params *OAuthTokenPa
 	token, err := client.Exchange(ctx, request.Code)
 	if err != nil {
 		uc.logger.Errorf("[googleGetToken] 换取token失败: %v", err)
-		return 0, errors.InternalServer("EXCHANGE_TOKEN_ERROR", fmt.Sprintf("换取token失败: %v", err))
+		return 0, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	uc.logger.Infof("[googleGetToken] 获取Google用户信息")
@@ -313,7 +309,7 @@ func (uc *oauthUseCase) googleGetToken(ctx context.Context, params *OAuthTokenPa
 	googleUserInfo, err := client.GetUserInfo(token.AccessToken)
 	if err != nil {
 		uc.logger.Errorf("[googleGetToken] 获取用户信息失败: %v", err)
-		return 0, errors.InternalServer("GET_USER_INFO_ERROR", fmt.Sprintf("获取用户信息失败: %v", err))
+		return 0, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	uc.logger.Infof("[googleGetToken] Google用户信息: openID=%s, email=%s", googleUserInfo.OpenID, googleUserInfo.Email)
@@ -331,7 +327,7 @@ func (uc *oauthUseCase) googleGetToken(ctx context.Context, params *OAuthTokenPa
 
 // appleGetToken Apple OAuth token获取
 // 完整复刻原项目 apple() 函数（oAuthLoginGetTokenLogic.go Line 163-261）
-// ⚠️ 添加tenant_id到所有数据库操作
+// 所有数据库操作直接使用当前单库模型
 func (uc *oauthUseCase) appleGetToken(ctx context.Context, params *OAuthTokenParams) (int64, error) {
 	uc.logger.Infof("[appleGetToken] method: apple")
 
@@ -339,7 +335,7 @@ func (uc *oauthUseCase) appleGetToken(ctx context.Context, params *OAuthTokenPar
 	var callback map[string]interface{}
 	if err := json.Unmarshal([]byte(params.Callback), &callback); err != nil {
 		uc.logger.Errorf("[appleGetToken] 解析callback数据失败: %v", err)
-		return 0, errors.BadRequest("PARSE_CALLBACK_ERROR", fmt.Sprintf("解析callback数据失败: %v", err))
+		return 0, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	state, _ := callback["state"].(string)
@@ -371,7 +367,7 @@ func (uc *oauthUseCase) appleGetToken(ctx context.Context, params *OAuthTokenPar
 	})
 	if err != nil {
 		uc.logger.Errorf("[appleGetToken] 创建Apple客户端失败: %v", err)
-		return 0, errors.InternalServer("CREATE_APPLE_CLIENT_ERROR", fmt.Sprintf("创建Apple客户端失败: %v", err))
+		return 0, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	uc.logger.Infof("[appleGetToken] 验证Apple web token")
@@ -380,26 +376,26 @@ func (uc *oauthUseCase) appleGetToken(ctx context.Context, params *OAuthTokenPar
 	resp, err := client.VerifyWebToken(ctx, code)
 	if err != nil {
 		uc.logger.Errorf("[appleGetToken] 验证web token失败: %v", err)
-		return 0, errors.InternalServer("VERIFY_WEB_TOKEN_ERROR", fmt.Sprintf("验证web token失败: %v", err))
+		return 0, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	if resp.Error != "" {
 		uc.logger.Errorf("[appleGetToken] Apple返回错误: %s", resp.Error)
-		return 0, errors.InternalServer("APPLE_ERROR", fmt.Sprintf("Apple返回错误: %s", resp.Error))
+		return 0, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	// 6. 获取Apple unique ID
 	appleUnique, err := apple.GetUniqueID(resp.IDToken)
 	if err != nil {
 		uc.logger.Errorf("[appleGetToken] 获取Apple unique ID失败: %v", err)
-		return 0, errors.InternalServer("GET_UNIQUE_ID_ERROR", fmt.Sprintf("获取Apple unique ID失败: %v", err))
+		return 0, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	// 7. 获取Apple用户claims
 	appleUserInfo, err := apple.GetClaims(resp.AccessToken)
 	if err != nil {
 		uc.logger.Errorf("[appleGetToken] 获取Apple用户信息失败: %v", err)
-		return 0, errors.InternalServer("GET_APPLE_USER_INFO_ERROR", fmt.Sprintf("获取Apple用户信息失败: %v", err))
+		return 0, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	// 8. 提取email（可能为空）
@@ -423,7 +419,7 @@ func (uc *oauthUseCase) appleGetToken(ctx context.Context, params *OAuthTokenPar
 
 // telegramGetToken Telegram OAuth token获取
 // 完整复刻原项目 telegram() 函数（oAuthLoginGetTokenLogic.go Line 263-324）
-// ⚠️ 添加tenant_id到所有数据库操作
+// 所有数据库操作直接使用当前单库模型
 func (uc *oauthUseCase) telegramGetToken(ctx context.Context, params *OAuthTokenParams) (int64, error) {
 	uc.logger.Infof("[telegramGetToken] method: telegram")
 
@@ -438,7 +434,7 @@ func (uc *oauthUseCase) telegramGetToken(ctx context.Context, params *OAuthToken
 	var callback map[string]interface{}
 	if err := json.Unmarshal([]byte(params.Callback), &callback); err != nil {
 		uc.logger.Errorf("[telegramGetToken] 解析callback数据失败: %v", err)
-		return 0, errors.BadRequest("PARSE_CALLBACK_ERROR", fmt.Sprintf("解析callback数据失败: %v", err))
+		return 0, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	encodeText, _ := callback["tgAuthResult"].(string)
@@ -448,14 +444,14 @@ func (uc *oauthUseCase) telegramGetToken(ctx context.Context, params *OAuthToken
 	callbackData, err := telegram.ParseAndValidateBase64([]byte(encodeText), config["bot_token"])
 	if err != nil {
 		uc.logger.Errorf("[telegramGetToken] 解析Telegram callback失败: %v", err)
-		return 0, errors.BadRequest("PARSE_TELEGRAM_CALLBACK_ERROR", fmt.Sprintf("解析Telegram callback失败: %v", err))
+		return 0, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	// 4. 验证auth date（24小时内有效）
 	if time.Now().Unix()-*callbackData.AuthDate > AuthExpire {
 		uc.logger.Errorf("[telegramGetToken] Telegram auth date已过期, authDate: %d, now: %d",
 			*callbackData.AuthDate, time.Now().Unix())
-		return 0, errors.BadRequest("AUTH_DATE_EXPIRED", "Telegram认证时间已过期")
+		return 0, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	// 5. 构造用户ID和email

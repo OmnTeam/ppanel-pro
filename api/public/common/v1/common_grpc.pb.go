@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v3.19.4
-// source: public/common/v1/common.proto
+// source: api/public/common/v1/common.proto
 
 package v1
 
@@ -443,5 +443,5 @@ var Common_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "public/common/v1/common.proto",
+	Metadata: "api/public/common/v1/common.proto",
 }

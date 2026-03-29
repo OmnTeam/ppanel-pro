@@ -18,10 +18,6 @@ type ProxyCoupon struct {
 	// ID of the ent.
 	// 优惠券ID
 	ID int64 `json:"id,omitempty"`
-	// 用户限制
-	UserLimit int64 `json:"user_limit,omitempty"`
-	// 订阅限制（逗号分隔的订阅ID）
-	Subscribe string `json:"subscribe,omitempty"`
 	// 优惠券名称
 	Name string `json:"name,omitempty"`
 	// 优惠券代码
@@ -33,11 +29,17 @@ type ProxyCoupon struct {
 	// 优惠券折扣
 	Discount int64 `json:"discount,omitempty"`
 	// 开始时间
-	StartTime time.Time `json:"start_time,omitempty"`
+	StartTime int64 `json:"start_time,omitempty"`
 	// 结束时间
-	EndTime time.Time `json:"end_time,omitempty"`
-	// 优惠券状态，0禁用，1启用
-	Status int8 `json:"status,omitempty"`
+	ExpireTime int64 `json:"expire_time,omitempty"`
+	// 用户限制
+	UserLimit int64 `json:"user_limit,omitempty"`
+	// 订阅限制
+	Subscribe string `json:"subscribe,omitempty"`
+	// 已使用次数
+	UsedCount int64 `json:"used_count,omitempty"`
+	// 是否启用
+	Enable bool `json:"enable,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -50,11 +52,13 @@ func (*ProxyCoupon) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case proxycoupon.FieldID, proxycoupon.FieldUserLimit, proxycoupon.FieldCount, proxycoupon.FieldType, proxycoupon.FieldDiscount, proxycoupon.FieldStatus:
+		case proxycoupon.FieldEnable:
+			values[i] = new(sql.NullBool)
+		case proxycoupon.FieldID, proxycoupon.FieldCount, proxycoupon.FieldType, proxycoupon.FieldDiscount, proxycoupon.FieldStartTime, proxycoupon.FieldExpireTime, proxycoupon.FieldUserLimit, proxycoupon.FieldUsedCount:
 			values[i] = new(sql.NullInt64)
-		case proxycoupon.FieldSubscribe, proxycoupon.FieldName, proxycoupon.FieldCode:
+		case proxycoupon.FieldName, proxycoupon.FieldCode, proxycoupon.FieldSubscribe:
 			values[i] = new(sql.NullString)
-		case proxycoupon.FieldStartTime, proxycoupon.FieldEndTime, proxycoupon.FieldCreatedAt, proxycoupon.FieldUpdatedAt:
+		case proxycoupon.FieldCreatedAt, proxycoupon.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -77,18 +81,6 @@ func (_m *ProxyCoupon) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int64(value.Int64)
-		case proxycoupon.FieldUserLimit:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field user_limit", values[i])
-			} else if value.Valid {
-				_m.UserLimit = value.Int64
-			}
-		case proxycoupon.FieldSubscribe:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field subscribe", values[i])
-			} else if value.Valid {
-				_m.Subscribe = value.String
-			}
 		case proxycoupon.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -120,22 +112,40 @@ func (_m *ProxyCoupon) assignValues(columns []string, values []any) error {
 				_m.Discount = value.Int64
 			}
 		case proxycoupon.FieldStartTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field start_time", values[i])
 			} else if value.Valid {
-				_m.StartTime = value.Time
+				_m.StartTime = value.Int64
 			}
-		case proxycoupon.FieldEndTime:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field end_time", values[i])
-			} else if value.Valid {
-				_m.EndTime = value.Time
-			}
-		case proxycoupon.FieldStatus:
+		case proxycoupon.FieldExpireTime:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
+				return fmt.Errorf("unexpected type %T for field expire_time", values[i])
 			} else if value.Valid {
-				_m.Status = int8(value.Int64)
+				_m.ExpireTime = value.Int64
+			}
+		case proxycoupon.FieldUserLimit:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field user_limit", values[i])
+			} else if value.Valid {
+				_m.UserLimit = value.Int64
+			}
+		case proxycoupon.FieldSubscribe:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field subscribe", values[i])
+			} else if value.Valid {
+				_m.Subscribe = value.String
+			}
+		case proxycoupon.FieldUsedCount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field used_count", values[i])
+			} else if value.Valid {
+				_m.UsedCount = value.Int64
+			}
+		case proxycoupon.FieldEnable:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field enable", values[i])
+			} else if value.Valid {
+				_m.Enable = value.Bool
 			}
 		case proxycoupon.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -185,12 +195,6 @@ func (_m *ProxyCoupon) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProxyCoupon(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
-	builder.WriteString("user_limit=")
-	builder.WriteString(fmt.Sprintf("%v", _m.UserLimit))
-	builder.WriteString(", ")
-	builder.WriteString("subscribe=")
-	builder.WriteString(_m.Subscribe)
-	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
@@ -207,13 +211,22 @@ func (_m *ProxyCoupon) String() string {
 	builder.WriteString(fmt.Sprintf("%v", _m.Discount))
 	builder.WriteString(", ")
 	builder.WriteString("start_time=")
-	builder.WriteString(_m.StartTime.Format(time.ANSIC))
+	builder.WriteString(fmt.Sprintf("%v", _m.StartTime))
 	builder.WriteString(", ")
-	builder.WriteString("end_time=")
-	builder.WriteString(_m.EndTime.Format(time.ANSIC))
+	builder.WriteString("expire_time=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ExpireTime))
 	builder.WriteString(", ")
-	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", _m.Status))
+	builder.WriteString("user_limit=")
+	builder.WriteString(fmt.Sprintf("%v", _m.UserLimit))
+	builder.WriteString(", ")
+	builder.WriteString("subscribe=")
+	builder.WriteString(_m.Subscribe)
+	builder.WriteString(", ")
+	builder.WriteString("used_count=")
+	builder.WriteString(fmt.Sprintf("%v", _m.UsedCount))
+	builder.WriteString(", ")
+	builder.WriteString("enable=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Enable))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

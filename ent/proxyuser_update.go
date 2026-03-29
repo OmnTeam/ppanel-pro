@@ -98,27 +98,6 @@ func (_u *ProxyUserUpdate) ClearAvatar() *ProxyUserUpdate {
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyUserUpdate) SetTenantID(v int64) *ProxyUserUpdate {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyUserUpdate) SetNillableTenantID(v *int64) *ProxyUserUpdate {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyUserUpdate) AddTenantID(v int64) *ProxyUserUpdate {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
 // SetBalance sets the "balance" field.
 func (_u *ProxyUserUpdate) SetBalance(v int64) *ProxyUserUpdate {
 	_u.mutation.ResetBalance()
@@ -147,14 +126,14 @@ func (_u *ProxyUserUpdate) ClearBalance() *ProxyUserUpdate {
 }
 
 // SetTelegram sets the "telegram" field.
-func (_u *ProxyUserUpdate) SetTelegram(v int) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) SetTelegram(v int64) *ProxyUserUpdate {
 	_u.mutation.ResetTelegram()
 	_u.mutation.SetTelegram(v)
 	return _u
 }
 
 // SetNillableTelegram sets the "telegram" field if the given value is not nil.
-func (_u *ProxyUserUpdate) SetNillableTelegram(v *int) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) SetNillableTelegram(v *int64) *ProxyUserUpdate {
 	if v != nil {
 		_u.SetTelegram(*v)
 	}
@@ -162,7 +141,7 @@ func (_u *ProxyUserUpdate) SetNillableTelegram(v *int) *ProxyUserUpdate {
 }
 
 // AddTelegram adds value to the "telegram" field.
-func (_u *ProxyUserUpdate) AddTelegram(v int) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) AddTelegram(v int64) *ProxyUserUpdate {
 	_u.mutation.AddTelegram(v)
 	return _u
 }
@@ -435,44 +414,23 @@ func (_u *ProxyUserUpdate) SetNillableEnableTradeNotify(v *bool) *ProxyUserUpdat
 	return _u
 }
 
-// SetGroupID sets the "group_id" field.
-func (_u *ProxyUserUpdate) SetGroupID(v int64) *ProxyUserUpdate {
-	_u.mutation.ResetGroupID()
-	_u.mutation.SetGroupID(v)
+// SetRules sets the "rules" field.
+func (_u *ProxyUserUpdate) SetRules(v string) *ProxyUserUpdate {
+	_u.mutation.SetRules(v)
 	return _u
 }
 
-// SetNillableGroupID sets the "group_id" field if the given value is not nil.
-func (_u *ProxyUserUpdate) SetNillableGroupID(v *int64) *ProxyUserUpdate {
+// SetNillableRules sets the "rules" field if the given value is not nil.
+func (_u *ProxyUserUpdate) SetNillableRules(v *string) *ProxyUserUpdate {
 	if v != nil {
-		_u.SetGroupID(*v)
+		_u.SetRules(*v)
 	}
 	return _u
 }
 
-// AddGroupID adds value to the "group_id" field.
-func (_u *ProxyUserUpdate) AddGroupID(v int64) *ProxyUserUpdate {
-	_u.mutation.AddGroupID(v)
-	return _u
-}
-
-// ClearGroupID clears the value of the "group_id" field.
-func (_u *ProxyUserUpdate) ClearGroupID() *ProxyUserUpdate {
-	_u.mutation.ClearGroupID()
-	return _u
-}
-
-// SetGroupLocked sets the "group_locked" field.
-func (_u *ProxyUserUpdate) SetGroupLocked(v bool) *ProxyUserUpdate {
-	_u.mutation.SetGroupLocked(v)
-	return _u
-}
-
-// SetNillableGroupLocked sets the "group_locked" field if the given value is not nil.
-func (_u *ProxyUserUpdate) SetNillableGroupLocked(v *bool) *ProxyUserUpdate {
-	if v != nil {
-		_u.SetGroupLocked(*v)
-	}
+// ClearRules clears the value of the "rules" field.
+func (_u *ProxyUserUpdate) ClearRules() *ProxyUserUpdate {
+	_u.mutation.ClearRules()
 	return _u
 }
 
@@ -503,16 +461,23 @@ func (_u *ProxyUserUpdate) ClearDeletedAt() *ProxyUserUpdate {
 }
 
 // SetIsDel sets the "is_del" field.
-func (_u *ProxyUserUpdate) SetIsDel(v bool) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) SetIsDel(v uint64) *ProxyUserUpdate {
+	_u.mutation.ResetIsDel()
 	_u.mutation.SetIsDel(v)
 	return _u
 }
 
 // SetNillableIsDel sets the "is_del" field if the given value is not nil.
-func (_u *ProxyUserUpdate) SetNillableIsDel(v *bool) *ProxyUserUpdate {
+func (_u *ProxyUserUpdate) SetNillableIsDel(v *uint64) *ProxyUserUpdate {
 	if v != nil {
 		_u.SetIsDel(*v)
 	}
+	return _u
+}
+
+// AddIsDel adds value to the "is_del" field.
+func (_u *ProxyUserUpdate) AddIsDel(v int64) *ProxyUserUpdate {
+	_u.mutation.AddIsDel(v)
 	return _u
 }
 
@@ -690,12 +655,6 @@ func (_u *ProxyUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.AvatarCleared() {
 		_spec.ClearField(proxyuser.FieldAvatar, field.TypeString)
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyuser.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyuser.FieldTenantID, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.Balance(); ok {
 		_spec.SetField(proxyuser.FieldBalance, field.TypeInt64, value)
 	}
@@ -706,13 +665,13 @@ func (_u *ProxyUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.ClearField(proxyuser.FieldBalance, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.Telegram(); ok {
-		_spec.SetField(proxyuser.FieldTelegram, field.TypeInt, value)
+		_spec.SetField(proxyuser.FieldTelegram, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedTelegram(); ok {
-		_spec.AddField(proxyuser.FieldTelegram, field.TypeInt, value)
+		_spec.AddField(proxyuser.FieldTelegram, field.TypeInt64, value)
 	}
 	if _u.mutation.TelegramCleared() {
-		_spec.ClearField(proxyuser.FieldTelegram, field.TypeInt)
+		_spec.ClearField(proxyuser.FieldTelegram, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.ReferCode(); ok {
 		_spec.SetField(proxyuser.FieldReferCode, field.TypeString, value)
@@ -783,17 +742,11 @@ func (_u *ProxyUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.EnableTradeNotify(); ok {
 		_spec.SetField(proxyuser.FieldEnableTradeNotify, field.TypeBool, value)
 	}
-	if value, ok := _u.mutation.GroupID(); ok {
-		_spec.SetField(proxyuser.FieldGroupID, field.TypeInt64, value)
+	if value, ok := _u.mutation.Rules(); ok {
+		_spec.SetField(proxyuser.FieldRules, field.TypeString, value)
 	}
-	if value, ok := _u.mutation.AddedGroupID(); ok {
-		_spec.AddField(proxyuser.FieldGroupID, field.TypeInt64, value)
-	}
-	if _u.mutation.GroupIDCleared() {
-		_spec.ClearField(proxyuser.FieldGroupID, field.TypeInt64)
-	}
-	if value, ok := _u.mutation.GroupLocked(); ok {
-		_spec.SetField(proxyuser.FieldGroupLocked, field.TypeBool, value)
+	if _u.mutation.RulesCleared() {
+		_spec.ClearField(proxyuser.FieldRules, field.TypeString)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyuser.FieldUpdatedAt, field.TypeTime, value)
@@ -805,10 +758,13 @@ func (_u *ProxyUserUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.ClearField(proxyuser.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.IsDel(); ok {
-		_spec.SetField(proxyuser.FieldIsDel, field.TypeBool, value)
+		_spec.SetField(proxyuser.FieldIsDel, field.TypeUint64, value)
+	}
+	if value, ok := _u.mutation.AddedIsDel(); ok {
+		_spec.AddField(proxyuser.FieldIsDel, field.TypeUint64, value)
 	}
 	if _u.mutation.IsDelCleared() {
-		_spec.ClearField(proxyuser.FieldIsDel, field.TypeBool)
+		_spec.ClearField(proxyuser.FieldIsDel, field.TypeUint64)
 	}
 	if _u.mutation.RedemptionRecordsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -988,27 +944,6 @@ func (_u *ProxyUserUpdateOne) ClearAvatar() *ProxyUserUpdateOne {
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyUserUpdateOne) SetTenantID(v int64) *ProxyUserUpdateOne {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyUserUpdateOne) SetNillableTenantID(v *int64) *ProxyUserUpdateOne {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyUserUpdateOne) AddTenantID(v int64) *ProxyUserUpdateOne {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
 // SetBalance sets the "balance" field.
 func (_u *ProxyUserUpdateOne) SetBalance(v int64) *ProxyUserUpdateOne {
 	_u.mutation.ResetBalance()
@@ -1037,14 +972,14 @@ func (_u *ProxyUserUpdateOne) ClearBalance() *ProxyUserUpdateOne {
 }
 
 // SetTelegram sets the "telegram" field.
-func (_u *ProxyUserUpdateOne) SetTelegram(v int) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) SetTelegram(v int64) *ProxyUserUpdateOne {
 	_u.mutation.ResetTelegram()
 	_u.mutation.SetTelegram(v)
 	return _u
 }
 
 // SetNillableTelegram sets the "telegram" field if the given value is not nil.
-func (_u *ProxyUserUpdateOne) SetNillableTelegram(v *int) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) SetNillableTelegram(v *int64) *ProxyUserUpdateOne {
 	if v != nil {
 		_u.SetTelegram(*v)
 	}
@@ -1052,7 +987,7 @@ func (_u *ProxyUserUpdateOne) SetNillableTelegram(v *int) *ProxyUserUpdateOne {
 }
 
 // AddTelegram adds value to the "telegram" field.
-func (_u *ProxyUserUpdateOne) AddTelegram(v int) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) AddTelegram(v int64) *ProxyUserUpdateOne {
 	_u.mutation.AddTelegram(v)
 	return _u
 }
@@ -1325,44 +1260,23 @@ func (_u *ProxyUserUpdateOne) SetNillableEnableTradeNotify(v *bool) *ProxyUserUp
 	return _u
 }
 
-// SetGroupID sets the "group_id" field.
-func (_u *ProxyUserUpdateOne) SetGroupID(v int64) *ProxyUserUpdateOne {
-	_u.mutation.ResetGroupID()
-	_u.mutation.SetGroupID(v)
+// SetRules sets the "rules" field.
+func (_u *ProxyUserUpdateOne) SetRules(v string) *ProxyUserUpdateOne {
+	_u.mutation.SetRules(v)
 	return _u
 }
 
-// SetNillableGroupID sets the "group_id" field if the given value is not nil.
-func (_u *ProxyUserUpdateOne) SetNillableGroupID(v *int64) *ProxyUserUpdateOne {
+// SetNillableRules sets the "rules" field if the given value is not nil.
+func (_u *ProxyUserUpdateOne) SetNillableRules(v *string) *ProxyUserUpdateOne {
 	if v != nil {
-		_u.SetGroupID(*v)
+		_u.SetRules(*v)
 	}
 	return _u
 }
 
-// AddGroupID adds value to the "group_id" field.
-func (_u *ProxyUserUpdateOne) AddGroupID(v int64) *ProxyUserUpdateOne {
-	_u.mutation.AddGroupID(v)
-	return _u
-}
-
-// ClearGroupID clears the value of the "group_id" field.
-func (_u *ProxyUserUpdateOne) ClearGroupID() *ProxyUserUpdateOne {
-	_u.mutation.ClearGroupID()
-	return _u
-}
-
-// SetGroupLocked sets the "group_locked" field.
-func (_u *ProxyUserUpdateOne) SetGroupLocked(v bool) *ProxyUserUpdateOne {
-	_u.mutation.SetGroupLocked(v)
-	return _u
-}
-
-// SetNillableGroupLocked sets the "group_locked" field if the given value is not nil.
-func (_u *ProxyUserUpdateOne) SetNillableGroupLocked(v *bool) *ProxyUserUpdateOne {
-	if v != nil {
-		_u.SetGroupLocked(*v)
-	}
+// ClearRules clears the value of the "rules" field.
+func (_u *ProxyUserUpdateOne) ClearRules() *ProxyUserUpdateOne {
+	_u.mutation.ClearRules()
 	return _u
 }
 
@@ -1393,16 +1307,23 @@ func (_u *ProxyUserUpdateOne) ClearDeletedAt() *ProxyUserUpdateOne {
 }
 
 // SetIsDel sets the "is_del" field.
-func (_u *ProxyUserUpdateOne) SetIsDel(v bool) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) SetIsDel(v uint64) *ProxyUserUpdateOne {
+	_u.mutation.ResetIsDel()
 	_u.mutation.SetIsDel(v)
 	return _u
 }
 
 // SetNillableIsDel sets the "is_del" field if the given value is not nil.
-func (_u *ProxyUserUpdateOne) SetNillableIsDel(v *bool) *ProxyUserUpdateOne {
+func (_u *ProxyUserUpdateOne) SetNillableIsDel(v *uint64) *ProxyUserUpdateOne {
 	if v != nil {
 		_u.SetIsDel(*v)
 	}
+	return _u
+}
+
+// AddIsDel adds value to the "is_del" field.
+func (_u *ProxyUserUpdateOne) AddIsDel(v int64) *ProxyUserUpdateOne {
+	_u.mutation.AddIsDel(v)
 	return _u
 }
 
@@ -1610,12 +1531,6 @@ func (_u *ProxyUserUpdateOne) sqlSave(ctx context.Context) (_node *ProxyUser, er
 	if _u.mutation.AvatarCleared() {
 		_spec.ClearField(proxyuser.FieldAvatar, field.TypeString)
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyuser.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyuser.FieldTenantID, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.Balance(); ok {
 		_spec.SetField(proxyuser.FieldBalance, field.TypeInt64, value)
 	}
@@ -1626,13 +1541,13 @@ func (_u *ProxyUserUpdateOne) sqlSave(ctx context.Context) (_node *ProxyUser, er
 		_spec.ClearField(proxyuser.FieldBalance, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.Telegram(); ok {
-		_spec.SetField(proxyuser.FieldTelegram, field.TypeInt, value)
+		_spec.SetField(proxyuser.FieldTelegram, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedTelegram(); ok {
-		_spec.AddField(proxyuser.FieldTelegram, field.TypeInt, value)
+		_spec.AddField(proxyuser.FieldTelegram, field.TypeInt64, value)
 	}
 	if _u.mutation.TelegramCleared() {
-		_spec.ClearField(proxyuser.FieldTelegram, field.TypeInt)
+		_spec.ClearField(proxyuser.FieldTelegram, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.ReferCode(); ok {
 		_spec.SetField(proxyuser.FieldReferCode, field.TypeString, value)
@@ -1703,17 +1618,11 @@ func (_u *ProxyUserUpdateOne) sqlSave(ctx context.Context) (_node *ProxyUser, er
 	if value, ok := _u.mutation.EnableTradeNotify(); ok {
 		_spec.SetField(proxyuser.FieldEnableTradeNotify, field.TypeBool, value)
 	}
-	if value, ok := _u.mutation.GroupID(); ok {
-		_spec.SetField(proxyuser.FieldGroupID, field.TypeInt64, value)
+	if value, ok := _u.mutation.Rules(); ok {
+		_spec.SetField(proxyuser.FieldRules, field.TypeString, value)
 	}
-	if value, ok := _u.mutation.AddedGroupID(); ok {
-		_spec.AddField(proxyuser.FieldGroupID, field.TypeInt64, value)
-	}
-	if _u.mutation.GroupIDCleared() {
-		_spec.ClearField(proxyuser.FieldGroupID, field.TypeInt64)
-	}
-	if value, ok := _u.mutation.GroupLocked(); ok {
-		_spec.SetField(proxyuser.FieldGroupLocked, field.TypeBool, value)
+	if _u.mutation.RulesCleared() {
+		_spec.ClearField(proxyuser.FieldRules, field.TypeString)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyuser.FieldUpdatedAt, field.TypeTime, value)
@@ -1725,10 +1634,13 @@ func (_u *ProxyUserUpdateOne) sqlSave(ctx context.Context) (_node *ProxyUser, er
 		_spec.ClearField(proxyuser.FieldDeletedAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.IsDel(); ok {
-		_spec.SetField(proxyuser.FieldIsDel, field.TypeBool, value)
+		_spec.SetField(proxyuser.FieldIsDel, field.TypeUint64, value)
+	}
+	if value, ok := _u.mutation.AddedIsDel(); ok {
+		_spec.AddField(proxyuser.FieldIsDel, field.TypeUint64, value)
 	}
 	if _u.mutation.IsDelCleared() {
-		_spec.ClearField(proxyuser.FieldIsDel, field.TypeBool)
+		_spec.ClearField(proxyuser.FieldIsDel, field.TypeUint64)
 	}
 	if _u.mutation.RedemptionRecordsCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -2,6 +2,7 @@ package common
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
 	"github.com/go-kratos/kratos/v2/log"
@@ -116,7 +117,7 @@ func (uc *CommonUsecase) GetClient(ctx context.Context) ([]*SubscribeClient, int
 
 // GetPrivacyPolicy gets privacy policy content
 func (uc *CommonUsecase) GetPrivacyPolicy(ctx context.Context) (string, error) {
-	content, err := uc.repo.GetTosConfig(ctx, "privacy_policy")
+	content, err := uc.repo.GetTosConfig(ctx, "PrivacyPolicy")
 	if err != nil {
 		uc.log.Errorw("GetPrivacyPolicy error", "error", err)
 		return "", err
@@ -127,7 +128,7 @@ func (uc *CommonUsecase) GetPrivacyPolicy(ctx context.Context) (string, error) {
 
 // GetTos gets terms of service content
 func (uc *CommonUsecase) GetTos(ctx context.Context) (string, error) {
-	content, err := uc.repo.GetTosConfig(ctx, "tos_content")
+	content, err := uc.repo.GetTosConfig(ctx, "TosContent")
 	if err != nil {
 		uc.log.Errorw("GetTos error", "error", err)
 		return "", err
@@ -174,6 +175,12 @@ func (uc *CommonUsecase) GetGlobalConfig(ctx context.Context) (*GlobalConfig, er
 		verifyCode = make(map[string]string)
 	}
 
+	verifyConfigMap, err := uc.repo.GetSystemConfigByCategory(ctx, "verify")
+	if err != nil {
+		uc.log.Errorw("GetSystemConfigByCategory verify error", "error", err)
+		verifyConfigMap = make(map[string]string)
+	}
+
 	// Get enabled auth methods from database
 	oauthMethods, err := uc.repo.GetEnabledAuthMethods(ctx)
 	if err != nil {
@@ -198,19 +205,19 @@ func (uc *CommonUsecase) GetGlobalConfig(ctx context.Context) (*GlobalConfig, er
 		if uc.conf.Email != nil {
 			authConfig.Email = uc.conf.Email
 		}
-		if uc.conf.Register != nil {
-			authConfig.Register = uc.conf.Register
-		}
 	}
+	authConfig.Register = buildRegisterConfig(uc.conf, nil)
 
-	// Combine config file data with database data
+	// Old /site/config behavior relies on the runtime config snapshot for
+	// site/register/invite/subscribe, while verify/currency/verify_code are still
+	// layered from database values.
 	return &GlobalConfig{
-		Site:         getSiteConfig(uc.conf),
-		Verify:       getVerifyConfig(uc.conf),
+		Site:         buildSiteConfig(uc.conf, nil),
+		Verify:       buildVerifyConfig(uc.conf, verifyConfigMap),
 		Auth:         authConfig,
-		Invite:       getInviteConfig(uc.conf),
+		Invite:       buildInviteConfig(uc.conf, nil),
 		Currency:     currency,
-		Subscribe:    getSubscribeConfig(uc.conf),
+		Subscribe:    buildSubscribeConfig(uc.conf, nil),
 		VerifyCode:   verifyCode,
 		OAuthMethods: oauthMethods,
 		WebAd:        webAd,
@@ -233,18 +240,60 @@ func getVerifyConfig(conf *conf.Application) *conf.Verify {
 	return conf.Verify
 }
 
-func getInviteConfig(conf *conf.Application) *conf.Invite {
-	if conf == nil {
-		return nil
-	}
-	return conf.Invite
-}
-
 func getSubscribeConfig(conf *conf.Application) *conf.Subscribe {
 	if conf == nil {
 		return nil
 	}
 	return conf.Subscribe
+}
+
+func buildSiteConfig(app *conf.Application, values map[string]string) *conf.Site {
+	var result conf.Site
+	if app != nil && app.Site != nil {
+		result = *app.Site
+	}
+	if value := stringFromMap(values, "Host", "host"); value != "" {
+		result.Host = value
+	}
+	if value := stringFromMap(values, "SiteName", "site_name"); value != "" {
+		result.SiteName = value
+	}
+	if value := stringFromMap(values, "SiteDesc", "site_desc"); value != "" {
+		result.SiteDesc = value
+	}
+	if value := stringFromMap(values, "SiteLogo", "site_logo"); value != "" {
+		result.SiteLogo = value
+	}
+	if value := stringFromMap(values, "Keywords", "keywords"); value != "" {
+		result.Keywords = value
+	}
+	if value := stringFromMap(values, "CustomHTML", "custom_html"); value != "" {
+		result.CustomHtml = value
+	}
+	if value := stringFromMap(values, "CustomData", "custom_data"); value != "" {
+		result.CustomData = value
+	}
+	return &result
+}
+
+func buildSubscribeConfig(app *conf.Application, values map[string]string) *conf.Subscribe {
+	var result conf.Subscribe
+	if app != nil && app.Subscribe != nil {
+		result = *app.Subscribe
+	}
+	result.SingleModel = boolFromMap(values, result.SingleModel, "SingleModel", "single_model")
+	if value := stringFromMap(values, "SubscribePath", "subscribe_path"); value != "" {
+		result.SubscribePath = value
+	}
+	if value := stringFromMap(values, "SubscribeDomain", "subscribe_domain"); value != "" {
+		result.SubscribeDomain = value
+	}
+	result.PanDomain = boolFromMap(values, result.PanDomain, "PanDomain", "pan_domain")
+	result.UserAgentLimit = boolFromMap(values, result.UserAgentLimit, "UserAgentLimit", "user_agent_limit")
+	if value := stringFromMap(values, "UserAgentList", "user_agent_list"); value != "" {
+		result.UserAgentList = value
+	}
+	return &result
 }
 
 // GetStat gets system statistics
@@ -256,6 +305,80 @@ func (uc *CommonUsecase) GetStat(ctx context.Context) (*Statistics, error) {
 	}
 
 	return stat, nil
+}
+
+func buildVerifyConfig(app *conf.Application, values map[string]string) *conf.Verify {
+	var result conf.Verify
+	if app != nil && app.Verify != nil {
+		result = *app.Verify
+	}
+	if value := stringFromMap(values, "TurnstileSiteKey", "turnstile_site_key"); value != "" {
+		result.TurnstileSiteKey = value
+	}
+	result.EnableLoginVerify = boolFromMap(values, result.EnableLoginVerify, "EnableLoginVerify", "enable_login_verify")
+	result.EnableRegisterVerify = boolFromMap(values, result.EnableRegisterVerify, "EnableRegisterVerify", "enable_register_verify")
+	result.EnableResetPasswordVerify = boolFromMap(values, result.EnableResetPasswordVerify, "EnableResetPasswordVerify", "enable_reset_password_verify")
+	return &result
+}
+
+func buildRegisterConfig(app *conf.Application, values map[string]string) *conf.Register {
+	var result conf.Register
+	if app != nil && app.Register != nil {
+		result = *app.Register
+	}
+	result.StopRegister = boolFromMap(values, result.StopRegister, "StopRegister", "stop_register")
+	result.EnableIpRegisterLimit = boolFromMap(values, result.EnableIpRegisterLimit, "EnableIpRegisterLimit", "enable_ip_register_limit")
+	result.IpRegisterLimit = int64FromMap(values, result.IpRegisterLimit, "IpRegisterLimit", "ip_register_limit")
+	result.IpRegisterLimitDuration = int64FromMap(values, result.IpRegisterLimitDuration, "IpRegisterLimitDuration", "ip_register_limit_duration")
+	result.EnableTrial = boolFromMap(values, result.EnableTrial, "EnableTrial", "enable_trial")
+	result.TrialSubscribe = int64FromMap(values, result.TrialSubscribe, "TrialSubscribe", "trial_subscribe")
+	result.TrialTime = int64FromMap(values, result.TrialTime, "TrialTime", "trial_time")
+	if value := stringFromMap(values, "TrialTimeUnit", "trial_time_unit"); value != "" {
+		result.TrialTimeUnit = value
+	}
+	return &result
+}
+
+func buildInviteConfig(app *conf.Application, values map[string]string) *conf.Invite {
+	var result conf.Invite
+	if app != nil && app.Invite != nil {
+		result = *app.Invite
+	}
+	result.ForcedInvite = boolFromMap(values, result.ForcedInvite, "ForcedInvite", "forced_invite")
+	result.OnlyFirstPurchase = boolFromMap(values, result.OnlyFirstPurchase, "OnlyFirstPurchase", "only_first_purchase")
+	result.ReferralPercentage = int64FromMap(values, result.ReferralPercentage, "ReferralPercentage", "referral_percentage")
+	return &result
+}
+
+func stringFromMap(values map[string]string, keys ...string) string {
+	for _, key := range keys {
+		if value, ok := values[key]; ok && value != "" {
+			return value
+		}
+	}
+	return ""
+}
+
+func boolFromMap(values map[string]string, fallback bool, keys ...string) bool {
+	for _, key := range keys {
+		if value, ok := values[key]; ok {
+			if parsed, err := strconv.ParseBool(value); err == nil {
+				return parsed
+			}
+		}
+	}
+	return fallback
+}
+
+func int64FromMap(values map[string]string, fallback int64, keys ...string) int64 {
+	for _, key := range keys {
+		if value, ok := values[key]; ok {
+			if parsed, err := strconv.ParseInt(value, 10, 64); err == nil {
+				return parsed
+			}
+		}
+	}
+	return fallback
 }
 
 // SendEmailCode sends email verification code

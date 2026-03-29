@@ -262,12 +262,12 @@ func (_q *ProxyServerQuery) Clone() *ProxyServerQuery {
 // Example:
 //
 //	var v []struct {
-//		TenantID int64 `json:"tenant_id,omitempty"`
+//		Name string `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ProxyServer.Query().
-//		GroupBy(proxyserver.FieldTenantID).
+//		GroupBy(proxyserver.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *ProxyServerQuery) GroupBy(field string, fields ...string) *ProxyServerGroupBy {
@@ -285,11 +285,11 @@ func (_q *ProxyServerQuery) GroupBy(field string, fields ...string) *ProxyServer
 // Example:
 //
 //	var v []struct {
-//		TenantID int64 `json:"tenant_id,omitempty"`
+//		Name string `json:"name,omitempty"`
 //	}
 //
 //	client.ProxyServer.Query().
-//		Select(proxyserver.FieldTenantID).
+//		Select(proxyserver.FieldName).
 //		Scan(ctx, &v)
 func (_q *ProxyServerQuery) Select(fields ...string) *ProxyServerSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

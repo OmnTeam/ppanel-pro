@@ -4,7 +4,6 @@ package api.admin.ads.v1;
 
 import "google/api/annotations.proto";
 import "validate/validate.proto";
-import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/ads/v1;v1";
 
@@ -56,11 +55,11 @@ message Ads {
   string content = 4;
   string description = 5;
   string target_url = 6;
-  google.protobuf.Timestamp start_time = 7;
-  google.protobuf.Timestamp end_time = 8;
-  bool status = 9;
-  google.protobuf.Timestamp created_at = 10;
-  google.protobuf.Timestamp updated_at = 11;
+  int64 start_time = 7;    // Unix timestamp in seconds
+  int64 end_time = 8;      // Unix timestamp in seconds
+  int32 status = 9;        // 状态：0=禁用 1=启用
+  int64 created_at = 10;   // Unix timestamp in seconds
+  int64 updated_at = 11;   // Unix timestamp in seconds
 }
 
 // 获取广告列表请求
@@ -68,7 +67,7 @@ message GetAdsListRequest {
   int32 page = 1;
   int32 size = 2;
   string search = 3;
-  optional bool status = 4;
+  optional int32 status = 4;
 }
 
 // 获取广告列表数据
@@ -96,9 +95,9 @@ message GetAdsData {
 
 // 获取广告详情响应
 message GetAdsReply {
-  int32 code = 1;          // 状态码
-  string message = 2;      // 消息内容
-  GetAdsData data = 3;     // 响应数据
+  int32 code = 1;           // 状态码
+  string message = 2;       // 消息内容
+  GetAdsData data = 3;      // 响应数据
 }
 
 // 创建广告请求
@@ -108,9 +107,9 @@ message CreateAdsRequest {
   string content = 3;
   string description = 4;
   string target_url = 5;
-  google.protobuf.Timestamp start_time = 6;
-  google.protobuf.Timestamp end_time = 7;
-  bool status = 8;
+  int64 start_time = 6;    // Unix timestamp in seconds
+  int64 end_time = 7;      // Unix timestamp in seconds
+  int32 status = 8;        // 状态：0=禁用 1=启用
 }
 
 // 创建广告数据
@@ -133,9 +132,9 @@ message UpdateAdsRequest {
   string content = 4;
   string description = 5;
   string target_url = 6;
-  google.protobuf.Timestamp start_time = 7;
-  google.protobuf.Timestamp end_time = 8;
-  bool status = 9;
+  int64 start_time = 7;    // Unix timestamp in seconds
+  int64 end_time = 8;      // Unix timestamp in seconds
+  int32 status = 9;        // 状态：0=禁用 1=启用
 }
 
 // 更新广告数据

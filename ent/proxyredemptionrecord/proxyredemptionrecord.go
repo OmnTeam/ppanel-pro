@@ -33,19 +33,19 @@ const (
 	// EdgeRedemptionCode holds the string denoting the redemption_code edge name in mutations.
 	EdgeRedemptionCode = "redemption_code"
 	// Table holds the table name of the proxyredemptionrecord in the database.
-	Table = "proxy_redemption_record"
+	Table = "redemption_record"
 	// UserTable is the table that holds the user relation/edge.
-	UserTable = "proxy_redemption_record"
+	UserTable = "redemption_record"
 	// UserInverseTable is the table name for the ProxyUser entity.
 	// It exists in this package in order to avoid circular dependency with the "proxyuser" package.
-	UserInverseTable = "proxy_user"
+	UserInverseTable = "user"
 	// UserColumn is the table column denoting the user relation/edge.
 	UserColumn = "user_id"
 	// RedemptionCodeTable is the table that holds the redemption_code relation/edge.
-	RedemptionCodeTable = "proxy_redemption_record"
+	RedemptionCodeTable = "redemption_record"
 	// RedemptionCodeInverseTable is the table name for the ProxyRedemptionCode entity.
 	// It exists in this package in order to avoid circular dependency with the "proxyredemptioncode" package.
-	RedemptionCodeInverseTable = "proxy_redemption_code"
+	RedemptionCodeInverseTable = "redemption_code"
 	// RedemptionCodeColumn is the table column denoting the redemption_code relation/edge.
 	RedemptionCodeColumn = "redemption_code_id"
 )

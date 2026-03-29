@@ -22,8 +22,9 @@ func NewGroupService(uc *group.GroupUseCase) *GroupService {
 	}
 }
 
-// ===== 用户组管理 =====
+// ===== 用户组管理 (已废弃 - UserGroup已移除) =====
 
+/*
 // GetUserGroupList 获取用户组列表
 func (s *GroupService) GetUserGroupList(ctx context.Context, req *v1.GetUserGroupListRequest) (*v1.GetUserGroupListReply, error) {
 	list, total, err := s.uc.GetUserGroupList(ctx, req)
@@ -114,6 +115,7 @@ func (s *GroupService) UpdateUserUserGroup(ctx context.Context, req *v1.UpdateUs
 		},
 	}, nil
 }
+*/
 
 // ===== 节点组管理 =====
 
@@ -231,7 +233,7 @@ func (s *GroupService) UpdateGroupConfig(ctx context.Context, req *v1.UpdateGrou
 
 // RecalculateGroup 重新计算分组
 func (s *GroupService) RecalculateGroup(ctx context.Context, req *v1.RecalculateGroupRequest) (*v1.RecalculateGroupReply, error) {
-	historyId, err := s.uc.RecalculateGroup(ctx, &v1.RecalculateGroupRequest{Mode: req.Mode})
+	historyId, err := s.uc.RecalculateGroup(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -275,9 +277,9 @@ func (s *GroupService) GetGroupHistory(ctx context.Context, req *v1.GetGroupHist
 			Id:          item.ID,
 			GroupMode:   item.GroupMode,
 			TriggerType: item.TriggerType,
-			Status:      item.Status,
-			Progress:    int32(item.Progress),
-			Total:       int32(item.Total),
+			Status:      item.State,
+			Progress:    int32(item.SuccessCount),
+			Total:       int32(item.TotalUsers),
 			CreatedAt:   item.CreatedAt.Unix(),
 		})
 	}
@@ -294,15 +296,34 @@ func (s *GroupService) GetGroupHistory(ctx context.Context, req *v1.GetGroupHist
 
 // GetGroupHistoryDetail 获取分组历史详情
 func (s *GroupService) GetGroupHistoryDetail(ctx context.Context, req *v1.GetGroupHistoryDetailRequest) (*v1.GetGroupHistoryDetailReply, error) {
-	// TODO: Implement get group history detail
+	history, err := s.uc.GetGroupHistoryDetail(ctx, req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert ent entity to proto message
+	historyMsg := &v1.GroupHistory{
+		Id:          history.ID,
+		GroupMode:   history.GroupMode,
+		TriggerType: history.TriggerType,
+		Status:      history.State,
+		Progress:    int32(history.SuccessCount),
+		Total:       int32(history.TotalUsers),
+		CreatedAt:   history.CreatedAt.Unix(),
+	}
+
+	// 当前历史记录仅存储错误信息，结果详情保持为空
+	result := ""
+	errorMsg := history.ErrorMessage
+
 	return &v1.GetGroupHistoryDetailReply{
 		Code:    int32(responsecode.AdminGetGroupHistoryDetailSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetGroupHistoryDetailSuccess],
 		Data: &v1.GetGroupHistoryDetailData{
 			Detail: &v1.GroupHistoryDetail{
-				History: &v1.GroupHistory{},
-				Result:  "",
-				Error:   "",
+				History: historyMsg,
+				Result:  result,
+				Error:   errorMsg,
 			},
 		},
 	}, nil
@@ -310,25 +331,40 @@ func (s *GroupService) GetGroupHistoryDetail(ctx context.Context, req *v1.GetGro
 
 // ExportGroupResult 导出分组结果
 func (s *GroupService) ExportGroupResult(ctx context.Context, req *v1.ExportGroupResultRequest) (*v1.ExportGroupResultReply, error) {
-	// TODO: Implement export group result
+	_, filename, err := s.uc.ExportGroupResult(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: 实际实现中，这里应该将文件保存到存储服务并返回URL
+	// 目前直接返回文件名，实际使用时可能需要：
+	// 1. 将CSV数据上传到对象存储（如S3、OSS）
+	// 2. 生成下载链接
+	// 3. 设置链接过期时间
+	// 4. 返回可访问的URL
+
 	return &v1.ExportGroupResultReply{
 		Code:    int32(responsecode.AdminExportGroupResultSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminExportGroupResultSuccess],
 		Data: &v1.ExportGroupResultData{
-			FileUrl: "",
+			FileUrl: filename, // 目前返回文件名，实际应该返回URL
 		},
 	}, nil
 }
 
 // MigrateUsers 迁移用户
 func (s *GroupService) MigrateUsers(ctx context.Context, req *v1.MigrateUsersRequest) (*v1.MigrateUsersReply, error) {
-	// TODO: Implement migrate users
+	successCount, failedCount, err := s.uc.MigrateUsers(ctx, req.FromUserGroupId, req.ToUserGroupId, req.IncludeLocked)
+	if err != nil {
+		return nil, err
+	}
+
 	return &v1.MigrateUsersReply{
 		Code:    int32(responsecode.AdminMigrateUsersSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminMigrateUsersSuccess],
 		Data: &v1.MigrateUsersData{
-			SuccessCount: 0,
-			FailedCount:  0,
+			SuccessCount: successCount,
+			FailedCount:  failedCount,
 		},
 	}, nil
 }
@@ -356,7 +392,7 @@ func (s *GroupService) PreviewUserNodes(ctx context.Context, req *v1.PreviewUser
 		Message: responsecode.CodeMessages[responsecode.AdminPreviewUserNodesSuccess],
 		Data: &v1.PreviewUserNodesData{
 			UserId:      req.UserId,
-			UserGroupId: userGroupId,
+			NodeGroupId: userGroupId,
 			Nodes:       nodeList,
 		},
 	}, nil
@@ -364,12 +400,42 @@ func (s *GroupService) PreviewUserNodes(ctx context.Context, req *v1.PreviewUser
 
 // ResetGroups 重置所有分组
 func (s *GroupService) ResetGroups(ctx context.Context, req *v1.ResetGroupsRequest) (*v1.ResetGroupsReply, error) {
-	// TODO: Implement reset groups
+	// Require confirmation for safety
+	if !req.Confirm {
+		return &v1.ResetGroupsReply{
+			Code:    int32(responsecode.ErrInvalidParameter),
+			Message: "Param Error",
+			Data: &v1.ResetGroupsData{
+				Success: false,
+			},
+		}, nil
+	}
+
+	if err := s.uc.ResetGroups(ctx); err != nil {
+		return nil, err
+	}
+
 	return &v1.ResetGroupsReply{
 		Code:    int32(responsecode.AdminResetGroupsSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminResetGroupsSuccess],
 		Data: &v1.ResetGroupsData{
 			Success: true,
+		},
+	}, nil
+}
+
+// GetSubscribeGroupMapping 获取订阅组映射
+func (s *GroupService) GetSubscribeGroupMapping(ctx context.Context, req *v1.GetSubscribeGroupMappingRequest) (*v1.GetSubscribeGroupMappingReply, error) {
+	list, err := s.uc.GetSubscribeGroupMapping(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.GetSubscribeGroupMappingReply{
+		Code:    int32(responsecode.AdminGetSubscribeGroupMappingSuccess),
+		Message: responsecode.CodeMessages[responsecode.AdminGetSubscribeGroupMappingSuccess],
+		Data: &v1.GetSubscribeGroupMappingData{
+			List: list,
 		},
 	}, nil
 }

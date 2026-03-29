@@ -168,6 +168,26 @@ func (_u *ProxyRedemptionCodeUpdate) SetUpdatedAt(v time.Time) *ProxyRedemptionC
 	return _u
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (_u *ProxyRedemptionCodeUpdate) SetDeletedAt(v time.Time) *ProxyRedemptionCodeUpdate {
+	_u.mutation.SetDeletedAt(v)
+	return _u
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (_u *ProxyRedemptionCodeUpdate) SetNillableDeletedAt(v *time.Time) *ProxyRedemptionCodeUpdate {
+	if v != nil {
+		_u.SetDeletedAt(*v)
+	}
+	return _u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (_u *ProxyRedemptionCodeUpdate) ClearDeletedAt() *ProxyRedemptionCodeUpdate {
+	_u.mutation.ClearDeletedAt()
+	return _u
+}
+
 // AddRecordIDs adds the "records" edge to the ProxyRedemptionRecord entity by IDs.
 func (_u *ProxyRedemptionCodeUpdate) AddRecordIDs(ids ...int64) *ProxyRedemptionCodeUpdate {
 	_u.mutation.AddRecordIDs(ids...)
@@ -310,6 +330,12 @@ func (_u *ProxyRedemptionCodeUpdate) sqlSave(ctx context.Context) (_node int, er
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyredemptioncode.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeletedAt(); ok {
+		_spec.SetField(proxyredemptioncode.FieldDeletedAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeletedAtCleared() {
+		_spec.ClearField(proxyredemptioncode.FieldDeletedAt, field.TypeTime)
 	}
 	if _u.mutation.RecordsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -515,6 +541,26 @@ func (_u *ProxyRedemptionCodeUpdateOne) SetUpdatedAt(v time.Time) *ProxyRedempti
 	return _u
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (_u *ProxyRedemptionCodeUpdateOne) SetDeletedAt(v time.Time) *ProxyRedemptionCodeUpdateOne {
+	_u.mutation.SetDeletedAt(v)
+	return _u
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (_u *ProxyRedemptionCodeUpdateOne) SetNillableDeletedAt(v *time.Time) *ProxyRedemptionCodeUpdateOne {
+	if v != nil {
+		_u.SetDeletedAt(*v)
+	}
+	return _u
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (_u *ProxyRedemptionCodeUpdateOne) ClearDeletedAt() *ProxyRedemptionCodeUpdateOne {
+	_u.mutation.ClearDeletedAt()
+	return _u
+}
+
 // AddRecordIDs adds the "records" edge to the ProxyRedemptionRecord entity by IDs.
 func (_u *ProxyRedemptionCodeUpdateOne) AddRecordIDs(ids ...int64) *ProxyRedemptionCodeUpdateOne {
 	_u.mutation.AddRecordIDs(ids...)
@@ -687,6 +733,12 @@ func (_u *ProxyRedemptionCodeUpdateOne) sqlSave(ctx context.Context) (_node *Pro
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyredemptioncode.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := _u.mutation.DeletedAt(); ok {
+		_spec.SetField(proxyredemptioncode.FieldDeletedAt, field.TypeTime, value)
+	}
+	if _u.mutation.DeletedAtCleared() {
+		_spec.ClearField(proxyredemptioncode.FieldDeletedAt, field.TypeTime)
 	}
 	if _u.mutation.RecordsCleared() {
 		edge := &sqlgraph.EdgeSpec{

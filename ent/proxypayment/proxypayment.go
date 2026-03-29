@@ -3,8 +3,6 @@
 package proxypayment
 
 import (
-	"time"
-
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -17,14 +15,14 @@ const (
 	FieldName = "name"
 	// FieldPlatform holds the string denoting the platform field in the database.
 	FieldPlatform = "platform"
-	// FieldDescription holds the string denoting the description field in the database.
-	FieldDescription = "description"
 	// FieldIcon holds the string denoting the icon field in the database.
 	FieldIcon = "icon"
 	// FieldDomain holds the string denoting the domain field in the database.
 	FieldDomain = "domain"
 	// FieldConfig holds the string denoting the config field in the database.
 	FieldConfig = "config"
+	// FieldDescription holds the string denoting the description field in the database.
+	FieldDescription = "description"
 	// FieldFeeMode holds the string denoting the fee_mode field in the database.
 	FieldFeeMode = "fee_mode"
 	// FieldFeePercent holds the string denoting the fee_percent field in the database.
@@ -35,12 +33,8 @@ const (
 	FieldEnable = "enable"
 	// FieldToken holds the string denoting the token field in the database.
 	FieldToken = "token"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
-	FieldCreatedAt = "created_at"
-	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
-	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxypayment in the database.
-	Table = "proxy_payment"
+	Table = "payment"
 )
 
 // Columns holds all SQL columns for proxypayment fields.
@@ -48,17 +42,15 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 	FieldPlatform,
-	FieldDescription,
 	FieldIcon,
 	FieldDomain,
 	FieldConfig,
+	FieldDescription,
 	FieldFeeMode,
 	FieldFeePercent,
 	FieldFeeAmount,
 	FieldEnable,
 	FieldToken,
-	FieldCreatedAt,
-	FieldUpdatedAt,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -89,21 +81,15 @@ var (
 	// ConfigValidator is a validator for the "config" field. It is called by the builders before save.
 	ConfigValidator func(string) error
 	// DefaultFeeMode holds the default value on creation for the "fee_mode" field.
-	DefaultFeeMode int
+	DefaultFeeMode uint
 	// DefaultFeePercent holds the default value on creation for the "fee_percent" field.
-	DefaultFeePercent float64
+	DefaultFeePercent int64
 	// DefaultFeeAmount holds the default value on creation for the "fee_amount" field.
-	DefaultFeeAmount int
+	DefaultFeeAmount int64
 	// DefaultEnable holds the default value on creation for the "enable" field.
 	DefaultEnable bool
 	// TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	TokenValidator func(string) error
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
-	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
-	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
-	UpdateDefaultUpdatedAt func() time.Time
 )
 
 // OrderOption defines the ordering options for the ProxyPayment queries.
@@ -124,11 +110,6 @@ func ByPlatform(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPlatform, opts...).ToFunc()
 }
 
-// ByDescription orders the results by the description field.
-func ByDescription(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDescription, opts...).ToFunc()
-}
-
 // ByIcon orders the results by the icon field.
 func ByIcon(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIcon, opts...).ToFunc()
@@ -142,6 +123,11 @@ func ByDomain(opts ...sql.OrderTermOption) OrderOption {
 // ByConfig orders the results by the config field.
 func ByConfig(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldConfig, opts...).ToFunc()
+}
+
+// ByDescription orders the results by the description field.
+func ByDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
 // ByFeeMode orders the results by the fee_mode field.
@@ -167,14 +153,4 @@ func ByEnable(opts ...sql.OrderTermOption) OrderOption {
 // ByToken orders the results by the token field.
 func ByToken(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldToken, opts...).ToFunc()
-}
-
-// ByCreatedAt orders the results by the created_at field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
-}
-
-// ByUpdatedAt orders the results by the updated_at field.
-func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }

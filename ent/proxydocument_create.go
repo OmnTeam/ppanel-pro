@@ -188,6 +188,12 @@ func (_c *ProxyDocumentCreate) check() error {
 	if _, ok := _c.mutation.Show(); !ok {
 		return &ValidationError{Name: "show", err: errors.New(`ent: missing required field "ProxyDocument.show"`)}
 	}
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProxyDocument.created_at"`)}
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ProxyDocument.updated_at"`)}
+	}
 	return nil
 }
 

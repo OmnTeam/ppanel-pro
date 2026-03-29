@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -37,20 +36,6 @@ func (_c *ProxyPaymentCreate) SetNillableName(v *string) *ProxyPaymentCreate {
 // SetPlatform sets the "platform" field.
 func (_c *ProxyPaymentCreate) SetPlatform(v string) *ProxyPaymentCreate {
 	_c.mutation.SetPlatform(v)
-	return _c
-}
-
-// SetDescription sets the "description" field.
-func (_c *ProxyPaymentCreate) SetDescription(v string) *ProxyPaymentCreate {
-	_c.mutation.SetDescription(v)
-	return _c
-}
-
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (_c *ProxyPaymentCreate) SetNillableDescription(v *string) *ProxyPaymentCreate {
-	if v != nil {
-		_c.SetDescription(*v)
-	}
 	return _c
 }
 
@@ -88,14 +73,28 @@ func (_c *ProxyPaymentCreate) SetConfig(v string) *ProxyPaymentCreate {
 	return _c
 }
 
+// SetDescription sets the "description" field.
+func (_c *ProxyPaymentCreate) SetDescription(v string) *ProxyPaymentCreate {
+	_c.mutation.SetDescription(v)
+	return _c
+}
+
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (_c *ProxyPaymentCreate) SetNillableDescription(v *string) *ProxyPaymentCreate {
+	if v != nil {
+		_c.SetDescription(*v)
+	}
+	return _c
+}
+
 // SetFeeMode sets the "fee_mode" field.
-func (_c *ProxyPaymentCreate) SetFeeMode(v int) *ProxyPaymentCreate {
+func (_c *ProxyPaymentCreate) SetFeeMode(v uint) *ProxyPaymentCreate {
 	_c.mutation.SetFeeMode(v)
 	return _c
 }
 
 // SetNillableFeeMode sets the "fee_mode" field if the given value is not nil.
-func (_c *ProxyPaymentCreate) SetNillableFeeMode(v *int) *ProxyPaymentCreate {
+func (_c *ProxyPaymentCreate) SetNillableFeeMode(v *uint) *ProxyPaymentCreate {
 	if v != nil {
 		_c.SetFeeMode(*v)
 	}
@@ -103,13 +102,13 @@ func (_c *ProxyPaymentCreate) SetNillableFeeMode(v *int) *ProxyPaymentCreate {
 }
 
 // SetFeePercent sets the "fee_percent" field.
-func (_c *ProxyPaymentCreate) SetFeePercent(v float64) *ProxyPaymentCreate {
+func (_c *ProxyPaymentCreate) SetFeePercent(v int64) *ProxyPaymentCreate {
 	_c.mutation.SetFeePercent(v)
 	return _c
 }
 
 // SetNillableFeePercent sets the "fee_percent" field if the given value is not nil.
-func (_c *ProxyPaymentCreate) SetNillableFeePercent(v *float64) *ProxyPaymentCreate {
+func (_c *ProxyPaymentCreate) SetNillableFeePercent(v *int64) *ProxyPaymentCreate {
 	if v != nil {
 		_c.SetFeePercent(*v)
 	}
@@ -117,13 +116,13 @@ func (_c *ProxyPaymentCreate) SetNillableFeePercent(v *float64) *ProxyPaymentCre
 }
 
 // SetFeeAmount sets the "fee_amount" field.
-func (_c *ProxyPaymentCreate) SetFeeAmount(v int) *ProxyPaymentCreate {
+func (_c *ProxyPaymentCreate) SetFeeAmount(v int64) *ProxyPaymentCreate {
 	_c.mutation.SetFeeAmount(v)
 	return _c
 }
 
 // SetNillableFeeAmount sets the "fee_amount" field if the given value is not nil.
-func (_c *ProxyPaymentCreate) SetNillableFeeAmount(v *int) *ProxyPaymentCreate {
+func (_c *ProxyPaymentCreate) SetNillableFeeAmount(v *int64) *ProxyPaymentCreate {
 	if v != nil {
 		_c.SetFeeAmount(*v)
 	}
@@ -147,42 +146,6 @@ func (_c *ProxyPaymentCreate) SetNillableEnable(v *bool) *ProxyPaymentCreate {
 // SetToken sets the "token" field.
 func (_c *ProxyPaymentCreate) SetToken(v string) *ProxyPaymentCreate {
 	_c.mutation.SetToken(v)
-	return _c
-}
-
-// SetNillableToken sets the "token" field if the given value is not nil.
-func (_c *ProxyPaymentCreate) SetNillableToken(v *string) *ProxyPaymentCreate {
-	if v != nil {
-		_c.SetToken(*v)
-	}
-	return _c
-}
-
-// SetCreatedAt sets the "created_at" field.
-func (_c *ProxyPaymentCreate) SetCreatedAt(v time.Time) *ProxyPaymentCreate {
-	_c.mutation.SetCreatedAt(v)
-	return _c
-}
-
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (_c *ProxyPaymentCreate) SetNillableCreatedAt(v *time.Time) *ProxyPaymentCreate {
-	if v != nil {
-		_c.SetCreatedAt(*v)
-	}
-	return _c
-}
-
-// SetUpdatedAt sets the "updated_at" field.
-func (_c *ProxyPaymentCreate) SetUpdatedAt(v time.Time) *ProxyPaymentCreate {
-	_c.mutation.SetUpdatedAt(v)
-	return _c
-}
-
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (_c *ProxyPaymentCreate) SetNillableUpdatedAt(v *time.Time) *ProxyPaymentCreate {
-	if v != nil {
-		_c.SetUpdatedAt(*v)
-	}
 	return _c
 }
 
@@ -255,14 +218,6 @@ func (_c *ProxyPaymentCreate) defaults() {
 		v := proxypayment.DefaultEnable
 		_c.mutation.SetEnable(v)
 	}
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		v := proxypayment.DefaultCreatedAt()
-		_c.mutation.SetCreatedAt(v)
-	}
-	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		v := proxypayment.DefaultUpdatedAt()
-		_c.mutation.SetUpdatedAt(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -283,10 +238,16 @@ func (_c *ProxyPaymentCreate) check() error {
 			return &ValidationError{Name: "platform", err: fmt.Errorf(`ent: validator failed for field "ProxyPayment.platform": %w`, err)}
 		}
 	}
+	if _, ok := _c.mutation.Icon(); !ok {
+		return &ValidationError{Name: "icon", err: errors.New(`ent: missing required field "ProxyPayment.icon"`)}
+	}
 	if v, ok := _c.mutation.Icon(); ok {
 		if err := proxypayment.IconValidator(v); err != nil {
 			return &ValidationError{Name: "icon", err: fmt.Errorf(`ent: validator failed for field "ProxyPayment.icon": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.Domain(); !ok {
+		return &ValidationError{Name: "domain", err: errors.New(`ent: missing required field "ProxyPayment.domain"`)}
 	}
 	if v, ok := _c.mutation.Domain(); ok {
 		if err := proxypayment.DomainValidator(v); err != nil {
@@ -304,19 +265,22 @@ func (_c *ProxyPaymentCreate) check() error {
 	if _, ok := _c.mutation.FeeMode(); !ok {
 		return &ValidationError{Name: "fee_mode", err: errors.New(`ent: missing required field "ProxyPayment.fee_mode"`)}
 	}
+	if _, ok := _c.mutation.FeePercent(); !ok {
+		return &ValidationError{Name: "fee_percent", err: errors.New(`ent: missing required field "ProxyPayment.fee_percent"`)}
+	}
+	if _, ok := _c.mutation.FeeAmount(); !ok {
+		return &ValidationError{Name: "fee_amount", err: errors.New(`ent: missing required field "ProxyPayment.fee_amount"`)}
+	}
 	if _, ok := _c.mutation.Enable(); !ok {
 		return &ValidationError{Name: "enable", err: errors.New(`ent: missing required field "ProxyPayment.enable"`)}
+	}
+	if _, ok := _c.mutation.Token(); !ok {
+		return &ValidationError{Name: "token", err: errors.New(`ent: missing required field "ProxyPayment.token"`)}
 	}
 	if v, ok := _c.mutation.Token(); ok {
 		if err := proxypayment.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "ProxyPayment.token": %w`, err)}
 		}
-	}
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProxyPayment.created_at"`)}
-	}
-	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ProxyPayment.updated_at"`)}
 	}
 	return nil
 }
@@ -358,10 +322,6 @@ func (_c *ProxyPaymentCreate) createSpec() (*ProxyPayment, *sqlgraph.CreateSpec)
 		_spec.SetField(proxypayment.FieldPlatform, field.TypeString, value)
 		_node.Platform = value
 	}
-	if value, ok := _c.mutation.Description(); ok {
-		_spec.SetField(proxypayment.FieldDescription, field.TypeString, value)
-		_node.Description = value
-	}
 	if value, ok := _c.mutation.Icon(); ok {
 		_spec.SetField(proxypayment.FieldIcon, field.TypeString, value)
 		_node.Icon = value
@@ -374,16 +334,20 @@ func (_c *ProxyPaymentCreate) createSpec() (*ProxyPayment, *sqlgraph.CreateSpec)
 		_spec.SetField(proxypayment.FieldConfig, field.TypeString, value)
 		_node.Config = value
 	}
+	if value, ok := _c.mutation.Description(); ok {
+		_spec.SetField(proxypayment.FieldDescription, field.TypeString, value)
+		_node.Description = value
+	}
 	if value, ok := _c.mutation.FeeMode(); ok {
-		_spec.SetField(proxypayment.FieldFeeMode, field.TypeInt, value)
+		_spec.SetField(proxypayment.FieldFeeMode, field.TypeUint, value)
 		_node.FeeMode = value
 	}
 	if value, ok := _c.mutation.FeePercent(); ok {
-		_spec.SetField(proxypayment.FieldFeePercent, field.TypeFloat64, value)
+		_spec.SetField(proxypayment.FieldFeePercent, field.TypeInt64, value)
 		_node.FeePercent = value
 	}
 	if value, ok := _c.mutation.FeeAmount(); ok {
-		_spec.SetField(proxypayment.FieldFeeAmount, field.TypeInt, value)
+		_spec.SetField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
 		_node.FeeAmount = value
 	}
 	if value, ok := _c.mutation.Enable(); ok {
@@ -393,14 +357,6 @@ func (_c *ProxyPaymentCreate) createSpec() (*ProxyPayment, *sqlgraph.CreateSpec)
 	if value, ok := _c.mutation.Token(); ok {
 		_spec.SetField(proxypayment.FieldToken, field.TypeString, value)
 		_node.Token = value
-	}
-	if value, ok := _c.mutation.CreatedAt(); ok {
-		_spec.SetField(proxypayment.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
-	}
-	if value, ok := _c.mutation.UpdatedAt(); ok {
-		_spec.SetField(proxypayment.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
 	}
 	return _node, _spec
 }

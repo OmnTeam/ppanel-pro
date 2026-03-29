@@ -61,13 +61,13 @@ func (_c *ProxyUserDeviceOnlineRecordCreate) SetNillableOfflineTime(v *time.Time
 }
 
 // SetOnlineSeconds sets the "online_seconds" field.
-func (_c *ProxyUserDeviceOnlineRecordCreate) SetOnlineSeconds(v int) *ProxyUserDeviceOnlineRecordCreate {
+func (_c *ProxyUserDeviceOnlineRecordCreate) SetOnlineSeconds(v int64) *ProxyUserDeviceOnlineRecordCreate {
 	_c.mutation.SetOnlineSeconds(v)
 	return _c
 }
 
 // SetNillableOnlineSeconds sets the "online_seconds" field if the given value is not nil.
-func (_c *ProxyUserDeviceOnlineRecordCreate) SetNillableOnlineSeconds(v *int) *ProxyUserDeviceOnlineRecordCreate {
+func (_c *ProxyUserDeviceOnlineRecordCreate) SetNillableOnlineSeconds(v *int64) *ProxyUserDeviceOnlineRecordCreate {
 	if v != nil {
 		_c.SetOnlineSeconds(*v)
 	}
@@ -75,13 +75,13 @@ func (_c *ProxyUserDeviceOnlineRecordCreate) SetNillableOnlineSeconds(v *int) *P
 }
 
 // SetDurationDays sets the "duration_days" field.
-func (_c *ProxyUserDeviceOnlineRecordCreate) SetDurationDays(v int) *ProxyUserDeviceOnlineRecordCreate {
+func (_c *ProxyUserDeviceOnlineRecordCreate) SetDurationDays(v int64) *ProxyUserDeviceOnlineRecordCreate {
 	_c.mutation.SetDurationDays(v)
 	return _c
 }
 
 // SetNillableDurationDays sets the "duration_days" field if the given value is not nil.
-func (_c *ProxyUserDeviceOnlineRecordCreate) SetNillableDurationDays(v *int) *ProxyUserDeviceOnlineRecordCreate {
+func (_c *ProxyUserDeviceOnlineRecordCreate) SetNillableDurationDays(v *int64) *ProxyUserDeviceOnlineRecordCreate {
 	if v != nil {
 		_c.SetDurationDays(*v)
 	}
@@ -219,11 +219,11 @@ func (_c *ProxyUserDeviceOnlineRecordCreate) createSpec() (*ProxyUserDeviceOnlin
 		_node.OfflineTime = &value
 	}
 	if value, ok := _c.mutation.OnlineSeconds(); ok {
-		_spec.SetField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt, value)
+		_spec.SetField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt64, value)
 		_node.OnlineSeconds = &value
 	}
 	if value, ok := _c.mutation.DurationDays(); ok {
-		_spec.SetField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt, value)
+		_spec.SetField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt64, value)
 		_node.DurationDays = &value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {

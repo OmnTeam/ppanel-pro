@@ -24,7 +24,7 @@ const (
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// Table holds the table name of the proxyticketfollow in the database.
-	Table = "proxy_ticket_follow"
+	Table = "ticket_follow"
 )
 
 // Columns holds all SQL columns for proxyticketfollow fields.
@@ -52,6 +52,8 @@ var (
 	DefaultTicketID int64
 	// DefaultFrom holds the default value on creation for the "from" field.
 	DefaultFrom string
+	// FromValidator is a validator for the "from" field. It is called by the builders before save.
+	FromValidator func(string) error
 	// DefaultType holds the default value on creation for the "type" field.
 	DefaultType int8
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.8.4
 // - protoc             v3.19.4
-// source: public/common/v1/common.proto
+// source: api/public/common/v1/common.proto
 
 package v1
 
@@ -52,7 +52,7 @@ type CommonHTTPServer interface {
 
 func RegisterCommonHTTPServer(s *http.Server, srv CommonHTTPServer) {
 	r := s.Route("/")
-	r.GET("/v1/common/ads", _Common_GetAds1_HTTP_Handler(srv))
+	r.GET("/v1/common/ads", _Common_GetAds0_HTTP_Handler(srv))
 	r.GET("/v1/common/client", _Common_GetClient0_HTTP_Handler(srv))
 	r.GET("/v1/common/site/privacy", _Common_GetPrivacyPolicy0_HTTP_Handler(srv))
 	r.GET("/v1/common/site/tos", _Common_GetTos0_HTTP_Handler(srv))
@@ -63,7 +63,7 @@ func RegisterCommonHTTPServer(s *http.Server, srv CommonHTTPServer) {
 	r.POST("/v1/common/check_verification_code", _Common_CheckVerificationCode0_HTTP_Handler(srv))
 }
 
-func _Common_GetAds1_HTTP_Handler(srv CommonHTTPServer) func(ctx http.Context) error {
+func _Common_GetAds0_HTTP_Handler(srv CommonHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in GetAdsRequest
 		if err := ctx.BindQuery(&in); err != nil {

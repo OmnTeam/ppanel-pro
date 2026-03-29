@@ -6,7 +6,6 @@ import "time"
 // This type is used for system configuration management
 type SystemConfig struct {
 	ID        int64     `json:"id"`
-	TenantID  int64     `json:"tenant_id"`
 	Category  string    `json:"category"`
 	Key       string    `json:"key"`
 	Value     string    `json:"value"`

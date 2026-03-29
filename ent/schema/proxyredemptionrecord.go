@@ -10,14 +10,14 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// ProxyRedemptionRecord 兑换记录表
+// ProxyRedemptionRecord holds the schema definition for the ProxyRedemptionRecord entity.
 type ProxyRedemptionRecord struct {
 	ent.Schema
 }
 
 func (ProxyRedemptionRecord) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "proxy_redemption_record"},
+		entsql.Annotation{Table: "redemption_record"},
 		entsql.WithComments(true),
 	}
 }

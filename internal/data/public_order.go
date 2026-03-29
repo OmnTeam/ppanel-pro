@@ -11,7 +11,6 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxyorder"
 	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribe"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
 	publicBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public"
@@ -39,6 +38,12 @@ const (
 
 	// CloseOrderTimeMinutes 订单自动关闭的时间（分钟）
 	CloseOrderTimeMinutes = 15
+
+	// MaxQuantity 最大购买数量
+	MaxQuantity = 100
+
+	// MaxOrderAmount 最大订单金额（分）
+	MaxOrderAmount = 1000000000 // 10亿分
 )
 
 // SubscribeDiscount 订阅折扣结构
@@ -441,7 +446,11 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 
 	// 检查单一模式限制（已修复：之前缺失）
 	// 如果启用单一模式，用户一次只能有一个活动订阅
-	if r.config != nil && r.config.Subscribe != nil && r.config.Subscribe.SingleModel {
+	singleModelEnabled := r.config != nil && r.config.Subscribe != nil && r.config.Subscribe.SingleModel
+	if subscribeValues, err := loadSystemConfigMap(ctx, r.data.db, "subscribe"); err == nil {
+		singleModelEnabled = systemConfigBool(subscribeValues, singleModelEnabled, "SingleModel", "single_model")
+	}
+	if singleModelEnabled {
 		existingSubscriptions, err := r.data.db.ProxyUserSubscribe.Query().
 			Where(
 				proxyusersubscribe.UserIDEQ(req.UserID),
@@ -1555,6 +1564,9 @@ func (r *publicOrderRepo) buildNotifyURL(ctx context.Context, payment *ent.Proxy
 	if contextHost, ok := ctx.Value("requestHost").(string); ok && contextHost != "" {
 		host = contextHost
 		r.logger.Infof("[buildNotifyURL] Using context host: %s", host)
+	} else if siteValues, err := loadSystemConfigMap(ctx, r.data.db, "site"); err == nil && systemConfigString(siteValues, "Host", "host") != "" {
+		host = systemConfigString(siteValues, "Host", "host")
+		r.logger.Infof("[buildNotifyURL] Using database host: %s", host)
 	} else if r.config != nil && r.config.Site != nil && r.config.Site.Host != "" {
 		// 第三优先级：使用配置站点主机作为后备
 		host = r.config.Site.Host
@@ -1649,7 +1661,12 @@ func (r *publicOrderRepo) generateEPayPayment(ctx context.Context, order *ent.Pr
 
 	// 从配置生成站点名称或使用默认值
 	siteName := "Order Payment"
-	if r.config != nil && r.config.Site != nil && r.config.Site.SiteName != "" {
+	if siteValues, err := loadSystemConfigMap(ctx, r.data.db, "site"); err == nil {
+		if value := systemConfigString(siteValues, "SiteName", "site_name"); value != "" {
+			siteName = value
+		}
+	}
+	if siteName == "Order Payment" && r.config != nil && r.config.Site != nil && r.config.Site.SiteName != "" {
 		siteName = r.config.Site.SiteName
 	}
 
@@ -1758,7 +1775,12 @@ func (r *publicOrderRepo) generateCryptoSaaSPayment(ctx context.Context, order *
 
 	// 从配置生成站点名称或使用默认值
 	siteName := "Order Payment"
-	if r.config != nil && r.config.Site != nil && r.config.Site.SiteName != "" {
+	if siteValues, err := loadSystemConfigMap(ctx, r.data.db, "site"); err == nil {
+		if value := systemConfigString(siteValues, "SiteName", "site_name"); value != "" {
+			siteName = value
+		}
+	}
+	if siteName == "Order Payment" && r.config != nil && r.config.Site != nil && r.config.Site.SiteName != "" {
 		siteName = r.config.Site.SiteName
 	}
 
@@ -1914,23 +1936,15 @@ func (r *publicOrderRepo) queryExchangeRate(ctx context.Context, targetCurrency 
 	amount := float64(amountInCents) / float64(100)
 
 	// 从 proxy_system 获取货币配置 表
-	currencyConfigs, err := r.data.db.ProxySystem.Query().
-		Where(proxysystem.CategoryEQ("currency")).
-		All(ctx)
+	configMap, err := loadSystemConfigMap(ctx, r.data.db, "currency")
 	if err != nil {
 		r.logger.Errorf("[queryExchangeRate] Query currency config failed: %v", err)
 		return 0, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
 
-	// 将货币配置解析为映射
-	configMap := make(map[string]string)
-	for _, cfg := range currencyConfigs {
-		configMap[cfg.Key] = cfg.Value
-	}
-
 	// 提取货币单位和访问密钥
-	currencyUnit := configMap["CurrencyUnit"]
-	accessKey := configMap["AccessKey"]
+	currencyUnit := systemConfigString(configMap, "CurrencyUnit", "Currency", "default_currency")
+	accessKey := systemConfigString(configMap, "AccessKey", "access_key")
 
 	// 如果未配置汇率API密钥，跳过转换
 	if accessKey == "" {

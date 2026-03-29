@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -14,7 +13,6 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxyorder"
 	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribe"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	portalBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/portal"
@@ -556,7 +554,7 @@ func (r *publicPortalRepo) CreatePayment(ctx context.Context, orderNo string, re
 	r.logger.Infof("[CreatePayment] orderNo: %s, returnURL: %s",
 		orderNo, returnURL)
 
-	// 临时设置默认tenantID（用于内部辅助方法）
+	// 当前为单库模型，直接使用当前请求上下文
 
 	// 1. 查询订单并验证状态
 	order, err := r.data.db.ProxyOrder.Query().
@@ -701,7 +699,7 @@ func (r *publicPortalRepo) CreatePayment(ctx context.Context, orderNo string, re
 func (r *publicPortalRepo) CheckOrderStatus(ctx context.Context, orderNo, authType, identifier string) (*portalBiz.OrderStatusInfo, string, error) {
 	r.logger.Infof("[CheckOrderStatus] orderNo: %s, authType: %s", orderNo, authType)
 
-	// 临时设置默认tenantID（用于内部辅助方法）
+	// 当前为单库模型，直接使用当前请求上下文
 
 	// 1. 查询订单
 	order, err := r.data.db.ProxyOrder.Query().
@@ -833,56 +831,16 @@ func (r *publicPortalRepo) validateUserAuth(ctx context.Context, userID int, aut
 	return nil
 }
 
-// getJWTConfig 获取JWT配置（从环境变量）
-// 与auth.go中的实现保持一致
-func (r *publicPortalRepo) getJWTConfig() (string, int) {
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		secret = DefaultJWTSecret
-	}
-
-	expireStr := os.Getenv("JWT_EXPIRE")
-	expire := DefaultJWTExpire
-	if expireStr != "" {
-		if exp, err := strconv.Atoi(expireStr); err == nil {
-			expire = exp
-		}
-	}
-
-	return secret, expire
-}
-
 // generateSessionToken 生成session token
 // ⚠️ 完整复刻原项目逻辑（queryPurchaseOrderLogic.go:generateSessionToken）
 func (r *publicPortalRepo) generateSessionToken(ctx context.Context, userID int) (string, error) {
-	// 1. 生成session ID
-	sessionID := tool.GenerateUUID()
-
-	// 2. 获取JWT配置并生成token
-	secret, expire := r.getJWTConfig()
-	claims := map[string]interface{}{
-		"user_id":    userID,
-		"session_id": sessionID,
-	}
-	token, err := tool.GenerateJWT(
-		secret,
-		int64(expire),
-		claims,
-	)
+	token, err := r.data.issueSessionToken(ctx, int64(userID), sessionTokenOptions{})
 	if err != nil {
-		r.logger.Errorf("[generateSessionToken] JWT生成失败: %v", err)
+		r.logger.Errorf("[generateSessionToken] Token生成失败: %v", err)
 		return "", errors.InternalServer("TOKEN_ERROR", "Token生成失败")
 	}
 
-	// 3. 存储session到Redis（TTL与JWT过期时间一致）
-	sessionKey := fmt.Sprintf("%s:%s", constant.SessionIdKey, sessionID)
-	ttl := time.Duration(expire) * time.Second
-	if err := r.data.rdb.Set(ctx, sessionKey, userID, ttl).Err(); err != nil {
-		r.logger.Errorf("[generateSessionToken] Redis存储session失败: %v", err)
-		return "", errors.InternalServer("REDIS_ERROR", "Session存储失败")
-	}
-
-	r.logger.Infof("[generateSessionToken] Token生成成功: userID=%d, sessionID=%s", userID, sessionID)
+	r.logger.Infof("[generateSessionToken] Token生成成功: userID=%d", userID)
 	return token, nil
 }
 
@@ -1096,25 +1054,14 @@ func (r *publicPortalRepo) queryExchangeRate(ctx context.Context, targetCurrency
 	amount := float64(amountInCents) / float64(100)
 
 	// 2. 查询系统货币配置
-	configs, err := r.data.db.ProxySystem.Query().
-		Where(
-			proxysystem.KeyIn("currency_unit", "currency_symbol", "access_key"),
-		).
-		All(ctx)
-
+	configMap, err := loadSystemConfigMap(ctx, r.data.db, "currency")
 	if err != nil {
 		r.logger.Errorf("[queryExchangeRate] 查询货币配置失败: %v", err)
 		return 0, errors.InternalServer("DATABASE_ERROR", "查询货币配置失败")
 	}
 
-	// 3. 解析配置
-	configMap := make(map[string]string)
-	for _, cfg := range configs {
-		configMap[cfg.Key] = cfg.Value
-	}
-
-	currencyUnit := configMap["currency_unit"]
-	accessKey := configMap["access_key"]
+	currencyUnit := systemConfigString(configMap, "CurrencyUnit", "Currency", "default_currency")
+	accessKey := systemConfigString(configMap, "AccessKey", "access_key")
 
 	// 4. 如果没有配置汇率API key，直接返回原金额
 	if accessKey == "" {
@@ -1153,8 +1100,13 @@ func (r *publicPortalRepo) buildNotifyURL(ctx context.Context, paymentConfig *en
 	// ⚠️ 关键：使用"requestHost"而不是"request_host"（constant.CtxKeyRequestHost = "requestHost"）
 	host, ok := ctx.Value("requestHost").(string)
 	if !ok || host == "" {
-		// 3. Fallback到应用配置的host
-		host = r.data.conf.Site.Host
+		// 3. Fallback到数据库中的站点Host，再回退到配置文件
+		if siteValues, err := loadSystemConfigMap(ctx, r.data.db, "site"); err == nil {
+			host = systemConfigString(siteValues, "Host", "host")
+		}
+		if host == "" && r.data.conf != nil && r.data.conf.Site != nil {
+			host = r.data.conf.Site.Host
+		}
 		if host == "" {
 			host = "localhost"
 		}
@@ -1165,17 +1117,20 @@ func (r *publicPortalRepo) buildNotifyURL(ctx context.Context, paymentConfig *en
 
 // getSiteName 获取站点名称
 func (r *publicPortalRepo) getSiteName(ctx context.Context) string {
-	config, err := r.data.db.ProxySystem.Query().
-		Where(
-			proxysystem.KeyEQ("site_name"),
-		).
-		Only(ctx)
-
-	if err != nil || config == nil {
+	siteValues, err := loadSystemConfigMap(ctx, r.data.db, "site")
+	if err != nil {
+		if r.data.conf != nil && r.data.conf.Site != nil {
+			return r.data.conf.Site.SiteName
+		}
+		return ""
+	}
+	if siteName := systemConfigString(siteValues, "SiteName", "site_name"); siteName != "" {
+		return siteName
+	}
+	if r.data.conf != nil && r.data.conf.Site != nil {
 		return r.data.conf.Site.SiteName
 	}
-
-	return config.Value
+	return ""
 }
 
 // processPortalBalancePayment 处理 Portal 订单的余额支付

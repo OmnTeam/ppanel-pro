@@ -54,11 +54,6 @@ func IDLTE(id int64) predicate.ProxyAuthMethod {
 	return predicate.ProxyAuthMethod(sql.FieldLTE(FieldID, id))
 }
 
-// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
-func TenantID(v int64) predicate.ProxyAuthMethod {
-	return predicate.ProxyAuthMethod(sql.FieldEQ(FieldTenantID, v))
-}
-
 // Method applies equality check predicate on the "method" field. It's identical to MethodEQ.
 func Method(v string) predicate.ProxyAuthMethod {
 	return predicate.ProxyAuthMethod(sql.FieldEQ(FieldMethod, v))
@@ -82,46 +77,6 @@ func CreatedAt(v time.Time) predicate.ProxyAuthMethod {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.ProxyAuthMethod {
 	return predicate.ProxyAuthMethod(sql.FieldEQ(FieldUpdatedAt, v))
-}
-
-// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
-func TenantIDEQ(v int64) predicate.ProxyAuthMethod {
-	return predicate.ProxyAuthMethod(sql.FieldEQ(FieldTenantID, v))
-}
-
-// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
-func TenantIDNEQ(v int64) predicate.ProxyAuthMethod {
-	return predicate.ProxyAuthMethod(sql.FieldNEQ(FieldTenantID, v))
-}
-
-// TenantIDIn applies the In predicate on the "tenant_id" field.
-func TenantIDIn(vs ...int64) predicate.ProxyAuthMethod {
-	return predicate.ProxyAuthMethod(sql.FieldIn(FieldTenantID, vs...))
-}
-
-// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
-func TenantIDNotIn(vs ...int64) predicate.ProxyAuthMethod {
-	return predicate.ProxyAuthMethod(sql.FieldNotIn(FieldTenantID, vs...))
-}
-
-// TenantIDGT applies the GT predicate on the "tenant_id" field.
-func TenantIDGT(v int64) predicate.ProxyAuthMethod {
-	return predicate.ProxyAuthMethod(sql.FieldGT(FieldTenantID, v))
-}
-
-// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
-func TenantIDGTE(v int64) predicate.ProxyAuthMethod {
-	return predicate.ProxyAuthMethod(sql.FieldGTE(FieldTenantID, v))
-}
-
-// TenantIDLT applies the LT predicate on the "tenant_id" field.
-func TenantIDLT(v int64) predicate.ProxyAuthMethod {
-	return predicate.ProxyAuthMethod(sql.FieldLT(FieldTenantID, v))
-}
-
-// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
-func TenantIDLTE(v int64) predicate.ProxyAuthMethod {
-	return predicate.ProxyAuthMethod(sql.FieldLTE(FieldTenantID, v))
 }
 
 // MethodEQ applies the EQ predicate on the "method" field.
@@ -304,6 +259,16 @@ func CreatedAtLTE(v time.Time) predicate.ProxyAuthMethod {
 	return predicate.ProxyAuthMethod(sql.FieldLTE(FieldCreatedAt, v))
 }
 
+// CreatedAtIsNil applies the IsNil predicate on the "created_at" field.
+func CreatedAtIsNil() predicate.ProxyAuthMethod {
+	return predicate.ProxyAuthMethod(sql.FieldIsNull(FieldCreatedAt))
+}
+
+// CreatedAtNotNil applies the NotNil predicate on the "created_at" field.
+func CreatedAtNotNil() predicate.ProxyAuthMethod {
+	return predicate.ProxyAuthMethod(sql.FieldNotNull(FieldCreatedAt))
+}
+
 // UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
 func UpdatedAtEQ(v time.Time) predicate.ProxyAuthMethod {
 	return predicate.ProxyAuthMethod(sql.FieldEQ(FieldUpdatedAt, v))
@@ -342,6 +307,16 @@ func UpdatedAtLT(v time.Time) predicate.ProxyAuthMethod {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.ProxyAuthMethod {
 	return predicate.ProxyAuthMethod(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// UpdatedAtIsNil applies the IsNil predicate on the "updated_at" field.
+func UpdatedAtIsNil() predicate.ProxyAuthMethod {
+	return predicate.ProxyAuthMethod(sql.FieldIsNull(FieldUpdatedAt))
+}
+
+// UpdatedAtNotNil applies the NotNil predicate on the "updated_at" field.
+func UpdatedAtNotNil() predicate.ProxyAuthMethod {
+	return predicate.ProxyAuthMethod(sql.FieldNotNull(FieldUpdatedAt))
 }
 
 // And groups predicates with the AND operator between them.

@@ -28,27 +28,6 @@ func (_u *ProxySubscribeApplicationUpdate) Where(ps ...predicate.ProxySubscribeA
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxySubscribeApplicationUpdate) SetTenantID(v int64) *ProxySubscribeApplicationUpdate {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxySubscribeApplicationUpdate) SetNillableTenantID(v *int64) *ProxySubscribeApplicationUpdate {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxySubscribeApplicationUpdate) AddTenantID(v int64) *ProxySubscribeApplicationUpdate {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
 // SetName sets the "name" field.
 func (_u *ProxySubscribeApplicationUpdate) SetName(v string) *ProxySubscribeApplicationUpdate {
 	_u.mutation.SetName(v)
@@ -199,6 +178,12 @@ func (_u *ProxySubscribeApplicationUpdate) SetUpdatedAt(v time.Time) *ProxySubsc
 	return _u
 }
 
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (_u *ProxySubscribeApplicationUpdate) ClearUpdatedAt() *ProxySubscribeApplicationUpdate {
+	_u.mutation.ClearUpdatedAt()
+	return _u
+}
+
 // Mutation returns the ProxySubscribeApplicationMutation object of the builder.
 func (_u *ProxySubscribeApplicationUpdate) Mutation() *ProxySubscribeApplicationMutation {
 	return _u.mutation
@@ -234,7 +219,7 @@ func (_u *ProxySubscribeApplicationUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_u *ProxySubscribeApplicationUpdate) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
+	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
 		v := proxysubscribeapplication.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
@@ -267,11 +252,6 @@ func (_u *ProxySubscribeApplicationUpdate) check() error {
 			return &ValidationError{Name: "output_format", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribeApplication.output_format": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.DownloadLink(); ok {
-		if err := proxysubscribeapplication.DownloadLinkValidator(v); err != nil {
-			return &ValidationError{Name: "download_link", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribeApplication.download_link": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -286,12 +266,6 @@ func (_u *ProxySubscribeApplicationUpdate) sqlSave(ctx context.Context) (_node i
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxysubscribeapplication.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxysubscribeapplication.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxysubscribeapplication.FieldName, field.TypeString, value)
@@ -329,8 +303,14 @@ func (_u *ProxySubscribeApplicationUpdate) sqlSave(ctx context.Context) (_node i
 	if value, ok := _u.mutation.DownloadLink(); ok {
 		_spec.SetField(proxysubscribeapplication.FieldDownloadLink, field.TypeString, value)
 	}
+	if _u.mutation.CreatedAtCleared() {
+		_spec.ClearField(proxysubscribeapplication.FieldCreatedAt, field.TypeTime)
+	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxysubscribeapplication.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if _u.mutation.UpdatedAtCleared() {
+		_spec.ClearField(proxysubscribeapplication.FieldUpdatedAt, field.TypeTime)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -350,27 +330,6 @@ type ProxySubscribeApplicationUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxySubscribeApplicationMutation
-}
-
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxySubscribeApplicationUpdateOne) SetTenantID(v int64) *ProxySubscribeApplicationUpdateOne {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxySubscribeApplicationUpdateOne) SetNillableTenantID(v *int64) *ProxySubscribeApplicationUpdateOne {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxySubscribeApplicationUpdateOne) AddTenantID(v int64) *ProxySubscribeApplicationUpdateOne {
-	_u.mutation.AddTenantID(v)
-	return _u
 }
 
 // SetName sets the "name" field.
@@ -523,6 +482,12 @@ func (_u *ProxySubscribeApplicationUpdateOne) SetUpdatedAt(v time.Time) *ProxySu
 	return _u
 }
 
+// ClearUpdatedAt clears the value of the "updated_at" field.
+func (_u *ProxySubscribeApplicationUpdateOne) ClearUpdatedAt() *ProxySubscribeApplicationUpdateOne {
+	_u.mutation.ClearUpdatedAt()
+	return _u
+}
+
 // Mutation returns the ProxySubscribeApplicationMutation object of the builder.
 func (_u *ProxySubscribeApplicationUpdateOne) Mutation() *ProxySubscribeApplicationMutation {
 	return _u.mutation
@@ -571,7 +536,7 @@ func (_u *ProxySubscribeApplicationUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_u *ProxySubscribeApplicationUpdateOne) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok {
+	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
 		v := proxysubscribeapplication.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
@@ -602,11 +567,6 @@ func (_u *ProxySubscribeApplicationUpdateOne) check() error {
 	if v, ok := _u.mutation.OutputFormat(); ok {
 		if err := proxysubscribeapplication.OutputFormatValidator(v); err != nil {
 			return &ValidationError{Name: "output_format", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribeApplication.output_format": %w`, err)}
-		}
-	}
-	if v, ok := _u.mutation.DownloadLink(); ok {
-		if err := proxysubscribeapplication.DownloadLinkValidator(v); err != nil {
-			return &ValidationError{Name: "download_link", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribeApplication.download_link": %w`, err)}
 		}
 	}
 	return nil
@@ -640,12 +600,6 @@ func (_u *ProxySubscribeApplicationUpdateOne) sqlSave(ctx context.Context) (_nod
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxysubscribeapplication.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxysubscribeapplication.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxysubscribeapplication.FieldName, field.TypeString, value)
@@ -683,8 +637,14 @@ func (_u *ProxySubscribeApplicationUpdateOne) sqlSave(ctx context.Context) (_nod
 	if value, ok := _u.mutation.DownloadLink(); ok {
 		_spec.SetField(proxysubscribeapplication.FieldDownloadLink, field.TypeString, value)
 	}
+	if _u.mutation.CreatedAtCleared() {
+		_spec.ClearField(proxysubscribeapplication.FieldCreatedAt, field.TypeTime)
+	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxysubscribeapplication.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if _u.mutation.UpdatedAtCleared() {
+		_spec.ClearField(proxysubscribeapplication.FieldUpdatedAt, field.TypeTime)
 	}
 	_node = &ProxySubscribeApplication{config: _u.config}
 	_spec.Assign = _node.assignValues

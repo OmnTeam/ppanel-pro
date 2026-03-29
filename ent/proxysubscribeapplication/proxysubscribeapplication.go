@@ -13,8 +13,6 @@ const (
 	Label = "proxy_subscribe_application"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldTenantID holds the string denoting the tenant_id field in the database.
-	FieldTenantID = "tenant_id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldIcon holds the string denoting the icon field in the database.
@@ -38,13 +36,12 @@ const (
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxysubscribeapplication in the database.
-	Table = "proxy_subscribe_application"
+	Table = "subscribe_application"
 )
 
 // Columns holds all SQL columns for proxysubscribeapplication fields.
 var Columns = []string{
 	FieldID,
-	FieldTenantID,
 	FieldName,
 	FieldIcon,
 	FieldDescription,
@@ -69,14 +66,18 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultTenantID holds the default value on creation for the "tenant_id" field.
-	DefaultTenantID int64
+	// DefaultName holds the default value on creation for the "name" field.
+	DefaultName string
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
+	// DefaultScheme holds the default value on creation for the "scheme" field.
+	DefaultScheme string
 	// SchemeValidator is a validator for the "scheme" field. It is called by the builders before save.
 	SchemeValidator func(string) error
+	// DefaultUserAgent holds the default value on creation for the "user_agent" field.
+	DefaultUserAgent string
 	// UserAgentValidator is a validator for the "user_agent" field. It is called by the builders before save.
 	UserAgentValidator func(string) error
 	// DefaultIsDefault holds the default value on creation for the "is_default" field.
@@ -85,8 +86,6 @@ var (
 	DefaultOutputFormat string
 	// OutputFormatValidator is a validator for the "output_format" field. It is called by the builders before save.
 	OutputFormatValidator func(string) error
-	// DownloadLinkValidator is a validator for the "download_link" field. It is called by the builders before save.
-	DownloadLinkValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -103,11 +102,6 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByTenantID orders the results by the tenant_id field.
-func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.

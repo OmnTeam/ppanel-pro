@@ -128,6 +128,15 @@ message Subscribe {
   string user_agent_list = 6;
 }
 
+message Device {
+  bool enable = 1;
+  string security_secret = 2;
+}
+
+message Node {
+  string node_secret = 1;
+}
+
 message Admin {
   string email = 1;
   string password = 2;
@@ -143,4 +152,6 @@ message Application {
   Invite invite = 6;
   Subscribe subscribe = 7;
   Admin admin = 8;
+  Device device = 9;
+  Node node = 10;
 }

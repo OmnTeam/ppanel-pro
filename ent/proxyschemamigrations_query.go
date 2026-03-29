@@ -82,8 +82,8 @@ func (_q *ProxySchemaMigrationsQuery) FirstX(ctx context.Context) *ProxySchemaMi
 
 // FirstID returns the first ProxySchemaMigrations ID from the query.
 // Returns a *NotFoundError when no ProxySchemaMigrations ID was found.
-func (_q *ProxySchemaMigrationsQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *ProxySchemaMigrationsQuery) FirstID(ctx context.Context) (id int64, err error) {
+	var ids []int64
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
@@ -95,7 +95,7 @@ func (_q *ProxySchemaMigrationsQuery) FirstID(ctx context.Context) (id int, err 
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *ProxySchemaMigrationsQuery) FirstIDX(ctx context.Context) int {
+func (_q *ProxySchemaMigrationsQuery) FirstIDX(ctx context.Context) int64 {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -133,8 +133,8 @@ func (_q *ProxySchemaMigrationsQuery) OnlyX(ctx context.Context) *ProxySchemaMig
 // OnlyID is like Only, but returns the only ProxySchemaMigrations ID in the query.
 // Returns a *NotSingularError when more than one ProxySchemaMigrations ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *ProxySchemaMigrationsQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (_q *ProxySchemaMigrationsQuery) OnlyID(ctx context.Context) (id int64, err error) {
+	var ids []int64
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
@@ -150,7 +150,7 @@ func (_q *ProxySchemaMigrationsQuery) OnlyID(ctx context.Context) (id int, err e
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *ProxySchemaMigrationsQuery) OnlyIDX(ctx context.Context) int {
+func (_q *ProxySchemaMigrationsQuery) OnlyIDX(ctx context.Context) int64 {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -178,7 +178,7 @@ func (_q *ProxySchemaMigrationsQuery) AllX(ctx context.Context) []*ProxySchemaMi
 }
 
 // IDs executes the query and returns a list of ProxySchemaMigrations IDs.
-func (_q *ProxySchemaMigrationsQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (_q *ProxySchemaMigrationsQuery) IDs(ctx context.Context) (ids []int64, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
@@ -190,7 +190,7 @@ func (_q *ProxySchemaMigrationsQuery) IDs(ctx context.Context) (ids []int, err e
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *ProxySchemaMigrationsQuery) IDsX(ctx context.Context) []int {
+func (_q *ProxySchemaMigrationsQuery) IDsX(ctx context.Context) []int64 {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -262,12 +262,12 @@ func (_q *ProxySchemaMigrationsQuery) Clone() *ProxySchemaMigrationsQuery {
 // Example:
 //
 //	var v []struct {
-//		Version string `json:"version,omitempty"`
+//		Dirty bool `json:"dirty,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ProxySchemaMigrations.Query().
-//		GroupBy(proxyschemamigrations.FieldVersion).
+//		GroupBy(proxyschemamigrations.FieldDirty).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *ProxySchemaMigrationsQuery) GroupBy(field string, fields ...string) *ProxySchemaMigrationsGroupBy {
@@ -285,11 +285,11 @@ func (_q *ProxySchemaMigrationsQuery) GroupBy(field string, fields ...string) *P
 // Example:
 //
 //	var v []struct {
-//		Version string `json:"version,omitempty"`
+//		Dirty bool `json:"dirty,omitempty"`
 //	}
 //
 //	client.ProxySchemaMigrations.Query().
-//		Select(proxyschemamigrations.FieldVersion).
+//		Select(proxyschemamigrations.FieldDirty).
 //		Scan(ctx, &v)
 func (_q *ProxySchemaMigrationsQuery) Select(fields ...string) *ProxySchemaMigrationsSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
@@ -365,7 +365,7 @@ func (_q *ProxySchemaMigrationsQuery) sqlCount(ctx context.Context) (int, error)
 }
 
 func (_q *ProxySchemaMigrationsQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(proxyschemamigrations.Table, proxyschemamigrations.Columns, sqlgraph.NewFieldSpec(proxyschemamigrations.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(proxyschemamigrations.Table, proxyschemamigrations.Columns, sqlgraph.NewFieldSpec(proxyschemamigrations.FieldID, field.TypeInt64))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

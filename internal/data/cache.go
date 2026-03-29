@@ -16,6 +16,14 @@ const (
 	// CacheExpiry 缓存过期时间（秒）
 	CacheExpiry = 300
 
+	// Legacy auth/common cache keys must stay byte-for-byte compatible with the
+	// old project because verification flows and rate limits are shared.
+	AuthCodeCacheKey          = "auth:verify:email"
+	AuthCodeTelephoneCacheKey = "auth:verify:telephone"
+	SendIntervalKeyPrefix     = "send:interval:"
+	SendCountLimitKeyPrefix   = "send:limit:"
+	RegisterIpKeyPrefix       = "register:ip:"
+
 	// System config cache keys
 	CurrencyConfigKey   = "system:currency_config"
 	InviteConfigKey     = "system:invite_config"
@@ -27,6 +35,7 @@ const (
 	VerifyCodeConfigKey = "system:verify_code_config"
 	VerifyConfigKey     = "system:verify_config"
 	GlobalConfigKey     = "system:global_config"
+	CommonStatCacheKey  = "common:stat"
 )
 
 // Status 服务器状态

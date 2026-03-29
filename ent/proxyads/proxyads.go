@@ -13,8 +13,6 @@ const (
 	Label = "proxy_ads"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldTenantID holds the string denoting the tenant_id field in the database.
-	FieldTenantID = "tenant_id"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
 	// FieldType holds the string denoting the type field in the database.
@@ -36,13 +34,12 @@ const (
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxyads in the database.
-	Table = "proxy_ads"
+	Table = "ads"
 )
 
 // Columns holds all SQL columns for proxyads fields.
 var Columns = []string{
 	FieldID,
-	FieldTenantID,
 	FieldTitle,
 	FieldType,
 	FieldContent,
@@ -66,8 +63,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultTenantID holds the default value on creation for the "tenant_id" field.
-	DefaultTenantID int64
 	// DefaultTitle holds the default value on creation for the "title" field.
 	DefaultTitle string
 	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
@@ -81,7 +76,7 @@ var (
 	// TargetURLValidator is a validator for the "target_url" field. It is called by the builders before save.
 	TargetURLValidator func(string) error
 	// DefaultStatus holds the default value on creation for the "status" field.
-	DefaultStatus int8
+	DefaultStatus int
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -96,11 +91,6 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByTenantID orders the results by the tenant_id field.
-func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByTitle orders the results by the title field.

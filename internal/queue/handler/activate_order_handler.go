@@ -10,6 +10,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxycoupon"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyorder"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptionrecord"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
@@ -31,6 +32,7 @@ const (
 	OrderTypeRenewal      = 2 // 续费订阅
 	OrderTypeResetTraffic = 3 // 流量重置
 	OrderTypeRecharge     = 4 // 余额充值
+	OrderTypeRedemption   = 5 // 兑换码激活
 )
 
 // 订单状态常量
@@ -45,17 +47,19 @@ const (
 // ActivateOrderHandler 激活订单处理器
 // ⚠️ 完整复刻原项目逻辑 (activateOrderLogic.go)
 type ActivateOrderHandler struct {
-	db     *ent.Client
-	rdb    *redis.Client
-	logger *log.Helper
+	db                *ent.Client
+	rdb               *redis.Client
+	groupRecalculator groupRecalculator
+	logger            *log.Helper
 }
 
 // NewActivateOrderHandler 创建激活订单处理器
-func NewActivateOrderHandler(db *ent.Client, rdb *redis.Client, logger log.Logger) *ActivateOrderHandler {
+func NewActivateOrderHandler(db *ent.Client, rdb *redis.Client, groupRecalculator groupRecalculator, logger log.Logger) *ActivateOrderHandler {
 	return &ActivateOrderHandler{
-		db:     db,
-		rdb:    rdb,
-		logger: log.NewHelper(logger),
+		db:                db,
+		rdb:               rdb,
+		groupRecalculator: groupRecalculator,
+		logger:            log.NewHelper(logger),
 	}
 }
 
@@ -66,19 +70,22 @@ func (h *ActivateOrderHandler) ProcessTask(ctx context.Context, task *asynq.Task
 	// 1. 解析payload
 	payload, err := h.parsePayload(ctx, task.Payload())
 	if err != nil {
-		return nil // 记录日志并继续
+		return err
 	}
 
 	// 2. 验证并获取订单
 	orderInfo, err := h.validateAndGetOrder(ctx, payload)
 	if err != nil {
-		return nil // 记录日志并继续
+		return err
+	}
+	if orderInfo == nil {
+		return nil
 	}
 
 	// 3. 根据订单类型处理订单
 	if err = h.processOrderByType(ctx, orderInfo); err != nil {
 		h.logger.Errorf("[ActivateOrder] 处理任务失败: %v", err)
-		return nil
+		return err
 	}
 
 	// 4. 后处理：更新优惠券和订单状态
@@ -113,6 +120,11 @@ func (h *ActivateOrderHandler) validateAndGetOrder(ctx context.Context, payload 
 		return nil, err
 	}
 
+	if orderInfo.Status == OrderStatusFinished {
+		h.logger.Infof("[ActivateOrder] 订单已完成，跳过重复处理: orderNo=%s", orderInfo.OrderNo)
+		return nil, nil
+	}
+
 	if orderInfo.Status != OrderStatusPaid {
 		h.logger.Errorf("[ActivateOrder] 订单状态错误: orderNo=%s, status=%d", orderInfo.OrderNo, orderInfo.Status)
 		return nil, fmt.Errorf("invalid order status")
@@ -133,6 +145,8 @@ func (h *ActivateOrderHandler) processOrderByType(ctx context.Context, orderInfo
 		return h.ResetTraffic(ctx, orderInfo)
 	case OrderTypeRecharge:
 		return h.Recharge(ctx, orderInfo)
+	case OrderTypeRedemption:
+		return h.RedemptionActivate(ctx, orderInfo)
 	default:
 		h.logger.Errorf("[ActivateOrder] 订单类型无效: type=%d", orderInfo.Type)
 		return fmt.Errorf("invalid order type: %d", orderInfo.Type)
@@ -183,13 +197,16 @@ func (h *ActivateOrderHandler) NewPurchase(ctx context.Context, orderInfo *ent.P
 		return err
 	}
 
-	// 4. 处理佣金（在单独的goroutine中异步执行，避免阻塞）
+	// 4. 触发用户组重新计算（在后台goroutine中异步执行）
+	h.triggerUserGroupRecalculation(ctx, int64(userInfo.ID))
+
+	// 5. 处理佣金（在单独的goroutine中异步执行，避免阻塞）
 	go h.handleCommission(context.Background(), userInfo, orderInfo)
 
-	// 5. 清理服务器缓存
+	// 6. 清理服务器缓存
 	h.clearServerCache(ctx, sub)
 
-	// 6. 发送通知
+	// 7. 发送通知
 	h.sendNotifications(ctx, orderInfo, userInfo, sub, userSub, NotifyTypePurchase)
 
 	h.logger.Infof("[ActivateOrder] 创建用户订阅成功")
@@ -237,7 +254,8 @@ func (h *ActivateOrderHandler) createGuestUser(ctx context.Context, orderInfo *e
 	err = h.db.TX(ctx, func(tx *ent.Tx) error {
 		// 2.1 创建用户
 		user, err := tx.ProxyUser.Create().
-			SetPassword(tempOrder.Password). // 已加密
+			SetPassword(tool.EncodePassWord(tempOrder.Password)).
+			SetAlgo("default").
 			Save(ctx)
 		if err != nil {
 			return err
@@ -268,6 +286,7 @@ func (h *ActivateOrderHandler) createGuestUser(ctx context.Context, orderInfo *e
 			return err
 		}
 
+		orderInfo.UserID = int64(user.ID)
 		userInfo = user
 		return nil
 	})
@@ -348,7 +367,7 @@ func (h *ActivateOrderHandler) createUserSubscription(ctx context.Context, order
 	expireTime := tool.AddTime(sub.UnitTime, int64(orderInfo.Quantity), now)
 	token := tool.GenerateSubscribeToken(orderInfo.OrderNo)
 
-	userSub, err := h.db.ProxyUserSubscribe.Create().
+	builder := h.db.ProxyUserSubscribe.Create().
 		SetUserID(orderInfo.UserID).
 		SetOrderID(orderInfo.ID).
 		SetSubscribeID(orderInfo.SubscribeID).
@@ -357,18 +376,21 @@ func (h *ActivateOrderHandler) createUserSubscription(ctx context.Context, order
 		SetTraffic(sub.Traffic).
 		SetDownload(0).
 		SetUpload(0).
+		SetExpiredDownload(0).
+		SetExpiredUpload(0).
 		SetToken(token).
 		SetUUID(uuid.New().String()).
-		SetStatus(1).
-		Save(ctx)
+		SetStatus(1)
+	if sub.NodeGroupID != nil {
+		builder = builder.SetNodeGroupID(*sub.NodeGroupID)
+	}
+
+	userSub, err := builder.Save(ctx)
 
 	if err != nil {
 		h.logger.Errorf("[ActivateOrder] 创建用户订阅失败: %v", err)
 		return nil, err
 	}
-
-	// 注意：subscribe_token字段不存在于ProxyOrder表中，跳过更新
-	// Token信息已经存储在ProxyUserSubscribe表中
 
 	return userSub, nil
 }
@@ -382,7 +404,7 @@ func (h *ActivateOrderHandler) createUserSubscription(ctx context.Context, order
 // 完整复刻原项目逻辑 (activateOrderLogic.go:352-421)
 // 异步运行以避免阻塞主订单处理流程
 func (h *ActivateOrderHandler) handleCommission(ctx context.Context, userInfo *ent.ProxyUser, orderInfo *ent.ProxyOrder) {
-	if !h.shouldProcessCommission(userInfo, orderInfo.Type == OrderTypeSubscribe) {
+	if !h.shouldProcessCommission(userInfo, orderInfo.IsNew) {
 		return
 	}
 
@@ -406,7 +428,7 @@ func (h *ActivateOrderHandler) handleCommission(ctx context.Context, userInfo *e
 	}
 
 	// 佣金计算公式：(订单金额 - 订单手续费) * 佣金比例
-	amount := h.calculateCommission(int64(orderInfo.Price-orderInfo.FeeAmount), referralPercentage)
+	amount := h.calculateCommission(int64(orderInfo.Amount-orderInfo.FeeAmount), referralPercentage)
 
 	// 使用事务更新佣金
 	err = h.db.TX(ctx, func(tx *ent.Tx) error {
@@ -522,17 +544,11 @@ func (h *ActivateOrderHandler) Renewal(ctx context.Context, orderInfo *ent.Proxy
 		return err
 	}
 
-	// 2. 获取用户订阅 - 注意：需要从订单关联的用户订阅中获取，而不是从订单的SubscribeToken字段
-	userSubs, err := h.db.ProxyUserSubscribe.Query().
-		Where(
-			proxyusersubscribe.OrderID(orderInfo.ID),
-		).
-		All(ctx)
-	if err != nil || len(userSubs) == 0 {
-		h.logger.Errorf("[ActivateOrder] 查询用户订阅失败: %v, orderID=%d", err, orderInfo.ID)
+	// 2. 获取用户订阅 - 老项目按订单保存的 subscribe_token 查订阅
+	userSub, err := h.getUserSubscription(ctx, orderInfo.SubscribeToken)
+	if err != nil {
 		return err
 	}
-	userSub := userSubs[0]
 
 	// 3. 获取订阅套餐信息
 	sub, err := h.getSubscribeInfo(ctx, int64(orderInfo.SubscribeID))
@@ -566,6 +582,10 @@ func (h *ActivateOrderHandler) Renewal(ctx context.Context, orderInfo *ent.Proxy
 // getUserSubscription 根据token获取用户订阅
 // 复刻原项目 line 517-524
 func (h *ActivateOrderHandler) getUserSubscription(ctx context.Context, token string) (*ent.ProxyUserSubscribe, error) {
+	if token == "" {
+		return nil, fmt.Errorf("subscribe token is empty")
+	}
+
 	userSub, err := h.db.ProxyUserSubscribe.Query().
 		Where(
 			proxyusersubscribe.TokenEQ(token),
@@ -615,6 +635,8 @@ func (h *ActivateOrderHandler) updateSubscriptionForRenewal(ctx context.Context,
 	updateBuilder := h.db.ProxyUserSubscribe.UpdateOneID(userSub.ID).
 		SetExpireTime(newExpireTime).
 		SetStatus(1).
+		SetExpiredDownload(0).
+		SetExpiredUpload(0).
 		ClearFinishedAt()
 
 	if resetTraffic {
@@ -645,22 +667,18 @@ func (h *ActivateOrderHandler) ResetTraffic(ctx context.Context, orderInfo *ent.
 		return err
 	}
 
-	// 2. 获取用户订阅 - 注意：需要从订单关联的用户订阅中获取，而不是从订单的SubscribeToken字段
-	userSubs, err := h.db.ProxyUserSubscribe.Query().
-		Where(
-			proxyusersubscribe.OrderID(orderInfo.ID),
-		).
-		All(ctx)
-	if err != nil || len(userSubs) == 0 {
-		h.logger.Errorf("[ActivateOrder] 查询用户订阅失败: %v, orderID=%d", err, orderInfo.ID)
+	// 2. 获取用户订阅 - 老项目按订单保存的 subscribe_token 查订阅
+	userSub, err := h.getUserSubscription(ctx, orderInfo.SubscribeToken)
+	if err != nil {
 		return err
 	}
-	userSub := userSubs[0]
 
 	// 3. 重置流量
 	if err := h.db.ProxyUserSubscribe.UpdateOneID(userSub.ID).
 		SetDownload(0).
 		SetUpload(0).
+		SetExpiredDownload(0).
+		SetExpiredUpload(0).
 		SetStatus(1).
 		Exec(ctx); err != nil {
 		h.logger.Errorf("[ActivateOrder] 更新用户订阅失败: %v", err)
@@ -985,7 +1003,12 @@ func (h *ActivateOrderHandler) clearUserSubscribeCache(ctx context.Context, user
 	// 从原项目 user/cache.go:63-79 逻辑：
 	// 清理用户订阅相关的所有缓存键
 	cacheKeys := []string{
-		fmt.Sprintf("cache:user:subscribe:token:%s", userSub.Token),
+		fmt.Sprintf("cache:user:subscribe:token:%s", func() string {
+			if userSub.Token != nil {
+				return *userSub.Token
+			}
+			return ""
+		}()),
 		fmt.Sprintf("cache:user:subscribe:user:%d", userSub.UserID),
 		fmt.Sprintf("cache:user:subscribe:id:%d", userSub.ID),
 	}
@@ -1056,7 +1079,7 @@ func (h *ActivateOrderHandler) updateCouponUsedCount(ctx context.Context, orderI
 	}
 
 	return h.db.ProxyCoupon.UpdateOneID(coupon.ID).
-		SetCount(coupon.Count + 1).
+		AddUsedCount(1).
 		Exec(ctx)
 }
 
@@ -1068,29 +1091,28 @@ type InviteSystemConfig struct {
 
 // loadInviteSystemConfig 加载邀请系统配置
 func (h *ActivateOrderHandler) loadInviteSystemConfig(ctx context.Context) (*InviteSystemConfig, error) {
-	config, err := h.db.ProxySystem.Query().
-		Where(
-			proxysystem.CategoryEQ("invite"),
-			proxysystem.KeyEQ("config"),
-		).
-		Only(ctx)
-
+	entries, err := h.db.ProxySystem.Query().
+		Where(proxysystem.CategoryEQ("invite")).
+		All(ctx)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return &InviteSystemConfig{
-				ReferralPercentage: 0,
-				OnlyFirstPurchase:  false,
-			}, nil
+		return nil, err
+	}
+
+	inviteConfig := &InviteSystemConfig{}
+	for _, entry := range entries {
+		switch entry.Key {
+		case "ReferralPercentage", "referral_percentage":
+			if value, parseErr := strconv.Atoi(entry.Value); parseErr == nil {
+				inviteConfig.ReferralPercentage = value
+			}
+		case "OnlyFirstPurchase", "only_first_purchase":
+			if value, parseErr := strconv.ParseBool(entry.Value); parseErr == nil {
+				inviteConfig.OnlyFirstPurchase = value
+			}
 		}
-		return nil, err
 	}
 
-	var inviteConfig InviteSystemConfig
-	if err := json.Unmarshal([]byte(config.Value), &inviteConfig); err != nil {
-		return nil, err
-	}
-
-	return &inviteConfig, nil
+	return inviteConfig, nil
 }
 
 // loadGlobalReferralPercentage 加载全局佣金比例
@@ -1111,7 +1133,7 @@ func (h *ActivateOrderHandler) loadGlobalReferralPercentage(ctx context.Context)
 func (h *ActivateOrderHandler) getTelegramBot(ctx context.Context) (*tgbotapi.BotAPI, error) {
 	// 查询Telegram配置（从proxy_system表读取）
 	// 注意：由于是队列处理器，无法使用全局租户ID，这里使用租户ID=0（默认租户）
-	// 如需支持多租户，需要在payload中传递tenantID
+	// 如需扩展额外隔离维度，需要在payload中显式传递
 	config, err := h.db.ProxySystem.Query().
 		Where(
 			proxysystem.CategoryEQ("telegram"),
@@ -1224,4 +1246,284 @@ func (h *ActivateOrderHandler) renderAdminNotificationText(data map[string]strin
 		data["OrderStatus"],
 		data["OrderTime"],
 		data["PaymentMethod"])
+}
+
+// ============================================================================
+// RedemptionActivate - 处理兑换码激活订单
+// 完整复刻原项目逻辑 (activateOrderLogic.go:899-1130)
+// ============================================================================
+
+// RedemptionActivate 处理兑换码激活订单
+// 完整复刻原项目逻辑 (activateOrderLogic.go:899-1130)
+// 包括订阅创建或延期、兑换码使用次数更新、兑换记录创建
+func (h *ActivateOrderHandler) RedemptionActivate(ctx context.Context, orderInfo *ent.ProxyOrder) error {
+	// 1. 获取用户信息
+	userInfo, err := h.getExistingUser(ctx, int64(orderInfo.UserID))
+	if err != nil {
+		return err
+	}
+
+	// 2. 获取订阅套餐信息
+	sub, err := h.getSubscribeInfo(ctx, int64(orderInfo.SubscribeID))
+	if err != nil {
+		return err
+	}
+
+	// 3. 从Redis获取兑换码信息
+	cacheKey := fmt.Sprintf("redemption_order:%s", orderInfo.OrderNo)
+	data, err := h.rdb.Get(ctx, cacheKey).Result()
+	if err != nil {
+		h.logger.Errorf("[ActivateOrder] 获取兑换码缓存失败: %v, key=%s", err, cacheKey)
+		return err
+	}
+
+	var redemptionData struct {
+		RedemptionCodeID int64  `json:"redemption_code_id"`
+		UnitTime         string `json:"unit_time"`
+		Quantity         int64  `json:"quantity"`
+	}
+	if err = json.Unmarshal([]byte(data), &redemptionData); err != nil {
+		h.logger.Errorf("[ActivateOrder] 反序列化兑换码缓存失败: %v", err)
+		return err
+	}
+
+	// 4. 幂等性检查：查询是否已有兑换记录
+	existingRecords, err := h.db.ProxyRedemptionRecord.Query().
+		Where(
+			proxyredemptionrecord.UserIDEQ(userInfo.ID),
+			proxyredemptionrecord.RedemptionCodeIDEQ(redemptionData.RedemptionCodeID),
+		).
+		All(ctx)
+
+	if err == nil {
+		for _, record := range existingRecords {
+			if int64(record.RedemptionCodeID) == redemptionData.RedemptionCodeID {
+				h.logger.Infof("[ActivateOrder] 兑换码已处理过，跳过: orderNo=%s, userID=%d, codeID=%d",
+					orderInfo.OrderNo, userInfo.ID, redemptionData.RedemptionCodeID)
+				return nil // 幂等性保护
+			}
+		}
+	}
+
+	// 5. 查找用户现有订阅
+	var existingSubscribe *ent.ProxyUserSubscribe
+	userSubscribes, err := h.db.ProxyUserSubscribe.Query().
+		Where(
+			proxyusersubscribe.UserIDEQ(userInfo.ID),
+			proxyusersubscribe.SubscribeIDEQ(orderInfo.SubscribeID),
+		).
+		All(ctx)
+
+	if err == nil && len(userSubscribes) > 0 {
+		existingSubscribe = userSubscribes[0]
+	}
+
+	now := time.Now()
+
+	// 6. 使用事务保护核心操作
+	err = h.db.TX(ctx, func(tx *ent.Tx) error {
+		// 6.1 创建或更新订阅
+		if existingSubscribe != nil {
+			// 续期现有订阅
+			newExpireTime := now
+			if existingSubscribe.ExpireTime != nil && existingSubscribe.ExpireTime.After(now) {
+				newExpireTime = *existingSubscribe.ExpireTime
+			}
+
+			// 计算新的过期时间
+			newExpireTime = tool.AddTime(redemptionData.UnitTime, redemptionData.Quantity, newExpireTime)
+
+			// 更新订阅
+			updateBuilder := tx.ProxyUserSubscribe.UpdateOneID(existingSubscribe.ID).
+				SetOrderID(orderInfo.ID).
+				SetExpireTime(newExpireTime).
+				SetStatus(1).
+				ClearFinishedAt()
+			if sub.Traffic > 0 {
+				updateBuilder = updateBuilder.
+					SetTraffic(sub.Traffic * 1024 * 1024 * 1024).
+					SetDownload(0).
+					SetUpload(0)
+			}
+			err = updateBuilder.Exec(ctx)
+			if err != nil {
+				h.logger.Errorf("[ActivateOrder] 更新订阅失败: %v", err)
+				return err
+			}
+
+			h.logger.Infof("[ActivateOrder] 续期现有订阅成功: subscribeID=%d, newExpireTime=%v",
+				existingSubscribe.ID, newExpireTime)
+		} else {
+			// 检查配额限制
+			if sub.Quota > 0 {
+				count, err := tx.ProxyUserSubscribe.Query().
+					Where(
+						proxyusersubscribe.UserIDEQ(userInfo.ID),
+						proxyusersubscribe.SubscribeIDEQ(orderInfo.SubscribeID),
+					).
+					Count(ctx)
+				if err != nil {
+					h.logger.Errorf("[ActivateOrder] 查询用户订阅数量失败: %v", err)
+					return err
+				}
+				if count >= int(sub.Quota) {
+					h.logger.Infof("[ActivateOrder] 订阅配额已超限: userID=%d, subscribeID=%d, quota=%d, count=%d",
+						userInfo.ID, orderInfo.SubscribeID, sub.Quota, count)
+					return fmt.Errorf("subscribe quota limit exceeded")
+				}
+			}
+
+			// 创建新订阅
+			expireTime := tool.AddTime(redemptionData.UnitTime, redemptionData.Quantity, now)
+			traffic := int64(0)
+			if sub.Traffic > 0 {
+				traffic = sub.Traffic * 1024 * 1024 * 1024
+			}
+
+			builder := tx.ProxyUserSubscribe.Create().
+				SetUserID(int64(userInfo.ID)).
+				SetOrderID(orderInfo.ID).
+				SetSubscribeID(orderInfo.SubscribeID).
+				SetStartTime(now).
+				SetExpireTime(expireTime).
+				SetTraffic(traffic).
+				SetDownload(0).
+				SetUpload(0).
+				SetExpiredDownload(0).
+				SetExpiredUpload(0).
+				SetToken(tool.GenerateSubscribeToken(orderInfo.OrderNo)).
+				SetUUID(uuid.New().String()).
+				SetStatus(1)
+			if sub.NodeGroupID != nil {
+				builder = builder.SetNodeGroupID(*sub.NodeGroupID)
+			}
+			_, err = builder.Save(ctx)
+
+			if err != nil {
+				h.logger.Errorf("[ActivateOrder] 创建订阅失败: %v", err)
+				return err
+			}
+
+			h.logger.Infof("[ActivateOrder] 创建新订阅成功: expireTime=%v", expireTime)
+		}
+
+		// 6.2 更新兑换码使用次数
+		if err := tx.ProxyRedemptionCode.UpdateOneID(redemptionData.RedemptionCodeID).
+			AddUsedCount(1).
+			Exec(ctx); err != nil {
+			h.logger.Errorf("[ActivateOrder] 更新兑换码使用次数失败: %v", err)
+			return err
+		}
+
+		// 6.3 创建兑换记录
+		_, err = tx.ProxyRedemptionRecord.Create().
+			SetRedemptionCodeID(redemptionData.RedemptionCodeID).
+			SetUserID(int64(userInfo.ID)).
+			SetSubscribeID(orderInfo.SubscribeID).
+			SetUnitTime(redemptionData.UnitTime).
+			SetQuantity(redemptionData.Quantity).
+			SetRedeemedAt(now).
+			Save(ctx)
+
+		if err != nil {
+			h.logger.Errorf("[ActivateOrder] 创建兑换记录失败: %v", err)
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		h.logger.Errorf("[ActivateOrder] 兑换码激活事务失败: %v", err)
+		return err
+	}
+
+	// 7. 触发用户组重新计算（在后台goroutine中异步执行）
+	h.triggerUserGroupRecalculation(ctx, int64(userInfo.ID))
+
+	// 8. 清理服务器缓存（关键步骤：让节点获取最新订阅）
+	h.clearServerCache(ctx, sub)
+
+	// 8.1 清理用户订阅缓存（如果存在）
+	if existingSubscribe != nil {
+		if err = h.clearUserSubscribeCache(ctx, existingSubscribe); err != nil {
+			h.logger.Errorf("[ActivateOrder] 清理用户订阅缓存失败: %v", err)
+		}
+	}
+
+	// 9. 删除Redis临时数据
+	h.rdb.Del(ctx, cacheKey)
+
+	// 10. 发送通知（可选）
+	// 可以复用现有的通知模板或创建新的兑换通知模板
+
+	h.logger.Infof("[ActivateOrder] 兑换码激活成功: orderNo=%s, userID=%d, subscribeID=%d",
+		orderInfo.OrderNo, userInfo.ID, orderInfo.SubscribeID)
+
+	return nil
+}
+
+// ============================================================================
+// triggerUserGroupRecalculation - 触发用户组重新计算
+// 完整复刻原项目逻辑 (activateOrderLogic.go:513-568)
+// ============================================================================
+
+// triggerUserGroupRecalculation 触发用户组重新计算
+// 完整复刻原项目逻辑 (activateOrderLogic.go:513-568)
+// 在后台goroutine中异步执行，避免阻塞主订单处理流程
+func (h *ActivateOrderHandler) triggerUserGroupRecalculation(ctx context.Context, userId int64) {
+	go func() {
+		// 使用带超时的新context用于用户组重新计算
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		// 检查是否启用了用户组管理
+		var groupEnabled string
+		err := h.db.ProxySystem.Query().
+			Where(
+				proxysystem.CategoryEQ("group"),
+				proxysystem.KeyEQ("enabled"),
+			).
+			Select("value").
+			Scan(ctx, &groupEnabled)
+
+		if err != nil || (groupEnabled != "true" && groupEnabled != "1") {
+			h.logger.Debugf("[ActivateOrder] 用户组管理未启用，跳过重新计算")
+			return
+		}
+
+		// 获取配置的用户组模式
+		var groupMode string
+		err = h.db.ProxySystem.Query().
+			Where(
+				proxysystem.CategoryEQ("group"),
+				proxysystem.KeyEQ("mode"),
+			).
+			Select("value").
+			Scan(ctx, &groupMode)
+
+		if err != nil {
+			h.logger.Errorf("[ActivateOrder] 获取用户组模式失败: %v", err)
+			return
+		}
+
+		// 老项目允许 average / subscribe / traffic 三种模式
+		if groupMode != "average" && groupMode != "subscribe" && groupMode != "traffic" {
+			h.logger.Debugf("[ActivateOrder] 用户组模式无效 (当前: %s)，跳过", groupMode)
+			return
+		}
+
+		if h.groupRecalculator == nil {
+			h.logger.Warnf("[ActivateOrder] 分组重算仓储未注入，跳过: userID=%d, mode=%s", userId, groupMode)
+			return
+		}
+
+		historyID, err := h.groupRecalculator.RecalculateGroup(ctx, groupMode, "")
+		if err != nil {
+			h.logger.Errorf("[ActivateOrder] 触发用户组重算失败: userID=%d, mode=%s, err=%v", userId, groupMode, err)
+			return
+		}
+
+		h.logger.Infof("[ActivateOrder] 成功触发用户组重新计算: userID=%d, mode=%s, historyID=%d", userId, groupMode, historyID)
+	}()
 }

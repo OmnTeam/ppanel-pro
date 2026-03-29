@@ -75,18 +75,13 @@ func Avatar(v string) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldAvatar, v))
 }
 
-// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
-func TenantID(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldEQ(FieldTenantID, v))
-}
-
 // Balance applies equality check predicate on the "balance" field. It's identical to BalanceEQ.
 func Balance(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldBalance, v))
 }
 
 // Telegram applies equality check predicate on the "telegram" field. It's identical to TelegramEQ.
-func Telegram(v int) predicate.ProxyUser {
+func Telegram(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldTelegram, v))
 }
 
@@ -165,14 +160,9 @@ func EnableTradeNotify(v bool) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldEnableTradeNotify, v))
 }
 
-// GroupID applies equality check predicate on the "group_id" field. It's identical to GroupIDEQ.
-func GroupID(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldEQ(FieldGroupID, v))
-}
-
-// GroupLocked applies equality check predicate on the "group_locked" field. It's identical to GroupLockedEQ.
-func GroupLocked(v bool) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldEQ(FieldGroupLocked, v))
+// Rules applies equality check predicate on the "rules" field. It's identical to RulesEQ.
+func Rules(v string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldEQ(FieldRules, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -191,7 +181,7 @@ func DeletedAt(v time.Time) predicate.ProxyUser {
 }
 
 // IsDel applies equality check predicate on the "is_del" field. It's identical to IsDelEQ.
-func IsDel(v bool) predicate.ProxyUser {
+func IsDel(v uint64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldIsDel, v))
 }
 
@@ -475,46 +465,6 @@ func AvatarContainsFold(v string) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldContainsFold(FieldAvatar, v))
 }
 
-// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
-func TenantIDEQ(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldEQ(FieldTenantID, v))
-}
-
-// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
-func TenantIDNEQ(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldNEQ(FieldTenantID, v))
-}
-
-// TenantIDIn applies the In predicate on the "tenant_id" field.
-func TenantIDIn(vs ...int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldIn(FieldTenantID, vs...))
-}
-
-// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
-func TenantIDNotIn(vs ...int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldNotIn(FieldTenantID, vs...))
-}
-
-// TenantIDGT applies the GT predicate on the "tenant_id" field.
-func TenantIDGT(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldGT(FieldTenantID, v))
-}
-
-// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
-func TenantIDGTE(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldGTE(FieldTenantID, v))
-}
-
-// TenantIDLT applies the LT predicate on the "tenant_id" field.
-func TenantIDLT(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldLT(FieldTenantID, v))
-}
-
-// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
-func TenantIDLTE(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldLTE(FieldTenantID, v))
-}
-
 // BalanceEQ applies the EQ predicate on the "balance" field.
 func BalanceEQ(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldBalance, v))
@@ -566,42 +516,42 @@ func BalanceNotNil() predicate.ProxyUser {
 }
 
 // TelegramEQ applies the EQ predicate on the "telegram" field.
-func TelegramEQ(v int) predicate.ProxyUser {
+func TelegramEQ(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldTelegram, v))
 }
 
 // TelegramNEQ applies the NEQ predicate on the "telegram" field.
-func TelegramNEQ(v int) predicate.ProxyUser {
+func TelegramNEQ(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNEQ(FieldTelegram, v))
 }
 
 // TelegramIn applies the In predicate on the "telegram" field.
-func TelegramIn(vs ...int) predicate.ProxyUser {
+func TelegramIn(vs ...int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldIn(FieldTelegram, vs...))
 }
 
 // TelegramNotIn applies the NotIn predicate on the "telegram" field.
-func TelegramNotIn(vs ...int) predicate.ProxyUser {
+func TelegramNotIn(vs ...int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNotIn(FieldTelegram, vs...))
 }
 
 // TelegramGT applies the GT predicate on the "telegram" field.
-func TelegramGT(v int) predicate.ProxyUser {
+func TelegramGT(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldGT(FieldTelegram, v))
 }
 
 // TelegramGTE applies the GTE predicate on the "telegram" field.
-func TelegramGTE(v int) predicate.ProxyUser {
+func TelegramGTE(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldGTE(FieldTelegram, v))
 }
 
 // TelegramLT applies the LT predicate on the "telegram" field.
-func TelegramLT(v int) predicate.ProxyUser {
+func TelegramLT(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldLT(FieldTelegram, v))
 }
 
 // TelegramLTE applies the LTE predicate on the "telegram" field.
-func TelegramLTE(v int) predicate.ProxyUser {
+func TelegramLTE(v int64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldLTE(FieldTelegram, v))
 }
 
@@ -980,64 +930,79 @@ func EnableTradeNotifyNEQ(v bool) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNEQ(FieldEnableTradeNotify, v))
 }
 
-// GroupIDEQ applies the EQ predicate on the "group_id" field.
-func GroupIDEQ(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldEQ(FieldGroupID, v))
+// RulesEQ applies the EQ predicate on the "rules" field.
+func RulesEQ(v string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldEQ(FieldRules, v))
 }
 
-// GroupIDNEQ applies the NEQ predicate on the "group_id" field.
-func GroupIDNEQ(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldNEQ(FieldGroupID, v))
+// RulesNEQ applies the NEQ predicate on the "rules" field.
+func RulesNEQ(v string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldNEQ(FieldRules, v))
 }
 
-// GroupIDIn applies the In predicate on the "group_id" field.
-func GroupIDIn(vs ...int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldIn(FieldGroupID, vs...))
+// RulesIn applies the In predicate on the "rules" field.
+func RulesIn(vs ...string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldIn(FieldRules, vs...))
 }
 
-// GroupIDNotIn applies the NotIn predicate on the "group_id" field.
-func GroupIDNotIn(vs ...int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldNotIn(FieldGroupID, vs...))
+// RulesNotIn applies the NotIn predicate on the "rules" field.
+func RulesNotIn(vs ...string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldNotIn(FieldRules, vs...))
 }
 
-// GroupIDGT applies the GT predicate on the "group_id" field.
-func GroupIDGT(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldGT(FieldGroupID, v))
+// RulesGT applies the GT predicate on the "rules" field.
+func RulesGT(v string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldGT(FieldRules, v))
 }
 
-// GroupIDGTE applies the GTE predicate on the "group_id" field.
-func GroupIDGTE(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldGTE(FieldGroupID, v))
+// RulesGTE applies the GTE predicate on the "rules" field.
+func RulesGTE(v string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldGTE(FieldRules, v))
 }
 
-// GroupIDLT applies the LT predicate on the "group_id" field.
-func GroupIDLT(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldLT(FieldGroupID, v))
+// RulesLT applies the LT predicate on the "rules" field.
+func RulesLT(v string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldLT(FieldRules, v))
 }
 
-// GroupIDLTE applies the LTE predicate on the "group_id" field.
-func GroupIDLTE(v int64) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldLTE(FieldGroupID, v))
+// RulesLTE applies the LTE predicate on the "rules" field.
+func RulesLTE(v string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldLTE(FieldRules, v))
 }
 
-// GroupIDIsNil applies the IsNil predicate on the "group_id" field.
-func GroupIDIsNil() predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldIsNull(FieldGroupID))
+// RulesContains applies the Contains predicate on the "rules" field.
+func RulesContains(v string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldContains(FieldRules, v))
 }
 
-// GroupIDNotNil applies the NotNil predicate on the "group_id" field.
-func GroupIDNotNil() predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldNotNull(FieldGroupID))
+// RulesHasPrefix applies the HasPrefix predicate on the "rules" field.
+func RulesHasPrefix(v string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldHasPrefix(FieldRules, v))
 }
 
-// GroupLockedEQ applies the EQ predicate on the "group_locked" field.
-func GroupLockedEQ(v bool) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldEQ(FieldGroupLocked, v))
+// RulesHasSuffix applies the HasSuffix predicate on the "rules" field.
+func RulesHasSuffix(v string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldHasSuffix(FieldRules, v))
 }
 
-// GroupLockedNEQ applies the NEQ predicate on the "group_locked" field.
-func GroupLockedNEQ(v bool) predicate.ProxyUser {
-	return predicate.ProxyUser(sql.FieldNEQ(FieldGroupLocked, v))
+// RulesIsNil applies the IsNil predicate on the "rules" field.
+func RulesIsNil() predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldIsNull(FieldRules))
+}
+
+// RulesNotNil applies the NotNil predicate on the "rules" field.
+func RulesNotNil() predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldNotNull(FieldRules))
+}
+
+// RulesEqualFold applies the EqualFold predicate on the "rules" field.
+func RulesEqualFold(v string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldEqualFold(FieldRules, v))
+}
+
+// RulesContainsFold applies the ContainsFold predicate on the "rules" field.
+func RulesContainsFold(v string) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldContainsFold(FieldRules, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -1171,13 +1136,43 @@ func DeletedAtNotNil() predicate.ProxyUser {
 }
 
 // IsDelEQ applies the EQ predicate on the "is_del" field.
-func IsDelEQ(v bool) predicate.ProxyUser {
+func IsDelEQ(v uint64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldEQ(FieldIsDel, v))
 }
 
 // IsDelNEQ applies the NEQ predicate on the "is_del" field.
-func IsDelNEQ(v bool) predicate.ProxyUser {
+func IsDelNEQ(v uint64) predicate.ProxyUser {
 	return predicate.ProxyUser(sql.FieldNEQ(FieldIsDel, v))
+}
+
+// IsDelIn applies the In predicate on the "is_del" field.
+func IsDelIn(vs ...uint64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldIn(FieldIsDel, vs...))
+}
+
+// IsDelNotIn applies the NotIn predicate on the "is_del" field.
+func IsDelNotIn(vs ...uint64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldNotIn(FieldIsDel, vs...))
+}
+
+// IsDelGT applies the GT predicate on the "is_del" field.
+func IsDelGT(v uint64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldGT(FieldIsDel, v))
+}
+
+// IsDelGTE applies the GTE predicate on the "is_del" field.
+func IsDelGTE(v uint64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldGTE(FieldIsDel, v))
+}
+
+// IsDelLT applies the LT predicate on the "is_del" field.
+func IsDelLT(v uint64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldLT(FieldIsDel, v))
+}
+
+// IsDelLTE applies the LTE predicate on the "is_del" field.
+func IsDelLTE(v uint64) predicate.ProxyUser {
+	return predicate.ProxyUser(sql.FieldLTE(FieldIsDel, v))
 }
 
 // IsDelIsNil applies the IsNil predicate on the "is_del" field.

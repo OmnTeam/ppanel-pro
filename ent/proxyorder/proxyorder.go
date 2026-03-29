@@ -13,8 +13,6 @@ const (
 	Label = "proxy_order"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldTenantID holds the string denoting the tenant_id field in the database.
-	FieldTenantID = "tenant_id"
 	// FieldParentID holds the string denoting the parent_id field in the database.
 	FieldParentID = "parent_id"
 	// FieldUserID holds the string denoting the user_id field in the database.
@@ -29,6 +27,8 @@ const (
 	FieldPrice = "price"
 	// FieldAmount holds the string denoting the amount field in the database.
 	FieldAmount = "amount"
+	// FieldGiftAmount holds the string denoting the gift_amount field in the database.
+	FieldGiftAmount = "gift_amount"
 	// FieldDiscount holds the string denoting the discount field in the database.
 	FieldDiscount = "discount"
 	// FieldCoupon holds the string denoting the coupon field in the database.
@@ -37,14 +37,12 @@ const (
 	FieldCouponDiscount = "coupon_discount"
 	// FieldCommission holds the string denoting the commission field in the database.
 	FieldCommission = "commission"
-	// FieldFeeAmount holds the string denoting the fee_amount field in the database.
-	FieldFeeAmount = "fee_amount"
-	// FieldGiftAmount holds the string denoting the gift_amount field in the database.
-	FieldGiftAmount = "gift_amount"
 	// FieldPaymentID holds the string denoting the payment_id field in the database.
 	FieldPaymentID = "payment_id"
 	// FieldMethod holds the string denoting the method field in the database.
 	FieldMethod = "method"
+	// FieldFeeAmount holds the string denoting the fee_amount field in the database.
+	FieldFeeAmount = "fee_amount"
 	// FieldTradeNo holds the string denoting the trade_no field in the database.
 	FieldTradeNo = "trade_no"
 	// FieldStatus holds the string denoting the status field in the database.
@@ -60,13 +58,12 @@ const (
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxyorder in the database.
-	Table = "proxy_order"
+	Table = "order"
 )
 
 // Columns holds all SQL columns for proxyorder fields.
 var Columns = []string{
 	FieldID,
-	FieldTenantID,
 	FieldParentID,
 	FieldUserID,
 	FieldOrderNo,
@@ -74,14 +71,14 @@ var Columns = []string{
 	FieldQuantity,
 	FieldPrice,
 	FieldAmount,
+	FieldGiftAmount,
 	FieldDiscount,
 	FieldCoupon,
 	FieldCouponDiscount,
 	FieldCommission,
-	FieldFeeAmount,
-	FieldGiftAmount,
 	FieldPaymentID,
 	FieldMethod,
+	FieldFeeAmount,
 	FieldTradeNo,
 	FieldStatus,
 	FieldSubscribeID,
@@ -102,8 +99,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultTenantID holds the default value on creation for the "tenant_id" field.
-	DefaultTenantID int64
 	// DefaultUserID holds the default value on creation for the "user_id" field.
 	DefaultUserID int64
 	// OrderNoValidator is a validator for the "order_no" field. It is called by the builders before save.
@@ -116,6 +111,8 @@ var (
 	DefaultPrice int64
 	// DefaultAmount holds the default value on creation for the "amount" field.
 	DefaultAmount int64
+	// DefaultGiftAmount holds the default value on creation for the "gift_amount" field.
+	DefaultGiftAmount int64
 	// DefaultDiscount holds the default value on creation for the "discount" field.
 	DefaultDiscount int64
 	// CouponValidator is a validator for the "coupon" field. It is called by the builders before save.
@@ -124,14 +121,14 @@ var (
 	DefaultCouponDiscount int64
 	// DefaultCommission holds the default value on creation for the "commission" field.
 	DefaultCommission int64
-	// DefaultFeeAmount holds the default value on creation for the "fee_amount" field.
-	DefaultFeeAmount int64
-	// DefaultGiftAmount holds the default value on creation for the "gift_amount" field.
-	DefaultGiftAmount int64
 	// DefaultPaymentID holds the default value on creation for the "payment_id" field.
 	DefaultPaymentID int64
+	// DefaultMethod holds the default value on creation for the "method" field.
+	DefaultMethod string
 	// MethodValidator is a validator for the "method" field. It is called by the builders before save.
 	MethodValidator func(string) error
+	// DefaultFeeAmount holds the default value on creation for the "fee_amount" field.
+	DefaultFeeAmount int64
 	// TradeNoValidator is a validator for the "trade_no" field. It is called by the builders before save.
 	TradeNoValidator func(string) error
 	// DefaultStatus holds the default value on creation for the "status" field.
@@ -156,11 +153,6 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByTenantID orders the results by the tenant_id field.
-func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByParentID orders the results by the parent_id field.
@@ -198,6 +190,11 @@ func ByAmount(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAmount, opts...).ToFunc()
 }
 
+// ByGiftAmount orders the results by the gift_amount field.
+func ByGiftAmount(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldGiftAmount, opts...).ToFunc()
+}
+
 // ByDiscount orders the results by the discount field.
 func ByDiscount(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDiscount, opts...).ToFunc()
@@ -218,16 +215,6 @@ func ByCommission(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCommission, opts...).ToFunc()
 }
 
-// ByFeeAmount orders the results by the fee_amount field.
-func ByFeeAmount(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldFeeAmount, opts...).ToFunc()
-}
-
-// ByGiftAmount orders the results by the gift_amount field.
-func ByGiftAmount(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldGiftAmount, opts...).ToFunc()
-}
-
 // ByPaymentID orders the results by the payment_id field.
 func ByPaymentID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPaymentID, opts...).ToFunc()
@@ -236,6 +223,11 @@ func ByPaymentID(opts ...sql.OrderTermOption) OrderOption {
 // ByMethod orders the results by the method field.
 func ByMethod(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMethod, opts...).ToFunc()
+}
+
+// ByFeeAmount orders the results by the fee_amount field.
+func ByFeeAmount(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFeeAmount, opts...).ToFunc()
 }
 
 // ByTradeNo orders the results by the trade_no field.

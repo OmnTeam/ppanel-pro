@@ -20,20 +20,6 @@ type ProxyOrderCreate struct {
 	hooks    []Hook
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_c *ProxyOrderCreate) SetTenantID(v int64) *ProxyOrderCreate {
-	_c.mutation.SetTenantID(v)
-	return _c
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_c *ProxyOrderCreate) SetNillableTenantID(v *int64) *ProxyOrderCreate {
-	if v != nil {
-		_c.SetTenantID(*v)
-	}
-	return _c
-}
-
 // SetParentID sets the "parent_id" field.
 func (_c *ProxyOrderCreate) SetParentID(v int64) *ProxyOrderCreate {
 	_c.mutation.SetParentID(v)
@@ -124,6 +110,20 @@ func (_c *ProxyOrderCreate) SetNillableAmount(v *int64) *ProxyOrderCreate {
 	return _c
 }
 
+// SetGiftAmount sets the "gift_amount" field.
+func (_c *ProxyOrderCreate) SetGiftAmount(v int64) *ProxyOrderCreate {
+	_c.mutation.SetGiftAmount(v)
+	return _c
+}
+
+// SetNillableGiftAmount sets the "gift_amount" field if the given value is not nil.
+func (_c *ProxyOrderCreate) SetNillableGiftAmount(v *int64) *ProxyOrderCreate {
+	if v != nil {
+		_c.SetGiftAmount(*v)
+	}
+	return _c
+}
+
 // SetDiscount sets the "discount" field.
 func (_c *ProxyOrderCreate) SetDiscount(v int64) *ProxyOrderCreate {
 	_c.mutation.SetDiscount(v)
@@ -180,34 +180,6 @@ func (_c *ProxyOrderCreate) SetNillableCommission(v *int64) *ProxyOrderCreate {
 	return _c
 }
 
-// SetFeeAmount sets the "fee_amount" field.
-func (_c *ProxyOrderCreate) SetFeeAmount(v int64) *ProxyOrderCreate {
-	_c.mutation.SetFeeAmount(v)
-	return _c
-}
-
-// SetNillableFeeAmount sets the "fee_amount" field if the given value is not nil.
-func (_c *ProxyOrderCreate) SetNillableFeeAmount(v *int64) *ProxyOrderCreate {
-	if v != nil {
-		_c.SetFeeAmount(*v)
-	}
-	return _c
-}
-
-// SetGiftAmount sets the "gift_amount" field.
-func (_c *ProxyOrderCreate) SetGiftAmount(v int64) *ProxyOrderCreate {
-	_c.mutation.SetGiftAmount(v)
-	return _c
-}
-
-// SetNillableGiftAmount sets the "gift_amount" field if the given value is not nil.
-func (_c *ProxyOrderCreate) SetNillableGiftAmount(v *int64) *ProxyOrderCreate {
-	if v != nil {
-		_c.SetGiftAmount(*v)
-	}
-	return _c
-}
-
 // SetPaymentID sets the "payment_id" field.
 func (_c *ProxyOrderCreate) SetPaymentID(v int64) *ProxyOrderCreate {
 	_c.mutation.SetPaymentID(v)
@@ -232,6 +204,20 @@ func (_c *ProxyOrderCreate) SetMethod(v string) *ProxyOrderCreate {
 func (_c *ProxyOrderCreate) SetNillableMethod(v *string) *ProxyOrderCreate {
 	if v != nil {
 		_c.SetMethod(*v)
+	}
+	return _c
+}
+
+// SetFeeAmount sets the "fee_amount" field.
+func (_c *ProxyOrderCreate) SetFeeAmount(v int64) *ProxyOrderCreate {
+	_c.mutation.SetFeeAmount(v)
+	return _c
+}
+
+// SetNillableFeeAmount sets the "fee_amount" field if the given value is not nil.
+func (_c *ProxyOrderCreate) SetNillableFeeAmount(v *int64) *ProxyOrderCreate {
+	if v != nil {
+		_c.SetFeeAmount(*v)
 	}
 	return _c
 }
@@ -375,10 +361,6 @@ func (_c *ProxyOrderCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxyOrderCreate) defaults() {
-	if _, ok := _c.mutation.TenantID(); !ok {
-		v := proxyorder.DefaultTenantID
-		_c.mutation.SetTenantID(v)
-	}
 	if _, ok := _c.mutation.UserID(); !ok {
 		v := proxyorder.DefaultUserID
 		_c.mutation.SetUserID(v)
@@ -399,6 +381,10 @@ func (_c *ProxyOrderCreate) defaults() {
 		v := proxyorder.DefaultAmount
 		_c.mutation.SetAmount(v)
 	}
+	if _, ok := _c.mutation.GiftAmount(); !ok {
+		v := proxyorder.DefaultGiftAmount
+		_c.mutation.SetGiftAmount(v)
+	}
 	if _, ok := _c.mutation.Discount(); !ok {
 		v := proxyorder.DefaultDiscount
 		_c.mutation.SetDiscount(v)
@@ -411,17 +397,17 @@ func (_c *ProxyOrderCreate) defaults() {
 		v := proxyorder.DefaultCommission
 		_c.mutation.SetCommission(v)
 	}
-	if _, ok := _c.mutation.FeeAmount(); !ok {
-		v := proxyorder.DefaultFeeAmount
-		_c.mutation.SetFeeAmount(v)
-	}
-	if _, ok := _c.mutation.GiftAmount(); !ok {
-		v := proxyorder.DefaultGiftAmount
-		_c.mutation.SetGiftAmount(v)
-	}
 	if _, ok := _c.mutation.PaymentID(); !ok {
 		v := proxyorder.DefaultPaymentID
 		_c.mutation.SetPaymentID(v)
+	}
+	if _, ok := _c.mutation.Method(); !ok {
+		v := proxyorder.DefaultMethod
+		_c.mutation.SetMethod(v)
+	}
+	if _, ok := _c.mutation.FeeAmount(); !ok {
+		v := proxyorder.DefaultFeeAmount
+		_c.mutation.SetFeeAmount(v)
 	}
 	if _, ok := _c.mutation.Status(); !ok {
 		v := proxyorder.DefaultStatus
@@ -447,9 +433,6 @@ func (_c *ProxyOrderCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ProxyOrderCreate) check() error {
-	if _, ok := _c.mutation.TenantID(); !ok {
-		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "ProxyOrder.tenant_id"`)}
-	}
 	if _, ok := _c.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "ProxyOrder.user_id"`)}
 	}
@@ -473,6 +456,9 @@ func (_c *ProxyOrderCreate) check() error {
 	if _, ok := _c.mutation.Amount(); !ok {
 		return &ValidationError{Name: "amount", err: errors.New(`ent: missing required field "ProxyOrder.amount"`)}
 	}
+	if _, ok := _c.mutation.GiftAmount(); !ok {
+		return &ValidationError{Name: "gift_amount", err: errors.New(`ent: missing required field "ProxyOrder.gift_amount"`)}
+	}
 	if _, ok := _c.mutation.Discount(); !ok {
 		return &ValidationError{Name: "discount", err: errors.New(`ent: missing required field "ProxyOrder.discount"`)}
 	}
@@ -487,19 +473,19 @@ func (_c *ProxyOrderCreate) check() error {
 	if _, ok := _c.mutation.Commission(); !ok {
 		return &ValidationError{Name: "commission", err: errors.New(`ent: missing required field "ProxyOrder.commission"`)}
 	}
-	if _, ok := _c.mutation.FeeAmount(); !ok {
-		return &ValidationError{Name: "fee_amount", err: errors.New(`ent: missing required field "ProxyOrder.fee_amount"`)}
-	}
-	if _, ok := _c.mutation.GiftAmount(); !ok {
-		return &ValidationError{Name: "gift_amount", err: errors.New(`ent: missing required field "ProxyOrder.gift_amount"`)}
-	}
 	if _, ok := _c.mutation.PaymentID(); !ok {
 		return &ValidationError{Name: "payment_id", err: errors.New(`ent: missing required field "ProxyOrder.payment_id"`)}
+	}
+	if _, ok := _c.mutation.Method(); !ok {
+		return &ValidationError{Name: "method", err: errors.New(`ent: missing required field "ProxyOrder.method"`)}
 	}
 	if v, ok := _c.mutation.Method(); ok {
 		if err := proxyorder.MethodValidator(v); err != nil {
 			return &ValidationError{Name: "method", err: fmt.Errorf(`ent: validator failed for field "ProxyOrder.method": %w`, err)}
 		}
+	}
+	if _, ok := _c.mutation.FeeAmount(); !ok {
+		return &ValidationError{Name: "fee_amount", err: errors.New(`ent: missing required field "ProxyOrder.fee_amount"`)}
 	}
 	if v, ok := _c.mutation.TradeNo(); ok {
 		if err := proxyorder.TradeNoValidator(v); err != nil {
@@ -558,10 +544,6 @@ func (_c *ProxyOrderCreate) createSpec() (*ProxyOrder, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := _c.mutation.TenantID(); ok {
-		_spec.SetField(proxyorder.FieldTenantID, field.TypeInt64, value)
-		_node.TenantID = value
-	}
 	if value, ok := _c.mutation.ParentID(); ok {
 		_spec.SetField(proxyorder.FieldParentID, field.TypeInt64, value)
 		_node.ParentID = value
@@ -590,6 +572,10 @@ func (_c *ProxyOrderCreate) createSpec() (*ProxyOrder, *sqlgraph.CreateSpec) {
 		_spec.SetField(proxyorder.FieldAmount, field.TypeInt64, value)
 		_node.Amount = value
 	}
+	if value, ok := _c.mutation.GiftAmount(); ok {
+		_spec.SetField(proxyorder.FieldGiftAmount, field.TypeInt64, value)
+		_node.GiftAmount = value
+	}
 	if value, ok := _c.mutation.Discount(); ok {
 		_spec.SetField(proxyorder.FieldDiscount, field.TypeInt64, value)
 		_node.Discount = value
@@ -606,14 +592,6 @@ func (_c *ProxyOrderCreate) createSpec() (*ProxyOrder, *sqlgraph.CreateSpec) {
 		_spec.SetField(proxyorder.FieldCommission, field.TypeInt64, value)
 		_node.Commission = value
 	}
-	if value, ok := _c.mutation.FeeAmount(); ok {
-		_spec.SetField(proxyorder.FieldFeeAmount, field.TypeInt64, value)
-		_node.FeeAmount = value
-	}
-	if value, ok := _c.mutation.GiftAmount(); ok {
-		_spec.SetField(proxyorder.FieldGiftAmount, field.TypeInt64, value)
-		_node.GiftAmount = value
-	}
 	if value, ok := _c.mutation.PaymentID(); ok {
 		_spec.SetField(proxyorder.FieldPaymentID, field.TypeInt64, value)
 		_node.PaymentID = value
@@ -621,6 +599,10 @@ func (_c *ProxyOrderCreate) createSpec() (*ProxyOrder, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Method(); ok {
 		_spec.SetField(proxyorder.FieldMethod, field.TypeString, value)
 		_node.Method = value
+	}
+	if value, ok := _c.mutation.FeeAmount(); ok {
+		_spec.SetField(proxyorder.FieldFeeAmount, field.TypeInt64, value)
+		_node.FeeAmount = value
 	}
 	if value, ok := _c.mutation.TradeNo(); ok {
 		_spec.SetField(proxyorder.FieldTradeNo, field.TypeString, value)

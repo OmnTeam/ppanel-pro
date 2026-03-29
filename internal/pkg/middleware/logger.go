@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"strings"
 	"time"
@@ -26,13 +27,15 @@ func Logging(logger log.Logger) middleware.Middleware {
 			start := time.Now()
 
 			// Get transport information
-			var method, path, clientIP, userAgent string
+			var method, path, clientIP, userAgent, requestURI, requestHost string
 			if tr, ok := transport.FromServerContext(ctx); ok {
 				if ht, ok := tr.(khttp.Transporter); ok {
 					path = ht.Operation()
 					method = ht.Request().Method
 					clientIP = ht.Request().RemoteAddr
 					userAgent = ht.Request().UserAgent()
+					requestURI = ht.Request().RequestURI
+					requestHost = ht.Request().Host
 
 					// Try to get real IP from X-Forwarded-For or X-Real-IP
 					if forwardedFor := ht.Request().Header.Get("X-Forwarded-For"); forwardedFor != "" {
@@ -40,6 +43,13 @@ func Logging(logger log.Logger) middleware.Middleware {
 					} else if realIP := ht.Request().Header.Get("X-Real-IP"); realIP != "" {
 						clientIP = realIP
 					}
+
+					// Store User-Agent, Client IP, Request URI, and Request Host in context for later use
+					ctx = context.WithValue(ctx, userAgentKey, userAgent)
+					ctx = context.WithValue(ctx, clientIPKey, clientIP)
+					ctx = context.WithValue(ctx, requestURIKey, requestURI)
+					ctx = context.WithValue(ctx, requestHostKey, requestHost)
+					// Note: gatewayMode is not available in the middleware, needs to be set elsewhere
 				}
 			}
 
@@ -67,7 +77,7 @@ func Logging(logger log.Logger) middleware.Middleware {
 					"path", path,
 					"client_ip", clientIP,
 					"duration", duration,
-					"error", err,
+					"error", err.Error(),
 				)
 			} else if duration.Milliseconds() > SlowRequestThreshold {
 				// Log slow request warning
@@ -77,7 +87,7 @@ func Logging(logger log.Logger) middleware.Middleware {
 					"path", path,
 					"client_ip", clientIP,
 					"duration", duration,
-					"duration_ms", duration.Milliseconds(),
+					"duration_ms", fmt.Sprintf("%d ms", duration.Milliseconds()),
 				)
 			} else {
 				// Log success
@@ -87,7 +97,7 @@ func Logging(logger log.Logger) middleware.Middleware {
 					"path", path,
 					"client_ip", clientIP,
 					"duration", duration,
-					"duration_ms", duration.Milliseconds(),
+					"duration_ms", fmt.Sprintf("%d ms", duration.Milliseconds()),
 				)
 			}
 

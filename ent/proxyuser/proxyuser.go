@@ -22,8 +22,6 @@ const (
 	FieldSalt = "salt"
 	// FieldAvatar holds the string denoting the avatar field in the database.
 	FieldAvatar = "avatar"
-	// FieldTenantID holds the string denoting the tenant_id field in the database.
-	FieldTenantID = "tenant_id"
 	// FieldBalance holds the string denoting the balance field in the database.
 	FieldBalance = "balance"
 	// FieldTelegram holds the string denoting the telegram field in the database.
@@ -58,10 +56,8 @@ const (
 	FieldEnableSubscribeNotify = "enable_subscribe_notify"
 	// FieldEnableTradeNotify holds the string denoting the enable_trade_notify field in the database.
 	FieldEnableTradeNotify = "enable_trade_notify"
-	// FieldGroupID holds the string denoting the group_id field in the database.
-	FieldGroupID = "group_id"
-	// FieldGroupLocked holds the string denoting the group_locked field in the database.
-	FieldGroupLocked = "group_locked"
+	// FieldRules holds the string denoting the rules field in the database.
+	FieldRules = "rules"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -75,19 +71,19 @@ const (
 	// EdgeWithdrawals holds the string denoting the withdrawals edge name in mutations.
 	EdgeWithdrawals = "withdrawals"
 	// Table holds the table name of the proxyuser in the database.
-	Table = "proxy_user"
+	Table = "user"
 	// RedemptionRecordsTable is the table that holds the redemption_records relation/edge.
-	RedemptionRecordsTable = "proxy_redemption_record"
+	RedemptionRecordsTable = "redemption_record"
 	// RedemptionRecordsInverseTable is the table name for the ProxyRedemptionRecord entity.
 	// It exists in this package in order to avoid circular dependency with the "proxyredemptionrecord" package.
-	RedemptionRecordsInverseTable = "proxy_redemption_record"
+	RedemptionRecordsInverseTable = "redemption_record"
 	// RedemptionRecordsColumn is the table column denoting the redemption_records relation/edge.
 	RedemptionRecordsColumn = "user_id"
 	// WithdrawalsTable is the table that holds the withdrawals relation/edge.
-	WithdrawalsTable = "proxy_user_withdrawal"
+	WithdrawalsTable = "user_withdrawal"
 	// WithdrawalsInverseTable is the table name for the ProxyUserWithdrawal entity.
 	// It exists in this package in order to avoid circular dependency with the "proxyuserwithdrawal" package.
-	WithdrawalsInverseTable = "proxy_user_withdrawal"
+	WithdrawalsInverseTable = "user_withdrawal"
 	// WithdrawalsColumn is the table column denoting the withdrawals relation/edge.
 	WithdrawalsColumn = "user_id"
 )
@@ -99,7 +95,6 @@ var Columns = []string{
 	FieldAlgo,
 	FieldSalt,
 	FieldAvatar,
-	FieldTenantID,
 	FieldBalance,
 	FieldTelegram,
 	FieldReferCode,
@@ -117,8 +112,7 @@ var Columns = []string{
 	FieldEnableLoginNotify,
 	FieldEnableSubscribeNotify,
 	FieldEnableTradeNotify,
-	FieldGroupID,
-	FieldGroupLocked,
+	FieldRules,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
@@ -144,8 +138,6 @@ var (
 	AlgoValidator func(string) error
 	// SaltValidator is a validator for the "salt" field. It is called by the builders before save.
 	SaltValidator func(string) error
-	// DefaultTenantID holds the default value on creation for the "tenant_id" field.
-	DefaultTenantID int64
 	// DefaultBalance holds the default value on creation for the "balance" field.
 	DefaultBalance int64
 	// ReferCodeValidator is a validator for the "refer_code" field. It is called by the builders before save.
@@ -176,18 +168,12 @@ var (
 	DefaultEnableSubscribeNotify bool
 	// DefaultEnableTradeNotify holds the default value on creation for the "enable_trade_notify" field.
 	DefaultEnableTradeNotify bool
-	// DefaultGroupID holds the default value on creation for the "group_id" field.
-	DefaultGroupID int64
-	// DefaultGroupLocked holds the default value on creation for the "group_locked" field.
-	DefaultGroupLocked bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
-	// DefaultIsDel holds the default value on creation for the "is_del" field.
-	DefaultIsDel bool
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(int64) error
 )
@@ -218,11 +204,6 @@ func BySalt(opts ...sql.OrderTermOption) OrderOption {
 // ByAvatar orders the results by the avatar field.
 func ByAvatar(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAvatar, opts...).ToFunc()
-}
-
-// ByTenantID orders the results by the tenant_id field.
-func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByBalance orders the results by the balance field.
@@ -310,14 +291,9 @@ func ByEnableTradeNotify(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEnableTradeNotify, opts...).ToFunc()
 }
 
-// ByGroupID orders the results by the group_id field.
-func ByGroupID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldGroupID, opts...).ToFunc()
-}
-
-// ByGroupLocked orders the results by the group_locked field.
-func ByGroupLocked(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldGroupLocked, opts...).ToFunc()
+// ByRules orders the results by the rules field.
+func ByRules(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRules, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

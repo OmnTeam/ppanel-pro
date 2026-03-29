@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
 	"github.com/OmnTeam/ppanel-pro/ent/proxytask"
 	taskmodel "github.com/OmnTeam/ppanel-pro/internal/model/task"
 	"github.com/OmnTeam/ppanel-pro/pkg/email"
@@ -169,7 +168,7 @@ func (h *BatchEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) e
 			h.log.WithContext(ctx).Infof("[BatchEmailHandler] Worker stopped by context cancellation, taskID: %d", taskID)
 			// 更新任务状态
 			_ = h.db.ProxyTask.UpdateOneID(taskID).
-				SetCurrent(uint32(count)).
+				SetCurrent(count).
 				Exec(ctx)
 			return nil
 		default:
@@ -195,7 +194,7 @@ func (h *BatchEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) e
 		}
 
 		err = h.db.ProxyTask.UpdateOneID(taskID).
-			SetCurrent(uint32(count)).
+			SetCurrent(count).
 			SetErrors(errorJSON).
 			Exec(ctx)
 		if err != nil {
@@ -209,7 +208,7 @@ func (h *BatchEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) e
 	// 标记任务为完成
 	err = h.db.ProxyTask.UpdateOneID(taskID).
 		SetStatus(int8(taskmodel.StatusCompleted)).
-		SetCurrent(uint32(count)).
+		SetCurrent(count).
 		Exec(ctx)
 	if err != nil {
 		h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Failed to update task status to Completed: %v", err)
@@ -223,58 +222,27 @@ func (h *BatchEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) e
 
 // loadEmailConfig loads email configuration from ProxySystem table
 func (h *BatchEmailHandler) loadEmailConfig(ctx context.Context) (*EmailSystemConfig, error) {
-	// Query email config from ProxySystem table
-	// Category: "email", Key: "config"
-	config, err := h.db.ProxySystem.Query().
-		Where(
-			proxysystem.CategoryEQ("email"),
-			proxysystem.KeyEQ("config"),
-		).
-		Only(ctx)
-
+	config, err := loadQueueEmailConfig(ctx, h.db)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Email config not found, category: email, key: config")
+			h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Email auth method config not found")
 			return nil, fmt.Errorf("email config not found")
 		}
-		h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Failed to query email config, error: %v", err)
+		h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Failed to load email config, error: %v", err)
 		return nil, err
 	}
-
-	var emailConfig EmailSystemConfig
-	if err := json.Unmarshal([]byte(config.Value), &emailConfig); err != nil {
-		h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Failed to unmarshal email config, error: %v", err)
-		return nil, err
-	}
-
-	return &emailConfig, nil
+	return &EmailSystemConfig{
+		Platform:       config.Platform,
+		PlatformConfig: config.PlatformConfig,
+	}, nil
 }
 
 // loadSiteConfig loads site configuration from ProxySystem table
 func (h *BatchEmailHandler) loadSiteConfig(ctx context.Context) (*SiteConfig, error) {
-	// Query site config from ProxySystem table
-	// Category: "site", Key: "config"
-	config, err := h.db.ProxySystem.Query().
-		Where(
-			proxysystem.CategoryEQ("site"),
-			proxysystem.KeyEQ("config"),
-		).
-		Only(ctx)
-
+	siteName, err := loadQueueSiteName(ctx, h.db)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Site config not found, category: site, key: config")
-			return nil, fmt.Errorf("site config not found")
-		}
-		h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Failed to query site config, error: %v", err)
+		h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Failed to load site config, error: %v", err)
 		return nil, err
 	}
-
-	var siteConfig SiteConfig
-	if err := json.Unmarshal([]byte(config.Value), &siteConfig); err != nil {
-		h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Failed to unmarshal site config, error: %v", err)
-		return nil, err
-	}
-
-	return &siteConfig, nil
+	return &SiteConfig{SiteName: siteName}, nil
 }

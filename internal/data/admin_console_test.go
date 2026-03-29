@@ -33,14 +33,14 @@ func seedConsoleTestData(t *testing.T, client *ent.Client, ctx context.Context) 
 	// Create users
 	users := make([]*ent.ProxyUser, 10)
 	for i := 0; i < 10; i++ {
-		user, err := client.ProxyUser.Create()
-		SetTenantID(tenantID)
-		SetPassword("password")
-		SetEnable(true)
-		SetIsAdmin(false)
-		SetBalance(0)
-		SetCreatedAt(time.Now().Add(-time.Duration(i) * 24 * time.Hour))
-		Save(ctx)
+		user, err := client.ProxyUser.Create().
+			SetTenantID(tenantID).
+			SetPassword("password").
+			SetEnable(true).
+			SetIsAdmin(false).
+			SetBalance(0).
+			SetCreatedAt(time.Now().Add(-time.Duration(i) * 24 * time.Hour)).
+			Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create user %d: %v", i, err)
 		}

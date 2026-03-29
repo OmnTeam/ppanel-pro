@@ -24,6 +24,20 @@ type ProxyServerGroup struct {
 	Description string `json:"description,omitempty"`
 	// Sort Order
 	Sort int `json:"sort,omitempty"`
+	// For Calculation
+	ForCalculation bool `json:"for_calculation,omitempty"`
+	// Is Expired Group
+	IsExpiredGroup bool `json:"is_expired_group,omitempty"`
+	// Expired Days Limit
+	ExpiredDaysLimit int `json:"expired_days_limit,omitempty"`
+	// Max Traffic GB for Expired Users
+	MaxTrafficGBExpired *int64 `json:"max_traffic_gb_expired,omitempty"`
+	// Speed Limit
+	SpeedLimit int `json:"speed_limit,omitempty"`
+	// Minimum Traffic
+	MinTrafficGB *int64 `json:"min_traffic_gb,omitempty"`
+	// Maximum Traffic
+	MaxTrafficGB *int64 `json:"max_traffic_gb,omitempty"`
 	// Creation Time
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Update Time
@@ -36,7 +50,9 @@ func (*ProxyServerGroup) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case proxyservergroup.FieldID, proxyservergroup.FieldSort:
+		case proxyservergroup.FieldForCalculation, proxyservergroup.FieldIsExpiredGroup:
+			values[i] = new(sql.NullBool)
+		case proxyservergroup.FieldID, proxyservergroup.FieldSort, proxyservergroup.FieldExpiredDaysLimit, proxyservergroup.FieldMaxTrafficGBExpired, proxyservergroup.FieldSpeedLimit, proxyservergroup.FieldMinTrafficGB, proxyservergroup.FieldMaxTrafficGB:
 			values[i] = new(sql.NullInt64)
 		case proxyservergroup.FieldName, proxyservergroup.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -80,6 +96,51 @@ func (_m *ProxyServerGroup) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value.Valid {
 				_m.Sort = int(value.Int64)
+			}
+		case proxyservergroup.FieldForCalculation:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field for_calculation", values[i])
+			} else if value.Valid {
+				_m.ForCalculation = value.Bool
+			}
+		case proxyservergroup.FieldIsExpiredGroup:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_expired_group", values[i])
+			} else if value.Valid {
+				_m.IsExpiredGroup = value.Bool
+			}
+		case proxyservergroup.FieldExpiredDaysLimit:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field expired_days_limit", values[i])
+			} else if value.Valid {
+				_m.ExpiredDaysLimit = int(value.Int64)
+			}
+		case proxyservergroup.FieldMaxTrafficGBExpired:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field max_traffic_gb_expired", values[i])
+			} else if value.Valid {
+				_m.MaxTrafficGBExpired = new(int64)
+				*_m.MaxTrafficGBExpired = value.Int64
+			}
+		case proxyservergroup.FieldSpeedLimit:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field speed_limit", values[i])
+			} else if value.Valid {
+				_m.SpeedLimit = int(value.Int64)
+			}
+		case proxyservergroup.FieldMinTrafficGB:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field min_traffic_gb", values[i])
+			} else if value.Valid {
+				_m.MinTrafficGB = new(int64)
+				*_m.MinTrafficGB = value.Int64
+			}
+		case proxyservergroup.FieldMaxTrafficGB:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field max_traffic_gb", values[i])
+			} else if value.Valid {
+				_m.MaxTrafficGB = new(int64)
+				*_m.MaxTrafficGB = value.Int64
 			}
 		case proxyservergroup.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -137,6 +198,33 @@ func (_m *ProxyServerGroup) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("sort=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Sort))
+	builder.WriteString(", ")
+	builder.WriteString("for_calculation=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ForCalculation))
+	builder.WriteString(", ")
+	builder.WriteString("is_expired_group=")
+	builder.WriteString(fmt.Sprintf("%v", _m.IsExpiredGroup))
+	builder.WriteString(", ")
+	builder.WriteString("expired_days_limit=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ExpiredDaysLimit))
+	builder.WriteString(", ")
+	if v := _m.MaxTrafficGBExpired; v != nil {
+		builder.WriteString("max_traffic_gb_expired=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	builder.WriteString("speed_limit=")
+	builder.WriteString(fmt.Sprintf("%v", _m.SpeedLimit))
+	builder.WriteString(", ")
+	if v := _m.MinTrafficGB; v != nil {
+		builder.WriteString("min_traffic_gb=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.MaxTrafficGB; v != nil {
+		builder.WriteString("max_traffic_gb=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

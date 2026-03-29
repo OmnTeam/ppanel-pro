@@ -87,7 +87,7 @@ func (s *AuthMethodService) UpdateAuthMethodConfig(ctx context.Context, req *v1.
 
 // GetEmailPlatform 获取邮件平台列表
 func (s *AuthMethodService) GetEmailPlatform(ctx context.Context, req *v1.GetEmailPlatformRequest) (*v1.PlatformListReply, error) {
-	// 平台列表是全局配置，不需要 tenantID
+	// 平台列表是全局配置
 	platforms := s.uc.GetEmailPlatforms(ctx)
 	result := make([]*v1.Platform, 0, len(platforms))
 	for _, p := range platforms {
@@ -107,7 +107,7 @@ func (s *AuthMethodService) GetEmailPlatform(ctx context.Context, req *v1.GetEma
 
 // GetSmsPlatform 获取短信平台列表
 func (s *AuthMethodService) GetSmsPlatform(ctx context.Context, req *v1.GetSmsPlatformRequest) (*v1.PlatformListReply, error) {
-	// 平台列表是全局配置，不需要 tenantID
+	// 平台列表是全局配置
 	platforms := s.uc.GetSmsPlatforms(ctx)
 	result := make([]*v1.Platform, 0, len(platforms))
 	for _, p := range platforms {

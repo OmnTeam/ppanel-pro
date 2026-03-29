@@ -27,9 +27,9 @@ type ProxyUserDeviceOnlineRecord struct {
 	// 下线时间
 	OfflineTime *time.Time `json:"offline_time,omitempty"`
 	// 在线秒数
-	OnlineSeconds *int `json:"online_seconds,omitempty"`
+	OnlineSeconds *int64 `json:"online_seconds,omitempty"`
 	// 持续天数
-	DurationDays *int `json:"duration_days,omitempty"`
+	DurationDays *int64 `json:"duration_days,omitempty"`
 	// 创建时间
 	CreatedAt    time.Time `json:"created_at,omitempty"`
 	selectValues sql.SelectValues
@@ -97,15 +97,15 @@ func (_m *ProxyUserDeviceOnlineRecord) assignValues(columns []string, values []a
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field online_seconds", values[i])
 			} else if value.Valid {
-				_m.OnlineSeconds = new(int)
-				*_m.OnlineSeconds = int(value.Int64)
+				_m.OnlineSeconds = new(int64)
+				*_m.OnlineSeconds = value.Int64
 			}
 		case proxyuserdeviceonlinerecord.FieldDurationDays:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field duration_days", values[i])
 			} else if value.Valid {
-				_m.DurationDays = new(int)
-				*_m.DurationDays = int(value.Int64)
+				_m.DurationDays = new(int64)
+				*_m.DurationDays = value.Int64
 			}
 		case proxyuserdeviceonlinerecord.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

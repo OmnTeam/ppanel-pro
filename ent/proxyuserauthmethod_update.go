@@ -49,27 +49,6 @@ func (_u *ProxyUserAuthMethodUpdate) AddUserID(v int64) *ProxyUserAuthMethodUpda
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyUserAuthMethodUpdate) SetTenantID(v int64) *ProxyUserAuthMethodUpdate {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyUserAuthMethodUpdate) SetNillableTenantID(v *int64) *ProxyUserAuthMethodUpdate {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyUserAuthMethodUpdate) AddTenantID(v int64) *ProxyUserAuthMethodUpdate {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
 // SetAuthType sets the "auth_type" field.
 func (_u *ProxyUserAuthMethodUpdate) SetAuthType(v string) *ProxyUserAuthMethodUpdate {
 	_u.mutation.SetAuthType(v)
@@ -192,12 +171,6 @@ func (_u *ProxyUserAuthMethodUpdate) sqlSave(ctx context.Context) (_node int, er
 	if value, ok := _u.mutation.AddedUserID(); ok {
 		_spec.AddField(proxyuserauthmethod.FieldUserID, field.TypeInt64, value)
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyuserauthmethod.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyuserauthmethod.FieldTenantID, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.AuthType(); ok {
 		_spec.SetField(proxyuserauthmethod.FieldAuthType, field.TypeString, value)
 	}
@@ -248,27 +221,6 @@ func (_u *ProxyUserAuthMethodUpdateOne) SetNillableUserID(v *int64) *ProxyUserAu
 // AddUserID adds value to the "user_id" field.
 func (_u *ProxyUserAuthMethodUpdateOne) AddUserID(v int64) *ProxyUserAuthMethodUpdateOne {
 	_u.mutation.AddUserID(v)
-	return _u
-}
-
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyUserAuthMethodUpdateOne) SetTenantID(v int64) *ProxyUserAuthMethodUpdateOne {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyUserAuthMethodUpdateOne) SetNillableTenantID(v *int64) *ProxyUserAuthMethodUpdateOne {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyUserAuthMethodUpdateOne) AddTenantID(v int64) *ProxyUserAuthMethodUpdateOne {
-	_u.mutation.AddTenantID(v)
 	return _u
 }
 
@@ -423,12 +375,6 @@ func (_u *ProxyUserAuthMethodUpdateOne) sqlSave(ctx context.Context) (_node *Pro
 	}
 	if value, ok := _u.mutation.AddedUserID(); ok {
 		_spec.AddField(proxyuserauthmethod.FieldUserID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyuserauthmethod.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyuserauthmethod.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AuthType(); ok {
 		_spec.SetField(proxyuserauthmethod.FieldAuthType, field.TypeString, value)

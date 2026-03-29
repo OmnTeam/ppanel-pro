@@ -30,7 +30,9 @@ import (
 	publicdocument "github.com/OmnTeam/ppanel-pro/internal/service/public/document"
 	publicpayment "github.com/OmnTeam/ppanel-pro/internal/service/public/payment"
 	publicportal "github.com/OmnTeam/ppanel-pro/internal/service/public/portal"
+	publicredemption "github.com/OmnTeam/ppanel-pro/internal/service/public/redemption"
 	publicsubscribe "github.com/OmnTeam/ppanel-pro/internal/service/public/subscribe"
+	publicsubscription "github.com/OmnTeam/ppanel-pro/internal/service/public/subscription"
 	publicticket "github.com/OmnTeam/ppanel-pro/internal/service/public/ticket"
 	publicuser "github.com/OmnTeam/ppanel-pro/internal/service/public/user"
 	// Server模块服务
@@ -80,6 +82,10 @@ var ProviderSet = wire.NewSet(
 	publicportal.NewPortalService,
 	// Public Subscribe模块服务
 	publicsubscribe.NewSubscribeService,
+	// Public Subscription模块服务（订阅配置生成）
+	publicsubscription.NewPublicSubscriptionService,
+	// Public Redemption模块服务
+	publicredemption.NewRedemptionService,
 	// Public Ticket模块服务
 	publicticket.NewTicketService,
 	// Public User模块服务

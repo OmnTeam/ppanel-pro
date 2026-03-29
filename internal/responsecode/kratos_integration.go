@@ -18,36 +18,14 @@ func NewKratosError(code int) error {
 	// 根据错误码确定HTTP状态码
 	var httpCode int
 	switch {
-	case code >= 4000000 && code < 5000000:
-		// 权限错误
-		if code >= 4006003000 && code < 4006003100 {
-			// 认证错误 -> 401 Unauthorized
-			httpCode = 401
-		} else {
-			// 授权错误 -> 403 Forbidden
-			httpCode = 403
-		}
-	case code >= 3000000 && code < 4000000:
-		// 业务错误 -> 400 Bad Request
-		httpCode = 400
-	case code >= 5000000 && code < 6000000:
-		// 系统错误 -> 500 Internal Server Error
-		httpCode = 500
-	case code >= 6000000 && code < 7000000:
-		// 网络错误 -> 503 Service Unavailable
-		httpCode = 503
-	case code >= 7000000 && code < 8000000:
-		// 数据错误 -> 500 Internal Server Error
-		httpCode = 500
-	case code >= 8000000 && code < 9000000:
-		// 配置错误 -> 500 Internal Server Error
-		httpCode = 500
-	case code >= 9000000 && code < 10000000:
-		// 第三方错误 -> 500 Internal Server Error
+	case code == 40002 || code == 40003 || code == 40004:
+		httpCode = 401
+	case code == 40005 || code == 40006 || code == 40007 || code == 40008:
+		httpCode = 403
+	case code == 500 || code == 10001 || code == 10002 || code == 10003 || code == 10004 || code == 80001 || code == 90001 || code == 90002 || code == 90003 || code == 90004 || code == 90005 || code == 90006 || code == 90007 || code == 90008 || code == 90009 || code == 90010 || code == 90011 || code == 90012 || code == 90013 || code == 90014 || code == 90015 || code == 90017 || code == 90018:
 		httpCode = 500
 	default:
-		// 默认为内部错误
-		httpCode = 500
+		httpCode = 400
 	}
 
 	// 创建错误，并将自定义错误码放在metadata中
@@ -58,118 +36,139 @@ func NewKratosError(code int) error {
 
 // getKratosReason 根据响应码获取Kratos错误原因
 func getKratosReason(code int) string {
-	reasons := map[int]string{
-		// 认证错误
-		ErrMissingAuthToken:     "MISSING_AUTH_TOKEN",
-		ErrInvalidAuthToken:     "INVALID_AUTH_TOKEN",
-		ErrAuthTokenExpired:     "AUTH_TOKEN_EXPIRED",
-		ErrInvalidCredentials:   "INVALID_CREDENTIALS",
-		ErrUserNotAuthenticated: "USER_NOT_AUTHENTICATED",
-		ErrPasswordIncorrect:    "PASSWORD_INCORRECT",
-		ErrAccountLocked:        "ACCOUNT_LOCKED",
-		ErrAccountDisabled:      "ACCOUNT_DISABLED",
-
-		// 授权错误
-		ErrPermissionDenied:       "PERMISSION_DENIED",
-		ErrInsufficientPermission: "INSUFFICIENT_PERMISSION",
-		ErrResourceAccessDenied:   "RESOURCE_ACCESS_DENIED",
-		ErrOperationNotAllowed:    "OPERATION_NOT_ALLOWED",
-		ErrTenantAccessDenied:     "TENANT_ACCESS_DENIED",
-		ErrCrossTenantOperation:   "CROSS_TENANT_OPERATION",
-		ErrNotResourceOwner:       "NOT_RESOURCE_OWNER",
-
-		// 参数验证错误
-		ErrInvalidUserID:        "INVALID_USER_ID",
-		ErrInvalidTenantID:      "INVALID_TENANT_ID",
-		ErrInvalidOrderID:       "INVALID_ORDER_ID",
-		ErrInvalidSubscribeID:   "INVALID_SUBSCRIBE_ID",
-		ErrInvalidPaymentID:     "INVALID_PAYMENT_ID",
-		ErrInvalidServerID:      "INVALID_SERVER_ID",
-		ErrInvalidNodeID:        "INVALID_NODE_ID",
-		ErrInvalidCouponCode:    "INVALID_COUPON_CODE",
-		ErrMissingRequiredParam: "MISSING_REQUIRED_PARAM",
-		ErrInvalidParamFormat:   "INVALID_PARAM_FORMAT",
-
-		// 数据不存在错误
-		ErrUserNotFound:                 "USER_NOT_FOUND",
-		ErrOrderNotFound:                "ORDER_NOT_FOUND",
-		ErrSubscribeNotFound:            "SUBSCRIBE_NOT_FOUND",
-		ErrPaymentNotFound:              "PAYMENT_NOT_FOUND",
-		ErrServerNotFound:               "SERVER_NOT_FOUND",
-		ErrNodeNotFound:                 "NODE_NOT_FOUND",
-		ErrCouponNotFound:               "COUPON_NOT_FOUND",
-		ErrDeviceNotFound:               "DEVICE_NOT_FOUND",
-		ErrAuthMethodNotFound:           "AUTH_METHOD_NOT_FOUND",
-		ErrAnnouncementNotFound:         "ANNOUNCEMENT_NOT_FOUND",
-		ErrDocumentNotFound:             "DOCUMENT_NOT_FOUND",
-		ErrAdsNotFound:                  "ADS_NOT_FOUND",
-		ErrSystemNotFound:               "SYSTEM_NOT_FOUND",
-		ErrSubscribeApplicationNotFound: "SUBSCRIBE_APPLICATION_NOT_FOUND",
-		ErrServerGroupNotFound:          "SERVER_GROUP_NOT_FOUND",
-		ErrTicketNotFound:               "TICKET_NOT_FOUND",
-
-		// 数据冲突错误
-		ErrUserAlreadyExists:                 "USER_ALREADY_EXISTS",
-		ErrOrderAlreadyExists:                "ORDER_ALREADY_EXISTS",
-		ErrSubscribeAlreadyExists:            "SUBSCRIBE_ALREADY_EXISTS",
-		ErrPaymentAlreadyExists:              "PAYMENT_ALREADY_EXISTS",
-		ErrServerAlreadyExists:               "SERVER_ALREADY_EXISTS",
-		ErrNodeAlreadyExists:                 "NODE_ALREADY_EXISTS",
-		ErrCouponAlreadyExists:               "COUPON_ALREADY_EXISTS",
-		ErrDuplicateEmail:                    "DUPLICATE_EMAIL",
-		ErrDuplicateUsername:                 "DUPLICATE_USERNAME",
-		ErrTelephoneExist:                    "TELEPHONE_EXIST",
-		ErrAnnouncementAlreadyExists:         "ANNOUNCEMENT_ALREADY_EXISTS",
-		ErrDocumentAlreadyExists:             "DOCUMENT_ALREADY_EXISTS",
-		ErrSystemAlreadyExists:               "SYSTEM_ALREADY_EXISTS",
-		ErrAuthMethodAlreadyExists:           "AUTH_METHOD_ALREADY_EXISTS",
-		ErrSubscribeApplicationAlreadyExists: "SUBSCRIBE_APPLICATION_ALREADY_EXISTS",
-
-		// 业务逻辑错误
-		ErrOrderCannotCancel:       "ORDER_CANNOT_CANCEL",
-		ErrOrderCannotComplete:     "ORDER_CANNOT_COMPLETE",
-		ErrOrderCannotClose:        "ORDER_CANNOT_CLOSE",
-		ErrCouponExpired:           "COUPON_EXPIRED",
-		ErrCouponNotAvailable:      "COUPON_NOT_AVAILABLE",
-		ErrCouponUsedUp:            "COUPON_USED_UP",
-		ErrCouponUserLimitExceeded: "COUPON_USER_LIMIT_EXCEEDED",
-		ErrInsufficientBalance:     "INSUFFICIENT_BALANCE",
-		ErrDeviceLimitExceeded:     "DEVICE_LIMIT_EXCEEDED",
-		ErrSubscribeExpired:        "SUBSCRIBE_EXPIRED",
-		ErrTrafficExceeded:         "TRAFFIC_EXCEEDED",
-		ErrSubscribeInUse:          "SUBSCRIBE_IN_USE",
-		ErrInvalidOrderStatus:      "INVALID_ORDER_STATUS",
-		ErrInvalidParameter:        "INVALID_PARAMETER",
-		ErrTitleRequired:           "TITLE_REQUIRED",
-		ErrTypeRequired:            "TYPE_REQUIRED",
-		ErrInvalidTimeRange:        "INVALID_TIME_RANGE",
-		ErrInvalidTicketStatus:     "INVALID_TICKET_STATUS",
-		ErrInvalidTicketPriority:   "INVALID_TICKET_PRIORITY",
-
-		// 系统错误
-		ErrDatabaseConnection:  "DATABASE_CONNECTION_FAILED",
-		ErrDatabaseQuery:       "DATABASE_QUERY_FAILED",
-		ErrDatabaseUpdate:      "DATABASE_UPDATE_FAILED",
-		ErrDatabaseInsert:      "DATABASE_INSERT_FAILED",
-		ErrDatabaseDelete:      "DATABASE_DELETE_FAILED",
-		ErrDatabaseTransaction: "DATABASE_TRANSACTION_FAILED",
-		ErrCacheConnection:     "CACHE_CONNECTION_FAILED",
-		ErrCacheGet:            "CACHE_GET_FAILED",
-		ErrCacheSet:            "CACHE_SET_FAILED",
-		ErrInternalError:       "INTERNAL_ERROR",
-		ErrServiceUnavailable:  "SERVICE_UNAVAILABLE",
-		ErrConfigurationError:  "CONFIGURATION_ERROR",
-
-		// 外部服务错误
-		ErrIPGeolocationFailed: "IP_GEOLOCATION_FAILED",
-		ErrPaymentGatewayError: "PAYMENT_GATEWAY_ERROR",
-		ErrEmailSendFailed:     "EMAIL_SEND_FAILED",
-		ErrSMSSendFailed:       "SMS_SEND_FAILED",
-		ErrThirdPartyAPIError:  "THIRD_PARTY_API_ERROR",
-	}
-
-	if reason, exists := reasons[code]; exists {
-		return reason
+	switch code {
+	case 40002:
+		return "MISSING_AUTH_TOKEN"
+	case 40003:
+		return "INVALID_AUTH_TOKEN"
+	case 40004:
+		return "AUTH_TOKEN_EXPIRED"
+	case 20003:
+		return "INVALID_CREDENTIALS"
+	case 20004:
+		return "ACCOUNT_DISABLED"
+	case 40008:
+		return "PERMISSION_DENIED"
+	case 40005:
+		return "RESOURCE_ACCESS_DENIED"
+	case 40006:
+		return "INVALID_CIPHERTEXT"
+	case 40007:
+		return "SECRET_IS_EMPTY"
+	case 400:
+		return "INVALID_PARAMETER"
+	case 401:
+		return "TOO_MANY_REQUESTS"
+	case 20002:
+		return "USER_NOT_FOUND"
+	case 61001:
+		return "ORDER_NOT_FOUND"
+	case 60002:
+		return "SUBSCRIBE_NOT_FOUND"
+	case 61002:
+		return "PAYMENT_NOT_FOUND"
+	case 30002:
+		return "SERVER_NOT_FOUND"
+	case 50001:
+		return "COUPON_NOT_FOUND"
+	case 90017:
+		return "DEVICE_NOT_FOUND"
+	case 30004:
+		return "SERVER_GROUP_NOT_FOUND"
+	case 20001:
+		return "USER_ALREADY_EXISTS"
+	case 90011:
+		return "DUPLICATE_EMAIL"
+	case 90012:
+		return "TELEPHONE_EXIST"
+	case 60003:
+		return "SUBSCRIBE_ALREADY_EXISTS"
+	case 30001:
+		return "SERVER_ALREADY_EXISTS"
+	case 61003:
+		return "ORDER_CANNOT_CANCEL"
+	case 50005:
+		return "COUPON_EXPIRED"
+	case 50003:
+		return "COUPON_NOT_AVAILABLE"
+	case 50002:
+		return "COUPON_USED_UP"
+	case 50004:
+		return "COUPON_USER_LIMIT_EXCEEDED"
+	case 20005:
+		return "INSUFFICIENT_BALANCE"
+	case 20010:
+		return "USER_COMMISSION_NOT_ENOUGH"
+	case 60001:
+		return "SUBSCRIBE_EXPIRED"
+	case 61005:
+		return "TRAFFIC_EXCEEDED"
+	case 60004:
+		return "SUBSCRIBE_IN_USE"
+	case 60005:
+		return "SINGLE_SUBSCRIBE_MODE_EXCEEDS_LIMIT"
+	case 60006:
+		return "SUBSCRIBE_QUOTA_LIMIT"
+	case 60007:
+		return "SUBSCRIBE_OUT_OF_STOCK"
+	case 61004:
+		return "INSUFFICIENT_OF_PERIOD"
+	case 70001:
+		return "VERIFY_CODE_ERROR"
+	case 80001:
+		return "QUEUE_ENQUEUE_ERROR"
+	case 90001:
+		return "DEBUG_MODE_ERROR"
+	case 90002:
+		return "SMS_SEND_FAILED"
+	case 90003:
+		return "SMS_NOT_ENABLED"
+	case 90004:
+		return "EMAIL_NOT_ENABLED"
+	case 90005:
+		return "GET_AUTHENTICATOR_ERROR"
+	case 90006:
+		return "AUTHENTICATOR_NOT_SUPPORTED"
+	case 90007:
+		return "TELEPHONE_AREA_CODE_EMPTY"
+	case 90008:
+		return "PASSWORD_EMPTY"
+	case 90009:
+		return "AREA_CODE_EMPTY"
+	case 90010:
+		return "PASSWORD_OR_VERIFICATION_CODE_REQUIRED"
+	case 90013:
+		return "DEVICE_EXIST"
+	case 90014:
+		return "TELEPHONE_ERROR"
+	case 90015:
+		return "TODAY_SEND_COUNT_EXCEEDS_LIMIT"
+	case 90018:
+		return "USERID_NOT_MATCH"
+	case 20006:
+		return "STOP_REGISTER"
+	case 20007:
+		return "TELEGRAM_NOT_BOUND"
+	case 20008:
+		return "USER_NOT_BIND_OAUTH"
+	case 20009:
+		return "INVITE_CODE_ERROR"
+	case 20011:
+		return "REGISTER_IP_LIMIT"
+	case 30003:
+		return "NODE_GROUP_EXIST"
+	case 30005:
+		return "NODE_GROUP_NOT_EMPTY"
+	case 10001:
+		return "DATABASE_QUERY_FAILED"
+	case 10002:
+		return "DATABASE_UPDATE_FAILED"
+	case 10003:
+		return "DATABASE_INSERT_FAILED"
+	case 10004:
+		return "DATABASE_DELETE_FAILED"
+	case 500:
+		return "INTERNAL_ERROR"
 	}
 	return "UNKNOWN_ERROR"
 }
@@ -216,11 +215,6 @@ func ErrOrderListFailed() error {
 }
 
 // ==== 通用参数验证错误 ====
-
-// ErrTenantIDRequired 租户ID必需
-func ErrTenantIDRequired() error {
-	return NewKratosError(ErrInvalidTenantID)
-}
 
 // ErrUserIDRequired 用户ID必需
 func ErrUserIDRequired() error {

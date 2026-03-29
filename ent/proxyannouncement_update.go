@@ -28,27 +28,6 @@ func (_u *ProxyAnnouncementUpdate) Where(ps ...predicate.ProxyAnnouncement) *Pro
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyAnnouncementUpdate) SetTenantID(v int64) *ProxyAnnouncementUpdate {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyAnnouncementUpdate) SetNillableTenantID(v *int64) *ProxyAnnouncementUpdate {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyAnnouncementUpdate) AddTenantID(v int64) *ProxyAnnouncementUpdate {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
 // SetTitle sets the "title" field.
 func (_u *ProxyAnnouncementUpdate) SetTitle(v string) *ProxyAnnouncementUpdate {
 	_u.mutation.SetTitle(v)
@@ -194,12 +173,6 @@ func (_u *ProxyAnnouncementUpdate) sqlSave(ctx context.Context) (_node int, err 
 			}
 		}
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyannouncement.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyannouncement.FieldTenantID, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(proxyannouncement.FieldTitle, field.TypeString, value)
 	}
@@ -239,27 +212,6 @@ type ProxyAnnouncementUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxyAnnouncementMutation
-}
-
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyAnnouncementUpdateOne) SetTenantID(v int64) *ProxyAnnouncementUpdateOne {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyAnnouncementUpdateOne) SetNillableTenantID(v *int64) *ProxyAnnouncementUpdateOne {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyAnnouncementUpdateOne) AddTenantID(v int64) *ProxyAnnouncementUpdateOne {
-	_u.mutation.AddTenantID(v)
-	return _u
 }
 
 // SetTitle sets the "title" field.
@@ -436,12 +388,6 @@ func (_u *ProxyAnnouncementUpdateOne) sqlSave(ctx context.Context) (_node *Proxy
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyannouncement.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyannouncement.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(proxyannouncement.FieldTitle, field.TypeString, value)

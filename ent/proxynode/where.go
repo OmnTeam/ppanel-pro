@@ -65,7 +65,7 @@ func Tags(v string) predicate.ProxyNode {
 }
 
 // Port applies equality check predicate on the "port" field. It's identical to PortEQ.
-func Port(v int) predicate.ProxyNode {
+func Port(v uint16) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldEQ(FieldPort, v))
 }
 
@@ -92,16 +92,6 @@ func Enabled(v bool) predicate.ProxyNode {
 // Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
 func Sort(v int) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldEQ(FieldSort, v))
-}
-
-// GroupID applies equality check predicate on the "group_id" field. It's identical to GroupIDEQ.
-func GroupID(v int64) predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldEQ(FieldGroupID, v))
-}
-
-// GroupLocked applies equality check predicate on the "group_locked" field. It's identical to GroupLockedEQ.
-func GroupLocked(v bool) predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldEQ(FieldGroupLocked, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
@@ -245,42 +235,42 @@ func TagsContainsFold(v string) predicate.ProxyNode {
 }
 
 // PortEQ applies the EQ predicate on the "port" field.
-func PortEQ(v int) predicate.ProxyNode {
+func PortEQ(v uint16) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldEQ(FieldPort, v))
 }
 
 // PortNEQ applies the NEQ predicate on the "port" field.
-func PortNEQ(v int) predicate.ProxyNode {
+func PortNEQ(v uint16) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldNEQ(FieldPort, v))
 }
 
 // PortIn applies the In predicate on the "port" field.
-func PortIn(vs ...int) predicate.ProxyNode {
+func PortIn(vs ...uint16) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldIn(FieldPort, vs...))
 }
 
 // PortNotIn applies the NotIn predicate on the "port" field.
-func PortNotIn(vs ...int) predicate.ProxyNode {
+func PortNotIn(vs ...uint16) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldNotIn(FieldPort, vs...))
 }
 
 // PortGT applies the GT predicate on the "port" field.
-func PortGT(v int) predicate.ProxyNode {
+func PortGT(v uint16) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldGT(FieldPort, v))
 }
 
 // PortGTE applies the GTE predicate on the "port" field.
-func PortGTE(v int) predicate.ProxyNode {
+func PortGTE(v uint16) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldGTE(FieldPort, v))
 }
 
 // PortLT applies the LT predicate on the "port" field.
-func PortLT(v int) predicate.ProxyNode {
+func PortLT(v uint16) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldLT(FieldPort, v))
 }
 
 // PortLTE applies the LTE predicate on the "port" field.
-func PortLTE(v int) predicate.ProxyNode {
+func PortLTE(v uint16) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldLTE(FieldPort, v))
 }
 
@@ -504,64 +494,14 @@ func SortLTE(v int) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldLTE(FieldSort, v))
 }
 
-// GroupIDEQ applies the EQ predicate on the "group_id" field.
-func GroupIDEQ(v int64) predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldEQ(FieldGroupID, v))
+// NodeGroupIdsIsNil applies the IsNil predicate on the "node_group_ids" field.
+func NodeGroupIdsIsNil() predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldIsNull(FieldNodeGroupIds))
 }
 
-// GroupIDNEQ applies the NEQ predicate on the "group_id" field.
-func GroupIDNEQ(v int64) predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldNEQ(FieldGroupID, v))
-}
-
-// GroupIDIn applies the In predicate on the "group_id" field.
-func GroupIDIn(vs ...int64) predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldIn(FieldGroupID, vs...))
-}
-
-// GroupIDNotIn applies the NotIn predicate on the "group_id" field.
-func GroupIDNotIn(vs ...int64) predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldNotIn(FieldGroupID, vs...))
-}
-
-// GroupIDGT applies the GT predicate on the "group_id" field.
-func GroupIDGT(v int64) predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldGT(FieldGroupID, v))
-}
-
-// GroupIDGTE applies the GTE predicate on the "group_id" field.
-func GroupIDGTE(v int64) predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldGTE(FieldGroupID, v))
-}
-
-// GroupIDLT applies the LT predicate on the "group_id" field.
-func GroupIDLT(v int64) predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldLT(FieldGroupID, v))
-}
-
-// GroupIDLTE applies the LTE predicate on the "group_id" field.
-func GroupIDLTE(v int64) predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldLTE(FieldGroupID, v))
-}
-
-// GroupIDIsNil applies the IsNil predicate on the "group_id" field.
-func GroupIDIsNil() predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldIsNull(FieldGroupID))
-}
-
-// GroupIDNotNil applies the NotNil predicate on the "group_id" field.
-func GroupIDNotNil() predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldNotNull(FieldGroupID))
-}
-
-// GroupLockedEQ applies the EQ predicate on the "group_locked" field.
-func GroupLockedEQ(v bool) predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldEQ(FieldGroupLocked, v))
-}
-
-// GroupLockedNEQ applies the NEQ predicate on the "group_locked" field.
-func GroupLockedNEQ(v bool) predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldNEQ(FieldGroupLocked, v))
+// NodeGroupIdsNotNil applies the NotNil predicate on the "node_group_ids" field.
+func NodeGroupIdsNotNil() predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldNotNull(FieldNodeGroupIds))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -604,16 +544,6 @@ func CreatedAtLTE(v time.Time) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldLTE(FieldCreatedAt, v))
 }
 
-// CreatedAtIsNil applies the IsNil predicate on the "created_at" field.
-func CreatedAtIsNil() predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldIsNull(FieldCreatedAt))
-}
-
-// CreatedAtNotNil applies the NotNil predicate on the "created_at" field.
-func CreatedAtNotNil() predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldNotNull(FieldCreatedAt))
-}
-
 // UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
 func UpdatedAtEQ(v time.Time) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldEQ(FieldUpdatedAt, v))
@@ -652,16 +582,6 @@ func UpdatedAtLT(v time.Time) predicate.ProxyNode {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldLTE(FieldUpdatedAt, v))
-}
-
-// UpdatedAtIsNil applies the IsNil predicate on the "updated_at" field.
-func UpdatedAtIsNil() predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldIsNull(FieldUpdatedAt))
-}
-
-// UpdatedAtNotNil applies the NotNil predicate on the "updated_at" field.
-func UpdatedAtNotNil() predicate.ProxyNode {
-	return predicate.ProxyNode(sql.FieldNotNull(FieldUpdatedAt))
 }
 
 // And groups predicates with the AND operator between them.

@@ -262,12 +262,12 @@ func (_q *ProxyAnnouncementQuery) Clone() *ProxyAnnouncementQuery {
 // Example:
 //
 //	var v []struct {
-//		TenantID int64 `json:"tenant_id,omitempty"`
+//		Title string `json:"title,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ProxyAnnouncement.Query().
-//		GroupBy(proxyannouncement.FieldTenantID).
+//		GroupBy(proxyannouncement.FieldTitle).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *ProxyAnnouncementQuery) GroupBy(field string, fields ...string) *ProxyAnnouncementGroupBy {
@@ -285,11 +285,11 @@ func (_q *ProxyAnnouncementQuery) GroupBy(field string, fields ...string) *Proxy
 // Example:
 //
 //	var v []struct {
-//		TenantID int64 `json:"tenant_id,omitempty"`
+//		Title string `json:"title,omitempty"`
 //	}
 //
 //	client.ProxyAnnouncement.Query().
-//		Select(proxyannouncement.FieldTenantID).
+//		Select(proxyannouncement.FieldTitle).
 //		Scan(ctx, &v)
 func (_q *ProxyAnnouncementQuery) Select(fields ...string) *ProxyAnnouncementSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

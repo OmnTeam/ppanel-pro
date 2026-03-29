@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.8.4
 // - protoc             v3.19.4
-// source: admin/ads/v1/ads.proto
+// source: api/admin/ads/v1/ads.proto
 
 package v1
 

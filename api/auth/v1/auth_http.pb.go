@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.8.4
 // - protoc             v3.19.4
-// source: auth/v1/auth.proto
+// source: api/auth/v1/auth.proto
 
 package v1
 

@@ -69,6 +69,41 @@ func Sort(v int) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldEQ(FieldSort, v))
 }
 
+// ForCalculation applies equality check predicate on the "for_calculation" field. It's identical to ForCalculationEQ.
+func ForCalculation(v bool) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldForCalculation, v))
+}
+
+// IsExpiredGroup applies equality check predicate on the "is_expired_group" field. It's identical to IsExpiredGroupEQ.
+func IsExpiredGroup(v bool) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldIsExpiredGroup, v))
+}
+
+// ExpiredDaysLimit applies equality check predicate on the "expired_days_limit" field. It's identical to ExpiredDaysLimitEQ.
+func ExpiredDaysLimit(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldExpiredDaysLimit, v))
+}
+
+// MaxTrafficGBExpired applies equality check predicate on the "max_traffic_gb_expired" field. It's identical to MaxTrafficGBExpiredEQ.
+func MaxTrafficGBExpired(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldMaxTrafficGBExpired, v))
+}
+
+// SpeedLimit applies equality check predicate on the "speed_limit" field. It's identical to SpeedLimitEQ.
+func SpeedLimit(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldSpeedLimit, v))
+}
+
+// MinTrafficGB applies equality check predicate on the "min_traffic_gb" field. It's identical to MinTrafficGBEQ.
+func MinTrafficGB(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldMinTrafficGB, v))
+}
+
+// MaxTrafficGB applies equality check predicate on the "max_traffic_gb" field. It's identical to MaxTrafficGBEQ.
+func MaxTrafficGB(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldMaxTrafficGB, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldEQ(FieldCreatedAt, v))
@@ -199,6 +234,16 @@ func DescriptionHasSuffix(v string) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldHasSuffix(FieldDescription, v))
 }
 
+// DescriptionIsNil applies the IsNil predicate on the "description" field.
+func DescriptionIsNil() predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldIsNull(FieldDescription))
+}
+
+// DescriptionNotNil applies the NotNil predicate on the "description" field.
+func DescriptionNotNil() predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNotNull(FieldDescription))
+}
+
 // DescriptionEqualFold applies the EqualFold predicate on the "description" field.
 func DescriptionEqualFold(v string) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldEqualFold(FieldDescription, v))
@@ -247,6 +292,256 @@ func SortLT(v int) predicate.ProxyServerGroup {
 // SortLTE applies the LTE predicate on the "sort" field.
 func SortLTE(v int) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldLTE(FieldSort, v))
+}
+
+// ForCalculationEQ applies the EQ predicate on the "for_calculation" field.
+func ForCalculationEQ(v bool) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldForCalculation, v))
+}
+
+// ForCalculationNEQ applies the NEQ predicate on the "for_calculation" field.
+func ForCalculationNEQ(v bool) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNEQ(FieldForCalculation, v))
+}
+
+// IsExpiredGroupEQ applies the EQ predicate on the "is_expired_group" field.
+func IsExpiredGroupEQ(v bool) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldIsExpiredGroup, v))
+}
+
+// IsExpiredGroupNEQ applies the NEQ predicate on the "is_expired_group" field.
+func IsExpiredGroupNEQ(v bool) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNEQ(FieldIsExpiredGroup, v))
+}
+
+// ExpiredDaysLimitEQ applies the EQ predicate on the "expired_days_limit" field.
+func ExpiredDaysLimitEQ(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldExpiredDaysLimit, v))
+}
+
+// ExpiredDaysLimitNEQ applies the NEQ predicate on the "expired_days_limit" field.
+func ExpiredDaysLimitNEQ(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNEQ(FieldExpiredDaysLimit, v))
+}
+
+// ExpiredDaysLimitIn applies the In predicate on the "expired_days_limit" field.
+func ExpiredDaysLimitIn(vs ...int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldIn(FieldExpiredDaysLimit, vs...))
+}
+
+// ExpiredDaysLimitNotIn applies the NotIn predicate on the "expired_days_limit" field.
+func ExpiredDaysLimitNotIn(vs ...int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNotIn(FieldExpiredDaysLimit, vs...))
+}
+
+// ExpiredDaysLimitGT applies the GT predicate on the "expired_days_limit" field.
+func ExpiredDaysLimitGT(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGT(FieldExpiredDaysLimit, v))
+}
+
+// ExpiredDaysLimitGTE applies the GTE predicate on the "expired_days_limit" field.
+func ExpiredDaysLimitGTE(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGTE(FieldExpiredDaysLimit, v))
+}
+
+// ExpiredDaysLimitLT applies the LT predicate on the "expired_days_limit" field.
+func ExpiredDaysLimitLT(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLT(FieldExpiredDaysLimit, v))
+}
+
+// ExpiredDaysLimitLTE applies the LTE predicate on the "expired_days_limit" field.
+func ExpiredDaysLimitLTE(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLTE(FieldExpiredDaysLimit, v))
+}
+
+// MaxTrafficGBExpiredEQ applies the EQ predicate on the "max_traffic_gb_expired" field.
+func MaxTrafficGBExpiredEQ(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldMaxTrafficGBExpired, v))
+}
+
+// MaxTrafficGBExpiredNEQ applies the NEQ predicate on the "max_traffic_gb_expired" field.
+func MaxTrafficGBExpiredNEQ(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNEQ(FieldMaxTrafficGBExpired, v))
+}
+
+// MaxTrafficGBExpiredIn applies the In predicate on the "max_traffic_gb_expired" field.
+func MaxTrafficGBExpiredIn(vs ...int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldIn(FieldMaxTrafficGBExpired, vs...))
+}
+
+// MaxTrafficGBExpiredNotIn applies the NotIn predicate on the "max_traffic_gb_expired" field.
+func MaxTrafficGBExpiredNotIn(vs ...int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNotIn(FieldMaxTrafficGBExpired, vs...))
+}
+
+// MaxTrafficGBExpiredGT applies the GT predicate on the "max_traffic_gb_expired" field.
+func MaxTrafficGBExpiredGT(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGT(FieldMaxTrafficGBExpired, v))
+}
+
+// MaxTrafficGBExpiredGTE applies the GTE predicate on the "max_traffic_gb_expired" field.
+func MaxTrafficGBExpiredGTE(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGTE(FieldMaxTrafficGBExpired, v))
+}
+
+// MaxTrafficGBExpiredLT applies the LT predicate on the "max_traffic_gb_expired" field.
+func MaxTrafficGBExpiredLT(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLT(FieldMaxTrafficGBExpired, v))
+}
+
+// MaxTrafficGBExpiredLTE applies the LTE predicate on the "max_traffic_gb_expired" field.
+func MaxTrafficGBExpiredLTE(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLTE(FieldMaxTrafficGBExpired, v))
+}
+
+// MaxTrafficGBExpiredIsNil applies the IsNil predicate on the "max_traffic_gb_expired" field.
+func MaxTrafficGBExpiredIsNil() predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldIsNull(FieldMaxTrafficGBExpired))
+}
+
+// MaxTrafficGBExpiredNotNil applies the NotNil predicate on the "max_traffic_gb_expired" field.
+func MaxTrafficGBExpiredNotNil() predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNotNull(FieldMaxTrafficGBExpired))
+}
+
+// SpeedLimitEQ applies the EQ predicate on the "speed_limit" field.
+func SpeedLimitEQ(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldSpeedLimit, v))
+}
+
+// SpeedLimitNEQ applies the NEQ predicate on the "speed_limit" field.
+func SpeedLimitNEQ(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNEQ(FieldSpeedLimit, v))
+}
+
+// SpeedLimitIn applies the In predicate on the "speed_limit" field.
+func SpeedLimitIn(vs ...int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldIn(FieldSpeedLimit, vs...))
+}
+
+// SpeedLimitNotIn applies the NotIn predicate on the "speed_limit" field.
+func SpeedLimitNotIn(vs ...int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNotIn(FieldSpeedLimit, vs...))
+}
+
+// SpeedLimitGT applies the GT predicate on the "speed_limit" field.
+func SpeedLimitGT(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGT(FieldSpeedLimit, v))
+}
+
+// SpeedLimitGTE applies the GTE predicate on the "speed_limit" field.
+func SpeedLimitGTE(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGTE(FieldSpeedLimit, v))
+}
+
+// SpeedLimitLT applies the LT predicate on the "speed_limit" field.
+func SpeedLimitLT(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLT(FieldSpeedLimit, v))
+}
+
+// SpeedLimitLTE applies the LTE predicate on the "speed_limit" field.
+func SpeedLimitLTE(v int) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLTE(FieldSpeedLimit, v))
+}
+
+// MinTrafficGBEQ applies the EQ predicate on the "min_traffic_gb" field.
+func MinTrafficGBEQ(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldMinTrafficGB, v))
+}
+
+// MinTrafficGBNEQ applies the NEQ predicate on the "min_traffic_gb" field.
+func MinTrafficGBNEQ(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNEQ(FieldMinTrafficGB, v))
+}
+
+// MinTrafficGBIn applies the In predicate on the "min_traffic_gb" field.
+func MinTrafficGBIn(vs ...int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldIn(FieldMinTrafficGB, vs...))
+}
+
+// MinTrafficGBNotIn applies the NotIn predicate on the "min_traffic_gb" field.
+func MinTrafficGBNotIn(vs ...int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNotIn(FieldMinTrafficGB, vs...))
+}
+
+// MinTrafficGBGT applies the GT predicate on the "min_traffic_gb" field.
+func MinTrafficGBGT(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGT(FieldMinTrafficGB, v))
+}
+
+// MinTrafficGBGTE applies the GTE predicate on the "min_traffic_gb" field.
+func MinTrafficGBGTE(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGTE(FieldMinTrafficGB, v))
+}
+
+// MinTrafficGBLT applies the LT predicate on the "min_traffic_gb" field.
+func MinTrafficGBLT(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLT(FieldMinTrafficGB, v))
+}
+
+// MinTrafficGBLTE applies the LTE predicate on the "min_traffic_gb" field.
+func MinTrafficGBLTE(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLTE(FieldMinTrafficGB, v))
+}
+
+// MinTrafficGBIsNil applies the IsNil predicate on the "min_traffic_gb" field.
+func MinTrafficGBIsNil() predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldIsNull(FieldMinTrafficGB))
+}
+
+// MinTrafficGBNotNil applies the NotNil predicate on the "min_traffic_gb" field.
+func MinTrafficGBNotNil() predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNotNull(FieldMinTrafficGB))
+}
+
+// MaxTrafficGBEQ applies the EQ predicate on the "max_traffic_gb" field.
+func MaxTrafficGBEQ(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldMaxTrafficGB, v))
+}
+
+// MaxTrafficGBNEQ applies the NEQ predicate on the "max_traffic_gb" field.
+func MaxTrafficGBNEQ(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNEQ(FieldMaxTrafficGB, v))
+}
+
+// MaxTrafficGBIn applies the In predicate on the "max_traffic_gb" field.
+func MaxTrafficGBIn(vs ...int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldIn(FieldMaxTrafficGB, vs...))
+}
+
+// MaxTrafficGBNotIn applies the NotIn predicate on the "max_traffic_gb" field.
+func MaxTrafficGBNotIn(vs ...int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNotIn(FieldMaxTrafficGB, vs...))
+}
+
+// MaxTrafficGBGT applies the GT predicate on the "max_traffic_gb" field.
+func MaxTrafficGBGT(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGT(FieldMaxTrafficGB, v))
+}
+
+// MaxTrafficGBGTE applies the GTE predicate on the "max_traffic_gb" field.
+func MaxTrafficGBGTE(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGTE(FieldMaxTrafficGB, v))
+}
+
+// MaxTrafficGBLT applies the LT predicate on the "max_traffic_gb" field.
+func MaxTrafficGBLT(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLT(FieldMaxTrafficGB, v))
+}
+
+// MaxTrafficGBLTE applies the LTE predicate on the "max_traffic_gb" field.
+func MaxTrafficGBLTE(v int64) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLTE(FieldMaxTrafficGB, v))
+}
+
+// MaxTrafficGBIsNil applies the IsNil predicate on the "max_traffic_gb" field.
+func MaxTrafficGBIsNil() predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldIsNull(FieldMaxTrafficGB))
+}
+
+// MaxTrafficGBNotNil applies the NotNil predicate on the "max_traffic_gb" field.
+func MaxTrafficGBNotNil() predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNotNull(FieldMaxTrafficGB))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

@@ -3,7 +3,6 @@ package data
 import (
 	"context"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyannouncement"
 	announcementBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/announcement"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
@@ -25,7 +24,7 @@ func NewPublicAnnouncementRepo(data *Data, logger log.Logger) announcementBiz.An
 
 // QueryAnnouncement 查询公告列表
 func (r *publicAnnouncementRepo) QueryAnnouncement(ctx context.Context, page, size int32, pinned, popup *bool) ([]*announcementBiz.Announcement, int64, error) {
-	// 查询条件: show=true (移除tenant_id过滤)
+	// 查询条件: show=true
 	query := r.data.db.ProxyAnnouncement.Query().
 		Where(
 			proxyannouncement.Show(true),
@@ -48,9 +47,12 @@ func (r *publicAnnouncementRepo) QueryAnnouncement(ctx context.Context, page, si
 		return nil, 0, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
 
+	if size == 0 {
+		size = 10
+	}
+
 	// 分页查询
 	announcements, err := query.
-		Order(ent.Desc(proxyannouncement.FieldPinned), ent.Desc(proxyannouncement.FieldCreatedAt)).
 		Offset(int((page - 1) * size)).
 		Limit(int(size)).
 		All(ctx)

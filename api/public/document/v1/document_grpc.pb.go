@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v3.19.4
-// source: public/document/v1/document.proto
+// source: api/public/document/v1/document.proto
 
 package v1
 
@@ -166,5 +166,5 @@ var Document_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "public/document/v1/document.proto",
+	Metadata: "api/public/document/v1/document.proto",
 }

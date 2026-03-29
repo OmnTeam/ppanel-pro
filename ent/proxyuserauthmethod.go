@@ -20,9 +20,7 @@ type ProxyUserAuthMethod struct {
 	ID int64 `json:"id,omitempty"`
 	// 用户ID
 	UserID int64 `json:"user_id,omitempty"`
-	// 租户ID
-	TenantID int64 `json:"tenant_id,omitempty"`
-	// 认证类型: apple, google, github, facebook, telegram, email, mobile
+	// 认证类型
 	AuthType string `json:"auth_type,omitempty"`
 	// 认证标识
 	AuthIdentifier string `json:"auth_identifier,omitempty"`
@@ -42,7 +40,7 @@ func (*ProxyUserAuthMethod) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case proxyuserauthmethod.FieldVerified:
 			values[i] = new(sql.NullBool)
-		case proxyuserauthmethod.FieldID, proxyuserauthmethod.FieldUserID, proxyuserauthmethod.FieldTenantID:
+		case proxyuserauthmethod.FieldID, proxyuserauthmethod.FieldUserID:
 			values[i] = new(sql.NullInt64)
 		case proxyuserauthmethod.FieldAuthType, proxyuserauthmethod.FieldAuthIdentifier:
 			values[i] = new(sql.NullString)
@@ -74,12 +72,6 @@ func (_m *ProxyUserAuthMethod) assignValues(columns []string, values []any) erro
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
 				_m.UserID = value.Int64
-			}
-		case proxyuserauthmethod.FieldTenantID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
-			} else if value.Valid {
-				_m.TenantID = value.Int64
 			}
 		case proxyuserauthmethod.FieldAuthType:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -149,9 +141,6 @@ func (_m *ProxyUserAuthMethod) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("user_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.UserID))
-	builder.WriteString(", ")
-	builder.WriteString("tenant_id=")
-	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
 	builder.WriteString(", ")
 	builder.WriteString("auth_type=")
 	builder.WriteString(_m.AuthType)

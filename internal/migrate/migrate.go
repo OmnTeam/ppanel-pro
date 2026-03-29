@@ -7,13 +7,12 @@ import (
 	"time"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
 	"github.com/OmnTeam/ppanel-pro/internal/model/auth"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/ppanel-pro/pkg/uuidx"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -23,14 +22,18 @@ type Migrator struct {
 	client   *ent.Client
 	logger   *log.Helper
 	appConf  *conf.Application
+	dbDriver string
+	dbSource string
 }
 
 // NewMigrator 创建新的迁移器
-func NewMigrator(client *ent.Client, logger log.Logger, appConf *conf.Application) *Migrator {
+func NewMigrator(client *ent.Client, logger log.Logger, appConf *conf.Application, dbDriver, dbSource string) *Migrator {
 	return &Migrator{
-		client:  client,
-		logger:  log.NewHelper(logger),
-		appConf: appConf,
+		client:   client,
+		logger:   log.NewHelper(logger),
+		appConf:  appConf,
+		dbDriver: dbDriver,
+		dbSource: dbSource,
 	}
 }
 
@@ -73,20 +76,8 @@ func (m *Migrator) AutoMigrateWithData(ctx context.Context) error {
 // InitBasicData 初始化基础数据
 func (m *Migrator) InitBasicData(ctx context.Context) error {
 	m.logger.Info("Starting basic data initialization...")
-
-	// 初始化认证方法
-	if err := m.initAuthMethods(ctx); err != nil {
-		return fmt.Errorf("failed to init auth methods: %w", err)
-	}
-
-	// 初始化默认支付方式
-	if err := m.initPaymentMethods(ctx); err != nil {
-		return fmt.Errorf("failed to init payment methods: %w", err)
-	}
-
-	// 初始化系统配置
-	if err := m.initSystemConfig(ctx); err != nil {
-		return fmt.Errorf("failed to init system config: %w", err)
+	if err := m.initLegacyDefaultData(ctx); err != nil {
+		return fmt.Errorf("failed to init legacy default data: %w", err)
 	}
 
 	m.logger.Info("Basic data initialization completed")
@@ -96,11 +87,10 @@ func (m *Migrator) InitBasicData(ctx context.Context) error {
 // CreateDefaultAdminUser 创建默认管理员用户
 func (m *Migrator) CreateDefaultAdminUser(ctx context.Context) error {
 	// 从配置文件读取管理员凭据
-	var email, password, algo string
+	var email, password string
 	if m.appConf != nil && m.appConf.Admin != nil {
 		email = m.appConf.Admin.Email
 		password = m.appConf.Admin.Password
-		algo = m.appConf.Admin.Algo
 	}
 
 	// 如果配置为空，使用默认值
@@ -110,51 +100,27 @@ func (m *Migrator) CreateDefaultAdminUser(ctx context.Context) error {
 	if password == "" {
 		password = "admin123456"
 	}
-	if algo == "" {
-		algo = "default"
-	}
 
-	// 检查是否已存在该邮箱的认证方式
-	exist, err := m.client.ProxyUserAuthMethod.Query().
-		Where(
-			proxyuserauthmethod.AuthType("email"),
-			proxyuserauthmethod.AuthIdentifier(email),
-		).
+	// 旧项目是“只要库里已有用户，就跳过管理员初始化”
+	exist, err := m.client.ProxyUser.Query().
 		Exist(ctx)
 	if err != nil {
 		return err
 	}
 
 	if exist {
-		m.logger.Infof("Admin user with email %s already exists, skip creation", email)
+		m.logger.Infof("User already exists, skip creating administrator account")
 		return nil
 	}
 
 	encodedPwd := tool.EncodePassWord(password)
-	referCode := tool.KeyNew(6, 1)
+	referCode := uuidx.UserInviteCode(time.Now().Unix())
 
 	// 创建管理员用户
 	user, err := m.client.ProxyUser.Create().
 		SetPassword(encodedPwd).
-		SetAlgo(algo).
-		SetAvatar("").
-		SetBalance(0).
-		SetTelegram(0).
 		SetReferCode(referCode).
-		SetCommission(0).
-		SetReferralPercentage(10).
-		SetGiftAmount(0).
-		SetEnable(true).
 		SetIsAdmin(true).
-		SetValidEmail(true).
-		SetEnableEmailNotify(true).
-		SetEnableTelegramNotify(false).
-		SetEnableBalanceNotify(true).
-		SetEnableLoginNotify(true).
-		SetEnableSubscribeNotify(true).
-		SetEnableTradeNotify(true).
-		SetCreatedAt(time.Now()).
-		SetUpdatedAt(time.Now()).
 		Save(ctx)
 
 	if err != nil {
@@ -166,9 +132,7 @@ func (m *Migrator) CreateDefaultAdminUser(ctx context.Context) error {
 		SetUserID(user.ID).
 		SetAuthType("email").
 		SetAuthIdentifier(email).
-		SetVerified(false).
-		SetCreatedAt(time.Now()).
-		SetUpdatedAt(time.Now()).
+		SetVerified(true).
 		Save(ctx)
 
 	if err != nil {
@@ -185,22 +149,22 @@ func (m *Migrator) CreateDefaultAdminUser(ctx context.Context) error {
 func (m *Migrator) initAuthMethods(ctx context.Context) error {
 	// 邮件认证配置
 	emailConfig := auth.EmailAuthConfig{
-		Platform:         "smtp",
-		EnableVerify:     false,
-		EnableNotify:     false,
+		Platform:           "smtp",
+		EnableVerify:       false,
+		EnableNotify:       false,
 		EnableDomainSuffix: false,
-		DomainSuffixList: "",
+		DomainSuffixList:   "",
 		PlatformConfig: auth.SMTPConfig{
-			Host:     "",
-			Port:     587,
-			User:     "",
-			Pass:     "",
-			From:     "",
-			SSL:      false,
+			Host: "",
+			Port: 587,
+			User: "",
+			Pass: "",
+			From: "",
+			SSL:  false,
 		},
-		VerifyEmailTemplate:     "",
-		ExpirationEmailTemplate: "",
-		MaintenanceEmailTemplate: "",
+		VerifyEmailTemplate:        "",
+		ExpirationEmailTemplate:    "",
+		MaintenanceEmailTemplate:   "",
 		TrafficExceedEmailTemplate: "",
 	}
 	emailConfigJSON, _ := json.Marshal(emailConfig)
@@ -299,8 +263,6 @@ func (m *Migrator) initPaymentMethods(ctx context.Context) error {
 		SetFeeAmount(0).
 		SetEnable(true).
 		SetToken("").
-		SetCreatedAt(time.Now()).
-		SetUpdatedAt(time.Now()).
 		Save(ctx)
 
 	if err != nil {
@@ -313,56 +275,8 @@ func (m *Migrator) initPaymentMethods(ctx context.Context) error {
 
 // initSystemConfig 初始化系统配置
 func (m *Migrator) initSystemConfig(ctx context.Context) error {
-	// 简化的系统配置
-	systemConfigs := []struct {
-		category string
-		key      string
-		value    string
-		typ      string
-		desc     string
-	}{
-		{"site", "site_name", "PPanel Pro", "string", "站点名称"},
-		{"site", "site_desc", "Professional Panel Management System", "string", "站点描述"},
-		{"currency", "default_currency", "CNY", "string", "默认货币"},
-		{"currency", "currency_symbol", "¥", "string", "货币符号"},
-	}
-
-	// 创建系统配置，根据category和key查询是否已存在
-	createdCount := 0
-	for _, config := range systemConfigs {
-		// 检查是否已存在该系统配置
-		exist, err := m.client.ProxySystem.Query().
-			Where(
-				proxysystem.Category(config.category),
-				proxysystem.Key(config.key),
-			).
-			Exist(ctx)
-		if err != nil {
-			return fmt.Errorf("failed to check system config %s.%s: %w", config.category, config.key, err)
-		}
-
-		if exist {
-			m.logger.Infof("System config %s.%s already exists, skip creation", config.category, config.key)
-			continue
-		}
-
-		// 创建系统配置
-		_, err = m.client.ProxySystem.Create().
-			SetCategory(config.category).
-			SetKey(config.key).
-			SetValue(config.value).
-			SetType(config.typ).
-			SetDesc(config.desc).
-			SetCreatedAt(time.Now()).
-			SetUpdatedAt(time.Now()).
-			Save(ctx)
-		if err != nil {
-			return fmt.Errorf("failed to create system config %s.%s: %w", config.category, config.key, err)
-		}
-		createdCount++
-	}
-
-	m.logger.Infof("Successfully created %d new system config items", createdCount)
+	// Deprecated: legacy default data must be initialized via embedded legacy SQL to stay
+	// identical to the old project. Keep this method as a no-op to avoid seeding wrong keys.
+	m.logger.Info("initSystemConfig is deprecated; legacy default system data is loaded by initLegacyDefaultData")
 	return nil
 }
-

@@ -20,20 +20,6 @@ type ProxyAnnouncementCreate struct {
 	hooks    []Hook
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_c *ProxyAnnouncementCreate) SetTenantID(v int64) *ProxyAnnouncementCreate {
-	_c.mutation.SetTenantID(v)
-	return _c
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_c *ProxyAnnouncementCreate) SetNillableTenantID(v *int64) *ProxyAnnouncementCreate {
-	if v != nil {
-		_c.SetTenantID(*v)
-	}
-	return _c
-}
-
 // SetTitle sets the "title" field.
 func (_c *ProxyAnnouncementCreate) SetTitle(v string) *ProxyAnnouncementCreate {
 	_c.mutation.SetTitle(v)
@@ -173,10 +159,6 @@ func (_c *ProxyAnnouncementCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxyAnnouncementCreate) defaults() {
-	if _, ok := _c.mutation.TenantID(); !ok {
-		v := proxyannouncement.DefaultTenantID
-		_c.mutation.SetTenantID(v)
-	}
 	if _, ok := _c.mutation.Title(); !ok {
 		v := proxyannouncement.DefaultTitle
 		_c.mutation.SetTitle(v)
@@ -205,9 +187,6 @@ func (_c *ProxyAnnouncementCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ProxyAnnouncementCreate) check() error {
-	if _, ok := _c.mutation.TenantID(); !ok {
-		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "ProxyAnnouncement.tenant_id"`)}
-	}
 	if _, ok := _c.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "ProxyAnnouncement.title"`)}
 	}
@@ -262,10 +241,6 @@ func (_c *ProxyAnnouncementCreate) createSpec() (*ProxyAnnouncement, *sqlgraph.C
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
-	}
-	if value, ok := _c.mutation.TenantID(); ok {
-		_spec.SetField(proxyannouncement.FieldTenantID, field.TypeInt64, value)
-		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.Title(); ok {
 		_spec.SetField(proxyannouncement.FieldTitle, field.TypeString, value)

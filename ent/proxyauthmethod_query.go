@@ -262,12 +262,12 @@ func (_q *ProxyAuthMethodQuery) Clone() *ProxyAuthMethodQuery {
 // Example:
 //
 //	var v []struct {
-//		TenantID int64 `json:"tenant_id,omitempty"`
+//		Method string `json:"method,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ProxyAuthMethod.Query().
-//		GroupBy(proxyauthmethod.FieldTenantID).
+//		GroupBy(proxyauthmethod.FieldMethod).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *ProxyAuthMethodQuery) GroupBy(field string, fields ...string) *ProxyAuthMethodGroupBy {
@@ -285,11 +285,11 @@ func (_q *ProxyAuthMethodQuery) GroupBy(field string, fields ...string) *ProxyAu
 // Example:
 //
 //	var v []struct {
-//		TenantID int64 `json:"tenant_id,omitempty"`
+//		Method string `json:"method,omitempty"`
 //	}
 //
 //	client.ProxyAuthMethod.Query().
-//		Select(proxyauthmethod.FieldTenantID).
+//		Select(proxyauthmethod.FieldMethod).
 //		Scan(ctx, &v)
 func (_q *ProxyAuthMethodQuery) Select(fields ...string) *ProxyAuthMethodSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

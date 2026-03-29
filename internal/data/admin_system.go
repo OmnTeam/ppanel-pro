@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
 	systembiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/system"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
@@ -75,14 +74,22 @@ func (r *adminSystemRepo) GetConfigByCategory(ctx context.Context, category stri
 		return nil, responsecode.NewDatabaseQueryError()
 	}
 
-	// Convert to tool.SystemConfig
-	configs = make([]*tool.SystemConfig, 0, len(systems))
+	// Convert to tool.SystemConfig and normalize any legacy alias keys back to old-project keys.
+	configByKey := make(map[string]*tool.SystemConfig, len(systems))
 	for _, sys := range systems {
-		configs = append(configs, &tool.SystemConfig{
-			Key:   sys.Key,
+		key := normalizeSystemConfigKey(sys.Key)
+		if _, exists := configByKey[key]; exists && sys.Key != key {
+			continue
+		}
+		configByKey[key] = &tool.SystemConfig{
+			Key:   key,
 			Value: sys.Value,
 			Type:  sys.Type,
-		})
+		}
+	}
+	configs = make([]*tool.SystemConfig, 0, len(configByKey))
+	for _, config := range configByKey {
+		configs = append(configs, config)
 	}
 
 	// Cache the result
@@ -228,40 +235,29 @@ func (r *adminSystemRepo) UpdateConfigByCategory(ctx context.Context, category s
 		}
 	}
 
+	syncRuntimeAppConfig(ctx, r.data.db, r.data.conf, r.log)
+
 	return nil
 }
 
 // GetNodeMultiplier 获取节点倍率配置
 func (r *adminSystemRepo) GetNodeMultiplier(ctx context.Context) (string, error) {
-	// Query node_multiplier config from database
-	system, err := r.data.db.ProxySystem.Query().
-		Where(func(s *sql.Selector) {
-			s.Where(sql.And(
-				sql.EQ(s.C(proxysystem.FieldCategory), "server"),
-				sql.EQ(s.C(proxysystem.FieldKey), "NodeMultiplier"),
-			))
-		}).
-		Only(ctx)
+	values, err := loadSystemConfigMap(ctx, r.data.db, "server")
 	if err != nil {
-		// If not found, return empty string (not an error)
-		if ent.IsNotFound(err) {
-			return "", nil
-		}
 		r.log.Errorf("[GetNodeMultiplier] Failed to query node multiplier: %v", err)
 		return "", responsecode.NewDatabaseQueryError()
 	}
 
-	return system.Value, nil
+	return systemConfigString(values, "NodeMultiplierConfig", "NodeMultiplier"), nil
 }
 
 // UpdateNodeMultiplier 更新节点倍率配置
 func (r *adminSystemRepo) UpdateNodeMultiplier(ctx context.Context, value string) error {
-	// Check if config exists
 	exists, err := r.data.db.ProxySystem.Query().
 		Where(func(s *sql.Selector) {
 			s.Where(sql.And(
 				sql.EQ(s.C(proxysystem.FieldCategory), "server"),
-				sql.EQ(s.C(proxysystem.FieldKey), "NodeMultiplier"),
+				sql.EQ(s.C(proxysystem.FieldKey), "NodeMultiplierConfig"),
 			))
 		}).
 		Exist(ctx)
@@ -276,7 +272,7 @@ func (r *adminSystemRepo) UpdateNodeMultiplier(ctx context.Context, value string
 			Where(func(s *sql.Selector) {
 				s.Where(sql.And(
 					sql.EQ(s.C(proxysystem.FieldCategory), "server"),
-					sql.EQ(s.C(proxysystem.FieldKey), "NodeMultiplier"),
+					sql.EQ(s.C(proxysystem.FieldKey), "NodeMultiplierConfig"),
 				))
 			}).
 			SetValue(value).
@@ -293,14 +289,20 @@ func (r *adminSystemRepo) UpdateNodeMultiplier(ctx context.Context, value string
 		// Create new config
 		_, err := r.data.db.ProxySystem.Create().
 			SetCategory("server").
-			SetKey("NodeMultiplier").
+			SetKey("NodeMultiplierConfig").
 			SetValue(value).
 			SetType("string").
-			SetDesc("节点倍率配置").
+			SetDesc("node multiplier config").
 			Save(ctx)
 		if err != nil {
 			r.log.Errorf("[UpdateNodeMultiplier] Failed to create node multiplier: %v", err)
 			return responsecode.NewDatabaseUpdateError()
+		}
+	}
+
+	for _, cacheKey := range []string{NodeConfigKey, GlobalConfigKey} {
+		if err := r.data.rdb.Del(ctx, cacheKey).Err(); err != nil && err != redis.Nil {
+			r.log.Warnf("Failed to delete cache key %s: %v", cacheKey, err)
 		}
 	}
 

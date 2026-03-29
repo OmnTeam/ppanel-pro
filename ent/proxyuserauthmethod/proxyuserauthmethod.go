@@ -15,8 +15,6 @@ const (
 	FieldID = "id"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
-	// FieldTenantID holds the string denoting the tenant_id field in the database.
-	FieldTenantID = "tenant_id"
 	// FieldAuthType holds the string denoting the auth_type field in the database.
 	FieldAuthType = "auth_type"
 	// FieldAuthIdentifier holds the string denoting the auth_identifier field in the database.
@@ -28,14 +26,13 @@ const (
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxyuserauthmethod in the database.
-	Table = "proxy_user_auth_method"
+	Table = "user_auth_methods"
 )
 
 // Columns holds all SQL columns for proxyuserauthmethod fields.
 var Columns = []string{
 	FieldID,
 	FieldUserID,
-	FieldTenantID,
 	FieldAuthType,
 	FieldAuthIdentifier,
 	FieldVerified,
@@ -54,8 +51,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultTenantID holds the default value on creation for the "tenant_id" field.
-	DefaultTenantID int64
 	// AuthTypeValidator is a validator for the "auth_type" field. It is called by the builders before save.
 	AuthTypeValidator func(string) error
 	// AuthIdentifierValidator is a validator for the "auth_identifier" field. It is called by the builders before save.
@@ -83,11 +78,6 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByUserID orders the results by the user_id field.
 func ByUserID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUserID, opts...).ToFunc()
-}
-
-// ByTenantID orders the results by the tenant_id field.
-func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByAuthType orders the results by the auth_type field.

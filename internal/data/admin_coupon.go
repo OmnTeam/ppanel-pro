@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -34,17 +33,11 @@ func (r *couponRepo) CreateCoupon(ctx context.Context, name, code string, count 
 		SetCount(int64(count)).
 		SetType(int8(typ)).
 		SetDiscount(discount).
-		SetStartTime(time.Unix(startTime, 0)).
-		SetEndTime(time.Unix(expireTime, 0)).
+		SetStartTime(startTime).
+		SetExpireTime(expireTime).
 		SetUserLimit(userLimit).
 		SetSubscribe(subscribe).
-		SetStatus(func() int8 {
-			if enable {
-				return 1
-			} else {
-				return 0
-			}
-		}()).
+		SetEnable(enable).
 		Save(ctx)
 
 	return err
@@ -61,17 +54,11 @@ func (r *couponRepo) UpdateCoupon(ctx context.Context, id int, name, code string
 		SetCount(int64(count)).
 		SetType(int8(typ)).
 		SetDiscount(discount).
-		SetStartTime(time.Unix(startTime, 0)).
-		SetEndTime(time.Unix(expireTime, 0)).
+		SetStartTime(startTime).
+		SetExpireTime(expireTime).
 		SetUserLimit(userLimit).
 		SetSubscribe(subscribe).
-		SetStatus(func() int8 {
-			if enable {
-				return 1
-			} else {
-				return 0
-			}
-		}()).
+		SetEnable(enable).
 		Exec(ctx)
 }
 

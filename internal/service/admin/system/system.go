@@ -80,7 +80,7 @@ func (s *SystemService) GetInviteConfig(ctx context.Context, req *pb.GetInviteCo
 		Message: responsecode.CodeMessages[responsecode.AdminGetInviteConfigSuccess],
 		Data: &pb.InviteConfig{
 			ForcedInvite:       config.ForcedInvite,
-			ReferralPercentage: int32(config.ReferralPercentage),
+			ReferralPercentage: int64(config.ReferralPercentage),
 			OnlyFirstPurchase:  config.OnlyFirstPurchase,
 		},
 	}, nil
@@ -182,9 +182,9 @@ func (s *SystemService) UpdatePrivacyPolicyConfig(ctx context.Context, req *pb.U
 func convertBizNodeConfigToPb(config *systembiz.NodeConfig) *pb.NodeConfig {
 	pbConfig := &pb.NodeConfig{
 		NodeSecret:             config.NodeSecret,
-		NodePullInterval:       int32(config.NodePullInterval),
-		NodePushInterval:       int32(config.NodePushInterval),
-		TrafficReportThreshold: int32(config.TrafficReportThreshold),
+		NodePullInterval:       int64(config.NodePullInterval),
+		NodePushInterval:       int64(config.NodePushInterval),
+		TrafficReportThreshold: int64(config.TrafficReportThreshold),
 		IpStrategy:             config.IPStrategy,
 	}
 
@@ -217,7 +217,7 @@ func convertBizNodeConfigToPb(config *systembiz.NodeConfig) *pb.NodeConfig {
 					Name:     outbound.Name,
 					Protocol: outbound.Protocol,
 					Address:  outbound.Address,
-					Port:     int32(outbound.Port),
+					Port:     int64(outbound.Port),
 					Password: outbound.Password,
 					Rules:    outbound.Rules,
 				})
@@ -478,9 +478,9 @@ func (s *SystemService) GetVerifyCodeConfig(ctx context.Context, req *pb.GetVeri
 		Code:    responsecode.AdminGetVerifyCodeConfigSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminGetVerifyCodeConfigSuccess],
 		Data: &pb.VerifyCodeConfig{
-			VerifyCodeExpireTime: int32(config.VerifyCodeExpireTime),
-			VerifyCodeLimit:      int32(config.VerifyCodeLimit),
-			VerifyCodeInterval:   int32(config.VerifyCodeInterval),
+			VerifyCodeExpireTime: int64(config.VerifyCodeExpireTime),
+			VerifyCodeLimit:      int64(config.VerifyCodeLimit),
+			VerifyCodeInterval:   int64(config.VerifyCodeInterval),
 		},
 	}, nil
 }
@@ -519,11 +519,16 @@ func (s *SystemService) GetVerifyConfig(ctx context.Context, req *pb.GetVerifyCo
 		Code:    responsecode.AdminGetVerifyConfigSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminGetVerifyConfigSuccess],
 		Data: &pb.VerifyConfig{
-			TurnstileSiteKey:          config.TurnstileSiteKey,
-			TurnstileSecret:           config.TurnstileSecret,
-			EnableLoginVerify:         config.EnableLoginVerify,
-			EnableRegisterVerify:      config.EnableRegisterVerify,
-			EnableResetPasswordVerify: config.EnableResetPasswordVerify,
+			CaptchaType:                    config.CaptchaType,
+			TurnstileSiteKey:               config.TurnstileSiteKey,
+			TurnstileSecret:                config.TurnstileSecret,
+			EnableUserLoginCaptcha:         config.EnableUserLoginCaptcha,
+			EnableUserRegisterCaptcha:      config.EnableUserRegisterCaptcha,
+			EnableAdminLoginCaptcha:        config.EnableAdminLoginCaptcha,
+			EnableUserResetPasswordCaptcha: config.EnableUserResetPasswordCaptcha,
+			EnableLoginVerify:              config.EnableUserLoginCaptcha,
+			EnableRegisterVerify:           config.EnableUserRegisterCaptcha,
+			EnableResetPasswordVerify:      config.EnableUserResetPasswordCaptcha,
 		},
 	}, nil
 }
@@ -532,11 +537,13 @@ func (s *SystemService) GetVerifyConfig(ctx context.Context, req *pb.GetVerifyCo
 func (s *SystemService) UpdateVerifyConfig(ctx context.Context, req *pb.UpdateVerifyConfigRequest) (*pb.UpdateVerifyConfigReply, error) {
 
 	config := &systembiz.VerifyConfig{
-		TurnstileSiteKey:          req.TurnstileSiteKey,
-		TurnstileSecret:           req.TurnstileSecret,
-		EnableLoginVerify:         req.EnableLoginVerify,
-		EnableRegisterVerify:      req.EnableRegisterVerify,
-		EnableResetPasswordVerify: req.EnableResetPasswordVerify,
+		CaptchaType:                    req.CaptchaType,
+		TurnstileSiteKey:               req.TurnstileSiteKey,
+		TurnstileSecret:                req.TurnstileSecret,
+		EnableUserLoginCaptcha:         req.EnableUserLoginCaptcha || req.EnableLoginVerify,
+		EnableUserRegisterCaptcha:      req.EnableUserRegisterCaptcha || req.EnableRegisterVerify,
+		EnableAdminLoginCaptcha:        req.EnableAdminLoginCaptcha,
+		EnableUserResetPasswordCaptcha: req.EnableUserResetPasswordCaptcha || req.EnableResetPasswordVerify,
 	}
 
 	if err := s.uc.UpdateVerifyConfig(ctx, config); err != nil {

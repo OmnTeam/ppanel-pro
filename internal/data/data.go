@@ -17,6 +17,7 @@ import (
 	"github.com/google/wire"
 	"github.com/hibiken/asynq"
 	"github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9/maintnotifications"
 )
 
 // Global device manager instance
@@ -58,6 +59,7 @@ var ProviderSet = wire.NewSet(
 	NewAdminUserSubscribeRepo,
 	// Auth模块仓储
 	NewAuthRepo,
+	NewAuthCompat,
 	// Public Common模块仓储
 	NewCommonRepo,
 	// Public Order模块仓储
@@ -68,6 +70,8 @@ var ProviderSet = wire.NewSet(
 	NewPublicDocumentRepo,
 	// Public Portal模块仓储
 	NewPublicPortalRepo,
+	// Public Redemption模块仓储
+	NewPublicRedemptionRepo,
 	// Public Ticket模块仓储
 	NewPublicTicketRepo,
 	// Public User模块仓储
@@ -76,6 +80,8 @@ var ProviderSet = wire.NewSet(
 	NewPublicPaymentRepo,
 	// Public Subscribe模块仓储
 	NewPublicSubscribeRepo,
+	// Public Subscription模块仓储（订阅配置生成）
+	NewPublicSubscriptionRepo,
 	// Public Withdrawal模块仓储
 	NewWithdrawalRepo,
 	// Server模块仓储
@@ -86,12 +92,14 @@ var ProviderSet = wire.NewSet(
 
 // Data
 type Data struct {
-	db          *ent.Client
-	rdb         *redis.Client
-	queue       *asynq.Client
-	queueServer *asynq.Server
-	conf        *conf.Application     // 应用配置（包含JWT等配置）
-	deviceMgr   *device.DeviceManager // 设备管理器
+	db             *ent.Client
+	rdb            *redis.Client
+	queue          *asynq.Client
+	queueServer    *asynq.Server
+	queueScheduler *asynq.Scheduler
+	serverConf     *conf.Server
+	conf           *conf.Application     // 应用配置（包含JWT等配置）
+	deviceMgr      *device.DeviceManager // 设备管理器
 }
 
 // DB 获取数据库客户端
@@ -102,6 +110,16 @@ func (d *Data) DB() *ent.Client {
 // RDB 获取Redis客户端
 func (d *Data) RDB() *redis.Client {
 	return d.rdb
+}
+
+// Queue 获取异步队列客户端
+func (d *Data) Queue() *asynq.Client {
+	return d.queue
+}
+
+// AppConf 获取应用配置
+func (d *Data) AppConf() *conf.Application {
+	return d.conf
 }
 
 // Redis 获取Redis客户端 (为中间件兼容)
@@ -115,12 +133,13 @@ func (d *Data) DeviceManager() *device.DeviceManager {
 }
 
 // FindOne 实现用户服务接口 - 根据用户ID查找用户
-func (d *Data) FindOne(ctx context.Context, userId int) (*ent.ProxyUser, error) {
-	return d.db.ProxyUser.Get(ctx, int64(userId))
+func (d *Data) FindOne(ctx context.Context, userId int64) (*ent.ProxyUser, error) {
+	return d.db.ProxyUser.Get(ctx, userId)
 }
 
 // NewData
-func NewData(c *conf.Data, appConf *conf.Application, logger log.Logger) (*Data, func(), error) {
+func NewData(c *conf.Data, serverConf *conf.Server, appConf *conf.Application, logger log.Logger) (*Data, func(), error) {
+	bootstrapCtx := context.Background()
 	log.NewHelper(logger).Infof("connecting to database: %s", c.Database.Source)
 
 	client, err := ent.Open(c.Database.Driver, c.Database.Source)
@@ -129,43 +148,43 @@ func NewData(c *conf.Data, appConf *conf.Application, logger log.Logger) (*Data,
 		return nil, nil, err
 	}
 	client = client.Debug()
-	// 运行自动迁移工具
-	if err := client.Schema.Create(context.Background()); err != nil {
-		log.NewHelper(logger).Errorf("failed creating schema resources: %v", err)
+
+	migrator := migrate.NewMigrator(client, logger, appConf, c.Database.Driver, c.Database.Source)
+	existingLegacySchema, err := hasExistingLegacySchema(bootstrapCtx, c.Database.Driver, c.Database.Source)
+	if err != nil {
+		log.NewHelper(logger).Errorf("failed detecting database schema state: %v", err)
 		return nil, nil, err
 	}
-	log.NewHelper(logger).Infof("database schema migration completed successfully")
 
-	// 初始化默认数据 - 使用迁移系统
-	log.NewHelper(logger).Infof("starting default data initialization...")
-	log.NewHelper(logger).Infof("appConf value: %+v", appConf)
-	if appConf != nil {
-		log.NewHelper(logger).Infof("app config found, creating migrator...")
-		log.NewHelper(logger).Infof("app config site: %+v", appConf.Site)
-		if appConf.Admin != nil {
-			log.NewHelper(logger).Infof("admin config found: email=%s", appConf.Admin.Email)
+	if existingLegacySchema {
+		log.NewHelper(logger).Info("existing legacy schema detected; skipping ent schema auto migration to avoid modifying imported old-project tables")
+		if hasMigrationsTable, err := hasDatabaseTable(bootstrapCtx, c.Database.Driver, c.Database.Source, "schema_migrations"); err != nil {
+			log.NewHelper(logger).Errorf("failed checking schema_migrations table: %v", err)
+			return nil, nil, err
+		} else if hasMigrationsTable {
+			if err := migrator.InitBasicData(bootstrapCtx); err != nil {
+				log.NewHelper(logger).Errorf("failed to initialize legacy default data: %v", err)
+				return nil, nil, fmt.Errorf("failed to initialize legacy default data: %w", err)
+			}
 		} else {
-			log.NewHelper(logger).Warnf("admin config is nil in app config")
+			log.NewHelper(logger).Warn("schema_migrations table not found; skipping legacy default data sync for existing database")
 		}
-		migrator := migrate.NewMigrator(client, logger, appConf)
-		log.NewHelper(logger).Infof("migrator created, starting AutoMigrateWithData...")
-		if err := migrator.AutoMigrateWithData(context.Background()); err != nil {
-			log.NewHelper(logger).Errorf("failed to initialize default data: %v", err)
-			return nil, nil, fmt.Errorf("failed to initialize default data: %w", err)
+		if err := migrator.CreateDefaultAdminUser(bootstrapCtx); err != nil {
+			log.NewHelper(logger).Errorf("failed to ensure default admin user: %v", err)
+			return nil, nil, fmt.Errorf("failed to ensure default admin user: %w", err)
 		}
-		log.NewHelper(logger).Infof("default data initialization completed successfully")
 	} else {
-		log.NewHelper(logger).Warnf("app config is nil, skipping default data initialization")
-		// 尝试使用默认配置进行迁移
-		log.NewHelper(logger).Infof("trying to use default config for migration...")
-		migrator := migrate.NewMigrator(client, logger, nil)
-		if err := migrator.AutoMigrateWithData(context.Background()); err != nil {
-			log.NewHelper(logger).Errorf("failed to initialize default data with nil config: %v", err)
-			// 不返回错误，只记录日志，允许服务启动
-		} else {
-			log.NewHelper(logger).Infof("default data initialization completed successfully with default config")
+		log.NewHelper(logger).Info("no existing legacy schema detected; running bootstrap migration path")
+		if err := migrator.AutoMigrateWithData(bootstrapCtx); err != nil {
+			log.NewHelper(logger).Errorf("failed to initialize schema/data: %v", err)
+			return nil, nil, fmt.Errorf("failed to initialize schema/data: %w", err)
 		}
 	}
+
+	// The old project hydrates its runtime config snapshot from database/auth
+	// records during startup. Keep the Kratos runtime config aligned so public
+	// routes and middleware observe the same values.
+	syncRuntimeAppConfig(bootstrapCtx, client, appConf, log.NewHelper(log.With(logger, "module", "data/runtime_config")))
 
 	// 创建 Redis 客户端
 	rdb := redis.NewClient(&redis.Options{
@@ -176,6 +195,12 @@ func NewData(c *conf.Data, appConf *conf.Application, logger log.Logger) (*Data,
 		WriteTimeout: c.Redis.WriteTimeout.AsDuration(),
 		PoolSize:     int(c.Redis.PoolSize),
 		MinIdleConns: int(c.Redis.MinIdleConns),
+		// Many customer environments still run Redis variants/versions without
+		// CLIENT MAINT_NOTIFICATIONS support. Disable the handshake explicitly
+		// to avoid noisy fallback warnings during startup.
+		MaintNotificationsConfig: &maintnotifications.Config{
+			Mode: maintnotifications.ModeDisabled,
+		},
 	})
 
 	// 测试 Redis 连接
@@ -186,10 +211,12 @@ func NewData(c *conf.Data, appConf *conf.Application, logger log.Logger) (*Data,
 	log.NewHelper(logger).Infof("connected to redis: %s", c.Redis.Addr)
 
 	// 创建 asynq 客户端 - 用于发送任务到队列
-	redisOpt := asynq.RedisClientOpt{
-		Addr:     c.Redis.Addr,
-		Password: c.Redis.Password,
-		DB:       int(c.Redis.Db),
+	redisOpt := compatibleRedisConnOpt{
+		RedisClientOpt: asynq.RedisClientOpt{
+			Addr:     c.Redis.Addr,
+			Password: c.Redis.Password,
+			DB:       int(c.Redis.Db),
+		},
 	}
 	queueClient := asynq.NewClient(redisOpt)
 
@@ -201,30 +228,41 @@ func NewData(c *conf.Data, appConf *conf.Application, logger log.Logger) (*Data,
 			// Logger 使用默认的 asynq logger
 		},
 	)
+	queueScheduler := newQueueScheduler(redisOpt)
 
 	// 初始化设备管理器
 	deviceManager := device.NewDeviceManager(logger, 60, 30) // 心跳超时60秒，检查间隔30秒
 
 	d := &Data{
-		db:          client,
-		rdb:         rdb,
-		queue:       queueClient,
-		queueServer: queueServer,
-		conf:        appConf,
-		deviceMgr:   deviceManager,
+		db:             client,
+		rdb:            rdb,
+		queue:          queueClient,
+		queueServer:    queueServer,
+		queueScheduler: queueScheduler,
+		serverConf:     serverConf,
+		conf:           appConf,
+		deviceMgr:      deviceManager,
 	}
 
 	// 启动 asynq 队列服务器
 	mux := asynq.NewServeMux()
 	// 创建缓存服务
 	cacheService := service.NewCacheService(rdb, client, logger)
-	handler.RegisterHandlers(mux, client, rdb, queueClient, appConf, cacheService, logger)
+	groupRepo := NewAdminGroupRepo(d, logger)
+	handler.RegisterHandlers(mux, client, rdb, queueClient, appConf, cacheService, groupRepo, logger)
 	go func() {
 		if err := queueServer.Start(mux); err != nil {
 			log.NewHelper(logger).Fatalf("Failed to start asynq server: %v", err)
 		}
 	}()
 	log.NewHelper(logger).Info("Asynq queue server started successfully")
+
+	go func() {
+		if err := startQueueScheduler(queueScheduler, logger); err != nil {
+			log.NewHelper(logger).Fatalf("Failed to start asynq scheduler: %v", err)
+		}
+	}()
+	log.NewHelper(logger).Info("Asynq scheduler started successfully")
 
 	cleanup := func() {
 		log.NewHelper(logger).Info("closing the data resources")
@@ -240,6 +278,10 @@ func NewData(c *conf.Data, appConf *conf.Application, logger log.Logger) (*Data,
 		// 关闭 asynq 服务器
 		d.queueServer.Shutdown()
 		log.NewHelper(logger).Info("asynq server stopped")
+		if d.queueScheduler != nil {
+			d.queueScheduler.Shutdown()
+			log.NewHelper(logger).Info("asynq scheduler stopped")
+		}
 	}
 
 	return d, cleanup, nil

@@ -10,19 +10,16 @@ const (
 	// Label holds the string label denoting the proxyschemamigrations type in the database.
 	Label = "proxy_schema_migrations"
 	// FieldID holds the string denoting the id field in the database.
-	FieldID = "id"
-	// FieldVersion holds the string denoting the version field in the database.
-	FieldVersion = "version"
+	FieldID = "version"
 	// FieldDirty holds the string denoting the dirty field in the database.
 	FieldDirty = "dirty"
 	// Table holds the table name of the proxyschemamigrations in the database.
-	Table = "proxy_schema_migrations"
+	Table = "schema_migrations"
 )
 
 // Columns holds all SQL columns for proxyschemamigrations fields.
 var Columns = []string{
 	FieldID,
-	FieldVersion,
 	FieldDirty,
 }
 
@@ -36,22 +33,12 @@ func ValidColumn(column string) bool {
 	return false
 }
 
-var (
-	// DefaultDirty holds the default value on creation for the "dirty" field.
-	DefaultDirty bool
-)
-
 // OrderOption defines the ordering options for the ProxySchemaMigrations queries.
 type OrderOption func(*sql.Selector)
 
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByVersion orders the results by the version field.
-func ByVersion(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldVersion, opts...).ToFunc()
 }
 
 // ByDirty orders the results by the dirty field.

@@ -28,27 +28,6 @@ func (_u *ProxyAdsUpdate) Where(ps ...predicate.ProxyAds) *ProxyAdsUpdate {
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyAdsUpdate) SetTenantID(v int64) *ProxyAdsUpdate {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyAdsUpdate) SetNillableTenantID(v *int64) *ProxyAdsUpdate {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyAdsUpdate) AddTenantID(v int64) *ProxyAdsUpdate {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
 // SetTitle sets the "title" field.
 func (_u *ProxyAdsUpdate) SetTitle(v string) *ProxyAdsUpdate {
 	_u.mutation.SetTitle(v)
@@ -145,12 +124,6 @@ func (_u *ProxyAdsUpdate) SetNillableStartTime(v *time.Time) *ProxyAdsUpdate {
 	return _u
 }
 
-// ClearStartTime clears the value of the "start_time" field.
-func (_u *ProxyAdsUpdate) ClearStartTime() *ProxyAdsUpdate {
-	_u.mutation.ClearStartTime()
-	return _u
-}
-
 // SetEndTime sets the "end_time" field.
 func (_u *ProxyAdsUpdate) SetEndTime(v time.Time) *ProxyAdsUpdate {
 	_u.mutation.SetEndTime(v)
@@ -165,21 +138,15 @@ func (_u *ProxyAdsUpdate) SetNillableEndTime(v *time.Time) *ProxyAdsUpdate {
 	return _u
 }
 
-// ClearEndTime clears the value of the "end_time" field.
-func (_u *ProxyAdsUpdate) ClearEndTime() *ProxyAdsUpdate {
-	_u.mutation.ClearEndTime()
-	return _u
-}
-
 // SetStatus sets the "status" field.
-func (_u *ProxyAdsUpdate) SetStatus(v int8) *ProxyAdsUpdate {
+func (_u *ProxyAdsUpdate) SetStatus(v int) *ProxyAdsUpdate {
 	_u.mutation.ResetStatus()
 	_u.mutation.SetStatus(v)
 	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (_u *ProxyAdsUpdate) SetNillableStatus(v *int8) *ProxyAdsUpdate {
+func (_u *ProxyAdsUpdate) SetNillableStatus(v *int) *ProxyAdsUpdate {
 	if v != nil {
 		_u.SetStatus(*v)
 	}
@@ -187,14 +154,8 @@ func (_u *ProxyAdsUpdate) SetNillableStatus(v *int8) *ProxyAdsUpdate {
 }
 
 // AddStatus adds value to the "status" field.
-func (_u *ProxyAdsUpdate) AddStatus(v int8) *ProxyAdsUpdate {
+func (_u *ProxyAdsUpdate) AddStatus(v int) *ProxyAdsUpdate {
 	_u.mutation.AddStatus(v)
-	return _u
-}
-
-// ClearStatus clears the value of the "status" field.
-func (_u *ProxyAdsUpdate) ClearStatus() *ProxyAdsUpdate {
-	_u.mutation.ClearStatus()
 	return _u
 }
 
@@ -277,12 +238,6 @@ func (_u *ProxyAdsUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyads.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyads.FieldTenantID, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(proxyads.FieldTitle, field.TypeString, value)
 	}
@@ -307,23 +262,14 @@ func (_u *ProxyAdsUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if value, ok := _u.mutation.StartTime(); ok {
 		_spec.SetField(proxyads.FieldStartTime, field.TypeTime, value)
 	}
-	if _u.mutation.StartTimeCleared() {
-		_spec.ClearField(proxyads.FieldStartTime, field.TypeTime)
-	}
 	if value, ok := _u.mutation.EndTime(); ok {
 		_spec.SetField(proxyads.FieldEndTime, field.TypeTime, value)
 	}
-	if _u.mutation.EndTimeCleared() {
-		_spec.ClearField(proxyads.FieldEndTime, field.TypeTime)
-	}
 	if value, ok := _u.mutation.Status(); ok {
-		_spec.SetField(proxyads.FieldStatus, field.TypeInt8, value)
+		_spec.SetField(proxyads.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.AddedStatus(); ok {
-		_spec.AddField(proxyads.FieldStatus, field.TypeInt8, value)
-	}
-	if _u.mutation.StatusCleared() {
-		_spec.ClearField(proxyads.FieldStatus, field.TypeInt8)
+		_spec.AddField(proxyads.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyads.FieldUpdatedAt, field.TypeTime, value)
@@ -346,27 +292,6 @@ type ProxyAdsUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxyAdsMutation
-}
-
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyAdsUpdateOne) SetTenantID(v int64) *ProxyAdsUpdateOne {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyAdsUpdateOne) SetNillableTenantID(v *int64) *ProxyAdsUpdateOne {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyAdsUpdateOne) AddTenantID(v int64) *ProxyAdsUpdateOne {
-	_u.mutation.AddTenantID(v)
-	return _u
 }
 
 // SetTitle sets the "title" field.
@@ -465,12 +390,6 @@ func (_u *ProxyAdsUpdateOne) SetNillableStartTime(v *time.Time) *ProxyAdsUpdateO
 	return _u
 }
 
-// ClearStartTime clears the value of the "start_time" field.
-func (_u *ProxyAdsUpdateOne) ClearStartTime() *ProxyAdsUpdateOne {
-	_u.mutation.ClearStartTime()
-	return _u
-}
-
 // SetEndTime sets the "end_time" field.
 func (_u *ProxyAdsUpdateOne) SetEndTime(v time.Time) *ProxyAdsUpdateOne {
 	_u.mutation.SetEndTime(v)
@@ -485,21 +404,15 @@ func (_u *ProxyAdsUpdateOne) SetNillableEndTime(v *time.Time) *ProxyAdsUpdateOne
 	return _u
 }
 
-// ClearEndTime clears the value of the "end_time" field.
-func (_u *ProxyAdsUpdateOne) ClearEndTime() *ProxyAdsUpdateOne {
-	_u.mutation.ClearEndTime()
-	return _u
-}
-
 // SetStatus sets the "status" field.
-func (_u *ProxyAdsUpdateOne) SetStatus(v int8) *ProxyAdsUpdateOne {
+func (_u *ProxyAdsUpdateOne) SetStatus(v int) *ProxyAdsUpdateOne {
 	_u.mutation.ResetStatus()
 	_u.mutation.SetStatus(v)
 	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (_u *ProxyAdsUpdateOne) SetNillableStatus(v *int8) *ProxyAdsUpdateOne {
+func (_u *ProxyAdsUpdateOne) SetNillableStatus(v *int) *ProxyAdsUpdateOne {
 	if v != nil {
 		_u.SetStatus(*v)
 	}
@@ -507,14 +420,8 @@ func (_u *ProxyAdsUpdateOne) SetNillableStatus(v *int8) *ProxyAdsUpdateOne {
 }
 
 // AddStatus adds value to the "status" field.
-func (_u *ProxyAdsUpdateOne) AddStatus(v int8) *ProxyAdsUpdateOne {
+func (_u *ProxyAdsUpdateOne) AddStatus(v int) *ProxyAdsUpdateOne {
 	_u.mutation.AddStatus(v)
-	return _u
-}
-
-// ClearStatus clears the value of the "status" field.
-func (_u *ProxyAdsUpdateOne) ClearStatus() *ProxyAdsUpdateOne {
-	_u.mutation.ClearStatus()
 	return _u
 }
 
@@ -627,12 +534,6 @@ func (_u *ProxyAdsUpdateOne) sqlSave(ctx context.Context) (_node *ProxyAds, err 
 			}
 		}
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyads.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyads.FieldTenantID, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(proxyads.FieldTitle, field.TypeString, value)
 	}
@@ -657,23 +558,14 @@ func (_u *ProxyAdsUpdateOne) sqlSave(ctx context.Context) (_node *ProxyAds, err 
 	if value, ok := _u.mutation.StartTime(); ok {
 		_spec.SetField(proxyads.FieldStartTime, field.TypeTime, value)
 	}
-	if _u.mutation.StartTimeCleared() {
-		_spec.ClearField(proxyads.FieldStartTime, field.TypeTime)
-	}
 	if value, ok := _u.mutation.EndTime(); ok {
 		_spec.SetField(proxyads.FieldEndTime, field.TypeTime, value)
 	}
-	if _u.mutation.EndTimeCleared() {
-		_spec.ClearField(proxyads.FieldEndTime, field.TypeTime)
-	}
 	if value, ok := _u.mutation.Status(); ok {
-		_spec.SetField(proxyads.FieldStatus, field.TypeInt8, value)
+		_spec.SetField(proxyads.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.AddedStatus(); ok {
-		_spec.AddField(proxyads.FieldStatus, field.TypeInt8, value)
-	}
-	if _u.mutation.StatusCleared() {
-		_spec.ClearField(proxyads.FieldStatus, field.TypeInt8)
+		_spec.AddField(proxyads.FieldStatus, field.TypeInt, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyads.FieldUpdatedAt, field.TypeTime, value)

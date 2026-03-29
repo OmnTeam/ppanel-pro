@@ -54,6 +54,20 @@ func (_c *ProxyUserDeviceCreate) SetNillableIP(v *string) *ProxyUserDeviceCreate
 	return _c
 }
 
+// SetUserAgent sets the "user_agent" field.
+func (_c *ProxyUserDeviceCreate) SetUserAgent(v string) *ProxyUserDeviceCreate {
+	_c.mutation.SetUserAgent(v)
+	return _c
+}
+
+// SetNillableUserAgent sets the "user_agent" field if the given value is not nil.
+func (_c *ProxyUserDeviceCreate) SetNillableUserAgent(v *string) *ProxyUserDeviceCreate {
+	if v != nil {
+		_c.SetUserAgent(*v)
+	}
+	return _c
+}
+
 // SetIdentifier sets the "identifier" field.
 func (_c *ProxyUserDeviceCreate) SetIdentifier(v string) *ProxyUserDeviceCreate {
 	_c.mutation.SetIdentifier(v)
@@ -68,16 +82,16 @@ func (_c *ProxyUserDeviceCreate) SetNillableIdentifier(v *string) *ProxyUserDevi
 	return _c
 }
 
-// SetUserAgent sets the "user_agent" field.
-func (_c *ProxyUserDeviceCreate) SetUserAgent(v string) *ProxyUserDeviceCreate {
-	_c.mutation.SetUserAgent(v)
+// SetShortCode sets the "short_code" field.
+func (_c *ProxyUserDeviceCreate) SetShortCode(v string) *ProxyUserDeviceCreate {
+	_c.mutation.SetShortCode(v)
 	return _c
 }
 
-// SetNillableUserAgent sets the "user_agent" field if the given value is not nil.
-func (_c *ProxyUserDeviceCreate) SetNillableUserAgent(v *string) *ProxyUserDeviceCreate {
+// SetNillableShortCode sets the "short_code" field if the given value is not nil.
+func (_c *ProxyUserDeviceCreate) SetNillableShortCode(v *string) *ProxyUserDeviceCreate {
 	if v != nil {
-		_c.SetUserAgent(*v)
+		_c.SetShortCode(*v)
 	}
 	return _c
 }
@@ -179,6 +193,10 @@ func (_c *ProxyUserDeviceCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxyUserDeviceCreate) defaults() {
+	if _, ok := _c.mutation.ShortCode(); !ok {
+		v := proxyuserdevice.DefaultShortCode
+		_c.mutation.SetShortCode(v)
+	}
 	if _, ok := _c.mutation.Online(); !ok {
 		v := proxyuserdevice.DefaultOnline
 		_c.mutation.SetOnline(v)
@@ -207,14 +225,22 @@ func (_c *ProxyUserDeviceCreate) check() error {
 			return &ValidationError{Name: "ip", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.ip": %w`, err)}
 		}
 	}
+	if v, ok := _c.mutation.UserAgent(); ok {
+		if err := proxyuserdevice.UserAgentValidator(v); err != nil {
+			return &ValidationError{Name: "user_agent", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.user_agent": %w`, err)}
+		}
+	}
 	if v, ok := _c.mutation.Identifier(); ok {
 		if err := proxyuserdevice.IdentifierValidator(v); err != nil {
 			return &ValidationError{Name: "identifier", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.identifier": %w`, err)}
 		}
 	}
-	if v, ok := _c.mutation.UserAgent(); ok {
-		if err := proxyuserdevice.UserAgentValidator(v); err != nil {
-			return &ValidationError{Name: "user_agent", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.user_agent": %w`, err)}
+	if _, ok := _c.mutation.ShortCode(); !ok {
+		return &ValidationError{Name: "short_code", err: errors.New(`ent: missing required field "ProxyUserDevice.short_code"`)}
+	}
+	if v, ok := _c.mutation.ShortCode(); ok {
+		if err := proxyuserdevice.ShortCodeValidator(v); err != nil {
+			return &ValidationError{Name: "short_code", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.short_code": %w`, err)}
 		}
 	}
 	if _, ok := _c.mutation.Online(); !ok {
@@ -278,13 +304,17 @@ func (_c *ProxyUserDeviceCreate) createSpec() (*ProxyUserDevice, *sqlgraph.Creat
 		_spec.SetField(proxyuserdevice.FieldIP, field.TypeString, value)
 		_node.IP = &value
 	}
+	if value, ok := _c.mutation.UserAgent(); ok {
+		_spec.SetField(proxyuserdevice.FieldUserAgent, field.TypeString, value)
+		_node.UserAgent = &value
+	}
 	if value, ok := _c.mutation.Identifier(); ok {
 		_spec.SetField(proxyuserdevice.FieldIdentifier, field.TypeString, value)
 		_node.Identifier = &value
 	}
-	if value, ok := _c.mutation.UserAgent(); ok {
-		_spec.SetField(proxyuserdevice.FieldUserAgent, field.TypeString, value)
-		_node.UserAgent = &value
+	if value, ok := _c.mutation.ShortCode(); ok {
+		_spec.SetField(proxyuserdevice.FieldShortCode, field.TypeString, value)
+		_node.ShortCode = value
 	}
 	if value, ok := _c.mutation.Online(); ok {
 		_spec.SetField(proxyuserdevice.FieldOnline, field.TypeBool, value)

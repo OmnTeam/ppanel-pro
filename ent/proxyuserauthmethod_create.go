@@ -26,20 +26,6 @@ func (_c *ProxyUserAuthMethodCreate) SetUserID(v int64) *ProxyUserAuthMethodCrea
 	return _c
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_c *ProxyUserAuthMethodCreate) SetTenantID(v int64) *ProxyUserAuthMethodCreate {
-	_c.mutation.SetTenantID(v)
-	return _c
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_c *ProxyUserAuthMethodCreate) SetNillableTenantID(v *int64) *ProxyUserAuthMethodCreate {
-	if v != nil {
-		_c.SetTenantID(*v)
-	}
-	return _c
-}
-
 // SetAuthType sets the "auth_type" field.
 func (_c *ProxyUserAuthMethodCreate) SetAuthType(v string) *ProxyUserAuthMethodCreate {
 	_c.mutation.SetAuthType(v)
@@ -135,10 +121,6 @@ func (_c *ProxyUserAuthMethodCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxyUserAuthMethodCreate) defaults() {
-	if _, ok := _c.mutation.TenantID(); !ok {
-		v := proxyuserauthmethod.DefaultTenantID
-		_c.mutation.SetTenantID(v)
-	}
 	if _, ok := _c.mutation.Verified(); !ok {
 		v := proxyuserauthmethod.DefaultVerified
 		_c.mutation.SetVerified(v)
@@ -157,9 +139,6 @@ func (_c *ProxyUserAuthMethodCreate) defaults() {
 func (_c *ProxyUserAuthMethodCreate) check() error {
 	if _, ok := _c.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "ProxyUserAuthMethod.user_id"`)}
-	}
-	if _, ok := _c.mutation.TenantID(); !ok {
-		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "ProxyUserAuthMethod.tenant_id"`)}
 	}
 	if _, ok := _c.mutation.AuthType(); !ok {
 		return &ValidationError{Name: "auth_type", err: errors.New(`ent: missing required field "ProxyUserAuthMethod.auth_type"`)}
@@ -226,10 +205,6 @@ func (_c *ProxyUserAuthMethodCreate) createSpec() (*ProxyUserAuthMethod, *sqlgra
 	if value, ok := _c.mutation.UserID(); ok {
 		_spec.SetField(proxyuserauthmethod.FieldUserID, field.TypeInt64, value)
 		_node.UserID = value
-	}
-	if value, ok := _c.mutation.TenantID(); ok {
-		_spec.SetField(proxyuserauthmethod.FieldTenantID, field.TypeInt64, value)
-		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.AuthType(); ok {
 		_spec.SetField(proxyuserauthmethod.FieldAuthType, field.TypeString, value)

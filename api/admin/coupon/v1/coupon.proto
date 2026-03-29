@@ -50,16 +50,17 @@ service CouponService {
 
 // CreateCouponRequest 创建优惠券请求
 message CreateCouponRequest {
-  string name = 1;              // 优惠券名称
-  string code = 2;              // 优惠券代码（可选，为空则自动生成）
-  int32 count = 3;              // 数量限制
-  int32 type = 4;               // 类型：1：百分比 2：固定金额
-  string discount = 5;           // 折扣
-  string start_time = 6;         // 开始时间（Unix时间戳）
-  string expire_time = 7;        // 过期时间（Unix时间戳）
-  int32 user_limit = 8;         // 用户限制
-  repeated int32 subscribe = 9; // 订阅限制（订阅ID列表）
-  bool enable = 10;             // 启用
+  string name = 1;                // 优惠券名称
+  string code = 2;                // 优惠券代码（可选，为空则自动生成）
+  int64 count = 3;                // 数量限制
+  int32 type = 4;                 // 类型：1：百分比 2：固定金额
+  int64 discount = 5;             // 折扣（分）
+  int64 start_time = 6;           // 开始时间（Unix时间戳，秒）
+  int64 expire_time = 7;          // 过期时间（Unix时间戳，秒）
+  int64 user_limit = 8;           // 用户限制
+  repeated int64 subscribe = 9;   // 订阅限制（订阅ID列表）
+  int64 used_count = 10;          // 已使用数量
+  optional bool enable = 11;      // 启用
 }
 
 // CreateCouponReply 创建优惠券响应
@@ -70,17 +71,18 @@ message CreateCouponReply {
 
 // UpdateCouponRequest 更新优惠券请求
 message UpdateCouponRequest {
-  string id = 1;                 // 优惠券ID
-  string name = 2;              // 优惠券名称
-  string code = 3;              // 优惠券代码
-  int32 count = 4;              // 数量限制
-  int32 type = 5;               // 类型
-  string discount = 6;           // 折扣
-  string start_time = 7;         // 开始时间
-  string expire_time = 8;        // 过期时间
-  int32 user_limit = 9;        // 用户限制
-  repeated int32 subscribe = 10; // 订阅限制
-  bool enable = 11;             // 启用
+  int64 id = 1;                   // 优惠券ID
+  string name = 2;                // 优惠券名称
+  string code = 3;                // 优惠券代码
+  int64 count = 4;                // 数量限制
+  int32 type = 5;                 // 类型
+  int64 discount = 6;             // 折扣（分）
+  int64 start_time = 7;           // 开始时间
+  int64 expire_time = 8;          // 过期时间
+  int64 user_limit = 9;           // 用户限制
+  repeated int64 subscribe = 10;  // 订阅限制
+  int64 used_count = 11;          // 已使用数量
+  optional bool enable = 12;      // 启用
 }
 
 // UpdateCouponReply 更新优惠券响应
@@ -91,7 +93,7 @@ message UpdateCouponReply {
 
 // DeleteCouponRequest 删除优惠券请求
 message DeleteCouponRequest {
-  string id = 1;        // 优惠券ID
+  int64 id = 1;  // 优惠券ID
 }
 
 // DeleteCouponReply 删除优惠券响应
@@ -102,7 +104,7 @@ message DeleteCouponReply {
 
 // BatchDeleteCouponRequest 批量删除优惠券请求
 message BatchDeleteCouponRequest {
-  repeated int32 ids = 1;   // 优惠券ID列表
+  repeated int64 ids = 1;  // 优惠券ID列表
 }
 
 // BatchDeleteCouponReply 批量删除优惠券响应
@@ -113,16 +115,16 @@ message BatchDeleteCouponReply {
 
 // GetCouponListRequest 获取优惠券列表请求
 message GetCouponListRequest {
-  int32 page = 1;       // 页码
-  int32 size = 2;       // 每页数量
-  int32 subscribe = 3;  // 订阅筛选
-  string search = 4;    // 搜索关键字
+  int64 page = 1;      // 页码
+  int64 size = 2;      // 每页数量
+  int64 subscribe = 3; // 订阅筛选
+  string search = 4;   // 搜索关键字
 }
 
 // GetCouponListData 获取优惠券列表数据
 message GetCouponListData {
   repeated CouponItem list = 1;  // 优惠券列表
-  int32 total = 2;                // 总数
+  int64 total = 2;               // 总数
 }
 
 // GetCouponListReply 获取优惠券列表响应
@@ -134,18 +136,18 @@ message GetCouponListReply {
 
 // CouponItem 优惠券项
 message CouponItem {
-  string id = 1;                   // 优惠券ID
-  string name = 2;                // 优惠券名称
-  string code = 3;                // 优惠券代码
-  int32 count = 4;                // 数量限制
-  int32 type = 5;                 // 类型
-  string discount = 6;             // 折扣
-  string start_time = 7;           // 开始时间
-  string expire_time = 8;          // 过期时间
-  int32 user_limit = 9;           // 用户限制
-  repeated int32 subscribe = 10;  // 订阅限制
-  int32 used_count = 11;          // 已使用数量
-  bool enable = 12;               // 启用
-  string created_at = 13;          // 创建时间
-  string updated_at = 14;          // 更新时间
+  int64 id = 1;                    // 优惠券ID
+  string name = 2;                 // 优惠券名称
+  string code = 3;                 // 优惠券代码
+  int64 count = 4;                 // 数量限制
+  int32 type = 5;                  // 类型
+  int64 discount = 6;              // 折扣（分）
+  int64 start_time = 7;            // 开始时间（Unix时间戳，秒）
+  int64 expire_time = 8;           // 过期时间（Unix时间戳，秒）
+  int64 user_limit = 9;            // 用户限制
+  repeated int64 subscribe = 10;   // 订阅限制
+  int64 used_count = 11;           // 已使用数量
+  bool enable = 12;                // 启用
+  int64 created_at = 13;           // 创建时间（Unix时间戳，秒）
+  int64 updated_at = 14;           // 更新时间（Unix时间戳，秒）
 }

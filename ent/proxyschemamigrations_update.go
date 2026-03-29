@@ -27,20 +27,6 @@ func (_u *ProxySchemaMigrationsUpdate) Where(ps ...predicate.ProxySchemaMigratio
 	return _u
 }
 
-// SetVersion sets the "version" field.
-func (_u *ProxySchemaMigrationsUpdate) SetVersion(v string) *ProxySchemaMigrationsUpdate {
-	_u.mutation.SetVersion(v)
-	return _u
-}
-
-// SetNillableVersion sets the "version" field if the given value is not nil.
-func (_u *ProxySchemaMigrationsUpdate) SetNillableVersion(v *string) *ProxySchemaMigrationsUpdate {
-	if v != nil {
-		_u.SetVersion(*v)
-	}
-	return _u
-}
-
 // SetDirty sets the "dirty" field.
 func (_u *ProxySchemaMigrationsUpdate) SetDirty(v bool) *ProxySchemaMigrationsUpdate {
 	_u.mutation.SetDirty(v)
@@ -88,16 +74,13 @@ func (_u *ProxySchemaMigrationsUpdate) ExecX(ctx context.Context) {
 }
 
 func (_u *ProxySchemaMigrationsUpdate) sqlSave(ctx context.Context) (_node int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(proxyschemamigrations.Table, proxyschemamigrations.Columns, sqlgraph.NewFieldSpec(proxyschemamigrations.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyschemamigrations.Table, proxyschemamigrations.Columns, sqlgraph.NewFieldSpec(proxyschemamigrations.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := _u.mutation.Version(); ok {
-		_spec.SetField(proxyschemamigrations.FieldVersion, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Dirty(); ok {
 		_spec.SetField(proxyschemamigrations.FieldDirty, field.TypeBool, value)
@@ -120,20 +103,6 @@ type ProxySchemaMigrationsUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxySchemaMigrationsMutation
-}
-
-// SetVersion sets the "version" field.
-func (_u *ProxySchemaMigrationsUpdateOne) SetVersion(v string) *ProxySchemaMigrationsUpdateOne {
-	_u.mutation.SetVersion(v)
-	return _u
-}
-
-// SetNillableVersion sets the "version" field if the given value is not nil.
-func (_u *ProxySchemaMigrationsUpdateOne) SetNillableVersion(v *string) *ProxySchemaMigrationsUpdateOne {
-	if v != nil {
-		_u.SetVersion(*v)
-	}
-	return _u
 }
 
 // SetDirty sets the "dirty" field.
@@ -196,7 +165,7 @@ func (_u *ProxySchemaMigrationsUpdateOne) ExecX(ctx context.Context) {
 }
 
 func (_u *ProxySchemaMigrationsUpdateOne) sqlSave(ctx context.Context) (_node *ProxySchemaMigrations, err error) {
-	_spec := sqlgraph.NewUpdateSpec(proxyschemamigrations.Table, proxyschemamigrations.Columns, sqlgraph.NewFieldSpec(proxyschemamigrations.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(proxyschemamigrations.Table, proxyschemamigrations.Columns, sqlgraph.NewFieldSpec(proxyschemamigrations.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "ProxySchemaMigrations.id" for update`)}
@@ -220,9 +189,6 @@ func (_u *ProxySchemaMigrationsUpdateOne) sqlSave(ctx context.Context) (_node *P
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := _u.mutation.Version(); ok {
-		_spec.SetField(proxyschemamigrations.FieldVersion, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Dirty(); ok {
 		_spec.SetField(proxyschemamigrations.FieldDirty, field.TypeBool, value)

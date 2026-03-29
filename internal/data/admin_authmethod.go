@@ -64,6 +64,7 @@ func (r *adminAuthMethodRepo) Update(ctx context.Context, auth *authmethodbiz.Au
 			if err != nil {
 				return nil, err
 			}
+			syncRuntimeAppConfig(ctx, r.data.db, r.data.conf, r.log)
 			return r.convertToModel(po), nil
 		}
 		return nil, err
@@ -79,6 +80,8 @@ func (r *adminAuthMethodRepo) Update(ctx context.Context, auth *authmethodbiz.Au
 	if err != nil {
 		return nil, err
 	}
+
+	syncRuntimeAppConfig(ctx, r.data.db, r.data.conf, r.log)
 
 	return r.convertToModel(po), nil
 }

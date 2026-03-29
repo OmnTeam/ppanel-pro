@@ -28,27 +28,6 @@ func (_u *ProxyOrderUpdate) Where(ps ...predicate.ProxyOrder) *ProxyOrderUpdate 
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyOrderUpdate) SetTenantID(v int64) *ProxyOrderUpdate {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyOrderUpdate) SetNillableTenantID(v *int64) *ProxyOrderUpdate {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyOrderUpdate) AddTenantID(v int64) *ProxyOrderUpdate {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
 // SetParentID sets the "parent_id" field.
 func (_u *ProxyOrderUpdate) SetParentID(v int64) *ProxyOrderUpdate {
 	_u.mutation.ResetParentID()
@@ -195,6 +174,27 @@ func (_u *ProxyOrderUpdate) AddAmount(v int64) *ProxyOrderUpdate {
 	return _u
 }
 
+// SetGiftAmount sets the "gift_amount" field.
+func (_u *ProxyOrderUpdate) SetGiftAmount(v int64) *ProxyOrderUpdate {
+	_u.mutation.ResetGiftAmount()
+	_u.mutation.SetGiftAmount(v)
+	return _u
+}
+
+// SetNillableGiftAmount sets the "gift_amount" field if the given value is not nil.
+func (_u *ProxyOrderUpdate) SetNillableGiftAmount(v *int64) *ProxyOrderUpdate {
+	if v != nil {
+		_u.SetGiftAmount(*v)
+	}
+	return _u
+}
+
+// AddGiftAmount adds value to the "gift_amount" field.
+func (_u *ProxyOrderUpdate) AddGiftAmount(v int64) *ProxyOrderUpdate {
+	_u.mutation.AddGiftAmount(v)
+	return _u
+}
+
 // SetDiscount sets the "discount" field.
 func (_u *ProxyOrderUpdate) SetDiscount(v int64) *ProxyOrderUpdate {
 	_u.mutation.ResetDiscount()
@@ -278,48 +278,6 @@ func (_u *ProxyOrderUpdate) AddCommission(v int64) *ProxyOrderUpdate {
 	return _u
 }
 
-// SetFeeAmount sets the "fee_amount" field.
-func (_u *ProxyOrderUpdate) SetFeeAmount(v int64) *ProxyOrderUpdate {
-	_u.mutation.ResetFeeAmount()
-	_u.mutation.SetFeeAmount(v)
-	return _u
-}
-
-// SetNillableFeeAmount sets the "fee_amount" field if the given value is not nil.
-func (_u *ProxyOrderUpdate) SetNillableFeeAmount(v *int64) *ProxyOrderUpdate {
-	if v != nil {
-		_u.SetFeeAmount(*v)
-	}
-	return _u
-}
-
-// AddFeeAmount adds value to the "fee_amount" field.
-func (_u *ProxyOrderUpdate) AddFeeAmount(v int64) *ProxyOrderUpdate {
-	_u.mutation.AddFeeAmount(v)
-	return _u
-}
-
-// SetGiftAmount sets the "gift_amount" field.
-func (_u *ProxyOrderUpdate) SetGiftAmount(v int64) *ProxyOrderUpdate {
-	_u.mutation.ResetGiftAmount()
-	_u.mutation.SetGiftAmount(v)
-	return _u
-}
-
-// SetNillableGiftAmount sets the "gift_amount" field if the given value is not nil.
-func (_u *ProxyOrderUpdate) SetNillableGiftAmount(v *int64) *ProxyOrderUpdate {
-	if v != nil {
-		_u.SetGiftAmount(*v)
-	}
-	return _u
-}
-
-// AddGiftAmount adds value to the "gift_amount" field.
-func (_u *ProxyOrderUpdate) AddGiftAmount(v int64) *ProxyOrderUpdate {
-	_u.mutation.AddGiftAmount(v)
-	return _u
-}
-
 // SetPaymentID sets the "payment_id" field.
 func (_u *ProxyOrderUpdate) SetPaymentID(v int64) *ProxyOrderUpdate {
 	_u.mutation.ResetPaymentID()
@@ -355,9 +313,24 @@ func (_u *ProxyOrderUpdate) SetNillableMethod(v *string) *ProxyOrderUpdate {
 	return _u
 }
 
-// ClearMethod clears the value of the "method" field.
-func (_u *ProxyOrderUpdate) ClearMethod() *ProxyOrderUpdate {
-	_u.mutation.ClearMethod()
+// SetFeeAmount sets the "fee_amount" field.
+func (_u *ProxyOrderUpdate) SetFeeAmount(v int64) *ProxyOrderUpdate {
+	_u.mutation.ResetFeeAmount()
+	_u.mutation.SetFeeAmount(v)
+	return _u
+}
+
+// SetNillableFeeAmount sets the "fee_amount" field if the given value is not nil.
+func (_u *ProxyOrderUpdate) SetNillableFeeAmount(v *int64) *ProxyOrderUpdate {
+	if v != nil {
+		_u.SetFeeAmount(*v)
+	}
+	return _u
+}
+
+// AddFeeAmount adds value to the "fee_amount" field.
+func (_u *ProxyOrderUpdate) AddFeeAmount(v int64) *ProxyOrderUpdate {
+	_u.mutation.AddFeeAmount(v)
 	return _u
 }
 
@@ -546,12 +519,6 @@ func (_u *ProxyOrderUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 			}
 		}
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyorder.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyorder.FieldTenantID, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.ParentID(); ok {
 		_spec.SetField(proxyorder.FieldParentID, field.TypeInt64, value)
 	}
@@ -594,6 +561,12 @@ func (_u *ProxyOrderUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	if value, ok := _u.mutation.AddedAmount(); ok {
 		_spec.AddField(proxyorder.FieldAmount, field.TypeInt64, value)
 	}
+	if value, ok := _u.mutation.GiftAmount(); ok {
+		_spec.SetField(proxyorder.FieldGiftAmount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedGiftAmount(); ok {
+		_spec.AddField(proxyorder.FieldGiftAmount, field.TypeInt64, value)
+	}
 	if value, ok := _u.mutation.Discount(); ok {
 		_spec.SetField(proxyorder.FieldDiscount, field.TypeInt64, value)
 	}
@@ -618,18 +591,6 @@ func (_u *ProxyOrderUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	if value, ok := _u.mutation.AddedCommission(); ok {
 		_spec.AddField(proxyorder.FieldCommission, field.TypeInt64, value)
 	}
-	if value, ok := _u.mutation.FeeAmount(); ok {
-		_spec.SetField(proxyorder.FieldFeeAmount, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedFeeAmount(); ok {
-		_spec.AddField(proxyorder.FieldFeeAmount, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.GiftAmount(); ok {
-		_spec.SetField(proxyorder.FieldGiftAmount, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedGiftAmount(); ok {
-		_spec.AddField(proxyorder.FieldGiftAmount, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.PaymentID(); ok {
 		_spec.SetField(proxyorder.FieldPaymentID, field.TypeInt64, value)
 	}
@@ -639,8 +600,11 @@ func (_u *ProxyOrderUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 	if value, ok := _u.mutation.Method(); ok {
 		_spec.SetField(proxyorder.FieldMethod, field.TypeString, value)
 	}
-	if _u.mutation.MethodCleared() {
-		_spec.ClearField(proxyorder.FieldMethod, field.TypeString)
+	if value, ok := _u.mutation.FeeAmount(); ok {
+		_spec.SetField(proxyorder.FieldFeeAmount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedFeeAmount(); ok {
+		_spec.AddField(proxyorder.FieldFeeAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.TradeNo(); ok {
 		_spec.SetField(proxyorder.FieldTradeNo, field.TypeString, value)
@@ -690,27 +654,6 @@ type ProxyOrderUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxyOrderMutation
-}
-
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyOrderUpdateOne) SetTenantID(v int64) *ProxyOrderUpdateOne {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyOrderUpdateOne) SetNillableTenantID(v *int64) *ProxyOrderUpdateOne {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyOrderUpdateOne) AddTenantID(v int64) *ProxyOrderUpdateOne {
-	_u.mutation.AddTenantID(v)
-	return _u
 }
 
 // SetParentID sets the "parent_id" field.
@@ -859,6 +802,27 @@ func (_u *ProxyOrderUpdateOne) AddAmount(v int64) *ProxyOrderUpdateOne {
 	return _u
 }
 
+// SetGiftAmount sets the "gift_amount" field.
+func (_u *ProxyOrderUpdateOne) SetGiftAmount(v int64) *ProxyOrderUpdateOne {
+	_u.mutation.ResetGiftAmount()
+	_u.mutation.SetGiftAmount(v)
+	return _u
+}
+
+// SetNillableGiftAmount sets the "gift_amount" field if the given value is not nil.
+func (_u *ProxyOrderUpdateOne) SetNillableGiftAmount(v *int64) *ProxyOrderUpdateOne {
+	if v != nil {
+		_u.SetGiftAmount(*v)
+	}
+	return _u
+}
+
+// AddGiftAmount adds value to the "gift_amount" field.
+func (_u *ProxyOrderUpdateOne) AddGiftAmount(v int64) *ProxyOrderUpdateOne {
+	_u.mutation.AddGiftAmount(v)
+	return _u
+}
+
 // SetDiscount sets the "discount" field.
 func (_u *ProxyOrderUpdateOne) SetDiscount(v int64) *ProxyOrderUpdateOne {
 	_u.mutation.ResetDiscount()
@@ -942,48 +906,6 @@ func (_u *ProxyOrderUpdateOne) AddCommission(v int64) *ProxyOrderUpdateOne {
 	return _u
 }
 
-// SetFeeAmount sets the "fee_amount" field.
-func (_u *ProxyOrderUpdateOne) SetFeeAmount(v int64) *ProxyOrderUpdateOne {
-	_u.mutation.ResetFeeAmount()
-	_u.mutation.SetFeeAmount(v)
-	return _u
-}
-
-// SetNillableFeeAmount sets the "fee_amount" field if the given value is not nil.
-func (_u *ProxyOrderUpdateOne) SetNillableFeeAmount(v *int64) *ProxyOrderUpdateOne {
-	if v != nil {
-		_u.SetFeeAmount(*v)
-	}
-	return _u
-}
-
-// AddFeeAmount adds value to the "fee_amount" field.
-func (_u *ProxyOrderUpdateOne) AddFeeAmount(v int64) *ProxyOrderUpdateOne {
-	_u.mutation.AddFeeAmount(v)
-	return _u
-}
-
-// SetGiftAmount sets the "gift_amount" field.
-func (_u *ProxyOrderUpdateOne) SetGiftAmount(v int64) *ProxyOrderUpdateOne {
-	_u.mutation.ResetGiftAmount()
-	_u.mutation.SetGiftAmount(v)
-	return _u
-}
-
-// SetNillableGiftAmount sets the "gift_amount" field if the given value is not nil.
-func (_u *ProxyOrderUpdateOne) SetNillableGiftAmount(v *int64) *ProxyOrderUpdateOne {
-	if v != nil {
-		_u.SetGiftAmount(*v)
-	}
-	return _u
-}
-
-// AddGiftAmount adds value to the "gift_amount" field.
-func (_u *ProxyOrderUpdateOne) AddGiftAmount(v int64) *ProxyOrderUpdateOne {
-	_u.mutation.AddGiftAmount(v)
-	return _u
-}
-
 // SetPaymentID sets the "payment_id" field.
 func (_u *ProxyOrderUpdateOne) SetPaymentID(v int64) *ProxyOrderUpdateOne {
 	_u.mutation.ResetPaymentID()
@@ -1019,9 +941,24 @@ func (_u *ProxyOrderUpdateOne) SetNillableMethod(v *string) *ProxyOrderUpdateOne
 	return _u
 }
 
-// ClearMethod clears the value of the "method" field.
-func (_u *ProxyOrderUpdateOne) ClearMethod() *ProxyOrderUpdateOne {
-	_u.mutation.ClearMethod()
+// SetFeeAmount sets the "fee_amount" field.
+func (_u *ProxyOrderUpdateOne) SetFeeAmount(v int64) *ProxyOrderUpdateOne {
+	_u.mutation.ResetFeeAmount()
+	_u.mutation.SetFeeAmount(v)
+	return _u
+}
+
+// SetNillableFeeAmount sets the "fee_amount" field if the given value is not nil.
+func (_u *ProxyOrderUpdateOne) SetNillableFeeAmount(v *int64) *ProxyOrderUpdateOne {
+	if v != nil {
+		_u.SetFeeAmount(*v)
+	}
+	return _u
+}
+
+// AddFeeAmount adds value to the "fee_amount" field.
+func (_u *ProxyOrderUpdateOne) AddFeeAmount(v int64) *ProxyOrderUpdateOne {
+	_u.mutation.AddFeeAmount(v)
 	return _u
 }
 
@@ -1240,12 +1177,6 @@ func (_u *ProxyOrderUpdateOne) sqlSave(ctx context.Context) (_node *ProxyOrder, 
 			}
 		}
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyorder.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyorder.FieldTenantID, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.ParentID(); ok {
 		_spec.SetField(proxyorder.FieldParentID, field.TypeInt64, value)
 	}
@@ -1288,6 +1219,12 @@ func (_u *ProxyOrderUpdateOne) sqlSave(ctx context.Context) (_node *ProxyOrder, 
 	if value, ok := _u.mutation.AddedAmount(); ok {
 		_spec.AddField(proxyorder.FieldAmount, field.TypeInt64, value)
 	}
+	if value, ok := _u.mutation.GiftAmount(); ok {
+		_spec.SetField(proxyorder.FieldGiftAmount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedGiftAmount(); ok {
+		_spec.AddField(proxyorder.FieldGiftAmount, field.TypeInt64, value)
+	}
 	if value, ok := _u.mutation.Discount(); ok {
 		_spec.SetField(proxyorder.FieldDiscount, field.TypeInt64, value)
 	}
@@ -1312,18 +1249,6 @@ func (_u *ProxyOrderUpdateOne) sqlSave(ctx context.Context) (_node *ProxyOrder, 
 	if value, ok := _u.mutation.AddedCommission(); ok {
 		_spec.AddField(proxyorder.FieldCommission, field.TypeInt64, value)
 	}
-	if value, ok := _u.mutation.FeeAmount(); ok {
-		_spec.SetField(proxyorder.FieldFeeAmount, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedFeeAmount(); ok {
-		_spec.AddField(proxyorder.FieldFeeAmount, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.GiftAmount(); ok {
-		_spec.SetField(proxyorder.FieldGiftAmount, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedGiftAmount(); ok {
-		_spec.AddField(proxyorder.FieldGiftAmount, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.PaymentID(); ok {
 		_spec.SetField(proxyorder.FieldPaymentID, field.TypeInt64, value)
 	}
@@ -1333,8 +1258,11 @@ func (_u *ProxyOrderUpdateOne) sqlSave(ctx context.Context) (_node *ProxyOrder, 
 	if value, ok := _u.mutation.Method(); ok {
 		_spec.SetField(proxyorder.FieldMethod, field.TypeString, value)
 	}
-	if _u.mutation.MethodCleared() {
-		_spec.ClearField(proxyorder.FieldMethod, field.TypeString)
+	if value, ok := _u.mutation.FeeAmount(); ok {
+		_spec.SetField(proxyorder.FieldFeeAmount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedFeeAmount(); ok {
+		_spec.AddField(proxyorder.FieldFeeAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.TradeNo(); ok {
 		_spec.SetField(proxyorder.FieldTradeNo, field.TypeString, value)

@@ -28,7 +28,7 @@ type PortalRepo interface {
 	// ⚠️ 包含保存临时订单到Redis的逻辑（复刻原项目事务逻辑）
 	CreatePortalOrder(ctx context.Context, req *CreateOrderRequest) (string, error)
 
-	// GetOrderByNo 根据订单号查询订单（含租户过滤）
+	// GetOrderByNo 根据订单号查询订单
 	GetOrderByNo(ctx context.Context, orderNo string) (*OrderInfo, error)
 
 	// GetTempOrderInfo 获取临时订单信息
@@ -104,7 +104,6 @@ type CreateOrderRequest struct {
 
 // TempOrderInfo 临时订单信息（存储到Redis）
 type TempOrderInfo struct {
-	TenantID   int // ⚠️ 租户ID
 	OrderNo    string
 	Identifier string
 	AuthType   string

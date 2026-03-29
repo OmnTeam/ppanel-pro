@@ -19,23 +19,15 @@ type ProxySchemaMigrationsCreate struct {
 	hooks    []Hook
 }
 
-// SetVersion sets the "version" field.
-func (_c *ProxySchemaMigrationsCreate) SetVersion(v string) *ProxySchemaMigrationsCreate {
-	_c.mutation.SetVersion(v)
-	return _c
-}
-
 // SetDirty sets the "dirty" field.
 func (_c *ProxySchemaMigrationsCreate) SetDirty(v bool) *ProxySchemaMigrationsCreate {
 	_c.mutation.SetDirty(v)
 	return _c
 }
 
-// SetNillableDirty sets the "dirty" field if the given value is not nil.
-func (_c *ProxySchemaMigrationsCreate) SetNillableDirty(v *bool) *ProxySchemaMigrationsCreate {
-	if v != nil {
-		_c.SetDirty(*v)
-	}
+// SetID sets the "id" field.
+func (_c *ProxySchemaMigrationsCreate) SetID(v int64) *ProxySchemaMigrationsCreate {
+	_c.mutation.SetID(v)
 	return _c
 }
 
@@ -46,7 +38,6 @@ func (_c *ProxySchemaMigrationsCreate) Mutation() *ProxySchemaMigrationsMutation
 
 // Save creates the ProxySchemaMigrations in the database.
 func (_c *ProxySchemaMigrationsCreate) Save(ctx context.Context) (*ProxySchemaMigrations, error) {
-	_c.defaults()
 	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
@@ -72,19 +63,8 @@ func (_c *ProxySchemaMigrationsCreate) ExecX(ctx context.Context) {
 	}
 }
 
-// defaults sets the default values of the builder before save.
-func (_c *ProxySchemaMigrationsCreate) defaults() {
-	if _, ok := _c.mutation.Dirty(); !ok {
-		v := proxyschemamigrations.DefaultDirty
-		_c.mutation.SetDirty(v)
-	}
-}
-
 // check runs all checks and user-defined validators on the builder.
 func (_c *ProxySchemaMigrationsCreate) check() error {
-	if _, ok := _c.mutation.Version(); !ok {
-		return &ValidationError{Name: "version", err: errors.New(`ent: missing required field "ProxySchemaMigrations.version"`)}
-	}
 	if _, ok := _c.mutation.Dirty(); !ok {
 		return &ValidationError{Name: "dirty", err: errors.New(`ent: missing required field "ProxySchemaMigrations.dirty"`)}
 	}
@@ -102,8 +82,10 @@ func (_c *ProxySchemaMigrationsCreate) sqlSave(ctx context.Context) (*ProxySchem
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != _node.ID {
+		id := _spec.ID.Value.(int64)
+		_node.ID = int64(id)
+	}
 	_c.mutation.id = &_node.ID
 	_c.mutation.done = true
 	return _node, nil
@@ -112,11 +94,11 @@ func (_c *ProxySchemaMigrationsCreate) sqlSave(ctx context.Context) (*ProxySchem
 func (_c *ProxySchemaMigrationsCreate) createSpec() (*ProxySchemaMigrations, *sqlgraph.CreateSpec) {
 	var (
 		_node = &ProxySchemaMigrations{config: _c.config}
-		_spec = sqlgraph.NewCreateSpec(proxyschemamigrations.Table, sqlgraph.NewFieldSpec(proxyschemamigrations.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(proxyschemamigrations.Table, sqlgraph.NewFieldSpec(proxyschemamigrations.FieldID, field.TypeInt64))
 	)
-	if value, ok := _c.mutation.Version(); ok {
-		_spec.SetField(proxyschemamigrations.FieldVersion, field.TypeString, value)
-		_node.Version = value
+	if id, ok := _c.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
 	}
 	if value, ok := _c.mutation.Dirty(); ok {
 		_spec.SetField(proxyschemamigrations.FieldDirty, field.TypeBool, value)
@@ -143,7 +125,6 @@ func (_c *ProxySchemaMigrationsCreateBulk) Save(ctx context.Context) ([]*ProxySc
 	for i := range _c.builders {
 		func(i int, root context.Context) {
 			builder := _c.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ProxySchemaMigrationsMutation)
 				if !ok {
@@ -170,9 +151,9 @@ func (_c *ProxySchemaMigrationsCreateBulk) Save(ctx context.Context) ([]*ProxySc
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
+				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
 					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
+					nodes[i].ID = int64(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

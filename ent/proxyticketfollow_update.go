@@ -150,7 +150,20 @@ func (_u *ProxyTicketFollowUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *ProxyTicketFollowUpdate) check() error {
+	if v, ok := _u.mutation.From(); ok {
+		if err := proxyticketfollow.FromValidator(v); err != nil {
+			return &ValidationError{Name: "from", err: fmt.Errorf(`ent: validator failed for field "ProxyTicketFollow.from": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (_u *ProxyTicketFollowUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(proxyticketfollow.Table, proxyticketfollow.Columns, sqlgraph.NewFieldSpec(proxyticketfollow.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -338,7 +351,20 @@ func (_u *ProxyTicketFollowUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *ProxyTicketFollowUpdateOne) check() error {
+	if v, ok := _u.mutation.From(); ok {
+		if err := proxyticketfollow.FromValidator(v); err != nil {
+			return &ValidationError{Name: "from", err: fmt.Errorf(`ent: validator failed for field "ProxyTicketFollow.from": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (_u *ProxyTicketFollowUpdateOne) sqlSave(ctx context.Context) (_node *ProxyTicketFollow, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(proxyticketfollow.Table, proxyticketfollow.Columns, sqlgraph.NewFieldSpec(proxyticketfollow.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {

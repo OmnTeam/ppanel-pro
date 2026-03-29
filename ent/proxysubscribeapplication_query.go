@@ -262,12 +262,12 @@ func (_q *ProxySubscribeApplicationQuery) Clone() *ProxySubscribeApplicationQuer
 // Example:
 //
 //	var v []struct {
-//		TenantID int64 `json:"tenant_id,omitempty"`
+//		Name string `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ProxySubscribeApplication.Query().
-//		GroupBy(proxysubscribeapplication.FieldTenantID).
+//		GroupBy(proxysubscribeapplication.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *ProxySubscribeApplicationQuery) GroupBy(field string, fields ...string) *ProxySubscribeApplicationGroupBy {
@@ -285,11 +285,11 @@ func (_q *ProxySubscribeApplicationQuery) GroupBy(field string, fields ...string
 // Example:
 //
 //	var v []struct {
-//		TenantID int64 `json:"tenant_id,omitempty"`
+//		Name string `json:"name,omitempty"`
 //	}
 //
 //	client.ProxySubscribeApplication.Query().
-//		Select(proxysubscribeapplication.FieldTenantID).
+//		Select(proxysubscribeapplication.FieldName).
 //		Scan(ctx, &v)
 func (_q *ProxySubscribeApplicationQuery) Select(fields ...string) *ProxySubscribeApplicationSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

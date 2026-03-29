@@ -2,9 +2,6 @@ package server
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
-	"fmt"
 
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
@@ -12,6 +9,7 @@ import (
 
 // ServerNodeRepo 节点服务器仓储接口
 type ServerNodeRepo interface {
+	GetNodeSecret(ctx context.Context) (string, error)
 	GetServerConfig(ctx context.Context, serverID int64, protocol string) (*ServerConfig, error)
 	GetServerUserList(ctx context.Context, serverID int64, protocol string) ([]*ServerUser, error)
 	PushUserTraffic(ctx context.Context, req *PushUserTrafficRequest) error
@@ -122,18 +120,24 @@ func NewServerNodeUsecase(repo ServerNodeRepo, logger log.Logger) *ServerNodeUse
 }
 
 // validateSecretKey 验证密钥
-func (uc *ServerNodeUsecase) validateSecretKey(serverID int64, secretKey string) bool {
-	// 简单的密钥验证逻辑
-	// 实际生产环境应该使用更安全的方式
-	expectedKey := fmt.Sprintf("server_%d", serverID)
-	hash := md5.Sum([]byte(expectedKey))
-	return hex.EncodeToString(hash[:]) == secretKey
+// 老项目语义：直接比对运行时 NodeSecret，而不是按 server_id 派生。
+func (uc *ServerNodeUsecase) validateSecretKey(ctx context.Context, secretKey string) (bool, error) {
+	expectedKey, err := uc.repo.GetNodeSecret(ctx)
+	if err != nil {
+		return false, err
+	}
+	return expectedKey == secretKey, nil
 }
 
 // GetServerConfig 获取服务器配置
 func (uc *ServerNodeUsecase) GetServerConfig(ctx context.Context, serverID int64, protocol, secretKey string) (*ServerConfig, error) {
 	// 验证密钥
-	if !uc.validateSecretKey(serverID, secretKey) {
+	valid, err := uc.validateSecretKey(ctx, secretKey)
+	if err != nil {
+		uc.logger.Errorf("Load node secret failed: %v", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if !valid {
 		uc.logger.Errorf("Invalid secret key for server %d", serverID)
 		return nil, responsecode.ErrUnauthorized()
 	}
@@ -150,7 +154,12 @@ func (uc *ServerNodeUsecase) GetServerConfig(ctx context.Context, serverID int64
 // GetServerUserList 获取服务器用户列表
 func (uc *ServerNodeUsecase) GetServerUserList(ctx context.Context, serverID int64, protocol, secretKey string) ([]*ServerUser, error) {
 	// 验证密钥
-	if !uc.validateSecretKey(serverID, secretKey) {
+	valid, err := uc.validateSecretKey(ctx, secretKey)
+	if err != nil {
+		uc.logger.Errorf("Load node secret failed: %v", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if !valid {
 		uc.logger.Errorf("Invalid secret key for server %d", serverID)
 		return nil, responsecode.ErrUnauthorized()
 	}
@@ -167,12 +176,17 @@ func (uc *ServerNodeUsecase) GetServerUserList(ctx context.Context, serverID int
 // PushUserTraffic 推送用户流量
 func (uc *ServerNodeUsecase) PushUserTraffic(ctx context.Context, req *PushUserTrafficRequest) error {
 	// 验证密钥
-	if !uc.validateSecretKey(req.ServerID, req.SecretKey) {
+	valid, err := uc.validateSecretKey(ctx, req.SecretKey)
+	if err != nil {
+		uc.logger.Errorf("Load node secret failed: %v", err)
+		return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if !valid {
 		uc.logger.Errorf("Invalid secret key for server %d", req.ServerID)
 		return responsecode.ErrUnauthorized()
 	}
 
-	err := uc.repo.PushUserTraffic(ctx, req)
+	err = uc.repo.PushUserTraffic(ctx, req)
 	if err != nil {
 		uc.logger.Errorf("PushUserTraffic failed: %v", err)
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
@@ -184,12 +198,17 @@ func (uc *ServerNodeUsecase) PushUserTraffic(ctx context.Context, req *PushUserT
 // PushServerStatus 推送服务器状态
 func (uc *ServerNodeUsecase) PushServerStatus(ctx context.Context, req *PushServerStatusRequest) error {
 	// 验证密钥
-	if !uc.validateSecretKey(req.ServerID, req.SecretKey) {
+	valid, err := uc.validateSecretKey(ctx, req.SecretKey)
+	if err != nil {
+		uc.logger.Errorf("Load node secret failed: %v", err)
+		return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if !valid {
 		uc.logger.Errorf("Invalid secret key for server %d", req.ServerID)
 		return responsecode.ErrUnauthorized()
 	}
 
-	err := uc.repo.PushServerStatus(ctx, req)
+	err = uc.repo.PushServerStatus(ctx, req)
 	if err != nil {
 		uc.logger.Errorf("PushServerStatus failed: %v", err)
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
@@ -201,12 +220,17 @@ func (uc *ServerNodeUsecase) PushServerStatus(ctx context.Context, req *PushServ
 // PushOnlineUsers 推送在线用户
 func (uc *ServerNodeUsecase) PushOnlineUsers(ctx context.Context, req *PushOnlineUsersRequest) error {
 	// 验证密钥
-	if !uc.validateSecretKey(req.ServerID, req.SecretKey) {
+	valid, err := uc.validateSecretKey(ctx, req.SecretKey)
+	if err != nil {
+		uc.logger.Errorf("Load node secret failed: %v", err)
+		return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if !valid {
 		uc.logger.Errorf("Invalid secret key for server %d", req.ServerID)
 		return responsecode.ErrUnauthorized()
 	}
 
-	err := uc.repo.PushOnlineUsers(ctx, req)
+	err = uc.repo.PushOnlineUsers(ctx, req)
 	if err != nil {
 		uc.logger.Errorf("PushOnlineUsers failed: %v", err)
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
@@ -218,7 +242,12 @@ func (uc *ServerNodeUsecase) PushOnlineUsers(ctx context.Context, req *PushOnlin
 // QueryServerProtocolConfig 查询服务器协议配置
 func (uc *ServerNodeUsecase) QueryServerProtocolConfig(ctx context.Context, serverID int64, secretKey string, protocols []string) (*ProtocolConfig, error) {
 	// 验证密钥
-	if !uc.validateSecretKey(serverID, secretKey) {
+	valid, err := uc.validateSecretKey(ctx, secretKey)
+	if err != nil {
+		uc.logger.Errorf("Load node secret failed: %v", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if !valid {
 		uc.logger.Errorf("Invalid secret key for server %d", serverID)
 		return nil, responsecode.ErrUnauthorized()
 	}

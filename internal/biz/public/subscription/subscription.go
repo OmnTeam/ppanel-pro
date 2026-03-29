@@ -1,0 +1,424 @@
+package subscription
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"net/url"
+	"strconv"
+	"strings"
+	"time"
+
+	v1 "github.com/OmnTeam/ppanel-pro/api/public/subscription/v1"
+	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+)
+
+var ErrLegacyAccessDenied = errors.New("access denied")
+
+// SubscriptionRepo 订阅配置数据仓库接口
+type SubscriptionRepo interface {
+	// ValidateTokenAndGetSubscribe 验证token并获取用户订阅信息
+	ValidateTokenAndGetSubscribe(ctx context.Context, token string) (*UserSubscribe, error)
+
+	// GetAvailableNodes 获取可用节点列表
+	GetAvailableNodes(ctx context.Context, userSubscribe *UserSubscribe) ([]*NodeInfo, error)
+
+	// GetUserInfo 获取用户信息
+	GetUserInfo(ctx context.Context, userID int64) (*UserInfo, error)
+
+	// GetSubscribeInfo 获取订阅信息头
+	GetSubscribeInfo(ctx context.Context, userSubscribe *UserSubscribe) string
+
+	// UpdateSubscribeLog 更新订阅活动日志
+	UpdateSubscribeLog(ctx context.Context, userSubscribe *UserSubscribe, userAgent, clientIP string) error
+
+	// GetSubscribeApplications 获取所有订阅应用配置
+	GetSubscribeApplications(ctx context.Context) ([]*SubscribeApplication, error)
+
+	// GetSubscribeDomain 获取订阅域名配置（用于生成订阅URL）
+	GetSubscribeDomain(ctx context.Context) string
+
+	// GetSiteName 获取站点名称
+	GetSiteName(ctx context.Context) string
+
+	// GetSubscribeRuntimeConfig 获取订阅运行时配置
+	GetSubscribeRuntimeConfig(ctx context.Context) (*SubscribeRuntimeConfig, error)
+}
+
+// SubscribeApplication 订阅应用配置
+type SubscribeApplication struct {
+	ID                int64
+	Name              string
+	Icon              string
+	Description       string
+	Scheme            string
+	UserAgent         string
+	IsDefault         bool
+	SubscribeTemplate string
+	OutputFormat      string
+	DownloadLink      string
+}
+
+type SubscribeRuntimeConfig struct {
+	PanDomain      bool
+	UserAgentLimit bool
+	UserAgentList  string
+}
+
+// SubscriptionUseCase 订阅配置用例
+type SubscriptionUseCase struct {
+	repo SubscriptionRepo
+}
+
+// NewSubscriptionUseCase 创建订阅配置用例
+func NewSubscriptionUseCase(repo SubscriptionRepo) *SubscriptionUseCase {
+	return &SubscriptionUseCase{
+		repo: repo,
+	}
+}
+
+func (uc *SubscriptionUseCase) GetSubscribeApplications(ctx context.Context) ([]*SubscribeApplication, error) {
+	return uc.repo.GetSubscribeApplications(ctx)
+}
+
+// getSubscribeV2URL 生成订阅URL - 按照原项目逻辑实现
+// requestURI: 请求的URI（例如：/v1/subscribe?token=xxx）
+// requestHost: 请求的Host（例如：example.com）
+// gatewayMode: 是否为网关模式（如果为true，添加/sub前缀）
+func (uc *SubscriptionUseCase) getSubscribeV2URL(ctx context.Context, requestURI, requestHost string, gatewayMode bool) string {
+	uri := requestURI
+	// 如果是网关模式，添加 /sub 前缀
+	if gatewayMode {
+		uri = "/sub" + uri
+	}
+
+	// 使用自定义域名（如果配置了）
+	subscribeDomain := uc.repo.GetSubscribeDomain(ctx)
+	if subscribeDomain != "" {
+		domains := strings.Split(subscribeDomain, "\n")
+		if len(domains) > 0 {
+			return fmt.Sprintf("https://%s%s", strings.TrimSpace(domains[0]), uri)
+		}
+	}
+
+	// 使用当前请求的host
+	return fmt.Sprintf("https://%s%s", requestHost, uri)
+}
+
+func (uc *SubscriptionUseCase) ValidateLegacyRequest(ctx context.Context, token, requestHost, userAgent string, clients []*SubscribeApplication) error {
+	runtimeConfig, err := uc.repo.GetSubscribeRuntimeConfig(ctx)
+	if err != nil || runtimeConfig == nil {
+		return err
+	}
+
+	if runtimeConfig.PanDomain {
+		domainArr := strings.Split(requestHost, ".")
+		if len(domainArr) > 0 {
+			short, err := tool.FixedUniqueString(token, 8, "")
+			if err != nil {
+				return err
+			}
+			if !strings.EqualFold(short, domainArr[0]) {
+				return ErrLegacyAccessDenied
+			}
+		}
+	}
+
+	if runtimeConfig.UserAgentLimit {
+		if strings.TrimSpace(userAgent) == "" {
+			return ErrLegacyAccessDenied
+		}
+
+		clientUserAgents := tool.RemoveDuplicateElements(strings.Split(runtimeConfig.UserAgentList, "\n")...)
+		for _, item := range clients {
+			clientUserAgents = append(clientUserAgents, strings.ToLower(strings.TrimSpace(item.UserAgent)))
+		}
+
+		allow := false
+		for _, keyword := range clientUserAgents {
+			keyword = strings.ToLower(strings.TrimSpace(keyword))
+			if keyword == "" {
+				continue
+			}
+			if strings.Contains(strings.ToLower(userAgent), keyword) {
+				allow = true
+			}
+		}
+
+		if !allow {
+			return ErrLegacyAccessDenied
+		}
+	}
+
+	return nil
+}
+
+// GetSubscribeConfig 获取订阅配置 - 按照原项目逻辑实现
+func (uc *SubscriptionUseCase) GetSubscribeConfig(ctx context.Context, req *v1.GetSubscribeConfigRequest, userAgent, clientIP, requestURI, requestHost string, gatewayMode bool, queryParams map[string]string) (*v1.GetSubscribeConfigReply, error) {
+	// 按照原项目逻辑，使用defer记录日志，并只在成功时记录
+	var subscribeStatus = false
+	var userSubscribe *UserSubscribe
+
+	defer func() {
+		if subscribeStatus && userSubscribe != nil {
+			_ = uc.repo.UpdateSubscribeLog(ctx, userSubscribe, userAgent, clientIP)
+		}
+	}()
+
+	// 1. 查询客户端应用列表
+	clients, err := uc.repo.GetSubscribeApplications(ctx)
+	if err != nil {
+		return &v1.GetSubscribeConfigReply{
+			Code:    50000,
+			Message: "Failed to query client applications",
+		}, nil
+	}
+
+	if err := uc.ValidateLegacyRequest(ctx, req.Token, requestHost, userAgent, clients); err != nil {
+		return nil, err
+	}
+
+	// 2. 根据User-Agent匹配客户端
+	userAgentLower := strings.ToLower(userAgent)
+	var targetApp, defaultApp *SubscribeApplication
+
+	for _, item := range clients {
+		ua := strings.ToLower(item.UserAgent)
+		if item.IsDefault {
+			defaultApp = item
+		}
+
+		if strings.Contains(userAgentLower, ua) {
+			// 特殊处理Stash
+			if strings.Contains(userAgentLower, "stash") && !strings.Contains(ua, "stash") {
+				continue
+			}
+			targetApp = item
+			break
+		}
+	}
+
+	if targetApp == nil {
+		if defaultApp == nil {
+			return &v1.GetSubscribeConfigReply{
+				Code:    40004,
+				Message: "No matching client found",
+			}, nil
+		}
+		targetApp = defaultApp
+	}
+
+	// 3. 验证token并获取用户订阅
+	userSubscribe, err = uc.repo.ValidateTokenAndGetSubscribe(ctx, req.Token)
+	if err != nil {
+		return &v1.GetSubscribeConfigReply{
+			Code:    40001,
+			Message: err.Error(),
+		}, nil
+	}
+
+	// 4. 获取用户信息
+	userInfo, err := uc.repo.GetUserInfo(ctx, userSubscribe.UserID)
+	if err != nil {
+		return &v1.GetSubscribeConfigReply{
+			Code:    50000,
+			Message: "Failed to get user info",
+		}, nil
+	}
+
+	// 5. 构建请求参数（URL参数）
+	params := make(map[string]string, len(queryParams))
+	for key, value := range queryParams {
+		params[key] = value
+	}
+	if req.Target != "" {
+		params["target"] = req.Target
+	}
+	if req.List {
+		params["list"] = "true"
+	}
+	if req.Emoji {
+		params["emoji"] = "true"
+	}
+	if req.Udp {
+		params["udp"] = "true"
+	}
+	if req.Tfo {
+		params["tfo"] = "true"
+	}
+	if req.Scv {
+		params["scv"] = "true"
+	}
+	if req.Sort > 0 {
+		params["sort"] = strconv.FormatInt(int64(req.Sort), 10)
+	}
+	if req.Filter != "" {
+		params["filter"] = req.Filter
+	}
+	if req.Expand {
+		params["expand"] = "true"
+	}
+
+	// 6. 获取可用节点列表（包含分组过滤、过期检查等）
+	nodes, err := uc.repo.GetAvailableNodes(ctx, userSubscribe)
+	if err != nil {
+		return &v1.GetSubscribeConfigReply{
+			Code:    50000,
+			Message: err.Error(),
+		}, nil
+	}
+
+	// 7. 生成订阅URL（按照原项目逻辑）
+	subscribeURL := uc.getSubscribeV2URL(ctx, requestURI, requestHost, gatewayMode)
+
+	// 8. 更新用户信息中的订阅URL
+	userInfo.SubscribeURL = subscribeURL
+	userInfo.Password = userSubscribe.UUID
+	userInfo.Download = userSubscribe.Download
+	userInfo.Upload = userSubscribe.Upload
+	userInfo.Traffic = userSubscribe.Traffic
+	if userSubscribe.ExpireTime > 0 {
+		userInfo.ExpiredAt = time.UnixMilli(userSubscribe.ExpireTime)
+	}
+
+	// 9. 获取站点名称
+	siteName := uc.repo.GetSiteName(ctx)
+
+	// 10. 生成配置文件（使用模板方式）
+	configBytes, err := RenderTemplate(
+		targetApp.SubscribeTemplate,
+		targetApp.OutputFormat,
+		siteName, // 从配置获取站点名称
+		userSubscribe.SubscribeName,
+		nodes,
+		userSubscribe,
+		*userInfo, // 传入包含订阅URL的用户信息
+		params,
+	)
+	if err != nil {
+		return &v1.GetSubscribeConfigReply{
+			Code:    50000,
+			Message: "Failed to generate config: " + err.Error(),
+		}, nil
+	}
+
+	// 8. 获取订阅信息头
+	header := uc.repo.GetSubscribeInfo(ctx, userSubscribe)
+
+	// 9. 确定文件名和Content-Type
+	contentType := ""
+	filename := ""
+	switch strings.ToLower(targetApp.OutputFormat) {
+	case "json", "yaml", "conf":
+		contentType = "application/octet-stream; charset=UTF-8"
+		filename = url.QueryEscape(siteName) + "." + strings.ToLower(targetApp.OutputFormat)
+	}
+
+	// 10. 标记成功（defer会记录日志）
+	subscribeStatus = true
+
+	return &v1.GetSubscribeConfigReply{
+		Code:    0,
+		Message: "success",
+		Data: &v1.GetSubscribeConfigData{
+			Config:      string(configBytes),
+			Header:      header,
+			ContentType: contentType,
+			Filename:    filename,
+		},
+	}, nil
+}
+
+// UserSubscribe 用户订阅信息
+type UserSubscribe struct {
+	ID          int64
+	UserID      int64
+	SubscribeID int64
+	Token       string
+	UUID        string
+	StartTime   int64
+	ExpireTime  int64
+	Traffic     int64
+	Download    int64
+	Upload      int64
+	Status      int
+
+	// 过期期间流量
+	ExpiredDownload int64
+	ExpiredUpload   int64
+
+	// 扩展信息
+	SubscribeName string
+	NodeGroups    []int64
+	NodeTags      []string
+	NodeGroupID   int64
+}
+
+// UserInfo 用户信息
+type UserInfo struct {
+	ID         int64
+	Email      string
+	InviteCode string
+
+	// 扩展信息（用于模板渲染）
+	Password     string    `json:"password"`
+	ExpiredAt    time.Time `json:"expired_at"`
+	Download     int64     `json:"download"`
+	Upload       int64     `json:"upload"`
+	Traffic      int64     `json:"traffic"`
+	SubscribeURL string    `json:"subscribe_url"`
+}
+
+// NodeInfo 节点信息
+type NodeInfo struct {
+	ID          int64
+	Sort        int
+	Name        string
+	Server      string
+	Port        uint16
+	Type        string
+	Tags        []string
+	NodeGroupID int64
+
+	Security                string
+	SNI                     string
+	AllowInsecure           bool
+	Fingerprint             string
+	RealityServerAddr       string
+	RealityServerPort       int
+	RealityPrivateKey       string
+	RealityPublicKey        string
+	RealityShortId          string
+	Transport               string
+	Host                    string
+	Path                    string
+	ServiceName             string
+	Method                  string
+	ServerKey               string
+	Flow                    string
+	HopPorts                string
+	HopInterval             int
+	ObfsPassword            string
+	UpMbps                  int
+	DownMbps                int
+	DisableSNI              bool
+	ReduceRtt               bool
+	UDPRelayMode            string
+	CongestionController    string
+	PaddingScheme           string
+	Multiplex               string
+	XhttpMode               string
+	XhttpExtra              string
+	Encryption              string
+	EncryptionMode          string
+	EncryptionRtt           string
+	EncryptionTicket        string
+	EncryptionServerPadding string
+	EncryptionPrivateKey    string
+	EncryptionClientPadding string
+	EncryptionPassword      string
+	Ratio                   float64
+	CertMode                string
+	CertDNSProvider         string
+	CertDNSEnv              string
+}

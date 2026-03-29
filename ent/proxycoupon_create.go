@@ -20,37 +20,17 @@ type ProxyCouponCreate struct {
 	hooks    []Hook
 }
 
-// SetUserLimit sets the "user_limit" field.
-func (_c *ProxyCouponCreate) SetUserLimit(v int64) *ProxyCouponCreate {
-	_c.mutation.SetUserLimit(v)
-	return _c
-}
-
-// SetNillableUserLimit sets the "user_limit" field if the given value is not nil.
-func (_c *ProxyCouponCreate) SetNillableUserLimit(v *int64) *ProxyCouponCreate {
-	if v != nil {
-		_c.SetUserLimit(*v)
-	}
-	return _c
-}
-
-// SetSubscribe sets the "subscribe" field.
-func (_c *ProxyCouponCreate) SetSubscribe(v string) *ProxyCouponCreate {
-	_c.mutation.SetSubscribe(v)
-	return _c
-}
-
-// SetNillableSubscribe sets the "subscribe" field if the given value is not nil.
-func (_c *ProxyCouponCreate) SetNillableSubscribe(v *string) *ProxyCouponCreate {
-	if v != nil {
-		_c.SetSubscribe(*v)
-	}
-	return _c
-}
-
 // SetName sets the "name" field.
 func (_c *ProxyCouponCreate) SetName(v string) *ProxyCouponCreate {
 	_c.mutation.SetName(v)
+	return _c
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (_c *ProxyCouponCreate) SetNillableName(v *string) *ProxyCouponCreate {
+	if v != nil {
+		_c.SetName(*v)
+	}
 	return _c
 }
 
@@ -103,43 +83,85 @@ func (_c *ProxyCouponCreate) SetNillableDiscount(v *int64) *ProxyCouponCreate {
 }
 
 // SetStartTime sets the "start_time" field.
-func (_c *ProxyCouponCreate) SetStartTime(v time.Time) *ProxyCouponCreate {
+func (_c *ProxyCouponCreate) SetStartTime(v int64) *ProxyCouponCreate {
 	_c.mutation.SetStartTime(v)
 	return _c
 }
 
 // SetNillableStartTime sets the "start_time" field if the given value is not nil.
-func (_c *ProxyCouponCreate) SetNillableStartTime(v *time.Time) *ProxyCouponCreate {
+func (_c *ProxyCouponCreate) SetNillableStartTime(v *int64) *ProxyCouponCreate {
 	if v != nil {
 		_c.SetStartTime(*v)
 	}
 	return _c
 }
 
-// SetEndTime sets the "end_time" field.
-func (_c *ProxyCouponCreate) SetEndTime(v time.Time) *ProxyCouponCreate {
-	_c.mutation.SetEndTime(v)
+// SetExpireTime sets the "expire_time" field.
+func (_c *ProxyCouponCreate) SetExpireTime(v int64) *ProxyCouponCreate {
+	_c.mutation.SetExpireTime(v)
 	return _c
 }
 
-// SetNillableEndTime sets the "end_time" field if the given value is not nil.
-func (_c *ProxyCouponCreate) SetNillableEndTime(v *time.Time) *ProxyCouponCreate {
+// SetNillableExpireTime sets the "expire_time" field if the given value is not nil.
+func (_c *ProxyCouponCreate) SetNillableExpireTime(v *int64) *ProxyCouponCreate {
 	if v != nil {
-		_c.SetEndTime(*v)
+		_c.SetExpireTime(*v)
 	}
 	return _c
 }
 
-// SetStatus sets the "status" field.
-func (_c *ProxyCouponCreate) SetStatus(v int8) *ProxyCouponCreate {
-	_c.mutation.SetStatus(v)
+// SetUserLimit sets the "user_limit" field.
+func (_c *ProxyCouponCreate) SetUserLimit(v int64) *ProxyCouponCreate {
+	_c.mutation.SetUserLimit(v)
 	return _c
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (_c *ProxyCouponCreate) SetNillableStatus(v *int8) *ProxyCouponCreate {
+// SetNillableUserLimit sets the "user_limit" field if the given value is not nil.
+func (_c *ProxyCouponCreate) SetNillableUserLimit(v *int64) *ProxyCouponCreate {
 	if v != nil {
-		_c.SetStatus(*v)
+		_c.SetUserLimit(*v)
+	}
+	return _c
+}
+
+// SetSubscribe sets the "subscribe" field.
+func (_c *ProxyCouponCreate) SetSubscribe(v string) *ProxyCouponCreate {
+	_c.mutation.SetSubscribe(v)
+	return _c
+}
+
+// SetNillableSubscribe sets the "subscribe" field if the given value is not nil.
+func (_c *ProxyCouponCreate) SetNillableSubscribe(v *string) *ProxyCouponCreate {
+	if v != nil {
+		_c.SetSubscribe(*v)
+	}
+	return _c
+}
+
+// SetUsedCount sets the "used_count" field.
+func (_c *ProxyCouponCreate) SetUsedCount(v int64) *ProxyCouponCreate {
+	_c.mutation.SetUsedCount(v)
+	return _c
+}
+
+// SetNillableUsedCount sets the "used_count" field if the given value is not nil.
+func (_c *ProxyCouponCreate) SetNillableUsedCount(v *int64) *ProxyCouponCreate {
+	if v != nil {
+		_c.SetUsedCount(*v)
+	}
+	return _c
+}
+
+// SetEnable sets the "enable" field.
+func (_c *ProxyCouponCreate) SetEnable(v bool) *ProxyCouponCreate {
+	_c.mutation.SetEnable(v)
+	return _c
+}
+
+// SetNillableEnable sets the "enable" field if the given value is not nil.
+func (_c *ProxyCouponCreate) SetNillableEnable(v *bool) *ProxyCouponCreate {
+	if v != nil {
+		_c.SetEnable(*v)
 	}
 	return _c
 }
@@ -213,9 +235,9 @@ func (_c *ProxyCouponCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxyCouponCreate) defaults() {
-	if _, ok := _c.mutation.UserLimit(); !ok {
-		v := proxycoupon.DefaultUserLimit
-		_c.mutation.SetUserLimit(v)
+	if _, ok := _c.mutation.Name(); !ok {
+		v := proxycoupon.DefaultName
+		_c.mutation.SetName(v)
 	}
 	if _, ok := _c.mutation.Count(); !ok {
 		v := proxycoupon.DefaultCount
@@ -230,16 +252,28 @@ func (_c *ProxyCouponCreate) defaults() {
 		_c.mutation.SetDiscount(v)
 	}
 	if _, ok := _c.mutation.StartTime(); !ok {
-		v := proxycoupon.DefaultStartTime()
+		v := proxycoupon.DefaultStartTime
 		_c.mutation.SetStartTime(v)
 	}
-	if _, ok := _c.mutation.EndTime(); !ok {
-		v := proxycoupon.DefaultEndTime()
-		_c.mutation.SetEndTime(v)
+	if _, ok := _c.mutation.ExpireTime(); !ok {
+		v := proxycoupon.DefaultExpireTime
+		_c.mutation.SetExpireTime(v)
 	}
-	if _, ok := _c.mutation.Status(); !ok {
-		v := proxycoupon.DefaultStatus
-		_c.mutation.SetStatus(v)
+	if _, ok := _c.mutation.UserLimit(); !ok {
+		v := proxycoupon.DefaultUserLimit
+		_c.mutation.SetUserLimit(v)
+	}
+	if _, ok := _c.mutation.Subscribe(); !ok {
+		v := proxycoupon.DefaultSubscribe
+		_c.mutation.SetSubscribe(v)
+	}
+	if _, ok := _c.mutation.UsedCount(); !ok {
+		v := proxycoupon.DefaultUsedCount
+		_c.mutation.SetUsedCount(v)
+	}
+	if _, ok := _c.mutation.Enable(); !ok {
+		v := proxycoupon.DefaultEnable
+		_c.mutation.SetEnable(v)
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := proxycoupon.DefaultCreatedAt()
@@ -253,9 +287,6 @@ func (_c *ProxyCouponCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ProxyCouponCreate) check() error {
-	if _, ok := _c.mutation.UserLimit(); !ok {
-		return &ValidationError{Name: "user_limit", err: errors.New(`ent: missing required field "ProxyCoupon.user_limit"`)}
-	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "ProxyCoupon.name"`)}
 	}
@@ -284,11 +315,25 @@ func (_c *ProxyCouponCreate) check() error {
 	if _, ok := _c.mutation.StartTime(); !ok {
 		return &ValidationError{Name: "start_time", err: errors.New(`ent: missing required field "ProxyCoupon.start_time"`)}
 	}
-	if _, ok := _c.mutation.EndTime(); !ok {
-		return &ValidationError{Name: "end_time", err: errors.New(`ent: missing required field "ProxyCoupon.end_time"`)}
+	if _, ok := _c.mutation.ExpireTime(); !ok {
+		return &ValidationError{Name: "expire_time", err: errors.New(`ent: missing required field "ProxyCoupon.expire_time"`)}
 	}
-	if _, ok := _c.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "ProxyCoupon.status"`)}
+	if _, ok := _c.mutation.UserLimit(); !ok {
+		return &ValidationError{Name: "user_limit", err: errors.New(`ent: missing required field "ProxyCoupon.user_limit"`)}
+	}
+	if _, ok := _c.mutation.Subscribe(); !ok {
+		return &ValidationError{Name: "subscribe", err: errors.New(`ent: missing required field "ProxyCoupon.subscribe"`)}
+	}
+	if v, ok := _c.mutation.Subscribe(); ok {
+		if err := proxycoupon.SubscribeValidator(v); err != nil {
+			return &ValidationError{Name: "subscribe", err: fmt.Errorf(`ent: validator failed for field "ProxyCoupon.subscribe": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.UsedCount(); !ok {
+		return &ValidationError{Name: "used_count", err: errors.New(`ent: missing required field "ProxyCoupon.used_count"`)}
+	}
+	if _, ok := _c.mutation.Enable(); !ok {
+		return &ValidationError{Name: "enable", err: errors.New(`ent: missing required field "ProxyCoupon.enable"`)}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProxyCoupon.created_at"`)}
@@ -328,14 +373,6 @@ func (_c *ProxyCouponCreate) createSpec() (*ProxyCoupon, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := _c.mutation.UserLimit(); ok {
-		_spec.SetField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
-		_node.UserLimit = value
-	}
-	if value, ok := _c.mutation.Subscribe(); ok {
-		_spec.SetField(proxycoupon.FieldSubscribe, field.TypeString, value)
-		_node.Subscribe = value
-	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(proxycoupon.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -357,16 +394,28 @@ func (_c *ProxyCouponCreate) createSpec() (*ProxyCoupon, *sqlgraph.CreateSpec) {
 		_node.Discount = value
 	}
 	if value, ok := _c.mutation.StartTime(); ok {
-		_spec.SetField(proxycoupon.FieldStartTime, field.TypeTime, value)
+		_spec.SetField(proxycoupon.FieldStartTime, field.TypeInt64, value)
 		_node.StartTime = value
 	}
-	if value, ok := _c.mutation.EndTime(); ok {
-		_spec.SetField(proxycoupon.FieldEndTime, field.TypeTime, value)
-		_node.EndTime = value
+	if value, ok := _c.mutation.ExpireTime(); ok {
+		_spec.SetField(proxycoupon.FieldExpireTime, field.TypeInt64, value)
+		_node.ExpireTime = value
 	}
-	if value, ok := _c.mutation.Status(); ok {
-		_spec.SetField(proxycoupon.FieldStatus, field.TypeInt8, value)
-		_node.Status = value
+	if value, ok := _c.mutation.UserLimit(); ok {
+		_spec.SetField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
+		_node.UserLimit = value
+	}
+	if value, ok := _c.mutation.Subscribe(); ok {
+		_spec.SetField(proxycoupon.FieldSubscribe, field.TypeString, value)
+		_node.Subscribe = value
+	}
+	if value, ok := _c.mutation.UsedCount(); ok {
+		_spec.SetField(proxycoupon.FieldUsedCount, field.TypeInt64, value)
+		_node.UsedCount = value
+	}
+	if value, ok := _c.mutation.Enable(); ok {
+		_spec.SetField(proxycoupon.FieldEnable, field.TypeBool, value)
+		_node.Enable = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(proxycoupon.FieldCreatedAt, field.TypeTime, value)

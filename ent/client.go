@@ -21,6 +21,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxycoupon"
 	"github.com/OmnTeam/ppanel-pro/ent/proxydocument"
 	"github.com/OmnTeam/ppanel-pro/ent/proxygrouphistory"
+	"github.com/OmnTeam/ppanel-pro/ent/proxygrouphistorydetail"
 	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyorder"
 	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
@@ -42,7 +43,6 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdevice"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdeviceonlinerecord"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyusergroup"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserwithdrawal"
 )
@@ -64,6 +64,8 @@ type Client struct {
 	ProxyDocument *ProxyDocumentClient
 	// ProxyGroupHistory is the client for interacting with the ProxyGroupHistory builders.
 	ProxyGroupHistory *ProxyGroupHistoryClient
+	// ProxyGroupHistoryDetail is the client for interacting with the ProxyGroupHistoryDetail builders.
+	ProxyGroupHistoryDetail *ProxyGroupHistoryDetailClient
 	// ProxyNode is the client for interacting with the ProxyNode builders.
 	ProxyNode *ProxyNodeClient
 	// ProxyOrder is the client for interacting with the ProxyOrder builders.
@@ -106,8 +108,6 @@ type Client struct {
 	ProxyUserDevice *ProxyUserDeviceClient
 	// ProxyUserDeviceOnlineRecord is the client for interacting with the ProxyUserDeviceOnlineRecord builders.
 	ProxyUserDeviceOnlineRecord *ProxyUserDeviceOnlineRecordClient
-	// ProxyUserGroup is the client for interacting with the ProxyUserGroup builders.
-	ProxyUserGroup *ProxyUserGroupClient
 	// ProxyUserSubscribe is the client for interacting with the ProxyUserSubscribe builders.
 	ProxyUserSubscribe *ProxyUserSubscribeClient
 	// ProxyUserWithdrawal is the client for interacting with the ProxyUserWithdrawal builders.
@@ -129,6 +129,7 @@ func (c *Client) init() {
 	c.ProxyCoupon = NewProxyCouponClient(c.config)
 	c.ProxyDocument = NewProxyDocumentClient(c.config)
 	c.ProxyGroupHistory = NewProxyGroupHistoryClient(c.config)
+	c.ProxyGroupHistoryDetail = NewProxyGroupHistoryDetailClient(c.config)
 	c.ProxyNode = NewProxyNodeClient(c.config)
 	c.ProxyOrder = NewProxyOrderClient(c.config)
 	c.ProxyPayment = NewProxyPaymentClient(c.config)
@@ -150,7 +151,6 @@ func (c *Client) init() {
 	c.ProxyUserAuthMethod = NewProxyUserAuthMethodClient(c.config)
 	c.ProxyUserDevice = NewProxyUserDeviceClient(c.config)
 	c.ProxyUserDeviceOnlineRecord = NewProxyUserDeviceOnlineRecordClient(c.config)
-	c.ProxyUserGroup = NewProxyUserGroupClient(c.config)
 	c.ProxyUserSubscribe = NewProxyUserSubscribeClient(c.config)
 	c.ProxyUserWithdrawal = NewProxyUserWithdrawalClient(c.config)
 }
@@ -251,6 +251,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ProxyCoupon:                 NewProxyCouponClient(cfg),
 		ProxyDocument:               NewProxyDocumentClient(cfg),
 		ProxyGroupHistory:           NewProxyGroupHistoryClient(cfg),
+		ProxyGroupHistoryDetail:     NewProxyGroupHistoryDetailClient(cfg),
 		ProxyNode:                   NewProxyNodeClient(cfg),
 		ProxyOrder:                  NewProxyOrderClient(cfg),
 		ProxyPayment:                NewProxyPaymentClient(cfg),
@@ -272,7 +273,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ProxyUserAuthMethod:         NewProxyUserAuthMethodClient(cfg),
 		ProxyUserDevice:             NewProxyUserDeviceClient(cfg),
 		ProxyUserDeviceOnlineRecord: NewProxyUserDeviceOnlineRecordClient(cfg),
-		ProxyUserGroup:              NewProxyUserGroupClient(cfg),
 		ProxyUserSubscribe:          NewProxyUserSubscribeClient(cfg),
 		ProxyUserWithdrawal:         NewProxyUserWithdrawalClient(cfg),
 	}, nil
@@ -300,6 +300,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ProxyCoupon:                 NewProxyCouponClient(cfg),
 		ProxyDocument:               NewProxyDocumentClient(cfg),
 		ProxyGroupHistory:           NewProxyGroupHistoryClient(cfg),
+		ProxyGroupHistoryDetail:     NewProxyGroupHistoryDetailClient(cfg),
 		ProxyNode:                   NewProxyNodeClient(cfg),
 		ProxyOrder:                  NewProxyOrderClient(cfg),
 		ProxyPayment:                NewProxyPaymentClient(cfg),
@@ -321,7 +322,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ProxyUserAuthMethod:         NewProxyUserAuthMethodClient(cfg),
 		ProxyUserDevice:             NewProxyUserDeviceClient(cfg),
 		ProxyUserDeviceOnlineRecord: NewProxyUserDeviceOnlineRecordClient(cfg),
-		ProxyUserGroup:              NewProxyUserGroupClient(cfg),
 		ProxyUserSubscribe:          NewProxyUserSubscribeClient(cfg),
 		ProxyUserWithdrawal:         NewProxyUserWithdrawalClient(cfg),
 	}, nil
@@ -354,14 +354,13 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.ProxyAds, c.ProxyAnnouncement, c.ProxyAuthMethod, c.ProxyCoupon,
-		c.ProxyDocument, c.ProxyGroupHistory, c.ProxyNode, c.ProxyOrder,
-		c.ProxyPayment, c.ProxyRedemptionCode, c.ProxyRedemptionRecord,
+		c.ProxyDocument, c.ProxyGroupHistory, c.ProxyGroupHistoryDetail, c.ProxyNode,
+		c.ProxyOrder, c.ProxyPayment, c.ProxyRedemptionCode, c.ProxyRedemptionRecord,
 		c.ProxySchemaMigrations, c.ProxyServer, c.ProxyServerGroup, c.ProxySubscribe,
 		c.ProxySubscribeApplication, c.ProxySubscribeGroup, c.ProxySystem,
 		c.ProxySystemLog, c.ProxyTask, c.ProxyTicket, c.ProxyTicketFollow,
 		c.ProxyTrafficLog, c.ProxyUser, c.ProxyUserAuthMethod, c.ProxyUserDevice,
-		c.ProxyUserDeviceOnlineRecord, c.ProxyUserGroup, c.ProxyUserSubscribe,
-		c.ProxyUserWithdrawal,
+		c.ProxyUserDeviceOnlineRecord, c.ProxyUserSubscribe, c.ProxyUserWithdrawal,
 	} {
 		n.Use(hooks...)
 	}
@@ -372,14 +371,13 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.ProxyAds, c.ProxyAnnouncement, c.ProxyAuthMethod, c.ProxyCoupon,
-		c.ProxyDocument, c.ProxyGroupHistory, c.ProxyNode, c.ProxyOrder,
-		c.ProxyPayment, c.ProxyRedemptionCode, c.ProxyRedemptionRecord,
+		c.ProxyDocument, c.ProxyGroupHistory, c.ProxyGroupHistoryDetail, c.ProxyNode,
+		c.ProxyOrder, c.ProxyPayment, c.ProxyRedemptionCode, c.ProxyRedemptionRecord,
 		c.ProxySchemaMigrations, c.ProxyServer, c.ProxyServerGroup, c.ProxySubscribe,
 		c.ProxySubscribeApplication, c.ProxySubscribeGroup, c.ProxySystem,
 		c.ProxySystemLog, c.ProxyTask, c.ProxyTicket, c.ProxyTicketFollow,
 		c.ProxyTrafficLog, c.ProxyUser, c.ProxyUserAuthMethod, c.ProxyUserDevice,
-		c.ProxyUserDeviceOnlineRecord, c.ProxyUserGroup, c.ProxyUserSubscribe,
-		c.ProxyUserWithdrawal,
+		c.ProxyUserDeviceOnlineRecord, c.ProxyUserSubscribe, c.ProxyUserWithdrawal,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -400,6 +398,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ProxyDocument.mutate(ctx, m)
 	case *ProxyGroupHistoryMutation:
 		return c.ProxyGroupHistory.mutate(ctx, m)
+	case *ProxyGroupHistoryDetailMutation:
+		return c.ProxyGroupHistoryDetail.mutate(ctx, m)
 	case *ProxyNodeMutation:
 		return c.ProxyNode.mutate(ctx, m)
 	case *ProxyOrderMutation:
@@ -442,8 +442,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ProxyUserDevice.mutate(ctx, m)
 	case *ProxyUserDeviceOnlineRecordMutation:
 		return c.ProxyUserDeviceOnlineRecord.mutate(ctx, m)
-	case *ProxyUserGroupMutation:
-		return c.ProxyUserGroup.mutate(ctx, m)
 	case *ProxyUserSubscribeMutation:
 		return c.ProxyUserSubscribe.mutate(ctx, m)
 	case *ProxyUserWithdrawalMutation:
@@ -1251,6 +1249,139 @@ func (c *ProxyGroupHistoryClient) mutate(ctx context.Context, m *ProxyGroupHisto
 	}
 }
 
+// ProxyGroupHistoryDetailClient is a client for the ProxyGroupHistoryDetail schema.
+type ProxyGroupHistoryDetailClient struct {
+	config
+}
+
+// NewProxyGroupHistoryDetailClient returns a client for the ProxyGroupHistoryDetail from the given config.
+func NewProxyGroupHistoryDetailClient(c config) *ProxyGroupHistoryDetailClient {
+	return &ProxyGroupHistoryDetailClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `proxygrouphistorydetail.Hooks(f(g(h())))`.
+func (c *ProxyGroupHistoryDetailClient) Use(hooks ...Hook) {
+	c.hooks.ProxyGroupHistoryDetail = append(c.hooks.ProxyGroupHistoryDetail, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `proxygrouphistorydetail.Intercept(f(g(h())))`.
+func (c *ProxyGroupHistoryDetailClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ProxyGroupHistoryDetail = append(c.inters.ProxyGroupHistoryDetail, interceptors...)
+}
+
+// Create returns a builder for creating a ProxyGroupHistoryDetail entity.
+func (c *ProxyGroupHistoryDetailClient) Create() *ProxyGroupHistoryDetailCreate {
+	mutation := newProxyGroupHistoryDetailMutation(c.config, OpCreate)
+	return &ProxyGroupHistoryDetailCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ProxyGroupHistoryDetail entities.
+func (c *ProxyGroupHistoryDetailClient) CreateBulk(builders ...*ProxyGroupHistoryDetailCreate) *ProxyGroupHistoryDetailCreateBulk {
+	return &ProxyGroupHistoryDetailCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ProxyGroupHistoryDetailClient) MapCreateBulk(slice any, setFunc func(*ProxyGroupHistoryDetailCreate, int)) *ProxyGroupHistoryDetailCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ProxyGroupHistoryDetailCreateBulk{err: fmt.Errorf("calling to ProxyGroupHistoryDetailClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ProxyGroupHistoryDetailCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ProxyGroupHistoryDetailCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ProxyGroupHistoryDetail.
+func (c *ProxyGroupHistoryDetailClient) Update() *ProxyGroupHistoryDetailUpdate {
+	mutation := newProxyGroupHistoryDetailMutation(c.config, OpUpdate)
+	return &ProxyGroupHistoryDetailUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ProxyGroupHistoryDetailClient) UpdateOne(_m *ProxyGroupHistoryDetail) *ProxyGroupHistoryDetailUpdateOne {
+	mutation := newProxyGroupHistoryDetailMutation(c.config, OpUpdateOne, withProxyGroupHistoryDetail(_m))
+	return &ProxyGroupHistoryDetailUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ProxyGroupHistoryDetailClient) UpdateOneID(id int64) *ProxyGroupHistoryDetailUpdateOne {
+	mutation := newProxyGroupHistoryDetailMutation(c.config, OpUpdateOne, withProxyGroupHistoryDetailID(id))
+	return &ProxyGroupHistoryDetailUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ProxyGroupHistoryDetail.
+func (c *ProxyGroupHistoryDetailClient) Delete() *ProxyGroupHistoryDetailDelete {
+	mutation := newProxyGroupHistoryDetailMutation(c.config, OpDelete)
+	return &ProxyGroupHistoryDetailDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ProxyGroupHistoryDetailClient) DeleteOne(_m *ProxyGroupHistoryDetail) *ProxyGroupHistoryDetailDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ProxyGroupHistoryDetailClient) DeleteOneID(id int64) *ProxyGroupHistoryDetailDeleteOne {
+	builder := c.Delete().Where(proxygrouphistorydetail.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ProxyGroupHistoryDetailDeleteOne{builder}
+}
+
+// Query returns a query builder for ProxyGroupHistoryDetail.
+func (c *ProxyGroupHistoryDetailClient) Query() *ProxyGroupHistoryDetailQuery {
+	return &ProxyGroupHistoryDetailQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProxyGroupHistoryDetail},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ProxyGroupHistoryDetail entity by its id.
+func (c *ProxyGroupHistoryDetailClient) Get(ctx context.Context, id int64) (*ProxyGroupHistoryDetail, error) {
+	return c.Query().Where(proxygrouphistorydetail.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ProxyGroupHistoryDetailClient) GetX(ctx context.Context, id int64) *ProxyGroupHistoryDetail {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ProxyGroupHistoryDetailClient) Hooks() []Hook {
+	return c.hooks.ProxyGroupHistoryDetail
+}
+
+// Interceptors returns the client interceptors.
+func (c *ProxyGroupHistoryDetailClient) Interceptors() []Interceptor {
+	return c.inters.ProxyGroupHistoryDetail
+}
+
+func (c *ProxyGroupHistoryDetailClient) mutate(ctx context.Context, m *ProxyGroupHistoryDetailMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ProxyGroupHistoryDetailCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ProxyGroupHistoryDetailUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ProxyGroupHistoryDetailUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ProxyGroupHistoryDetailDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ProxyGroupHistoryDetail mutation op: %q", m.Op())
+	}
+}
+
 // ProxyNodeClient is a client for the ProxyNode schema.
 type ProxyNodeClient struct {
 	config
@@ -2025,7 +2156,7 @@ func (c *ProxySchemaMigrationsClient) UpdateOne(_m *ProxySchemaMigrations) *Prox
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ProxySchemaMigrationsClient) UpdateOneID(id int) *ProxySchemaMigrationsUpdateOne {
+func (c *ProxySchemaMigrationsClient) UpdateOneID(id int64) *ProxySchemaMigrationsUpdateOne {
 	mutation := newProxySchemaMigrationsMutation(c.config, OpUpdateOne, withProxySchemaMigrationsID(id))
 	return &ProxySchemaMigrationsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -2042,7 +2173,7 @@ func (c *ProxySchemaMigrationsClient) DeleteOne(_m *ProxySchemaMigrations) *Prox
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxySchemaMigrationsClient) DeleteOneID(id int) *ProxySchemaMigrationsDeleteOne {
+func (c *ProxySchemaMigrationsClient) DeleteOneID(id int64) *ProxySchemaMigrationsDeleteOne {
 	builder := c.Delete().Where(proxyschemamigrations.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -2059,12 +2190,12 @@ func (c *ProxySchemaMigrationsClient) Query() *ProxySchemaMigrationsQuery {
 }
 
 // Get returns a ProxySchemaMigrations entity by its id.
-func (c *ProxySchemaMigrationsClient) Get(ctx context.Context, id int) (*ProxySchemaMigrations, error) {
+func (c *ProxySchemaMigrationsClient) Get(ctx context.Context, id int64) (*ProxySchemaMigrations, error) {
 	return c.Query().Where(proxyschemamigrations.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ProxySchemaMigrationsClient) GetX(ctx context.Context, id int) *ProxySchemaMigrations {
+func (c *ProxySchemaMigrationsClient) GetX(ctx context.Context, id int64) *ProxySchemaMigrations {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -4124,139 +4255,6 @@ func (c *ProxyUserDeviceOnlineRecordClient) mutate(ctx context.Context, m *Proxy
 	}
 }
 
-// ProxyUserGroupClient is a client for the ProxyUserGroup schema.
-type ProxyUserGroupClient struct {
-	config
-}
-
-// NewProxyUserGroupClient returns a client for the ProxyUserGroup from the given config.
-func NewProxyUserGroupClient(c config) *ProxyUserGroupClient {
-	return &ProxyUserGroupClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `proxyusergroup.Hooks(f(g(h())))`.
-func (c *ProxyUserGroupClient) Use(hooks ...Hook) {
-	c.hooks.ProxyUserGroup = append(c.hooks.ProxyUserGroup, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `proxyusergroup.Intercept(f(g(h())))`.
-func (c *ProxyUserGroupClient) Intercept(interceptors ...Interceptor) {
-	c.inters.ProxyUserGroup = append(c.inters.ProxyUserGroup, interceptors...)
-}
-
-// Create returns a builder for creating a ProxyUserGroup entity.
-func (c *ProxyUserGroupClient) Create() *ProxyUserGroupCreate {
-	mutation := newProxyUserGroupMutation(c.config, OpCreate)
-	return &ProxyUserGroupCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of ProxyUserGroup entities.
-func (c *ProxyUserGroupClient) CreateBulk(builders ...*ProxyUserGroupCreate) *ProxyUserGroupCreateBulk {
-	return &ProxyUserGroupCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *ProxyUserGroupClient) MapCreateBulk(slice any, setFunc func(*ProxyUserGroupCreate, int)) *ProxyUserGroupCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &ProxyUserGroupCreateBulk{err: fmt.Errorf("calling to ProxyUserGroupClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*ProxyUserGroupCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &ProxyUserGroupCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for ProxyUserGroup.
-func (c *ProxyUserGroupClient) Update() *ProxyUserGroupUpdate {
-	mutation := newProxyUserGroupMutation(c.config, OpUpdate)
-	return &ProxyUserGroupUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *ProxyUserGroupClient) UpdateOne(_m *ProxyUserGroup) *ProxyUserGroupUpdateOne {
-	mutation := newProxyUserGroupMutation(c.config, OpUpdateOne, withProxyUserGroup(_m))
-	return &ProxyUserGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *ProxyUserGroupClient) UpdateOneID(id int64) *ProxyUserGroupUpdateOne {
-	mutation := newProxyUserGroupMutation(c.config, OpUpdateOne, withProxyUserGroupID(id))
-	return &ProxyUserGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for ProxyUserGroup.
-func (c *ProxyUserGroupClient) Delete() *ProxyUserGroupDelete {
-	mutation := newProxyUserGroupMutation(c.config, OpDelete)
-	return &ProxyUserGroupDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *ProxyUserGroupClient) DeleteOne(_m *ProxyUserGroup) *ProxyUserGroupDeleteOne {
-	return c.DeleteOneID(_m.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ProxyUserGroupClient) DeleteOneID(id int64) *ProxyUserGroupDeleteOne {
-	builder := c.Delete().Where(proxyusergroup.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &ProxyUserGroupDeleteOne{builder}
-}
-
-// Query returns a query builder for ProxyUserGroup.
-func (c *ProxyUserGroupClient) Query() *ProxyUserGroupQuery {
-	return &ProxyUserGroupQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeProxyUserGroup},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a ProxyUserGroup entity by its id.
-func (c *ProxyUserGroupClient) Get(ctx context.Context, id int64) (*ProxyUserGroup, error) {
-	return c.Query().Where(proxyusergroup.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *ProxyUserGroupClient) GetX(ctx context.Context, id int64) *ProxyUserGroup {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// Hooks returns the client hooks.
-func (c *ProxyUserGroupClient) Hooks() []Hook {
-	return c.hooks.ProxyUserGroup
-}
-
-// Interceptors returns the client interceptors.
-func (c *ProxyUserGroupClient) Interceptors() []Interceptor {
-	return c.inters.ProxyUserGroup
-}
-
-func (c *ProxyUserGroupClient) mutate(ctx context.Context, m *ProxyUserGroupMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&ProxyUserGroupCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&ProxyUserGroupUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&ProxyUserGroupUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&ProxyUserGroupDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown ProxyUserGroup mutation op: %q", m.Op())
-	}
-}
-
 // ProxyUserSubscribeClient is a client for the ProxyUserSubscribe schema.
 type ProxyUserSubscribeClient struct {
 	config
@@ -4543,20 +4541,22 @@ func (c *ProxyUserWithdrawalClient) mutate(ctx context.Context, m *ProxyUserWith
 type (
 	hooks struct {
 		ProxyAds, ProxyAnnouncement, ProxyAuthMethod, ProxyCoupon, ProxyDocument,
-		ProxyGroupHistory, ProxyNode, ProxyOrder, ProxyPayment, ProxyRedemptionCode,
-		ProxyRedemptionRecord, ProxySchemaMigrations, ProxyServer, ProxyServerGroup,
-		ProxySubscribe, ProxySubscribeApplication, ProxySubscribeGroup, ProxySystem,
-		ProxySystemLog, ProxyTask, ProxyTicket, ProxyTicketFollow, ProxyTrafficLog,
-		ProxyUser, ProxyUserAuthMethod, ProxyUserDevice, ProxyUserDeviceOnlineRecord,
-		ProxyUserGroup, ProxyUserSubscribe, ProxyUserWithdrawal []ent.Hook
+		ProxyGroupHistory, ProxyGroupHistoryDetail, ProxyNode, ProxyOrder,
+		ProxyPayment, ProxyRedemptionCode, ProxyRedemptionRecord,
+		ProxySchemaMigrations, ProxyServer, ProxyServerGroup, ProxySubscribe,
+		ProxySubscribeApplication, ProxySubscribeGroup, ProxySystem, ProxySystemLog,
+		ProxyTask, ProxyTicket, ProxyTicketFollow, ProxyTrafficLog, ProxyUser,
+		ProxyUserAuthMethod, ProxyUserDevice, ProxyUserDeviceOnlineRecord,
+		ProxyUserSubscribe, ProxyUserWithdrawal []ent.Hook
 	}
 	inters struct {
 		ProxyAds, ProxyAnnouncement, ProxyAuthMethod, ProxyCoupon, ProxyDocument,
-		ProxyGroupHistory, ProxyNode, ProxyOrder, ProxyPayment, ProxyRedemptionCode,
-		ProxyRedemptionRecord, ProxySchemaMigrations, ProxyServer, ProxyServerGroup,
-		ProxySubscribe, ProxySubscribeApplication, ProxySubscribeGroup, ProxySystem,
-		ProxySystemLog, ProxyTask, ProxyTicket, ProxyTicketFollow, ProxyTrafficLog,
-		ProxyUser, ProxyUserAuthMethod, ProxyUserDevice, ProxyUserDeviceOnlineRecord,
-		ProxyUserGroup, ProxyUserSubscribe, ProxyUserWithdrawal []ent.Interceptor
+		ProxyGroupHistory, ProxyGroupHistoryDetail, ProxyNode, ProxyOrder,
+		ProxyPayment, ProxyRedemptionCode, ProxyRedemptionRecord,
+		ProxySchemaMigrations, ProxyServer, ProxyServerGroup, ProxySubscribe,
+		ProxySubscribeApplication, ProxySubscribeGroup, ProxySystem, ProxySystemLog,
+		ProxyTask, ProxyTicket, ProxyTicketFollow, ProxyTrafficLog, ProxyUser,
+		ProxyUserAuthMethod, ProxyUserDevice, ProxyUserDeviceOnlineRecord,
+		ProxyUserSubscribe, ProxyUserWithdrawal []ent.Interceptor
 	}
 )

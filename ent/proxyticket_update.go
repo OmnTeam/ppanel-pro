@@ -28,27 +28,6 @@ func (_u *ProxyTicketUpdate) Where(ps ...predicate.ProxyTicket) *ProxyTicketUpda
 	return _u
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyTicketUpdate) SetTenantID(v int64) *ProxyTicketUpdate {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyTicketUpdate) SetNillableTenantID(v *int64) *ProxyTicketUpdate {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyTicketUpdate) AddTenantID(v int64) *ProxyTicketUpdate {
-	_u.mutation.AddTenantID(v)
-	return _u
-}
-
 // SetTitle sets the "title" field.
 func (_u *ProxyTicketUpdate) SetTitle(v string) *ProxyTicketUpdate {
 	_u.mutation.SetTitle(v)
@@ -139,21 +118,9 @@ func (_u *ProxyTicketUpdate) SetNillableCreatedAt(v *time.Time) *ProxyTicketUpda
 	return _u
 }
 
-// ClearCreatedAt clears the value of the "created_at" field.
-func (_u *ProxyTicketUpdate) ClearCreatedAt() *ProxyTicketUpdate {
-	_u.mutation.ClearCreatedAt()
-	return _u
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxyTicketUpdate) SetUpdatedAt(v time.Time) *ProxyTicketUpdate {
 	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// ClearUpdatedAt clears the value of the "updated_at" field.
-func (_u *ProxyTicketUpdate) ClearUpdatedAt() *ProxyTicketUpdate {
-	_u.mutation.ClearUpdatedAt()
 	return _u
 }
 
@@ -192,13 +159,26 @@ func (_u *ProxyTicketUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_u *ProxyTicketUpdate) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := proxyticket.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *ProxyTicketUpdate) check() error {
+	if v, ok := _u.mutation.Title(); ok {
+		if err := proxyticket.TitleValidator(v); err != nil {
+			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "ProxyTicket.title": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (_u *ProxyTicketUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(proxyticket.Table, proxyticket.Columns, sqlgraph.NewFieldSpec(proxyticket.FieldID, field.TypeInt64))
 	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -206,12 +186,6 @@ func (_u *ProxyTicketUpdate) sqlSave(ctx context.Context) (_node int, err error)
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyticket.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyticket.FieldTenantID, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(proxyticket.FieldTitle, field.TypeString, value)
@@ -237,14 +211,8 @@ func (_u *ProxyTicketUpdate) sqlSave(ctx context.Context) (_node int, err error)
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxyticket.FieldCreatedAt, field.TypeTime, value)
 	}
-	if _u.mutation.CreatedAtCleared() {
-		_spec.ClearField(proxyticket.FieldCreatedAt, field.TypeTime)
-	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyticket.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if _u.mutation.UpdatedAtCleared() {
-		_spec.ClearField(proxyticket.FieldUpdatedAt, field.TypeTime)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -264,27 +232,6 @@ type ProxyTicketUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxyTicketMutation
-}
-
-// SetTenantID sets the "tenant_id" field.
-func (_u *ProxyTicketUpdateOne) SetTenantID(v int64) *ProxyTicketUpdateOne {
-	_u.mutation.ResetTenantID()
-	_u.mutation.SetTenantID(v)
-	return _u
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_u *ProxyTicketUpdateOne) SetNillableTenantID(v *int64) *ProxyTicketUpdateOne {
-	if v != nil {
-		_u.SetTenantID(*v)
-	}
-	return _u
-}
-
-// AddTenantID adds value to the "tenant_id" field.
-func (_u *ProxyTicketUpdateOne) AddTenantID(v int64) *ProxyTicketUpdateOne {
-	_u.mutation.AddTenantID(v)
-	return _u
 }
 
 // SetTitle sets the "title" field.
@@ -377,21 +324,9 @@ func (_u *ProxyTicketUpdateOne) SetNillableCreatedAt(v *time.Time) *ProxyTicketU
 	return _u
 }
 
-// ClearCreatedAt clears the value of the "created_at" field.
-func (_u *ProxyTicketUpdateOne) ClearCreatedAt() *ProxyTicketUpdateOne {
-	_u.mutation.ClearCreatedAt()
-	return _u
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxyTicketUpdateOne) SetUpdatedAt(v time.Time) *ProxyTicketUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// ClearUpdatedAt clears the value of the "updated_at" field.
-func (_u *ProxyTicketUpdateOne) ClearUpdatedAt() *ProxyTicketUpdateOne {
-	_u.mutation.ClearUpdatedAt()
 	return _u
 }
 
@@ -443,13 +378,26 @@ func (_u *ProxyTicketUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_u *ProxyTicketUpdateOne) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := proxyticket.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (_u *ProxyTicketUpdateOne) check() error {
+	if v, ok := _u.mutation.Title(); ok {
+		if err := proxyticket.TitleValidator(v); err != nil {
+			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "ProxyTicket.title": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (_u *ProxyTicketUpdateOne) sqlSave(ctx context.Context) (_node *ProxyTicket, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(proxyticket.Table, proxyticket.Columns, sqlgraph.NewFieldSpec(proxyticket.FieldID, field.TypeInt64))
 	id, ok := _u.mutation.ID()
 	if !ok {
@@ -475,12 +423,6 @@ func (_u *ProxyTicketUpdateOne) sqlSave(ctx context.Context) (_node *ProxyTicket
 			}
 		}
 	}
-	if value, ok := _u.mutation.TenantID(); ok {
-		_spec.SetField(proxyticket.FieldTenantID, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedTenantID(); ok {
-		_spec.AddField(proxyticket.FieldTenantID, field.TypeInt64, value)
-	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(proxyticket.FieldTitle, field.TypeString, value)
 	}
@@ -505,14 +447,8 @@ func (_u *ProxyTicketUpdateOne) sqlSave(ctx context.Context) (_node *ProxyTicket
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxyticket.FieldCreatedAt, field.TypeTime, value)
 	}
-	if _u.mutation.CreatedAtCleared() {
-		_spec.ClearField(proxyticket.FieldCreatedAt, field.TypeTime)
-	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyticket.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if _u.mutation.UpdatedAtCleared() {
-		_spec.ClearField(proxyticket.FieldUpdatedAt, field.TypeTime)
 	}
 	_node = &ProxyTicket{config: _u.config}
 	_spec.Assign = _node.assignValues

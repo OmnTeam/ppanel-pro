@@ -49,13 +49,13 @@ func (_c *ProxyNodeCreate) SetNillableTags(v *string) *ProxyNodeCreate {
 }
 
 // SetPort sets the "port" field.
-func (_c *ProxyNodeCreate) SetPort(v int) *ProxyNodeCreate {
+func (_c *ProxyNodeCreate) SetPort(v uint16) *ProxyNodeCreate {
 	_c.mutation.SetPort(v)
 	return _c
 }
 
 // SetNillablePort sets the "port" field if the given value is not nil.
-func (_c *ProxyNodeCreate) SetNillablePort(v *int) *ProxyNodeCreate {
+func (_c *ProxyNodeCreate) SetNillablePort(v *uint16) *ProxyNodeCreate {
 	if v != nil {
 		_c.SetPort(*v)
 	}
@@ -132,31 +132,9 @@ func (_c *ProxyNodeCreate) SetNillableSort(v *int) *ProxyNodeCreate {
 	return _c
 }
 
-// SetGroupID sets the "group_id" field.
-func (_c *ProxyNodeCreate) SetGroupID(v int64) *ProxyNodeCreate {
-	_c.mutation.SetGroupID(v)
-	return _c
-}
-
-// SetNillableGroupID sets the "group_id" field if the given value is not nil.
-func (_c *ProxyNodeCreate) SetNillableGroupID(v *int64) *ProxyNodeCreate {
-	if v != nil {
-		_c.SetGroupID(*v)
-	}
-	return _c
-}
-
-// SetGroupLocked sets the "group_locked" field.
-func (_c *ProxyNodeCreate) SetGroupLocked(v bool) *ProxyNodeCreate {
-	_c.mutation.SetGroupLocked(v)
-	return _c
-}
-
-// SetNillableGroupLocked sets the "group_locked" field if the given value is not nil.
-func (_c *ProxyNodeCreate) SetNillableGroupLocked(v *bool) *ProxyNodeCreate {
-	if v != nil {
-		_c.SetGroupLocked(*v)
-	}
+// SetNodeGroupIds sets the "node_group_ids" field.
+func (_c *ProxyNodeCreate) SetNodeGroupIds(v []int64) *ProxyNodeCreate {
+	_c.mutation.SetNodeGroupIds(v)
 	return _c
 }
 
@@ -261,14 +239,6 @@ func (_c *ProxyNodeCreate) defaults() {
 		v := proxynode.DefaultSort
 		_c.mutation.SetSort(v)
 	}
-	if _, ok := _c.mutation.GroupID(); !ok {
-		v := proxynode.DefaultGroupID
-		_c.mutation.SetGroupID(v)
-	}
-	if _, ok := _c.mutation.GroupLocked(); !ok {
-		v := proxynode.DefaultGroupLocked
-		_c.mutation.SetGroupLocked(v)
-	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := proxynode.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
@@ -325,8 +295,11 @@ func (_c *ProxyNodeCreate) check() error {
 	if _, ok := _c.mutation.Sort(); !ok {
 		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "ProxyNode.sort"`)}
 	}
-	if _, ok := _c.mutation.GroupLocked(); !ok {
-		return &ValidationError{Name: "group_locked", err: errors.New(`ent: missing required field "ProxyNode.group_locked"`)}
+	if _, ok := _c.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProxyNode.created_at"`)}
+	}
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ProxyNode.updated_at"`)}
 	}
 	return nil
 }
@@ -369,7 +342,7 @@ func (_c *ProxyNodeCreate) createSpec() (*ProxyNode, *sqlgraph.CreateSpec) {
 		_node.Tags = value
 	}
 	if value, ok := _c.mutation.Port(); ok {
-		_spec.SetField(proxynode.FieldPort, field.TypeInt, value)
+		_spec.SetField(proxynode.FieldPort, field.TypeUint16, value)
 		_node.Port = value
 	}
 	if value, ok := _c.mutation.Address(); ok {
@@ -392,13 +365,9 @@ func (_c *ProxyNodeCreate) createSpec() (*ProxyNode, *sqlgraph.CreateSpec) {
 		_spec.SetField(proxynode.FieldSort, field.TypeInt, value)
 		_node.Sort = value
 	}
-	if value, ok := _c.mutation.GroupID(); ok {
-		_spec.SetField(proxynode.FieldGroupID, field.TypeInt64, value)
-		_node.GroupID = &value
-	}
-	if value, ok := _c.mutation.GroupLocked(); ok {
-		_spec.SetField(proxynode.FieldGroupLocked, field.TypeBool, value)
-		_node.GroupLocked = value
+	if value, ok := _c.mutation.NodeGroupIds(); ok {
+		_spec.SetField(proxynode.FieldNodeGroupIds, field.TypeJSON, value)
+		_node.NodeGroupIds = value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(proxynode.FieldCreatedAt, field.TypeTime, value)

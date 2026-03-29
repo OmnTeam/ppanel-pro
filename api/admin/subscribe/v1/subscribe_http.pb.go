@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.8.4
 // - protoc             v3.19.4
-// source: admin/subscribe/v1/subscribe.proto
+// source: api/admin/subscribe/v1/subscribe.proto
 
 package v1
 

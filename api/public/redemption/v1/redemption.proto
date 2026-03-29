@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package api.public.redemption.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "github.com/OmnTeam/ppanel-pro/api/public/redemption/v1;v1";
+option java_multiple_files = true;
+option java_package = "api.public.redemption.v1";
+
+// RedemptionService 兑换码服务
+service RedemptionService {
+  // RedeemCode 兑换兑换码
+  rpc RedeemCode (RedeemCodeRequest) returns (RedeemCodeReply) {
+    option (google.api.http) = {
+      post: "/v1/public/redemption"
+      body: "*"
+    };
+  }
+}
+
+// RedeemCodeRequest 兑换码请求
+message RedeemCodeRequest {
+  string code = 1; // 兑换码
+}
+
+// RedeemCodeReply 兑换码响应
+message RedeemCodeReply {
+  int32 code = 1;
+  string message = 2;
+  RedeemCodeData data = 3;
+}
+
+// RedeemCodeData 兑换码数据
+message RedeemCodeData {
+  string order_no = 1; // 订单号
+  string message = 2;  // 提示信息
+}

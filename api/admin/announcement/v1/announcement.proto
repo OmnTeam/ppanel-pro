@@ -59,28 +59,10 @@ message Announcement {
   int64 updated_at = 8;  // Unix timestamp in seconds
 }
 
-// 创建公告请求
+// 创建公告请求（仅 title 和 content，与原项目一致）
 message CreateAnnouncementRequest {
   string title = 1 [(validate.rules).string = {min_len: 1, max_len: 255}];
   string content = 2;
-  bool show = 3;
-  bool pinned = 4;
-  bool popup = 5;
-}
-
-// 更新公告请求
-message UpdateAnnouncementRequest {
-  int64 id = 1;
-  string title = 2 [(validate.rules).string = {min_len: 1, max_len: 255}];
-  string content = 3;
-  bool show = 4;
-  bool pinned = 5;
-  bool popup = 6;
-}
-
-// 获取公告详情请求
-message GetAnnouncementRequest {
-  int64 id = 1;
 }
 
 // 公告数据
@@ -90,15 +72,30 @@ message AnnouncementData {
 
 // 公告响应
 message AnnouncementReply {
-  int32 code = 1;                // 状态码
-  string message = 2;            // 消息内容
-  AnnouncementData data = 3;     // 响应数据
+  int32 code = 1;              // 状态码
+  string message = 2;          // 消息内容
+  AnnouncementData data = 3;   // 响应数据
+}
+
+// 更新公告请求
+message UpdateAnnouncementRequest {
+  int64 id = 1;
+  string title = 2 [(validate.rules).string = {min_len: 1, max_len: 255}];
+  string content = 3;
+  optional bool show = 4;
+  optional bool pinned = 5;
+  optional bool popup = 6;
+}
+
+// 获取公告详情请求
+message GetAnnouncementRequest {
+  int64 id = 1;
 }
 
 // 获取公告列表请求
 message ListAnnouncementsRequest {
-  int32 page = 1;
-  int32 size = 2 [(validate.rules).int32 = {gte: 1, lte: 100}];
+  int64 page = 1;
+  int64 size = 2;
   string search = 3;
   optional bool show = 4;
   optional bool pinned = 5;
@@ -133,10 +130,4 @@ message DeleteAnnouncementReply {
   int32 code = 1;                   // 状态码
   string message = 2;               // 消息内容
   DeleteAnnouncementData data = 3;  // 响应数据
-}
-
-// 获取公开公告请求
-message GetPublicAnnouncementsRequest {
-  // 可选的限制数量参数
-  optional int32 limit = 1;
 }

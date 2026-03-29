@@ -552,7 +552,7 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeTrafficLogs(ctx context.Context
 }
 
 // 辅助函数：获取int64指针的值，nil返回0
-func getInt64Value(p *int64) int64 {
+func getInt64ValueFromPointer(p *int64) int64 {
 	if p == nil {
 		return 0
 	}

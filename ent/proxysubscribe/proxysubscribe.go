@@ -37,6 +37,16 @@ const (
 	FieldDeviceLimit = "device_limit"
 	// FieldQuota holds the string denoting the quota field in the database.
 	FieldQuota = "quota"
+	// FieldNodes holds the string denoting the nodes field in the database.
+	FieldNodes = "nodes"
+	// FieldNodeTags holds the string denoting the node_tags field in the database.
+	FieldNodeTags = "node_tags"
+	// FieldNodeGroupIds holds the string denoting the node_group_ids field in the database.
+	FieldNodeGroupIds = "node_group_ids"
+	// FieldNodeGroupID holds the string denoting the node_group_id field in the database.
+	FieldNodeGroupID = "node_group_id"
+	// FieldTrafficLimit holds the string denoting the traffic_limit field in the database.
+	FieldTrafficLimit = "traffic_limit"
 	// FieldShow holds the string denoting the show field in the database.
 	FieldShow = "show"
 	// FieldSell holds the string denoting the sell field in the database.
@@ -51,16 +61,14 @@ const (
 	FieldResetCycle = "reset_cycle"
 	// FieldRenewalReset holds the string denoting the renewal_reset field in the database.
 	FieldRenewalReset = "renewal_reset"
-	// FieldNodes holds the string denoting the nodes field in the database.
-	FieldNodes = "nodes"
-	// FieldNodeTags holds the string denoting the node_tags field in the database.
-	FieldNodeTags = "node_tags"
+	// FieldShowOriginalPrice holds the string denoting the show_original_price field in the database.
+	FieldShowOriginalPrice = "show_original_price"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxysubscribe in the database.
-	Table = "proxy_subscribe"
+	Table = "subscribe"
 )
 
 // Columns holds all SQL columns for proxysubscribe fields.
@@ -78,6 +86,11 @@ var Columns = []string{
 	FieldSpeedLimit,
 	FieldDeviceLimit,
 	FieldQuota,
+	FieldNodes,
+	FieldNodeTags,
+	FieldNodeGroupIds,
+	FieldNodeGroupID,
+	FieldTrafficLimit,
 	FieldShow,
 	FieldSell,
 	FieldSort,
@@ -85,8 +98,7 @@ var Columns = []string{
 	FieldAllowDeduction,
 	FieldResetCycle,
 	FieldRenewalReset,
-	FieldNodes,
-	FieldNodeTags,
+	FieldShowOriginalPrice,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -128,6 +140,16 @@ var (
 	DefaultDeviceLimit int64
 	// DefaultQuota holds the default value on creation for the "quota" field.
 	DefaultQuota int64
+	// DefaultNodes holds the default value on creation for the "nodes" field.
+	DefaultNodes string
+	// NodesValidator is a validator for the "nodes" field. It is called by the builders before save.
+	NodesValidator func(string) error
+	// DefaultNodeTags holds the default value on creation for the "node_tags" field.
+	DefaultNodeTags string
+	// NodeTagsValidator is a validator for the "node_tags" field. It is called by the builders before save.
+	NodeTagsValidator func(string) error
+	// DefaultNodeGroupID holds the default value on creation for the "node_group_id" field.
+	DefaultNodeGroupID int64
 	// DefaultShow holds the default value on creation for the "show" field.
 	DefaultShow bool
 	// DefaultSell holds the default value on creation for the "sell" field.
@@ -142,14 +164,8 @@ var (
 	DefaultResetCycle int64
 	// DefaultRenewalReset holds the default value on creation for the "renewal_reset" field.
 	DefaultRenewalReset bool
-	// DefaultNodes holds the default value on creation for the "nodes" field.
-	DefaultNodes string
-	// NodesValidator is a validator for the "nodes" field. It is called by the builders before save.
-	NodesValidator func(string) error
-	// DefaultNodeTags holds the default value on creation for the "node_tags" field.
-	DefaultNodeTags string
-	// NodeTagsValidator is a validator for the "node_tags" field. It is called by the builders before save.
-	NodeTagsValidator func(string) error
+	// DefaultShowOriginalPrice holds the default value on creation for the "show_original_price" field.
+	DefaultShowOriginalPrice bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -228,6 +244,26 @@ func ByQuota(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldQuota, opts...).ToFunc()
 }
 
+// ByNodes orders the results by the nodes field.
+func ByNodes(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNodes, opts...).ToFunc()
+}
+
+// ByNodeTags orders the results by the node_tags field.
+func ByNodeTags(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNodeTags, opts...).ToFunc()
+}
+
+// ByNodeGroupID orders the results by the node_group_id field.
+func ByNodeGroupID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNodeGroupID, opts...).ToFunc()
+}
+
+// ByTrafficLimit orders the results by the traffic_limit field.
+func ByTrafficLimit(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTrafficLimit, opts...).ToFunc()
+}
+
 // ByShow orders the results by the show field.
 func ByShow(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldShow, opts...).ToFunc()
@@ -263,14 +299,9 @@ func ByRenewalReset(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRenewalReset, opts...).ToFunc()
 }
 
-// ByNodes orders the results by the nodes field.
-func ByNodes(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldNodes, opts...).ToFunc()
-}
-
-// ByNodeTags orders the results by the node_tags field.
-func ByNodeTags(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldNodeTags, opts...).ToFunc()
+// ByShowOriginalPrice orders the results by the show_original_price field.
+func ByShowOriginalPrice(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldShowOriginalPrice, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

@@ -54,11 +54,6 @@ func IDLTE(id int64) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldLTE(FieldID, id))
 }
 
-// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
-func TenantID(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldEQ(FieldTenantID, v))
-}
-
 // ParentID applies equality check predicate on the "parent_id" field. It's identical to ParentIDEQ.
 func ParentID(v int64) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldEQ(FieldParentID, v))
@@ -94,6 +89,11 @@ func Amount(v int64) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldEQ(FieldAmount, v))
 }
 
+// GiftAmount applies equality check predicate on the "gift_amount" field. It's identical to GiftAmountEQ.
+func GiftAmount(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldEQ(FieldGiftAmount, v))
+}
+
 // Discount applies equality check predicate on the "discount" field. It's identical to DiscountEQ.
 func Discount(v int64) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldEQ(FieldDiscount, v))
@@ -114,16 +114,6 @@ func Commission(v int64) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldEQ(FieldCommission, v))
 }
 
-// FeeAmount applies equality check predicate on the "fee_amount" field. It's identical to FeeAmountEQ.
-func FeeAmount(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldEQ(FieldFeeAmount, v))
-}
-
-// GiftAmount applies equality check predicate on the "gift_amount" field. It's identical to GiftAmountEQ.
-func GiftAmount(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldEQ(FieldGiftAmount, v))
-}
-
 // PaymentID applies equality check predicate on the "payment_id" field. It's identical to PaymentIDEQ.
 func PaymentID(v int64) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldEQ(FieldPaymentID, v))
@@ -132,6 +122,11 @@ func PaymentID(v int64) predicate.ProxyOrder {
 // Method applies equality check predicate on the "method" field. It's identical to MethodEQ.
 func Method(v string) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldEQ(FieldMethod, v))
+}
+
+// FeeAmount applies equality check predicate on the "fee_amount" field. It's identical to FeeAmountEQ.
+func FeeAmount(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldEQ(FieldFeeAmount, v))
 }
 
 // TradeNo applies equality check predicate on the "trade_no" field. It's identical to TradeNoEQ.
@@ -167,46 +162,6 @@ func CreatedAt(v time.Time) predicate.ProxyOrder {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldEQ(FieldUpdatedAt, v))
-}
-
-// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
-func TenantIDEQ(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldEQ(FieldTenantID, v))
-}
-
-// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
-func TenantIDNEQ(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldNEQ(FieldTenantID, v))
-}
-
-// TenantIDIn applies the In predicate on the "tenant_id" field.
-func TenantIDIn(vs ...int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldIn(FieldTenantID, vs...))
-}
-
-// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
-func TenantIDNotIn(vs ...int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldNotIn(FieldTenantID, vs...))
-}
-
-// TenantIDGT applies the GT predicate on the "tenant_id" field.
-func TenantIDGT(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldGT(FieldTenantID, v))
-}
-
-// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
-func TenantIDGTE(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldGTE(FieldTenantID, v))
-}
-
-// TenantIDLT applies the LT predicate on the "tenant_id" field.
-func TenantIDLT(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldLT(FieldTenantID, v))
-}
-
-// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
-func TenantIDLTE(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldLTE(FieldTenantID, v))
 }
 
 // ParentIDEQ applies the EQ predicate on the "parent_id" field.
@@ -524,6 +479,46 @@ func AmountLTE(v int64) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldLTE(FieldAmount, v))
 }
 
+// GiftAmountEQ applies the EQ predicate on the "gift_amount" field.
+func GiftAmountEQ(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldEQ(FieldGiftAmount, v))
+}
+
+// GiftAmountNEQ applies the NEQ predicate on the "gift_amount" field.
+func GiftAmountNEQ(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldNEQ(FieldGiftAmount, v))
+}
+
+// GiftAmountIn applies the In predicate on the "gift_amount" field.
+func GiftAmountIn(vs ...int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldIn(FieldGiftAmount, vs...))
+}
+
+// GiftAmountNotIn applies the NotIn predicate on the "gift_amount" field.
+func GiftAmountNotIn(vs ...int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldNotIn(FieldGiftAmount, vs...))
+}
+
+// GiftAmountGT applies the GT predicate on the "gift_amount" field.
+func GiftAmountGT(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldGT(FieldGiftAmount, v))
+}
+
+// GiftAmountGTE applies the GTE predicate on the "gift_amount" field.
+func GiftAmountGTE(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldGTE(FieldGiftAmount, v))
+}
+
+// GiftAmountLT applies the LT predicate on the "gift_amount" field.
+func GiftAmountLT(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldLT(FieldGiftAmount, v))
+}
+
+// GiftAmountLTE applies the LTE predicate on the "gift_amount" field.
+func GiftAmountLTE(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldLTE(FieldGiftAmount, v))
+}
+
 // DiscountEQ applies the EQ predicate on the "discount" field.
 func DiscountEQ(v int64) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldEQ(FieldDiscount, v))
@@ -719,86 +714,6 @@ func CommissionLTE(v int64) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldLTE(FieldCommission, v))
 }
 
-// FeeAmountEQ applies the EQ predicate on the "fee_amount" field.
-func FeeAmountEQ(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldEQ(FieldFeeAmount, v))
-}
-
-// FeeAmountNEQ applies the NEQ predicate on the "fee_amount" field.
-func FeeAmountNEQ(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldNEQ(FieldFeeAmount, v))
-}
-
-// FeeAmountIn applies the In predicate on the "fee_amount" field.
-func FeeAmountIn(vs ...int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldIn(FieldFeeAmount, vs...))
-}
-
-// FeeAmountNotIn applies the NotIn predicate on the "fee_amount" field.
-func FeeAmountNotIn(vs ...int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldNotIn(FieldFeeAmount, vs...))
-}
-
-// FeeAmountGT applies the GT predicate on the "fee_amount" field.
-func FeeAmountGT(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldGT(FieldFeeAmount, v))
-}
-
-// FeeAmountGTE applies the GTE predicate on the "fee_amount" field.
-func FeeAmountGTE(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldGTE(FieldFeeAmount, v))
-}
-
-// FeeAmountLT applies the LT predicate on the "fee_amount" field.
-func FeeAmountLT(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldLT(FieldFeeAmount, v))
-}
-
-// FeeAmountLTE applies the LTE predicate on the "fee_amount" field.
-func FeeAmountLTE(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldLTE(FieldFeeAmount, v))
-}
-
-// GiftAmountEQ applies the EQ predicate on the "gift_amount" field.
-func GiftAmountEQ(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldEQ(FieldGiftAmount, v))
-}
-
-// GiftAmountNEQ applies the NEQ predicate on the "gift_amount" field.
-func GiftAmountNEQ(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldNEQ(FieldGiftAmount, v))
-}
-
-// GiftAmountIn applies the In predicate on the "gift_amount" field.
-func GiftAmountIn(vs ...int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldIn(FieldGiftAmount, vs...))
-}
-
-// GiftAmountNotIn applies the NotIn predicate on the "gift_amount" field.
-func GiftAmountNotIn(vs ...int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldNotIn(FieldGiftAmount, vs...))
-}
-
-// GiftAmountGT applies the GT predicate on the "gift_amount" field.
-func GiftAmountGT(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldGT(FieldGiftAmount, v))
-}
-
-// GiftAmountGTE applies the GTE predicate on the "gift_amount" field.
-func GiftAmountGTE(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldGTE(FieldGiftAmount, v))
-}
-
-// GiftAmountLT applies the LT predicate on the "gift_amount" field.
-func GiftAmountLT(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldLT(FieldGiftAmount, v))
-}
-
-// GiftAmountLTE applies the LTE predicate on the "gift_amount" field.
-func GiftAmountLTE(v int64) predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldLTE(FieldGiftAmount, v))
-}
-
 // PaymentIDEQ applies the EQ predicate on the "payment_id" field.
 func PaymentIDEQ(v int64) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldEQ(FieldPaymentID, v))
@@ -894,16 +809,6 @@ func MethodHasSuffix(v string) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldHasSuffix(FieldMethod, v))
 }
 
-// MethodIsNil applies the IsNil predicate on the "method" field.
-func MethodIsNil() predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldIsNull(FieldMethod))
-}
-
-// MethodNotNil applies the NotNil predicate on the "method" field.
-func MethodNotNil() predicate.ProxyOrder {
-	return predicate.ProxyOrder(sql.FieldNotNull(FieldMethod))
-}
-
 // MethodEqualFold applies the EqualFold predicate on the "method" field.
 func MethodEqualFold(v string) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldEqualFold(FieldMethod, v))
@@ -912,6 +817,46 @@ func MethodEqualFold(v string) predicate.ProxyOrder {
 // MethodContainsFold applies the ContainsFold predicate on the "method" field.
 func MethodContainsFold(v string) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldContainsFold(FieldMethod, v))
+}
+
+// FeeAmountEQ applies the EQ predicate on the "fee_amount" field.
+func FeeAmountEQ(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldEQ(FieldFeeAmount, v))
+}
+
+// FeeAmountNEQ applies the NEQ predicate on the "fee_amount" field.
+func FeeAmountNEQ(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldNEQ(FieldFeeAmount, v))
+}
+
+// FeeAmountIn applies the In predicate on the "fee_amount" field.
+func FeeAmountIn(vs ...int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldIn(FieldFeeAmount, vs...))
+}
+
+// FeeAmountNotIn applies the NotIn predicate on the "fee_amount" field.
+func FeeAmountNotIn(vs ...int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldNotIn(FieldFeeAmount, vs...))
+}
+
+// FeeAmountGT applies the GT predicate on the "fee_amount" field.
+func FeeAmountGT(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldGT(FieldFeeAmount, v))
+}
+
+// FeeAmountGTE applies the GTE predicate on the "fee_amount" field.
+func FeeAmountGTE(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldGTE(FieldFeeAmount, v))
+}
+
+// FeeAmountLT applies the LT predicate on the "fee_amount" field.
+func FeeAmountLT(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldLT(FieldFeeAmount, v))
+}
+
+// FeeAmountLTE applies the LTE predicate on the "fee_amount" field.
+func FeeAmountLTE(v int64) predicate.ProxyOrder {
+	return predicate.ProxyOrder(sql.FieldLTE(FieldFeeAmount, v))
 }
 
 // TradeNoEQ applies the EQ predicate on the "trade_no" field.

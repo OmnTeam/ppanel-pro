@@ -42,21 +42,18 @@ service UserAuthMethodService {
 // ===== CreateUserAuthMethod =====
 
 message CreateUserAuthMethodRequest {
-  string user_id = 1;
-  string auth_type = 2;  // apple, google, github, facebook, telegram, email, mobile
+  int64 user_id = 1;
+  string auth_type = 2;        // apple, google, github, facebook, telegram, email, mobile
   string auth_identifier = 3;  // 认证标识（邮箱、手机号、OpenID等）
-  bool verified = 4;  // 是否已验证
 }
 
-message CreateUserAuthMethodReply {
-  string id = 1;
-}
+message CreateUserAuthMethodReply {}
 
 // ===== UpdateUserAuthMethod =====
 
 message UpdateUserAuthMethodRequest {
-  string user_id = 1;  // 用户ID
-  string auth_type = 2;  // 认证类型
+  int64 user_id = 1;           // 用户ID
+  string auth_type = 2;        // 认证类型
   string auth_identifier = 3;  // 认证标识
 }
 
@@ -65,8 +62,8 @@ message UpdateUserAuthMethodReply {}
 // ===== DeleteUserAuthMethod =====
 
 message DeleteUserAuthMethodRequest {
-  string user_id = 1;  // 用户ID
-  string auth_type = 2;  // 认证类型
+  int64 user_id = 1;   // 用户ID
+  string auth_type = 2; // 认证类型
 }
 
 message DeleteUserAuthMethodReply {}
@@ -74,23 +71,18 @@ message DeleteUserAuthMethodReply {}
 // ===== GetUserAuthMethod =====
 
 message GetUserAuthMethodRequest {
-  string user_id = 1;  // 用户ID
-  string auth_type = 2;  // 可选：过滤认证类型
+  int64 user_id = 1;  // 用户ID
 }
 
 message GetUserAuthMethodReply {
-  repeated UserAuthMethod list = 1;
+  repeated UserAuthMethod auth_methods = 1;
 }
 
 // ===== Common Messages =====
 
 // UserAuthMethod 用户认证方法
 message UserAuthMethod {
-  string id = 1;
-  string user_id = 2;
-  string auth_type = 3;  // apple, google, github, facebook, telegram, email, mobile
-  string auth_identifier = 4;  // 认证标识
-  bool verified = 5;  // 是否已验证
-  string created_at = 6;  // Unix timestamp in milliseconds
-  string updated_at = 7;  // Unix timestamp in milliseconds
+  string auth_type = 1;        // apple, google, github, facebook, telegram, email, mobile
+  string auth_identifier = 2;  // 认证标识
+  bool verified = 3;           // 是否已验证
 }

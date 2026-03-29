@@ -32,15 +32,17 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
+	FieldDeletedAt = "deleted_at"
 	// EdgeRecords holds the string denoting the records edge name in mutations.
 	EdgeRecords = "records"
 	// Table holds the table name of the proxyredemptioncode in the database.
-	Table = "proxy_redemption_code"
+	Table = "redemption_code"
 	// RecordsTable is the table that holds the records relation/edge.
-	RecordsTable = "proxy_redemption_record"
+	RecordsTable = "redemption_record"
 	// RecordsInverseTable is the table name for the ProxyRedemptionRecord entity.
 	// It exists in this package in order to avoid circular dependency with the "proxyredemptionrecord" package.
-	RecordsInverseTable = "proxy_redemption_record"
+	RecordsInverseTable = "redemption_record"
 	// RecordsColumn is the table column denoting the records relation/edge.
 	RecordsColumn = "redemption_code_id"
 )
@@ -57,6 +59,7 @@ var Columns = []string{
 	FieldStatus,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldDeletedAt,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -147,6 +150,11 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByDeletedAt orders the results by the deleted_at field.
+func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
 }
 
 // ByRecordsCount orders the results by records count.

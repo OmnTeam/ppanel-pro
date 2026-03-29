@@ -10,14 +10,14 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// ProxyRedemptionCode 兑换码表
+// ProxyRedemptionCode holds the schema definition for the ProxyRedemptionCode entity.
 type ProxyRedemptionCode struct {
 	ent.Schema
 }
 
 func (ProxyRedemptionCode) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "proxy_redemption_code"},
+		entsql.Annotation{Table: "redemption_code"},
 		entsql.WithComments(true),
 	}
 }
@@ -34,6 +34,7 @@ func (ProxyRedemptionCode) Fields() []ent.Field {
 		field.Int8("status").Default(1).Comment("状态"),
 		field.Time("created_at").Default(time.Now).Immutable().Comment("创建时间"),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now).Comment("更新时间"),
+		field.Time("deleted_at").Optional().Nillable().Comment("删除时间"),
 	}
 }
 

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v3.19.4
-// source: public/announcement/v1/announcement.proto
+// source: api/public/announcement/v1/announcement.proto
 
 package v1
 
@@ -125,5 +125,5 @@ var Announcement_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "public/announcement/v1/announcement.proto",
+	Metadata: "api/public/announcement/v1/announcement.proto",
 }

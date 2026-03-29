@@ -21,7 +21,7 @@ type ProxyTicketFollow struct {
 	TicketID int64 `json:"ticket_id,omitempty"`
 	// 来源/操作人
 	From string `json:"from,omitempty"`
-	// 类型: 1=文本, 2=图片
+	// 类型
 	Type int8 `json:"type,omitempty"`
 	// 跟进内容
 	Content string `json:"content,omitempty"`

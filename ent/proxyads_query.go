@@ -262,12 +262,12 @@ func (_q *ProxyAdsQuery) Clone() *ProxyAdsQuery {
 // Example:
 //
 //	var v []struct {
-//		TenantID int64 `json:"tenant_id,omitempty"`
+//		Title string `json:"title,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.ProxyAds.Query().
-//		GroupBy(proxyads.FieldTenantID).
+//		GroupBy(proxyads.FieldTitle).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (_q *ProxyAdsQuery) GroupBy(field string, fields ...string) *ProxyAdsGroupBy {
@@ -285,11 +285,11 @@ func (_q *ProxyAdsQuery) GroupBy(field string, fields ...string) *ProxyAdsGroupB
 // Example:
 //
 //	var v []struct {
-//		TenantID int64 `json:"tenant_id,omitempty"`
+//		Title string `json:"title,omitempty"`
 //	}
 //
 //	client.ProxyAds.Query().
-//		Select(proxyads.FieldTenantID).
+//		Select(proxyads.FieldTitle).
 //		Scan(ctx, &v)
 func (_q *ProxyAdsQuery) Select(fields ...string) *ProxyAdsSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)

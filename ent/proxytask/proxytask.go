@@ -32,7 +32,7 @@ const (
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxytask in the database.
-	Table = "proxy_task"
+	Table = "task"
 )
 
 // Columns holds all SQL columns for proxytask fields.
@@ -63,9 +63,9 @@ var (
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus int8
 	// DefaultTotal holds the default value on creation for the "total" field.
-	DefaultTotal uint32
+	DefaultTotal uint64
 	// DefaultCurrent holds the default value on creation for the "current" field.
-	DefaultCurrent uint32
+	DefaultCurrent uint64
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.

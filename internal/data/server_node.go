@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
 	serverBiz "github.com/OmnTeam/ppanel-pro/internal/biz/server"
 	"github.com/OmnTeam/ppanel-pro/internal/queue/types"
@@ -27,6 +29,26 @@ func NewServerNodeRepo(data *Data, logger log.Logger) serverBiz.ServerNodeRepo {
 		log:   log.NewHelper(logger),
 		queue: data.queue,
 	}
+}
+
+func (r *serverNodeRepo) GetNodeSecret(ctx context.Context) (string, error) {
+	config, err := r.data.db.ProxySystem.Query().
+		Where(
+			proxysystem.CategoryEQ("server"),
+			proxysystem.KeyEQ("NodeSecret"),
+		).
+		Only(ctx)
+	if err == nil {
+		return config.Value, nil
+	}
+	if !ent.IsNotFound(err) {
+		r.log.Errorf("GetNodeSecret failed: %v", err)
+		return "", err
+	}
+	if r.data.conf != nil && r.data.conf.GetNode() != nil {
+		return r.data.conf.GetNode().GetNodeSecret(), nil
+	}
+	return "", nil
 }
 
 // GetServerConfig 获取服务器配置

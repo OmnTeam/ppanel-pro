@@ -81,6 +81,18 @@ func (f ProxyGroupHistoryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyGroupHistoryMutation", m)
 }
 
+// The ProxyGroupHistoryDetailFunc type is an adapter to allow the use of ordinary
+// function as ProxyGroupHistoryDetail mutator.
+type ProxyGroupHistoryDetailFunc func(context.Context, *ent.ProxyGroupHistoryDetailMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProxyGroupHistoryDetailFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProxyGroupHistoryDetailMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyGroupHistoryDetailMutation", m)
+}
+
 // The ProxyNodeFunc type is an adapter to allow the use of ordinary
 // function as ProxyNode mutator.
 type ProxyNodeFunc func(context.Context, *ent.ProxyNodeMutation) (ent.Value, error)
@@ -331,18 +343,6 @@ func (f ProxyUserDeviceOnlineRecordFunc) Mutate(ctx context.Context, m ent.Mutat
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyUserDeviceOnlineRecordMutation", m)
-}
-
-// The ProxyUserGroupFunc type is an adapter to allow the use of ordinary
-// function as ProxyUserGroup mutator.
-type ProxyUserGroupFunc func(context.Context, *ent.ProxyUserGroupMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ProxyUserGroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ProxyUserGroupMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProxyUserGroupMutation", m)
 }
 
 // The ProxyUserSubscribeFunc type is an adapter to allow the use of ordinary

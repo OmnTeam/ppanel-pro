@@ -104,14 +104,14 @@ func (_u *ProxyUserDeviceOnlineRecordUpdate) ClearOfflineTime() *ProxyUserDevice
 }
 
 // SetOnlineSeconds sets the "online_seconds" field.
-func (_u *ProxyUserDeviceOnlineRecordUpdate) SetOnlineSeconds(v int) *ProxyUserDeviceOnlineRecordUpdate {
+func (_u *ProxyUserDeviceOnlineRecordUpdate) SetOnlineSeconds(v int64) *ProxyUserDeviceOnlineRecordUpdate {
 	_u.mutation.ResetOnlineSeconds()
 	_u.mutation.SetOnlineSeconds(v)
 	return _u
 }
 
 // SetNillableOnlineSeconds sets the "online_seconds" field if the given value is not nil.
-func (_u *ProxyUserDeviceOnlineRecordUpdate) SetNillableOnlineSeconds(v *int) *ProxyUserDeviceOnlineRecordUpdate {
+func (_u *ProxyUserDeviceOnlineRecordUpdate) SetNillableOnlineSeconds(v *int64) *ProxyUserDeviceOnlineRecordUpdate {
 	if v != nil {
 		_u.SetOnlineSeconds(*v)
 	}
@@ -119,7 +119,7 @@ func (_u *ProxyUserDeviceOnlineRecordUpdate) SetNillableOnlineSeconds(v *int) *P
 }
 
 // AddOnlineSeconds adds value to the "online_seconds" field.
-func (_u *ProxyUserDeviceOnlineRecordUpdate) AddOnlineSeconds(v int) *ProxyUserDeviceOnlineRecordUpdate {
+func (_u *ProxyUserDeviceOnlineRecordUpdate) AddOnlineSeconds(v int64) *ProxyUserDeviceOnlineRecordUpdate {
 	_u.mutation.AddOnlineSeconds(v)
 	return _u
 }
@@ -131,14 +131,14 @@ func (_u *ProxyUserDeviceOnlineRecordUpdate) ClearOnlineSeconds() *ProxyUserDevi
 }
 
 // SetDurationDays sets the "duration_days" field.
-func (_u *ProxyUserDeviceOnlineRecordUpdate) SetDurationDays(v int) *ProxyUserDeviceOnlineRecordUpdate {
+func (_u *ProxyUserDeviceOnlineRecordUpdate) SetDurationDays(v int64) *ProxyUserDeviceOnlineRecordUpdate {
 	_u.mutation.ResetDurationDays()
 	_u.mutation.SetDurationDays(v)
 	return _u
 }
 
 // SetNillableDurationDays sets the "duration_days" field if the given value is not nil.
-func (_u *ProxyUserDeviceOnlineRecordUpdate) SetNillableDurationDays(v *int) *ProxyUserDeviceOnlineRecordUpdate {
+func (_u *ProxyUserDeviceOnlineRecordUpdate) SetNillableDurationDays(v *int64) *ProxyUserDeviceOnlineRecordUpdate {
 	if v != nil {
 		_u.SetDurationDays(*v)
 	}
@@ -146,7 +146,7 @@ func (_u *ProxyUserDeviceOnlineRecordUpdate) SetNillableDurationDays(v *int) *Pr
 }
 
 // AddDurationDays adds value to the "duration_days" field.
-func (_u *ProxyUserDeviceOnlineRecordUpdate) AddDurationDays(v int) *ProxyUserDeviceOnlineRecordUpdate {
+func (_u *ProxyUserDeviceOnlineRecordUpdate) AddDurationDays(v int64) *ProxyUserDeviceOnlineRecordUpdate {
 	_u.mutation.AddDurationDays(v)
 	return _u
 }
@@ -233,22 +233,22 @@ func (_u *ProxyUserDeviceOnlineRecordUpdate) sqlSave(ctx context.Context) (_node
 		_spec.ClearField(proxyuserdeviceonlinerecord.FieldOfflineTime, field.TypeTime)
 	}
 	if value, ok := _u.mutation.OnlineSeconds(); ok {
-		_spec.SetField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt, value)
+		_spec.SetField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedOnlineSeconds(); ok {
-		_spec.AddField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt, value)
+		_spec.AddField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt64, value)
 	}
 	if _u.mutation.OnlineSecondsCleared() {
-		_spec.ClearField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt)
+		_spec.ClearField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.DurationDays(); ok {
-		_spec.SetField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt, value)
+		_spec.SetField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedDurationDays(); ok {
-		_spec.AddField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt, value)
+		_spec.AddField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt64, value)
 	}
 	if _u.mutation.DurationDaysCleared() {
-		_spec.ClearField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt)
+		_spec.ClearField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt64)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -346,14 +346,14 @@ func (_u *ProxyUserDeviceOnlineRecordUpdateOne) ClearOfflineTime() *ProxyUserDev
 }
 
 // SetOnlineSeconds sets the "online_seconds" field.
-func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetOnlineSeconds(v int) *ProxyUserDeviceOnlineRecordUpdateOne {
+func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetOnlineSeconds(v int64) *ProxyUserDeviceOnlineRecordUpdateOne {
 	_u.mutation.ResetOnlineSeconds()
 	_u.mutation.SetOnlineSeconds(v)
 	return _u
 }
 
 // SetNillableOnlineSeconds sets the "online_seconds" field if the given value is not nil.
-func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetNillableOnlineSeconds(v *int) *ProxyUserDeviceOnlineRecordUpdateOne {
+func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetNillableOnlineSeconds(v *int64) *ProxyUserDeviceOnlineRecordUpdateOne {
 	if v != nil {
 		_u.SetOnlineSeconds(*v)
 	}
@@ -361,7 +361,7 @@ func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetNillableOnlineSeconds(v *int)
 }
 
 // AddOnlineSeconds adds value to the "online_seconds" field.
-func (_u *ProxyUserDeviceOnlineRecordUpdateOne) AddOnlineSeconds(v int) *ProxyUserDeviceOnlineRecordUpdateOne {
+func (_u *ProxyUserDeviceOnlineRecordUpdateOne) AddOnlineSeconds(v int64) *ProxyUserDeviceOnlineRecordUpdateOne {
 	_u.mutation.AddOnlineSeconds(v)
 	return _u
 }
@@ -373,14 +373,14 @@ func (_u *ProxyUserDeviceOnlineRecordUpdateOne) ClearOnlineSeconds() *ProxyUserD
 }
 
 // SetDurationDays sets the "duration_days" field.
-func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetDurationDays(v int) *ProxyUserDeviceOnlineRecordUpdateOne {
+func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetDurationDays(v int64) *ProxyUserDeviceOnlineRecordUpdateOne {
 	_u.mutation.ResetDurationDays()
 	_u.mutation.SetDurationDays(v)
 	return _u
 }
 
 // SetNillableDurationDays sets the "duration_days" field if the given value is not nil.
-func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetNillableDurationDays(v *int) *ProxyUserDeviceOnlineRecordUpdateOne {
+func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetNillableDurationDays(v *int64) *ProxyUserDeviceOnlineRecordUpdateOne {
 	if v != nil {
 		_u.SetDurationDays(*v)
 	}
@@ -388,7 +388,7 @@ func (_u *ProxyUserDeviceOnlineRecordUpdateOne) SetNillableDurationDays(v *int) 
 }
 
 // AddDurationDays adds value to the "duration_days" field.
-func (_u *ProxyUserDeviceOnlineRecordUpdateOne) AddDurationDays(v int) *ProxyUserDeviceOnlineRecordUpdateOne {
+func (_u *ProxyUserDeviceOnlineRecordUpdateOne) AddDurationDays(v int64) *ProxyUserDeviceOnlineRecordUpdateOne {
 	_u.mutation.AddDurationDays(v)
 	return _u
 }
@@ -505,22 +505,22 @@ func (_u *ProxyUserDeviceOnlineRecordUpdateOne) sqlSave(ctx context.Context) (_n
 		_spec.ClearField(proxyuserdeviceonlinerecord.FieldOfflineTime, field.TypeTime)
 	}
 	if value, ok := _u.mutation.OnlineSeconds(); ok {
-		_spec.SetField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt, value)
+		_spec.SetField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedOnlineSeconds(); ok {
-		_spec.AddField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt, value)
+		_spec.AddField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt64, value)
 	}
 	if _u.mutation.OnlineSecondsCleared() {
-		_spec.ClearField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt)
+		_spec.ClearField(proxyuserdeviceonlinerecord.FieldOnlineSeconds, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.DurationDays(); ok {
-		_spec.SetField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt, value)
+		_spec.SetField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.AddedDurationDays(); ok {
-		_spec.AddField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt, value)
+		_spec.AddField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt64, value)
 	}
 	if _u.mutation.DurationDaysCleared() {
-		_spec.ClearField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt)
+		_spec.ClearField(proxyuserdeviceonlinerecord.FieldDurationDays, field.TypeInt64)
 	}
 	_node = &ProxyUserDeviceOnlineRecord{config: _u.config}
 	_spec.Assign = _node.assignValues

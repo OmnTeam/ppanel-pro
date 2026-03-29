@@ -479,7 +479,7 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 	builder.SetEnable(req.Enable)
 	builder.SetIsAdmin(req.IsAdmin)
 	if telegramID > 0 {
-		builder.SetTelegram(int(telegramID))
+		builder.SetTelegram(telegramID)
 	}
 
 	// 字符串字段：仅在非空时更新（避免清空重要字段）

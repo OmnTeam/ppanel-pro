@@ -26,7 +26,7 @@ const (
 	// FieldTimestamp holds the string denoting the timestamp field in the database.
 	FieldTimestamp = "timestamp"
 	// Table holds the table name of the proxytrafficlog in the database.
-	Table = "proxy_traffic_log"
+	Table = "traffic_log"
 )
 
 // Columns holds all SQL columns for proxytrafficlog fields.
@@ -52,9 +52,9 @@ func ValidColumn(column string) bool {
 
 var (
 	// DefaultDownload holds the default value on creation for the "download" field.
-	DefaultDownload int
+	DefaultDownload int64
 	// DefaultUpload holds the default value on creation for the "upload" field.
-	DefaultUpload int
+	DefaultUpload int64
 	// DefaultTimestamp holds the default value on creation for the "timestamp" field.
 	DefaultTimestamp func() time.Time
 )

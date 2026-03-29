@@ -39,13 +39,13 @@ func (_c *ProxyTrafficLogCreate) SetSubscribeID(v int64) *ProxyTrafficLogCreate 
 }
 
 // SetDownload sets the "download" field.
-func (_c *ProxyTrafficLogCreate) SetDownload(v int) *ProxyTrafficLogCreate {
+func (_c *ProxyTrafficLogCreate) SetDownload(v int64) *ProxyTrafficLogCreate {
 	_c.mutation.SetDownload(v)
 	return _c
 }
 
 // SetNillableDownload sets the "download" field if the given value is not nil.
-func (_c *ProxyTrafficLogCreate) SetNillableDownload(v *int) *ProxyTrafficLogCreate {
+func (_c *ProxyTrafficLogCreate) SetNillableDownload(v *int64) *ProxyTrafficLogCreate {
 	if v != nil {
 		_c.SetDownload(*v)
 	}
@@ -53,13 +53,13 @@ func (_c *ProxyTrafficLogCreate) SetNillableDownload(v *int) *ProxyTrafficLogCre
 }
 
 // SetUpload sets the "upload" field.
-func (_c *ProxyTrafficLogCreate) SetUpload(v int) *ProxyTrafficLogCreate {
+func (_c *ProxyTrafficLogCreate) SetUpload(v int64) *ProxyTrafficLogCreate {
 	_c.mutation.SetUpload(v)
 	return _c
 }
 
 // SetNillableUpload sets the "upload" field if the given value is not nil.
-func (_c *ProxyTrafficLogCreate) SetNillableUpload(v *int) *ProxyTrafficLogCreate {
+func (_c *ProxyTrafficLogCreate) SetNillableUpload(v *int64) *ProxyTrafficLogCreate {
 	if v != nil {
 		_c.SetUpload(*v)
 	}
@@ -200,11 +200,11 @@ func (_c *ProxyTrafficLogCreate) createSpec() (*ProxyTrafficLog, *sqlgraph.Creat
 		_node.SubscribeID = value
 	}
 	if value, ok := _c.mutation.Download(); ok {
-		_spec.SetField(proxytrafficlog.FieldDownload, field.TypeInt, value)
+		_spec.SetField(proxytrafficlog.FieldDownload, field.TypeInt64, value)
 		_node.Download = value
 	}
 	if value, ok := _c.mutation.Upload(); ok {
-		_spec.SetField(proxytrafficlog.FieldUpload, field.TypeInt, value)
+		_spec.SetField(proxytrafficlog.FieldUpload, field.TypeInt64, value)
 		_node.Upload = value
 	}
 	if value, ok := _c.mutation.Timestamp(); ok {

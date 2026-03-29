@@ -15,9 +15,8 @@ import (
 type ProxySchemaMigrations struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
 	// 迁移版本号
-	Version string `json:"version,omitempty"`
+	ID int64 `json:"id,omitempty"`
 	// 是否脏数据
 	Dirty        bool `json:"dirty,omitempty"`
 	selectValues sql.SelectValues
@@ -32,8 +31,6 @@ func (*ProxySchemaMigrations) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case proxyschemamigrations.FieldID:
 			values[i] = new(sql.NullInt64)
-		case proxyschemamigrations.FieldVersion:
-			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -54,13 +51,7 @@ func (_m *ProxySchemaMigrations) assignValues(columns []string, values []any) er
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			_m.ID = int(value.Int64)
-		case proxyschemamigrations.FieldVersion:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field version", values[i])
-			} else if value.Valid {
-				_m.Version = value.String
-			}
+			_m.ID = int64(value.Int64)
 		case proxyschemamigrations.FieldDirty:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field dirty", values[i])
@@ -103,9 +94,6 @@ func (_m *ProxySchemaMigrations) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProxySchemaMigrations(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
-	builder.WriteString("version=")
-	builder.WriteString(_m.Version)
-	builder.WriteString(", ")
 	builder.WriteString("dirty=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Dirty))
 	builder.WriteByte(')')

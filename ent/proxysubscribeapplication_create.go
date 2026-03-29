@@ -20,23 +20,17 @@ type ProxySubscribeApplicationCreate struct {
 	hooks    []Hook
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_c *ProxySubscribeApplicationCreate) SetTenantID(v int64) *ProxySubscribeApplicationCreate {
-	_c.mutation.SetTenantID(v)
-	return _c
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_c *ProxySubscribeApplicationCreate) SetNillableTenantID(v *int64) *ProxySubscribeApplicationCreate {
-	if v != nil {
-		_c.SetTenantID(*v)
-	}
-	return _c
-}
-
 // SetName sets the "name" field.
 func (_c *ProxySubscribeApplicationCreate) SetName(v string) *ProxySubscribeApplicationCreate {
 	_c.mutation.SetName(v)
+	return _c
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (_c *ProxySubscribeApplicationCreate) SetNillableName(v *string) *ProxySubscribeApplicationCreate {
+	if v != nil {
+		_c.SetName(*v)
+	}
 	return _c
 }
 
@@ -74,9 +68,25 @@ func (_c *ProxySubscribeApplicationCreate) SetScheme(v string) *ProxySubscribeAp
 	return _c
 }
 
+// SetNillableScheme sets the "scheme" field if the given value is not nil.
+func (_c *ProxySubscribeApplicationCreate) SetNillableScheme(v *string) *ProxySubscribeApplicationCreate {
+	if v != nil {
+		_c.SetScheme(*v)
+	}
+	return _c
+}
+
 // SetUserAgent sets the "user_agent" field.
 func (_c *ProxySubscribeApplicationCreate) SetUserAgent(v string) *ProxySubscribeApplicationCreate {
 	_c.mutation.SetUserAgent(v)
+	return _c
+}
+
+// SetNillableUserAgent sets the "user_agent" field if the given value is not nil.
+func (_c *ProxySubscribeApplicationCreate) SetNillableUserAgent(v *string) *ProxySubscribeApplicationCreate {
+	if v != nil {
+		_c.SetUserAgent(*v)
+	}
 	return _c
 }
 
@@ -197,9 +207,17 @@ func (_c *ProxySubscribeApplicationCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxySubscribeApplicationCreate) defaults() {
-	if _, ok := _c.mutation.TenantID(); !ok {
-		v := proxysubscribeapplication.DefaultTenantID
-		_c.mutation.SetTenantID(v)
+	if _, ok := _c.mutation.Name(); !ok {
+		v := proxysubscribeapplication.DefaultName
+		_c.mutation.SetName(v)
+	}
+	if _, ok := _c.mutation.Scheme(); !ok {
+		v := proxysubscribeapplication.DefaultScheme
+		_c.mutation.SetScheme(v)
+	}
+	if _, ok := _c.mutation.UserAgent(); !ok {
+		v := proxysubscribeapplication.DefaultUserAgent
+		_c.mutation.SetUserAgent(v)
 	}
 	if _, ok := _c.mutation.IsDefault(); !ok {
 		v := proxysubscribeapplication.DefaultIsDefault
@@ -221,9 +239,6 @@ func (_c *ProxySubscribeApplicationCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ProxySubscribeApplicationCreate) check() error {
-	if _, ok := _c.mutation.TenantID(); !ok {
-		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "ProxySubscribeApplication.tenant_id"`)}
-	}
 	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "ProxySubscribeApplication.name"`)}
 	}
@@ -267,17 +282,6 @@ func (_c *ProxySubscribeApplicationCreate) check() error {
 	if _, ok := _c.mutation.DownloadLink(); !ok {
 		return &ValidationError{Name: "download_link", err: errors.New(`ent: missing required field "ProxySubscribeApplication.download_link"`)}
 	}
-	if v, ok := _c.mutation.DownloadLink(); ok {
-		if err := proxysubscribeapplication.DownloadLinkValidator(v); err != nil {
-			return &ValidationError{Name: "download_link", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribeApplication.download_link": %w`, err)}
-		}
-	}
-	if _, ok := _c.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProxySubscribeApplication.created_at"`)}
-	}
-	if _, ok := _c.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "ProxySubscribeApplication.updated_at"`)}
-	}
 	if v, ok := _c.mutation.ID(); ok {
 		if err := proxysubscribeapplication.IDValidator(v); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "ProxySubscribeApplication.id": %w`, err)}
@@ -314,10 +318,6 @@ func (_c *ProxySubscribeApplicationCreate) createSpec() (*ProxySubscribeApplicat
 	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
-	}
-	if value, ok := _c.mutation.TenantID(); ok {
-		_spec.SetField(proxysubscribeapplication.FieldTenantID, field.TypeInt64, value)
-		_node.TenantID = value
 	}
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(proxysubscribeapplication.FieldName, field.TypeString, value)

@@ -9,7 +9,6 @@ import (
 	"reflect"
 	"strconv"
 
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/errors"
 )
 
@@ -24,7 +23,7 @@ type ErrorResponse struct {
 // 所有错误统一返回 HTTP 200，业务错误码在响应体的 code 字段中
 func CustomErrorEncoder(w http.ResponseWriter, r *http.Request, err error) {
 	// 默认错误码和消息
-	errorCode := responsecode.ErrInternalError
+	errorCode := 500
 	errorMessage := "Internal Server Error"
 
 	// 尝试从 Kratos 错误中提取信息

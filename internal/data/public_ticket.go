@@ -49,7 +49,7 @@ func (r *publicTicketRepo) CreateTicket(ctx context.Context, userID int, title, 
 
 // GetTicketList gets user's ticket list
 // 完整复刻原项目 getUserTicketListLogic.go
-// ⚠️ 注意：当前schema暂不支持tenant_id字段
+// 注意：当前实现使用单库模型
 // 支持分页、状态过滤、搜索功能
 func (r *publicTicketRepo) GetTicketList(ctx context.Context, userID int, page, size int, status *int32, search *string) (int64, []*ticketBiz.TicketInfo, error) {
 	r.logger.Infof("[GetTicketList] userID: %d, page: %d, size: %d", userID, page, size)
@@ -127,10 +127,6 @@ func (r *publicTicketRepo) GetTicketByID(ctx context.Context, ticketID int) (*ti
 		Only(ctx)
 
 	if err != nil {
-		if ent.IsNotFound(err) {
-			r.logger.Errorf("[GetTicketByID] 工单不存在: ticketID=%d", ticketID)
-			return nil, errors.NotFound("TICKET_NOT_FOUND", "工单不存在")
-		}
 		r.logger.Errorf("[GetTicketByID] 查询工单失败: %v", err)
 		return nil, errors.InternalServer("DATABASE_ERROR", fmt.Sprintf("查询工单失败: %v", err))
 	}
@@ -155,23 +151,18 @@ func (r *publicTicketRepo) UpdateTicketStatus(ctx context.Context, userID, ticke
 		userID, ticketID, status)
 
 	// 更新状态 - 使用user_id过滤确保安全
-	affected, err := r.data.db.ProxyTicket.Update().
+	err := r.data.db.ProxyTicket.Update().
 		Where(proxyticket.IDEQ(ticketID),
 			proxyticket.UserIDEQ(userID)).
 		SetStatus(int8(status)).
-		Save(ctx)
+		Exec(ctx)
 
 	if err != nil {
 		r.logger.Errorf("[UpdateTicketStatus] 更新状态失败: %v", err)
 		return errors.InternalServer("DATABASE_ERROR", fmt.Sprintf("更新状态失败: %v", err))
 	}
 
-	if affected == 0 {
-		r.logger.Errorf("[UpdateTicketStatus] 工单不存在或无权限, affected: %d", affected)
-		return errors.NotFound("TICKET_NOT_FOUND", "工单不存在或无权限")
-	}
-
-	r.logger.Infof("[UpdateTicketStatus] 更新成功, affected: %d", affected)
+	r.logger.Infof("[UpdateTicketStatus] 更新成功")
 	return nil
 }
 

@@ -50,22 +50,22 @@ service PaymentService {
 
 // 支付方式信息
 message PaymentMethod {
-string id = 1;
+  int64 id = 1;
   string name = 2;
   string platform = 3;
   string description = 4;
   string icon = 5;
   string domain = 6;
   google.protobuf.Struct config = 7;
-  int32 fee_mode = 8;
-string fee_percent = 9;
-string fee_amount = 10;
+  int32 fee_mode = 8;          // 手续费模式
+  int64 fee_percent = 9;       // 手续费百分比
+  int64 fee_amount = 10;       // 手续费固定金额（分）
   bool enable = 11;
   string notify_url = 12;
   string token = 13;
 }
 
-// 支付平台信息 - 完全复刻原项目 server-master/internal/types/types.go:PlatformInfo
+// 支付平台信息
 message PaymentPlatform {
   string platform = 1 [json_name = "platform"];
   string platform_url = 2 [json_name = "platform_url"];
@@ -80,15 +80,22 @@ message CreatePaymentMethodRequest {
   string icon = 4;
   string domain = 5;
   google.protobuf.Struct config = 6;
-  int32 fee_mode = 7;
-string fee_percent = 8;
-string fee_amount = 9;
+  int32 fee_mode = 7;       // 手续费模式
+  int64 fee_percent = 8;    // 手续费百分比
+  int64 fee_amount = 9;     // 手续费固定金额（分）
   optional bool enable = 10;
+}
+
+// 创建支付方式响应
+message CreatePaymentMethodReply {
+  int32 code = 1;           // 状态码
+  string message = 2;       // 消息内容
+  PaymentMethod data = 3;   // 响应数据
 }
 
 // 更新支付方式请求
 message UpdatePaymentMethodRequest {
-string id = 1;
+  int64 id = 1 [(validate.rules).int64.gt = 0];
   string name = 2 [(validate.rules).string.min_len = 1];
   string platform = 3 [(validate.rules).string.min_len = 1];
   string description = 4;
@@ -96,14 +103,27 @@ string id = 1;
   string domain = 6;
   google.protobuf.Struct config = 7;
   int32 fee_mode = 8;
-string fee_percent = 9;
-string fee_amount = 10;
+  int64 fee_percent = 9;
+  int64 fee_amount = 10;
   optional bool enable = 11;
+}
+
+// 更新支付方式响应
+message UpdatePaymentMethodReply {
+  int32 code = 1;           // 状态码
+  string message = 2;       // 消息内容
+  PaymentMethod data = 3;   // 响应数据
 }
 
 // 删除支付方式请求
 message DeletePaymentMethodRequest {
-  string id = 1;
+  int64 id = 1;
+}
+
+// 删除支付方式响应
+message DeletePaymentMethodReply {
+  int32 code = 1;     // 状态码
+  string message = 2; // 消息内容
 }
 
 // 获取支付方式列表请求
@@ -115,34 +135,9 @@ message GetPaymentMethodListRequest {
   optional bool enable = 5;
 }
 
-// 获取支付平台请求
-message GetPaymentPlatformRequest {
-}
-
-// 创建支付方式响应
-message CreatePaymentMethodReply {
-  int32 code = 1;           // 状态码
-  string message = 2;       // 消息内容
-  PaymentMethod data = 3;   // 响应数据（直接返回PaymentMethod，不需要额外包装）
-}
-
-// 更新支付方式响应
-message UpdatePaymentMethodReply {
-  int32 code = 1;           // 状态码
-  string message = 2;       // 消息内容
-  PaymentMethod data = 3;   // 响应数据（直接返回PaymentMethod，不需要额外包装）
-}
-
-// 删除支付方式响应
-message DeletePaymentMethodReply {
-  int32 code = 1;     // 状态码
-  string message = 2; // 消息内容
-  // 注意：老项目无返回值，这里保持空响应
-}
-
 // 获取支付方式列表数据
 message GetPaymentMethodListData {
-  int32 total = 1;
+  int64 total = 1;
   repeated PaymentMethod list = 2;
 }
 
@@ -153,7 +148,10 @@ message GetPaymentMethodListReply {
   GetPaymentMethodListData data = 3;      // 响应数据
 }
 
-// 获取支付平台数据 - 完全复刻原项目 server-master/internal/types/types.go:PlatformResponse
+// 获取支付平台请求
+message GetPaymentPlatformRequest {}
+
+// 获取支付平台数据
 message GetPaymentPlatformData {
   repeated PaymentPlatform list = 1 [json_name = "list"];
 }

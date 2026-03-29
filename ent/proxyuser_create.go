@@ -70,20 +70,6 @@ func (_c *ProxyUserCreate) SetNillableAvatar(v *string) *ProxyUserCreate {
 	return _c
 }
 
-// SetTenantID sets the "tenant_id" field.
-func (_c *ProxyUserCreate) SetTenantID(v int64) *ProxyUserCreate {
-	_c.mutation.SetTenantID(v)
-	return _c
-}
-
-// SetNillableTenantID sets the "tenant_id" field if the given value is not nil.
-func (_c *ProxyUserCreate) SetNillableTenantID(v *int64) *ProxyUserCreate {
-	if v != nil {
-		_c.SetTenantID(*v)
-	}
-	return _c
-}
-
 // SetBalance sets the "balance" field.
 func (_c *ProxyUserCreate) SetBalance(v int64) *ProxyUserCreate {
 	_c.mutation.SetBalance(v)
@@ -99,13 +85,13 @@ func (_c *ProxyUserCreate) SetNillableBalance(v *int64) *ProxyUserCreate {
 }
 
 // SetTelegram sets the "telegram" field.
-func (_c *ProxyUserCreate) SetTelegram(v int) *ProxyUserCreate {
+func (_c *ProxyUserCreate) SetTelegram(v int64) *ProxyUserCreate {
 	_c.mutation.SetTelegram(v)
 	return _c
 }
 
 // SetNillableTelegram sets the "telegram" field if the given value is not nil.
-func (_c *ProxyUserCreate) SetNillableTelegram(v *int) *ProxyUserCreate {
+func (_c *ProxyUserCreate) SetNillableTelegram(v *int64) *ProxyUserCreate {
 	if v != nil {
 		_c.SetTelegram(*v)
 	}
@@ -322,30 +308,16 @@ func (_c *ProxyUserCreate) SetNillableEnableTradeNotify(v *bool) *ProxyUserCreat
 	return _c
 }
 
-// SetGroupID sets the "group_id" field.
-func (_c *ProxyUserCreate) SetGroupID(v int64) *ProxyUserCreate {
-	_c.mutation.SetGroupID(v)
+// SetRules sets the "rules" field.
+func (_c *ProxyUserCreate) SetRules(v string) *ProxyUserCreate {
+	_c.mutation.SetRules(v)
 	return _c
 }
 
-// SetNillableGroupID sets the "group_id" field if the given value is not nil.
-func (_c *ProxyUserCreate) SetNillableGroupID(v *int64) *ProxyUserCreate {
+// SetNillableRules sets the "rules" field if the given value is not nil.
+func (_c *ProxyUserCreate) SetNillableRules(v *string) *ProxyUserCreate {
 	if v != nil {
-		_c.SetGroupID(*v)
-	}
-	return _c
-}
-
-// SetGroupLocked sets the "group_locked" field.
-func (_c *ProxyUserCreate) SetGroupLocked(v bool) *ProxyUserCreate {
-	_c.mutation.SetGroupLocked(v)
-	return _c
-}
-
-// SetNillableGroupLocked sets the "group_locked" field if the given value is not nil.
-func (_c *ProxyUserCreate) SetNillableGroupLocked(v *bool) *ProxyUserCreate {
-	if v != nil {
-		_c.SetGroupLocked(*v)
+		_c.SetRules(*v)
 	}
 	return _c
 }
@@ -393,13 +365,13 @@ func (_c *ProxyUserCreate) SetNillableDeletedAt(v *time.Time) *ProxyUserCreate {
 }
 
 // SetIsDel sets the "is_del" field.
-func (_c *ProxyUserCreate) SetIsDel(v bool) *ProxyUserCreate {
+func (_c *ProxyUserCreate) SetIsDel(v uint64) *ProxyUserCreate {
 	_c.mutation.SetIsDel(v)
 	return _c
 }
 
 // SetNillableIsDel sets the "is_del" field if the given value is not nil.
-func (_c *ProxyUserCreate) SetNillableIsDel(v *bool) *ProxyUserCreate {
+func (_c *ProxyUserCreate) SetNillableIsDel(v *uint64) *ProxyUserCreate {
 	if v != nil {
 		_c.SetIsDel(*v)
 	}
@@ -481,10 +453,6 @@ func (_c *ProxyUserCreate) defaults() {
 		v := proxyuser.DefaultAlgo
 		_c.mutation.SetAlgo(v)
 	}
-	if _, ok := _c.mutation.TenantID(); !ok {
-		v := proxyuser.DefaultTenantID
-		_c.mutation.SetTenantID(v)
-	}
 	if _, ok := _c.mutation.Balance(); !ok {
 		v := proxyuser.DefaultBalance
 		_c.mutation.SetBalance(v)
@@ -541,14 +509,6 @@ func (_c *ProxyUserCreate) defaults() {
 		v := proxyuser.DefaultEnableTradeNotify
 		_c.mutation.SetEnableTradeNotify(v)
 	}
-	if _, ok := _c.mutation.GroupID(); !ok {
-		v := proxyuser.DefaultGroupID
-		_c.mutation.SetGroupID(v)
-	}
-	if _, ok := _c.mutation.GroupLocked(); !ok {
-		v := proxyuser.DefaultGroupLocked
-		_c.mutation.SetGroupLocked(v)
-	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := proxyuser.DefaultCreatedAt()
 		_c.mutation.SetCreatedAt(v)
@@ -556,10 +516,6 @@ func (_c *ProxyUserCreate) defaults() {
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		v := proxyuser.DefaultUpdatedAt()
 		_c.mutation.SetUpdatedAt(v)
-	}
-	if _, ok := _c.mutation.IsDel(); !ok {
-		v := proxyuser.DefaultIsDel
-		_c.mutation.SetIsDel(v)
 	}
 }
 
@@ -585,9 +541,6 @@ func (_c *ProxyUserCreate) check() error {
 		if err := proxyuser.SaltValidator(v); err != nil {
 			return &ValidationError{Name: "salt", err: fmt.Errorf(`ent: validator failed for field "ProxyUser.salt": %w`, err)}
 		}
-	}
-	if _, ok := _c.mutation.TenantID(); !ok {
-		return &ValidationError{Name: "tenant_id", err: errors.New(`ent: missing required field "ProxyUser.tenant_id"`)}
 	}
 	if v, ok := _c.mutation.ReferCode(); ok {
 		if err := proxyuser.ReferCodeValidator(v); err != nil {
@@ -626,9 +579,6 @@ func (_c *ProxyUserCreate) check() error {
 	}
 	if _, ok := _c.mutation.EnableTradeNotify(); !ok {
 		return &ValidationError{Name: "enable_trade_notify", err: errors.New(`ent: missing required field "ProxyUser.enable_trade_notify"`)}
-	}
-	if _, ok := _c.mutation.GroupLocked(); !ok {
-		return &ValidationError{Name: "group_locked", err: errors.New(`ent: missing required field "ProxyUser.group_locked"`)}
 	}
 	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "ProxyUser.created_at"`)}
@@ -689,16 +639,12 @@ func (_c *ProxyUserCreate) createSpec() (*ProxyUser, *sqlgraph.CreateSpec) {
 		_spec.SetField(proxyuser.FieldAvatar, field.TypeString, value)
 		_node.Avatar = &value
 	}
-	if value, ok := _c.mutation.TenantID(); ok {
-		_spec.SetField(proxyuser.FieldTenantID, field.TypeInt64, value)
-		_node.TenantID = value
-	}
 	if value, ok := _c.mutation.Balance(); ok {
 		_spec.SetField(proxyuser.FieldBalance, field.TypeInt64, value)
 		_node.Balance = &value
 	}
 	if value, ok := _c.mutation.Telegram(); ok {
-		_spec.SetField(proxyuser.FieldTelegram, field.TypeInt, value)
+		_spec.SetField(proxyuser.FieldTelegram, field.TypeInt64, value)
 		_node.Telegram = &value
 	}
 	if value, ok := _c.mutation.ReferCode(); ok {
@@ -761,13 +707,9 @@ func (_c *ProxyUserCreate) createSpec() (*ProxyUser, *sqlgraph.CreateSpec) {
 		_spec.SetField(proxyuser.FieldEnableTradeNotify, field.TypeBool, value)
 		_node.EnableTradeNotify = value
 	}
-	if value, ok := _c.mutation.GroupID(); ok {
-		_spec.SetField(proxyuser.FieldGroupID, field.TypeInt64, value)
-		_node.GroupID = &value
-	}
-	if value, ok := _c.mutation.GroupLocked(); ok {
-		_spec.SetField(proxyuser.FieldGroupLocked, field.TypeBool, value)
-		_node.GroupLocked = value
+	if value, ok := _c.mutation.Rules(); ok {
+		_spec.SetField(proxyuser.FieldRules, field.TypeString, value)
+		_node.Rules = &value
 	}
 	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(proxyuser.FieldCreatedAt, field.TypeTime, value)
@@ -782,7 +724,7 @@ func (_c *ProxyUserCreate) createSpec() (*ProxyUser, *sqlgraph.CreateSpec) {
 		_node.DeletedAt = &value
 	}
 	if value, ok := _c.mutation.IsDel(); ok {
-		_spec.SetField(proxyuser.FieldIsDel, field.TypeBool, value)
+		_spec.SetField(proxyuser.FieldIsDel, field.TypeUint64, value)
 		_node.IsDel = &value
 	}
 	if nodes := _c.mutation.RedemptionRecordsIDs(); len(nodes) > 0 {

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v3.19.4
-// source: admin/marketing/v1/marketing.proto
+// source: api/admin/marketing/v1/marketing.proto
 
 package v1
 
@@ -403,5 +403,5 @@ var MarketingService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "admin/marketing/v1/marketing.proto",
+	Metadata: "api/admin/marketing/v1/marketing.proto",
 }

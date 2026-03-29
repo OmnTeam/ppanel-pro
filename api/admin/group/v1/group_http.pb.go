@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.8.4
 // - protoc             v3.19.4
-// source: admin/group/v1/group.proto
+// source: api/admin/group/v1/group.proto
 
 package v1
 
@@ -20,34 +20,26 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationGroupCreateNodeGroup = "/api.admin.group.v1.Group/CreateNodeGroup"
-const OperationGroupCreateUserGroup = "/api.admin.group.v1.Group/CreateUserGroup"
 const OperationGroupDeleteNodeGroup = "/api.admin.group.v1.Group/DeleteNodeGroup"
-const OperationGroupDeleteUserGroup = "/api.admin.group.v1.Group/DeleteUserGroup"
 const OperationGroupExportGroupResult = "/api.admin.group.v1.Group/ExportGroupResult"
 const OperationGroupGetGroupConfig = "/api.admin.group.v1.Group/GetGroupConfig"
 const OperationGroupGetGroupHistory = "/api.admin.group.v1.Group/GetGroupHistory"
 const OperationGroupGetGroupHistoryDetail = "/api.admin.group.v1.Group/GetGroupHistoryDetail"
 const OperationGroupGetNodeGroupList = "/api.admin.group.v1.Group/GetNodeGroupList"
 const OperationGroupGetRecalculationStatus = "/api.admin.group.v1.Group/GetRecalculationStatus"
-const OperationGroupGetUserGroupList = "/api.admin.group.v1.Group/GetUserGroupList"
+const OperationGroupGetSubscribeGroupMapping = "/api.admin.group.v1.Group/GetSubscribeGroupMapping"
 const OperationGroupMigrateUsers = "/api.admin.group.v1.Group/MigrateUsers"
 const OperationGroupPreviewUserNodes = "/api.admin.group.v1.Group/PreviewUserNodes"
 const OperationGroupRecalculateGroup = "/api.admin.group.v1.Group/RecalculateGroup"
 const OperationGroupResetGroups = "/api.admin.group.v1.Group/ResetGroups"
 const OperationGroupUpdateGroupConfig = "/api.admin.group.v1.Group/UpdateGroupConfig"
 const OperationGroupUpdateNodeGroup = "/api.admin.group.v1.Group/UpdateNodeGroup"
-const OperationGroupUpdateUserGroup = "/api.admin.group.v1.Group/UpdateUserGroup"
-const OperationGroupUpdateUserUserGroup = "/api.admin.group.v1.Group/UpdateUserUserGroup"
 
 type GroupHTTPServer interface {
 	// CreateNodeGroup CreateNodeGroup 创建节点组
 	CreateNodeGroup(context.Context, *CreateNodeGroupRequest) (*CreateNodeGroupReply, error)
-	// CreateUserGroup CreateUserGroup 创建用户组
-	CreateUserGroup(context.Context, *CreateUserGroupRequest) (*CreateUserGroupReply, error)
 	// DeleteNodeGroup DeleteNodeGroup 删除节点组
 	DeleteNodeGroup(context.Context, *DeleteNodeGroupRequest) (*DeleteNodeGroupReply, error)
-	// DeleteUserGroup DeleteUserGroup 删除用户组
-	DeleteUserGroup(context.Context, *DeleteUserGroupRequest) (*DeleteUserGroupReply, error)
 	// ExportGroupResult ExportGroupResult 导出分组结果
 	ExportGroupResult(context.Context, *ExportGroupResultRequest) (*ExportGroupResultReply, error)
 	// GetGroupConfig ===== 分组配置管理 =====
@@ -62,9 +54,8 @@ type GroupHTTPServer interface {
 	GetNodeGroupList(context.Context, *GetNodeGroupListRequest) (*GetNodeGroupListReply, error)
 	// GetRecalculationStatus GetRecalculationStatus 获取重新计算状态
 	GetRecalculationStatus(context.Context, *GetRecalculationStatusRequest) (*GetRecalculationStatusReply, error)
-	// GetUserGroupList ===== 用户组管理 =====
-	// GetUserGroupList 获取用户组列表
-	GetUserGroupList(context.Context, *GetUserGroupListRequest) (*GetUserGroupListReply, error)
+	// GetSubscribeGroupMapping GetSubscribeGroupMapping 获取订阅组映射
+	GetSubscribeGroupMapping(context.Context, *GetSubscribeGroupMappingRequest) (*GetSubscribeGroupMappingReply, error)
 	// MigrateUsers MigrateUsers 迁移用户到另一个分组
 	MigrateUsers(context.Context, *MigrateUsersRequest) (*MigrateUsersReply, error)
 	// PreviewUserNodes PreviewUserNodes 预览用户节点
@@ -78,19 +69,10 @@ type GroupHTTPServer interface {
 	UpdateGroupConfig(context.Context, *UpdateGroupConfigRequest) (*UpdateGroupConfigReply, error)
 	// UpdateNodeGroup UpdateNodeGroup 更新节点组
 	UpdateNodeGroup(context.Context, *UpdateNodeGroupRequest) (*UpdateNodeGroupReply, error)
-	// UpdateUserGroup UpdateUserGroup 更新用户组
-	UpdateUserGroup(context.Context, *UpdateUserGroupRequest) (*UpdateUserGroupReply, error)
-	// UpdateUserUserGroup UpdateUserUserGroup 更新用户的用户组
-	UpdateUserUserGroup(context.Context, *UpdateUserUserGroupRequest) (*UpdateUserUserGroupReply, error)
 }
 
 func RegisterGroupHTTPServer(s *http.Server, srv GroupHTTPServer) {
 	r := s.Route("/")
-	r.GET("/v1/admin/group/user/list", _Group_GetUserGroupList0_HTTP_Handler(srv))
-	r.POST("/v1/admin/group/user", _Group_CreateUserGroup0_HTTP_Handler(srv))
-	r.PUT("/v1/admin/group/user", _Group_UpdateUserGroup0_HTTP_Handler(srv))
-	r.DELETE("/v1/admin/group/user", _Group_DeleteUserGroup0_HTTP_Handler(srv))
-	r.PUT("/v1/admin/group/user/usergroup", _Group_UpdateUserUserGroup0_HTTP_Handler(srv))
 	r.GET("/v1/admin/group/node/list", _Group_GetNodeGroupList0_HTTP_Handler(srv))
 	r.POST("/v1/admin/group/node", _Group_CreateNodeGroup0_HTTP_Handler(srv))
 	r.PUT("/v1/admin/group/node", _Group_UpdateNodeGroup0_HTTP_Handler(srv))
@@ -105,113 +87,7 @@ func RegisterGroupHTTPServer(s *http.Server, srv GroupHTTPServer) {
 	r.POST("/v1/admin/group/migrate", _Group_MigrateUsers0_HTTP_Handler(srv))
 	r.GET("/v1/admin/group/preview", _Group_PreviewUserNodes0_HTTP_Handler(srv))
 	r.POST("/v1/admin/group/reset", _Group_ResetGroups0_HTTP_Handler(srv))
-}
-
-func _Group_GetUserGroupList0_HTTP_Handler(srv GroupHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in GetUserGroupListRequest
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationGroupGetUserGroupList)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.GetUserGroupList(ctx, req.(*GetUserGroupListRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*GetUserGroupListReply)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _Group_CreateUserGroup0_HTTP_Handler(srv GroupHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in CreateUserGroupRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationGroupCreateUserGroup)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.CreateUserGroup(ctx, req.(*CreateUserGroupRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*CreateUserGroupReply)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _Group_UpdateUserGroup0_HTTP_Handler(srv GroupHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in UpdateUserGroupRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationGroupUpdateUserGroup)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.UpdateUserGroup(ctx, req.(*UpdateUserGroupRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*UpdateUserGroupReply)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _Group_DeleteUserGroup0_HTTP_Handler(srv GroupHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in DeleteUserGroupRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationGroupDeleteUserGroup)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.DeleteUserGroup(ctx, req.(*DeleteUserGroupRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*DeleteUserGroupReply)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _Group_UpdateUserUserGroup0_HTTP_Handler(srv GroupHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in UpdateUserUserGroupRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationGroupUpdateUserUserGroup)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.UpdateUserUserGroup(ctx, req.(*UpdateUserUserGroupRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*UpdateUserUserGroupReply)
-		return ctx.Result(200, reply)
-	}
+	r.GET("/v1/admin/group/subscribe/mapping", _Group_GetSubscribeGroupMapping0_HTTP_Handler(srv))
 }
 
 func _Group_GetNodeGroupList0_HTTP_Handler(srv GroupHTTPServer) func(ctx http.Context) error {
@@ -501,26 +377,41 @@ func _Group_ResetGroups0_HTTP_Handler(srv GroupHTTPServer) func(ctx http.Context
 	}
 }
 
+func _Group_GetSubscribeGroupMapping0_HTTP_Handler(srv GroupHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetSubscribeGroupMappingRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGroupGetSubscribeGroupMapping)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetSubscribeGroupMapping(ctx, req.(*GetSubscribeGroupMappingRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetSubscribeGroupMappingReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type GroupHTTPClient interface {
 	CreateNodeGroup(ctx context.Context, req *CreateNodeGroupRequest, opts ...http.CallOption) (rsp *CreateNodeGroupReply, err error)
-	CreateUserGroup(ctx context.Context, req *CreateUserGroupRequest, opts ...http.CallOption) (rsp *CreateUserGroupReply, err error)
 	DeleteNodeGroup(ctx context.Context, req *DeleteNodeGroupRequest, opts ...http.CallOption) (rsp *DeleteNodeGroupReply, err error)
-	DeleteUserGroup(ctx context.Context, req *DeleteUserGroupRequest, opts ...http.CallOption) (rsp *DeleteUserGroupReply, err error)
 	ExportGroupResult(ctx context.Context, req *ExportGroupResultRequest, opts ...http.CallOption) (rsp *ExportGroupResultReply, err error)
 	GetGroupConfig(ctx context.Context, req *GetGroupConfigRequest, opts ...http.CallOption) (rsp *GetGroupConfigReply, err error)
 	GetGroupHistory(ctx context.Context, req *GetGroupHistoryRequest, opts ...http.CallOption) (rsp *GetGroupHistoryReply, err error)
 	GetGroupHistoryDetail(ctx context.Context, req *GetGroupHistoryDetailRequest, opts ...http.CallOption) (rsp *GetGroupHistoryDetailReply, err error)
 	GetNodeGroupList(ctx context.Context, req *GetNodeGroupListRequest, opts ...http.CallOption) (rsp *GetNodeGroupListReply, err error)
 	GetRecalculationStatus(ctx context.Context, req *GetRecalculationStatusRequest, opts ...http.CallOption) (rsp *GetRecalculationStatusReply, err error)
-	GetUserGroupList(ctx context.Context, req *GetUserGroupListRequest, opts ...http.CallOption) (rsp *GetUserGroupListReply, err error)
+	GetSubscribeGroupMapping(ctx context.Context, req *GetSubscribeGroupMappingRequest, opts ...http.CallOption) (rsp *GetSubscribeGroupMappingReply, err error)
 	MigrateUsers(ctx context.Context, req *MigrateUsersRequest, opts ...http.CallOption) (rsp *MigrateUsersReply, err error)
 	PreviewUserNodes(ctx context.Context, req *PreviewUserNodesRequest, opts ...http.CallOption) (rsp *PreviewUserNodesReply, err error)
 	RecalculateGroup(ctx context.Context, req *RecalculateGroupRequest, opts ...http.CallOption) (rsp *RecalculateGroupReply, err error)
 	ResetGroups(ctx context.Context, req *ResetGroupsRequest, opts ...http.CallOption) (rsp *ResetGroupsReply, err error)
 	UpdateGroupConfig(ctx context.Context, req *UpdateGroupConfigRequest, opts ...http.CallOption) (rsp *UpdateGroupConfigReply, err error)
 	UpdateNodeGroup(ctx context.Context, req *UpdateNodeGroupRequest, opts ...http.CallOption) (rsp *UpdateNodeGroupReply, err error)
-	UpdateUserGroup(ctx context.Context, req *UpdateUserGroupRequest, opts ...http.CallOption) (rsp *UpdateUserGroupReply, err error)
-	UpdateUserUserGroup(ctx context.Context, req *UpdateUserUserGroupRequest, opts ...http.CallOption) (rsp *UpdateUserUserGroupReply, err error)
 }
 
 type GroupHTTPClientImpl struct {
@@ -544,37 +435,11 @@ func (c *GroupHTTPClientImpl) CreateNodeGroup(ctx context.Context, in *CreateNod
 	return &out, nil
 }
 
-func (c *GroupHTTPClientImpl) CreateUserGroup(ctx context.Context, in *CreateUserGroupRequest, opts ...http.CallOption) (*CreateUserGroupReply, error) {
-	var out CreateUserGroupReply
-	pattern := "/v1/admin/group/user"
-	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationGroupCreateUserGroup))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, nil
-}
-
 func (c *GroupHTTPClientImpl) DeleteNodeGroup(ctx context.Context, in *DeleteNodeGroupRequest, opts ...http.CallOption) (*DeleteNodeGroupReply, error) {
 	var out DeleteNodeGroupReply
 	pattern := "/v1/admin/group/node"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationGroupDeleteNodeGroup))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "DELETE", path, in, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, nil
-}
-
-func (c *GroupHTTPClientImpl) DeleteUserGroup(ctx context.Context, in *DeleteUserGroupRequest, opts ...http.CallOption) (*DeleteUserGroupReply, error) {
-	var out DeleteUserGroupReply
-	pattern := "/v1/admin/group/user"
-	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationGroupDeleteUserGroup))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "DELETE", path, in, &out, opts...)
 	if err != nil {
@@ -661,11 +526,11 @@ func (c *GroupHTTPClientImpl) GetRecalculationStatus(ctx context.Context, in *Ge
 	return &out, nil
 }
 
-func (c *GroupHTTPClientImpl) GetUserGroupList(ctx context.Context, in *GetUserGroupListRequest, opts ...http.CallOption) (*GetUserGroupListReply, error) {
-	var out GetUserGroupListReply
-	pattern := "/v1/admin/group/user/list"
+func (c *GroupHTTPClientImpl) GetSubscribeGroupMapping(ctx context.Context, in *GetSubscribeGroupMappingRequest, opts ...http.CallOption) (*GetSubscribeGroupMappingReply, error) {
+	var out GetSubscribeGroupMappingReply
+	pattern := "/v1/admin/group/subscribe/mapping"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationGroupGetUserGroupList))
+	opts = append(opts, http.Operation(OperationGroupGetSubscribeGroupMapping))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -744,32 +609,6 @@ func (c *GroupHTTPClientImpl) UpdateNodeGroup(ctx context.Context, in *UpdateNod
 	pattern := "/v1/admin/group/node"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationGroupUpdateNodeGroup))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, nil
-}
-
-func (c *GroupHTTPClientImpl) UpdateUserGroup(ctx context.Context, in *UpdateUserGroupRequest, opts ...http.CallOption) (*UpdateUserGroupReply, error) {
-	var out UpdateUserGroupReply
-	pattern := "/v1/admin/group/user"
-	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationGroupUpdateUserGroup))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, nil
-}
-
-func (c *GroupHTTPClientImpl) UpdateUserUserGroup(ctx context.Context, in *UpdateUserUserGroupRequest, opts ...http.CallOption) (*UpdateUserUserGroupReply, error) {
-	var out UpdateUserUserGroupReply
-	pattern := "/v1/admin/group/user/usergroup"
-	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationGroupUpdateUserUserGroup))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {

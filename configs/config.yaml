@@ -1,6 +1,6 @@
 server:
   http:
-    addr: 0.0.0.0:8080
+    addr: 0.0.0.0:8088
     timeout: 1s
   grpc:
     addr: 0.0.0.0:9012
@@ -43,9 +43,9 @@ data:
     pool_size: 10
     min_idle_conns: 5
 
-application:
+app:
   site:
-    host: "localhost:8001"
+    host: "localhost:8088"
     site_name: "PPanel Pro"
     site_desc: "Professional Panel Management System"
     site_logo: "/assets/logo.png"
@@ -59,12 +59,12 @@ application:
     enable_register_verify: false
     enable_reset_password_verify: false
 
-  mobile_auth:
+  mobile:
     enable: false
     enable_whitelist: false
     whitelist: []
 
-  email_auth:
+  email:
     enable: false
     enable_verify: false
     enable_domain_suffix: false

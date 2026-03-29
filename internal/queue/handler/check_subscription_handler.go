@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
@@ -12,6 +13,7 @@ import (
 	queueTypes "github.com/OmnTeam/ppanel-pro/internal/queue/types"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/hibiken/asynq"
+	"github.com/redis/go-redis/v9"
 )
 
 // CheckSubscriptionHandler 检查订阅状态处理器
@@ -19,14 +21,16 @@ import (
 // ⚠️ 完整复刻原项目逻辑（checkSubscriptionLogic.go）
 type CheckSubscriptionHandler struct {
 	db     *ent.Client
+	rdb    *redis.Client
 	queue  *asynq.Client
 	logger *log.Helper
 }
 
 // NewCheckSubscriptionHandler 创建检查订阅处理器
-func NewCheckSubscriptionHandler(db *ent.Client, queue *asynq.Client, logger log.Logger) *CheckSubscriptionHandler {
+func NewCheckSubscriptionHandler(db *ent.Client, rdb *redis.Client, queue *asynq.Client, logger log.Logger) *CheckSubscriptionHandler {
 	return &CheckSubscriptionHandler{
 		db:     db,
+		rdb:    rdb,
 		queue:  queue,
 		logger: log.NewHelper(logger),
 	}
@@ -133,7 +137,7 @@ func (h *CheckSubscriptionHandler) checkTrafficExceeded(ctx context.Context) err
 	}
 
 	// 清理缓存（复刻原项目 line 58-63）
-	// TODO: 需要实现用户订阅缓存清理 ClearSubscribeCache(ctx, trafficExceededSubs)
+	h.clearUserSubscribeCache(ctx, trafficExceededSubs)
 	h.clearServerCache(ctx, trafficExceededSubs)
 
 	return nil
@@ -207,7 +211,7 @@ func (h *CheckSubscriptionHandler) checkExpired(ctx context.Context) error {
 	}
 
 	// 清理缓存（复刻原项目 line 101-105）
-	// TODO: 需要实现用户订阅缓存清理 ClearSubscribeCache(ctx, list)
+	h.clearUserSubscribeCache(ctx, list)
 	h.clearServerCache(ctx, list)
 
 	return nil
@@ -343,8 +347,7 @@ func (h *CheckSubscriptionHandler) loadSiteConfig(ctx context.Context) (map[stri
 	// 查询Site类别下的所有配置
 	configs, err := h.db.ProxySystem.Query().
 		Where(
-			proxysystem.CategoryEQ("Site"),
-			proxysystem.KeyIn("SiteLogo", "SiteName"),
+			proxysystem.CategoryEQ("site"),
 		).
 		All(ctx)
 
@@ -354,16 +357,43 @@ func (h *CheckSubscriptionHandler) loadSiteConfig(ctx context.Context) (map[stri
 
 	// 填充配置值
 	for _, config := range configs {
-		result[config.Key] = config.Value
+		switch config.Key {
+		case "SiteLogo", "site_logo":
+			result["SiteLogo"] = config.Value
+		case "SiteName", "site_name":
+			result["SiteName"] = config.Value
+		}
 	}
 
 	return result, nil
 }
 
+func (h *CheckSubscriptionHandler) clearUserSubscribeCache(ctx context.Context, userSubs []*ent.ProxyUserSubscribe) {
+	if h.rdb == nil || len(userSubs) == 0 {
+		return
+	}
+
+	keys := make([]string, 0, len(userSubs)*3)
+	for _, sub := range userSubs {
+		if sub == nil {
+			continue
+		}
+		if sub.Token != nil && *sub.Token != "" {
+			keys = append(keys, fmt.Sprintf("cache:user:subscribe:token:%s", *sub.Token))
+		}
+		keys = append(keys,
+			fmt.Sprintf("cache:user:subscribe:user:%d", sub.UserID),
+			fmt.Sprintf("cache:user:subscribe:id:%d", sub.ID),
+		)
+	}
+
+	h.deleteRedisKeys(ctx, keys...)
+}
+
 // clearServerCache clears server cache by collecting unique subscribe_ids
 // 复刻原项目 checkSubscriptionLogic.go line 198-211
 func (h *CheckSubscriptionHandler) clearServerCache(ctx context.Context, userSubs []*ent.ProxyUserSubscribe) {
-	if len(userSubs) == 0 {
+	if h.rdb == nil || len(userSubs) == 0 {
 		return
 	}
 
@@ -377,12 +407,41 @@ func (h *CheckSubscriptionHandler) clearServerCache(ctx context.Context, userSub
 		}
 	}
 
-	// TODO: Clear cache for each subscribe_id (需要缓存模块实现)
-	// for subID := range subs {
-	//     if err := h.clearSubscriptionCache(ctx, subID); err != nil {
-	//         h.logger.Errorf("[CheckSubscription] ClearCache failed: subscribeID=%d, error=%v", subID, err)
-	//     }
-	// }
+	keys := make([]string, 0, len(subs)*2)
+	for subID := range subs {
+		keys = append(keys,
+			fmt.Sprintf("cache:subscribe:id:%d", subID),
+			fmt.Sprintf("cache:subscribe:servers:%d", subID),
+		)
+	}
 
-	h.logger.Infof("[CheckSubscription] Collected %d unique subscribe_ids for cache clearing", len(subs))
+	h.deleteRedisKeys(ctx, keys...)
+	h.logger.Infof("[CheckSubscription] Cleared cache for %d unique subscribe_ids", len(subs))
+}
+
+func (h *CheckSubscriptionHandler) deleteRedisKeys(ctx context.Context, keys ...string) {
+	if h.rdb == nil || len(keys) == 0 {
+		return
+	}
+
+	unique := make(map[string]struct{}, len(keys))
+	filtered := make([]string, 0, len(keys))
+	for _, key := range keys {
+		if key == "" {
+			continue
+		}
+		if _, ok := unique[key]; ok {
+			continue
+		}
+		unique[key] = struct{}{}
+		filtered = append(filtered, key)
+	}
+
+	if len(filtered) == 0 {
+		return
+	}
+
+	if err := h.rdb.Del(ctx, filtered...).Err(); err != nil {
+		h.logger.Warnf("[CheckSubscription] Delete redis keys failed: %v, keys=%v", err, filtered)
+	}
 }

@@ -18,24 +18,28 @@ type ProxyGroupHistory struct {
 	// ID of the ent.
 	// 历史记录ID
 	ID int64 `json:"id,omitempty"`
-	// 分组模式: user/node
+	// 分组模式
 	GroupMode string `json:"group_mode,omitempty"`
-	// 触发类型: manual/auto
+	// 触发类型
 	TriggerType string `json:"trigger_type,omitempty"`
-	// 状态: pending/running/completed/failed
-	Status string `json:"status,omitempty"`
-	// 进度
-	Progress int `json:"progress,omitempty"`
-	// 总数
-	Total int `json:"total,omitempty"`
-	// 结果详情JSON
-	Result string `json:"result,omitempty"`
+	// 状态
+	State string `json:"state,omitempty"`
+	// 总用户数
+	TotalUsers int `json:"total_users,omitempty"`
+	// 成功数量
+	SuccessCount int `json:"success_count,omitempty"`
+	// 失败数量
+	FailedCount int `json:"failed_count,omitempty"`
+	// 开始时间
+	StartTime *time.Time `json:"start_time,omitempty"`
+	// 结束时间
+	EndTime *time.Time `json:"end_time,omitempty"`
+	// 操作人
+	Operator *string `json:"operator,omitempty"`
 	// 错误信息
-	Error string `json:"error,omitempty"`
+	ErrorMessage string `json:"error_message,omitempty"`
 	// 创建时间
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// 更新时间
-	UpdatedAt    time.Time `json:"updated_at,omitempty"`
+	CreatedAt    time.Time `json:"created_at,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -44,11 +48,11 @@ func (*ProxyGroupHistory) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case proxygrouphistory.FieldID, proxygrouphistory.FieldProgress, proxygrouphistory.FieldTotal:
+		case proxygrouphistory.FieldID, proxygrouphistory.FieldTotalUsers, proxygrouphistory.FieldSuccessCount, proxygrouphistory.FieldFailedCount:
 			values[i] = new(sql.NullInt64)
-		case proxygrouphistory.FieldGroupMode, proxygrouphistory.FieldTriggerType, proxygrouphistory.FieldStatus, proxygrouphistory.FieldResult, proxygrouphistory.FieldError:
+		case proxygrouphistory.FieldGroupMode, proxygrouphistory.FieldTriggerType, proxygrouphistory.FieldState, proxygrouphistory.FieldOperator, proxygrouphistory.FieldErrorMessage:
 			values[i] = new(sql.NullString)
-		case proxygrouphistory.FieldCreatedAt, proxygrouphistory.FieldUpdatedAt:
+		case proxygrouphistory.FieldStartTime, proxygrouphistory.FieldEndTime, proxygrouphistory.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -83,47 +87,62 @@ func (_m *ProxyGroupHistory) assignValues(columns []string, values []any) error 
 			} else if value.Valid {
 				_m.TriggerType = value.String
 			}
-		case proxygrouphistory.FieldStatus:
+		case proxygrouphistory.FieldState:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
+				return fmt.Errorf("unexpected type %T for field state", values[i])
 			} else if value.Valid {
-				_m.Status = value.String
+				_m.State = value.String
 			}
-		case proxygrouphistory.FieldProgress:
+		case proxygrouphistory.FieldTotalUsers:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field progress", values[i])
+				return fmt.Errorf("unexpected type %T for field total_users", values[i])
 			} else if value.Valid {
-				_m.Progress = int(value.Int64)
+				_m.TotalUsers = int(value.Int64)
 			}
-		case proxygrouphistory.FieldTotal:
+		case proxygrouphistory.FieldSuccessCount:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field total", values[i])
+				return fmt.Errorf("unexpected type %T for field success_count", values[i])
 			} else if value.Valid {
-				_m.Total = int(value.Int64)
+				_m.SuccessCount = int(value.Int64)
 			}
-		case proxygrouphistory.FieldResult:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field result", values[i])
+		case proxygrouphistory.FieldFailedCount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field failed_count", values[i])
 			} else if value.Valid {
-				_m.Result = value.String
+				_m.FailedCount = int(value.Int64)
 			}
-		case proxygrouphistory.FieldError:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field error", values[i])
+		case proxygrouphistory.FieldStartTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field start_time", values[i])
 			} else if value.Valid {
-				_m.Error = value.String
+				_m.StartTime = new(time.Time)
+				*_m.StartTime = value.Time
+			}
+		case proxygrouphistory.FieldEndTime:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field end_time", values[i])
+			} else if value.Valid {
+				_m.EndTime = new(time.Time)
+				*_m.EndTime = value.Time
+			}
+		case proxygrouphistory.FieldOperator:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field operator", values[i])
+			} else if value.Valid {
+				_m.Operator = new(string)
+				*_m.Operator = value.String
+			}
+		case proxygrouphistory.FieldErrorMessage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field error_message", values[i])
+			} else if value.Valid {
+				_m.ErrorMessage = value.String
 			}
 		case proxygrouphistory.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				_m.CreatedAt = value.Time
-			}
-		case proxygrouphistory.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				_m.UpdatedAt = value.Time
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -167,26 +186,38 @@ func (_m *ProxyGroupHistory) String() string {
 	builder.WriteString("trigger_type=")
 	builder.WriteString(_m.TriggerType)
 	builder.WriteString(", ")
-	builder.WriteString("status=")
-	builder.WriteString(_m.Status)
+	builder.WriteString("state=")
+	builder.WriteString(_m.State)
 	builder.WriteString(", ")
-	builder.WriteString("progress=")
-	builder.WriteString(fmt.Sprintf("%v", _m.Progress))
+	builder.WriteString("total_users=")
+	builder.WriteString(fmt.Sprintf("%v", _m.TotalUsers))
 	builder.WriteString(", ")
-	builder.WriteString("total=")
-	builder.WriteString(fmt.Sprintf("%v", _m.Total))
+	builder.WriteString("success_count=")
+	builder.WriteString(fmt.Sprintf("%v", _m.SuccessCount))
 	builder.WriteString(", ")
-	builder.WriteString("result=")
-	builder.WriteString(_m.Result)
+	builder.WriteString("failed_count=")
+	builder.WriteString(fmt.Sprintf("%v", _m.FailedCount))
 	builder.WriteString(", ")
-	builder.WriteString("error=")
-	builder.WriteString(_m.Error)
+	if v := _m.StartTime; v != nil {
+		builder.WriteString("start_time=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := _m.EndTime; v != nil {
+		builder.WriteString("end_time=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := _m.Operator; v != nil {
+		builder.WriteString("operator=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	builder.WriteString("error_message=")
+	builder.WriteString(_m.ErrorMessage)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -24,7 +24,7 @@ const (
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// Table holds the table name of the proxysystemlog in the database.
-	Table = "proxy_system_log"
+	Table = "system_logs"
 )
 
 // Columns holds all SQL columns for proxysystemlog fields.

@@ -104,21 +104,9 @@ func (_u *ProxyDocumentUpdate) SetNillableCreatedAt(v *time.Time) *ProxyDocument
 	return _u
 }
 
-// ClearCreatedAt clears the value of the "created_at" field.
-func (_u *ProxyDocumentUpdate) ClearCreatedAt() *ProxyDocumentUpdate {
-	_u.mutation.ClearCreatedAt()
-	return _u
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxyDocumentUpdate) SetUpdatedAt(v time.Time) *ProxyDocumentUpdate {
 	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// ClearUpdatedAt clears the value of the "updated_at" field.
-func (_u *ProxyDocumentUpdate) ClearUpdatedAt() *ProxyDocumentUpdate {
-	_u.mutation.ClearUpdatedAt()
 	return _u
 }
 
@@ -157,7 +145,7 @@ func (_u *ProxyDocumentUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_u *ProxyDocumentUpdate) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := proxydocument.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
@@ -208,14 +196,8 @@ func (_u *ProxyDocumentUpdate) sqlSave(ctx context.Context) (_node int, err erro
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxydocument.FieldCreatedAt, field.TypeTime, value)
 	}
-	if _u.mutation.CreatedAtCleared() {
-		_spec.ClearField(proxydocument.FieldCreatedAt, field.TypeTime)
-	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxydocument.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if _u.mutation.UpdatedAtCleared() {
-		_spec.ClearField(proxydocument.FieldUpdatedAt, field.TypeTime)
 	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -313,21 +295,9 @@ func (_u *ProxyDocumentUpdateOne) SetNillableCreatedAt(v *time.Time) *ProxyDocum
 	return _u
 }
 
-// ClearCreatedAt clears the value of the "created_at" field.
-func (_u *ProxyDocumentUpdateOne) ClearCreatedAt() *ProxyDocumentUpdateOne {
-	_u.mutation.ClearCreatedAt()
-	return _u
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxyDocumentUpdateOne) SetUpdatedAt(v time.Time) *ProxyDocumentUpdateOne {
 	_u.mutation.SetUpdatedAt(v)
-	return _u
-}
-
-// ClearUpdatedAt clears the value of the "updated_at" field.
-func (_u *ProxyDocumentUpdateOne) ClearUpdatedAt() *ProxyDocumentUpdateOne {
-	_u.mutation.ClearUpdatedAt()
 	return _u
 }
 
@@ -379,7 +349,7 @@ func (_u *ProxyDocumentUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_u *ProxyDocumentUpdateOne) defaults() {
-	if _, ok := _u.mutation.UpdatedAt(); !ok && !_u.mutation.UpdatedAtCleared() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := proxydocument.UpdateDefaultUpdatedAt()
 		_u.mutation.SetUpdatedAt(v)
 	}
@@ -447,14 +417,8 @@ func (_u *ProxyDocumentUpdateOne) sqlSave(ctx context.Context) (_node *ProxyDocu
 	if value, ok := _u.mutation.CreatedAt(); ok {
 		_spec.SetField(proxydocument.FieldCreatedAt, field.TypeTime, value)
 	}
-	if _u.mutation.CreatedAtCleared() {
-		_spec.ClearField(proxydocument.FieldCreatedAt, field.TypeTime)
-	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxydocument.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if _u.mutation.UpdatedAtCleared() {
-		_spec.ClearField(proxydocument.FieldUpdatedAt, field.TypeTime)
 	}
 	_node = &ProxyDocument{config: _u.config}
 	_spec.Assign = _node.assignValues

@@ -18,6 +18,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxycoupon"
 	"github.com/OmnTeam/ppanel-pro/ent/proxydocument"
 	"github.com/OmnTeam/ppanel-pro/ent/proxygrouphistory"
+	"github.com/OmnTeam/ppanel-pro/ent/proxygrouphistorydetail"
 	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyorder"
 	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
@@ -39,7 +40,6 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdevice"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdeviceonlinerecord"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyusergroup"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserwithdrawal"
 )
@@ -108,6 +108,7 @@ func checkColumn(t, c string) error {
 			proxycoupon.Table:                 proxycoupon.ValidColumn,
 			proxydocument.Table:               proxydocument.ValidColumn,
 			proxygrouphistory.Table:           proxygrouphistory.ValidColumn,
+			proxygrouphistorydetail.Table:     proxygrouphistorydetail.ValidColumn,
 			proxynode.Table:                   proxynode.ValidColumn,
 			proxyorder.Table:                  proxyorder.ValidColumn,
 			proxypayment.Table:                proxypayment.ValidColumn,
@@ -129,7 +130,6 @@ func checkColumn(t, c string) error {
 			proxyuserauthmethod.Table:         proxyuserauthmethod.ValidColumn,
 			proxyuserdevice.Table:             proxyuserdevice.ValidColumn,
 			proxyuserdeviceonlinerecord.Table: proxyuserdeviceonlinerecord.ValidColumn,
-			proxyusergroup.Table:              proxyusergroup.ValidColumn,
 			proxyusersubscribe.Table:          proxyusersubscribe.ValidColumn,
 			proxyuserwithdrawal.Table:         proxyuserwithdrawal.ValidColumn,
 		})

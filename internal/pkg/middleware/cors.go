@@ -2,123 +2,187 @@ package middleware
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
 	khttp "github.com/go-kratos/kratos/v2/transport/http"
 )
 
-// CORSFilter 返回一个 CORS HTTP Filter，使用配置文件设置
+var defaultCORSConfig = &conf.Server_CORS{
+	Enable:           true,
+	AllowedOrigins:   []string{"*"},
+	AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"},
+	AllowedHeaders:   []string{"*"},
+	ExposedHeaders:   []string{"Content-Length", "Content-Type", "Authorization"},
+	AllowCredentials: true,
+	MaxAge:           86400,
+}
+
+// CORSFilter returns a Kratos HTTP filter backed by server.cors config.
 func CORSFilter(corsConfig *conf.Server_CORS) khttp.FilterFunc {
+	config := normalizeCORSConfig(corsConfig)
+
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			// 如果CORS被禁用，直接通过
-			if corsConfig != nil && !corsConfig.Enable {
+			if !config.Enable {
 				next.ServeHTTP(w, r)
 				return
 			}
 
-			// 设置默认值
-			if corsConfig == nil {
-				corsConfig = getDefaultCORSConfig()
-			}
-
-			// 获取请求的 Origin
-			origin := r.Header.Get("Origin")
-
-			// 设置允许的源
-			if len(corsConfig.AllowedOrigins) > 0 {
-				if contains(corsConfig.AllowedOrigins, "*") {
-					if origin != "" {
-						w.Header().Set("Access-Control-Allow-Origin", origin)
-					} else {
-						w.Header().Set("Access-Control-Allow-Origin", "*")
-					}
-				} else if contains(corsConfig.AllowedOrigins, origin) {
-					w.Header().Set("Access-Control-Allow-Origin", origin)
-				}
-			} else {
-				w.Header().Set("Access-Control-Allow-Origin", "*")
-			}
-
-			// 设置是否允许凭证
-			if corsConfig.AllowCredentials {
-				w.Header().Set("Access-Control-Allow-Credentials", "true")
-			}
-
-			// 设置允许的请求方法
-			if len(corsConfig.AllowedMethods) > 0 {
-				methods := strings.Join(corsConfig.AllowedMethods, ", ")
-				w.Header().Set("Access-Control-Allow-Methods", methods)
-			} else {
-				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD")
-			}
-
-			// 设置允许的请求头
-			if len(corsConfig.AllowedHeaders) > 0 {
-				if contains(corsConfig.AllowedHeaders, "*") {
-					requestHeaders := r.Header.Get("Access-Control-Request-Headers")
-					if requestHeaders != "" {
-						w.Header().Set("Access-Control-Allow-Headers", requestHeaders)
-					} else {
-						w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept, Origin")
-					}
-				} else {
-					headers := strings.Join(corsConfig.AllowedHeaders, ", ")
-					w.Header().Set("Access-Control-Allow-Headers", headers)
-				}
-			} else {
-				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With, Accept, Origin")
-			}
-
-			// 设置预检请求的有效期
-			if corsConfig.MaxAge > 0 {
-				w.Header().Set("Access-Control-Max-Age", string(rune(corsConfig.MaxAge)))
-			} else {
-				w.Header().Set("Access-Control-Max-Age", "86400")
-			}
-
-			// 设置允许客户端访问的响应头
-			if len(corsConfig.ExposedHeaders) > 0 {
-				headers := strings.Join(corsConfig.ExposedHeaders, ", ")
-				w.Header().Set("Access-Control-Expose-Headers", headers)
-			} else {
-				w.Header().Set("Access-Control-Expose-Headers", "Content-Length, Content-Type, Authorization")
-			}
-
-			// 添加 Vary 头
-			w.Header().Add("Vary", "Origin")
-			w.Header().Add("Vary", "Access-Control-Request-Method")
-			w.Header().Add("Vary", "Access-Control-Request-Headers")
-
-			// 处理 OPTIONS 预检请求
-			if r.Method == "OPTIONS" {
+			ApplyCORSHeaders(w.Header(), r, config)
+			if IsCORSPreflightRequest(r) {
 				w.WriteHeader(http.StatusNoContent)
 				return
 			}
 
-			// 继续处理其他请求
 			next.ServeHTTP(w, r)
 		})
 	}
 }
 
-// getDefaultCORSConfig 返回默认的CORS配置
-func getDefaultCORSConfig() *conf.Server_CORS {
-	return &conf.Server_CORS{
-		Enable:           true,
-		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"*"},
-		AllowCredentials: true,
-		MaxAge:           86400,
+// ApplyCORSHeaders applies the configured CORS headers onto the response.
+func ApplyCORSHeaders(header http.Header, r *http.Request, corsConfig *conf.Server_CORS) {
+	config := normalizeCORSConfig(corsConfig)
+	origin := strings.TrimSpace(r.Header.Get("Origin"))
+
+	if allowedOrigin := resolveAllowedOrigin(config, origin); allowedOrigin != "" {
+		header.Set("Access-Control-Allow-Origin", allowedOrigin)
+	}
+	if config.AllowCredentials {
+		header.Set("Access-Control-Allow-Credentials", "true")
+	}
+
+	header.Set("Access-Control-Allow-Methods", strings.Join(config.AllowedMethods, ", "))
+	header.Set("Access-Control-Allow-Headers", resolveAllowedHeaders(r, config))
+	header.Set("Access-Control-Max-Age", strconv.FormatInt(int64(config.MaxAge), 10))
+
+	if len(config.ExposedHeaders) > 0 {
+		header.Set("Access-Control-Expose-Headers", strings.Join(config.ExposedHeaders, ", "))
+	}
+
+	appendVary(header, "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers")
+}
+
+// IsCORSPreflightRequest reports whether the request is a browser preflight.
+func IsCORSPreflightRequest(r *http.Request) bool {
+	return r.Method == http.MethodOptions &&
+		strings.TrimSpace(r.Header.Get("Origin")) != "" &&
+		strings.TrimSpace(r.Header.Get("Access-Control-Request-Method")) != ""
+}
+
+func normalizeCORSConfig(corsConfig *conf.Server_CORS) *conf.Server_CORS {
+	if corsConfig == nil {
+		return cloneCORSConfig(defaultCORSConfig)
+	}
+
+	config := cloneCORSConfig(corsConfig)
+	if len(config.AllowedOrigins) == 0 {
+		config.AllowedOrigins = append([]string(nil), defaultCORSConfig.AllowedOrigins...)
+	}
+	if len(config.AllowedMethods) == 0 {
+		config.AllowedMethods = append([]string(nil), defaultCORSConfig.AllowedMethods...)
+	}
+	if len(config.AllowedHeaders) == 0 {
+		config.AllowedHeaders = append([]string(nil), defaultCORSConfig.AllowedHeaders...)
+	}
+	if len(config.ExposedHeaders) == 0 {
+		config.ExposedHeaders = append([]string(nil), defaultCORSConfig.ExposedHeaders...)
+	}
+	if config.MaxAge <= 0 {
+		config.MaxAge = defaultCORSConfig.MaxAge
+	}
+
+	return config
+}
+
+func resolveAllowedOrigin(config *conf.Server_CORS, origin string) string {
+	if len(config.AllowedOrigins) == 0 {
+		return ""
+	}
+
+	if contains(config.AllowedOrigins, "*") {
+		if config.AllowCredentials {
+			return origin
+		}
+		return "*"
+	}
+
+	if origin != "" && contains(config.AllowedOrigins, origin) {
+		return origin
+	}
+
+	return ""
+}
+
+func resolveAllowedHeaders(r *http.Request, config *conf.Server_CORS) string {
+	if len(config.AllowedHeaders) == 0 {
+		return ""
+	}
+	if contains(config.AllowedHeaders, "*") {
+		if requestHeaders := strings.TrimSpace(r.Header.Get("Access-Control-Request-Headers")); requestHeaders != "" {
+			return requestHeaders
+		}
+		return "Content-Type, Authorization, X-Requested-With, Accept, Origin"
+	}
+	return strings.Join(config.AllowedHeaders, ", ")
+}
+
+func appendVary(header http.Header, values ...string) {
+	seen := make(map[string]struct{})
+	merged := make([]string, 0, len(values))
+
+	for _, existing := range header.Values("Vary") {
+		for _, part := range strings.Split(existing, ",") {
+			token := strings.TrimSpace(part)
+			if token == "" {
+				continue
+			}
+			if _, ok := seen[token]; ok {
+				continue
+			}
+			seen[token] = struct{}{}
+			merged = append(merged, token)
+		}
+	}
+
+	for _, value := range values {
+		for _, part := range strings.Split(value, ",") {
+			token := strings.TrimSpace(part)
+			if token == "" {
+				continue
+			}
+			if _, ok := seen[token]; ok {
+				continue
+			}
+			seen[token] = struct{}{}
+			merged = append(merged, token)
+		}
+	}
+
+	if len(merged) > 0 {
+		header.Set("Vary", strings.Join(merged, ", "))
 	}
 }
 
-// contains 检查字符串切片是否包含指定字符串
+func cloneCORSConfig(corsConfig *conf.Server_CORS) *conf.Server_CORS {
+	if corsConfig == nil {
+		return nil
+	}
+	return &conf.Server_CORS{
+		Enable:           corsConfig.Enable,
+		AllowedOrigins:   append([]string(nil), corsConfig.AllowedOrigins...),
+		AllowedMethods:   append([]string(nil), corsConfig.AllowedMethods...),
+		AllowedHeaders:   append([]string(nil), corsConfig.AllowedHeaders...),
+		ExposedHeaders:   append([]string(nil), corsConfig.ExposedHeaders...),
+		AllowCredentials: corsConfig.AllowCredentials,
+		MaxAge:           corsConfig.MaxAge,
+	}
+}
+
 func contains(slice []string, item string) bool {
 	for _, s := range slice {
-		if s == item {
+		if strings.TrimSpace(s) == item {
 			return true
 		}
 	}

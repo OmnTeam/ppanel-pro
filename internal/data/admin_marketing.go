@@ -206,7 +206,7 @@ func (r *adminMarketingRepo) CreateBatchSendEmailTask(ctx context.Context, subje
 		SetContent(contentJSON).
 		SetStatus(int8(taskmodel.StatusPending)).
 		SetErrors("").
-		SetTotal(uint32(total)).
+		SetTotal(total).
 		SetCurrent(0).
 		Save(ctx)
 
@@ -498,7 +498,7 @@ func (r *adminMarketingRepo) CreateQuotaTask(ctx context.Context, subscribers []
 		SetContent(contentJSON).
 		SetStatus(int8(taskmodel.StatusPending)).
 		SetErrors("").
-		SetTotal(uint32(len(subIds))).
+		SetTotal(uint64(len(subIds))).
 		SetCurrent(0).
 		Save(ctx)
 

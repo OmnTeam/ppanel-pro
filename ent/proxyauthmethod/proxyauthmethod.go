@@ -13,8 +13,6 @@ const (
 	Label = "proxy_auth_method"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldTenantID holds the string denoting the tenant_id field in the database.
-	FieldTenantID = "tenant_id"
 	// FieldMethod holds the string denoting the method field in the database.
 	FieldMethod = "method"
 	// FieldConfig holds the string denoting the config field in the database.
@@ -26,13 +24,12 @@ const (
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxyauthmethod in the database.
-	Table = "proxy_auth_method"
+	Table = "auth_method"
 )
 
 // Columns holds all SQL columns for proxyauthmethod fields.
 var Columns = []string{
 	FieldID,
-	FieldTenantID,
 	FieldMethod,
 	FieldConfig,
 	FieldEnabled,
@@ -51,8 +48,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultTenantID holds the default value on creation for the "tenant_id" field.
-	DefaultTenantID int64
+	// DefaultMethod holds the default value on creation for the "method" field.
+	DefaultMethod string
 	// MethodValidator is a validator for the "method" field. It is called by the builders before save.
 	MethodValidator func(string) error
 	// ConfigValidator is a validator for the "config" field. It is called by the builders before save.
@@ -73,11 +70,6 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByTenantID orders the results by the tenant_id field.
-func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByMethod orders the results by the method field.

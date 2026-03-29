@@ -13,8 +13,6 @@ const (
 	Label = "proxy_server"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldTenantID holds the string denoting the tenant_id field in the database.
-	FieldTenantID = "tenant_id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldCountry holds the string denoting the country field in the database.
@@ -22,25 +20,32 @@ const (
 	// FieldCity holds the string denoting the city field in the database.
 	FieldCity = "city"
 	// FieldServerAddr holds the string denoting the server_addr field in the database.
-	FieldServerAddr = "server_addr"
+	FieldServerAddr = "address"
 	// FieldSort holds the string denoting the sort field in the database.
 	FieldSort = "sort"
 	// FieldProtocol holds the string denoting the protocol field in the database.
-	FieldProtocol = "protocol"
+	FieldProtocol = "protocols"
 	// FieldLastReportedAt holds the string denoting the last_reported_at field in the database.
 	FieldLastReportedAt = "last_reported_at"
+	// FieldLongitude holds the string denoting the longitude field in the database.
+	FieldLongitude = "longitude"
+	// FieldLatitude holds the string denoting the latitude field in the database.
+	FieldLatitude = "latitude"
+	// FieldLongitudeCenter holds the string denoting the longitude_center field in the database.
+	FieldLongitudeCenter = "longitude_center"
+	// FieldLatitudeCenter holds the string denoting the latitude_center field in the database.
+	FieldLatitudeCenter = "latitude_center"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxyserver in the database.
-	Table = "proxy_server"
+	Table = "servers"
 )
 
 // Columns holds all SQL columns for proxyserver fields.
 var Columns = []string{
 	FieldID,
-	FieldTenantID,
 	FieldName,
 	FieldCountry,
 	FieldCity,
@@ -48,6 +53,10 @@ var Columns = []string{
 	FieldSort,
 	FieldProtocol,
 	FieldLastReportedAt,
+	FieldLongitude,
+	FieldLatitude,
+	FieldLongitudeCenter,
+	FieldLatitudeCenter,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -63,8 +72,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultTenantID holds the default value on creation for the "tenant_id" field.
-	DefaultTenantID int64
 	// DefaultName holds the default value on creation for the "name" field.
 	DefaultName string
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -83,6 +90,22 @@ var (
 	ServerAddrValidator func(string) error
 	// DefaultSort holds the default value on creation for the "sort" field.
 	DefaultSort int
+	// DefaultLongitude holds the default value on creation for the "longitude" field.
+	DefaultLongitude string
+	// LongitudeValidator is a validator for the "longitude" field. It is called by the builders before save.
+	LongitudeValidator func(string) error
+	// DefaultLatitude holds the default value on creation for the "latitude" field.
+	DefaultLatitude string
+	// LatitudeValidator is a validator for the "latitude" field. It is called by the builders before save.
+	LatitudeValidator func(string) error
+	// DefaultLongitudeCenter holds the default value on creation for the "longitude_center" field.
+	DefaultLongitudeCenter string
+	// LongitudeCenterValidator is a validator for the "longitude_center" field. It is called by the builders before save.
+	LongitudeCenterValidator func(string) error
+	// DefaultLatitudeCenter holds the default value on creation for the "latitude_center" field.
+	DefaultLatitudeCenter string
+	// LatitudeCenterValidator is a validator for the "latitude_center" field. It is called by the builders before save.
+	LatitudeCenterValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -97,11 +120,6 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByTenantID orders the results by the tenant_id field.
-func ByTenantID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTenantID, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.
@@ -137,6 +155,26 @@ func ByProtocol(opts ...sql.OrderTermOption) OrderOption {
 // ByLastReportedAt orders the results by the last_reported_at field.
 func ByLastReportedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLastReportedAt, opts...).ToFunc()
+}
+
+// ByLongitude orders the results by the longitude field.
+func ByLongitude(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLongitude, opts...).ToFunc()
+}
+
+// ByLatitude orders the results by the latitude field.
+func ByLatitude(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLatitude, opts...).ToFunc()
+}
+
+// ByLongitudeCenter orders the results by the longitude_center field.
+func ByLongitudeCenter(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLongitudeCenter, opts...).ToFunc()
+}
+
+// ByLatitudeCenter orders the results by the latitude_center field.
+func ByLatitudeCenter(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLatitudeCenter, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

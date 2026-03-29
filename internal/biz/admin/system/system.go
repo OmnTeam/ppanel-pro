@@ -104,11 +104,13 @@ type VerifyCodeConfig struct {
 
 // VerifyConfig 验证配置
 type VerifyConfig struct {
-	TurnstileSiteKey          string `json:"TurnstileSiteKey"`
-	TurnstileSecret           string `json:"TurnstileSecret"`
-	EnableLoginVerify         bool   `json:"EnableLoginVerify"`
-	EnableRegisterVerify      bool   `json:"EnableRegisterVerify"`
-	EnableResetPasswordVerify bool   `json:"EnableResetPasswordVerify"`
+	CaptchaType                    string `json:"CaptchaType"`
+	TurnstileSiteKey               string `json:"TurnstileSiteKey"`
+	TurnstileSecret                string `json:"TurnstileSecret"`
+	EnableUserLoginCaptcha         bool   `json:"EnableUserLoginCaptcha"`
+	EnableUserRegisterCaptcha      bool   `json:"EnableUserRegisterCaptcha"`
+	EnableAdminLoginCaptcha        bool   `json:"EnableAdminLoginCaptcha"`
+	EnableUserResetPasswordCaptcha bool   `json:"EnableUserResetPasswordCaptcha"`
 }
 
 // TimePeriod 时间段倍率

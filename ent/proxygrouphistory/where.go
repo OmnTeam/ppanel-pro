@@ -64,39 +64,49 @@ func TriggerType(v string) predicate.ProxyGroupHistory {
 	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldTriggerType, v))
 }
 
-// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
-func Status(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldStatus, v))
+// State applies equality check predicate on the "state" field. It's identical to StateEQ.
+func State(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldState, v))
 }
 
-// Progress applies equality check predicate on the "progress" field. It's identical to ProgressEQ.
-func Progress(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldProgress, v))
+// TotalUsers applies equality check predicate on the "total_users" field. It's identical to TotalUsersEQ.
+func TotalUsers(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldTotalUsers, v))
 }
 
-// Total applies equality check predicate on the "total" field. It's identical to TotalEQ.
-func Total(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldTotal, v))
+// SuccessCount applies equality check predicate on the "success_count" field. It's identical to SuccessCountEQ.
+func SuccessCount(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldSuccessCount, v))
 }
 
-// Result applies equality check predicate on the "result" field. It's identical to ResultEQ.
-func Result(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldResult, v))
+// FailedCount applies equality check predicate on the "failed_count" field. It's identical to FailedCountEQ.
+func FailedCount(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldFailedCount, v))
 }
 
-// Error applies equality check predicate on the "error" field. It's identical to ErrorEQ.
-func Error(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldError, v))
+// StartTime applies equality check predicate on the "start_time" field. It's identical to StartTimeEQ.
+func StartTime(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldStartTime, v))
+}
+
+// EndTime applies equality check predicate on the "end_time" field. It's identical to EndTimeEQ.
+func EndTime(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldEndTime, v))
+}
+
+// Operator applies equality check predicate on the "operator" field. It's identical to OperatorEQ.
+func Operator(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldOperator, v))
+}
+
+// ErrorMessage applies equality check predicate on the "error_message" field. It's identical to ErrorMessageEQ.
+func ErrorMessage(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldErrorMessage, v))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.ProxyGroupHistory {
 	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldCreatedAt, v))
-}
-
-// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
-func UpdatedAt(v time.Time) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
 // GroupModeEQ applies the EQ predicate on the "group_mode" field.
@@ -229,299 +239,439 @@ func TriggerTypeContainsFold(v string) predicate.ProxyGroupHistory {
 	return predicate.ProxyGroupHistory(sql.FieldContainsFold(FieldTriggerType, v))
 }
 
-// StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldStatus, v))
+// StateEQ applies the EQ predicate on the "state" field.
+func StateEQ(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldState, v))
 }
 
-// StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldStatus, v))
+// StateNEQ applies the NEQ predicate on the "state" field.
+func StateNEQ(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldState, v))
 }
 
-// StatusIn applies the In predicate on the "status" field.
-func StatusIn(vs ...string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldIn(FieldStatus, vs...))
+// StateIn applies the In predicate on the "state" field.
+func StateIn(vs ...string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldIn(FieldState, vs...))
 }
 
-// StatusNotIn applies the NotIn predicate on the "status" field.
-func StatusNotIn(vs ...string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldStatus, vs...))
+// StateNotIn applies the NotIn predicate on the "state" field.
+func StateNotIn(vs ...string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldState, vs...))
 }
 
-// StatusGT applies the GT predicate on the "status" field.
-func StatusGT(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldGT(FieldStatus, v))
+// StateGT applies the GT predicate on the "state" field.
+func StateGT(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGT(FieldState, v))
 }
 
-// StatusGTE applies the GTE predicate on the "status" field.
-func StatusGTE(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldStatus, v))
+// StateGTE applies the GTE predicate on the "state" field.
+func StateGTE(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldState, v))
 }
 
-// StatusLT applies the LT predicate on the "status" field.
-func StatusLT(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldLT(FieldStatus, v))
+// StateLT applies the LT predicate on the "state" field.
+func StateLT(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLT(FieldState, v))
 }
 
-// StatusLTE applies the LTE predicate on the "status" field.
-func StatusLTE(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldStatus, v))
+// StateLTE applies the LTE predicate on the "state" field.
+func StateLTE(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldState, v))
 }
 
-// StatusContains applies the Contains predicate on the "status" field.
-func StatusContains(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldContains(FieldStatus, v))
+// StateContains applies the Contains predicate on the "state" field.
+func StateContains(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldContains(FieldState, v))
 }
 
-// StatusHasPrefix applies the HasPrefix predicate on the "status" field.
-func StatusHasPrefix(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldHasPrefix(FieldStatus, v))
+// StateHasPrefix applies the HasPrefix predicate on the "state" field.
+func StateHasPrefix(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldHasPrefix(FieldState, v))
 }
 
-// StatusHasSuffix applies the HasSuffix predicate on the "status" field.
-func StatusHasSuffix(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldHasSuffix(FieldStatus, v))
+// StateHasSuffix applies the HasSuffix predicate on the "state" field.
+func StateHasSuffix(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldHasSuffix(FieldState, v))
 }
 
-// StatusEqualFold applies the EqualFold predicate on the "status" field.
-func StatusEqualFold(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEqualFold(FieldStatus, v))
+// StateEqualFold applies the EqualFold predicate on the "state" field.
+func StateEqualFold(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEqualFold(FieldState, v))
 }
 
-// StatusContainsFold applies the ContainsFold predicate on the "status" field.
-func StatusContainsFold(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldContainsFold(FieldStatus, v))
+// StateContainsFold applies the ContainsFold predicate on the "state" field.
+func StateContainsFold(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldContainsFold(FieldState, v))
 }
 
-// ProgressEQ applies the EQ predicate on the "progress" field.
-func ProgressEQ(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldProgress, v))
+// TotalUsersEQ applies the EQ predicate on the "total_users" field.
+func TotalUsersEQ(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldTotalUsers, v))
 }
 
-// ProgressNEQ applies the NEQ predicate on the "progress" field.
-func ProgressNEQ(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldProgress, v))
+// TotalUsersNEQ applies the NEQ predicate on the "total_users" field.
+func TotalUsersNEQ(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldTotalUsers, v))
 }
 
-// ProgressIn applies the In predicate on the "progress" field.
-func ProgressIn(vs ...int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldIn(FieldProgress, vs...))
+// TotalUsersIn applies the In predicate on the "total_users" field.
+func TotalUsersIn(vs ...int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldIn(FieldTotalUsers, vs...))
 }
 
-// ProgressNotIn applies the NotIn predicate on the "progress" field.
-func ProgressNotIn(vs ...int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldProgress, vs...))
+// TotalUsersNotIn applies the NotIn predicate on the "total_users" field.
+func TotalUsersNotIn(vs ...int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldTotalUsers, vs...))
 }
 
-// ProgressGT applies the GT predicate on the "progress" field.
-func ProgressGT(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldGT(FieldProgress, v))
+// TotalUsersGT applies the GT predicate on the "total_users" field.
+func TotalUsersGT(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGT(FieldTotalUsers, v))
 }
 
-// ProgressGTE applies the GTE predicate on the "progress" field.
-func ProgressGTE(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldProgress, v))
+// TotalUsersGTE applies the GTE predicate on the "total_users" field.
+func TotalUsersGTE(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldTotalUsers, v))
 }
 
-// ProgressLT applies the LT predicate on the "progress" field.
-func ProgressLT(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldLT(FieldProgress, v))
+// TotalUsersLT applies the LT predicate on the "total_users" field.
+func TotalUsersLT(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLT(FieldTotalUsers, v))
 }
 
-// ProgressLTE applies the LTE predicate on the "progress" field.
-func ProgressLTE(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldProgress, v))
+// TotalUsersLTE applies the LTE predicate on the "total_users" field.
+func TotalUsersLTE(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldTotalUsers, v))
 }
 
-// TotalEQ applies the EQ predicate on the "total" field.
-func TotalEQ(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldTotal, v))
+// SuccessCountEQ applies the EQ predicate on the "success_count" field.
+func SuccessCountEQ(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldSuccessCount, v))
 }
 
-// TotalNEQ applies the NEQ predicate on the "total" field.
-func TotalNEQ(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldTotal, v))
+// SuccessCountNEQ applies the NEQ predicate on the "success_count" field.
+func SuccessCountNEQ(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldSuccessCount, v))
 }
 
-// TotalIn applies the In predicate on the "total" field.
-func TotalIn(vs ...int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldIn(FieldTotal, vs...))
+// SuccessCountIn applies the In predicate on the "success_count" field.
+func SuccessCountIn(vs ...int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldIn(FieldSuccessCount, vs...))
 }
 
-// TotalNotIn applies the NotIn predicate on the "total" field.
-func TotalNotIn(vs ...int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldTotal, vs...))
+// SuccessCountNotIn applies the NotIn predicate on the "success_count" field.
+func SuccessCountNotIn(vs ...int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldSuccessCount, vs...))
 }
 
-// TotalGT applies the GT predicate on the "total" field.
-func TotalGT(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldGT(FieldTotal, v))
+// SuccessCountGT applies the GT predicate on the "success_count" field.
+func SuccessCountGT(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGT(FieldSuccessCount, v))
 }
 
-// TotalGTE applies the GTE predicate on the "total" field.
-func TotalGTE(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldTotal, v))
+// SuccessCountGTE applies the GTE predicate on the "success_count" field.
+func SuccessCountGTE(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldSuccessCount, v))
 }
 
-// TotalLT applies the LT predicate on the "total" field.
-func TotalLT(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldLT(FieldTotal, v))
+// SuccessCountLT applies the LT predicate on the "success_count" field.
+func SuccessCountLT(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLT(FieldSuccessCount, v))
 }
 
-// TotalLTE applies the LTE predicate on the "total" field.
-func TotalLTE(v int) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldTotal, v))
+// SuccessCountLTE applies the LTE predicate on the "success_count" field.
+func SuccessCountLTE(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldSuccessCount, v))
 }
 
-// ResultEQ applies the EQ predicate on the "result" field.
-func ResultEQ(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldResult, v))
+// FailedCountEQ applies the EQ predicate on the "failed_count" field.
+func FailedCountEQ(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldFailedCount, v))
 }
 
-// ResultNEQ applies the NEQ predicate on the "result" field.
-func ResultNEQ(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldResult, v))
+// FailedCountNEQ applies the NEQ predicate on the "failed_count" field.
+func FailedCountNEQ(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldFailedCount, v))
 }
 
-// ResultIn applies the In predicate on the "result" field.
-func ResultIn(vs ...string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldIn(FieldResult, vs...))
+// FailedCountIn applies the In predicate on the "failed_count" field.
+func FailedCountIn(vs ...int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldIn(FieldFailedCount, vs...))
 }
 
-// ResultNotIn applies the NotIn predicate on the "result" field.
-func ResultNotIn(vs ...string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldResult, vs...))
+// FailedCountNotIn applies the NotIn predicate on the "failed_count" field.
+func FailedCountNotIn(vs ...int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldFailedCount, vs...))
 }
 
-// ResultGT applies the GT predicate on the "result" field.
-func ResultGT(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldGT(FieldResult, v))
+// FailedCountGT applies the GT predicate on the "failed_count" field.
+func FailedCountGT(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGT(FieldFailedCount, v))
 }
 
-// ResultGTE applies the GTE predicate on the "result" field.
-func ResultGTE(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldResult, v))
+// FailedCountGTE applies the GTE predicate on the "failed_count" field.
+func FailedCountGTE(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldFailedCount, v))
 }
 
-// ResultLT applies the LT predicate on the "result" field.
-func ResultLT(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldLT(FieldResult, v))
+// FailedCountLT applies the LT predicate on the "failed_count" field.
+func FailedCountLT(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLT(FieldFailedCount, v))
 }
 
-// ResultLTE applies the LTE predicate on the "result" field.
-func ResultLTE(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldResult, v))
+// FailedCountLTE applies the LTE predicate on the "failed_count" field.
+func FailedCountLTE(v int) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldFailedCount, v))
 }
 
-// ResultContains applies the Contains predicate on the "result" field.
-func ResultContains(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldContains(FieldResult, v))
+// StartTimeEQ applies the EQ predicate on the "start_time" field.
+func StartTimeEQ(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldStartTime, v))
 }
 
-// ResultHasPrefix applies the HasPrefix predicate on the "result" field.
-func ResultHasPrefix(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldHasPrefix(FieldResult, v))
+// StartTimeNEQ applies the NEQ predicate on the "start_time" field.
+func StartTimeNEQ(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldStartTime, v))
 }
 
-// ResultHasSuffix applies the HasSuffix predicate on the "result" field.
-func ResultHasSuffix(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldHasSuffix(FieldResult, v))
+// StartTimeIn applies the In predicate on the "start_time" field.
+func StartTimeIn(vs ...time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldIn(FieldStartTime, vs...))
 }
 
-// ResultIsNil applies the IsNil predicate on the "result" field.
-func ResultIsNil() predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldIsNull(FieldResult))
+// StartTimeNotIn applies the NotIn predicate on the "start_time" field.
+func StartTimeNotIn(vs ...time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldStartTime, vs...))
 }
 
-// ResultNotNil applies the NotNil predicate on the "result" field.
-func ResultNotNil() predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNotNull(FieldResult))
+// StartTimeGT applies the GT predicate on the "start_time" field.
+func StartTimeGT(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGT(FieldStartTime, v))
 }
 
-// ResultEqualFold applies the EqualFold predicate on the "result" field.
-func ResultEqualFold(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEqualFold(FieldResult, v))
+// StartTimeGTE applies the GTE predicate on the "start_time" field.
+func StartTimeGTE(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldStartTime, v))
 }
 
-// ResultContainsFold applies the ContainsFold predicate on the "result" field.
-func ResultContainsFold(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldContainsFold(FieldResult, v))
+// StartTimeLT applies the LT predicate on the "start_time" field.
+func StartTimeLT(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLT(FieldStartTime, v))
 }
 
-// ErrorEQ applies the EQ predicate on the "error" field.
-func ErrorEQ(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldError, v))
+// StartTimeLTE applies the LTE predicate on the "start_time" field.
+func StartTimeLTE(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldStartTime, v))
 }
 
-// ErrorNEQ applies the NEQ predicate on the "error" field.
-func ErrorNEQ(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldError, v))
+// StartTimeIsNil applies the IsNil predicate on the "start_time" field.
+func StartTimeIsNil() predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldIsNull(FieldStartTime))
 }
 
-// ErrorIn applies the In predicate on the "error" field.
-func ErrorIn(vs ...string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldIn(FieldError, vs...))
+// StartTimeNotNil applies the NotNil predicate on the "start_time" field.
+func StartTimeNotNil() predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNotNull(FieldStartTime))
 }
 
-// ErrorNotIn applies the NotIn predicate on the "error" field.
-func ErrorNotIn(vs ...string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldError, vs...))
+// EndTimeEQ applies the EQ predicate on the "end_time" field.
+func EndTimeEQ(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldEndTime, v))
 }
 
-// ErrorGT applies the GT predicate on the "error" field.
-func ErrorGT(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldGT(FieldError, v))
+// EndTimeNEQ applies the NEQ predicate on the "end_time" field.
+func EndTimeNEQ(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldEndTime, v))
 }
 
-// ErrorGTE applies the GTE predicate on the "error" field.
-func ErrorGTE(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldError, v))
+// EndTimeIn applies the In predicate on the "end_time" field.
+func EndTimeIn(vs ...time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldIn(FieldEndTime, vs...))
 }
 
-// ErrorLT applies the LT predicate on the "error" field.
-func ErrorLT(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldLT(FieldError, v))
+// EndTimeNotIn applies the NotIn predicate on the "end_time" field.
+func EndTimeNotIn(vs ...time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldEndTime, vs...))
 }
 
-// ErrorLTE applies the LTE predicate on the "error" field.
-func ErrorLTE(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldError, v))
+// EndTimeGT applies the GT predicate on the "end_time" field.
+func EndTimeGT(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGT(FieldEndTime, v))
 }
 
-// ErrorContains applies the Contains predicate on the "error" field.
-func ErrorContains(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldContains(FieldError, v))
+// EndTimeGTE applies the GTE predicate on the "end_time" field.
+func EndTimeGTE(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldEndTime, v))
 }
 
-// ErrorHasPrefix applies the HasPrefix predicate on the "error" field.
-func ErrorHasPrefix(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldHasPrefix(FieldError, v))
+// EndTimeLT applies the LT predicate on the "end_time" field.
+func EndTimeLT(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLT(FieldEndTime, v))
 }
 
-// ErrorHasSuffix applies the HasSuffix predicate on the "error" field.
-func ErrorHasSuffix(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldHasSuffix(FieldError, v))
+// EndTimeLTE applies the LTE predicate on the "end_time" field.
+func EndTimeLTE(v time.Time) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldEndTime, v))
 }
 
-// ErrorIsNil applies the IsNil predicate on the "error" field.
-func ErrorIsNil() predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldIsNull(FieldError))
+// EndTimeIsNil applies the IsNil predicate on the "end_time" field.
+func EndTimeIsNil() predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldIsNull(FieldEndTime))
 }
 
-// ErrorNotNil applies the NotNil predicate on the "error" field.
-func ErrorNotNil() predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNotNull(FieldError))
+// EndTimeNotNil applies the NotNil predicate on the "end_time" field.
+func EndTimeNotNil() predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNotNull(FieldEndTime))
 }
 
-// ErrorEqualFold applies the EqualFold predicate on the "error" field.
-func ErrorEqualFold(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEqualFold(FieldError, v))
+// OperatorEQ applies the EQ predicate on the "operator" field.
+func OperatorEQ(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldOperator, v))
 }
 
-// ErrorContainsFold applies the ContainsFold predicate on the "error" field.
-func ErrorContainsFold(v string) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldContainsFold(FieldError, v))
+// OperatorNEQ applies the NEQ predicate on the "operator" field.
+func OperatorNEQ(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldOperator, v))
+}
+
+// OperatorIn applies the In predicate on the "operator" field.
+func OperatorIn(vs ...string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldIn(FieldOperator, vs...))
+}
+
+// OperatorNotIn applies the NotIn predicate on the "operator" field.
+func OperatorNotIn(vs ...string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldOperator, vs...))
+}
+
+// OperatorGT applies the GT predicate on the "operator" field.
+func OperatorGT(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGT(FieldOperator, v))
+}
+
+// OperatorGTE applies the GTE predicate on the "operator" field.
+func OperatorGTE(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldOperator, v))
+}
+
+// OperatorLT applies the LT predicate on the "operator" field.
+func OperatorLT(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLT(FieldOperator, v))
+}
+
+// OperatorLTE applies the LTE predicate on the "operator" field.
+func OperatorLTE(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldOperator, v))
+}
+
+// OperatorContains applies the Contains predicate on the "operator" field.
+func OperatorContains(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldContains(FieldOperator, v))
+}
+
+// OperatorHasPrefix applies the HasPrefix predicate on the "operator" field.
+func OperatorHasPrefix(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldHasPrefix(FieldOperator, v))
+}
+
+// OperatorHasSuffix applies the HasSuffix predicate on the "operator" field.
+func OperatorHasSuffix(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldHasSuffix(FieldOperator, v))
+}
+
+// OperatorIsNil applies the IsNil predicate on the "operator" field.
+func OperatorIsNil() predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldIsNull(FieldOperator))
+}
+
+// OperatorNotNil applies the NotNil predicate on the "operator" field.
+func OperatorNotNil() predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNotNull(FieldOperator))
+}
+
+// OperatorEqualFold applies the EqualFold predicate on the "operator" field.
+func OperatorEqualFold(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEqualFold(FieldOperator, v))
+}
+
+// OperatorContainsFold applies the ContainsFold predicate on the "operator" field.
+func OperatorContainsFold(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldContainsFold(FieldOperator, v))
+}
+
+// ErrorMessageEQ applies the EQ predicate on the "error_message" field.
+func ErrorMessageEQ(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldErrorMessage, v))
+}
+
+// ErrorMessageNEQ applies the NEQ predicate on the "error_message" field.
+func ErrorMessageNEQ(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldErrorMessage, v))
+}
+
+// ErrorMessageIn applies the In predicate on the "error_message" field.
+func ErrorMessageIn(vs ...string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldIn(FieldErrorMessage, vs...))
+}
+
+// ErrorMessageNotIn applies the NotIn predicate on the "error_message" field.
+func ErrorMessageNotIn(vs ...string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldErrorMessage, vs...))
+}
+
+// ErrorMessageGT applies the GT predicate on the "error_message" field.
+func ErrorMessageGT(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGT(FieldErrorMessage, v))
+}
+
+// ErrorMessageGTE applies the GTE predicate on the "error_message" field.
+func ErrorMessageGTE(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldErrorMessage, v))
+}
+
+// ErrorMessageLT applies the LT predicate on the "error_message" field.
+func ErrorMessageLT(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLT(FieldErrorMessage, v))
+}
+
+// ErrorMessageLTE applies the LTE predicate on the "error_message" field.
+func ErrorMessageLTE(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldErrorMessage, v))
+}
+
+// ErrorMessageContains applies the Contains predicate on the "error_message" field.
+func ErrorMessageContains(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldContains(FieldErrorMessage, v))
+}
+
+// ErrorMessageHasPrefix applies the HasPrefix predicate on the "error_message" field.
+func ErrorMessageHasPrefix(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldHasPrefix(FieldErrorMessage, v))
+}
+
+// ErrorMessageHasSuffix applies the HasSuffix predicate on the "error_message" field.
+func ErrorMessageHasSuffix(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldHasSuffix(FieldErrorMessage, v))
+}
+
+// ErrorMessageIsNil applies the IsNil predicate on the "error_message" field.
+func ErrorMessageIsNil() predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldIsNull(FieldErrorMessage))
+}
+
+// ErrorMessageNotNil applies the NotNil predicate on the "error_message" field.
+func ErrorMessageNotNil() predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldNotNull(FieldErrorMessage))
+}
+
+// ErrorMessageEqualFold applies the EqualFold predicate on the "error_message" field.
+func ErrorMessageEqualFold(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldEqualFold(FieldErrorMessage, v))
+}
+
+// ErrorMessageContainsFold applies the ContainsFold predicate on the "error_message" field.
+func ErrorMessageContainsFold(v string) predicate.ProxyGroupHistory {
+	return predicate.ProxyGroupHistory(sql.FieldContainsFold(FieldErrorMessage, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -562,46 +712,6 @@ func CreatedAtLT(v time.Time) predicate.ProxyGroupHistory {
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.ProxyGroupHistory {
 	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldCreatedAt, v))
-}
-
-// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
-func UpdatedAtEQ(v time.Time) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldEQ(FieldUpdatedAt, v))
-}
-
-// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
-func UpdatedAtNEQ(v time.Time) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNEQ(FieldUpdatedAt, v))
-}
-
-// UpdatedAtIn applies the In predicate on the "updated_at" field.
-func UpdatedAtIn(vs ...time.Time) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldIn(FieldUpdatedAt, vs...))
-}
-
-// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
-func UpdatedAtNotIn(vs ...time.Time) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldNotIn(FieldUpdatedAt, vs...))
-}
-
-// UpdatedAtGT applies the GT predicate on the "updated_at" field.
-func UpdatedAtGT(v time.Time) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldGT(FieldUpdatedAt, v))
-}
-
-// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
-func UpdatedAtGTE(v time.Time) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldGTE(FieldUpdatedAt, v))
-}
-
-// UpdatedAtLT applies the LT predicate on the "updated_at" field.
-func UpdatedAtLT(v time.Time) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldLT(FieldUpdatedAt, v))
-}
-
-// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
-func UpdatedAtLTE(v time.Time) predicate.ProxyGroupHistory {
-	return predicate.ProxyGroupHistory(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
 // And groups predicates with the AND operator between them.

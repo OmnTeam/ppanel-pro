@@ -91,6 +91,41 @@ func (_u *ProxyUserSubscribeUpdate) AddSubscribeID(v int64) *ProxyUserSubscribeU
 	return _u
 }
 
+// SetNodeGroupID sets the "node_group_id" field.
+func (_u *ProxyUserSubscribeUpdate) SetNodeGroupID(v int64) *ProxyUserSubscribeUpdate {
+	_u.mutation.ResetNodeGroupID()
+	_u.mutation.SetNodeGroupID(v)
+	return _u
+}
+
+// SetNillableNodeGroupID sets the "node_group_id" field if the given value is not nil.
+func (_u *ProxyUserSubscribeUpdate) SetNillableNodeGroupID(v *int64) *ProxyUserSubscribeUpdate {
+	if v != nil {
+		_u.SetNodeGroupID(*v)
+	}
+	return _u
+}
+
+// AddNodeGroupID adds value to the "node_group_id" field.
+func (_u *ProxyUserSubscribeUpdate) AddNodeGroupID(v int64) *ProxyUserSubscribeUpdate {
+	_u.mutation.AddNodeGroupID(v)
+	return _u
+}
+
+// SetGroupLocked sets the "group_locked" field.
+func (_u *ProxyUserSubscribeUpdate) SetGroupLocked(v bool) *ProxyUserSubscribeUpdate {
+	_u.mutation.SetGroupLocked(v)
+	return _u
+}
+
+// SetNillableGroupLocked sets the "group_locked" field if the given value is not nil.
+func (_u *ProxyUserSubscribeUpdate) SetNillableGroupLocked(v *bool) *ProxyUserSubscribeUpdate {
+	if v != nil {
+		_u.SetGroupLocked(*v)
+	}
+	return _u
+}
+
 // SetStartTime sets the "start_time" field.
 func (_u *ProxyUserSubscribeUpdate) SetStartTime(v time.Time) *ProxyUserSubscribeUpdate {
 	_u.mutation.SetStartTime(v)
@@ -226,6 +261,60 @@ func (_u *ProxyUserSubscribeUpdate) ClearUpload() *ProxyUserSubscribeUpdate {
 	return _u
 }
 
+// SetExpiredDownload sets the "expired_download" field.
+func (_u *ProxyUserSubscribeUpdate) SetExpiredDownload(v int64) *ProxyUserSubscribeUpdate {
+	_u.mutation.ResetExpiredDownload()
+	_u.mutation.SetExpiredDownload(v)
+	return _u
+}
+
+// SetNillableExpiredDownload sets the "expired_download" field if the given value is not nil.
+func (_u *ProxyUserSubscribeUpdate) SetNillableExpiredDownload(v *int64) *ProxyUserSubscribeUpdate {
+	if v != nil {
+		_u.SetExpiredDownload(*v)
+	}
+	return _u
+}
+
+// AddExpiredDownload adds value to the "expired_download" field.
+func (_u *ProxyUserSubscribeUpdate) AddExpiredDownload(v int64) *ProxyUserSubscribeUpdate {
+	_u.mutation.AddExpiredDownload(v)
+	return _u
+}
+
+// ClearExpiredDownload clears the value of the "expired_download" field.
+func (_u *ProxyUserSubscribeUpdate) ClearExpiredDownload() *ProxyUserSubscribeUpdate {
+	_u.mutation.ClearExpiredDownload()
+	return _u
+}
+
+// SetExpiredUpload sets the "expired_upload" field.
+func (_u *ProxyUserSubscribeUpdate) SetExpiredUpload(v int64) *ProxyUserSubscribeUpdate {
+	_u.mutation.ResetExpiredUpload()
+	_u.mutation.SetExpiredUpload(v)
+	return _u
+}
+
+// SetNillableExpiredUpload sets the "expired_upload" field if the given value is not nil.
+func (_u *ProxyUserSubscribeUpdate) SetNillableExpiredUpload(v *int64) *ProxyUserSubscribeUpdate {
+	if v != nil {
+		_u.SetExpiredUpload(*v)
+	}
+	return _u
+}
+
+// AddExpiredUpload adds value to the "expired_upload" field.
+func (_u *ProxyUserSubscribeUpdate) AddExpiredUpload(v int64) *ProxyUserSubscribeUpdate {
+	_u.mutation.AddExpiredUpload(v)
+	return _u
+}
+
+// ClearExpiredUpload clears the value of the "expired_upload" field.
+func (_u *ProxyUserSubscribeUpdate) ClearExpiredUpload() *ProxyUserSubscribeUpdate {
+	_u.mutation.ClearExpiredUpload()
+	return _u
+}
+
 // SetToken sets the "token" field.
 func (_u *ProxyUserSubscribeUpdate) SetToken(v string) *ProxyUserSubscribeUpdate {
 	_u.mutation.SetToken(v)
@@ -293,6 +382,26 @@ func (_u *ProxyUserSubscribeUpdate) ClearStatus() *ProxyUserSubscribeUpdate {
 	return _u
 }
 
+// SetNote sets the "note" field.
+func (_u *ProxyUserSubscribeUpdate) SetNote(v string) *ProxyUserSubscribeUpdate {
+	_u.mutation.SetNote(v)
+	return _u
+}
+
+// SetNillableNote sets the "note" field if the given value is not nil.
+func (_u *ProxyUserSubscribeUpdate) SetNillableNote(v *string) *ProxyUserSubscribeUpdate {
+	if v != nil {
+		_u.SetNote(*v)
+	}
+	return _u
+}
+
+// ClearNote clears the value of the "note" field.
+func (_u *ProxyUserSubscribeUpdate) ClearNote() *ProxyUserSubscribeUpdate {
+	_u.mutation.ClearNote()
+	return _u
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxyUserSubscribeUpdate) SetUpdatedAt(v time.Time) *ProxyUserSubscribeUpdate {
 	_u.mutation.SetUpdatedAt(v)
@@ -352,6 +461,11 @@ func (_u *ProxyUserSubscribeUpdate) check() error {
 			return &ValidationError{Name: "uuid", err: fmt.Errorf(`ent: validator failed for field "ProxyUserSubscribe.uuid": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Note(); ok {
+		if err := proxyusersubscribe.NoteValidator(v); err != nil {
+			return &ValidationError{Name: "note", err: fmt.Errorf(`ent: validator failed for field "ProxyUserSubscribe.note": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -384,6 +498,15 @@ func (_u *ProxyUserSubscribeUpdate) sqlSave(ctx context.Context) (_node int, err
 	}
 	if value, ok := _u.mutation.AddedSubscribeID(); ok {
 		_spec.AddField(proxyusersubscribe.FieldSubscribeID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.NodeGroupID(); ok {
+		_spec.SetField(proxyusersubscribe.FieldNodeGroupID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedNodeGroupID(); ok {
+		_spec.AddField(proxyusersubscribe.FieldNodeGroupID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.GroupLocked(); ok {
+		_spec.SetField(proxyusersubscribe.FieldGroupLocked, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.StartTime(); ok {
 		_spec.SetField(proxyusersubscribe.FieldStartTime, field.TypeTime, value)
@@ -427,6 +550,24 @@ func (_u *ProxyUserSubscribeUpdate) sqlSave(ctx context.Context) (_node int, err
 	if _u.mutation.UploadCleared() {
 		_spec.ClearField(proxyusersubscribe.FieldUpload, field.TypeInt64)
 	}
+	if value, ok := _u.mutation.ExpiredDownload(); ok {
+		_spec.SetField(proxyusersubscribe.FieldExpiredDownload, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedExpiredDownload(); ok {
+		_spec.AddField(proxyusersubscribe.FieldExpiredDownload, field.TypeInt64, value)
+	}
+	if _u.mutation.ExpiredDownloadCleared() {
+		_spec.ClearField(proxyusersubscribe.FieldExpiredDownload, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.ExpiredUpload(); ok {
+		_spec.SetField(proxyusersubscribe.FieldExpiredUpload, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedExpiredUpload(); ok {
+		_spec.AddField(proxyusersubscribe.FieldExpiredUpload, field.TypeInt64, value)
+	}
+	if _u.mutation.ExpiredUploadCleared() {
+		_spec.ClearField(proxyusersubscribe.FieldExpiredUpload, field.TypeInt64)
+	}
 	if value, ok := _u.mutation.Token(); ok {
 		_spec.SetField(proxyusersubscribe.FieldToken, field.TypeString, value)
 	}
@@ -447,6 +588,12 @@ func (_u *ProxyUserSubscribeUpdate) sqlSave(ctx context.Context) (_node int, err
 	}
 	if _u.mutation.StatusCleared() {
 		_spec.ClearField(proxyusersubscribe.FieldStatus, field.TypeInt8)
+	}
+	if value, ok := _u.mutation.Note(); ok {
+		_spec.SetField(proxyusersubscribe.FieldNote, field.TypeString, value)
+	}
+	if _u.mutation.NoteCleared() {
+		_spec.ClearField(proxyusersubscribe.FieldNote, field.TypeString)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyusersubscribe.FieldUpdatedAt, field.TypeTime, value)
@@ -531,6 +678,41 @@ func (_u *ProxyUserSubscribeUpdateOne) SetNillableSubscribeID(v *int64) *ProxyUs
 // AddSubscribeID adds value to the "subscribe_id" field.
 func (_u *ProxyUserSubscribeUpdateOne) AddSubscribeID(v int64) *ProxyUserSubscribeUpdateOne {
 	_u.mutation.AddSubscribeID(v)
+	return _u
+}
+
+// SetNodeGroupID sets the "node_group_id" field.
+func (_u *ProxyUserSubscribeUpdateOne) SetNodeGroupID(v int64) *ProxyUserSubscribeUpdateOne {
+	_u.mutation.ResetNodeGroupID()
+	_u.mutation.SetNodeGroupID(v)
+	return _u
+}
+
+// SetNillableNodeGroupID sets the "node_group_id" field if the given value is not nil.
+func (_u *ProxyUserSubscribeUpdateOne) SetNillableNodeGroupID(v *int64) *ProxyUserSubscribeUpdateOne {
+	if v != nil {
+		_u.SetNodeGroupID(*v)
+	}
+	return _u
+}
+
+// AddNodeGroupID adds value to the "node_group_id" field.
+func (_u *ProxyUserSubscribeUpdateOne) AddNodeGroupID(v int64) *ProxyUserSubscribeUpdateOne {
+	_u.mutation.AddNodeGroupID(v)
+	return _u
+}
+
+// SetGroupLocked sets the "group_locked" field.
+func (_u *ProxyUserSubscribeUpdateOne) SetGroupLocked(v bool) *ProxyUserSubscribeUpdateOne {
+	_u.mutation.SetGroupLocked(v)
+	return _u
+}
+
+// SetNillableGroupLocked sets the "group_locked" field if the given value is not nil.
+func (_u *ProxyUserSubscribeUpdateOne) SetNillableGroupLocked(v *bool) *ProxyUserSubscribeUpdateOne {
+	if v != nil {
+		_u.SetGroupLocked(*v)
+	}
 	return _u
 }
 
@@ -669,6 +851,60 @@ func (_u *ProxyUserSubscribeUpdateOne) ClearUpload() *ProxyUserSubscribeUpdateOn
 	return _u
 }
 
+// SetExpiredDownload sets the "expired_download" field.
+func (_u *ProxyUserSubscribeUpdateOne) SetExpiredDownload(v int64) *ProxyUserSubscribeUpdateOne {
+	_u.mutation.ResetExpiredDownload()
+	_u.mutation.SetExpiredDownload(v)
+	return _u
+}
+
+// SetNillableExpiredDownload sets the "expired_download" field if the given value is not nil.
+func (_u *ProxyUserSubscribeUpdateOne) SetNillableExpiredDownload(v *int64) *ProxyUserSubscribeUpdateOne {
+	if v != nil {
+		_u.SetExpiredDownload(*v)
+	}
+	return _u
+}
+
+// AddExpiredDownload adds value to the "expired_download" field.
+func (_u *ProxyUserSubscribeUpdateOne) AddExpiredDownload(v int64) *ProxyUserSubscribeUpdateOne {
+	_u.mutation.AddExpiredDownload(v)
+	return _u
+}
+
+// ClearExpiredDownload clears the value of the "expired_download" field.
+func (_u *ProxyUserSubscribeUpdateOne) ClearExpiredDownload() *ProxyUserSubscribeUpdateOne {
+	_u.mutation.ClearExpiredDownload()
+	return _u
+}
+
+// SetExpiredUpload sets the "expired_upload" field.
+func (_u *ProxyUserSubscribeUpdateOne) SetExpiredUpload(v int64) *ProxyUserSubscribeUpdateOne {
+	_u.mutation.ResetExpiredUpload()
+	_u.mutation.SetExpiredUpload(v)
+	return _u
+}
+
+// SetNillableExpiredUpload sets the "expired_upload" field if the given value is not nil.
+func (_u *ProxyUserSubscribeUpdateOne) SetNillableExpiredUpload(v *int64) *ProxyUserSubscribeUpdateOne {
+	if v != nil {
+		_u.SetExpiredUpload(*v)
+	}
+	return _u
+}
+
+// AddExpiredUpload adds value to the "expired_upload" field.
+func (_u *ProxyUserSubscribeUpdateOne) AddExpiredUpload(v int64) *ProxyUserSubscribeUpdateOne {
+	_u.mutation.AddExpiredUpload(v)
+	return _u
+}
+
+// ClearExpiredUpload clears the value of the "expired_upload" field.
+func (_u *ProxyUserSubscribeUpdateOne) ClearExpiredUpload() *ProxyUserSubscribeUpdateOne {
+	_u.mutation.ClearExpiredUpload()
+	return _u
+}
+
 // SetToken sets the "token" field.
 func (_u *ProxyUserSubscribeUpdateOne) SetToken(v string) *ProxyUserSubscribeUpdateOne {
 	_u.mutation.SetToken(v)
@@ -733,6 +969,26 @@ func (_u *ProxyUserSubscribeUpdateOne) AddStatus(v int8) *ProxyUserSubscribeUpda
 // ClearStatus clears the value of the "status" field.
 func (_u *ProxyUserSubscribeUpdateOne) ClearStatus() *ProxyUserSubscribeUpdateOne {
 	_u.mutation.ClearStatus()
+	return _u
+}
+
+// SetNote sets the "note" field.
+func (_u *ProxyUserSubscribeUpdateOne) SetNote(v string) *ProxyUserSubscribeUpdateOne {
+	_u.mutation.SetNote(v)
+	return _u
+}
+
+// SetNillableNote sets the "note" field if the given value is not nil.
+func (_u *ProxyUserSubscribeUpdateOne) SetNillableNote(v *string) *ProxyUserSubscribeUpdateOne {
+	if v != nil {
+		_u.SetNote(*v)
+	}
+	return _u
+}
+
+// ClearNote clears the value of the "note" field.
+func (_u *ProxyUserSubscribeUpdateOne) ClearNote() *ProxyUserSubscribeUpdateOne {
+	_u.mutation.ClearNote()
 	return _u
 }
 
@@ -808,6 +1064,11 @@ func (_u *ProxyUserSubscribeUpdateOne) check() error {
 			return &ValidationError{Name: "uuid", err: fmt.Errorf(`ent: validator failed for field "ProxyUserSubscribe.uuid": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Note(); ok {
+		if err := proxyusersubscribe.NoteValidator(v); err != nil {
+			return &ValidationError{Name: "note", err: fmt.Errorf(`ent: validator failed for field "ProxyUserSubscribe.note": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -858,6 +1119,15 @@ func (_u *ProxyUserSubscribeUpdateOne) sqlSave(ctx context.Context) (_node *Prox
 	if value, ok := _u.mutation.AddedSubscribeID(); ok {
 		_spec.AddField(proxyusersubscribe.FieldSubscribeID, field.TypeInt64, value)
 	}
+	if value, ok := _u.mutation.NodeGroupID(); ok {
+		_spec.SetField(proxyusersubscribe.FieldNodeGroupID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedNodeGroupID(); ok {
+		_spec.AddField(proxyusersubscribe.FieldNodeGroupID, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.GroupLocked(); ok {
+		_spec.SetField(proxyusersubscribe.FieldGroupLocked, field.TypeBool, value)
+	}
 	if value, ok := _u.mutation.StartTime(); ok {
 		_spec.SetField(proxyusersubscribe.FieldStartTime, field.TypeTime, value)
 	}
@@ -900,6 +1170,24 @@ func (_u *ProxyUserSubscribeUpdateOne) sqlSave(ctx context.Context) (_node *Prox
 	if _u.mutation.UploadCleared() {
 		_spec.ClearField(proxyusersubscribe.FieldUpload, field.TypeInt64)
 	}
+	if value, ok := _u.mutation.ExpiredDownload(); ok {
+		_spec.SetField(proxyusersubscribe.FieldExpiredDownload, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedExpiredDownload(); ok {
+		_spec.AddField(proxyusersubscribe.FieldExpiredDownload, field.TypeInt64, value)
+	}
+	if _u.mutation.ExpiredDownloadCleared() {
+		_spec.ClearField(proxyusersubscribe.FieldExpiredDownload, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.ExpiredUpload(); ok {
+		_spec.SetField(proxyusersubscribe.FieldExpiredUpload, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedExpiredUpload(); ok {
+		_spec.AddField(proxyusersubscribe.FieldExpiredUpload, field.TypeInt64, value)
+	}
+	if _u.mutation.ExpiredUploadCleared() {
+		_spec.ClearField(proxyusersubscribe.FieldExpiredUpload, field.TypeInt64)
+	}
 	if value, ok := _u.mutation.Token(); ok {
 		_spec.SetField(proxyusersubscribe.FieldToken, field.TypeString, value)
 	}
@@ -920,6 +1208,12 @@ func (_u *ProxyUserSubscribeUpdateOne) sqlSave(ctx context.Context) (_node *Prox
 	}
 	if _u.mutation.StatusCleared() {
 		_spec.ClearField(proxyusersubscribe.FieldStatus, field.TypeInt8)
+	}
+	if value, ok := _u.mutation.Note(); ok {
+		_spec.SetField(proxyusersubscribe.FieldNote, field.TypeString, value)
+	}
+	if _u.mutation.NoteCleared() {
+		_spec.ClearField(proxyusersubscribe.FieldNote, field.TypeString)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxyusersubscribe.FieldUpdatedAt, field.TypeTime, value)

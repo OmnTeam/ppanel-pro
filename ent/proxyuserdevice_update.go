@@ -96,6 +96,26 @@ func (_u *ProxyUserDeviceUpdate) ClearIP() *ProxyUserDeviceUpdate {
 	return _u
 }
 
+// SetUserAgent sets the "user_agent" field.
+func (_u *ProxyUserDeviceUpdate) SetUserAgent(v string) *ProxyUserDeviceUpdate {
+	_u.mutation.SetUserAgent(v)
+	return _u
+}
+
+// SetNillableUserAgent sets the "user_agent" field if the given value is not nil.
+func (_u *ProxyUserDeviceUpdate) SetNillableUserAgent(v *string) *ProxyUserDeviceUpdate {
+	if v != nil {
+		_u.SetUserAgent(*v)
+	}
+	return _u
+}
+
+// ClearUserAgent clears the value of the "user_agent" field.
+func (_u *ProxyUserDeviceUpdate) ClearUserAgent() *ProxyUserDeviceUpdate {
+	_u.mutation.ClearUserAgent()
+	return _u
+}
+
 // SetIdentifier sets the "identifier" field.
 func (_u *ProxyUserDeviceUpdate) SetIdentifier(v string) *ProxyUserDeviceUpdate {
 	_u.mutation.SetIdentifier(v)
@@ -116,23 +136,17 @@ func (_u *ProxyUserDeviceUpdate) ClearIdentifier() *ProxyUserDeviceUpdate {
 	return _u
 }
 
-// SetUserAgent sets the "user_agent" field.
-func (_u *ProxyUserDeviceUpdate) SetUserAgent(v string) *ProxyUserDeviceUpdate {
-	_u.mutation.SetUserAgent(v)
+// SetShortCode sets the "short_code" field.
+func (_u *ProxyUserDeviceUpdate) SetShortCode(v string) *ProxyUserDeviceUpdate {
+	_u.mutation.SetShortCode(v)
 	return _u
 }
 
-// SetNillableUserAgent sets the "user_agent" field if the given value is not nil.
-func (_u *ProxyUserDeviceUpdate) SetNillableUserAgent(v *string) *ProxyUserDeviceUpdate {
+// SetNillableShortCode sets the "short_code" field if the given value is not nil.
+func (_u *ProxyUserDeviceUpdate) SetNillableShortCode(v *string) *ProxyUserDeviceUpdate {
 	if v != nil {
-		_u.SetUserAgent(*v)
+		_u.SetShortCode(*v)
 	}
-	return _u
-}
-
-// ClearUserAgent clears the value of the "user_agent" field.
-func (_u *ProxyUserDeviceUpdate) ClearUserAgent() *ProxyUserDeviceUpdate {
-	_u.mutation.ClearUserAgent()
 	return _u
 }
 
@@ -218,14 +232,19 @@ func (_u *ProxyUserDeviceUpdate) check() error {
 			return &ValidationError{Name: "ip", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.ip": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.UserAgent(); ok {
+		if err := proxyuserdevice.UserAgentValidator(v); err != nil {
+			return &ValidationError{Name: "user_agent", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.user_agent": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Identifier(); ok {
 		if err := proxyuserdevice.IdentifierValidator(v); err != nil {
 			return &ValidationError{Name: "identifier", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.identifier": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.UserAgent(); ok {
-		if err := proxyuserdevice.UserAgentValidator(v); err != nil {
-			return &ValidationError{Name: "user_agent", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.user_agent": %w`, err)}
+	if v, ok := _u.mutation.ShortCode(); ok {
+		if err := proxyuserdevice.ShortCodeValidator(v); err != nil {
+			return &ValidationError{Name: "short_code", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.short_code": %w`, err)}
 		}
 	}
 	return nil
@@ -264,17 +283,20 @@ func (_u *ProxyUserDeviceUpdate) sqlSave(ctx context.Context) (_node int, err er
 	if _u.mutation.IPCleared() {
 		_spec.ClearField(proxyuserdevice.FieldIP, field.TypeString)
 	}
+	if value, ok := _u.mutation.UserAgent(); ok {
+		_spec.SetField(proxyuserdevice.FieldUserAgent, field.TypeString, value)
+	}
+	if _u.mutation.UserAgentCleared() {
+		_spec.ClearField(proxyuserdevice.FieldUserAgent, field.TypeString)
+	}
 	if value, ok := _u.mutation.Identifier(); ok {
 		_spec.SetField(proxyuserdevice.FieldIdentifier, field.TypeString, value)
 	}
 	if _u.mutation.IdentifierCleared() {
 		_spec.ClearField(proxyuserdevice.FieldIdentifier, field.TypeString)
 	}
-	if value, ok := _u.mutation.UserAgent(); ok {
-		_spec.SetField(proxyuserdevice.FieldUserAgent, field.TypeString, value)
-	}
-	if _u.mutation.UserAgentCleared() {
-		_spec.ClearField(proxyuserdevice.FieldUserAgent, field.TypeString)
+	if value, ok := _u.mutation.ShortCode(); ok {
+		_spec.SetField(proxyuserdevice.FieldShortCode, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Online(); ok {
 		_spec.SetField(proxyuserdevice.FieldOnline, field.TypeBool, value)
@@ -373,6 +395,26 @@ func (_u *ProxyUserDeviceUpdateOne) ClearIP() *ProxyUserDeviceUpdateOne {
 	return _u
 }
 
+// SetUserAgent sets the "user_agent" field.
+func (_u *ProxyUserDeviceUpdateOne) SetUserAgent(v string) *ProxyUserDeviceUpdateOne {
+	_u.mutation.SetUserAgent(v)
+	return _u
+}
+
+// SetNillableUserAgent sets the "user_agent" field if the given value is not nil.
+func (_u *ProxyUserDeviceUpdateOne) SetNillableUserAgent(v *string) *ProxyUserDeviceUpdateOne {
+	if v != nil {
+		_u.SetUserAgent(*v)
+	}
+	return _u
+}
+
+// ClearUserAgent clears the value of the "user_agent" field.
+func (_u *ProxyUserDeviceUpdateOne) ClearUserAgent() *ProxyUserDeviceUpdateOne {
+	_u.mutation.ClearUserAgent()
+	return _u
+}
+
 // SetIdentifier sets the "identifier" field.
 func (_u *ProxyUserDeviceUpdateOne) SetIdentifier(v string) *ProxyUserDeviceUpdateOne {
 	_u.mutation.SetIdentifier(v)
@@ -393,23 +435,17 @@ func (_u *ProxyUserDeviceUpdateOne) ClearIdentifier() *ProxyUserDeviceUpdateOne 
 	return _u
 }
 
-// SetUserAgent sets the "user_agent" field.
-func (_u *ProxyUserDeviceUpdateOne) SetUserAgent(v string) *ProxyUserDeviceUpdateOne {
-	_u.mutation.SetUserAgent(v)
+// SetShortCode sets the "short_code" field.
+func (_u *ProxyUserDeviceUpdateOne) SetShortCode(v string) *ProxyUserDeviceUpdateOne {
+	_u.mutation.SetShortCode(v)
 	return _u
 }
 
-// SetNillableUserAgent sets the "user_agent" field if the given value is not nil.
-func (_u *ProxyUserDeviceUpdateOne) SetNillableUserAgent(v *string) *ProxyUserDeviceUpdateOne {
+// SetNillableShortCode sets the "short_code" field if the given value is not nil.
+func (_u *ProxyUserDeviceUpdateOne) SetNillableShortCode(v *string) *ProxyUserDeviceUpdateOne {
 	if v != nil {
-		_u.SetUserAgent(*v)
+		_u.SetShortCode(*v)
 	}
-	return _u
-}
-
-// ClearUserAgent clears the value of the "user_agent" field.
-func (_u *ProxyUserDeviceUpdateOne) ClearUserAgent() *ProxyUserDeviceUpdateOne {
-	_u.mutation.ClearUserAgent()
 	return _u
 }
 
@@ -508,14 +544,19 @@ func (_u *ProxyUserDeviceUpdateOne) check() error {
 			return &ValidationError{Name: "ip", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.ip": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.UserAgent(); ok {
+		if err := proxyuserdevice.UserAgentValidator(v); err != nil {
+			return &ValidationError{Name: "user_agent", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.user_agent": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Identifier(); ok {
 		if err := proxyuserdevice.IdentifierValidator(v); err != nil {
 			return &ValidationError{Name: "identifier", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.identifier": %w`, err)}
 		}
 	}
-	if v, ok := _u.mutation.UserAgent(); ok {
-		if err := proxyuserdevice.UserAgentValidator(v); err != nil {
-			return &ValidationError{Name: "user_agent", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.user_agent": %w`, err)}
+	if v, ok := _u.mutation.ShortCode(); ok {
+		if err := proxyuserdevice.ShortCodeValidator(v); err != nil {
+			return &ValidationError{Name: "short_code", err: fmt.Errorf(`ent: validator failed for field "ProxyUserDevice.short_code": %w`, err)}
 		}
 	}
 	return nil
@@ -571,17 +612,20 @@ func (_u *ProxyUserDeviceUpdateOne) sqlSave(ctx context.Context) (_node *ProxyUs
 	if _u.mutation.IPCleared() {
 		_spec.ClearField(proxyuserdevice.FieldIP, field.TypeString)
 	}
+	if value, ok := _u.mutation.UserAgent(); ok {
+		_spec.SetField(proxyuserdevice.FieldUserAgent, field.TypeString, value)
+	}
+	if _u.mutation.UserAgentCleared() {
+		_spec.ClearField(proxyuserdevice.FieldUserAgent, field.TypeString)
+	}
 	if value, ok := _u.mutation.Identifier(); ok {
 		_spec.SetField(proxyuserdevice.FieldIdentifier, field.TypeString, value)
 	}
 	if _u.mutation.IdentifierCleared() {
 		_spec.ClearField(proxyuserdevice.FieldIdentifier, field.TypeString)
 	}
-	if value, ok := _u.mutation.UserAgent(); ok {
-		_spec.SetField(proxyuserdevice.FieldUserAgent, field.TypeString, value)
-	}
-	if _u.mutation.UserAgentCleared() {
-		_spec.ClearField(proxyuserdevice.FieldUserAgent, field.TypeString)
+	if value, ok := _u.mutation.ShortCode(); ok {
+		_spec.SetField(proxyuserdevice.FieldShortCode, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Online(); ok {
 		_spec.SetField(proxyuserdevice.FieldOnline, field.TypeBool, value)

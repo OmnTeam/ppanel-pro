@@ -157,6 +157,11 @@ func (_c *ProxyTicketFollowCreate) check() error {
 	if _, ok := _c.mutation.From(); !ok {
 		return &ValidationError{Name: "from", err: errors.New(`ent: missing required field "ProxyTicketFollow.from"`)}
 	}
+	if v, ok := _c.mutation.From(); ok {
+		if err := proxyticketfollow.FromValidator(v); err != nil {
+			return &ValidationError{Name: "from", err: fmt.Errorf(`ent: validator failed for field "ProxyTicketFollow.from": %w`, err)}
+		}
+	}
 	if _, ok := _c.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "ProxyTicketFollow.type"`)}
 	}

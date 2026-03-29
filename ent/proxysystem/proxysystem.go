@@ -28,7 +28,7 @@ const (
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxysystem in the database.
-	Table = "proxy_system"
+	Table = "system"
 )
 
 // Columns holds all SQL columns for proxysystem fields.
@@ -58,6 +58,8 @@ var (
 	DefaultCategory string
 	// CategoryValidator is a validator for the "category" field. It is called by the builders before save.
 	CategoryValidator func(string) error
+	// DefaultKey holds the default value on creation for the "key" field.
+	DefaultKey string
 	// KeyValidator is a validator for the "key" field. It is called by the builders before save.
 	KeyValidator func(string) error
 	// DefaultType holds the default value on creation for the "type" field.

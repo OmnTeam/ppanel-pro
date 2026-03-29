@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
@@ -15,7 +13,7 @@ import (
 	oauthBiz "github.com/OmnTeam/ppanel-pro/internal/biz/auth/oauth"
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
 	"github.com/OmnTeam/ppanel-pro/internal/model/log"
-	"github.com/OmnTeam/ppanel-pro/pkg/jwt"
+	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 	"github.com/OmnTeam/ppanel-pro/pkg/uuidx"
 	"github.com/go-kratos/kratos/v2/errors"
@@ -41,44 +39,23 @@ func NewOAuthRepo(d *Data, config *conf.Application, logger kratoLog.Logger) oau
 	}
 }
 
-// getJWTConfig returns JWT secret and expiry from environment or defaults
-func (r *oauthRepo) getJWTConfig() (string, int) {
-	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		secret = DefaultJWTSecret
-	}
-
-	expireStr := os.Getenv("JWT_EXPIRE")
-	expire := DefaultJWTExpire
-	if expireStr != "" {
-		if val, err := strconv.Atoi(expireStr); err == nil {
-			expire = val
-		}
-	}
-
-	return secret, expire
-}
-
 // GetOAuthConfig 获取OAuth配置
 // 从 proxy_auth_method 表读取指定提供商的OAuth配置
 func (r *oauthRepo) GetOAuthConfig(ctx context.Context, method string) (map[string]string, error) {
 	r.logger.Infof("[GetOAuthConfig] method: %s", method)
 
-	// 查询 proxy_auth_method 表，移除 tenant_id 过滤
+	// 查询 proxy_auth_method 表
 	authMethod, err := r.data.db.ProxyAuthMethod.Query().
 		Where(proxyauthmethod.MethodEQ(method)).
 		Only(ctx)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, errors.NotFound("OAUTH_CONFIG_NOT_FOUND", fmt.Sprintf("OAuth配置未找到: %s", method))
-		}
-		return nil, errors.InternalServer("DATABASE_ERROR", fmt.Sprintf("查询OAuth配置失败: %v", err))
+		return nil, responsecode.NewDatabaseQueryError()
 	}
 
 	// 解析 config 字段（JSON格式）
 	var config map[string]string
 	if err := json.Unmarshal([]byte(authMethod.Config), &config); err != nil {
-		return nil, errors.InternalServer("CONFIG_PARSE_ERROR", fmt.Sprintf("解析OAuth配置失败: %v", err))
+		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	r.logger.Infof("[GetOAuthConfig] 成功获取OAuth配置, method: %s", method)
@@ -98,7 +75,7 @@ func (r *oauthRepo) SaveStateCode(ctx context.Context, provider, code, redirect 
 	err := r.data.rdb.Set(ctx, key, redirect, 5*time.Minute).Err()
 	if err != nil {
 		r.logger.Errorf("[SaveStateCode] Redis保存失败: %v", err)
-		return errors.InternalServer("REDIS_ERROR", fmt.Sprintf("保存state code失败: %v", err))
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	r.logger.Infof("[SaveStateCode] 成功保存state code, key: %s", key)
@@ -119,10 +96,10 @@ func (r *oauthRepo) GetStateCode(ctx context.Context, provider, code string) (st
 	if err != nil {
 		if err == redis.Nil {
 			r.logger.Errorf("[GetStateCode] state code不存在或已过期, key: %s", key)
-			return "", errors.BadRequest("STATE_CODE_INVALID", "state code无效或已过期")
+			return "", responsecode.NewKratosError(responsecode.ErrInternalError)
 		}
 		r.logger.Errorf("[GetStateCode] Redis读取失败: %v", err)
-		return "", errors.InternalServer("REDIS_ERROR", fmt.Sprintf("获取state code失败: %v", err))
+		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	r.logger.Infof("[GetStateCode] 成功获取state code, key: %s, redirect: %s", key, redirect)
@@ -134,7 +111,7 @@ func (r *oauthRepo) GetStateCode(ctx context.Context, provider, code string) (st
 func (r *oauthRepo) FindUserByOAuth(ctx context.Context, method, openID string) (int, error) {
 	r.logger.Infof("[FindUserByOAuth] method: %s, openID: %s", method, openID)
 
-	// 查询 proxy_user_auth_method 表，移除 tenant_id 过滤
+	// 查询 proxy_user_auth_method 表
 	authMethod, err := r.data.db.ProxyUserAuthMethod.Query().
 		Where(proxyuserauthmethod.AuthTypeEQ(method),
 			proxyuserauthmethod.AuthIdentifierEQ(openID)).
@@ -145,7 +122,7 @@ func (r *oauthRepo) FindUserByOAuth(ctx context.Context, method, openID string) 
 			return 0, errors.NotFound("USER_NOT_FOUND", "用户不存在")
 		}
 		r.logger.Errorf("[FindUserByOAuth] 数据库查询失败: %v", err)
-		return 0, errors.InternalServer("DATABASE_ERROR", fmt.Sprintf("查找用户失败: %v", err))
+		return 0, responsecode.NewDatabaseQueryError()
 	}
 
 	r.logger.Infof("[FindUserByOAuth] 找到用户, userID: %d", authMethod.UserID)
@@ -169,10 +146,11 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, method, openID, ema
 	// 1. 检查强制邀请配置
 	if r.config != nil && r.config.Invite != nil && r.config.Invite.ForcedInvite {
 		r.logger.Errorf("[CreateUserWithOAuth] 强制邀请模式已启用，禁止直接注册")
-		return 0, errors.BadRequest("INVITE_CODE_REQUIRED", "需要邀请码才能注册")
+		return 0, responsecode.NewKratosError(responsecode.ErrInviteCodeError)
 	}
 
 	var userID int
+	var trialSubscribe *ent.ProxyUserSubscribe
 
 	// 开始事务
 	err := r.data.db.TX(ctx, func(tx *ent.Tx) error {
@@ -185,11 +163,11 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, method, openID, ema
 				Only(ctx)
 			if err != nil && !ent.IsNotFound(err) {
 				r.logger.Errorf("[CreateUserWithOAuth] 检查email失败: %v", err)
-				return errors.InternalServer("DATABASE_ERROR", fmt.Sprintf("检查email失败: %v", err))
+				return responsecode.NewDatabaseQueryError()
 			}
 			if existingAuth != nil && existingAuth.UserID != 0 {
 				r.logger.Errorf("[CreateUserWithOAuth] email已被使用: %s, 已存在用户ID: %d", email, existingAuth.UserID)
-				return errors.BadRequest("EMAIL_EXISTS", fmt.Sprintf("email已被使用: %s", email))
+				return responsecode.NewKratosError(responsecode.ErrDuplicateEmail)
 			}
 		}
 
@@ -212,7 +190,7 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, method, openID, ema
 		user, err := userCreate.Save(ctx)
 		if err != nil {
 			r.logger.Errorf("[CreateUserWithOAuth] 创建用户失败: %v", err)
-			return errors.InternalServer("DATABASE_ERROR", fmt.Sprintf("创建用户失败: %v", err))
+			return responsecode.NewKratosError(responsecode.ErrDatabaseInsert)
 		}
 
 		userID = int(user.ID)
@@ -222,13 +200,13 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, method, openID, ema
 		referCode := uuidx.UserInviteCode(int64(userID))
 		r.logger.Infof("[CreateUserWithOAuth] 生成refer_code: %s, userID: %d", referCode, userID)
 
-		// 移除 tenant_id 隔离条件
+		// 单库模型下直接查询当前记录
 		err = tx.ProxyUser.UpdateOneID(int64(userID)).
 			SetReferCode(referCode).
 			Exec(ctx)
 		if err != nil {
 			r.logger.Errorf("[CreateUserWithOAuth] 更新refer_code失败: %v", err)
-			return errors.InternalServer("DATABASE_ERROR", fmt.Sprintf("更新refer_code失败: %v", err))
+			return responsecode.NewDatabaseUpdateError()
 		}
 
 		// 5. 创建 OAuth auth_method 记录
@@ -242,7 +220,7 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, method, openID, ema
 			Save(ctx)
 		if err != nil {
 			r.logger.Errorf("[CreateUserWithOAuth] 创建OAuth认证方法失败: %v", err)
-			return errors.InternalServer("DATABASE_ERROR", fmt.Sprintf("创建OAuth认证方法失败: %v", err))
+			return responsecode.NewKratosError(responsecode.ErrDatabaseInsert)
 		}
 
 		// 6. 如果email不为空，创建 email auth_method 记录
@@ -257,14 +235,14 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, method, openID, ema
 				Save(ctx)
 			if err != nil {
 				r.logger.Errorf("[CreateUserWithOAuth] 创建email认证方法失败: %v", err)
-				return errors.InternalServer("DATABASE_ERROR", fmt.Sprintf("创建email认证方法失败: %v", err))
+				return responsecode.NewKratosError(responsecode.ErrDatabaseInsert)
 			}
 		}
 
 		// 7. 激活试用订阅（如果配置启用）
 		if r.config != nil && r.config.Register != nil && r.config.Register.EnableTrial {
 			r.logger.Infof("[CreateUserWithOAuth] 激活试用订阅, userID: %d", userID)
-			err = r.activeTrial(ctx, tx, userID)
+			trialSubscribe, err = r.activeTrial(ctx, tx, userID)
 			if err != nil {
 				r.logger.Errorf("[CreateUserWithOAuth] 激活试用订阅失败: %v", err)
 				return err
@@ -277,6 +255,14 @@ func (r *oauthRepo) CreateUserWithOAuth(ctx context.Context, method, openID, ema
 	if err != nil {
 		r.logger.Errorf("[CreateUserWithOAuth] 用户创建事务失败: %v", err)
 		return 0, err
+	}
+	if trialSubscribe != nil {
+		legacyAuthRepo := &authRepo{
+			data:   r.data,
+			config: r.config,
+			log:    r.logger,
+		}
+		legacyAuthRepo.clearTrialCaches(ctx, trialSubscribe)
 	}
 
 	// 8. 记录注册日志（在事务外，失败不影响注册）
@@ -321,7 +307,7 @@ func (r *oauthRepo) RecordLoginLog(ctx context.Context, userID int, method, ip, 
 	content, err := loginLog.Marshal()
 	if err != nil {
 		r.logger.Errorf("[RecordLoginLog] 序列化登录日志失败: %v", err)
-		return errors.InternalServer("LOG_MARSHAL_ERROR", fmt.Sprintf("序列化登录日志失败: %v", err))
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	_, err = r.data.db.ProxySystemLog.Create().
@@ -332,7 +318,7 @@ func (r *oauthRepo) RecordLoginLog(ctx context.Context, userID int, method, ip, 
 		Save(ctx)
 	if err != nil {
 		r.logger.Errorf("[RecordLoginLog] 记录登录日志失败: %v", err)
-		return errors.InternalServer("LOG_SAVE_ERROR", fmt.Sprintf("记录登录日志失败: %v", err))
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	r.logger.Infof("[RecordLoginLog] 登录日志记录成功, userID: %d, success: %v", userID, success)
@@ -341,12 +327,12 @@ func (r *oauthRepo) RecordLoginLog(ctx context.Context, userID int, method, ip, 
 
 // activeTrial 激活试用订阅
 // 完整复刻原项目的 activeTrial 函数（Line 796-861）
-func (r *oauthRepo) activeTrial(ctx context.Context, tx *ent.Tx, userID int) error {
+func (r *oauthRepo) activeTrial(ctx context.Context, tx *ent.Tx, userID int) (*ent.ProxyUserSubscribe, error) {
 	r.logger.Infof("[activeTrial] userID: %d", userID)
 
 	// 获取试用订阅配置
 	if r.config == nil || r.config.Register == nil {
-		return errors.InternalServer("CONFIG_ERROR", "注册配置不存在")
+		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	trialSubscribeID := r.config.Register.TrialSubscribe
@@ -355,13 +341,13 @@ func (r *oauthRepo) activeTrial(ctx context.Context, tx *ent.Tx, userID int) err
 
 	r.logger.Infof("[activeTrial] 查询试用订阅模板, subscribeID: %d", trialSubscribeID)
 
-	// 查询试用订阅模板（移除tenant_id过滤）
+	// 查询试用订阅模板
 	sub, err := tx.ProxySubscribe.Query().
 		Where(proxysubscribe.IDEQ(trialSubscribeID)).
 		Only(ctx)
 	if err != nil {
 		r.logger.Errorf("[activeTrial] 查询试用订阅模板失败: %v", err)
-		return errors.InternalServer("DATABASE_ERROR", fmt.Sprintf("查询试用订阅模板失败: %v", err))
+		return nil, responsecode.NewDatabaseQueryError()
 	}
 
 	// 计算过期时间
@@ -376,7 +362,7 @@ func (r *oauthRepo) activeTrial(ctx context.Context, tx *ent.Tx, userID int) err
 		userID, sub.ID, sub.Traffic, expireTime.Format(time.RFC3339))
 
 	// 创建试用订阅记录
-	_, err = tx.ProxyUserSubscribe.Create().
+	userSubscribe, err := tx.ProxyUserSubscribe.Create().
 		SetUserID(int64(userID)).
 		SetOrderID(0).
 		SetSubscribeID(sub.ID).
@@ -391,11 +377,11 @@ func (r *oauthRepo) activeTrial(ctx context.Context, tx *ent.Tx, userID int) err
 		Save(ctx)
 	if err != nil {
 		r.logger.Errorf("[activeTrial] 创建试用订阅失败: %v", err)
-		return errors.InternalServer("DATABASE_ERROR", fmt.Sprintf("创建试用订阅失败: %v", err))
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseInsert)
 	}
 
 	r.logger.Infof("[activeTrial] 试用订阅激活成功, userID: %d, token: %s", userID, subscribeToken)
-	return nil
+	return userSubscribe, nil
 }
 
 // GenerateJWTToken 生成JWT令牌
@@ -405,36 +391,11 @@ func (r *oauthRepo) activeTrial(ctx context.Context, tx *ent.Tx, userID int) err
 func (r *oauthRepo) GenerateJWTToken(ctx context.Context, userID int) (string, error) {
 	r.logger.Infof("[GenerateJWTToken] userID: %d", userID)
 
-	// 生成session ID
-	sessionID := uuidx.NewUUID().String()
-
-	// 获取JWT配置（从环境变量或默认值）
-	accessSecret, accessExpire := r.getJWTConfig()
-
-	r.logger.Infof("[GenerateJWTToken] 生成JWT token, userID: %d, sessionID: %s, expire: %d秒",
-		userID, sessionID, accessExpire)
-
-	// 生成JWT token
-	token, err := jwt.NewJwtToken(
-		accessSecret,
-		time.Now().Unix(),
-		int64(accessExpire),
-		jwt.WithOption("UserId", int64(userID)),
-		jwt.WithOption("SessionId", sessionID),
-	)
+	token, err := r.data.issueSessionToken(ctx, int64(userID), sessionTokenOptions{})
 	if err != nil {
 		r.logger.Errorf("[GenerateJWTToken] 生成JWT token失败: %v", err)
-		return "", errors.InternalServer("TOKEN_GENERATE_ERROR", fmt.Sprintf("生成token失败: %v", err))
+		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
-
-	// 将session ID保存到Redis
-	sessionKey := fmt.Sprintf("session:%s", sessionID)
-	err = r.data.rdb.Set(ctx, sessionKey, int64(userID), time.Duration(accessExpire)*time.Second).Err()
-	if err != nil {
-		r.logger.Errorf("[GenerateJWTToken] 保存session到Redis失败: %v", err)
-		return "", errors.InternalServer("REDIS_ERROR", fmt.Sprintf("保存session失败: %v", err))
-	}
-
-	r.logger.Infof("[GenerateJWTToken] JWT token生成成功, userID: %d, sessionID: %s", userID, sessionID)
+	r.logger.Infof("[GenerateJWTToken] JWT token生成成功, userID: %d", userID)
 	return token, nil
 }

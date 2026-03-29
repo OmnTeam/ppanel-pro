@@ -5,7 +5,6 @@ package ent
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -22,28 +21,24 @@ type ProxyPayment struct {
 	Name string `json:"name,omitempty"`
 	// 支付平台
 	Platform string `json:"platform,omitempty"`
-	// 支付描述
-	Description string `json:"description,omitempty"`
 	// 支付图标
 	Icon string `json:"icon,omitempty"`
 	// 通知域名
 	Domain string `json:"domain,omitempty"`
 	// 支付配置
 	Config string `json:"config,omitempty"`
-	// 费用模式：0：无费用 1：百分比 2：固定金额 3：百分比+固定金额
-	FeeMode int `json:"fee_mode,omitempty"`
+	// 支付描述
+	Description string `json:"description,omitempty"`
+	// 费用模式
+	FeeMode uint `json:"fee_mode,omitempty"`
 	// 费用百分比
-	FeePercent float64 `json:"fee_percent,omitempty"`
+	FeePercent int64 `json:"fee_percent,omitempty"`
 	// 固定费用金额
-	FeeAmount int `json:"fee_amount,omitempty"`
+	FeeAmount int64 `json:"fee_amount,omitempty"`
 	// 是否启用
 	Enable bool `json:"enable,omitempty"`
 	// 支付令牌
-	Token string `json:"token,omitempty"`
-	// 创建时间
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	// 更新时间
-	UpdatedAt    time.Time `json:"updated_at,omitempty"`
+	Token        string `json:"token,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -54,14 +49,10 @@ func (*ProxyPayment) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case proxypayment.FieldEnable:
 			values[i] = new(sql.NullBool)
-		case proxypayment.FieldFeePercent:
-			values[i] = new(sql.NullFloat64)
-		case proxypayment.FieldID, proxypayment.FieldFeeMode, proxypayment.FieldFeeAmount:
+		case proxypayment.FieldID, proxypayment.FieldFeeMode, proxypayment.FieldFeePercent, proxypayment.FieldFeeAmount:
 			values[i] = new(sql.NullInt64)
-		case proxypayment.FieldName, proxypayment.FieldPlatform, proxypayment.FieldDescription, proxypayment.FieldIcon, proxypayment.FieldDomain, proxypayment.FieldConfig, proxypayment.FieldToken:
+		case proxypayment.FieldName, proxypayment.FieldPlatform, proxypayment.FieldIcon, proxypayment.FieldDomain, proxypayment.FieldConfig, proxypayment.FieldDescription, proxypayment.FieldToken:
 			values[i] = new(sql.NullString)
-		case proxypayment.FieldCreatedAt, proxypayment.FieldUpdatedAt:
-			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -95,12 +86,6 @@ func (_m *ProxyPayment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Platform = value.String
 			}
-		case proxypayment.FieldDescription:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field description", values[i])
-			} else if value.Valid {
-				_m.Description = value.String
-			}
 		case proxypayment.FieldIcon:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field icon", values[i])
@@ -119,23 +104,29 @@ func (_m *ProxyPayment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Config = value.String
 			}
+		case proxypayment.FieldDescription:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field description", values[i])
+			} else if value.Valid {
+				_m.Description = value.String
+			}
 		case proxypayment.FieldFeeMode:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field fee_mode", values[i])
 			} else if value.Valid {
-				_m.FeeMode = int(value.Int64)
+				_m.FeeMode = uint(value.Int64)
 			}
 		case proxypayment.FieldFeePercent:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field fee_percent", values[i])
 			} else if value.Valid {
-				_m.FeePercent = value.Float64
+				_m.FeePercent = value.Int64
 			}
 		case proxypayment.FieldFeeAmount:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field fee_amount", values[i])
 			} else if value.Valid {
-				_m.FeeAmount = int(value.Int64)
+				_m.FeeAmount = value.Int64
 			}
 		case proxypayment.FieldEnable:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -148,18 +139,6 @@ func (_m *ProxyPayment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field token", values[i])
 			} else if value.Valid {
 				_m.Token = value.String
-			}
-		case proxypayment.FieldCreatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
-			} else if value.Valid {
-				_m.CreatedAt = value.Time
-			}
-		case proxypayment.FieldUpdatedAt:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
-			} else if value.Valid {
-				_m.UpdatedAt = value.Time
 			}
 		default:
 			_m.selectValues.Set(columns[i], values[i])
@@ -203,9 +182,6 @@ func (_m *ProxyPayment) String() string {
 	builder.WriteString("platform=")
 	builder.WriteString(_m.Platform)
 	builder.WriteString(", ")
-	builder.WriteString("description=")
-	builder.WriteString(_m.Description)
-	builder.WriteString(", ")
 	builder.WriteString("icon=")
 	builder.WriteString(_m.Icon)
 	builder.WriteString(", ")
@@ -214,6 +190,9 @@ func (_m *ProxyPayment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("config=")
 	builder.WriteString(_m.Config)
+	builder.WriteString(", ")
+	builder.WriteString("description=")
+	builder.WriteString(_m.Description)
 	builder.WriteString(", ")
 	builder.WriteString("fee_mode=")
 	builder.WriteString(fmt.Sprintf("%v", _m.FeeMode))
@@ -229,12 +208,6 @@ func (_m *ProxyPayment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("token=")
 	builder.WriteString(_m.Token)
-	builder.WriteString(", ")
-	builder.WriteString("created_at=")
-	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

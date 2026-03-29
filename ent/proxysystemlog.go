@@ -17,13 +17,13 @@ type ProxySystemLog struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int64 `json:"id,omitempty"`
-	// 日志类型: 10=Email, 11=Mobile, 20=Subscribe, 21=SubscribeTraffic, 22=ServerTraffic, 23=ResetSubscribe, 30=Login, 31=Register, 32=Balance, 33=Commission, 34=Gift
+	// 日志类型
 	Type int8 `json:"type,omitempty"`
 	// 日志日期
 	Date string `json:"date,omitempty"`
-	// 对象ID（用户ID或其他关联对象ID）
+	// 对象ID
 	ObjectID int64 `json:"object_id,omitempty"`
-	// 日志内容（JSON格式）
+	// 日志内容
 	Content string `json:"content,omitempty"`
 	// 创建时间
 	CreatedAt    time.Time `json:"created_at,omitempty"`

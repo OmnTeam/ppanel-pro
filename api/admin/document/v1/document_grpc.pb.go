@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v3.19.4
-// source: admin/document/v1/document.proto
+// source: api/admin/document/v1/document.proto
 
 package v1
 
@@ -323,5 +323,5 @@ var DocumentService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "admin/document/v1/document.proto",
+	Metadata: "api/admin/document/v1/document.proto",
 }

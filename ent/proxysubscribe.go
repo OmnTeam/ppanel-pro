@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -24,17 +25,17 @@ type ProxySubscribe struct {
 	Language string `json:"language,omitempty"`
 	// 订阅套餐描述
 	Description *string `json:"description,omitempty"`
-	// 单位价格（单位：分）
+	// 单位价格
 	UnitPrice int64 `json:"unit_price,omitempty"`
 	// 单位时间
 	UnitTime string `json:"unit_time,omitempty"`
-	// 折扣配置JSON
+	// 折扣配置
 	Discount *string `json:"discount,omitempty"`
 	// 替换
 	Replacement int64 `json:"replacement,omitempty"`
 	// 库存
 	Inventory int64 `json:"inventory,omitempty"`
-	// 流量（字节）
+	// 流量
 	Traffic int64 `json:"traffic,omitempty"`
 	// 速度限制
 	SpeedLimit int64 `json:"speed_limit,omitempty"`
@@ -42,7 +43,17 @@ type ProxySubscribe struct {
 	DeviceLimit int64 `json:"device_limit,omitempty"`
 	// 配额
 	Quota int64 `json:"quota,omitempty"`
-	// 是否在门户页面显示
+	// 节点IDs
+	Nodes string `json:"nodes,omitempty"`
+	// 节点标签
+	NodeTags string `json:"node_tags,omitempty"`
+	// 节点组ID列表
+	NodeGroupIds []int64 `json:"node_group_ids,omitempty"`
+	// 默认节点组ID
+	NodeGroupID *int64 `json:"node_group_id,omitempty"`
+	// 流量限制规则
+	TrafficLimit *string `json:"traffic_limit,omitempty"`
+	// 是否显示
 	Show bool `json:"show,omitempty"`
 	// 是否售卖
 	Sell bool `json:"sell,omitempty"`
@@ -52,14 +63,12 @@ type ProxySubscribe struct {
 	DeductionRatio *int64 `json:"deduction_ratio,omitempty"`
 	// 允许扣除
 	AllowDeduction bool `json:"allow_deduction,omitempty"`
-	// 重置周期: 0-不重置 1-1号 2-每月 3-每年
+	// 重置周期
 	ResetCycle *int64 `json:"reset_cycle,omitempty"`
 	// 续费重置
 	RenewalReset bool `json:"renewal_reset,omitempty"`
-	// 节点IDs
-	Nodes string `json:"nodes,omitempty"`
-	// 节点标签
-	NodeTags string `json:"node_tags,omitempty"`
+	// 显示原价
+	ShowOriginalPrice bool `json:"show_original_price,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -72,11 +81,13 @@ func (*ProxySubscribe) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case proxysubscribe.FieldShow, proxysubscribe.FieldSell, proxysubscribe.FieldAllowDeduction, proxysubscribe.FieldRenewalReset:
+		case proxysubscribe.FieldNodeGroupIds:
+			values[i] = new([]byte)
+		case proxysubscribe.FieldShow, proxysubscribe.FieldSell, proxysubscribe.FieldAllowDeduction, proxysubscribe.FieldRenewalReset, proxysubscribe.FieldShowOriginalPrice:
 			values[i] = new(sql.NullBool)
-		case proxysubscribe.FieldID, proxysubscribe.FieldUnitPrice, proxysubscribe.FieldReplacement, proxysubscribe.FieldInventory, proxysubscribe.FieldTraffic, proxysubscribe.FieldSpeedLimit, proxysubscribe.FieldDeviceLimit, proxysubscribe.FieldQuota, proxysubscribe.FieldSort, proxysubscribe.FieldDeductionRatio, proxysubscribe.FieldResetCycle:
+		case proxysubscribe.FieldID, proxysubscribe.FieldUnitPrice, proxysubscribe.FieldReplacement, proxysubscribe.FieldInventory, proxysubscribe.FieldTraffic, proxysubscribe.FieldSpeedLimit, proxysubscribe.FieldDeviceLimit, proxysubscribe.FieldQuota, proxysubscribe.FieldNodeGroupID, proxysubscribe.FieldSort, proxysubscribe.FieldDeductionRatio, proxysubscribe.FieldResetCycle:
 			values[i] = new(sql.NullInt64)
-		case proxysubscribe.FieldName, proxysubscribe.FieldLanguage, proxysubscribe.FieldDescription, proxysubscribe.FieldUnitTime, proxysubscribe.FieldDiscount, proxysubscribe.FieldNodes, proxysubscribe.FieldNodeTags:
+		case proxysubscribe.FieldName, proxysubscribe.FieldLanguage, proxysubscribe.FieldDescription, proxysubscribe.FieldUnitTime, proxysubscribe.FieldDiscount, proxysubscribe.FieldNodes, proxysubscribe.FieldNodeTags, proxysubscribe.FieldTrafficLimit:
 			values[i] = new(sql.NullString)
 		case proxysubscribe.FieldCreatedAt, proxysubscribe.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -175,6 +186,40 @@ func (_m *ProxySubscribe) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Quota = value.Int64
 			}
+		case proxysubscribe.FieldNodes:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field nodes", values[i])
+			} else if value.Valid {
+				_m.Nodes = value.String
+			}
+		case proxysubscribe.FieldNodeTags:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field node_tags", values[i])
+			} else if value.Valid {
+				_m.NodeTags = value.String
+			}
+		case proxysubscribe.FieldNodeGroupIds:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field node_group_ids", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.NodeGroupIds); err != nil {
+					return fmt.Errorf("unmarshal field node_group_ids: %w", err)
+				}
+			}
+		case proxysubscribe.FieldNodeGroupID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field node_group_id", values[i])
+			} else if value.Valid {
+				_m.NodeGroupID = new(int64)
+				*_m.NodeGroupID = value.Int64
+			}
+		case proxysubscribe.FieldTrafficLimit:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field traffic_limit", values[i])
+			} else if value.Valid {
+				_m.TrafficLimit = new(string)
+				*_m.TrafficLimit = value.String
+			}
 		case proxysubscribe.FieldShow:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field show", values[i])
@@ -219,17 +264,11 @@ func (_m *ProxySubscribe) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.RenewalReset = value.Bool
 			}
-		case proxysubscribe.FieldNodes:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field nodes", values[i])
+		case proxysubscribe.FieldShowOriginalPrice:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field show_original_price", values[i])
 			} else if value.Valid {
-				_m.Nodes = value.String
-			}
-		case proxysubscribe.FieldNodeTags:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field node_tags", values[i])
-			} else if value.Valid {
-				_m.NodeTags = value.String
+				_m.ShowOriginalPrice = value.Bool
 			}
 		case proxysubscribe.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -319,6 +358,25 @@ func (_m *ProxySubscribe) String() string {
 	builder.WriteString("quota=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Quota))
 	builder.WriteString(", ")
+	builder.WriteString("nodes=")
+	builder.WriteString(_m.Nodes)
+	builder.WriteString(", ")
+	builder.WriteString("node_tags=")
+	builder.WriteString(_m.NodeTags)
+	builder.WriteString(", ")
+	builder.WriteString("node_group_ids=")
+	builder.WriteString(fmt.Sprintf("%v", _m.NodeGroupIds))
+	builder.WriteString(", ")
+	if v := _m.NodeGroupID; v != nil {
+		builder.WriteString("node_group_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.TrafficLimit; v != nil {
+		builder.WriteString("traffic_limit=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
 	builder.WriteString("show=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Show))
 	builder.WriteString(", ")
@@ -344,11 +402,8 @@ func (_m *ProxySubscribe) String() string {
 	builder.WriteString("renewal_reset=")
 	builder.WriteString(fmt.Sprintf("%v", _m.RenewalReset))
 	builder.WriteString(", ")
-	builder.WriteString("nodes=")
-	builder.WriteString(_m.Nodes)
-	builder.WriteString(", ")
-	builder.WriteString("node_tags=")
-	builder.WriteString(_m.NodeTags)
+	builder.WriteString("show_original_price=")
+	builder.WriteString(fmt.Sprintf("%v", _m.ShowOriginalPrice))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

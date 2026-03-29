@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.0
 // - protoc             v3.19.4
-// source: admin/ticket/v1/ticket.proto
+// source: api/admin/ticket/v1/ticket.proto
 
 package v1
 
@@ -239,5 +239,5 @@ var Ticket_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "admin/ticket/v1/ticket.proto",
+	Metadata: "api/admin/ticket/v1/ticket.proto",
 }

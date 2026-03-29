@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -23,7 +24,7 @@ type ProxyNode struct {
 	// 标签
 	Tags string `json:"tags,omitempty"`
 	// 连接端口
-	Port int `json:"port,omitempty"`
+	Port uint16 `json:"port,omitempty"`
 	// 连接地址
 	Address string `json:"address,omitempty"`
 	// 服务器ID
@@ -34,10 +35,8 @@ type ProxyNode struct {
 	Enabled bool `json:"enabled,omitempty"`
 	// 排序
 	Sort int `json:"sort,omitempty"`
-	// 节点分组ID
-	GroupID *int64 `json:"group_id,omitempty"`
-	// 是否锁定分组
-	GroupLocked bool `json:"group_locked,omitempty"`
+	// 节点组ID列表
+	NodeGroupIds []int64 `json:"node_group_ids,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -50,9 +49,11 @@ func (*ProxyNode) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case proxynode.FieldEnabled, proxynode.FieldGroupLocked:
+		case proxynode.FieldNodeGroupIds:
+			values[i] = new([]byte)
+		case proxynode.FieldEnabled:
 			values[i] = new(sql.NullBool)
-		case proxynode.FieldID, proxynode.FieldPort, proxynode.FieldServerID, proxynode.FieldSort, proxynode.FieldGroupID:
+		case proxynode.FieldID, proxynode.FieldPort, proxynode.FieldServerID, proxynode.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case proxynode.FieldName, proxynode.FieldTags, proxynode.FieldAddress, proxynode.FieldProtocol:
 			values[i] = new(sql.NullString)
@@ -95,7 +96,7 @@ func (_m *ProxyNode) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field port", values[i])
 			} else if value.Valid {
-				_m.Port = int(value.Int64)
+				_m.Port = uint16(value.Int64)
 			}
 		case proxynode.FieldAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -127,18 +128,13 @@ func (_m *ProxyNode) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Sort = int(value.Int64)
 			}
-		case proxynode.FieldGroupID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field group_id", values[i])
-			} else if value.Valid {
-				_m.GroupID = new(int64)
-				*_m.GroupID = value.Int64
-			}
-		case proxynode.FieldGroupLocked:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field group_locked", values[i])
-			} else if value.Valid {
-				_m.GroupLocked = value.Bool
+		case proxynode.FieldNodeGroupIds:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field node_group_ids", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &_m.NodeGroupIds); err != nil {
+					return fmt.Errorf("unmarshal field node_group_ids: %w", err)
+				}
 			}
 		case proxynode.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -212,13 +208,8 @@ func (_m *ProxyNode) String() string {
 	builder.WriteString("sort=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Sort))
 	builder.WriteString(", ")
-	if v := _m.GroupID; v != nil {
-		builder.WriteString("group_id=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
-	builder.WriteString(", ")
-	builder.WriteString("group_locked=")
-	builder.WriteString(fmt.Sprintf("%v", _m.GroupLocked))
+	builder.WriteString("node_group_ids=")
+	builder.WriteString(fmt.Sprintf("%v", _m.NodeGroupIds))
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

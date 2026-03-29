@@ -57,13 +57,13 @@ service DocumentService {
 
 // 文档信息
 message Document {
-string id = 1;
+  int64 id = 1;
   string title = 2;
   string content = 3;
   repeated string tags = 4;
   bool show = 5;
-string created_at = 6;
-string updated_at = 7;
+  int64 created_at = 6;  // Unix timestamp in seconds
+  int64 updated_at = 7;  // Unix timestamp in seconds
 }
 
 // 创建文档请求
@@ -74,60 +74,30 @@ message CreateDocumentRequest {
   google.protobuf.BoolValue show = 4;
 }
 
+// 创建文档响应
+message CreateDocumentReply {
+  int32 code = 1;     // 状态码
+  string message = 2; // 消息内容
+}
+
 // 更新文档请求
 message UpdateDocumentRequest {
-string id = 1;
+  int64 id = 1;
   string title = 2 [(validate.rules).string.min_len = 1];
   string content = 3 [(validate.rules).string.min_len = 1];
   repeated string tags = 4;
   google.protobuf.BoolValue show = 5;
 }
 
-// 删除文档请求
-message DeleteDocumentRequest {
-string id = 1;
-}
-
-// 批量删除文档请求
-message BatchDeleteDocumentRequest {
-  repeated int32 ids = 1 [(validate.rules).repeated.min_items = 1];
-}
-
-// 获取文档列表请求
-message GetDocumentListRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string tag = 3;
-  string search = 4;
-}
-
-// 获取文档详情请求
-message GetDocumentDetailRequest {
-string id = 1;
-}
-
-// 创建文档数据
-message CreateDocumentData {
-string id = 1;
-}
-
-// 创建文档响应
-message CreateDocumentReply {
-  int32 code = 1;                   // 状态码
-  string message = 2;               // 消息内容
-  CreateDocumentData data = 3;      // 响应数据
-}
-
-// 更新文档数据
-message UpdateDocumentData {
-  bool success = 1;
-}
-
 // 更新文档响应
 message UpdateDocumentReply {
-  int32 code = 1;                   // 状态码
-  string message = 2;               // 消息内容
-  UpdateDocumentData data = 3;      // 响应数据
+  int32 code = 1;     // 状态码
+  string message = 2; // 消息内容
+}
+
+// 删除文档请求
+message DeleteDocumentRequest {
+  int64 id = 1;
 }
 
 // 删除文档数据
@@ -142,6 +112,11 @@ message DeleteDocumentReply {
   DeleteDocumentData data = 3;      // 响应数据
 }
 
+// 批量删除文档请求
+message BatchDeleteDocumentRequest {
+  repeated int64 ids = 1;
+}
+
 // 批量删除文档数据
 message BatchDeleteDocumentData {
   bool success = 1;
@@ -154,9 +129,17 @@ message BatchDeleteDocumentReply {
   BatchDeleteDocumentData data = 3;    // 响应数据
 }
 
+// 获取文档列表请求
+message GetDocumentListRequest {
+  int64 page = 1;
+  int64 size = 2;
+  string tag = 3;
+  string search = 4;
+}
+
 // 获取文档列表数据
 message GetDocumentListData {
-  int32 total = 1;
+  int64 total = 1;
   repeated Document list = 2;
 }
 
@@ -165,6 +148,11 @@ message GetDocumentListReply {
   int32 code = 1;                    // 状态码
   string message = 2;                // 消息内容
   GetDocumentListData data = 3;      // 响应数据
+}
+
+// 获取文档详情请求
+message GetDocumentDetailRequest {
+  int64 id = 1;
 }
 
 // 获取文档详情数据

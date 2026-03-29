@@ -10,7 +10,6 @@ import (
 	portalBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/portal"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 // Helper functions for type conversion
@@ -212,11 +211,6 @@ func (s *PortalService) GetAvailablePaymentMethods(ctx context.Context, req *emp
 
 // PurchaseCheckout 购买结账（获取支付信息）
 func (s *PortalService) PurchaseCheckout(ctx context.Context, req *v1.PurchaseCheckoutRequest) (*v1.PurchaseCheckoutReply, error) {
-
-	if req.OrderNo == "" {
-		return nil, errors.BadRequest("INVALID_PARAMETER", "订单号不能为空")
-	}
-
 	// ReturnURL: 支付回调地址（可选）
 	returnURL := ""
 	if req.ReturnUrl != nil {
@@ -257,17 +251,6 @@ func (s *PortalService) PurchaseCheckout(ctx context.Context, req *v1.PurchaseCh
 
 // QueryPurchaseOrder 查询购买订单状态
 func (s *PortalService) QueryPurchaseOrder(ctx context.Context, req *v1.QueryPurchaseOrderRequest) (*v1.QueryPurchaseOrderReply, error) {
-
-	if req.OrderNo == "" {
-		return nil, errors.BadRequest("INVALID_PARAMETER", "订单号不能为空")
-	}
-	if req.AuthType == "" {
-		return nil, errors.BadRequest("INVALID_PARAMETER", "认证类型不能为空")
-	}
-	if req.Identifier == "" {
-		return nil, errors.BadRequest("INVALID_PARAMETER", "认证标识符不能为空")
-	}
-
 	statusInfo, token, err := s.uc.QueryPurchaseOrder(ctx, req.OrderNo, req.AuthType, req.Identifier)
 	if err != nil {
 		return nil, err

@@ -12,6 +12,8 @@ import (
 
 	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
+	pkgmiddleware "github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
+	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	pkgaes "github.com/OmnTeam/ppanel-pro/pkg/aes"
 	"github.com/OmnTeam/ppanel-pro/pkg/constant"
 	"github.com/OmnTeam/ppanel-pro/pkg/jwt"
@@ -25,7 +27,7 @@ import (
 
 // ServiceContext 服务上下文
 type ServiceContext struct {
-	Config       *conf.Bootstrap
+	Config       *conf.Server
 	Redis        *redis.Client
 	UserModel    UserService
 	DeviceConfig DeviceConfig
@@ -36,101 +38,275 @@ type UserService interface {
 	FindOne(ctx context.Context, userId int64) (*ent.ProxyUser, error)
 }
 
-// SessionIdKey Session ID Key
-const SessionIdKey = "session"
-
-// JwtAuth JWT 认证中间件 - 100% 原始逻辑转换
+// Auth JWT 认证中间件 - 对齐旧项目语义
 func (svc *ServiceContext) Auth() middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
-			// 获取传输层信息
 			tr, ok := transport.FromServerContext(ctx)
 			if !ok {
-				return nil, errors.Unauthorized("UNAUTHORIZED", "Transport context not found")
+				return nil, responsecode.NewKratosError(responsecode.ErrMissingAuthToken)
 			}
 
-			// get token from header
-			token := tr.RequestHeader().Get("Authorization")
+			authConfig := svc.getAuthConfig()
+			if authConfig != nil && !authConfig.EnableJwt {
+				return handler(ctx, req)
+			}
+			if shouldSkipAuth(tr.Operation(), authConfig) {
+				return handler(ctx, req)
+			}
+
+			token := strings.TrimSpace(tr.RequestHeader().Get("Authorization"))
 			if token == "" {
 				logger.WithContext(ctx).Debug("[AuthMiddleware] Token Empty")
-				return nil, errors.Unauthorized("UNAUTHORIZED", "Token Empty")
+				return nil, responsecode.NewKratosError(responsecode.ErrMissingAuthToken)
+			}
+			if strings.HasPrefix(token, "Bearer ") {
+				token = strings.TrimPrefix(token, "Bearer ")
 			}
 
-			// parse token
-			// Get JWT secret from environment or use default
-			secret := os.Getenv("JWT_SECRET")
-			if secret == "" {
-				secret = "your-secret-key-change-in-production"
-			}
-			claims, err := jwt.ParseJwtToken(token, secret)
+			claims, err := jwt.ParseJwtToken(token, svc.getJWTSecret(authConfig))
 			if err != nil {
 				logger.WithContext(ctx).Debug("[AuthMiddleware] ParseJwtToken",
 					logger.Field("error", err.Error()),
 					logger.Field("token", token))
-				return nil, errors.Unauthorized("UNAUTHORIZED", "Token Invalid")
+				return nil, responsecode.NewKratosError(responsecode.ErrAuthTokenExpired)
 			}
 
-			loginType := ""
-			if claims["LoginType"] != nil {
-				loginType = claims["LoginType"].(string)
+			loginType := getStringClaim(claims, "CtxLoginType")
+			if loginType == "" {
+				loginType = getStringClaim(claims, "LoginType")
+			}
+			identifier := getStringClaim(claims, "identifier")
+
+			userID, ok := getInt64Claim(claims, "UserId")
+			if !ok {
+				userID, ok = getInt64Claim(claims, "user_id")
+			}
+			if !ok {
+				return nil, responsecode.NewKratosError(responsecode.ErrInvalidAuthToken)
 			}
 
-			// get user id from token
-			userId := int64(claims["UserId"].(float64))
-			// get session id from token
-			sessionId := claims["SessionId"].(string)
+			sessionID := getStringClaim(claims, "SessionId")
+			if sessionID == "" {
+				sessionID = getStringClaim(claims, "session_id")
+			}
+			if sessionID == "" {
+				return nil, responsecode.NewKratosError(responsecode.ErrInvalidAuthToken)
+			}
 
-			// get session id from redis
-			sessionIdCacheKey := fmt.Sprintf("%v:%v", SessionIdKey, sessionId)
-			value, err := svc.Redis.Get(ctx, sessionIdCacheKey).Result()
+			sessionIDCacheKey := svc.sessionCacheKey(sessionID)
+			value, err := svc.Redis.Get(ctx, sessionIDCacheKey).Result()
 			if err != nil {
 				logger.WithContext(ctx).Debug("[AuthMiddleware] Redis Get",
 					logger.Field("error", err.Error()),
-					logger.Field("sessionId", sessionId))
-				return nil, errors.Unauthorized("UNAUTHORIZED", "Invalid Access")
+					logger.Field("sessionId", sessionID))
+				return nil, responsecode.NewKratosError(responsecode.ErrInvalidAccess)
 			}
 
-			// verify user id
-			if value != fmt.Sprintf("%v", userId) {
+			if value != fmt.Sprintf("%v", userID) {
 				logger.WithContext(ctx).Debug("[AuthMiddleware] Invalid Access",
-					logger.Field("userId", userId),
-					logger.Field("sessionId", sessionId))
-				return nil, errors.Unauthorized("UNAUTHORIZED", "Invalid Access")
+					logger.Field("userId", userID),
+					logger.Field("sessionId", sessionID))
+				return nil, responsecode.NewKratosError(responsecode.ErrInvalidAccess)
 			}
 
-			userInfo, err := svc.UserModel.FindOne(ctx, userId)
+			userInfo, err := svc.UserModel.FindOne(ctx, userID)
 			if err != nil {
 				logger.WithContext(ctx).Debug("[AuthMiddleware] UserModel FindOne",
 					logger.Field("error", err.Error()),
-					logger.Field("userId", userId))
-				return nil, errors.InternalServer("INTERNAL_ERROR", "Database Query Error")
+					logger.Field("userId", userID))
+				return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 			}
 
-			// admin verify
-			if tr.Kind() == transport.KindHTTP {
-				operation := tr.Operation()
-				if operation != "" {
-					paths := strings.Split(operation, " ")
-					if len(paths) > 1 {
-						urlPaths := strings.Split(paths[1], "/")
-						if tool.StringSliceContains(urlPaths, "admin") && !userInfo.IsAdmin {
-							logger.WithContext(ctx).Debug("[AuthMiddleware] Not Admin User",
-								logger.Field("userId", userId),
-								logger.Field("sessionId", sessionId))
-							return nil, errors.Unauthorized("UNAUTHORIZED", "Invalid Access")
-						}
-					}
-				}
+			if isAdminOperation(tr.Operation()) && !userInfo.IsAdmin {
+				logger.WithContext(ctx).Debug("[AuthMiddleware] Not Admin User",
+					logger.Field("userId", userID),
+					logger.Field("sessionId", sessionID))
+				return nil, responsecode.NewKratosError(responsecode.ErrInvalidAccess)
 			}
 
-			// 注入上下文
 			ctx = context.WithValue(ctx, constant.LoginType, loginType)
 			ctx = context.WithValue(ctx, constant.CtxKeyUser, userInfo)
-			ctx = context.WithValue(ctx, constant.CtxKeySessionID, sessionId)
+			ctx = context.WithValue(ctx, constant.CtxKeySessionID, sessionID)
+			if identifier != "" {
+				ctx = context.WithValue(ctx, constant.CtxKeyIdentifier, identifier)
+			}
+			ctx = pkgmiddleware.WithUserID(ctx, userID)
+			ctx = pkgmiddleware.WithSessionID(ctx, sessionID)
 
 			return handler(ctx, req)
 		}
 	}
+}
+
+func (svc *ServiceContext) getAuthConfig() *conf.Server_Auth {
+	if svc == nil || svc.Config == nil {
+		return nil
+	}
+	return svc.Config.Auth
+}
+
+func (svc *ServiceContext) getJWTSecret(authConfig *conf.Server_Auth) string {
+	if authConfig != nil && authConfig.JwtSecret != "" {
+		return authConfig.JwtSecret
+	}
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		secret = "your-secret-key-change-in-production"
+	}
+	return secret
+}
+
+func (svc *ServiceContext) sessionCacheKey(sessionID string) string {
+	return fmt.Sprintf("%s:%s", constant.SessionIdKey, sessionID)
+}
+
+func shouldSkipAuth(operation string, authConfig *conf.Server_Auth) bool {
+	normalized := strings.TrimSpace(operation)
+	if normalized == "" {
+		return false
+	}
+
+	for _, pathPrefix := range anonymousOperationPrefixes() {
+		if strings.HasPrefix(normalized, pathPrefix) {
+			return true
+		}
+	}
+
+	if pathLikeOperation := normalizeOperationPath(normalized); pathLikeOperation != "" {
+		for _, pathPrefix := range anonymousPathPrefixes() {
+			if strings.HasPrefix(pathLikeOperation, pathPrefix) {
+				return true
+			}
+		}
+		if isAnonymousCallbackPath(pathLikeOperation) {
+			return true
+		}
+	}
+
+	if authConfig == nil {
+		return false
+	}
+	for _, pathPrefix := range authConfig.NoAuthPaths {
+		if strings.HasPrefix(normalized, pathPrefix) {
+			return true
+		}
+		if pathLikeOperation := normalizeOperationPath(normalized); pathLikeOperation != "" && strings.HasPrefix(pathLikeOperation, pathPrefix) {
+			return true
+		}
+	}
+	return false
+}
+
+func anonymousOperationPrefixes() []string {
+	return []string{
+		"/api.public.auth.",
+		"/api.public.common.",
+		"/api.public.portal.",
+		"/api.auth.oauth.",
+		"/api.auth.",
+		"/api.server.v1.Server/",
+	}
+}
+
+func anonymousPathPrefixes() []string {
+	return []string{
+		"/v1/auth/",
+		"/v1/common/",
+		"/v1/notify/",
+		"/v1/public/portal/",
+		"/v1/telegram/",
+		"/api/public/auth/",
+		"/api/public/common/",
+		"/api/public/portal/",
+		"/api/auth/oauth/",
+		"/api/auth/",
+		"/v1/server/",
+		"/v2/server/",
+	}
+}
+
+func isAnonymousCallbackPath(path string) bool {
+	normalized := strings.ToLower(strings.TrimSpace(path))
+	if normalized == "" {
+		return false
+	}
+	return strings.HasPrefix(normalized, "/v1/payment/") && strings.HasSuffix(normalized, "/notify")
+}
+
+func normalizeOperationPath(operation string) string {
+	parts := strings.SplitN(strings.TrimSpace(operation), " ", 2)
+	if len(parts) == 2 {
+		return strings.TrimSpace(parts[1])
+	}
+	return strings.TrimSpace(operation)
+}
+
+func isAdminOperation(operation string) bool {
+	if operation == "" {
+		return false
+	}
+
+	normalized := strings.ToLower(strings.TrimSpace(operation))
+	if normalized == "" {
+		return false
+	}
+	if strings.HasPrefix(normalized, "/api.admin.") || strings.HasPrefix(normalized, "api.admin.") {
+		return true
+	}
+	if strings.Contains(normalized, ".admin.") {
+		return true
+	}
+
+	parts := strings.SplitN(normalized, " ", 2)
+	if len(parts) == 2 {
+		normalized = strings.TrimSpace(parts[1])
+	}
+
+	if strings.HasPrefix(normalized, "/admin/") || strings.HasPrefix(normalized, "admin/") {
+		return true
+	}
+
+	return strings.Contains(normalized, "/admin/")
+}
+
+func getStringClaim(claims map[string]interface{}, key string) string {
+	if claims == nil {
+		return ""
+	}
+	value, ok := claims[key]
+	if !ok {
+		return ""
+	}
+	stringValue, ok := value.(string)
+	if !ok {
+		return ""
+	}
+	return stringValue
+}
+
+func getInt64Claim(claims map[string]interface{}, key string) (int64, bool) {
+	if claims == nil {
+		return 0, false
+	}
+	value, ok := claims[key]
+	if !ok {
+		return 0, false
+	}
+	switch v := value.(type) {
+	case float64:
+		return int64(v), true
+	case int64:
+		return v, true
+	case int:
+		return int64(v), true
+	case json.Number:
+		parsed, err := v.Int64()
+		if err == nil {
+			return parsed, true
+		}
+	}
+	return 0, false
 }
 
 // Logger 日志中间件 - 100% 原始逻辑转换
@@ -556,7 +732,7 @@ func generateSpanID() string {
 
 // DeviceConfig 设备配置
 type DeviceConfig struct {
-	Enable        bool   `json:"enable"`
+	Enable         bool   `json:"enable"`
 	SecuritySecret string `json:"security_secret"`
 }
 

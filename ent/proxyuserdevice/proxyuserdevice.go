@@ -19,10 +19,12 @@ const (
 	FieldSubscribeID = "subscribe_id"
 	// FieldIP holds the string denoting the ip field in the database.
 	FieldIP = "ip"
-	// FieldIdentifier holds the string denoting the identifier field in the database.
-	FieldIdentifier = "identifier"
 	// FieldUserAgent holds the string denoting the user_agent field in the database.
 	FieldUserAgent = "user_agent"
+	// FieldIdentifier holds the string denoting the identifier field in the database.
+	FieldIdentifier = "Identifier"
+	// FieldShortCode holds the string denoting the short_code field in the database.
+	FieldShortCode = "short_code"
 	// FieldOnline holds the string denoting the online field in the database.
 	FieldOnline = "online"
 	// FieldEnabled holds the string denoting the enabled field in the database.
@@ -32,7 +34,7 @@ const (
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxyuserdevice in the database.
-	Table = "proxy_user_device"
+	Table = "user_device"
 )
 
 // Columns holds all SQL columns for proxyuserdevice fields.
@@ -41,8 +43,9 @@ var Columns = []string{
 	FieldUserID,
 	FieldSubscribeID,
 	FieldIP,
-	FieldIdentifier,
 	FieldUserAgent,
+	FieldIdentifier,
+	FieldShortCode,
 	FieldOnline,
 	FieldEnabled,
 	FieldCreatedAt,
@@ -62,10 +65,14 @@ func ValidColumn(column string) bool {
 var (
 	// IPValidator is a validator for the "ip" field. It is called by the builders before save.
 	IPValidator func(string) error
-	// IdentifierValidator is a validator for the "identifier" field. It is called by the builders before save.
-	IdentifierValidator func(string) error
 	// UserAgentValidator is a validator for the "user_agent" field. It is called by the builders before save.
 	UserAgentValidator func(string) error
+	// IdentifierValidator is a validator for the "identifier" field. It is called by the builders before save.
+	IdentifierValidator func(string) error
+	// DefaultShortCode holds the default value on creation for the "short_code" field.
+	DefaultShortCode string
+	// ShortCodeValidator is a validator for the "short_code" field. It is called by the builders before save.
+	ShortCodeValidator func(string) error
 	// DefaultOnline holds the default value on creation for the "online" field.
 	DefaultOnline bool
 	// DefaultEnabled holds the default value on creation for the "enabled" field.
@@ -103,14 +110,19 @@ func ByIP(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIP, opts...).ToFunc()
 }
 
+// ByUserAgent orders the results by the user_agent field.
+func ByUserAgent(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserAgent, opts...).ToFunc()
+}
+
 // ByIdentifier orders the results by the identifier field.
 func ByIdentifier(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIdentifier, opts...).ToFunc()
 }
 
-// ByUserAgent orders the results by the user_agent field.
-func ByUserAgent(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserAgent, opts...).ToFunc()
+// ByShortCode orders the results by the short_code field.
+func ByShortCode(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldShortCode, opts...).ToFunc()
 }
 
 // ByOnline orders the results by the online field.

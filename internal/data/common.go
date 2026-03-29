@@ -1,18 +1,26 @@
 package data
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net"
+	"net/http"
 	"time"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyads"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
+	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyserver"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	v1 "github.com/OmnTeam/ppanel-pro/internal/biz/common"
 	"github.com/OmnTeam/ppanel-pro/internal/queue/types"
+	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/limit"
 	"github.com/OmnTeam/ppanel-pro/pkg/phone"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
@@ -28,7 +36,7 @@ type commonRepo struct {
 // CacheKeyPayload stores verification code in Redis
 type CacheKeyPayload struct {
 	Code   string `json:"code"`
-	LastAt int    `json:"lastAt"`
+	LastAt int64  `json:"lastAt"`
 }
 
 // NewCommonRepo creates a new common repository
@@ -44,7 +52,7 @@ func (r *commonRepo) GetAdsList(ctx context.Context, status int) ([]*v1.Ads, err
 	// Query ads with status filter, limit to 200 items
 	entAds, err := r.data.db.ProxyAds.Query().
 		Where(
-			proxyads.Status(int8(status)),
+			proxyads.Status(status),
 		).
 		Limit(200).
 		All(ctx)
@@ -114,39 +122,24 @@ func (r *commonRepo) GetClientList(ctx context.Context) ([]*v1.SubscribeClient, 
 
 // GetTosConfig retrieves TOS/Privacy config from proxy_system table
 func (r *commonRepo) GetTosConfig(ctx context.Context, key string) (string, error) {
-	entSystem, err := r.data.db.ProxySystem.Query().
-		Where(
-			proxysystem.Category("tos"),
-			proxysystem.Key(key),
-		).
-		First(ctx)
+	values, err := loadSystemConfigMap(ctx, r.data.db, "tos")
 	if err != nil {
 		r.log.Warnw("GetTosConfig query failed", "error", err, "key", key)
 		// Return empty string if not found (not an error)
 		return "", nil
 	}
 
-	return entSystem.Value, nil
+	return systemConfigString(values, key), nil
 }
 
 // GetSystemConfigByCategory retrieves system config by category and returns as map
 func (r *commonRepo) GetSystemConfigByCategory(ctx context.Context, category string) (map[string]string, error) {
-	entConfigs, err := r.data.db.ProxySystem.Query().
-		Where(
-			proxysystem.Category(category),
-		).
-		All(ctx)
+	result, err := loadSystemConfigMap(ctx, r.data.db, category)
 	if err != nil {
 		r.log.Warnw("GetSystemConfigByCategory query failed", "error", err, "category", category)
 		// Return empty map if not found (not an error)
 		return make(map[string]string), nil
 	}
-
-	result := make(map[string]string)
-	for _, config := range entConfigs {
-		result[config.Key] = config.Value
-	}
-
 	return result, nil
 }
 
@@ -188,76 +181,101 @@ func (r *commonRepo) GetEnabledAuthMethods(ctx context.Context) ([]string, error
 
 // GetStatistics retrieves system statistics
 func (r *commonRepo) GetStatistics(ctx context.Context) (*v1.Statistics, error) {
-	// TODO: Implement Redis caching for better performance
+	if cached, err := r.data.rdb.Get(ctx, CommonStatCacheKey).Result(); err == nil && cached != "" {
+		var stat v1.Statistics
+		if err := json.Unmarshal([]byte(cached), &stat); err == nil {
+			return &stat, nil
+		}
+	}
 
-	// Query enabled user count from proxy_user table
-	// Note: This assumes proxy_user table exists, adjust based on actual schema
-	userCount := int64(0)
-	// For now, return mock data as user/server tables may not be fully migrated yet
-	// userCount will be implemented when user module is complete
+	userCount, err := r.data.db.ProxyUser.Query().
+		Where(proxyuser.EnableEQ(true)).
+		Count(ctx)
+	if err != nil {
+		r.log.Errorw("GetStatistics user count failed", "error", err)
+		return nil, err
+	}
 
-	// Query enabled server/node count
-	// This will be implemented when server module is complete
-	nodeCount := int64(0)
+	roundedUserCount := int64(userCount)
+	if roundedUserCount > 100 {
+		roundedUserCount -= roundedUserCount % 100
+	} else if roundedUserCount > 10 {
+		roundedUserCount -= roundedUserCount % 10
+	} else {
+		roundedUserCount = 1
+	}
 
-	// Country count and protocol list
-	// These require external IP API calls and complex processing
-	// Will be implemented in phase 2
-	countryCount := int64(0)
-	protocols := []string{}
+	nodeCount, err := r.data.db.ProxyNode.Query().
+		Where(proxynode.EnabledEQ(true)).
+		Count(ctx)
+	if err != nil {
+		r.log.Errorw("GetStatistics node count failed", "error", err)
+		return nil, err
+	}
 
-	return &v1.Statistics{
-		User:     userCount,
-		Node:     nodeCount,
+	serverAddresses, err := r.data.db.ProxyServer.Query().
+		Select(proxyserver.FieldServerAddr).
+		Strings(ctx)
+	if err != nil {
+		r.log.Errorw("GetStatistics server addresses failed", "error", err)
+		return nil, err
+	}
+
+	nodeProtocols, err := r.data.db.ProxyNode.Query().
+		Where(proxynode.EnabledEQ(true)).
+		Select(proxynode.FieldProtocol).
+		Strings(ctx)
+	if err != nil {
+		r.log.Errorw("GetStatistics protocol list failed", "error", err)
+		return nil, err
+	}
+
+	countryCount := int64(len(fetchCountryCodes(ctx, serverAddresses)))
+	protocols := collectProtocolTypes(nodeProtocols)
+
+	stat := &v1.Statistics{
+		User:     roundedUserCount,
+		Node:     int64(nodeCount),
 		Country:  countryCount,
 		Protocol: protocols,
-	}, nil
-}
-
-// parseVerifyType converts verify type to string
-func parseVerifyType(verifyType int32) string {
-	switch verifyType {
-	case 1:
-		return "register"
-	case 2:
-		return "security"
-	case 3:
-		return "reset_password"
-	default:
-		return "unknown"
 	}
+
+	if payload, err := json.Marshal(stat); err == nil {
+		_ = r.data.rdb.Set(ctx, CommonStatCacheKey, payload, time.Hour).Err()
+	}
+
+	return stat, nil
 }
 
 // SendEmailVerificationCode sends email verification code
 func (r *commonRepo) SendEmailVerificationCode(ctx context.Context, email string, verifyType int32) (string, error) {
-	// Build cache key: verify_code:{type}:{email}
-	cacheKey := fmt.Sprintf("verify_code:%s:%s", parseVerifyType(verifyType), email)
+	scene := parseVerifyType(verifyType)
+	cacheKey := verifyCodeEmailCacheKey(scene, email)
+	verifyCfg := r.loadVerifyCodeConfig(ctx)
 
-	// Rate limiting: 60-second interval limit (1 request per minute)
-	intervalLimiter := limit.NewPeriodLimit(60, 1, r.data.rdb, fmt.Sprintf("send_interval:email:%s:", parseVerifyType(verifyType)))
+	// Old project uses a fixed 60-second interval limiter with the legacy Redis key format.
+	intervalLimiter := limit.NewPeriodLimit(60, 1, r.data.rdb, fmt.Sprintf("%s:%s:%s", SendIntervalKeyPrefix, "email", scene))
 	permit, err := intervalLimiter.Take(email)
 	if err != nil {
 		r.log.Errorw("SendEmailVerificationCode interval limiter error", "error", err, "email", email)
-		return "", fmt.Errorf("rate limit error: %w", err)
+		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 	if !intervalLimiter.ParsePermitState(permit) {
 		r.log.Warnw("SendEmailVerificationCode interval limit exceeded", "email", email)
-		return "", fmt.Errorf("too many requests, please try again later")
+		return "", responsecode.NewKratosError(responsecode.ErrTooManyRequests)
 	}
 
-	// Daily limit: 5 emails per day (86400 seconds with alignment)
-	dailyLimiter := limit.NewPeriodLimit(86400, 5, r.data.rdb, fmt.Sprintf("send_daily:email:%s:", parseVerifyType(verifyType)), limit.Align())
-	permit, err = dailyLimiter.Take(email)
+	dailyLimiter := limit.NewPeriodLimit(86400, int(verifyCfg.Limit), r.data.rdb, SendCountLimitKeyPrefix, limit.Align())
+	permit, err = dailyLimiter.Take(fmt.Sprintf("%s:%s:%s", "email", scene, email))
 	if err != nil {
 		r.log.Errorw("SendEmailVerificationCode daily limiter error", "error", err, "email", email)
-		return "", fmt.Errorf("rate limit error: %w", err)
+		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 	if !dailyLimiter.ParsePermitState(permit) {
 		r.log.Warnw("SendEmailVerificationCode daily limit exceeded", "email", email)
-		return "", fmt.Errorf("daily send limit exceeded")
+		return "", responsecode.NewKratosError(responsecode.ErrTodaySendCountExceedsLimit)
 	}
 
-	// Validate user existence based on verify type
 	authMethod, err := r.data.db.ProxyUserAuthMethod.Query().
 		Where(
 			proxyuserauthmethod.AuthType("email"),
@@ -266,69 +284,65 @@ func (r *commonRepo) SendEmailVerificationCode(ctx context.Context, email string
 		First(ctx)
 	if err != nil && !ent.IsNotFound(err) {
 		r.log.Errorw("SendEmailVerificationCode query user error", "error", err, "email", email)
-		return "", fmt.Errorf("failed to query user: %w", err)
+		return "", responsecode.NewDatabaseQueryError()
 	}
 
-	// Check user existence requirements
-	if parseVerifyType(verifyType) == "register" && authMethod != nil {
+	if scene == verifySceneRegister && authMethod != nil {
 		r.log.Warnw("SendEmailVerificationCode user already exists", "email", email)
-		return "", fmt.Errorf("email already registered")
-	} else if parseVerifyType(verifyType) == "security" && authMethod == nil {
+		return "", responsecode.NewKratosError(responsecode.ErrUserAlreadyExists)
+	} else if scene == verifySceneSecurity && authMethod == nil {
 		r.log.Warnw("SendEmailVerificationCode user not found", "email", email)
-		return "", fmt.Errorf("email not registered")
+		return "", responsecode.NewKratosError(responsecode.ErrUserNotExist)
 	}
 
-	// Generate 6-digit verification code
 	code := tool.KeyNew(6, 0)
-
-	// Prepare cache payload
 	cachePayload := CacheKeyPayload{
 		Code:   code,
-		LastAt: int(time.Now().Unix()),
+		LastAt: time.Now().Unix(),
 	}
 
-	// Marshal cache payload
 	val, err := json.Marshal(cachePayload)
 	if err != nil {
 		r.log.Errorw("SendEmailVerificationCode marshal error", "error", err, "email", email)
-		return "", fmt.Errorf("failed to marshal payload: %w", err)
+		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
-	// Save to Redis with 5 minutes expiration
 	if err := r.data.rdb.Set(ctx, cacheKey, string(val), 5*time.Minute).Err(); err != nil {
 		r.log.Errorw("SendEmailVerificationCode Redis error", "error", err, "cache_key", cacheKey)
-		return "", fmt.Errorf("failed to save code: %w", err)
+		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
-	// Prepare email task payload
+	siteLogo := ""
+	siteName := ""
+	if appConf := r.data.AppConf(); appConf != nil && appConf.Site != nil {
+		siteLogo = appConf.Site.SiteLogo
+		siteName = appConf.Site.SiteName
+	}
 	emailPayload := types.SendEmailPayload{
 		Type:    types.EmailTypeVerify,
 		Email:   email,
-		Subject: "Verification Code",
+		Subject: "Verification code",
 		Content: map[string]interface{}{
 			"Type":     verifyType,
-			"SiteLogo": "https://example.com/logo.png", // 站点Logo，当前实现与原项目保持一致
-			"SiteName": "PPanel Pro",                   // 站点名称，当前实现与原项目保持一致
+			"SiteLogo": siteLogo,
+			"SiteName": siteName,
 			"Expire":   5,
 			"Code":     code,
 		},
 	}
 
-	// Marshal email task payload
 	payloadBytes, err := json.Marshal(emailPayload)
 	if err != nil {
 		r.log.Errorw("SendEmailVerificationCode marshal task payload error", "error", err, "email", email)
-		return "", fmt.Errorf("failed to marshal task payload: %w", err)
+		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
-	// Create asynq task
 	task := asynq.NewTask(types.ForthwithSendEmail, payloadBytes, asynq.MaxRetry(3))
 
-	// Enqueue task
 	taskInfo, err := r.data.queue.Enqueue(task)
 	if err != nil {
 		r.log.Errorw("SendEmailVerificationCode enqueue error", "error", err, "payload", string(payloadBytes))
-		return "", fmt.Errorf("failed to enqueue email task: %w", err)
+		return "", responsecode.NewKratosError(responsecode.ErrQueueEnqueueError)
 	}
 
 	r.log.Infow("Email verification code sent", "email", email, "code", code, "task_id", taskInfo.ID, "cache_key", cacheKey)
@@ -338,41 +352,38 @@ func (r *commonRepo) SendEmailVerificationCode(ctx context.Context, email string
 
 // SendSmsVerificationCode sends SMS verification code
 func (r *commonRepo) SendSmsVerificationCode(ctx context.Context, telephone, telephoneArea string, verifyType int32) (string, error) {
-	// Format phone number to E.164 format
 	phoneNumber, err := phone.FormatToE164(telephoneArea, telephone)
 	if err != nil {
 		r.log.Errorw("SendSmsVerificationCode invalid phone number", "error", err, "telephone", telephone, "area", telephoneArea)
-		return "", fmt.Errorf("invalid phone number: %w", err)
+		return "", responsecode.NewKratosError(responsecode.ErrTelephoneError)
 	}
 
-	// Build cache key: verify_code_telephone:{type}:{phone}
-	cacheKey := fmt.Sprintf("verify_code_telephone:%s:%s", parseVerifyType(verifyType), phoneNumber)
+	scene := parseVerifyType(verifyType)
+	cacheKey := verifyCodeTelephoneCacheKey(scene, phoneNumber)
+	verifyCfg := r.loadVerifyCodeConfig(ctx)
 
-	// Rate limiting: 60-second interval limit (1 request per minute)
-	intervalLimiter := limit.NewPeriodLimit(60, 1, r.data.rdb, fmt.Sprintf("send_interval:mobile:%s:", parseVerifyType(verifyType)))
+	intervalLimiter := limit.NewPeriodLimit(60, 1, r.data.rdb, fmt.Sprintf("%s:%s:%s", SendIntervalKeyPrefix, "mobile", scene))
 	permit, err := intervalLimiter.Take(phoneNumber)
 	if err != nil {
 		r.log.Errorw("SendSmsVerificationCode interval limiter error", "error", err, "phone", phoneNumber)
-		return "", fmt.Errorf("rate limit error: %w", err)
+		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 	if !intervalLimiter.ParsePermitState(permit) {
 		r.log.Warnw("SendSmsVerificationCode interval limit exceeded", "phone", phoneNumber)
-		return "", fmt.Errorf("too many requests, please try again later")
+		return "", responsecode.NewKratosError(responsecode.ErrTooManyRequests)
 	}
 
-	// Daily limit: 5 SMS per day (86400 seconds with alignment)
-	dailyLimiter := limit.NewPeriodLimit(86400, 5, r.data.rdb, fmt.Sprintf("send_daily:mobile:%s:", parseVerifyType(verifyType)), limit.Align())
-	permit, err = dailyLimiter.Take(phoneNumber)
+	dailyLimiter := limit.NewPeriodLimit(86400, int(verifyCfg.Limit), r.data.rdb, SendCountLimitKeyPrefix, limit.Align())
+	permit, err = dailyLimiter.Take(fmt.Sprintf("%s:%s:%s", "mobile", scene, phoneNumber))
 	if err != nil {
 		r.log.Errorw("SendSmsVerificationCode daily limiter error", "error", err, "phone", phoneNumber)
-		return "", fmt.Errorf("rate limit error: %w", err)
+		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 	if !dailyLimiter.ParsePermitState(permit) {
 		r.log.Warnw("SendSmsVerificationCode daily limit exceeded", "phone", phoneNumber)
-		return "", fmt.Errorf("daily send limit exceeded")
+		return "", responsecode.NewKratosError(responsecode.ErrTodaySendCountExceedsLimit)
 	}
 
-	// Validate user existence based on verify type
 	authMethod, err := r.data.db.ProxyUserAuthMethod.Query().
 		Where(
 			proxyuserauthmethod.AuthType("mobile"),
@@ -381,41 +392,34 @@ func (r *commonRepo) SendSmsVerificationCode(ctx context.Context, telephone, tel
 		First(ctx)
 	if err != nil && !ent.IsNotFound(err) {
 		r.log.Errorw("SendSmsVerificationCode query user error", "error", err, "phone", phoneNumber)
-		return "", fmt.Errorf("failed to query user: %w", err)
+		return "", responsecode.NewDatabaseQueryError()
 	}
 
-	// Check user existence requirements
-	if parseVerifyType(verifyType) == "register" && authMethod != nil {
+	if scene == verifySceneRegister && authMethod != nil {
 		r.log.Warnw("SendSmsVerificationCode user already exists", "phone", phoneNumber)
-		return "", fmt.Errorf("mobile already registered")
-	} else if parseVerifyType(verifyType) == "security" && authMethod == nil {
+		return "", responsecode.NewKratosError(responsecode.ErrUserAlreadyExists)
+	} else if scene == verifySceneSecurity && authMethod == nil {
 		r.log.Warnw("SendSmsVerificationCode user not found", "phone", phoneNumber)
-		return "", fmt.Errorf("mobile not registered")
+		return "", responsecode.NewKratosError(responsecode.ErrUserNotExist)
 	}
 
-	// Generate 6-digit verification code
 	code := tool.KeyNew(6, 0)
-
-	// Prepare cache payload
 	cachePayload := CacheKeyPayload{
 		Code:   code,
-		LastAt: int(time.Now().Unix()),
+		LastAt: time.Now().Unix(),
 	}
 
-	// Marshal cache payload
 	val, err := json.Marshal(cachePayload)
 	if err != nil {
 		r.log.Errorw("SendSmsVerificationCode marshal error", "error", err, "phone", phoneNumber)
-		return "", fmt.Errorf("failed to marshal payload: %w", err)
+		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
-	// Save to Redis with 5 minutes expiration
-	if err := r.data.rdb.Set(ctx, cacheKey, string(val), 5*time.Minute).Err(); err != nil {
+	if err := r.data.rdb.Set(ctx, cacheKey, string(val), time.Second*time.Duration(verifyCfg.ExpireTime)).Err(); err != nil {
 		r.log.Errorw("SendSmsVerificationCode Redis error", "error", err, "cache_key", cacheKey)
-		return "", fmt.Errorf("failed to save code: %w", err)
+		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
-	// Prepare SMS task payload
 	smsPayload := types.SendSmsPayload{
 		Type:          verifyType,
 		Telephone:     telephone,
@@ -423,21 +427,18 @@ func (r *commonRepo) SendSmsVerificationCode(ctx context.Context, telephone, tel
 		Content:       code,
 	}
 
-	// Marshal SMS task payload
 	payloadBytes, err := json.Marshal(smsPayload)
 	if err != nil {
 		r.log.Errorw("SendSmsVerificationCode marshal task payload error", "error", err, "phone", phoneNumber)
-		return "", fmt.Errorf("failed to marshal task payload: %w", err)
+		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
-	// Create asynq task
 	task := asynq.NewTask(types.ForthwithSendSms, payloadBytes)
 
-	// Enqueue task
 	taskInfo, err := r.data.queue.Enqueue(task)
 	if err != nil {
 		r.log.Errorw("SendSmsVerificationCode enqueue error", "error", err, "payload", string(payloadBytes))
-		return "", fmt.Errorf("failed to enqueue SMS task: %w", err)
+		return "", responsecode.NewKratosError(responsecode.ErrQueueEnqueueError)
 	}
 
 	r.log.Infow("SMS verification code sent", "phone", phoneNumber, "code", code, "task_id", taskInfo.ID, "cache_key", cacheKey)
@@ -450,14 +451,12 @@ func (r *commonRepo) CheckVerificationCode(ctx context.Context, method, account,
 	var cacheKey string
 
 	if method == "email" {
-		cacheKey = fmt.Sprintf("verify_code:%s:%s", parseVerifyType(verifyType), account)
+		cacheKey = verifyCodeEmailCacheKey(parseVerifyType(verifyType), account)
 	} else if method == "mobile" {
-		// For mobile, account should already include country code
-		phoneNumber := account
-		if account[0] != '+' {
-			phoneNumber = "+" + account
+		if !phone.CheckPhone(account) {
+			return false, responsecode.NewKratosError(responsecode.ErrTelephoneError)
 		}
-		cacheKey = fmt.Sprintf("verify_code_telephone:%s:%s", parseVerifyType(verifyType), phoneNumber)
+		cacheKey = verifyCodeTelephoneCacheKey(parseVerifyType(verifyType), "+"+account)
 	} else {
 		r.log.Warnw("CheckVerificationCode invalid method", "method", method)
 		return false, nil
@@ -485,4 +484,168 @@ func (r *commonRepo) CheckVerificationCode(ctx context.Context, method, account,
 
 	r.log.Infow("Verification code validated", "method", method, "account", account)
 	return true, nil
+}
+
+type runtimeVerifyCodeConfig struct {
+	ExpireTime int64
+	Limit      int64
+	Interval   int64
+}
+
+func (r *commonRepo) loadVerifyCodeConfig(ctx context.Context) runtimeVerifyCodeConfig {
+	result := runtimeVerifyCodeConfig{
+		ExpireTime: 300,
+		Limit:      15,
+		Interval:   60,
+	}
+
+	values, err := loadSystemConfigMap(ctx, r.data.db, "verify_code")
+	if err != nil {
+		r.log.Warnw("loadVerifyCodeConfig query failed, using defaults", "error", err)
+		return result
+	}
+
+	result.ExpireTime = getInt64Config(values, result.ExpireTime, "VerifyCodeExpireTime", "verify_code_expire_time")
+	result.Limit = getInt64Config(values, result.Limit, "VerifyCodeLimit", "verify_code_limit")
+	result.Interval = getInt64Config(values, result.Interval, "VerifyCodeInterval", "verify_code_interval")
+	return result
+}
+
+type ipAPIBatchRequest struct {
+	Query  string `json:"query"`
+	Fields string `json:"fields"`
+}
+
+type ipAPIBatchResponse struct {
+	CountryCode string `json:"countryCode"`
+}
+
+type nodeProtocolItem struct {
+	Type string `json:"type"`
+}
+
+func fetchCountryCodes(ctx context.Context, addresses []string) map[string]struct{} {
+	countries := make(map[string]struct{})
+	requests := make([]ipAPIBatchRequest, 0, len(addresses))
+
+	for _, address := range addresses {
+		address = resolveAddressToIP(address)
+		if address == "" {
+			continue
+		}
+		requests = append(requests, ipAPIBatchRequest{
+			Query:  address,
+			Fields: "countryCode",
+		})
+	}
+
+	if len(requests) == 0 {
+		return countries
+	}
+
+	client := &http.Client{Timeout: 10 * time.Second}
+	for start := 0; start < len(requests); start += 100 {
+		end := start + 100
+		if end > len(requests) {
+			end = len(requests)
+		}
+
+		body, err := json.Marshal(requests[start:end])
+		if err != nil {
+			continue
+		}
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodPost, "http://ip-api.com/batch", bytes.NewReader(body))
+		if err != nil {
+			continue
+		}
+		req.Header.Set("Content-Type", "application/json")
+
+		resp, err := client.Do(req)
+		if err != nil {
+			continue
+		}
+
+		respBody, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			continue
+		}
+
+		var payload []ipAPIBatchResponse
+		if err := json.Unmarshal(respBody, &payload); err != nil {
+			continue
+		}
+
+		for _, item := range payload {
+			if item.CountryCode == "" {
+				continue
+			}
+			countries[item.CountryCode] = struct{}{}
+		}
+	}
+
+	return countries
+}
+
+func resolveAddressToIP(address string) string {
+	if ip := net.ParseIP(address); ip != nil {
+		return ip.String()
+	}
+
+	records, err := net.LookupIP(address)
+	if err != nil {
+		return ""
+	}
+
+	for _, record := range records {
+		if record == nil {
+			continue
+		}
+		if ipv4 := record.To4(); ipv4 != nil {
+			return ipv4.String()
+		}
+		return record.String()
+	}
+
+	return ""
+}
+
+func collectProtocolTypes(protocolValues []string) []string {
+	seen := make(map[string]struct{})
+	result := make([]string, 0)
+
+	for _, raw := range protocolValues {
+		for _, item := range parseNodeProtocolTypes(raw) {
+			if item == "" {
+				continue
+			}
+			if _, exists := seen[item]; exists {
+				continue
+			}
+			seen[item] = struct{}{}
+			result = append(result, item)
+		}
+	}
+
+	return result
+}
+
+func parseNodeProtocolTypes(raw string) []string {
+	if raw == "" {
+		return nil
+	}
+
+	var list []nodeProtocolItem
+	if err := json.Unmarshal([]byte(raw), &list); err == nil && len(list) > 0 {
+		result := make([]string, 0, len(list))
+		for _, item := range list {
+			if item.Type != "" {
+				result = append(result, item.Type)
+			}
+		}
+		return result
+	}
+
+	return []string{raw}
 }

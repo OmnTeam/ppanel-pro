@@ -12,6 +12,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdevice"
 	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
 	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
+	"github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
 
@@ -87,7 +88,11 @@ func (s *UserService) BatchDeleteUser(ctx context.Context, req *v1.BatchDeleteUs
 
 // CurrentUser 获取当前用户
 func (s *UserService) CurrentUser(ctx context.Context, req *v1.CurrentUserRequest) (*v1.CurrentUserReply, error) {
-	user, err := s.uc.CurrentUser(ctx, int(parseInt64(req.UserId)))
+	userID := middleware.GetUserID(ctx)
+	if userID == 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrMissingAuthToken)
+	}
+	user, err := s.uc.CurrentUser(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
@@ -274,9 +279,11 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 			telephone = am.AuthIdentifier
 			// 手机号格式化处理，与原项目保持一致
 		} else if am.AuthType == "telegram" {
-			// Telegram ID 存储为字符串，需要转换
-			// 注意：这里简化处理，实际可能需要更复杂的转换逻辑
+			telegram, _ = strconv.ParseInt(am.AuthIdentifier, 10, 64)
 		}
+	}
+	if user.Telegram != nil && *user.Telegram > 0 {
+		telegram = *user.Telegram
 	}
 
 	// 转换认证方法为 proto

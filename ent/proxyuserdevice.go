@@ -24,10 +24,12 @@ type ProxyUserDevice struct {
 	SubscribeID *int64 `json:"subscribe_id,omitempty"`
 	// 设备IP
 	IP *string `json:"ip,omitempty"`
-	// 设备标识符
-	Identifier *string `json:"identifier,omitempty"`
 	// 设备User Agent
 	UserAgent *string `json:"user_agent,omitempty"`
+	// 设备标识符
+	Identifier *string `json:"identifier,omitempty"`
+	// 短码
+	ShortCode string `json:"short_code,omitempty"`
 	// 是否在线
 	Online bool `json:"online,omitempty"`
 	// 是否启用
@@ -48,7 +50,7 @@ func (*ProxyUserDevice) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case proxyuserdevice.FieldID, proxyuserdevice.FieldUserID, proxyuserdevice.FieldSubscribeID:
 			values[i] = new(sql.NullInt64)
-		case proxyuserdevice.FieldIP, proxyuserdevice.FieldIdentifier, proxyuserdevice.FieldUserAgent:
+		case proxyuserdevice.FieldIP, proxyuserdevice.FieldUserAgent, proxyuserdevice.FieldIdentifier, proxyuserdevice.FieldShortCode:
 			values[i] = new(sql.NullString)
 		case proxyuserdevice.FieldCreatedAt, proxyuserdevice.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -93,6 +95,13 @@ func (_m *ProxyUserDevice) assignValues(columns []string, values []any) error {
 				_m.IP = new(string)
 				*_m.IP = value.String
 			}
+		case proxyuserdevice.FieldUserAgent:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field user_agent", values[i])
+			} else if value.Valid {
+				_m.UserAgent = new(string)
+				*_m.UserAgent = value.String
+			}
 		case proxyuserdevice.FieldIdentifier:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field identifier", values[i])
@@ -100,12 +109,11 @@ func (_m *ProxyUserDevice) assignValues(columns []string, values []any) error {
 				_m.Identifier = new(string)
 				*_m.Identifier = value.String
 			}
-		case proxyuserdevice.FieldUserAgent:
+		case proxyuserdevice.FieldShortCode:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field user_agent", values[i])
+				return fmt.Errorf("unexpected type %T for field short_code", values[i])
 			} else if value.Valid {
-				_m.UserAgent = new(string)
-				*_m.UserAgent = value.String
+				_m.ShortCode = value.String
 			}
 		case proxyuserdevice.FieldOnline:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -180,15 +188,18 @@ func (_m *ProxyUserDevice) String() string {
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
+	if v := _m.UserAgent; v != nil {
+		builder.WriteString("user_agent=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
 	if v := _m.Identifier; v != nil {
 		builder.WriteString("identifier=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := _m.UserAgent; v != nil {
-		builder.WriteString("user_agent=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("short_code=")
+	builder.WriteString(_m.ShortCode)
 	builder.WriteString(", ")
 	builder.WriteString("online=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Online))

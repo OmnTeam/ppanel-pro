@@ -18,15 +18,13 @@ type ProxyOrder struct {
 	// ID of the ent.
 	// 订单ID
 	ID int64 `json:"id,omitempty"`
-	// 租户ID
-	TenantID int64 `json:"tenant_id,omitempty"`
 	// 父订单ID
 	ParentID int64 `json:"parent_id,omitempty"`
 	// 用户ID
 	UserID int64 `json:"user_id,omitempty"`
 	// 订单号
 	OrderNo string `json:"order_no,omitempty"`
-	// 订单类型：1:订阅 2:续费 3:重置流量 4:充值
+	// 订单类型
 	Type int8 `json:"type,omitempty"`
 	// 数量
 	Quantity int64 `json:"quantity,omitempty"`
@@ -34,6 +32,8 @@ type ProxyOrder struct {
 	Price int64 `json:"price,omitempty"`
 	// 实付金额
 	Amount int64 `json:"amount,omitempty"`
+	// 赠送金额
+	GiftAmount int64 `json:"gift_amount,omitempty"`
 	// 折扣金额
 	Discount int64 `json:"discount,omitempty"`
 	// 优惠券代码
@@ -42,17 +42,15 @@ type ProxyOrder struct {
 	CouponDiscount int64 `json:"coupon_discount,omitempty"`
 	// 佣金金额
 	Commission int64 `json:"commission,omitempty"`
-	// 手续费金额
-	FeeAmount int64 `json:"fee_amount,omitempty"`
-	// 赠送金额
-	GiftAmount int64 `json:"gift_amount,omitempty"`
 	// 支付方式ID
 	PaymentID int64 `json:"payment_id,omitempty"`
 	// 支付方式标识
 	Method string `json:"method,omitempty"`
+	// 手续费金额
+	FeeAmount int64 `json:"fee_amount,omitempty"`
 	// 第三方交易号
 	TradeNo string `json:"trade_no,omitempty"`
-	// 订单状态：0待支付 1已支付 2已取消 3已退款
+	// 订单状态
 	Status int8 `json:"status,omitempty"`
 	// 关联订阅ID
 	SubscribeID int64 `json:"subscribe_id,omitempty"`
@@ -74,7 +72,7 @@ func (*ProxyOrder) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case proxyorder.FieldIsNew:
 			values[i] = new(sql.NullBool)
-		case proxyorder.FieldID, proxyorder.FieldTenantID, proxyorder.FieldParentID, proxyorder.FieldUserID, proxyorder.FieldType, proxyorder.FieldQuantity, proxyorder.FieldPrice, proxyorder.FieldAmount, proxyorder.FieldDiscount, proxyorder.FieldCouponDiscount, proxyorder.FieldCommission, proxyorder.FieldFeeAmount, proxyorder.FieldGiftAmount, proxyorder.FieldPaymentID, proxyorder.FieldStatus, proxyorder.FieldSubscribeID:
+		case proxyorder.FieldID, proxyorder.FieldParentID, proxyorder.FieldUserID, proxyorder.FieldType, proxyorder.FieldQuantity, proxyorder.FieldPrice, proxyorder.FieldAmount, proxyorder.FieldGiftAmount, proxyorder.FieldDiscount, proxyorder.FieldCouponDiscount, proxyorder.FieldCommission, proxyorder.FieldPaymentID, proxyorder.FieldFeeAmount, proxyorder.FieldStatus, proxyorder.FieldSubscribeID:
 			values[i] = new(sql.NullInt64)
 		case proxyorder.FieldOrderNo, proxyorder.FieldCoupon, proxyorder.FieldMethod, proxyorder.FieldTradeNo, proxyorder.FieldSubscribeToken:
 			values[i] = new(sql.NullString)
@@ -101,12 +99,6 @@ func (_m *ProxyOrder) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int64(value.Int64)
-		case proxyorder.FieldTenantID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
-			} else if value.Valid {
-				_m.TenantID = value.Int64
-			}
 		case proxyorder.FieldParentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field parent_id", values[i])
@@ -149,6 +141,12 @@ func (_m *ProxyOrder) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Amount = value.Int64
 			}
+		case proxyorder.FieldGiftAmount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field gift_amount", values[i])
+			} else if value.Valid {
+				_m.GiftAmount = value.Int64
+			}
 		case proxyorder.FieldDiscount:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field discount", values[i])
@@ -173,18 +171,6 @@ func (_m *ProxyOrder) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.Commission = value.Int64
 			}
-		case proxyorder.FieldFeeAmount:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field fee_amount", values[i])
-			} else if value.Valid {
-				_m.FeeAmount = value.Int64
-			}
-		case proxyorder.FieldGiftAmount:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field gift_amount", values[i])
-			} else if value.Valid {
-				_m.GiftAmount = value.Int64
-			}
 		case proxyorder.FieldPaymentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field payment_id", values[i])
@@ -196,6 +182,12 @@ func (_m *ProxyOrder) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field method", values[i])
 			} else if value.Valid {
 				_m.Method = value.String
+			}
+		case proxyorder.FieldFeeAmount:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field fee_amount", values[i])
+			} else if value.Valid {
+				_m.FeeAmount = value.Int64
 			}
 		case proxyorder.FieldTradeNo:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -275,9 +267,6 @@ func (_m *ProxyOrder) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProxyOrder(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
-	builder.WriteString("tenant_id=")
-	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
-	builder.WriteString(", ")
 	builder.WriteString("parent_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.ParentID))
 	builder.WriteString(", ")
@@ -299,6 +288,9 @@ func (_m *ProxyOrder) String() string {
 	builder.WriteString("amount=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Amount))
 	builder.WriteString(", ")
+	builder.WriteString("gift_amount=")
+	builder.WriteString(fmt.Sprintf("%v", _m.GiftAmount))
+	builder.WriteString(", ")
 	builder.WriteString("discount=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Discount))
 	builder.WriteString(", ")
@@ -311,17 +303,14 @@ func (_m *ProxyOrder) String() string {
 	builder.WriteString("commission=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Commission))
 	builder.WriteString(", ")
-	builder.WriteString("fee_amount=")
-	builder.WriteString(fmt.Sprintf("%v", _m.FeeAmount))
-	builder.WriteString(", ")
-	builder.WriteString("gift_amount=")
-	builder.WriteString(fmt.Sprintf("%v", _m.GiftAmount))
-	builder.WriteString(", ")
 	builder.WriteString("payment_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.PaymentID))
 	builder.WriteString(", ")
 	builder.WriteString("method=")
 	builder.WriteString(_m.Method)
+	builder.WriteString(", ")
+	builder.WriteString("fee_amount=")
+	builder.WriteString(fmt.Sprintf("%v", _m.FeeAmount))
 	builder.WriteString(", ")
 	builder.WriteString("trade_no=")
 	builder.WriteString(_m.TradeNo)

@@ -126,6 +126,11 @@ message UserLoginRequest {
   string cf_token = 3; // Cloudflare turnstile token (optional)
   string ip = 4;        // X-Original-Forwarded-For header
   string user_agent = 5; // User-Agent header
+  string identifier = 6;  // Device identifier
+  string login_type = 7;  // Login-Type header fallback
+  string captcha_id = 8;  // Reserved for local captcha compatibility
+  string captcha_code = 9;
+  string slider_token = 10;
 }
 
 // ============================================================================
@@ -141,6 +146,11 @@ message TelephoneLoginRequest {
   string cf_token = 5;           // Cloudflare turnstile token (optional)
   string ip = 6;                 // X-Original-Forwarded-For header
   string user_agent = 7;         // User-Agent header
+  string identifier = 8;         // Device identifier
+  string login_type = 9;         // Login-Type header fallback
+  string captcha_id = 10;        // Reserved for local captcha compatibility
+  string captcha_code = 11;
+  string slider_token = 12;
 }
 
 // ============================================================================
@@ -156,6 +166,11 @@ message UserRegisterRequest {
   string cf_token = 5;  // Cloudflare turnstile token (optional)
   string ip = 6;        // X-Original-Forwarded-For header
   string user_agent = 7; // User-Agent header
+  string identifier = 8;  // Device identifier
+  string login_type = 9;  // Login-Type header fallback
+  string captcha_id = 10; // Reserved for local captcha compatibility
+  string captcha_code = 11;
+  string slider_token = 12;
 }
 
 // ============================================================================
@@ -172,6 +187,11 @@ message TelephoneRegisterRequest {
   string cf_token = 6;  // Cloudflare turnstile token (optional)
   string ip = 7;        // X-Original-Forwarded-For header
   string user_agent = 8; // User-Agent header
+  string identifier = 9;   // Device identifier
+  string login_type = 10;  // Login-Type header fallback
+  string captcha_id = 11;  // Reserved for local captcha compatibility
+  string captcha_code = 12;
+  string slider_token = 13;
 }
 
 // ============================================================================
@@ -186,6 +206,11 @@ message ResetPasswordRequest {
   string cf_token = 4;  // Cloudflare turnstile token (optional)
   string ip = 5;        // X-Original-Forwarded-For header
   string user_agent = 6; // User-Agent header
+  string identifier = 7;  // Device identifier
+  string login_type = 8;  // Login-Type header fallback
+  string captcha_id = 9;  // Reserved for local captcha compatibility
+  string captcha_code = 10;
+  string slider_token = 11;
 }
 
 // ============================================================================
@@ -201,6 +226,11 @@ message TelephoneResetPasswordRequest {
   string cf_token = 5;  // Cloudflare turnstile token (optional)
   string ip = 6;        // X-Original-Forwarded-For header
   string user_agent = 7; // User-Agent header
+  string identifier = 8;  // Device identifier
+  string login_type = 9;  // Login-Type header fallback
+  string captcha_id = 10; // Reserved for local captcha compatibility
+  string captcha_code = 11;
+  string slider_token = 12;
 }
 
 // ============================================================================

@@ -295,8 +295,7 @@ func (h *ResetTrafficHandler) resetMonth(ctx context.Context) error {
 		h.logger.Info("[ResetTraffic] No users found for monthly reset")
 	}
 
-	// TODO: Clear subscription cache (复刻原项目 line 256)
-	// h.clearSubscriptionCache(ctx, resetMonthSubIds)
+	h.clearSubscribeCacheByIDs(ctx, resetMonthSubIds...)
 
 	h.logger.Info("[ResetTraffic] Monthly reset process completed")
 	return nil
@@ -386,8 +385,7 @@ func (h *ResetTrafficHandler) reset1st(ctx context.Context, cache resetTrafficCa
 		h.logger.Info("[ResetTraffic] No users found for 1st reset")
 	}
 
-	// TODO: Clear subscription cache (复刻原项目 line 342)
-	// h.clearSubscriptionCache(ctx, reset1stSubIds)
+	h.clearSubscribeCacheByIDs(ctx, reset1stSubIds...)
 
 	h.logger.Info("[ResetTraffic] 1st reset process completed")
 	return nil
@@ -505,8 +503,7 @@ func (h *ResetTrafficHandler) resetYear(ctx context.Context) error {
 		h.logger.Info("[ResetTraffic] No users found for yearly reset")
 	}
 
-	// TODO: Clear subscription cache (复刻原项目 line 427-430)
-	// h.clearSubscriptionCache(ctx, resetYearSubIds)
+	h.clearSubscribeCacheByIDs(ctx, resetYearSubIds...)
 
 	h.logger.Info("[ResetTraffic] Yearly reset process completed")
 	return nil
@@ -648,35 +645,27 @@ func (h *ResetTrafficHandler) clearCache(ctx context.Context, list []*ent.ProxyU
 		return
 	}
 
-	subs := make(map[int64]bool)
+	subscribeIDs := make([]int64, 0, len(list))
 
 	for _, sub := range list {
 		if sub.SubscribeID > 0 {
-			// TODO: Clear user subscribe cache
-			// h.clearUserSubscribeCache(ctx, sub)
-
-			if _, ok := subs[sub.SubscribeID]; !ok {
-				subs[sub.SubscribeID] = true
-			}
+			subscribeIDs = append(subscribeIDs, sub.SubscribeID)
 		}
-		// Insert traffic reset log (复刻原项目 line 595)
+		clearLegacyUserSubscribeCaches(ctx, h.rdb, h.logger, sub)
 		h.insertLog(ctx, sub.ID, sub.UserID)
 	}
 
-	// TODO: Clear subscription cache for all affected subscribe_ids (复刻原项目 line 598-605)
-	// for subID := range subs {
-	//     h.clearSubscriptionCache(ctx, subID)
-	// }
+	h.clearSubscribeCacheByIDs(ctx, subscribeIDs...)
 }
 
 // insertLog inserts a reset traffic log entry (复刻原项目 line 610-625)
 func (h *ResetTrafficHandler) insertLog(ctx context.Context, subID, userID int64) {
-	trafficLog := map[string]interface{}{
-		"type":      "reset_traffic", // ResetSubscribeTypeAuto
-		"user_id":   userID,
-		"timestamp": time.Now().UnixMilli(),
+	trafficLog := logmodel.ResetSubscribe{
+		Type:      logmodel.ResetSubscribeTypeAuto,
+		UserId:    userID,
+		Timestamp: time.Now().UnixMilli(),
 	}
-	content, _ := json.Marshal(trafficLog)
+	content, _ := trafficLog.Marshal()
 
 	_, err := h.db.ProxySystemLog.Create().
 		SetType(int8(logmodel.TypeResetSubscribe)).
@@ -688,6 +677,10 @@ func (h *ResetTrafficHandler) insertLog(ctx context.Context, subID, userID int64
 	if err != nil {
 		h.logger.Errorf("[ResetTraffic] Failed to create system log for subscription: %v", err)
 	}
+}
+
+func (h *ResetTrafficHandler) clearSubscribeCacheByIDs(ctx context.Context, subscribeIDs ...int64) {
+	clearLegacySubscribeCaches(ctx, h.rdb, h.logger, subscribeIDs...)
 }
 
 // monthsDiff calculates the number of months between two times

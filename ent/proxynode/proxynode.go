@@ -29,16 +29,14 @@ const (
 	FieldEnabled = "enabled"
 	// FieldSort holds the string denoting the sort field in the database.
 	FieldSort = "sort"
-	// FieldGroupID holds the string denoting the group_id field in the database.
-	FieldGroupID = "group_id"
-	// FieldGroupLocked holds the string denoting the group_locked field in the database.
-	FieldGroupLocked = "group_locked"
+	// FieldNodeGroupIds holds the string denoting the node_group_ids field in the database.
+	FieldNodeGroupIds = "node_group_ids"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxynode in the database.
-	Table = "proxy_nodes"
+	Table = "nodes"
 )
 
 // Columns holds all SQL columns for proxynode fields.
@@ -52,8 +50,7 @@ var Columns = []string{
 	FieldProtocol,
 	FieldEnabled,
 	FieldSort,
-	FieldGroupID,
-	FieldGroupLocked,
+	FieldNodeGroupIds,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -78,7 +75,7 @@ var (
 	// TagsValidator is a validator for the "tags" field. It is called by the builders before save.
 	TagsValidator func(string) error
 	// DefaultPort holds the default value on creation for the "port" field.
-	DefaultPort int
+	DefaultPort uint16
 	// DefaultAddress holds the default value on creation for the "address" field.
 	DefaultAddress string
 	// AddressValidator is a validator for the "address" field. It is called by the builders before save.
@@ -93,10 +90,6 @@ var (
 	DefaultEnabled bool
 	// DefaultSort holds the default value on creation for the "sort" field.
 	DefaultSort int
-	// DefaultGroupID holds the default value on creation for the "group_id" field.
-	DefaultGroupID int64
-	// DefaultGroupLocked holds the default value on creation for the "group_locked" field.
-	DefaultGroupLocked bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -151,16 +144,6 @@ func ByEnabled(opts ...sql.OrderTermOption) OrderOption {
 // BySort orders the results by the sort field.
 func BySort(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSort, opts...).ToFunc()
-}
-
-// ByGroupID orders the results by the group_id field.
-func ByGroupID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldGroupID, opts...).ToFunc()
-}
-
-// ByGroupLocked orders the results by the group_locked field.
-func ByGroupLocked(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldGroupLocked, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

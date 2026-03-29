@@ -30,7 +30,9 @@ import (
 	publicdocument "github.com/OmnTeam/ppanel-pro/internal/biz/public/document"
 	publicpayment "github.com/OmnTeam/ppanel-pro/internal/biz/public/payment"
 	publicportal "github.com/OmnTeam/ppanel-pro/internal/biz/public/portal"
+	publicredemption "github.com/OmnTeam/ppanel-pro/internal/biz/public/redemption"
 	publicsubscribe "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscribe"
+	subscription "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
 	publicticket "github.com/OmnTeam/ppanel-pro/internal/biz/public/ticket"
 	publicuser "github.com/OmnTeam/ppanel-pro/internal/biz/public/user"
 	publicwithdrawal "github.com/OmnTeam/ppanel-pro/internal/biz/public/withdrawal"
@@ -83,8 +85,12 @@ var ProviderSet = wire.NewSet(
 	publicpayment.NewPaymentUseCase,
 	// Public Portal模块用例
 	publicportal.NewPortalUseCase,
+	// Public Redemption模块用例
+	publicredemption.NewRedemptionUseCase,
 	// Public Subscribe模块用例
 	publicsubscribe.NewSubscribeUseCase,
+	// Public Subscription模块用例（订阅配置生成）
+	subscription.NewSubscriptionUseCase,
 	// Public Ticket模块用例
 	publicticket.NewTicketUseCase,
 	// Public User模块用例

@@ -10,26 +10,23 @@ import (
 	"entgo.io/ent/schema/index"
 )
 
-// ProxySystem holds the schema definition for the ProxySystem entity
-// 系统配置表
+// ProxySystem holds the schema definition for the ProxySystem entity.
 type ProxySystem struct {
 	ent.Schema
 }
 
-// Annotations of the ProxySystem
 func (ProxySystem) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "proxy_system"},
+		entsql.Annotation{Table: "system"},
 		entsql.WithComments(true),
 	}
 }
 
-// Fields of the ProxySystem
 func (ProxySystem) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").Unique(),
 		field.String("category").MaxLen(100).Default("").Comment("分类"),
-		field.String("key").MaxLen(100).NotEmpty().Comment("键名"),
+		field.String("key").MaxLen(100).NotEmpty().Default("").Comment("键名"),
 		field.Text("value").Comment("键值"),
 		field.String("type").MaxLen(50).Default("").Comment("类型"),
 		field.Text("desc").Comment("描述"),
@@ -38,15 +35,12 @@ func (ProxySystem) Fields() []ent.Field {
 	}
 }
 
-// Indexes of the ProxySystem
 func (ProxySystem) Indexes() []ent.Index {
 	return []ent.Index{
-		// 确保category+key组合是唯一的
-		index.Fields("category", "key").Unique(),
+		index.Fields("key").Unique(),
 	}
 }
 
-// Edges of the ProxySystem
 func (ProxySystem) Edges() []ent.Edge {
 	return nil
 }

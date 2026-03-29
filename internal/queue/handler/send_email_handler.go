@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
 	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
 	queueTypes "github.com/OmnTeam/ppanel-pro/internal/queue/types"
 	"github.com/OmnTeam/ppanel-pro/pkg/email"
@@ -33,8 +32,7 @@ type SendEmailHandler struct {
 	logger *log.Helper
 }
 
-// NewSendEmailHandler creates a new email sending handler
-// 所有配置从数据库根据租户ID获取
+// NewSendEmailHandler creates a new email sending handler.
 func NewSendEmailHandler(db *ent.Client, logger log.Logger) *SendEmailHandler {
 	return &SendEmailHandler{
 		db:     db,
@@ -51,7 +49,7 @@ func (h *SendEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) er
 		return nil // Return nil to skip retry
 	}
 
-	// Load email config from ProxySystem table based on tenant ID
+	// Load email config from ProxySystem table
 	emailConfig, err := h.loadEmailConfig(ctx)
 	if err != nil {
 		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Load email config failed: %v", err)
@@ -213,33 +211,26 @@ func (h *SendEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) er
 	return nil
 }
 
-// loadEmailConfig loads email configuration from ProxySystem table based on tenant ID
+// loadEmailConfig loads email configuration from ProxySystem table.
 func (h *SendEmailHandler) loadEmailConfig(ctx context.Context) (*SendEmailSystemConfig, error) {
-	// Query email config from ProxySystem table
-	// Category: "email", Key: "config"
-	config, err := h.db.ProxySystem.Query().
-		Where(
-			proxysystem.CategoryEQ("email"),
-			proxysystem.KeyEQ("config"),
-		).
-		Only(ctx)
-
+	config, err := loadQueueEmailConfig(ctx, h.db)
 	if err != nil {
 		if ent.IsNotFound(err) {
-			h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Email config not found, category: email, key: config")
+			h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Email auth method config not found")
 			return nil, fmt.Errorf("email config not found")
 		}
-		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to query email config, error: %v", err)
+		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to load email config, error: %v", err)
 		return nil, err
 	}
 
-	var emailConfig SendEmailSystemConfig
-	if err := json.Unmarshal([]byte(config.Value), &emailConfig); err != nil {
-		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to unmarshal email config, error: %v", err)
-		return nil, err
-	}
-
-	return &emailConfig, nil
+	return &SendEmailSystemConfig{
+		Platform:                   config.Platform,
+		PlatformConfig:             config.PlatformConfig,
+		VerifyEmailTemplate:        config.VerifyEmailTemplate,
+		ExpirationEmailTemplate:    config.ExpirationEmailTemplate,
+		MaintenanceEmailTemplate:   config.MaintenanceEmailTemplate,
+		TrafficExceedEmailTemplate: config.TrafficExceedEmailTemplate,
+	}, nil
 }
 
 // SendEmailSiteConfig holds site configuration
@@ -249,31 +240,12 @@ type SendEmailSiteConfig struct {
 
 // loadSiteConfig loads site configuration from ProxySystem table
 func (h *SendEmailHandler) loadSiteConfig(ctx context.Context) (*SendEmailSiteConfig, error) {
-	// Query site config from ProxySystem table
-	// Category: "site", Key: "config"
-	config, err := h.db.ProxySystem.Query().
-		Where(
-			proxysystem.CategoryEQ("site"),
-			proxysystem.KeyEQ("config"),
-		).
-		Only(ctx)
-
+	siteName, err := loadQueueSiteName(ctx, h.db)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Site config not found, category: site, key: config")
-			return nil, fmt.Errorf("site config not found")
-		}
-		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to query site config, error: %v", err)
+		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to load site config, error: %v", err)
 		return nil, err
 	}
-
-	var siteConfig SendEmailSiteConfig
-	if err := json.Unmarshal([]byte(config.Value), &siteConfig); err != nil {
-		h.logger.WithContext(ctx).Errorf("[SendEmailHandler] Failed to unmarshal site config, error: %v", err)
-		return nil, err
-	}
-
-	return &siteConfig, nil
+	return &SendEmailSiteConfig{SiteName: siteName}, nil
 }
 
 // logMessage logs the email message to ProxySystemLog

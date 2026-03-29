@@ -31,12 +31,12 @@ const (
 	// EdgeUser holds the string denoting the user edge name in mutations.
 	EdgeUser = "user"
 	// Table holds the table name of the proxyuserwithdrawal in the database.
-	Table = "proxy_user_withdrawal"
+	Table = "user_withdrawal"
 	// UserTable is the table that holds the user relation/edge.
-	UserTable = "proxy_user_withdrawal"
+	UserTable = "user_withdrawal"
 	// UserInverseTable is the table name for the ProxyUser entity.
 	// It exists in this package in order to avoid circular dependency with the "proxyuser" package.
-	UserInverseTable = "proxy_user"
+	UserInverseTable = "user"
 	// UserColumn is the table column denoting the user relation/edge.
 	UserColumn = "user_id"
 )

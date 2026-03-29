@@ -113,12 +113,12 @@ func (s *CouponService) GetCouponList(ctx context.Context, req *v1.GetCouponList
 			Count:      int32(c.Count),
 			Type:       int32(c.Type),
 			Discount:   formatInt64(int64(c.Discount)),
-			StartTime:  formatInt64(c.StartTime.Unix()),
-			ExpireTime: formatInt64(c.EndTime.Unix()),
+			StartTime:  formatInt64(c.StartTime),
+			ExpireTime: formatInt64(c.ExpireTime),
 			UserLimit:  int32(c.UserLimit),
 			Subscribe:  convertIntSliceToInt32Slice(subscribeList),
-			UsedCount:  0, // TODO: 实现已使用数量统计
-			Enable:     c.Status == 1,
+			UsedCount:  int32(c.UsedCount),
+			Enable:     c.Enable,
 			CreatedAt:  formatInt64(c.CreatedAt.Unix()),
 			UpdatedAt:  formatInt64(c.UpdatedAt.Unix()),
 		})

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.8.4
 // - protoc             v3.19.4
-// source: public/portal/v1/portal.proto
+// source: api/public/portal/v1/portal.proto
 
 package v1
 
@@ -46,8 +46,8 @@ func RegisterPortalHTTPServer(s *http.Server, srv PortalHTTPServer) {
 	r := s.Route("/")
 	r.GET("/v1/public/portal/subscribe", _Portal_GetSubscription0_HTTP_Handler(srv))
 	r.POST("/v1/public/portal/pre", _Portal_PrePurchaseOrder0_HTTP_Handler(srv))
-	r.POST("/v1/public/portal/purchase", _Portal_Purchase1_HTTP_Handler(srv))
-	r.GET("/v1/public/portal/payment-method", _Portal_GetAvailablePaymentMethods1_HTTP_Handler(srv))
+	r.POST("/v1/public/portal/purchase", _Portal_Purchase0_HTTP_Handler(srv))
+	r.GET("/v1/public/portal/payment-method", _Portal_GetAvailablePaymentMethods0_HTTP_Handler(srv))
 	r.POST("/v1/public/portal/order/checkout", _Portal_PurchaseCheckout0_HTTP_Handler(srv))
 	r.GET("/v1/public/portal/order/status", _Portal_QueryPurchaseOrder0_HTTP_Handler(srv))
 }
@@ -93,7 +93,7 @@ func _Portal_PrePurchaseOrder0_HTTP_Handler(srv PortalHTTPServer) func(ctx http.
 	}
 }
 
-func _Portal_Purchase1_HTTP_Handler(srv PortalHTTPServer) func(ctx http.Context) error {
+func _Portal_Purchase0_HTTP_Handler(srv PortalHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in PurchaseRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -115,7 +115,7 @@ func _Portal_Purchase1_HTTP_Handler(srv PortalHTTPServer) func(ctx http.Context)
 	}
 }
 
-func _Portal_GetAvailablePaymentMethods1_HTTP_Handler(srv PortalHTTPServer) func(ctx http.Context) error {
+func _Portal_GetAvailablePaymentMethods0_HTTP_Handler(srv PortalHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {

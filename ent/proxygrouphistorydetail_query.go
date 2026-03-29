@@ -12,67 +12,67 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/OmnTeam/ppanel-pro/ent/predicate"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyusergroup"
+	"github.com/OmnTeam/ppanel-pro/ent/proxygrouphistorydetail"
 )
 
-// ProxyUserGroupQuery is the builder for querying ProxyUserGroup entities.
-type ProxyUserGroupQuery struct {
+// ProxyGroupHistoryDetailQuery is the builder for querying ProxyGroupHistoryDetail entities.
+type ProxyGroupHistoryDetailQuery struct {
 	config
 	ctx        *QueryContext
-	order      []proxyusergroup.OrderOption
+	order      []proxygrouphistorydetail.OrderOption
 	inters     []Interceptor
-	predicates []predicate.ProxyUserGroup
+	predicates []predicate.ProxyGroupHistoryDetail
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the ProxyUserGroupQuery builder.
-func (_q *ProxyUserGroupQuery) Where(ps ...predicate.ProxyUserGroup) *ProxyUserGroupQuery {
+// Where adds a new predicate for the ProxyGroupHistoryDetailQuery builder.
+func (_q *ProxyGroupHistoryDetailQuery) Where(ps ...predicate.ProxyGroupHistoryDetail) *ProxyGroupHistoryDetailQuery {
 	_q.predicates = append(_q.predicates, ps...)
 	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (_q *ProxyUserGroupQuery) Limit(limit int) *ProxyUserGroupQuery {
+func (_q *ProxyGroupHistoryDetailQuery) Limit(limit int) *ProxyGroupHistoryDetailQuery {
 	_q.ctx.Limit = &limit
 	return _q
 }
 
 // Offset to start from.
-func (_q *ProxyUserGroupQuery) Offset(offset int) *ProxyUserGroupQuery {
+func (_q *ProxyGroupHistoryDetailQuery) Offset(offset int) *ProxyGroupHistoryDetailQuery {
 	_q.ctx.Offset = &offset
 	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (_q *ProxyUserGroupQuery) Unique(unique bool) *ProxyUserGroupQuery {
+func (_q *ProxyGroupHistoryDetailQuery) Unique(unique bool) *ProxyGroupHistoryDetailQuery {
 	_q.ctx.Unique = &unique
 	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (_q *ProxyUserGroupQuery) Order(o ...proxyusergroup.OrderOption) *ProxyUserGroupQuery {
+func (_q *ProxyGroupHistoryDetailQuery) Order(o ...proxygrouphistorydetail.OrderOption) *ProxyGroupHistoryDetailQuery {
 	_q.order = append(_q.order, o...)
 	return _q
 }
 
-// First returns the first ProxyUserGroup entity from the query.
-// Returns a *NotFoundError when no ProxyUserGroup was found.
-func (_q *ProxyUserGroupQuery) First(ctx context.Context) (*ProxyUserGroup, error) {
+// First returns the first ProxyGroupHistoryDetail entity from the query.
+// Returns a *NotFoundError when no ProxyGroupHistoryDetail was found.
+func (_q *ProxyGroupHistoryDetailQuery) First(ctx context.Context) (*ProxyGroupHistoryDetail, error) {
 	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{proxyusergroup.Label}
+		return nil, &NotFoundError{proxygrouphistorydetail.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (_q *ProxyUserGroupQuery) FirstX(ctx context.Context) *ProxyUserGroup {
+func (_q *ProxyGroupHistoryDetailQuery) FirstX(ctx context.Context) *ProxyGroupHistoryDetail {
 	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -80,22 +80,22 @@ func (_q *ProxyUserGroupQuery) FirstX(ctx context.Context) *ProxyUserGroup {
 	return node
 }
 
-// FirstID returns the first ProxyUserGroup ID from the query.
-// Returns a *NotFoundError when no ProxyUserGroup ID was found.
-func (_q *ProxyUserGroupQuery) FirstID(ctx context.Context) (id int64, err error) {
+// FirstID returns the first ProxyGroupHistoryDetail ID from the query.
+// Returns a *NotFoundError when no ProxyGroupHistoryDetail ID was found.
+func (_q *ProxyGroupHistoryDetailQuery) FirstID(ctx context.Context) (id int64, err error) {
 	var ids []int64
 	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{proxyusergroup.Label}
+		err = &NotFoundError{proxygrouphistorydetail.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (_q *ProxyUserGroupQuery) FirstIDX(ctx context.Context) int64 {
+func (_q *ProxyGroupHistoryDetailQuery) FirstIDX(ctx context.Context) int64 {
 	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -103,10 +103,10 @@ func (_q *ProxyUserGroupQuery) FirstIDX(ctx context.Context) int64 {
 	return id
 }
 
-// Only returns a single ProxyUserGroup entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one ProxyUserGroup entity is found.
-// Returns a *NotFoundError when no ProxyUserGroup entities are found.
-func (_q *ProxyUserGroupQuery) Only(ctx context.Context) (*ProxyUserGroup, error) {
+// Only returns a single ProxyGroupHistoryDetail entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one ProxyGroupHistoryDetail entity is found.
+// Returns a *NotFoundError when no ProxyGroupHistoryDetail entities are found.
+func (_q *ProxyGroupHistoryDetailQuery) Only(ctx context.Context) (*ProxyGroupHistoryDetail, error) {
 	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
@@ -115,14 +115,14 @@ func (_q *ProxyUserGroupQuery) Only(ctx context.Context) (*ProxyUserGroup, error
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{proxyusergroup.Label}
+		return nil, &NotFoundError{proxygrouphistorydetail.Label}
 	default:
-		return nil, &NotSingularError{proxyusergroup.Label}
+		return nil, &NotSingularError{proxygrouphistorydetail.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (_q *ProxyUserGroupQuery) OnlyX(ctx context.Context) *ProxyUserGroup {
+func (_q *ProxyGroupHistoryDetailQuery) OnlyX(ctx context.Context) *ProxyGroupHistoryDetail {
 	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -130,10 +130,10 @@ func (_q *ProxyUserGroupQuery) OnlyX(ctx context.Context) *ProxyUserGroup {
 	return node
 }
 
-// OnlyID is like Only, but returns the only ProxyUserGroup ID in the query.
-// Returns a *NotSingularError when more than one ProxyUserGroup ID is found.
+// OnlyID is like Only, but returns the only ProxyGroupHistoryDetail ID in the query.
+// Returns a *NotSingularError when more than one ProxyGroupHistoryDetail ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (_q *ProxyUserGroupQuery) OnlyID(ctx context.Context) (id int64, err error) {
+func (_q *ProxyGroupHistoryDetailQuery) OnlyID(ctx context.Context) (id int64, err error) {
 	var ids []int64
 	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
@@ -142,15 +142,15 @@ func (_q *ProxyUserGroupQuery) OnlyID(ctx context.Context) (id int64, err error)
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{proxyusergroup.Label}
+		err = &NotFoundError{proxygrouphistorydetail.Label}
 	default:
-		err = &NotSingularError{proxyusergroup.Label}
+		err = &NotSingularError{proxygrouphistorydetail.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (_q *ProxyUserGroupQuery) OnlyIDX(ctx context.Context) int64 {
+func (_q *ProxyGroupHistoryDetailQuery) OnlyIDX(ctx context.Context) int64 {
 	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -158,18 +158,18 @@ func (_q *ProxyUserGroupQuery) OnlyIDX(ctx context.Context) int64 {
 	return id
 }
 
-// All executes the query and returns a list of ProxyUserGroups.
-func (_q *ProxyUserGroupQuery) All(ctx context.Context) ([]*ProxyUserGroup, error) {
+// All executes the query and returns a list of ProxyGroupHistoryDetails.
+func (_q *ProxyGroupHistoryDetailQuery) All(ctx context.Context) ([]*ProxyGroupHistoryDetail, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*ProxyUserGroup, *ProxyUserGroupQuery]()
-	return withInterceptors[[]*ProxyUserGroup](ctx, _q, qr, _q.inters)
+	qr := querierAll[[]*ProxyGroupHistoryDetail, *ProxyGroupHistoryDetailQuery]()
+	return withInterceptors[[]*ProxyGroupHistoryDetail](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (_q *ProxyUserGroupQuery) AllX(ctx context.Context) []*ProxyUserGroup {
+func (_q *ProxyGroupHistoryDetailQuery) AllX(ctx context.Context) []*ProxyGroupHistoryDetail {
 	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
@@ -177,20 +177,20 @@ func (_q *ProxyUserGroupQuery) AllX(ctx context.Context) []*ProxyUserGroup {
 	return nodes
 }
 
-// IDs executes the query and returns a list of ProxyUserGroup IDs.
-func (_q *ProxyUserGroupQuery) IDs(ctx context.Context) (ids []int64, err error) {
+// IDs executes the query and returns a list of ProxyGroupHistoryDetail IDs.
+func (_q *ProxyGroupHistoryDetailQuery) IDs(ctx context.Context) (ids []int64, err error) {
 	if _q.ctx.Unique == nil && _q.path != nil {
 		_q.Unique(true)
 	}
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
-	if err = _q.Select(proxyusergroup.FieldID).Scan(ctx, &ids); err != nil {
+	if err = _q.Select(proxygrouphistorydetail.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (_q *ProxyUserGroupQuery) IDsX(ctx context.Context) []int64 {
+func (_q *ProxyGroupHistoryDetailQuery) IDsX(ctx context.Context) []int64 {
 	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -199,16 +199,16 @@ func (_q *ProxyUserGroupQuery) IDsX(ctx context.Context) []int64 {
 }
 
 // Count returns the count of the given query.
-func (_q *ProxyUserGroupQuery) Count(ctx context.Context) (int, error) {
+func (_q *ProxyGroupHistoryDetailQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
 	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, _q, querierCount[*ProxyUserGroupQuery](), _q.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*ProxyGroupHistoryDetailQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (_q *ProxyUserGroupQuery) CountX(ctx context.Context) int {
+func (_q *ProxyGroupHistoryDetailQuery) CountX(ctx context.Context) int {
 	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -217,7 +217,7 @@ func (_q *ProxyUserGroupQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (_q *ProxyUserGroupQuery) Exist(ctx context.Context) (bool, error) {
+func (_q *ProxyGroupHistoryDetailQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
 	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
@@ -230,7 +230,7 @@ func (_q *ProxyUserGroupQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (_q *ProxyUserGroupQuery) ExistX(ctx context.Context) bool {
+func (_q *ProxyGroupHistoryDetailQuery) ExistX(ctx context.Context) bool {
 	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -238,18 +238,18 @@ func (_q *ProxyUserGroupQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the ProxyUserGroupQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the ProxyGroupHistoryDetailQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (_q *ProxyUserGroupQuery) Clone() *ProxyUserGroupQuery {
+func (_q *ProxyGroupHistoryDetailQuery) Clone() *ProxyGroupHistoryDetailQuery {
 	if _q == nil {
 		return nil
 	}
-	return &ProxyUserGroupQuery{
+	return &ProxyGroupHistoryDetailQuery{
 		config:     _q.config,
 		ctx:        _q.ctx.Clone(),
-		order:      append([]proxyusergroup.OrderOption{}, _q.order...),
+		order:      append([]proxygrouphistorydetail.OrderOption{}, _q.order...),
 		inters:     append([]Interceptor{}, _q.inters...),
-		predicates: append([]predicate.ProxyUserGroup{}, _q.predicates...),
+		predicates: append([]predicate.ProxyGroupHistoryDetail{}, _q.predicates...),
 		// clone intermediate query.
 		sql:  _q.sql.Clone(),
 		path: _q.path,
@@ -262,19 +262,19 @@ func (_q *ProxyUserGroupQuery) Clone() *ProxyUserGroupQuery {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		HistoryID int64 `json:"history_id,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.ProxyUserGroup.Query().
-//		GroupBy(proxyusergroup.FieldName).
+//	client.ProxyGroupHistoryDetail.Query().
+//		GroupBy(proxygrouphistorydetail.FieldHistoryID).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (_q *ProxyUserGroupQuery) GroupBy(field string, fields ...string) *ProxyUserGroupGroupBy {
+func (_q *ProxyGroupHistoryDetailQuery) GroupBy(field string, fields ...string) *ProxyGroupHistoryDetailGroupBy {
 	_q.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &ProxyUserGroupGroupBy{build: _q}
+	grbuild := &ProxyGroupHistoryDetailGroupBy{build: _q}
 	grbuild.flds = &_q.ctx.Fields
-	grbuild.label = proxyusergroup.Label
+	grbuild.label = proxygrouphistorydetail.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -285,26 +285,26 @@ func (_q *ProxyUserGroupQuery) GroupBy(field string, fields ...string) *ProxyUse
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		HistoryID int64 `json:"history_id,omitempty"`
 //	}
 //
-//	client.ProxyUserGroup.Query().
-//		Select(proxyusergroup.FieldName).
+//	client.ProxyGroupHistoryDetail.Query().
+//		Select(proxygrouphistorydetail.FieldHistoryID).
 //		Scan(ctx, &v)
-func (_q *ProxyUserGroupQuery) Select(fields ...string) *ProxyUserGroupSelect {
+func (_q *ProxyGroupHistoryDetailQuery) Select(fields ...string) *ProxyGroupHistoryDetailSelect {
 	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
-	sbuild := &ProxyUserGroupSelect{ProxyUserGroupQuery: _q}
-	sbuild.label = proxyusergroup.Label
+	sbuild := &ProxyGroupHistoryDetailSelect{ProxyGroupHistoryDetailQuery: _q}
+	sbuild.label = proxygrouphistorydetail.Label
 	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a ProxyUserGroupSelect configured with the given aggregations.
-func (_q *ProxyUserGroupQuery) Aggregate(fns ...AggregateFunc) *ProxyUserGroupSelect {
+// Aggregate returns a ProxyGroupHistoryDetailSelect configured with the given aggregations.
+func (_q *ProxyGroupHistoryDetailQuery) Aggregate(fns ...AggregateFunc) *ProxyGroupHistoryDetailSelect {
 	return _q.Select().Aggregate(fns...)
 }
 
-func (_q *ProxyUserGroupQuery) prepareQuery(ctx context.Context) error {
+func (_q *ProxyGroupHistoryDetailQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -316,7 +316,7 @@ func (_q *ProxyUserGroupQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range _q.ctx.Fields {
-		if !proxyusergroup.ValidColumn(f) {
+		if !proxygrouphistorydetail.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -330,16 +330,16 @@ func (_q *ProxyUserGroupQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (_q *ProxyUserGroupQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*ProxyUserGroup, error) {
+func (_q *ProxyGroupHistoryDetailQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*ProxyGroupHistoryDetail, error) {
 	var (
-		nodes = []*ProxyUserGroup{}
+		nodes = []*ProxyGroupHistoryDetail{}
 		_spec = _q.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*ProxyUserGroup).scanValues(nil, columns)
+		return (*ProxyGroupHistoryDetail).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &ProxyUserGroup{config: _q.config}
+		node := &ProxyGroupHistoryDetail{config: _q.config}
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
@@ -355,7 +355,7 @@ func (_q *ProxyUserGroupQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 	return nodes, nil
 }
 
-func (_q *ProxyUserGroupQuery) sqlCount(ctx context.Context) (int, error) {
+func (_q *ProxyGroupHistoryDetailQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := _q.querySpec()
 	_spec.Node.Columns = _q.ctx.Fields
 	if len(_q.ctx.Fields) > 0 {
@@ -364,8 +364,8 @@ func (_q *ProxyUserGroupQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (_q *ProxyUserGroupQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(proxyusergroup.Table, proxyusergroup.Columns, sqlgraph.NewFieldSpec(proxyusergroup.FieldID, field.TypeInt64))
+func (_q *ProxyGroupHistoryDetailQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(proxygrouphistorydetail.Table, proxygrouphistorydetail.Columns, sqlgraph.NewFieldSpec(proxygrouphistorydetail.FieldID, field.TypeInt64))
 	_spec.From = _q.sql
 	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -374,9 +374,9 @@ func (_q *ProxyUserGroupQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, proxyusergroup.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, proxygrouphistorydetail.FieldID)
 		for i := range fields {
-			if fields[i] != proxyusergroup.FieldID {
+			if fields[i] != proxygrouphistorydetail.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
@@ -404,12 +404,12 @@ func (_q *ProxyUserGroupQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (_q *ProxyUserGroupQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (_q *ProxyGroupHistoryDetailQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(_q.driver.Dialect())
-	t1 := builder.Table(proxyusergroup.Table)
+	t1 := builder.Table(proxygrouphistorydetail.Table)
 	columns := _q.ctx.Fields
 	if len(columns) == 0 {
-		columns = proxyusergroup.Columns
+		columns = proxygrouphistorydetail.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if _q.sql != nil {
@@ -436,28 +436,28 @@ func (_q *ProxyUserGroupQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// ProxyUserGroupGroupBy is the group-by builder for ProxyUserGroup entities.
-type ProxyUserGroupGroupBy struct {
+// ProxyGroupHistoryDetailGroupBy is the group-by builder for ProxyGroupHistoryDetail entities.
+type ProxyGroupHistoryDetailGroupBy struct {
 	selector
-	build *ProxyUserGroupQuery
+	build *ProxyGroupHistoryDetailQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (_g *ProxyUserGroupGroupBy) Aggregate(fns ...AggregateFunc) *ProxyUserGroupGroupBy {
+func (_g *ProxyGroupHistoryDetailGroupBy) Aggregate(fns ...AggregateFunc) *ProxyGroupHistoryDetailGroupBy {
 	_g.fns = append(_g.fns, fns...)
 	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_g *ProxyUserGroupGroupBy) Scan(ctx context.Context, v any) error {
+func (_g *ProxyGroupHistoryDetailGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
 	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*ProxyUserGroupQuery, *ProxyUserGroupGroupBy](ctx, _g.build, _g, _g.build.inters, v)
+	return scanWithInterceptors[*ProxyGroupHistoryDetailQuery, *ProxyGroupHistoryDetailGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (_g *ProxyUserGroupGroupBy) sqlScan(ctx context.Context, root *ProxyUserGroupQuery, v any) error {
+func (_g *ProxyGroupHistoryDetailGroupBy) sqlScan(ctx context.Context, root *ProxyGroupHistoryDetailQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(_g.fns))
 	for _, fn := range _g.fns {
@@ -484,28 +484,28 @@ func (_g *ProxyUserGroupGroupBy) sqlScan(ctx context.Context, root *ProxyUserGro
 	return sql.ScanSlice(rows, v)
 }
 
-// ProxyUserGroupSelect is the builder for selecting fields of ProxyUserGroup entities.
-type ProxyUserGroupSelect struct {
-	*ProxyUserGroupQuery
+// ProxyGroupHistoryDetailSelect is the builder for selecting fields of ProxyGroupHistoryDetail entities.
+type ProxyGroupHistoryDetailSelect struct {
+	*ProxyGroupHistoryDetailQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (_s *ProxyUserGroupSelect) Aggregate(fns ...AggregateFunc) *ProxyUserGroupSelect {
+func (_s *ProxyGroupHistoryDetailSelect) Aggregate(fns ...AggregateFunc) *ProxyGroupHistoryDetailSelect {
 	_s.fns = append(_s.fns, fns...)
 	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (_s *ProxyUserGroupSelect) Scan(ctx context.Context, v any) error {
+func (_s *ProxyGroupHistoryDetailSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
 	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*ProxyUserGroupQuery, *ProxyUserGroupSelect](ctx, _s.ProxyUserGroupQuery, _s, _s.inters, v)
+	return scanWithInterceptors[*ProxyGroupHistoryDetailQuery, *ProxyGroupHistoryDetailSelect](ctx, _s.ProxyGroupHistoryDetailQuery, _s, _s.inters, v)
 }
 
-func (_s *ProxyUserGroupSelect) sqlScan(ctx context.Context, root *ProxyUserGroupQuery, v any) error {
+func (_s *ProxyGroupHistoryDetailSelect) sqlScan(ctx context.Context, root *ProxyGroupHistoryDetailQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(_s.fns))
 	for _, fn := range _s.fns {

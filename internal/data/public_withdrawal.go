@@ -2,10 +2,12 @@ package data
 
 import (
 	"context"
+	"time"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserwithdrawal"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/public/withdrawal"
+	systemlog "github.com/OmnTeam/ppanel-pro/internal/model/log"
 	"github.com/go-kratos/kratos/v2/log"
 )
 
@@ -33,6 +35,47 @@ func (r *withdrawalRepo) CreateWithdrawal(ctx context.Context, userID int64, amo
 		SetReason("").
 		Save(ctx)
 	return err
+}
+
+func (r *withdrawalRepo) ProcessCommissionWithdraw(ctx context.Context, userID int64, amount int64, content string, commission int64) error {
+	return r.data.db.TX(ctx, func(tx *ent.Tx) error {
+		if err := tx.ProxyUser.UpdateOneID(userID).
+			SetCommission(commission).
+			Exec(ctx); err != nil {
+			return err
+		}
+
+		payload, err := (&systemlog.Commission{
+			Type:      systemlog.CommissionTypeConvertBalance,
+			Amount:    amount,
+			Timestamp: time.Now().UnixMilli(),
+		}).Marshal()
+		if err != nil {
+			return err
+		}
+
+		if _, err := tx.ProxySystemLog.Create().
+			SetType(int8(systemlog.TypeCommission)).
+			SetDate(time.Now().Format("2006-01-02")).
+			SetObjectID(userID).
+			SetContent(string(payload)).
+			SetCreatedAt(time.Now()).
+			Save(ctx); err != nil {
+			return err
+		}
+
+		if _, err := tx.ProxyUserWithdrawal.Create().
+			SetUserID(userID).
+			SetAmount(amount).
+			SetContent(content).
+			SetStatus(0).
+			SetReason("").
+			Save(ctx); err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 // GetWithdrawalByID 根据ID获取提现记录

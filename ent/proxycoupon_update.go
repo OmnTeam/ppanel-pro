@@ -28,47 +28,6 @@ func (_u *ProxyCouponUpdate) Where(ps ...predicate.ProxyCoupon) *ProxyCouponUpda
 	return _u
 }
 
-// SetUserLimit sets the "user_limit" field.
-func (_u *ProxyCouponUpdate) SetUserLimit(v int64) *ProxyCouponUpdate {
-	_u.mutation.ResetUserLimit()
-	_u.mutation.SetUserLimit(v)
-	return _u
-}
-
-// SetNillableUserLimit sets the "user_limit" field if the given value is not nil.
-func (_u *ProxyCouponUpdate) SetNillableUserLimit(v *int64) *ProxyCouponUpdate {
-	if v != nil {
-		_u.SetUserLimit(*v)
-	}
-	return _u
-}
-
-// AddUserLimit adds value to the "user_limit" field.
-func (_u *ProxyCouponUpdate) AddUserLimit(v int64) *ProxyCouponUpdate {
-	_u.mutation.AddUserLimit(v)
-	return _u
-}
-
-// SetSubscribe sets the "subscribe" field.
-func (_u *ProxyCouponUpdate) SetSubscribe(v string) *ProxyCouponUpdate {
-	_u.mutation.SetSubscribe(v)
-	return _u
-}
-
-// SetNillableSubscribe sets the "subscribe" field if the given value is not nil.
-func (_u *ProxyCouponUpdate) SetNillableSubscribe(v *string) *ProxyCouponUpdate {
-	if v != nil {
-		_u.SetSubscribe(*v)
-	}
-	return _u
-}
-
-// ClearSubscribe clears the value of the "subscribe" field.
-func (_u *ProxyCouponUpdate) ClearSubscribe() *ProxyCouponUpdate {
-	_u.mutation.ClearSubscribe()
-	return _u
-}
-
 // SetName sets the "name" field.
 func (_u *ProxyCouponUpdate) SetName(v string) *ProxyCouponUpdate {
 	_u.mutation.SetName(v)
@@ -161,51 +120,114 @@ func (_u *ProxyCouponUpdate) AddDiscount(v int64) *ProxyCouponUpdate {
 }
 
 // SetStartTime sets the "start_time" field.
-func (_u *ProxyCouponUpdate) SetStartTime(v time.Time) *ProxyCouponUpdate {
+func (_u *ProxyCouponUpdate) SetStartTime(v int64) *ProxyCouponUpdate {
+	_u.mutation.ResetStartTime()
 	_u.mutation.SetStartTime(v)
 	return _u
 }
 
 // SetNillableStartTime sets the "start_time" field if the given value is not nil.
-func (_u *ProxyCouponUpdate) SetNillableStartTime(v *time.Time) *ProxyCouponUpdate {
+func (_u *ProxyCouponUpdate) SetNillableStartTime(v *int64) *ProxyCouponUpdate {
 	if v != nil {
 		_u.SetStartTime(*v)
 	}
 	return _u
 }
 
-// SetEndTime sets the "end_time" field.
-func (_u *ProxyCouponUpdate) SetEndTime(v time.Time) *ProxyCouponUpdate {
-	_u.mutation.SetEndTime(v)
+// AddStartTime adds value to the "start_time" field.
+func (_u *ProxyCouponUpdate) AddStartTime(v int64) *ProxyCouponUpdate {
+	_u.mutation.AddStartTime(v)
 	return _u
 }
 
-// SetNillableEndTime sets the "end_time" field if the given value is not nil.
-func (_u *ProxyCouponUpdate) SetNillableEndTime(v *time.Time) *ProxyCouponUpdate {
+// SetExpireTime sets the "expire_time" field.
+func (_u *ProxyCouponUpdate) SetExpireTime(v int64) *ProxyCouponUpdate {
+	_u.mutation.ResetExpireTime()
+	_u.mutation.SetExpireTime(v)
+	return _u
+}
+
+// SetNillableExpireTime sets the "expire_time" field if the given value is not nil.
+func (_u *ProxyCouponUpdate) SetNillableExpireTime(v *int64) *ProxyCouponUpdate {
 	if v != nil {
-		_u.SetEndTime(*v)
+		_u.SetExpireTime(*v)
 	}
 	return _u
 }
 
-// SetStatus sets the "status" field.
-func (_u *ProxyCouponUpdate) SetStatus(v int8) *ProxyCouponUpdate {
-	_u.mutation.ResetStatus()
-	_u.mutation.SetStatus(v)
+// AddExpireTime adds value to the "expire_time" field.
+func (_u *ProxyCouponUpdate) AddExpireTime(v int64) *ProxyCouponUpdate {
+	_u.mutation.AddExpireTime(v)
 	return _u
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (_u *ProxyCouponUpdate) SetNillableStatus(v *int8) *ProxyCouponUpdate {
+// SetUserLimit sets the "user_limit" field.
+func (_u *ProxyCouponUpdate) SetUserLimit(v int64) *ProxyCouponUpdate {
+	_u.mutation.ResetUserLimit()
+	_u.mutation.SetUserLimit(v)
+	return _u
+}
+
+// SetNillableUserLimit sets the "user_limit" field if the given value is not nil.
+func (_u *ProxyCouponUpdate) SetNillableUserLimit(v *int64) *ProxyCouponUpdate {
 	if v != nil {
-		_u.SetStatus(*v)
+		_u.SetUserLimit(*v)
 	}
 	return _u
 }
 
-// AddStatus adds value to the "status" field.
-func (_u *ProxyCouponUpdate) AddStatus(v int8) *ProxyCouponUpdate {
-	_u.mutation.AddStatus(v)
+// AddUserLimit adds value to the "user_limit" field.
+func (_u *ProxyCouponUpdate) AddUserLimit(v int64) *ProxyCouponUpdate {
+	_u.mutation.AddUserLimit(v)
+	return _u
+}
+
+// SetSubscribe sets the "subscribe" field.
+func (_u *ProxyCouponUpdate) SetSubscribe(v string) *ProxyCouponUpdate {
+	_u.mutation.SetSubscribe(v)
+	return _u
+}
+
+// SetNillableSubscribe sets the "subscribe" field if the given value is not nil.
+func (_u *ProxyCouponUpdate) SetNillableSubscribe(v *string) *ProxyCouponUpdate {
+	if v != nil {
+		_u.SetSubscribe(*v)
+	}
+	return _u
+}
+
+// SetUsedCount sets the "used_count" field.
+func (_u *ProxyCouponUpdate) SetUsedCount(v int64) *ProxyCouponUpdate {
+	_u.mutation.ResetUsedCount()
+	_u.mutation.SetUsedCount(v)
+	return _u
+}
+
+// SetNillableUsedCount sets the "used_count" field if the given value is not nil.
+func (_u *ProxyCouponUpdate) SetNillableUsedCount(v *int64) *ProxyCouponUpdate {
+	if v != nil {
+		_u.SetUsedCount(*v)
+	}
+	return _u
+}
+
+// AddUsedCount adds value to the "used_count" field.
+func (_u *ProxyCouponUpdate) AddUsedCount(v int64) *ProxyCouponUpdate {
+	_u.mutation.AddUsedCount(v)
+	return _u
+}
+
+// SetEnable sets the "enable" field.
+func (_u *ProxyCouponUpdate) SetEnable(v bool) *ProxyCouponUpdate {
+	_u.mutation.SetEnable(v)
+	return _u
+}
+
+// SetNillableEnable sets the "enable" field if the given value is not nil.
+func (_u *ProxyCouponUpdate) SetNillableEnable(v *bool) *ProxyCouponUpdate {
+	if v != nil {
+		_u.SetEnable(*v)
+	}
 	return _u
 }
 
@@ -268,6 +290,11 @@ func (_u *ProxyCouponUpdate) check() error {
 			return &ValidationError{Name: "code", err: fmt.Errorf(`ent: validator failed for field "ProxyCoupon.code": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Subscribe(); ok {
+		if err := proxycoupon.SubscribeValidator(v); err != nil {
+			return &ValidationError{Name: "subscribe", err: fmt.Errorf(`ent: validator failed for field "ProxyCoupon.subscribe": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -282,18 +309,6 @@ func (_u *ProxyCouponUpdate) sqlSave(ctx context.Context) (_node int, err error)
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := _u.mutation.UserLimit(); ok {
-		_spec.SetField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedUserLimit(); ok {
-		_spec.AddField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.Subscribe(); ok {
-		_spec.SetField(proxycoupon.FieldSubscribe, field.TypeString, value)
-	}
-	if _u.mutation.SubscribeCleared() {
-		_spec.ClearField(proxycoupon.FieldSubscribe, field.TypeString)
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxycoupon.FieldName, field.TypeString, value)
@@ -320,16 +335,34 @@ func (_u *ProxyCouponUpdate) sqlSave(ctx context.Context) (_node int, err error)
 		_spec.AddField(proxycoupon.FieldDiscount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.StartTime(); ok {
-		_spec.SetField(proxycoupon.FieldStartTime, field.TypeTime, value)
+		_spec.SetField(proxycoupon.FieldStartTime, field.TypeInt64, value)
 	}
-	if value, ok := _u.mutation.EndTime(); ok {
-		_spec.SetField(proxycoupon.FieldEndTime, field.TypeTime, value)
+	if value, ok := _u.mutation.AddedStartTime(); ok {
+		_spec.AddField(proxycoupon.FieldStartTime, field.TypeInt64, value)
 	}
-	if value, ok := _u.mutation.Status(); ok {
-		_spec.SetField(proxycoupon.FieldStatus, field.TypeInt8, value)
+	if value, ok := _u.mutation.ExpireTime(); ok {
+		_spec.SetField(proxycoupon.FieldExpireTime, field.TypeInt64, value)
 	}
-	if value, ok := _u.mutation.AddedStatus(); ok {
-		_spec.AddField(proxycoupon.FieldStatus, field.TypeInt8, value)
+	if value, ok := _u.mutation.AddedExpireTime(); ok {
+		_spec.AddField(proxycoupon.FieldExpireTime, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.UserLimit(); ok {
+		_spec.SetField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedUserLimit(); ok {
+		_spec.AddField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.Subscribe(); ok {
+		_spec.SetField(proxycoupon.FieldSubscribe, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.UsedCount(); ok {
+		_spec.SetField(proxycoupon.FieldUsedCount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedUsedCount(); ok {
+		_spec.AddField(proxycoupon.FieldUsedCount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.Enable(); ok {
+		_spec.SetField(proxycoupon.FieldEnable, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxycoupon.FieldUpdatedAt, field.TypeTime, value)
@@ -352,47 +385,6 @@ type ProxyCouponUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ProxyCouponMutation
-}
-
-// SetUserLimit sets the "user_limit" field.
-func (_u *ProxyCouponUpdateOne) SetUserLimit(v int64) *ProxyCouponUpdateOne {
-	_u.mutation.ResetUserLimit()
-	_u.mutation.SetUserLimit(v)
-	return _u
-}
-
-// SetNillableUserLimit sets the "user_limit" field if the given value is not nil.
-func (_u *ProxyCouponUpdateOne) SetNillableUserLimit(v *int64) *ProxyCouponUpdateOne {
-	if v != nil {
-		_u.SetUserLimit(*v)
-	}
-	return _u
-}
-
-// AddUserLimit adds value to the "user_limit" field.
-func (_u *ProxyCouponUpdateOne) AddUserLimit(v int64) *ProxyCouponUpdateOne {
-	_u.mutation.AddUserLimit(v)
-	return _u
-}
-
-// SetSubscribe sets the "subscribe" field.
-func (_u *ProxyCouponUpdateOne) SetSubscribe(v string) *ProxyCouponUpdateOne {
-	_u.mutation.SetSubscribe(v)
-	return _u
-}
-
-// SetNillableSubscribe sets the "subscribe" field if the given value is not nil.
-func (_u *ProxyCouponUpdateOne) SetNillableSubscribe(v *string) *ProxyCouponUpdateOne {
-	if v != nil {
-		_u.SetSubscribe(*v)
-	}
-	return _u
-}
-
-// ClearSubscribe clears the value of the "subscribe" field.
-func (_u *ProxyCouponUpdateOne) ClearSubscribe() *ProxyCouponUpdateOne {
-	_u.mutation.ClearSubscribe()
-	return _u
 }
 
 // SetName sets the "name" field.
@@ -487,51 +479,114 @@ func (_u *ProxyCouponUpdateOne) AddDiscount(v int64) *ProxyCouponUpdateOne {
 }
 
 // SetStartTime sets the "start_time" field.
-func (_u *ProxyCouponUpdateOne) SetStartTime(v time.Time) *ProxyCouponUpdateOne {
+func (_u *ProxyCouponUpdateOne) SetStartTime(v int64) *ProxyCouponUpdateOne {
+	_u.mutation.ResetStartTime()
 	_u.mutation.SetStartTime(v)
 	return _u
 }
 
 // SetNillableStartTime sets the "start_time" field if the given value is not nil.
-func (_u *ProxyCouponUpdateOne) SetNillableStartTime(v *time.Time) *ProxyCouponUpdateOne {
+func (_u *ProxyCouponUpdateOne) SetNillableStartTime(v *int64) *ProxyCouponUpdateOne {
 	if v != nil {
 		_u.SetStartTime(*v)
 	}
 	return _u
 }
 
-// SetEndTime sets the "end_time" field.
-func (_u *ProxyCouponUpdateOne) SetEndTime(v time.Time) *ProxyCouponUpdateOne {
-	_u.mutation.SetEndTime(v)
+// AddStartTime adds value to the "start_time" field.
+func (_u *ProxyCouponUpdateOne) AddStartTime(v int64) *ProxyCouponUpdateOne {
+	_u.mutation.AddStartTime(v)
 	return _u
 }
 
-// SetNillableEndTime sets the "end_time" field if the given value is not nil.
-func (_u *ProxyCouponUpdateOne) SetNillableEndTime(v *time.Time) *ProxyCouponUpdateOne {
+// SetExpireTime sets the "expire_time" field.
+func (_u *ProxyCouponUpdateOne) SetExpireTime(v int64) *ProxyCouponUpdateOne {
+	_u.mutation.ResetExpireTime()
+	_u.mutation.SetExpireTime(v)
+	return _u
+}
+
+// SetNillableExpireTime sets the "expire_time" field if the given value is not nil.
+func (_u *ProxyCouponUpdateOne) SetNillableExpireTime(v *int64) *ProxyCouponUpdateOne {
 	if v != nil {
-		_u.SetEndTime(*v)
+		_u.SetExpireTime(*v)
 	}
 	return _u
 }
 
-// SetStatus sets the "status" field.
-func (_u *ProxyCouponUpdateOne) SetStatus(v int8) *ProxyCouponUpdateOne {
-	_u.mutation.ResetStatus()
-	_u.mutation.SetStatus(v)
+// AddExpireTime adds value to the "expire_time" field.
+func (_u *ProxyCouponUpdateOne) AddExpireTime(v int64) *ProxyCouponUpdateOne {
+	_u.mutation.AddExpireTime(v)
 	return _u
 }
 
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (_u *ProxyCouponUpdateOne) SetNillableStatus(v *int8) *ProxyCouponUpdateOne {
+// SetUserLimit sets the "user_limit" field.
+func (_u *ProxyCouponUpdateOne) SetUserLimit(v int64) *ProxyCouponUpdateOne {
+	_u.mutation.ResetUserLimit()
+	_u.mutation.SetUserLimit(v)
+	return _u
+}
+
+// SetNillableUserLimit sets the "user_limit" field if the given value is not nil.
+func (_u *ProxyCouponUpdateOne) SetNillableUserLimit(v *int64) *ProxyCouponUpdateOne {
 	if v != nil {
-		_u.SetStatus(*v)
+		_u.SetUserLimit(*v)
 	}
 	return _u
 }
 
-// AddStatus adds value to the "status" field.
-func (_u *ProxyCouponUpdateOne) AddStatus(v int8) *ProxyCouponUpdateOne {
-	_u.mutation.AddStatus(v)
+// AddUserLimit adds value to the "user_limit" field.
+func (_u *ProxyCouponUpdateOne) AddUserLimit(v int64) *ProxyCouponUpdateOne {
+	_u.mutation.AddUserLimit(v)
+	return _u
+}
+
+// SetSubscribe sets the "subscribe" field.
+func (_u *ProxyCouponUpdateOne) SetSubscribe(v string) *ProxyCouponUpdateOne {
+	_u.mutation.SetSubscribe(v)
+	return _u
+}
+
+// SetNillableSubscribe sets the "subscribe" field if the given value is not nil.
+func (_u *ProxyCouponUpdateOne) SetNillableSubscribe(v *string) *ProxyCouponUpdateOne {
+	if v != nil {
+		_u.SetSubscribe(*v)
+	}
+	return _u
+}
+
+// SetUsedCount sets the "used_count" field.
+func (_u *ProxyCouponUpdateOne) SetUsedCount(v int64) *ProxyCouponUpdateOne {
+	_u.mutation.ResetUsedCount()
+	_u.mutation.SetUsedCount(v)
+	return _u
+}
+
+// SetNillableUsedCount sets the "used_count" field if the given value is not nil.
+func (_u *ProxyCouponUpdateOne) SetNillableUsedCount(v *int64) *ProxyCouponUpdateOne {
+	if v != nil {
+		_u.SetUsedCount(*v)
+	}
+	return _u
+}
+
+// AddUsedCount adds value to the "used_count" field.
+func (_u *ProxyCouponUpdateOne) AddUsedCount(v int64) *ProxyCouponUpdateOne {
+	_u.mutation.AddUsedCount(v)
+	return _u
+}
+
+// SetEnable sets the "enable" field.
+func (_u *ProxyCouponUpdateOne) SetEnable(v bool) *ProxyCouponUpdateOne {
+	_u.mutation.SetEnable(v)
+	return _u
+}
+
+// SetNillableEnable sets the "enable" field if the given value is not nil.
+func (_u *ProxyCouponUpdateOne) SetNillableEnable(v *bool) *ProxyCouponUpdateOne {
+	if v != nil {
+		_u.SetEnable(*v)
+	}
 	return _u
 }
 
@@ -607,6 +662,11 @@ func (_u *ProxyCouponUpdateOne) check() error {
 			return &ValidationError{Name: "code", err: fmt.Errorf(`ent: validator failed for field "ProxyCoupon.code": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.Subscribe(); ok {
+		if err := proxycoupon.SubscribeValidator(v); err != nil {
+			return &ValidationError{Name: "subscribe", err: fmt.Errorf(`ent: validator failed for field "ProxyCoupon.subscribe": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -639,18 +699,6 @@ func (_u *ProxyCouponUpdateOne) sqlSave(ctx context.Context) (_node *ProxyCoupon
 			}
 		}
 	}
-	if value, ok := _u.mutation.UserLimit(); ok {
-		_spec.SetField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.AddedUserLimit(); ok {
-		_spec.AddField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
-	}
-	if value, ok := _u.mutation.Subscribe(); ok {
-		_spec.SetField(proxycoupon.FieldSubscribe, field.TypeString, value)
-	}
-	if _u.mutation.SubscribeCleared() {
-		_spec.ClearField(proxycoupon.FieldSubscribe, field.TypeString)
-	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxycoupon.FieldName, field.TypeString, value)
 	}
@@ -676,16 +724,34 @@ func (_u *ProxyCouponUpdateOne) sqlSave(ctx context.Context) (_node *ProxyCoupon
 		_spec.AddField(proxycoupon.FieldDiscount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.StartTime(); ok {
-		_spec.SetField(proxycoupon.FieldStartTime, field.TypeTime, value)
+		_spec.SetField(proxycoupon.FieldStartTime, field.TypeInt64, value)
 	}
-	if value, ok := _u.mutation.EndTime(); ok {
-		_spec.SetField(proxycoupon.FieldEndTime, field.TypeTime, value)
+	if value, ok := _u.mutation.AddedStartTime(); ok {
+		_spec.AddField(proxycoupon.FieldStartTime, field.TypeInt64, value)
 	}
-	if value, ok := _u.mutation.Status(); ok {
-		_spec.SetField(proxycoupon.FieldStatus, field.TypeInt8, value)
+	if value, ok := _u.mutation.ExpireTime(); ok {
+		_spec.SetField(proxycoupon.FieldExpireTime, field.TypeInt64, value)
 	}
-	if value, ok := _u.mutation.AddedStatus(); ok {
-		_spec.AddField(proxycoupon.FieldStatus, field.TypeInt8, value)
+	if value, ok := _u.mutation.AddedExpireTime(); ok {
+		_spec.AddField(proxycoupon.FieldExpireTime, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.UserLimit(); ok {
+		_spec.SetField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedUserLimit(); ok {
+		_spec.AddField(proxycoupon.FieldUserLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.Subscribe(); ok {
+		_spec.SetField(proxycoupon.FieldSubscribe, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.UsedCount(); ok {
+		_spec.SetField(proxycoupon.FieldUsedCount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedUsedCount(); ok {
+		_spec.AddField(proxycoupon.FieldUsedCount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.Enable(); ok {
+		_spec.SetField(proxycoupon.FieldEnable, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxycoupon.FieldUpdatedAt, field.TypeTime, value)

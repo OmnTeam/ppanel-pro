@@ -18,8 +18,6 @@ type ProxyServer struct {
 	// ID of the ent.
 	// 服务器ID
 	ID int64 `json:"id,omitempty"`
-	// 租户ID
-	TenantID int64 `json:"tenant_id,omitempty"`
 	// 服务器名称
 	Name string `json:"name,omitempty"`
 	// 国家
@@ -34,6 +32,14 @@ type ProxyServer struct {
 	Protocol string `json:"protocol,omitempty"`
 	// 最后报告时间
 	LastReportedAt *time.Time `json:"last_reported_at,omitempty"`
+	// 经度
+	Longitude string `json:"longitude,omitempty"`
+	// 纬度
+	Latitude string `json:"latitude,omitempty"`
+	// 中心经度
+	LongitudeCenter string `json:"longitude_center,omitempty"`
+	// 中心纬度
+	LatitudeCenter string `json:"latitude_center,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -46,9 +52,9 @@ func (*ProxyServer) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case proxyserver.FieldID, proxyserver.FieldTenantID, proxyserver.FieldSort:
+		case proxyserver.FieldID, proxyserver.FieldSort:
 			values[i] = new(sql.NullInt64)
-		case proxyserver.FieldName, proxyserver.FieldCountry, proxyserver.FieldCity, proxyserver.FieldServerAddr, proxyserver.FieldProtocol:
+		case proxyserver.FieldName, proxyserver.FieldCountry, proxyserver.FieldCity, proxyserver.FieldServerAddr, proxyserver.FieldProtocol, proxyserver.FieldLongitude, proxyserver.FieldLatitude, proxyserver.FieldLongitudeCenter, proxyserver.FieldLatitudeCenter:
 			values[i] = new(sql.NullString)
 		case proxyserver.FieldLastReportedAt, proxyserver.FieldCreatedAt, proxyserver.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -73,12 +79,6 @@ func (_m *ProxyServer) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			_m.ID = int64(value.Int64)
-		case proxyserver.FieldTenantID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field tenant_id", values[i])
-			} else if value.Valid {
-				_m.TenantID = value.Int64
-			}
 		case proxyserver.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -121,6 +121,30 @@ func (_m *ProxyServer) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.LastReportedAt = new(time.Time)
 				*_m.LastReportedAt = value.Time
+			}
+		case proxyserver.FieldLongitude:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field longitude", values[i])
+			} else if value.Valid {
+				_m.Longitude = value.String
+			}
+		case proxyserver.FieldLatitude:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field latitude", values[i])
+			} else if value.Valid {
+				_m.Latitude = value.String
+			}
+		case proxyserver.FieldLongitudeCenter:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field longitude_center", values[i])
+			} else if value.Valid {
+				_m.LongitudeCenter = value.String
+			}
+		case proxyserver.FieldLatitudeCenter:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field latitude_center", values[i])
+			} else if value.Valid {
+				_m.LatitudeCenter = value.String
 			}
 		case proxyserver.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -170,9 +194,6 @@ func (_m *ProxyServer) String() string {
 	var builder strings.Builder
 	builder.WriteString("ProxyServer(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
-	builder.WriteString("tenant_id=")
-	builder.WriteString(fmt.Sprintf("%v", _m.TenantID))
-	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
@@ -195,6 +216,18 @@ func (_m *ProxyServer) String() string {
 		builder.WriteString("last_reported_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
+	builder.WriteString(", ")
+	builder.WriteString("longitude=")
+	builder.WriteString(_m.Longitude)
+	builder.WriteString(", ")
+	builder.WriteString("latitude=")
+	builder.WriteString(_m.Latitude)
+	builder.WriteString(", ")
+	builder.WriteString("longitude_center=")
+	builder.WriteString(_m.LongitudeCenter)
+	builder.WriteString(", ")
+	builder.WriteString("latitude_center=")
+	builder.WriteString(_m.LatitudeCenter)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))

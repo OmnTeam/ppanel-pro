@@ -142,12 +142,12 @@ func (r *subscribeRepo) GetSubscribeList(ctx context.Context, req *model.Subscri
 // CheckSubscribeInUse check if subscribe is being used by active user subscriptions
 func (r *subscribeRepo) CheckSubscribeInUse(ctx context.Context, subscribeID int) (bool, error) {
 	// Query user_subscribe table to check if there are active subscriptions
-	// Note: This assumes user_subscribe table exists and has tenant_id, subscribe_id, and status fields
+	// Note: This assumes user_subscribe table exists and has subscribe_id and status fields
 	// Status 1 means active subscription
 	// This is a simplified implementation - actual implementation should query the user service
 
 	// For now, return false as we don't have the user_subscribe table schema
-	// In production, you would query: SELECT COUNT(*) FROM user_subscribe WHERE tenant_id=? AND subscribe_id=? AND status=1
+	// In production, you would query: SELECT COUNT(*) FROM user_subscribe WHERE subscribe_id=? AND status=1
 	return false, nil
 }
 

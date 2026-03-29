@@ -92,10 +92,10 @@ type ServerRepo interface {
 	FilterServerList(ctx context.Context, page, size int32, search string) (int64, []*Server, error)
 	GetServerProtocols(ctx context.Context, id int) ([]*server.Protocol, error)
 	ResetServerSort(ctx context.Context, sortItems []*SortItem) error
-	// Redis cache methods with tenant isolation
+	// Redis cache methods
 	GetServerStatus(ctx context.Context, serverID int) (*ServerResourceStatus, error)
 	GetOnlineUsers(ctx context.Context, serverID int64, protocol string) (map[int64][]string, error)
-	// Subscribe methods with tenant isolation
+	// Subscribe methods
 	GetUserSubscribeInfo(ctx context.Context, subscribeID int) (*UserSubscribeInfo, error)
 }
 
@@ -381,7 +381,7 @@ func (uc *ServerUsecase) buildServerStatus(ctx context.Context, srv *Server) *Se
 		Status:   uc.getServerStatusString(int(srv.LastReportedAt)),
 	}
 
-	// Get server resource status from Redis with tenant isolation
+	// Get server resource status from Redis
 	resourceStatus, err := uc.repo.GetServerStatus(ctx, int(srv.ID))
 	if err != nil {
 		uc.log.Warnf("Failed to get server status from cache for server %d: %v", srv.ID, err)
@@ -391,7 +391,7 @@ func (uc *ServerUsecase) buildServerStatus(ctx context.Context, srv *Server) *Se
 		status.Disk = resourceStatus.Disk
 	}
 
-	// Get online users with tenant isolation
+	// Get online users
 	status.Online = uc.getOnlineUsers(ctx, srv.ID, srv.Protocols)
 
 	return status
@@ -416,7 +416,7 @@ func (uc *ServerUsecase) getServerStatusString(lastReportedAt int) string {
 	return "online"
 }
 
-// getOnlineUsers gets online users for a server with tenant isolation
+// getOnlineUsers gets online users for a server
 func (uc *ServerUsecase) getOnlineUsers(ctx context.Context, serverID int64, protocols []*server.Protocol) []*ServerOnlineUser {
 	result := make([]*ServerOnlineUser, 0)
 
@@ -446,12 +446,12 @@ func (uc *ServerUsecase) getOnlineUsers(ctx context.Context, serverID int64, pro
 		}
 	}
 
-	// Merge same subscribe and fetch subscribe info with tenant isolation
+	// Merge same subscribe and fetch subscribe info
 	mergedResult := uc.mergeOnlineUsers(ctx, result)
 	return mergedResult
 }
 
-// mergeOnlineUsers merges online users with same subscribe ID and fetches subscribe info with tenant isolation
+// mergeOnlineUsers merges online users with same subscribe ID and fetches subscribe info
 func (uc *ServerUsecase) mergeOnlineUsers(ctx context.Context, users []*ServerOnlineUser) []*ServerOnlineUser {
 	mergedMap := make(map[int64]*ServerOnlineUser)
 
@@ -462,7 +462,7 @@ func (uc *ServerUsecase) mergeOnlineUsers(ctx context.Context, users []*ServerOn
 			existing.IP = append(existing.IP, user.IP...)
 			mergedMap[user.SubscribeID] = existing
 		} else {
-			// Fetch subscribe info with tenant isolation
+			// Fetch subscribe info
 			subscribeInfo, err := uc.repo.GetUserSubscribeInfo(ctx, int(user.SubscribeID))
 			if err != nil {
 				uc.log.Warnf("Failed to get subscribe info for subscribe %d: %v", user.SubscribeID, err)

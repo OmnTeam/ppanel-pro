@@ -59,11 +59,6 @@ func UserID(v int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldEQ(FieldUserID, v))
 }
 
-// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
-func TenantID(v int64) predicate.ProxyUserAuthMethod {
-	return predicate.ProxyUserAuthMethod(sql.FieldEQ(FieldTenantID, v))
-}
-
 // AuthType applies equality check predicate on the "auth_type" field. It's identical to AuthTypeEQ.
 func AuthType(v string) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldEQ(FieldAuthType, v))
@@ -127,46 +122,6 @@ func UserIDLT(v int64) predicate.ProxyUserAuthMethod {
 // UserIDLTE applies the LTE predicate on the "user_id" field.
 func UserIDLTE(v int64) predicate.ProxyUserAuthMethod {
 	return predicate.ProxyUserAuthMethod(sql.FieldLTE(FieldUserID, v))
-}
-
-// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
-func TenantIDEQ(v int64) predicate.ProxyUserAuthMethod {
-	return predicate.ProxyUserAuthMethod(sql.FieldEQ(FieldTenantID, v))
-}
-
-// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
-func TenantIDNEQ(v int64) predicate.ProxyUserAuthMethod {
-	return predicate.ProxyUserAuthMethod(sql.FieldNEQ(FieldTenantID, v))
-}
-
-// TenantIDIn applies the In predicate on the "tenant_id" field.
-func TenantIDIn(vs ...int64) predicate.ProxyUserAuthMethod {
-	return predicate.ProxyUserAuthMethod(sql.FieldIn(FieldTenantID, vs...))
-}
-
-// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
-func TenantIDNotIn(vs ...int64) predicate.ProxyUserAuthMethod {
-	return predicate.ProxyUserAuthMethod(sql.FieldNotIn(FieldTenantID, vs...))
-}
-
-// TenantIDGT applies the GT predicate on the "tenant_id" field.
-func TenantIDGT(v int64) predicate.ProxyUserAuthMethod {
-	return predicate.ProxyUserAuthMethod(sql.FieldGT(FieldTenantID, v))
-}
-
-// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
-func TenantIDGTE(v int64) predicate.ProxyUserAuthMethod {
-	return predicate.ProxyUserAuthMethod(sql.FieldGTE(FieldTenantID, v))
-}
-
-// TenantIDLT applies the LT predicate on the "tenant_id" field.
-func TenantIDLT(v int64) predicate.ProxyUserAuthMethod {
-	return predicate.ProxyUserAuthMethod(sql.FieldLT(FieldTenantID, v))
-}
-
-// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
-func TenantIDLTE(v int64) predicate.ProxyUserAuthMethod {
-	return predicate.ProxyUserAuthMethod(sql.FieldLTE(FieldTenantID, v))
 }
 
 // AuthTypeEQ applies the EQ predicate on the "auth_type" field.

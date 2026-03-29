@@ -7,33 +7,31 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// ProxySchemaMigrations holds the schema definition for the ProxySchemaMigrations entity
-// 数据库迁移版本记录表
+// ProxySchemaMigrations holds the schema definition for the ProxySchemaMigrations entity.
 type ProxySchemaMigrations struct {
 	ent.Schema
 }
 
-// Annotations of the ProxySchemaMigrations
 func (ProxySchemaMigrations) Annotations() []schema.Annotation {
 	return []schema.Annotation{
-		entsql.Annotation{Table: "proxy_schema_migrations"},
+		entsql.Annotation{Table: "schema_migrations"},
 		entsql.WithComments(true),
 	}
 }
 
-// Fields of the ProxySchemaMigrations
 func (ProxySchemaMigrations) Fields() []ent.Field {
+	incremental := false
+
 	return []ent.Field{
-		field.String("version").
-			Unique().
+		field.Int64("id").
+			StorageKey("version").
+			Annotations(entsql.Annotation{Incremental: &incremental}).
+			Immutable().
 			Comment("迁移版本号"),
-		field.Bool("dirty").
-			Default(false).
-			Comment("是否脏数据"),
+		field.Bool("dirty").Comment("是否脏数据"),
 	}
 }
 
-// Edges of the ProxySchemaMigrations
 func (ProxySchemaMigrations) Edges() []ent.Edge {
 	return nil
 }

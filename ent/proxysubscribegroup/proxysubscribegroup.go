@@ -22,7 +22,7 @@ const (
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxysubscribegroup in the database.
-	Table = "proxy_subscribe_group"
+	Table = "subscribe_group"
 )
 
 // Columns holds all SQL columns for proxysubscribegroup fields.

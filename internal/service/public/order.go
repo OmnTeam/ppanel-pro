@@ -91,7 +91,7 @@ func (s *PublicOrderService) QueryOrderList(ctx context.Context, req *pb.QueryOr
 
 // PreCreateOrder validates and calculates order price
 func (s *PublicOrderService) PreCreateOrder(ctx context.Context, req *pb.PreCreateOrderRequest) (*pb.OrderPreCreateReply, error) {
-	// Get tenant ID and user ID from context
+	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
 
 	params := &publicBiz.PreCreateOrderParams{
@@ -128,7 +128,7 @@ func (s *PublicOrderService) PreCreateOrder(ctx context.Context, req *pb.PreCrea
 
 // Purchase creates a purchase order
 func (s *PublicOrderService) Purchase(ctx context.Context, req *pb.PurchaseRequest) (*pb.PurchaseReply, error) {
-	// Get tenant ID and user ID from context
+	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
 
 	params := &publicBiz.PurchaseParams{
@@ -155,7 +155,7 @@ func (s *PublicOrderService) Purchase(ctx context.Context, req *pb.PurchaseReque
 
 // Recharge creates a recharge order
 func (s *PublicOrderService) Recharge(ctx context.Context, req *pb.RechargeRequest) (*pb.RechargeReply, error) {
-	// Get tenant ID and user ID from context
+	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
 
 	params := &publicBiz.RechargeParams{
@@ -180,7 +180,7 @@ func (s *PublicOrderService) Recharge(ctx context.Context, req *pb.RechargeReque
 
 // Renewal creates a renewal order
 func (s *PublicOrderService) Renewal(ctx context.Context, req *pb.RenewalRequest) (*pb.RenewalReply, error) {
-	// Get tenant ID and user ID from context
+	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
 
 	params := &publicBiz.RenewalParams{
@@ -207,7 +207,7 @@ func (s *PublicOrderService) Renewal(ctx context.Context, req *pb.RenewalRequest
 
 // ResetTraffic creates a reset traffic order
 func (s *PublicOrderService) ResetTraffic(ctx context.Context, req *pb.ResetTrafficRequest) (*pb.TrafficResetReply, error) {
-	// Get tenant ID and user ID from context
+	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
 
 	params := &publicBiz.ResetTrafficParams{

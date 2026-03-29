@@ -24,6 +24,8 @@ type Tx struct {
 	ProxyDocument *ProxyDocumentClient
 	// ProxyGroupHistory is the client for interacting with the ProxyGroupHistory builders.
 	ProxyGroupHistory *ProxyGroupHistoryClient
+	// ProxyGroupHistoryDetail is the client for interacting with the ProxyGroupHistoryDetail builders.
+	ProxyGroupHistoryDetail *ProxyGroupHistoryDetailClient
 	// ProxyNode is the client for interacting with the ProxyNode builders.
 	ProxyNode *ProxyNodeClient
 	// ProxyOrder is the client for interacting with the ProxyOrder builders.
@@ -66,8 +68,6 @@ type Tx struct {
 	ProxyUserDevice *ProxyUserDeviceClient
 	// ProxyUserDeviceOnlineRecord is the client for interacting with the ProxyUserDeviceOnlineRecord builders.
 	ProxyUserDeviceOnlineRecord *ProxyUserDeviceOnlineRecordClient
-	// ProxyUserGroup is the client for interacting with the ProxyUserGroup builders.
-	ProxyUserGroup *ProxyUserGroupClient
 	// ProxyUserSubscribe is the client for interacting with the ProxyUserSubscribe builders.
 	ProxyUserSubscribe *ProxyUserSubscribeClient
 	// ProxyUserWithdrawal is the client for interacting with the ProxyUserWithdrawal builders.
@@ -209,6 +209,7 @@ func (tx *Tx) init() {
 	tx.ProxyCoupon = NewProxyCouponClient(tx.config)
 	tx.ProxyDocument = NewProxyDocumentClient(tx.config)
 	tx.ProxyGroupHistory = NewProxyGroupHistoryClient(tx.config)
+	tx.ProxyGroupHistoryDetail = NewProxyGroupHistoryDetailClient(tx.config)
 	tx.ProxyNode = NewProxyNodeClient(tx.config)
 	tx.ProxyOrder = NewProxyOrderClient(tx.config)
 	tx.ProxyPayment = NewProxyPaymentClient(tx.config)
@@ -230,7 +231,6 @@ func (tx *Tx) init() {
 	tx.ProxyUserAuthMethod = NewProxyUserAuthMethodClient(tx.config)
 	tx.ProxyUserDevice = NewProxyUserDeviceClient(tx.config)
 	tx.ProxyUserDeviceOnlineRecord = NewProxyUserDeviceOnlineRecordClient(tx.config)
-	tx.ProxyUserGroup = NewProxyUserGroupClient(tx.config)
 	tx.ProxyUserSubscribe = NewProxyUserSubscribeClient(tx.config)
 	tx.ProxyUserWithdrawal = NewProxyUserWithdrawalClient(tx.config)
 }

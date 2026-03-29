@@ -54,11 +54,6 @@ func IDLTE(id int64) predicate.ProxyServer {
 	return predicate.ProxyServer(sql.FieldLTE(FieldID, id))
 }
 
-// TenantID applies equality check predicate on the "tenant_id" field. It's identical to TenantIDEQ.
-func TenantID(v int64) predicate.ProxyServer {
-	return predicate.ProxyServer(sql.FieldEQ(FieldTenantID, v))
-}
-
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.ProxyServer {
 	return predicate.ProxyServer(sql.FieldEQ(FieldName, v))
@@ -94,6 +89,26 @@ func LastReportedAt(v time.Time) predicate.ProxyServer {
 	return predicate.ProxyServer(sql.FieldEQ(FieldLastReportedAt, v))
 }
 
+// Longitude applies equality check predicate on the "longitude" field. It's identical to LongitudeEQ.
+func Longitude(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldEQ(FieldLongitude, v))
+}
+
+// Latitude applies equality check predicate on the "latitude" field. It's identical to LatitudeEQ.
+func Latitude(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldEQ(FieldLatitude, v))
+}
+
+// LongitudeCenter applies equality check predicate on the "longitude_center" field. It's identical to LongitudeCenterEQ.
+func LongitudeCenter(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldEQ(FieldLongitudeCenter, v))
+}
+
+// LatitudeCenter applies equality check predicate on the "latitude_center" field. It's identical to LatitudeCenterEQ.
+func LatitudeCenter(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldEQ(FieldLatitudeCenter, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.ProxyServer {
 	return predicate.ProxyServer(sql.FieldEQ(FieldCreatedAt, v))
@@ -102,46 +117,6 @@ func CreatedAt(v time.Time) predicate.ProxyServer {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.ProxyServer {
 	return predicate.ProxyServer(sql.FieldEQ(FieldUpdatedAt, v))
-}
-
-// TenantIDEQ applies the EQ predicate on the "tenant_id" field.
-func TenantIDEQ(v int64) predicate.ProxyServer {
-	return predicate.ProxyServer(sql.FieldEQ(FieldTenantID, v))
-}
-
-// TenantIDNEQ applies the NEQ predicate on the "tenant_id" field.
-func TenantIDNEQ(v int64) predicate.ProxyServer {
-	return predicate.ProxyServer(sql.FieldNEQ(FieldTenantID, v))
-}
-
-// TenantIDIn applies the In predicate on the "tenant_id" field.
-func TenantIDIn(vs ...int64) predicate.ProxyServer {
-	return predicate.ProxyServer(sql.FieldIn(FieldTenantID, vs...))
-}
-
-// TenantIDNotIn applies the NotIn predicate on the "tenant_id" field.
-func TenantIDNotIn(vs ...int64) predicate.ProxyServer {
-	return predicate.ProxyServer(sql.FieldNotIn(FieldTenantID, vs...))
-}
-
-// TenantIDGT applies the GT predicate on the "tenant_id" field.
-func TenantIDGT(v int64) predicate.ProxyServer {
-	return predicate.ProxyServer(sql.FieldGT(FieldTenantID, v))
-}
-
-// TenantIDGTE applies the GTE predicate on the "tenant_id" field.
-func TenantIDGTE(v int64) predicate.ProxyServer {
-	return predicate.ProxyServer(sql.FieldGTE(FieldTenantID, v))
-}
-
-// TenantIDLT applies the LT predicate on the "tenant_id" field.
-func TenantIDLT(v int64) predicate.ProxyServer {
-	return predicate.ProxyServer(sql.FieldLT(FieldTenantID, v))
-}
-
-// TenantIDLTE applies the LTE predicate on the "tenant_id" field.
-func TenantIDLTE(v int64) predicate.ProxyServer {
-	return predicate.ProxyServer(sql.FieldLTE(FieldTenantID, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -569,6 +544,266 @@ func LastReportedAtNotNil() predicate.ProxyServer {
 	return predicate.ProxyServer(sql.FieldNotNull(FieldLastReportedAt))
 }
 
+// LongitudeEQ applies the EQ predicate on the "longitude" field.
+func LongitudeEQ(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldEQ(FieldLongitude, v))
+}
+
+// LongitudeNEQ applies the NEQ predicate on the "longitude" field.
+func LongitudeNEQ(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldNEQ(FieldLongitude, v))
+}
+
+// LongitudeIn applies the In predicate on the "longitude" field.
+func LongitudeIn(vs ...string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldIn(FieldLongitude, vs...))
+}
+
+// LongitudeNotIn applies the NotIn predicate on the "longitude" field.
+func LongitudeNotIn(vs ...string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldNotIn(FieldLongitude, vs...))
+}
+
+// LongitudeGT applies the GT predicate on the "longitude" field.
+func LongitudeGT(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldGT(FieldLongitude, v))
+}
+
+// LongitudeGTE applies the GTE predicate on the "longitude" field.
+func LongitudeGTE(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldGTE(FieldLongitude, v))
+}
+
+// LongitudeLT applies the LT predicate on the "longitude" field.
+func LongitudeLT(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldLT(FieldLongitude, v))
+}
+
+// LongitudeLTE applies the LTE predicate on the "longitude" field.
+func LongitudeLTE(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldLTE(FieldLongitude, v))
+}
+
+// LongitudeContains applies the Contains predicate on the "longitude" field.
+func LongitudeContains(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldContains(FieldLongitude, v))
+}
+
+// LongitudeHasPrefix applies the HasPrefix predicate on the "longitude" field.
+func LongitudeHasPrefix(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldHasPrefix(FieldLongitude, v))
+}
+
+// LongitudeHasSuffix applies the HasSuffix predicate on the "longitude" field.
+func LongitudeHasSuffix(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldHasSuffix(FieldLongitude, v))
+}
+
+// LongitudeEqualFold applies the EqualFold predicate on the "longitude" field.
+func LongitudeEqualFold(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldEqualFold(FieldLongitude, v))
+}
+
+// LongitudeContainsFold applies the ContainsFold predicate on the "longitude" field.
+func LongitudeContainsFold(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldContainsFold(FieldLongitude, v))
+}
+
+// LatitudeEQ applies the EQ predicate on the "latitude" field.
+func LatitudeEQ(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldEQ(FieldLatitude, v))
+}
+
+// LatitudeNEQ applies the NEQ predicate on the "latitude" field.
+func LatitudeNEQ(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldNEQ(FieldLatitude, v))
+}
+
+// LatitudeIn applies the In predicate on the "latitude" field.
+func LatitudeIn(vs ...string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldIn(FieldLatitude, vs...))
+}
+
+// LatitudeNotIn applies the NotIn predicate on the "latitude" field.
+func LatitudeNotIn(vs ...string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldNotIn(FieldLatitude, vs...))
+}
+
+// LatitudeGT applies the GT predicate on the "latitude" field.
+func LatitudeGT(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldGT(FieldLatitude, v))
+}
+
+// LatitudeGTE applies the GTE predicate on the "latitude" field.
+func LatitudeGTE(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldGTE(FieldLatitude, v))
+}
+
+// LatitudeLT applies the LT predicate on the "latitude" field.
+func LatitudeLT(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldLT(FieldLatitude, v))
+}
+
+// LatitudeLTE applies the LTE predicate on the "latitude" field.
+func LatitudeLTE(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldLTE(FieldLatitude, v))
+}
+
+// LatitudeContains applies the Contains predicate on the "latitude" field.
+func LatitudeContains(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldContains(FieldLatitude, v))
+}
+
+// LatitudeHasPrefix applies the HasPrefix predicate on the "latitude" field.
+func LatitudeHasPrefix(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldHasPrefix(FieldLatitude, v))
+}
+
+// LatitudeHasSuffix applies the HasSuffix predicate on the "latitude" field.
+func LatitudeHasSuffix(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldHasSuffix(FieldLatitude, v))
+}
+
+// LatitudeEqualFold applies the EqualFold predicate on the "latitude" field.
+func LatitudeEqualFold(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldEqualFold(FieldLatitude, v))
+}
+
+// LatitudeContainsFold applies the ContainsFold predicate on the "latitude" field.
+func LatitudeContainsFold(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldContainsFold(FieldLatitude, v))
+}
+
+// LongitudeCenterEQ applies the EQ predicate on the "longitude_center" field.
+func LongitudeCenterEQ(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldEQ(FieldLongitudeCenter, v))
+}
+
+// LongitudeCenterNEQ applies the NEQ predicate on the "longitude_center" field.
+func LongitudeCenterNEQ(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldNEQ(FieldLongitudeCenter, v))
+}
+
+// LongitudeCenterIn applies the In predicate on the "longitude_center" field.
+func LongitudeCenterIn(vs ...string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldIn(FieldLongitudeCenter, vs...))
+}
+
+// LongitudeCenterNotIn applies the NotIn predicate on the "longitude_center" field.
+func LongitudeCenterNotIn(vs ...string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldNotIn(FieldLongitudeCenter, vs...))
+}
+
+// LongitudeCenterGT applies the GT predicate on the "longitude_center" field.
+func LongitudeCenterGT(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldGT(FieldLongitudeCenter, v))
+}
+
+// LongitudeCenterGTE applies the GTE predicate on the "longitude_center" field.
+func LongitudeCenterGTE(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldGTE(FieldLongitudeCenter, v))
+}
+
+// LongitudeCenterLT applies the LT predicate on the "longitude_center" field.
+func LongitudeCenterLT(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldLT(FieldLongitudeCenter, v))
+}
+
+// LongitudeCenterLTE applies the LTE predicate on the "longitude_center" field.
+func LongitudeCenterLTE(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldLTE(FieldLongitudeCenter, v))
+}
+
+// LongitudeCenterContains applies the Contains predicate on the "longitude_center" field.
+func LongitudeCenterContains(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldContains(FieldLongitudeCenter, v))
+}
+
+// LongitudeCenterHasPrefix applies the HasPrefix predicate on the "longitude_center" field.
+func LongitudeCenterHasPrefix(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldHasPrefix(FieldLongitudeCenter, v))
+}
+
+// LongitudeCenterHasSuffix applies the HasSuffix predicate on the "longitude_center" field.
+func LongitudeCenterHasSuffix(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldHasSuffix(FieldLongitudeCenter, v))
+}
+
+// LongitudeCenterEqualFold applies the EqualFold predicate on the "longitude_center" field.
+func LongitudeCenterEqualFold(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldEqualFold(FieldLongitudeCenter, v))
+}
+
+// LongitudeCenterContainsFold applies the ContainsFold predicate on the "longitude_center" field.
+func LongitudeCenterContainsFold(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldContainsFold(FieldLongitudeCenter, v))
+}
+
+// LatitudeCenterEQ applies the EQ predicate on the "latitude_center" field.
+func LatitudeCenterEQ(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldEQ(FieldLatitudeCenter, v))
+}
+
+// LatitudeCenterNEQ applies the NEQ predicate on the "latitude_center" field.
+func LatitudeCenterNEQ(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldNEQ(FieldLatitudeCenter, v))
+}
+
+// LatitudeCenterIn applies the In predicate on the "latitude_center" field.
+func LatitudeCenterIn(vs ...string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldIn(FieldLatitudeCenter, vs...))
+}
+
+// LatitudeCenterNotIn applies the NotIn predicate on the "latitude_center" field.
+func LatitudeCenterNotIn(vs ...string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldNotIn(FieldLatitudeCenter, vs...))
+}
+
+// LatitudeCenterGT applies the GT predicate on the "latitude_center" field.
+func LatitudeCenterGT(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldGT(FieldLatitudeCenter, v))
+}
+
+// LatitudeCenterGTE applies the GTE predicate on the "latitude_center" field.
+func LatitudeCenterGTE(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldGTE(FieldLatitudeCenter, v))
+}
+
+// LatitudeCenterLT applies the LT predicate on the "latitude_center" field.
+func LatitudeCenterLT(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldLT(FieldLatitudeCenter, v))
+}
+
+// LatitudeCenterLTE applies the LTE predicate on the "latitude_center" field.
+func LatitudeCenterLTE(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldLTE(FieldLatitudeCenter, v))
+}
+
+// LatitudeCenterContains applies the Contains predicate on the "latitude_center" field.
+func LatitudeCenterContains(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldContains(FieldLatitudeCenter, v))
+}
+
+// LatitudeCenterHasPrefix applies the HasPrefix predicate on the "latitude_center" field.
+func LatitudeCenterHasPrefix(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldHasPrefix(FieldLatitudeCenter, v))
+}
+
+// LatitudeCenterHasSuffix applies the HasSuffix predicate on the "latitude_center" field.
+func LatitudeCenterHasSuffix(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldHasSuffix(FieldLatitudeCenter, v))
+}
+
+// LatitudeCenterEqualFold applies the EqualFold predicate on the "latitude_center" field.
+func LatitudeCenterEqualFold(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldEqualFold(FieldLatitudeCenter, v))
+}
+
+// LatitudeCenterContainsFold applies the ContainsFold predicate on the "latitude_center" field.
+func LatitudeCenterContainsFold(v string) predicate.ProxyServer {
+	return predicate.ProxyServer(sql.FieldContainsFold(FieldLatitudeCenter, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.ProxyServer {
 	return predicate.ProxyServer(sql.FieldEQ(FieldCreatedAt, v))
@@ -609,16 +844,6 @@ func CreatedAtLTE(v time.Time) predicate.ProxyServer {
 	return predicate.ProxyServer(sql.FieldLTE(FieldCreatedAt, v))
 }
 
-// CreatedAtIsNil applies the IsNil predicate on the "created_at" field.
-func CreatedAtIsNil() predicate.ProxyServer {
-	return predicate.ProxyServer(sql.FieldIsNull(FieldCreatedAt))
-}
-
-// CreatedAtNotNil applies the NotNil predicate on the "created_at" field.
-func CreatedAtNotNil() predicate.ProxyServer {
-	return predicate.ProxyServer(sql.FieldNotNull(FieldCreatedAt))
-}
-
 // UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
 func UpdatedAtEQ(v time.Time) predicate.ProxyServer {
 	return predicate.ProxyServer(sql.FieldEQ(FieldUpdatedAt, v))
@@ -657,16 +882,6 @@ func UpdatedAtLT(v time.Time) predicate.ProxyServer {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.ProxyServer {
 	return predicate.ProxyServer(sql.FieldLTE(FieldUpdatedAt, v))
-}
-
-// UpdatedAtIsNil applies the IsNil predicate on the "updated_at" field.
-func UpdatedAtIsNil() predicate.ProxyServer {
-	return predicate.ProxyServer(sql.FieldIsNull(FieldUpdatedAt))
-}
-
-// UpdatedAtNotNil applies the NotNil predicate on the "updated_at" field.
-func UpdatedAtNotNil() predicate.ProxyServer {
-	return predicate.ProxyServer(sql.FieldNotNull(FieldUpdatedAt))
 }
 
 // And groups predicates with the AND operator between them.

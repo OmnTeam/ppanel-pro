@@ -8,123 +8,53 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.ProxySchemaMigrations {
+func ID(id int64) predicate.ProxySchemaMigrations {
 	return predicate.ProxySchemaMigrations(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.ProxySchemaMigrations {
+func IDEQ(id int64) predicate.ProxySchemaMigrations {
 	return predicate.ProxySchemaMigrations(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.ProxySchemaMigrations {
+func IDNEQ(id int64) predicate.ProxySchemaMigrations {
 	return predicate.ProxySchemaMigrations(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.ProxySchemaMigrations {
+func IDIn(ids ...int64) predicate.ProxySchemaMigrations {
 	return predicate.ProxySchemaMigrations(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.ProxySchemaMigrations {
+func IDNotIn(ids ...int64) predicate.ProxySchemaMigrations {
 	return predicate.ProxySchemaMigrations(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.ProxySchemaMigrations {
+func IDGT(id int64) predicate.ProxySchemaMigrations {
 	return predicate.ProxySchemaMigrations(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.ProxySchemaMigrations {
+func IDGTE(id int64) predicate.ProxySchemaMigrations {
 	return predicate.ProxySchemaMigrations(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.ProxySchemaMigrations {
+func IDLT(id int64) predicate.ProxySchemaMigrations {
 	return predicate.ProxySchemaMigrations(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.ProxySchemaMigrations {
+func IDLTE(id int64) predicate.ProxySchemaMigrations {
 	return predicate.ProxySchemaMigrations(sql.FieldLTE(FieldID, id))
-}
-
-// Version applies equality check predicate on the "version" field. It's identical to VersionEQ.
-func Version(v string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldEQ(FieldVersion, v))
 }
 
 // Dirty applies equality check predicate on the "dirty" field. It's identical to DirtyEQ.
 func Dirty(v bool) predicate.ProxySchemaMigrations {
 	return predicate.ProxySchemaMigrations(sql.FieldEQ(FieldDirty, v))
-}
-
-// VersionEQ applies the EQ predicate on the "version" field.
-func VersionEQ(v string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldEQ(FieldVersion, v))
-}
-
-// VersionNEQ applies the NEQ predicate on the "version" field.
-func VersionNEQ(v string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldNEQ(FieldVersion, v))
-}
-
-// VersionIn applies the In predicate on the "version" field.
-func VersionIn(vs ...string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldIn(FieldVersion, vs...))
-}
-
-// VersionNotIn applies the NotIn predicate on the "version" field.
-func VersionNotIn(vs ...string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldNotIn(FieldVersion, vs...))
-}
-
-// VersionGT applies the GT predicate on the "version" field.
-func VersionGT(v string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldGT(FieldVersion, v))
-}
-
-// VersionGTE applies the GTE predicate on the "version" field.
-func VersionGTE(v string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldGTE(FieldVersion, v))
-}
-
-// VersionLT applies the LT predicate on the "version" field.
-func VersionLT(v string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldLT(FieldVersion, v))
-}
-
-// VersionLTE applies the LTE predicate on the "version" field.
-func VersionLTE(v string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldLTE(FieldVersion, v))
-}
-
-// VersionContains applies the Contains predicate on the "version" field.
-func VersionContains(v string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldContains(FieldVersion, v))
-}
-
-// VersionHasPrefix applies the HasPrefix predicate on the "version" field.
-func VersionHasPrefix(v string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldHasPrefix(FieldVersion, v))
-}
-
-// VersionHasSuffix applies the HasSuffix predicate on the "version" field.
-func VersionHasSuffix(v string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldHasSuffix(FieldVersion, v))
-}
-
-// VersionEqualFold applies the EqualFold predicate on the "version" field.
-func VersionEqualFold(v string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldEqualFold(FieldVersion, v))
-}
-
-// VersionContainsFold applies the ContainsFold predicate on the "version" field.
-func VersionContainsFold(v string) predicate.ProxySchemaMigrations {
-	return predicate.ProxySchemaMigrations(sql.FieldContainsFold(FieldVersion, v))
 }
 
 // DirtyEQ applies the EQ predicate on the "dirty" field.

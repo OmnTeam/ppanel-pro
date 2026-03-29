@@ -13,10 +13,6 @@ const (
 	Label = "proxy_coupon"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldUserLimit holds the string denoting the user_limit field in the database.
-	FieldUserLimit = "user_limit"
-	// FieldSubscribe holds the string denoting the subscribe field in the database.
-	FieldSubscribe = "subscribe"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldCode holds the string denoting the code field in the database.
@@ -29,31 +25,38 @@ const (
 	FieldDiscount = "discount"
 	// FieldStartTime holds the string denoting the start_time field in the database.
 	FieldStartTime = "start_time"
-	// FieldEndTime holds the string denoting the end_time field in the database.
-	FieldEndTime = "end_time"
-	// FieldStatus holds the string denoting the status field in the database.
-	FieldStatus = "status"
+	// FieldExpireTime holds the string denoting the expire_time field in the database.
+	FieldExpireTime = "expire_time"
+	// FieldUserLimit holds the string denoting the user_limit field in the database.
+	FieldUserLimit = "user_limit"
+	// FieldSubscribe holds the string denoting the subscribe field in the database.
+	FieldSubscribe = "subscribe"
+	// FieldUsedCount holds the string denoting the used_count field in the database.
+	FieldUsedCount = "used_count"
+	// FieldEnable holds the string denoting the enable field in the database.
+	FieldEnable = "enable"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
 	// Table holds the table name of the proxycoupon in the database.
-	Table = "proxy_coupon"
+	Table = "coupon"
 )
 
 // Columns holds all SQL columns for proxycoupon fields.
 var Columns = []string{
 	FieldID,
-	FieldUserLimit,
-	FieldSubscribe,
 	FieldName,
 	FieldCode,
 	FieldCount,
 	FieldType,
 	FieldDiscount,
 	FieldStartTime,
-	FieldEndTime,
-	FieldStatus,
+	FieldExpireTime,
+	FieldUserLimit,
+	FieldSubscribe,
+	FieldUsedCount,
+	FieldEnable,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -69,8 +72,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// DefaultUserLimit holds the default value on creation for the "user_limit" field.
-	DefaultUserLimit int64
+	// DefaultName holds the default value on creation for the "name" field.
+	DefaultName string
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 	// CodeValidator is a validator for the "code" field. It is called by the builders before save.
@@ -82,11 +85,19 @@ var (
 	// DefaultDiscount holds the default value on creation for the "discount" field.
 	DefaultDiscount int64
 	// DefaultStartTime holds the default value on creation for the "start_time" field.
-	DefaultStartTime func() time.Time
-	// DefaultEndTime holds the default value on creation for the "end_time" field.
-	DefaultEndTime func() time.Time
-	// DefaultStatus holds the default value on creation for the "status" field.
-	DefaultStatus int8
+	DefaultStartTime int64
+	// DefaultExpireTime holds the default value on creation for the "expire_time" field.
+	DefaultExpireTime int64
+	// DefaultUserLimit holds the default value on creation for the "user_limit" field.
+	DefaultUserLimit int64
+	// DefaultSubscribe holds the default value on creation for the "subscribe" field.
+	DefaultSubscribe string
+	// SubscribeValidator is a validator for the "subscribe" field. It is called by the builders before save.
+	SubscribeValidator func(string) error
+	// DefaultUsedCount holds the default value on creation for the "used_count" field.
+	DefaultUsedCount int64
+	// DefaultEnable holds the default value on creation for the "enable" field.
+	DefaultEnable bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -101,16 +112,6 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
-// ByUserLimit orders the results by the user_limit field.
-func ByUserLimit(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserLimit, opts...).ToFunc()
-}
-
-// BySubscribe orders the results by the subscribe field.
-func BySubscribe(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSubscribe, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.
@@ -143,14 +144,29 @@ func ByStartTime(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStartTime, opts...).ToFunc()
 }
 
-// ByEndTime orders the results by the end_time field.
-func ByEndTime(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEndTime, opts...).ToFunc()
+// ByExpireTime orders the results by the expire_time field.
+func ByExpireTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExpireTime, opts...).ToFunc()
 }
 
-// ByStatus orders the results by the status field.
-func ByStatus(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+// ByUserLimit orders the results by the user_limit field.
+func ByUserLimit(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserLimit, opts...).ToFunc()
+}
+
+// BySubscribe orders the results by the subscribe field.
+func BySubscribe(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSubscribe, opts...).ToFunc()
+}
+
+// ByUsedCount orders the results by the used_count field.
+func ByUsedCount(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUsedCount, opts...).ToFunc()
+}
+
+// ByEnable orders the results by the enable field.
+func ByEnable(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEnable, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.
