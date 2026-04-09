@@ -31,6 +31,8 @@ func (ProxyNode) Fields() []ent.Field {
 		field.Int64("server_id").Default(0).Comment("服务器ID"),
 		field.String("protocol").MaxLen(100).Default("").Comment("协议"),
 		field.Bool("enabled").Default(true).Comment("启用"),
+		field.String("node_type").MaxLen(20).Default("landing").Comment("节点类型"),
+		field.Bool("is_hidden").Default(false).Comment("是否隐藏"),
 		field.Int("sort").Default(0).Comment("排序"),
 		field.JSON("node_group_ids", []int64{}).Optional().Comment("节点组ID列表"),
 		field.Time("created_at").Default(time.Now).Comment("创建时间"),

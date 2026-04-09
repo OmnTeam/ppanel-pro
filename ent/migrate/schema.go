@@ -161,6 +161,8 @@ var (
 		{Name: "server_id", Type: field.TypeInt64, Comment: "服务器ID", Default: 0},
 		{Name: "protocol", Type: field.TypeString, Size: 100, Comment: "协议", Default: ""},
 		{Name: "enabled", Type: field.TypeBool, Comment: "启用", Default: true},
+		{Name: "node_type", Type: field.TypeString, Size: 20, Comment: "节点类型", Default: "landing"},
+		{Name: "is_hidden", Type: field.TypeBool, Comment: "是否隐藏", Default: false},
 		{Name: "sort", Type: field.TypeInt, Comment: "排序", Default: 0},
 		{Name: "node_group_ids", Type: field.TypeJSON, Nullable: true, Comment: "节点组ID列表"},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
@@ -216,6 +218,7 @@ var (
 		{Name: "fee_mode", Type: field.TypeUint, Comment: "费用模式", Default: 0},
 		{Name: "fee_percent", Type: field.TypeInt64, Comment: "费用百分比", Default: 0},
 		{Name: "fee_amount", Type: field.TypeInt64, Comment: "固定费用金额", Default: 0},
+		{Name: "sort", Type: field.TypeInt64, Comment: "排序", Default: 0},
 		{Name: "enable", Type: field.TypeBool, Comment: "是否启用", Default: false},
 		{Name: "token", Type: field.TypeString, Unique: true, Size: 255, Comment: "支付令牌"},
 	}
@@ -233,7 +236,7 @@ var (
 			{
 				Name:    "proxypayment_enable",
 				Unique:  false,
-				Columns: []*schema.Column{PaymentColumns[10]},
+				Columns: []*schema.Column{PaymentColumns[11]},
 			},
 		},
 	}
@@ -326,6 +329,7 @@ var (
 	NodeGroupColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "ID"},
 		{Name: "name", Type: field.TypeString, Size: 255, Comment: "Group Name"},
+		{Name: "group_type", Type: field.TypeString, Size: 32, Comment: "Node Group Type", Default: "common"},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 500, Comment: "Group Description"},
 		{Name: "sort", Type: field.TypeInt, Comment: "Sort Order", Default: 0},
 		{Name: "for_calculation", Type: field.TypeBool, Comment: "For Calculation", Default: true},

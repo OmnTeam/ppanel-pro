@@ -42,6 +42,20 @@ func (_u *ProxyServerGroupUpdate) SetNillableName(v *string) *ProxyServerGroupUp
 	return _u
 }
 
+// SetGroupType sets the "group_type" field.
+func (_u *ProxyServerGroupUpdate) SetGroupType(v string) *ProxyServerGroupUpdate {
+	_u.mutation.SetGroupType(v)
+	return _u
+}
+
+// SetNillableGroupType sets the "group_type" field if the given value is not nil.
+func (_u *ProxyServerGroupUpdate) SetNillableGroupType(v *string) *ProxyServerGroupUpdate {
+	if v != nil {
+		_u.SetGroupType(*v)
+	}
+	return _u
+}
+
 // SetDescription sets the "description" field.
 func (_u *ProxyServerGroupUpdate) SetDescription(v string) *ProxyServerGroupUpdate {
 	_u.mutation.SetDescription(v)
@@ -302,6 +316,11 @@ func (_u *ProxyServerGroupUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "ProxyServerGroup.name": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.GroupType(); ok {
+		if err := proxyservergroup.GroupTypeValidator(v); err != nil {
+			return &ValidationError{Name: "group_type", err: fmt.Errorf(`ent: validator failed for field "ProxyServerGroup.group_type": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Description(); ok {
 		if err := proxyservergroup.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "ProxyServerGroup.description": %w`, err)}
@@ -324,6 +343,9 @@ func (_u *ProxyServerGroupUpdate) sqlSave(ctx context.Context) (_node int, err e
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxyservergroup.FieldName, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.GroupType(); ok {
+		_spec.SetField(proxyservergroup.FieldGroupType, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(proxyservergroup.FieldDescription, field.TypeString, value)
@@ -418,6 +440,20 @@ func (_u *ProxyServerGroupUpdateOne) SetName(v string) *ProxyServerGroupUpdateOn
 func (_u *ProxyServerGroupUpdateOne) SetNillableName(v *string) *ProxyServerGroupUpdateOne {
 	if v != nil {
 		_u.SetName(*v)
+	}
+	return _u
+}
+
+// SetGroupType sets the "group_type" field.
+func (_u *ProxyServerGroupUpdateOne) SetGroupType(v string) *ProxyServerGroupUpdateOne {
+	_u.mutation.SetGroupType(v)
+	return _u
+}
+
+// SetNillableGroupType sets the "group_type" field if the given value is not nil.
+func (_u *ProxyServerGroupUpdateOne) SetNillableGroupType(v *string) *ProxyServerGroupUpdateOne {
+	if v != nil {
+		_u.SetGroupType(*v)
 	}
 	return _u
 }
@@ -695,6 +731,11 @@ func (_u *ProxyServerGroupUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "ProxyServerGroup.name": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.GroupType(); ok {
+		if err := proxyservergroup.GroupTypeValidator(v); err != nil {
+			return &ValidationError{Name: "group_type", err: fmt.Errorf(`ent: validator failed for field "ProxyServerGroup.group_type": %w`, err)}
+		}
+	}
 	if v, ok := _u.mutation.Description(); ok {
 		if err := proxyservergroup.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf(`ent: validator failed for field "ProxyServerGroup.description": %w`, err)}
@@ -734,6 +775,9 @@ func (_u *ProxyServerGroupUpdateOne) sqlSave(ctx context.Context) (_node *ProxyS
 	}
 	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(proxyservergroup.FieldName, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.GroupType(); ok {
+		_spec.SetField(proxyservergroup.FieldGroupType, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(proxyservergroup.FieldDescription, field.TypeString, value)

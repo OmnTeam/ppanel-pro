@@ -141,6 +141,34 @@ func (_u *ProxyNodeUpdate) SetNillableEnabled(v *bool) *ProxyNodeUpdate {
 	return _u
 }
 
+// SetNodeType sets the "node_type" field.
+func (_u *ProxyNodeUpdate) SetNodeType(v string) *ProxyNodeUpdate {
+	_u.mutation.SetNodeType(v)
+	return _u
+}
+
+// SetNillableNodeType sets the "node_type" field if the given value is not nil.
+func (_u *ProxyNodeUpdate) SetNillableNodeType(v *string) *ProxyNodeUpdate {
+	if v != nil {
+		_u.SetNodeType(*v)
+	}
+	return _u
+}
+
+// SetIsHidden sets the "is_hidden" field.
+func (_u *ProxyNodeUpdate) SetIsHidden(v bool) *ProxyNodeUpdate {
+	_u.mutation.SetIsHidden(v)
+	return _u
+}
+
+// SetNillableIsHidden sets the "is_hidden" field if the given value is not nil.
+func (_u *ProxyNodeUpdate) SetNillableIsHidden(v *bool) *ProxyNodeUpdate {
+	if v != nil {
+		_u.SetIsHidden(*v)
+	}
+	return _u
+}
+
 // SetSort sets the "sort" field.
 func (_u *ProxyNodeUpdate) SetSort(v int) *ProxyNodeUpdate {
 	_u.mutation.ResetSort()
@@ -263,6 +291,11 @@ func (_u *ProxyNodeUpdate) check() error {
 			return &ValidationError{Name: "protocol", err: fmt.Errorf(`ent: validator failed for field "ProxyNode.protocol": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.NodeType(); ok {
+		if err := proxynode.NodeTypeValidator(v); err != nil {
+			return &ValidationError{Name: "node_type", err: fmt.Errorf(`ent: validator failed for field "ProxyNode.node_type": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -304,6 +337,12 @@ func (_u *ProxyNodeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.Enabled(); ok {
 		_spec.SetField(proxynode.FieldEnabled, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.NodeType(); ok {
+		_spec.SetField(proxynode.FieldNodeType, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.IsHidden(); ok {
+		_spec.SetField(proxynode.FieldIsHidden, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
 		_spec.SetField(proxynode.FieldSort, field.TypeInt, value)
@@ -460,6 +499,34 @@ func (_u *ProxyNodeUpdateOne) SetNillableEnabled(v *bool) *ProxyNodeUpdateOne {
 	return _u
 }
 
+// SetNodeType sets the "node_type" field.
+func (_u *ProxyNodeUpdateOne) SetNodeType(v string) *ProxyNodeUpdateOne {
+	_u.mutation.SetNodeType(v)
+	return _u
+}
+
+// SetNillableNodeType sets the "node_type" field if the given value is not nil.
+func (_u *ProxyNodeUpdateOne) SetNillableNodeType(v *string) *ProxyNodeUpdateOne {
+	if v != nil {
+		_u.SetNodeType(*v)
+	}
+	return _u
+}
+
+// SetIsHidden sets the "is_hidden" field.
+func (_u *ProxyNodeUpdateOne) SetIsHidden(v bool) *ProxyNodeUpdateOne {
+	_u.mutation.SetIsHidden(v)
+	return _u
+}
+
+// SetNillableIsHidden sets the "is_hidden" field if the given value is not nil.
+func (_u *ProxyNodeUpdateOne) SetNillableIsHidden(v *bool) *ProxyNodeUpdateOne {
+	if v != nil {
+		_u.SetIsHidden(*v)
+	}
+	return _u
+}
+
 // SetSort sets the "sort" field.
 func (_u *ProxyNodeUpdateOne) SetSort(v int) *ProxyNodeUpdateOne {
 	_u.mutation.ResetSort()
@@ -595,6 +662,11 @@ func (_u *ProxyNodeUpdateOne) check() error {
 			return &ValidationError{Name: "protocol", err: fmt.Errorf(`ent: validator failed for field "ProxyNode.protocol": %w`, err)}
 		}
 	}
+	if v, ok := _u.mutation.NodeType(); ok {
+		if err := proxynode.NodeTypeValidator(v); err != nil {
+			return &ValidationError{Name: "node_type", err: fmt.Errorf(`ent: validator failed for field "ProxyNode.node_type": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -653,6 +725,12 @@ func (_u *ProxyNodeUpdateOne) sqlSave(ctx context.Context) (_node *ProxyNode, er
 	}
 	if value, ok := _u.mutation.Enabled(); ok {
 		_spec.SetField(proxynode.FieldEnabled, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.NodeType(); ok {
+		_spec.SetField(proxynode.FieldNodeType, field.TypeString, value)
+	}
+	if value, ok := _u.mutation.IsHidden(); ok {
+		_spec.SetField(proxynode.FieldIsHidden, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
 		_spec.SetField(proxynode.FieldSort, field.TypeInt, value)

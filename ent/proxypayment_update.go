@@ -180,6 +180,27 @@ func (_u *ProxyPaymentUpdate) AddFeeAmount(v int64) *ProxyPaymentUpdate {
 	return _u
 }
 
+// SetSort sets the "sort" field.
+func (_u *ProxyPaymentUpdate) SetSort(v int64) *ProxyPaymentUpdate {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *ProxyPaymentUpdate) SetNillableSort(v *int64) *ProxyPaymentUpdate {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *ProxyPaymentUpdate) AddSort(v int64) *ProxyPaymentUpdate {
+	_u.mutation.AddSort(v)
+	return _u
+}
+
 // SetEnable sets the "enable" field.
 func (_u *ProxyPaymentUpdate) SetEnable(v bool) *ProxyPaymentUpdate {
 	_u.mutation.SetEnable(v)
@@ -325,6 +346,12 @@ func (_u *ProxyPaymentUpdate) sqlSave(ctx context.Context) (_node int, err error
 	}
 	if value, ok := _u.mutation.AddedFeeAmount(); ok {
 		_spec.AddField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(proxypayment.FieldSort, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(proxypayment.FieldSort, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Enable(); ok {
 		_spec.SetField(proxypayment.FieldEnable, field.TypeBool, value)
@@ -505,6 +532,27 @@ func (_u *ProxyPaymentUpdateOne) AddFeeAmount(v int64) *ProxyPaymentUpdateOne {
 	return _u
 }
 
+// SetSort sets the "sort" field.
+func (_u *ProxyPaymentUpdateOne) SetSort(v int64) *ProxyPaymentUpdateOne {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_u *ProxyPaymentUpdateOne) SetNillableSort(v *int64) *ProxyPaymentUpdateOne {
+	if v != nil {
+		_u.SetSort(*v)
+	}
+	return _u
+}
+
+// AddSort adds value to the "sort" field.
+func (_u *ProxyPaymentUpdateOne) AddSort(v int64) *ProxyPaymentUpdateOne {
+	_u.mutation.AddSort(v)
+	return _u
+}
+
 // SetEnable sets the "enable" field.
 func (_u *ProxyPaymentUpdateOne) SetEnable(v bool) *ProxyPaymentUpdateOne {
 	_u.mutation.SetEnable(v)
@@ -680,6 +728,12 @@ func (_u *ProxyPaymentUpdateOne) sqlSave(ctx context.Context) (_node *ProxyPayme
 	}
 	if value, ok := _u.mutation.AddedFeeAmount(); ok {
 		_spec.AddField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.Sort(); ok {
+		_spec.SetField(proxypayment.FieldSort, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSort(); ok {
+		_spec.AddField(proxypayment.FieldSort, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Enable(); ok {
 		_spec.SetField(proxypayment.FieldEnable, field.TypeBool, value)

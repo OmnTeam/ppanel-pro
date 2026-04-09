@@ -33,6 +33,10 @@ type ProxyNode struct {
 	Protocol string `json:"protocol,omitempty"`
 	// 启用
 	Enabled bool `json:"enabled,omitempty"`
+	// 节点类型
+	NodeType string `json:"node_type,omitempty"`
+	// 是否隐藏
+	IsHidden bool `json:"is_hidden,omitempty"`
 	// 排序
 	Sort int `json:"sort,omitempty"`
 	// 节点组ID列表
@@ -51,11 +55,11 @@ func (*ProxyNode) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case proxynode.FieldNodeGroupIds:
 			values[i] = new([]byte)
-		case proxynode.FieldEnabled:
+		case proxynode.FieldEnabled, proxynode.FieldIsHidden:
 			values[i] = new(sql.NullBool)
 		case proxynode.FieldID, proxynode.FieldPort, proxynode.FieldServerID, proxynode.FieldSort:
 			values[i] = new(sql.NullInt64)
-		case proxynode.FieldName, proxynode.FieldTags, proxynode.FieldAddress, proxynode.FieldProtocol:
+		case proxynode.FieldName, proxynode.FieldTags, proxynode.FieldAddress, proxynode.FieldProtocol, proxynode.FieldNodeType:
 			values[i] = new(sql.NullString)
 		case proxynode.FieldCreatedAt, proxynode.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -121,6 +125,18 @@ func (_m *ProxyNode) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field enabled", values[i])
 			} else if value.Valid {
 				_m.Enabled = value.Bool
+			}
+		case proxynode.FieldNodeType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field node_type", values[i])
+			} else if value.Valid {
+				_m.NodeType = value.String
+			}
+		case proxynode.FieldIsHidden:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_hidden", values[i])
+			} else if value.Valid {
+				_m.IsHidden = value.Bool
 			}
 		case proxynode.FieldSort:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -204,6 +220,12 @@ func (_m *ProxyNode) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("enabled=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Enabled))
+	builder.WriteString(", ")
+	builder.WriteString("node_type=")
+	builder.WriteString(_m.NodeType)
+	builder.WriteString(", ")
+	builder.WriteString("is_hidden=")
+	builder.WriteString(fmt.Sprintf("%v", _m.IsHidden))
 	builder.WriteString(", ")
 	builder.WriteString("sort=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Sort))

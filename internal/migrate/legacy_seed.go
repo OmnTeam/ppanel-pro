@@ -4,8 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"embed"
+	"errors"
 	"fmt"
 	"strings"
+
+	mysql "github.com/go-sql-driver/mysql"
 )
 
 //go:embed legacy_sql/*.sql
@@ -27,6 +30,11 @@ var legacySQLMigrations = []legacySQLMigration{
 	{version: 2128, path: "legacy_sql/02128_device_limit.up.sql"},
 	{version: 2131, path: "legacy_sql/02131_add_groups.up.sql"},
 	{version: 2132, path: "legacy_sql/02132_update_verify_config.up.sql"},
+	{version: 2133, path: "legacy_sql/02133_add_expired_node_group.up.sql"},
+	{version: 2134, path: "legacy_sql/02134_subscribe_traffic_limit.up.sql"},
+	{version: 2135, path: "legacy_sql/02135_add_node_group_type.up.sql"},
+	{version: 2136, path: "legacy_sql/02136_add_node_type_is_hidden.up.sql"},
+	{version: 2137, path: "legacy_sql/02137_payment_sort.up.sql"},
 }
 
 func (m *Migrator) initLegacyDefaultData(ctx context.Context) error {
@@ -80,6 +88,10 @@ func (m *Migrator) executeLegacySQLMigration(ctx context.Context, db *sql.DB, mi
 			continue
 		}
 		if _, err = tx.ExecContext(ctx, stmt); err != nil {
+			if shouldIgnoreLegacySQLError(migration.path, stmt, err) {
+				m.logger.Warnf("ignore legacy sql error: path=%s err=%v stmt=%s", migration.path, err, stmt)
+				continue
+			}
 			return fmt.Errorf("exec legacy sql %s failed: %w", migration.path, err)
 		}
 	}
@@ -170,6 +182,12 @@ func splitSQLStatements(content string) []string {
 
 func normalizeLegacyStatement(path, stmt string) string {
 	stmt = strings.TrimSpace(stmt)
+	if path == "legacy_sql/00002_init_basic_data.up.sql" && strings.Contains(stmt, "`subscribe_type`") {
+		// subscribe_type belonged to the legacy project, but the current schema
+		// replaced it with subscribe_application and no longer creates this table.
+		// Keep the embedded SQL as a reference snapshot while skipping the obsolete seed.
+		return ""
+	}
 	if path == "legacy_sql/02101_subscribe_application.up.sql" {
 		stmt = strings.Replace(stmt, "INSERT INTO `subscribe_application`", "INSERT IGNORE INTO `subscribe_application`", 1)
 	}
@@ -188,4 +206,33 @@ func shouldExecuteLegacyStatement(stmt string) bool {
 		strings.HasPrefix(upper, "PREPARE ") ||
 		strings.HasPrefix(upper, "EXECUTE ") ||
 		strings.HasPrefix(upper, "DEALLOCATE ")
+}
+
+func shouldIgnoreLegacySQLError(path, stmt string, err error) bool {
+	var mysqlErr *mysql.MySQLError
+	if !errors.As(err, &mysqlErr) {
+		return false
+	}
+
+	switch mysqlErr.Number {
+	case 1060:
+		return strings.HasPrefix(path, "legacy_sql/02133_") ||
+			path == "legacy_sql/02135_add_node_group_type.up.sql" ||
+			path == "legacy_sql/02136_add_node_type_is_hidden.up.sql" ||
+			path == "legacy_sql/02137_payment_sort.up.sql"
+	case 1061:
+		return path == "legacy_sql/02133_add_expired_node_group.up.sql"
+	case 1091:
+		return path == "legacy_sql/02137_payment_sort.up.sql"
+	}
+
+	upperStmt := strings.ToUpper(strings.TrimSpace(stmt))
+	if strings.HasPrefix(upperStmt, "ALTER TABLE") && strings.Contains(strings.ToLower(mysqlErr.Message), "duplicate") {
+		return strings.HasPrefix(path, "legacy_sql/02133_") ||
+			path == "legacy_sql/02135_add_node_group_type.up.sql" ||
+			path == "legacy_sql/02136_add_node_type_is_hidden.up.sql" ||
+			path == "legacy_sql/02137_payment_sort.up.sql"
+	}
+
+	return false
 }

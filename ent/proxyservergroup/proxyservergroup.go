@@ -15,6 +15,8 @@ const (
 	FieldID = "id"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldGroupType holds the string denoting the group_type field in the database.
+	FieldGroupType = "group_type"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
 	// FieldSort holds the string denoting the sort field in the database.
@@ -45,6 +47,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldName,
+	FieldGroupType,
 	FieldDescription,
 	FieldSort,
 	FieldForCalculation,
@@ -71,6 +74,10 @@ func ValidColumn(column string) bool {
 var (
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// DefaultGroupType holds the default value on creation for the "group_type" field.
+	DefaultGroupType string
+	// GroupTypeValidator is a validator for the "group_type" field. It is called by the builders before save.
+	GroupTypeValidator func(string) error
 	// DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	DescriptionValidator func(string) error
 	// DefaultSort holds the default value on creation for the "sort" field.
@@ -104,6 +111,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByGroupType orders the results by the group_type field.
+func ByGroupType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldGroupType, opts...).ToFunc()
 }
 
 // ByDescription orders the results by the description field.

@@ -89,6 +89,16 @@ func Enabled(v bool) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldEQ(FieldEnabled, v))
 }
 
+// NodeType applies equality check predicate on the "node_type" field. It's identical to NodeTypeEQ.
+func NodeType(v string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldEQ(FieldNodeType, v))
+}
+
+// IsHidden applies equality check predicate on the "is_hidden" field. It's identical to IsHiddenEQ.
+func IsHidden(v bool) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldEQ(FieldIsHidden, v))
+}
+
 // Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
 func Sort(v int) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldEQ(FieldSort, v))
@@ -452,6 +462,81 @@ func EnabledEQ(v bool) predicate.ProxyNode {
 // EnabledNEQ applies the NEQ predicate on the "enabled" field.
 func EnabledNEQ(v bool) predicate.ProxyNode {
 	return predicate.ProxyNode(sql.FieldNEQ(FieldEnabled, v))
+}
+
+// NodeTypeEQ applies the EQ predicate on the "node_type" field.
+func NodeTypeEQ(v string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldEQ(FieldNodeType, v))
+}
+
+// NodeTypeNEQ applies the NEQ predicate on the "node_type" field.
+func NodeTypeNEQ(v string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldNEQ(FieldNodeType, v))
+}
+
+// NodeTypeIn applies the In predicate on the "node_type" field.
+func NodeTypeIn(vs ...string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldIn(FieldNodeType, vs...))
+}
+
+// NodeTypeNotIn applies the NotIn predicate on the "node_type" field.
+func NodeTypeNotIn(vs ...string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldNotIn(FieldNodeType, vs...))
+}
+
+// NodeTypeGT applies the GT predicate on the "node_type" field.
+func NodeTypeGT(v string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldGT(FieldNodeType, v))
+}
+
+// NodeTypeGTE applies the GTE predicate on the "node_type" field.
+func NodeTypeGTE(v string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldGTE(FieldNodeType, v))
+}
+
+// NodeTypeLT applies the LT predicate on the "node_type" field.
+func NodeTypeLT(v string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldLT(FieldNodeType, v))
+}
+
+// NodeTypeLTE applies the LTE predicate on the "node_type" field.
+func NodeTypeLTE(v string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldLTE(FieldNodeType, v))
+}
+
+// NodeTypeContains applies the Contains predicate on the "node_type" field.
+func NodeTypeContains(v string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldContains(FieldNodeType, v))
+}
+
+// NodeTypeHasPrefix applies the HasPrefix predicate on the "node_type" field.
+func NodeTypeHasPrefix(v string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldHasPrefix(FieldNodeType, v))
+}
+
+// NodeTypeHasSuffix applies the HasSuffix predicate on the "node_type" field.
+func NodeTypeHasSuffix(v string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldHasSuffix(FieldNodeType, v))
+}
+
+// NodeTypeEqualFold applies the EqualFold predicate on the "node_type" field.
+func NodeTypeEqualFold(v string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldEqualFold(FieldNodeType, v))
+}
+
+// NodeTypeContainsFold applies the ContainsFold predicate on the "node_type" field.
+func NodeTypeContainsFold(v string) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldContainsFold(FieldNodeType, v))
+}
+
+// IsHiddenEQ applies the EQ predicate on the "is_hidden" field.
+func IsHiddenEQ(v bool) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldEQ(FieldIsHidden, v))
+}
+
+// IsHiddenNEQ applies the NEQ predicate on the "is_hidden" field.
+func IsHiddenNEQ(v bool) predicate.ProxyNode {
+	return predicate.ProxyNode(sql.FieldNEQ(FieldIsHidden, v))
 }
 
 // SortEQ applies the EQ predicate on the "sort" field.

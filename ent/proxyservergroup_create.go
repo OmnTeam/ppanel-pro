@@ -26,6 +26,20 @@ func (_c *ProxyServerGroupCreate) SetName(v string) *ProxyServerGroupCreate {
 	return _c
 }
 
+// SetGroupType sets the "group_type" field.
+func (_c *ProxyServerGroupCreate) SetGroupType(v string) *ProxyServerGroupCreate {
+	_c.mutation.SetGroupType(v)
+	return _c
+}
+
+// SetNillableGroupType sets the "group_type" field if the given value is not nil.
+func (_c *ProxyServerGroupCreate) SetNillableGroupType(v *string) *ProxyServerGroupCreate {
+	if v != nil {
+		_c.SetGroupType(*v)
+	}
+	return _c
+}
+
 // SetDescription sets the "description" field.
 func (_c *ProxyServerGroupCreate) SetDescription(v string) *ProxyServerGroupCreate {
 	_c.mutation.SetDescription(v)
@@ -221,6 +235,10 @@ func (_c *ProxyServerGroupCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (_c *ProxyServerGroupCreate) defaults() {
+	if _, ok := _c.mutation.GroupType(); !ok {
+		v := proxyservergroup.DefaultGroupType
+		_c.mutation.SetGroupType(v)
+	}
 	if _, ok := _c.mutation.Sort(); !ok {
 		v := proxyservergroup.DefaultSort
 		_c.mutation.SetSort(v)
@@ -259,6 +277,14 @@ func (_c *ProxyServerGroupCreate) check() error {
 	if v, ok := _c.mutation.Name(); ok {
 		if err := proxyservergroup.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "ProxyServerGroup.name": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.GroupType(); !ok {
+		return &ValidationError{Name: "group_type", err: errors.New(`ent: missing required field "ProxyServerGroup.group_type"`)}
+	}
+	if v, ok := _c.mutation.GroupType(); ok {
+		if err := proxyservergroup.GroupTypeValidator(v); err != nil {
+			return &ValidationError{Name: "group_type", err: fmt.Errorf(`ent: validator failed for field "ProxyServerGroup.group_type": %w`, err)}
 		}
 	}
 	if v, ok := _c.mutation.Description(); ok {
@@ -327,6 +353,10 @@ func (_c *ProxyServerGroupCreate) createSpec() (*ProxyServerGroup, *sqlgraph.Cre
 	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(proxyservergroup.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := _c.mutation.GroupType(); ok {
+		_spec.SetField(proxyservergroup.FieldGroupType, field.TypeString, value)
+		_node.GroupType = value
 	}
 	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(proxyservergroup.FieldDescription, field.TypeString, value)

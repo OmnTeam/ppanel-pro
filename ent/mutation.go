@@ -5912,6 +5912,8 @@ type ProxyNodeMutation struct {
 	addserver_id         *int64
 	protocol             *string
 	enabled              *bool
+	node_type            *string
+	is_hidden            *bool
 	sort                 *int
 	addsort              *int
 	node_group_ids       *[]int64
@@ -6320,6 +6322,78 @@ func (m *ProxyNodeMutation) ResetEnabled() {
 	m.enabled = nil
 }
 
+// SetNodeType sets the "node_type" field.
+func (m *ProxyNodeMutation) SetNodeType(s string) {
+	m.node_type = &s
+}
+
+// NodeType returns the value of the "node_type" field in the mutation.
+func (m *ProxyNodeMutation) NodeType() (r string, exists bool) {
+	v := m.node_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNodeType returns the old "node_type" field's value of the ProxyNode entity.
+// If the ProxyNode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyNodeMutation) OldNodeType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNodeType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNodeType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNodeType: %w", err)
+	}
+	return oldValue.NodeType, nil
+}
+
+// ResetNodeType resets all changes to the "node_type" field.
+func (m *ProxyNodeMutation) ResetNodeType() {
+	m.node_type = nil
+}
+
+// SetIsHidden sets the "is_hidden" field.
+func (m *ProxyNodeMutation) SetIsHidden(b bool) {
+	m.is_hidden = &b
+}
+
+// IsHidden returns the value of the "is_hidden" field in the mutation.
+func (m *ProxyNodeMutation) IsHidden() (r bool, exists bool) {
+	v := m.is_hidden
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsHidden returns the old "is_hidden" field's value of the ProxyNode entity.
+// If the ProxyNode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyNodeMutation) OldIsHidden(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsHidden is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsHidden requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsHidden: %w", err)
+	}
+	return oldValue.IsHidden, nil
+}
+
+// ResetIsHidden resets all changes to the "is_hidden" field.
+func (m *ProxyNodeMutation) ResetIsHidden() {
+	m.is_hidden = nil
+}
+
 // SetSort sets the "sort" field.
 func (m *ProxyNodeMutation) SetSort(i int) {
 	m.sort = &i
@@ -6547,7 +6621,7 @@ func (m *ProxyNodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProxyNodeMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 13)
 	if m.name != nil {
 		fields = append(fields, proxynode.FieldName)
 	}
@@ -6568,6 +6642,12 @@ func (m *ProxyNodeMutation) Fields() []string {
 	}
 	if m.enabled != nil {
 		fields = append(fields, proxynode.FieldEnabled)
+	}
+	if m.node_type != nil {
+		fields = append(fields, proxynode.FieldNodeType)
+	}
+	if m.is_hidden != nil {
+		fields = append(fields, proxynode.FieldIsHidden)
 	}
 	if m.sort != nil {
 		fields = append(fields, proxynode.FieldSort)
@@ -6603,6 +6683,10 @@ func (m *ProxyNodeMutation) Field(name string) (ent.Value, bool) {
 		return m.Protocol()
 	case proxynode.FieldEnabled:
 		return m.Enabled()
+	case proxynode.FieldNodeType:
+		return m.NodeType()
+	case proxynode.FieldIsHidden:
+		return m.IsHidden()
 	case proxynode.FieldSort:
 		return m.Sort()
 	case proxynode.FieldNodeGroupIds:
@@ -6634,6 +6718,10 @@ func (m *ProxyNodeMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldProtocol(ctx)
 	case proxynode.FieldEnabled:
 		return m.OldEnabled(ctx)
+	case proxynode.FieldNodeType:
+		return m.OldNodeType(ctx)
+	case proxynode.FieldIsHidden:
+		return m.OldIsHidden(ctx)
 	case proxynode.FieldSort:
 		return m.OldSort(ctx)
 	case proxynode.FieldNodeGroupIds:
@@ -6699,6 +6787,20 @@ func (m *ProxyNodeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetEnabled(v)
+		return nil
+	case proxynode.FieldNodeType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNodeType(v)
+		return nil
+	case proxynode.FieldIsHidden:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsHidden(v)
 		return nil
 	case proxynode.FieldSort:
 		v, ok := value.(int)
@@ -6845,6 +6947,12 @@ func (m *ProxyNodeMutation) ResetField(name string) error {
 		return nil
 	case proxynode.FieldEnabled:
 		m.ResetEnabled()
+		return nil
+	case proxynode.FieldNodeType:
+		m.ResetNodeType()
+		return nil
+	case proxynode.FieldIsHidden:
+		m.ResetIsHidden()
 		return nil
 	case proxynode.FieldSort:
 		m.ResetSort()
@@ -8939,6 +9047,8 @@ type ProxyPaymentMutation struct {
 	addfee_percent *int64
 	fee_amount     *int64
 	addfee_amount  *int64
+	sort           *int64
+	addsort        *int64
 	enable         *bool
 	token          *string
 	clearedFields  map[string]struct{}
@@ -9448,6 +9558,62 @@ func (m *ProxyPaymentMutation) ResetFeeAmount() {
 	m.addfee_amount = nil
 }
 
+// SetSort sets the "sort" field.
+func (m *ProxyPaymentMutation) SetSort(i int64) {
+	m.sort = &i
+	m.addsort = nil
+}
+
+// Sort returns the value of the "sort" field in the mutation.
+func (m *ProxyPaymentMutation) Sort() (r int64, exists bool) {
+	v := m.sort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSort returns the old "sort" field's value of the ProxyPayment entity.
+// If the ProxyPayment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyPaymentMutation) OldSort(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSort is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSort requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSort: %w", err)
+	}
+	return oldValue.Sort, nil
+}
+
+// AddSort adds i to the "sort" field.
+func (m *ProxyPaymentMutation) AddSort(i int64) {
+	if m.addsort != nil {
+		*m.addsort += i
+	} else {
+		m.addsort = &i
+	}
+}
+
+// AddedSort returns the value that was added to the "sort" field in this mutation.
+func (m *ProxyPaymentMutation) AddedSort() (r int64, exists bool) {
+	v := m.addsort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSort resets all changes to the "sort" field.
+func (m *ProxyPaymentMutation) ResetSort() {
+	m.sort = nil
+	m.addsort = nil
+}
+
 // SetEnable sets the "enable" field.
 func (m *ProxyPaymentMutation) SetEnable(b bool) {
 	m.enable = &b
@@ -9554,7 +9720,7 @@ func (m *ProxyPaymentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProxyPaymentMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 12)
 	if m.name != nil {
 		fields = append(fields, proxypayment.FieldName)
 	}
@@ -9581,6 +9747,9 @@ func (m *ProxyPaymentMutation) Fields() []string {
 	}
 	if m.fee_amount != nil {
 		fields = append(fields, proxypayment.FieldFeeAmount)
+	}
+	if m.sort != nil {
+		fields = append(fields, proxypayment.FieldSort)
 	}
 	if m.enable != nil {
 		fields = append(fields, proxypayment.FieldEnable)
@@ -9614,6 +9783,8 @@ func (m *ProxyPaymentMutation) Field(name string) (ent.Value, bool) {
 		return m.FeePercent()
 	case proxypayment.FieldFeeAmount:
 		return m.FeeAmount()
+	case proxypayment.FieldSort:
+		return m.Sort()
 	case proxypayment.FieldEnable:
 		return m.Enable()
 	case proxypayment.FieldToken:
@@ -9645,6 +9816,8 @@ func (m *ProxyPaymentMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldFeePercent(ctx)
 	case proxypayment.FieldFeeAmount:
 		return m.OldFeeAmount(ctx)
+	case proxypayment.FieldSort:
+		return m.OldSort(ctx)
 	case proxypayment.FieldEnable:
 		return m.OldEnable(ctx)
 	case proxypayment.FieldToken:
@@ -9721,6 +9894,13 @@ func (m *ProxyPaymentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetFeeAmount(v)
 		return nil
+	case proxypayment.FieldSort:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSort(v)
+		return nil
 	case proxypayment.FieldEnable:
 		v, ok := value.(bool)
 		if !ok {
@@ -9752,6 +9932,9 @@ func (m *ProxyPaymentMutation) AddedFields() []string {
 	if m.addfee_amount != nil {
 		fields = append(fields, proxypayment.FieldFeeAmount)
 	}
+	if m.addsort != nil {
+		fields = append(fields, proxypayment.FieldSort)
+	}
 	return fields
 }
 
@@ -9766,6 +9949,8 @@ func (m *ProxyPaymentMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedFeePercent()
 	case proxypayment.FieldFeeAmount:
 		return m.AddedFeeAmount()
+	case proxypayment.FieldSort:
+		return m.AddedSort()
 	}
 	return nil, false
 }
@@ -9795,6 +9980,13 @@ func (m *ProxyPaymentMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddFeeAmount(v)
+		return nil
+	case proxypayment.FieldSort:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSort(v)
 		return nil
 	}
 	return fmt.Errorf("unknown ProxyPayment numeric field %s", name)
@@ -9858,6 +10050,9 @@ func (m *ProxyPaymentMutation) ResetField(name string) error {
 		return nil
 	case proxypayment.FieldFeeAmount:
 		m.ResetFeeAmount()
+		return nil
+	case proxypayment.FieldSort:
+		m.ResetSort()
 		return nil
 	case proxypayment.FieldEnable:
 		m.ResetEnable()
@@ -13239,6 +13434,7 @@ type ProxyServerGroupMutation struct {
 	typ                       string
 	id                        *int64
 	name                      *string
+	group_type                *string
 	description               *string
 	sort                      *int
 	addsort                   *int
@@ -13400,6 +13596,42 @@ func (m *ProxyServerGroupMutation) OldName(ctx context.Context) (v string, err e
 // ResetName resets all changes to the "name" field.
 func (m *ProxyServerGroupMutation) ResetName() {
 	m.name = nil
+}
+
+// SetGroupType sets the "group_type" field.
+func (m *ProxyServerGroupMutation) SetGroupType(s string) {
+	m.group_type = &s
+}
+
+// GroupType returns the value of the "group_type" field in the mutation.
+func (m *ProxyServerGroupMutation) GroupType() (r string, exists bool) {
+	v := m.group_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGroupType returns the old "group_type" field's value of the ProxyServerGroup entity.
+// If the ProxyServerGroup object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxyServerGroupMutation) OldGroupType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGroupType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGroupType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGroupType: %w", err)
+	}
+	return oldValue.GroupType, nil
+}
+
+// ResetGroupType resets all changes to the "group_type" field.
+func (m *ProxyServerGroupMutation) ResetGroupType() {
+	m.group_type = nil
 }
 
 // SetDescription sets the "description" field.
@@ -14007,9 +14239,12 @@ func (m *ProxyServerGroupMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProxyServerGroupMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.name != nil {
 		fields = append(fields, proxyservergroup.FieldName)
+	}
+	if m.group_type != nil {
+		fields = append(fields, proxyservergroup.FieldGroupType)
 	}
 	if m.description != nil {
 		fields = append(fields, proxyservergroup.FieldDescription)
@@ -14054,6 +14289,8 @@ func (m *ProxyServerGroupMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case proxyservergroup.FieldName:
 		return m.Name()
+	case proxyservergroup.FieldGroupType:
+		return m.GroupType()
 	case proxyservergroup.FieldDescription:
 		return m.Description()
 	case proxyservergroup.FieldSort:
@@ -14087,6 +14324,8 @@ func (m *ProxyServerGroupMutation) OldField(ctx context.Context, name string) (e
 	switch name {
 	case proxyservergroup.FieldName:
 		return m.OldName(ctx)
+	case proxyservergroup.FieldGroupType:
+		return m.OldGroupType(ctx)
 	case proxyservergroup.FieldDescription:
 		return m.OldDescription(ctx)
 	case proxyservergroup.FieldSort:
@@ -14124,6 +14363,13 @@ func (m *ProxyServerGroupMutation) SetField(name string, value ent.Value) error 
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case proxyservergroup.FieldGroupType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGroupType(v)
 		return nil
 	case proxyservergroup.FieldDescription:
 		v, ok := value.(string)
@@ -14355,6 +14601,9 @@ func (m *ProxyServerGroupMutation) ResetField(name string) error {
 	switch name {
 	case proxyservergroup.FieldName:
 		m.ResetName()
+		return nil
+	case proxyservergroup.FieldGroupType:
+		m.ResetGroupType()
 		return nil
 	case proxyservergroup.FieldDescription:
 		m.ResetDescription()

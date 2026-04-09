@@ -118,6 +118,34 @@ func (_c *ProxyNodeCreate) SetNillableEnabled(v *bool) *ProxyNodeCreate {
 	return _c
 }
 
+// SetNodeType sets the "node_type" field.
+func (_c *ProxyNodeCreate) SetNodeType(v string) *ProxyNodeCreate {
+	_c.mutation.SetNodeType(v)
+	return _c
+}
+
+// SetNillableNodeType sets the "node_type" field if the given value is not nil.
+func (_c *ProxyNodeCreate) SetNillableNodeType(v *string) *ProxyNodeCreate {
+	if v != nil {
+		_c.SetNodeType(*v)
+	}
+	return _c
+}
+
+// SetIsHidden sets the "is_hidden" field.
+func (_c *ProxyNodeCreate) SetIsHidden(v bool) *ProxyNodeCreate {
+	_c.mutation.SetIsHidden(v)
+	return _c
+}
+
+// SetNillableIsHidden sets the "is_hidden" field if the given value is not nil.
+func (_c *ProxyNodeCreate) SetNillableIsHidden(v *bool) *ProxyNodeCreate {
+	if v != nil {
+		_c.SetIsHidden(*v)
+	}
+	return _c
+}
+
 // SetSort sets the "sort" field.
 func (_c *ProxyNodeCreate) SetSort(v int) *ProxyNodeCreate {
 	_c.mutation.SetSort(v)
@@ -235,6 +263,14 @@ func (_c *ProxyNodeCreate) defaults() {
 		v := proxynode.DefaultEnabled
 		_c.mutation.SetEnabled(v)
 	}
+	if _, ok := _c.mutation.NodeType(); !ok {
+		v := proxynode.DefaultNodeType
+		_c.mutation.SetNodeType(v)
+	}
+	if _, ok := _c.mutation.IsHidden(); !ok {
+		v := proxynode.DefaultIsHidden
+		_c.mutation.SetIsHidden(v)
+	}
 	if _, ok := _c.mutation.Sort(); !ok {
 		v := proxynode.DefaultSort
 		_c.mutation.SetSort(v)
@@ -291,6 +327,17 @@ func (_c *ProxyNodeCreate) check() error {
 	}
 	if _, ok := _c.mutation.Enabled(); !ok {
 		return &ValidationError{Name: "enabled", err: errors.New(`ent: missing required field "ProxyNode.enabled"`)}
+	}
+	if _, ok := _c.mutation.NodeType(); !ok {
+		return &ValidationError{Name: "node_type", err: errors.New(`ent: missing required field "ProxyNode.node_type"`)}
+	}
+	if v, ok := _c.mutation.NodeType(); ok {
+		if err := proxynode.NodeTypeValidator(v); err != nil {
+			return &ValidationError{Name: "node_type", err: fmt.Errorf(`ent: validator failed for field "ProxyNode.node_type": %w`, err)}
+		}
+	}
+	if _, ok := _c.mutation.IsHidden(); !ok {
+		return &ValidationError{Name: "is_hidden", err: errors.New(`ent: missing required field "ProxyNode.is_hidden"`)}
 	}
 	if _, ok := _c.mutation.Sort(); !ok {
 		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "ProxyNode.sort"`)}
@@ -360,6 +407,14 @@ func (_c *ProxyNodeCreate) createSpec() (*ProxyNode, *sqlgraph.CreateSpec) {
 	if value, ok := _c.mutation.Enabled(); ok {
 		_spec.SetField(proxynode.FieldEnabled, field.TypeBool, value)
 		_node.Enabled = value
+	}
+	if value, ok := _c.mutation.NodeType(); ok {
+		_spec.SetField(proxynode.FieldNodeType, field.TypeString, value)
+		_node.NodeType = value
+	}
+	if value, ok := _c.mutation.IsHidden(); ok {
+		_spec.SetField(proxynode.FieldIsHidden, field.TypeBool, value)
+		_node.IsHidden = value
 	}
 	if value, ok := _c.mutation.Sort(); ok {
 		_spec.SetField(proxynode.FieldSort, field.TypeInt, value)

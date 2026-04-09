@@ -97,6 +97,11 @@ func FeeAmount(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldFeeAmount, v))
 }
 
+// Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
+func Sort(v int64) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldEQ(FieldSort, v))
+}
+
 // Enable applies equality check predicate on the "enable" field. It's identical to EnableEQ.
 func Enable(v bool) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldEnable, v))
@@ -625,6 +630,46 @@ func FeeAmountLT(v int64) predicate.ProxyPayment {
 // FeeAmountLTE applies the LTE predicate on the "fee_amount" field.
 func FeeAmountLTE(v int64) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldLTE(FieldFeeAmount, v))
+}
+
+// SortEQ applies the EQ predicate on the "sort" field.
+func SortEQ(v int64) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldEQ(FieldSort, v))
+}
+
+// SortNEQ applies the NEQ predicate on the "sort" field.
+func SortNEQ(v int64) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldNEQ(FieldSort, v))
+}
+
+// SortIn applies the In predicate on the "sort" field.
+func SortIn(vs ...int64) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldIn(FieldSort, vs...))
+}
+
+// SortNotIn applies the NotIn predicate on the "sort" field.
+func SortNotIn(vs ...int64) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldNotIn(FieldSort, vs...))
+}
+
+// SortGT applies the GT predicate on the "sort" field.
+func SortGT(v int64) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldGT(FieldSort, v))
+}
+
+// SortGTE applies the GTE predicate on the "sort" field.
+func SortGTE(v int64) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldGTE(FieldSort, v))
+}
+
+// SortLT applies the LT predicate on the "sort" field.
+func SortLT(v int64) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldLT(FieldSort, v))
+}
+
+// SortLTE applies the LTE predicate on the "sort" field.
+func SortLTE(v int64) predicate.ProxyPayment {
+	return predicate.ProxyPayment(sql.FieldLTE(FieldSort, v))
 }
 
 // EnableEQ applies the EQ predicate on the "enable" field.

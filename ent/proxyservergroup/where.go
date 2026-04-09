@@ -59,6 +59,11 @@ func Name(v string) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldEQ(FieldName, v))
 }
 
+// GroupType applies equality check predicate on the "group_type" field. It's identical to GroupTypeEQ.
+func GroupType(v string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldGroupType, v))
+}
+
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
 func Description(v string) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldEQ(FieldDescription, v))
@@ -177,6 +182,71 @@ func NameEqualFold(v string) predicate.ProxyServerGroup {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.ProxyServerGroup {
 	return predicate.ProxyServerGroup(sql.FieldContainsFold(FieldName, v))
+}
+
+// GroupTypeEQ applies the EQ predicate on the "group_type" field.
+func GroupTypeEQ(v string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEQ(FieldGroupType, v))
+}
+
+// GroupTypeNEQ applies the NEQ predicate on the "group_type" field.
+func GroupTypeNEQ(v string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNEQ(FieldGroupType, v))
+}
+
+// GroupTypeIn applies the In predicate on the "group_type" field.
+func GroupTypeIn(vs ...string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldIn(FieldGroupType, vs...))
+}
+
+// GroupTypeNotIn applies the NotIn predicate on the "group_type" field.
+func GroupTypeNotIn(vs ...string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldNotIn(FieldGroupType, vs...))
+}
+
+// GroupTypeGT applies the GT predicate on the "group_type" field.
+func GroupTypeGT(v string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGT(FieldGroupType, v))
+}
+
+// GroupTypeGTE applies the GTE predicate on the "group_type" field.
+func GroupTypeGTE(v string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldGTE(FieldGroupType, v))
+}
+
+// GroupTypeLT applies the LT predicate on the "group_type" field.
+func GroupTypeLT(v string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLT(FieldGroupType, v))
+}
+
+// GroupTypeLTE applies the LTE predicate on the "group_type" field.
+func GroupTypeLTE(v string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldLTE(FieldGroupType, v))
+}
+
+// GroupTypeContains applies the Contains predicate on the "group_type" field.
+func GroupTypeContains(v string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldContains(FieldGroupType, v))
+}
+
+// GroupTypeHasPrefix applies the HasPrefix predicate on the "group_type" field.
+func GroupTypeHasPrefix(v string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldHasPrefix(FieldGroupType, v))
+}
+
+// GroupTypeHasSuffix applies the HasSuffix predicate on the "group_type" field.
+func GroupTypeHasSuffix(v string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldHasSuffix(FieldGroupType, v))
+}
+
+// GroupTypeEqualFold applies the EqualFold predicate on the "group_type" field.
+func GroupTypeEqualFold(v string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldEqualFold(FieldGroupType, v))
+}
+
+// GroupTypeContainsFold applies the ContainsFold predicate on the "group_type" field.
+func GroupTypeContainsFold(v string) predicate.ProxyServerGroup {
+	return predicate.ProxyServerGroup(sql.FieldContainsFold(FieldGroupType, v))
 }
 
 // DescriptionEQ applies the EQ predicate on the "description" field.

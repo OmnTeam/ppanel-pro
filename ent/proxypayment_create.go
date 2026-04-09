@@ -129,6 +129,20 @@ func (_c *ProxyPaymentCreate) SetNillableFeeAmount(v *int64) *ProxyPaymentCreate
 	return _c
 }
 
+// SetSort sets the "sort" field.
+func (_c *ProxyPaymentCreate) SetSort(v int64) *ProxyPaymentCreate {
+	_c.mutation.SetSort(v)
+	return _c
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (_c *ProxyPaymentCreate) SetNillableSort(v *int64) *ProxyPaymentCreate {
+	if v != nil {
+		_c.SetSort(*v)
+	}
+	return _c
+}
+
 // SetEnable sets the "enable" field.
 func (_c *ProxyPaymentCreate) SetEnable(v bool) *ProxyPaymentCreate {
 	_c.mutation.SetEnable(v)
@@ -214,6 +228,10 @@ func (_c *ProxyPaymentCreate) defaults() {
 		v := proxypayment.DefaultFeeAmount
 		_c.mutation.SetFeeAmount(v)
 	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		v := proxypayment.DefaultSort
+		_c.mutation.SetSort(v)
+	}
 	if _, ok := _c.mutation.Enable(); !ok {
 		v := proxypayment.DefaultEnable
 		_c.mutation.SetEnable(v)
@@ -270,6 +288,9 @@ func (_c *ProxyPaymentCreate) check() error {
 	}
 	if _, ok := _c.mutation.FeeAmount(); !ok {
 		return &ValidationError{Name: "fee_amount", err: errors.New(`ent: missing required field "ProxyPayment.fee_amount"`)}
+	}
+	if _, ok := _c.mutation.Sort(); !ok {
+		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "ProxyPayment.sort"`)}
 	}
 	if _, ok := _c.mutation.Enable(); !ok {
 		return &ValidationError{Name: "enable", err: errors.New(`ent: missing required field "ProxyPayment.enable"`)}
@@ -349,6 +370,10 @@ func (_c *ProxyPaymentCreate) createSpec() (*ProxyPayment, *sqlgraph.CreateSpec)
 	if value, ok := _c.mutation.FeeAmount(); ok {
 		_spec.SetField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
 		_node.FeeAmount = value
+	}
+	if value, ok := _c.mutation.Sort(); ok {
+		_spec.SetField(proxypayment.FieldSort, field.TypeInt64, value)
+		_node.Sort = value
 	}
 	if value, ok := _c.mutation.Enable(); ok {
 		_spec.SetField(proxypayment.FieldEnable, field.TypeBool, value)

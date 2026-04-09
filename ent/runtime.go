@@ -431,16 +431,26 @@ func init() {
 	proxynodeDescEnabled := proxynodeFields[7].Descriptor()
 	// proxynode.DefaultEnabled holds the default value on creation for the enabled field.
 	proxynode.DefaultEnabled = proxynodeDescEnabled.Default.(bool)
+	// proxynodeDescNodeType is the schema descriptor for node_type field.
+	proxynodeDescNodeType := proxynodeFields[8].Descriptor()
+	// proxynode.DefaultNodeType holds the default value on creation for the node_type field.
+	proxynode.DefaultNodeType = proxynodeDescNodeType.Default.(string)
+	// proxynode.NodeTypeValidator is a validator for the "node_type" field. It is called by the builders before save.
+	proxynode.NodeTypeValidator = proxynodeDescNodeType.Validators[0].(func(string) error)
+	// proxynodeDescIsHidden is the schema descriptor for is_hidden field.
+	proxynodeDescIsHidden := proxynodeFields[9].Descriptor()
+	// proxynode.DefaultIsHidden holds the default value on creation for the is_hidden field.
+	proxynode.DefaultIsHidden = proxynodeDescIsHidden.Default.(bool)
 	// proxynodeDescSort is the schema descriptor for sort field.
-	proxynodeDescSort := proxynodeFields[8].Descriptor()
+	proxynodeDescSort := proxynodeFields[10].Descriptor()
 	// proxynode.DefaultSort holds the default value on creation for the sort field.
 	proxynode.DefaultSort = proxynodeDescSort.Default.(int)
 	// proxynodeDescCreatedAt is the schema descriptor for created_at field.
-	proxynodeDescCreatedAt := proxynodeFields[10].Descriptor()
+	proxynodeDescCreatedAt := proxynodeFields[12].Descriptor()
 	// proxynode.DefaultCreatedAt holds the default value on creation for the created_at field.
 	proxynode.DefaultCreatedAt = proxynodeDescCreatedAt.Default.(func() time.Time)
 	// proxynodeDescUpdatedAt is the schema descriptor for updated_at field.
-	proxynodeDescUpdatedAt := proxynodeFields[11].Descriptor()
+	proxynodeDescUpdatedAt := proxynodeFields[13].Descriptor()
 	// proxynode.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	proxynode.DefaultUpdatedAt = proxynodeDescUpdatedAt.Default.(func() time.Time)
 	// proxynode.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
@@ -617,12 +627,16 @@ func init() {
 	proxypaymentDescFeeAmount := proxypaymentFields[9].Descriptor()
 	// proxypayment.DefaultFeeAmount holds the default value on creation for the fee_amount field.
 	proxypayment.DefaultFeeAmount = proxypaymentDescFeeAmount.Default.(int64)
+	// proxypaymentDescSort is the schema descriptor for sort field.
+	proxypaymentDescSort := proxypaymentFields[10].Descriptor()
+	// proxypayment.DefaultSort holds the default value on creation for the sort field.
+	proxypayment.DefaultSort = proxypaymentDescSort.Default.(int64)
 	// proxypaymentDescEnable is the schema descriptor for enable field.
-	proxypaymentDescEnable := proxypaymentFields[10].Descriptor()
+	proxypaymentDescEnable := proxypaymentFields[11].Descriptor()
 	// proxypayment.DefaultEnable holds the default value on creation for the enable field.
 	proxypayment.DefaultEnable = proxypaymentDescEnable.Default.(bool)
 	// proxypaymentDescToken is the schema descriptor for token field.
-	proxypaymentDescToken := proxypaymentFields[11].Descriptor()
+	proxypaymentDescToken := proxypaymentFields[12].Descriptor()
 	// proxypayment.TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	proxypayment.TokenValidator = func() func(string) error {
 		validators := proxypaymentDescToken.Validators
@@ -807,36 +821,42 @@ func init() {
 			return nil
 		}
 	}()
+	// proxyservergroupDescGroupType is the schema descriptor for group_type field.
+	proxyservergroupDescGroupType := proxyservergroupFields[2].Descriptor()
+	// proxyservergroup.DefaultGroupType holds the default value on creation for the group_type field.
+	proxyservergroup.DefaultGroupType = proxyservergroupDescGroupType.Default.(string)
+	// proxyservergroup.GroupTypeValidator is a validator for the "group_type" field. It is called by the builders before save.
+	proxyservergroup.GroupTypeValidator = proxyservergroupDescGroupType.Validators[0].(func(string) error)
 	// proxyservergroupDescDescription is the schema descriptor for description field.
-	proxyservergroupDescDescription := proxyservergroupFields[2].Descriptor()
+	proxyservergroupDescDescription := proxyservergroupFields[3].Descriptor()
 	// proxyservergroup.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
 	proxyservergroup.DescriptionValidator = proxyservergroupDescDescription.Validators[0].(func(string) error)
 	// proxyservergroupDescSort is the schema descriptor for sort field.
-	proxyservergroupDescSort := proxyservergroupFields[3].Descriptor()
+	proxyservergroupDescSort := proxyservergroupFields[4].Descriptor()
 	// proxyservergroup.DefaultSort holds the default value on creation for the sort field.
 	proxyservergroup.DefaultSort = proxyservergroupDescSort.Default.(int)
 	// proxyservergroupDescForCalculation is the schema descriptor for for_calculation field.
-	proxyservergroupDescForCalculation := proxyservergroupFields[4].Descriptor()
+	proxyservergroupDescForCalculation := proxyservergroupFields[5].Descriptor()
 	// proxyservergroup.DefaultForCalculation holds the default value on creation for the for_calculation field.
 	proxyservergroup.DefaultForCalculation = proxyservergroupDescForCalculation.Default.(bool)
 	// proxyservergroupDescIsExpiredGroup is the schema descriptor for is_expired_group field.
-	proxyservergroupDescIsExpiredGroup := proxyservergroupFields[5].Descriptor()
+	proxyservergroupDescIsExpiredGroup := proxyservergroupFields[6].Descriptor()
 	// proxyservergroup.DefaultIsExpiredGroup holds the default value on creation for the is_expired_group field.
 	proxyservergroup.DefaultIsExpiredGroup = proxyservergroupDescIsExpiredGroup.Default.(bool)
 	// proxyservergroupDescExpiredDaysLimit is the schema descriptor for expired_days_limit field.
-	proxyservergroupDescExpiredDaysLimit := proxyservergroupFields[6].Descriptor()
+	proxyservergroupDescExpiredDaysLimit := proxyservergroupFields[7].Descriptor()
 	// proxyservergroup.DefaultExpiredDaysLimit holds the default value on creation for the expired_days_limit field.
 	proxyservergroup.DefaultExpiredDaysLimit = proxyservergroupDescExpiredDaysLimit.Default.(int)
 	// proxyservergroupDescSpeedLimit is the schema descriptor for speed_limit field.
-	proxyservergroupDescSpeedLimit := proxyservergroupFields[8].Descriptor()
+	proxyservergroupDescSpeedLimit := proxyservergroupFields[9].Descriptor()
 	// proxyservergroup.DefaultSpeedLimit holds the default value on creation for the speed_limit field.
 	proxyservergroup.DefaultSpeedLimit = proxyservergroupDescSpeedLimit.Default.(int)
 	// proxyservergroupDescCreatedAt is the schema descriptor for created_at field.
-	proxyservergroupDescCreatedAt := proxyservergroupFields[11].Descriptor()
+	proxyservergroupDescCreatedAt := proxyservergroupFields[12].Descriptor()
 	// proxyservergroup.DefaultCreatedAt holds the default value on creation for the created_at field.
 	proxyservergroup.DefaultCreatedAt = proxyservergroupDescCreatedAt.Default.(func() time.Time)
 	// proxyservergroupDescUpdatedAt is the schema descriptor for updated_at field.
-	proxyservergroupDescUpdatedAt := proxyservergroupFields[12].Descriptor()
+	proxyservergroupDescUpdatedAt := proxyservergroupFields[13].Descriptor()
 	// proxyservergroup.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	proxyservergroup.DefaultUpdatedAt = proxyservergroupDescUpdatedAt.Default.(func() time.Time)
 	// proxyservergroup.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

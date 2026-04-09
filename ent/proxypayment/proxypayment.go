@@ -29,6 +29,8 @@ const (
 	FieldFeePercent = "fee_percent"
 	// FieldFeeAmount holds the string denoting the fee_amount field in the database.
 	FieldFeeAmount = "fee_amount"
+	// FieldSort holds the string denoting the sort field in the database.
+	FieldSort = "sort"
 	// FieldEnable holds the string denoting the enable field in the database.
 	FieldEnable = "enable"
 	// FieldToken holds the string denoting the token field in the database.
@@ -49,6 +51,7 @@ var Columns = []string{
 	FieldFeeMode,
 	FieldFeePercent,
 	FieldFeeAmount,
+	FieldSort,
 	FieldEnable,
 	FieldToken,
 }
@@ -86,6 +89,8 @@ var (
 	DefaultFeePercent int64
 	// DefaultFeeAmount holds the default value on creation for the "fee_amount" field.
 	DefaultFeeAmount int64
+	// DefaultSort holds the default value on creation for the "sort" field.
+	DefaultSort int64
 	// DefaultEnable holds the default value on creation for the "enable" field.
 	DefaultEnable bool
 	// TokenValidator is a validator for the "token" field. It is called by the builders before save.
@@ -143,6 +148,11 @@ func ByFeePercent(opts ...sql.OrderTermOption) OrderOption {
 // ByFeeAmount orders the results by the fee_amount field.
 func ByFeeAmount(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldFeeAmount, opts...).ToFunc()
+}
+
+// BySort orders the results by the sort field.
+func BySort(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSort, opts...).ToFunc()
 }
 
 // ByEnable orders the results by the enable field.

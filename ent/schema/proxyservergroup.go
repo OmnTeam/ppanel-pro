@@ -25,6 +25,7 @@ func (ProxyServerGroup) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int64("id").Positive().Comment("ID"),
 		field.String("name").MaxLen(255).NotEmpty().Comment("Group Name"),
+		field.String("group_type").MaxLen(32).Default("common").Comment("Node Group Type"),
 		field.String("description").MaxLen(500).Optional().Comment("Group Description"),
 		field.Int("sort").Default(0).Comment("Sort Order"),
 		field.Bool("for_calculation").Default(true).Comment("For Calculation"),

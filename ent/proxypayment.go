@@ -35,6 +35,8 @@ type ProxyPayment struct {
 	FeePercent int64 `json:"fee_percent,omitempty"`
 	// 固定费用金额
 	FeeAmount int64 `json:"fee_amount,omitempty"`
+	// 排序
+	Sort int64 `json:"sort,omitempty"`
 	// 是否启用
 	Enable bool `json:"enable,omitempty"`
 	// 支付令牌
@@ -49,7 +51,7 @@ func (*ProxyPayment) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case proxypayment.FieldEnable:
 			values[i] = new(sql.NullBool)
-		case proxypayment.FieldID, proxypayment.FieldFeeMode, proxypayment.FieldFeePercent, proxypayment.FieldFeeAmount:
+		case proxypayment.FieldID, proxypayment.FieldFeeMode, proxypayment.FieldFeePercent, proxypayment.FieldFeeAmount, proxypayment.FieldSort:
 			values[i] = new(sql.NullInt64)
 		case proxypayment.FieldName, proxypayment.FieldPlatform, proxypayment.FieldIcon, proxypayment.FieldDomain, proxypayment.FieldConfig, proxypayment.FieldDescription, proxypayment.FieldToken:
 			values[i] = new(sql.NullString)
@@ -128,6 +130,12 @@ func (_m *ProxyPayment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				_m.FeeAmount = value.Int64
 			}
+		case proxypayment.FieldSort:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field sort", values[i])
+			} else if value.Valid {
+				_m.Sort = value.Int64
+			}
 		case proxypayment.FieldEnable:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field enable", values[i])
@@ -202,6 +210,9 @@ func (_m *ProxyPayment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("fee_amount=")
 	builder.WriteString(fmt.Sprintf("%v", _m.FeeAmount))
+	builder.WriteString(", ")
+	builder.WriteString("sort=")
+	builder.WriteString(fmt.Sprintf("%v", _m.Sort))
 	builder.WriteString(", ")
 	builder.WriteString("enable=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Enable))

@@ -20,6 +20,8 @@ type ProxyServerGroup struct {
 	ID int64 `json:"id,omitempty"`
 	// Group Name
 	Name string `json:"name,omitempty"`
+	// Node Group Type
+	GroupType string `json:"group_type,omitempty"`
 	// Group Description
 	Description string `json:"description,omitempty"`
 	// Sort Order
@@ -54,7 +56,7 @@ func (*ProxyServerGroup) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case proxyservergroup.FieldID, proxyservergroup.FieldSort, proxyservergroup.FieldExpiredDaysLimit, proxyservergroup.FieldMaxTrafficGBExpired, proxyservergroup.FieldSpeedLimit, proxyservergroup.FieldMinTrafficGB, proxyservergroup.FieldMaxTrafficGB:
 			values[i] = new(sql.NullInt64)
-		case proxyservergroup.FieldName, proxyservergroup.FieldDescription:
+		case proxyservergroup.FieldName, proxyservergroup.FieldGroupType, proxyservergroup.FieldDescription:
 			values[i] = new(sql.NullString)
 		case proxyservergroup.FieldCreatedAt, proxyservergroup.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -84,6 +86,12 @@ func (_m *ProxyServerGroup) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				_m.Name = value.String
+			}
+		case proxyservergroup.FieldGroupType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field group_type", values[i])
+			} else if value.Valid {
+				_m.GroupType = value.String
 			}
 		case proxyservergroup.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -192,6 +200,9 @@ func (_m *ProxyServerGroup) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("name=")
 	builder.WriteString(_m.Name)
+	builder.WriteString(", ")
+	builder.WriteString("group_type=")
+	builder.WriteString(_m.GroupType)
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(_m.Description)

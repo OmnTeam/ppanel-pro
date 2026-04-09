@@ -32,6 +32,7 @@ func (ProxyPayment) Fields() []ent.Field {
 		field.Uint("fee_mode").Default(0).Comment("费用模式"),
 		field.Int64("fee_percent").Default(0).Comment("费用百分比"),
 		field.Int64("fee_amount").Default(0).Comment("固定费用金额"),
+		field.Int64("sort").Default(0).Comment("排序"),
 		field.Bool("enable").Default(false).Comment("是否启用"),
 		field.String("token").MaxLen(255).NotEmpty().Unique().Comment("支付令牌"),
 	}

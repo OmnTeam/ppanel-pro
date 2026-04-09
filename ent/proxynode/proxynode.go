@@ -27,6 +27,10 @@ const (
 	FieldProtocol = "protocol"
 	// FieldEnabled holds the string denoting the enabled field in the database.
 	FieldEnabled = "enabled"
+	// FieldNodeType holds the string denoting the node_type field in the database.
+	FieldNodeType = "node_type"
+	// FieldIsHidden holds the string denoting the is_hidden field in the database.
+	FieldIsHidden = "is_hidden"
 	// FieldSort holds the string denoting the sort field in the database.
 	FieldSort = "sort"
 	// FieldNodeGroupIds holds the string denoting the node_group_ids field in the database.
@@ -49,6 +53,8 @@ var Columns = []string{
 	FieldServerID,
 	FieldProtocol,
 	FieldEnabled,
+	FieldNodeType,
+	FieldIsHidden,
 	FieldSort,
 	FieldNodeGroupIds,
 	FieldCreatedAt,
@@ -88,6 +94,12 @@ var (
 	ProtocolValidator func(string) error
 	// DefaultEnabled holds the default value on creation for the "enabled" field.
 	DefaultEnabled bool
+	// DefaultNodeType holds the default value on creation for the "node_type" field.
+	DefaultNodeType string
+	// NodeTypeValidator is a validator for the "node_type" field. It is called by the builders before save.
+	NodeTypeValidator func(string) error
+	// DefaultIsHidden holds the default value on creation for the "is_hidden" field.
+	DefaultIsHidden bool
 	// DefaultSort holds the default value on creation for the "sort" field.
 	DefaultSort int
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -139,6 +151,16 @@ func ByProtocol(opts ...sql.OrderTermOption) OrderOption {
 // ByEnabled orders the results by the enabled field.
 func ByEnabled(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEnabled, opts...).ToFunc()
+}
+
+// ByNodeType orders the results by the node_type field.
+func ByNodeType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNodeType, opts...).ToFunc()
+}
+
+// ByIsHidden orders the results by the is_hidden field.
+func ByIsHidden(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsHidden, opts...).ToFunc()
 }
 
 // BySort orders the results by the sort field.
