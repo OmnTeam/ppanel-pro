@@ -9,6 +9,7 @@ message Bootstrap {
   Server server = 1;
   Data data = 2;
   Application app = 3;
+  bool debug = 4;
 }
 
 message Server {
@@ -133,8 +134,30 @@ message Device {
   string security_secret = 2;
 }
 
+message NodeDNS {
+  string proto = 1;
+  string address = 2;
+  repeated string domains = 3;
+}
+
+message NodeOutbound {
+  string name = 1;
+  string protocol = 2;
+  string address = 3;
+  int64 port = 4;
+  string password = 5;
+  repeated string rules = 6;
+}
+
 message Node {
   string node_secret = 1;
+  int64 node_pull_interval = 2;
+  int64 node_push_interval = 3;
+  int64 traffic_report_threshold = 4;
+  string ip_strategy = 5;
+  repeated NodeDNS dns = 6;
+  repeated string block = 7;
+  repeated NodeOutbound outbound = 8;
 }
 
 message Admin {

@@ -40,8 +40,6 @@ import (
 	subscriptionv1 "github.com/OmnTeam/ppanel-pro/api/public/subscription/v1"
 	publicticketv1 "github.com/OmnTeam/ppanel-pro/api/public/ticket/v1"
 	publicuserv1 "github.com/OmnTeam/ppanel-pro/api/public/user/v1"
-	// Server模块API
-	bserv1 "github.com/OmnTeam/ppanel-pro/api/server/v1"
 	subscriptionbiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
 	"github.com/OmnTeam/ppanel-pro/internal/data"
@@ -94,12 +92,12 @@ func NewHTTPServer(c *conf.Server, appConf *conf.Application, authMiddleware *ap
 
 	var opts = []http.ServerOption{
 		http.Filter(
+			middleware.TraceMiddleware(logger),
 			middleware.CORSFilter(c.Cors),                                 // CORS Filter 必须最外层
 			middleware.LegacyPathCompatFilter(),                           // 兼容旧项目尾斜杠路由
 			middleware.LegacyRouteGuardFilter(),                           // 屏蔽新项目多出的非兼容路由
 			middleware.DeviceMiddleware(getDeviceConfig(appConf), logger), // 设备加解密需保留在 HTTP Filter 链中
 		),
-		//http.Filter(middleware.TraceMiddleware(logger)),
 		http.Middleware(
 			recovery.Recovery(),
 			middleware.Logging(logger), // Logging middleware，记录请求日志
@@ -122,7 +120,7 @@ func NewHTTPServer(c *conf.Server, appConf *conf.Application, authMiddleware *ap
 		opts = append(opts, http.Timeout(httpConf.Timeout.AsDuration()))
 	}
 	srv := http.NewServer(opts...)
-	registerLegacyCompatRoutes(srv, authCompat, auth, oauthSvc, d, appConf, adminTicket, publicOrder, publicPayment, publicPortal, publicTicket, publicUser, logger)
+	registerLegacyCompatRoutes(srv, authCompat, auth, oauthSvc, d, appConf, adminGroup, adminPayment, adminSystem, adminTicket, publicOrder, publicPayment, publicPortal, publicTicket, publicUser, logger)
 	adsv1.RegisterAdsServiceHTTPServer(srv, ads)
 	announcementv1.RegisterAnnouncementServiceHTTPServer(srv, announcement)
 	applicationv1.RegisterSubscribeApplicationServiceHTTPServer(srv, application)
@@ -172,9 +170,6 @@ func NewHTTPServer(c *conf.Server, appConf *conf.Application, authMiddleware *ap
 	publicticketv1.RegisterTicketHTTPServer(srv, publicTicket)
 	// Public User模块服务注册
 	publicuserv1.RegisterUserHTTPServer(srv, publicUser)
-	// Server模块服务注册（节点服务器接口）
-	bserv1.RegisterServerHTTPServer(srv, server)
-
 	// 注册兼容的订阅配置端点（与原项目格式完全一致）
 	for _, subscribePath := range subscribeCompatPaths(appConf) {
 		srv.HandleFunc(subscribePath, handleSubscribeConfig(publicSubscription))

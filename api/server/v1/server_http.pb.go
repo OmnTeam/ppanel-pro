@@ -8,6 +8,7 @@ package v1
 
 import (
 	context "context"
+	httpform "github.com/OmnTeam/ppanel-pro/pkg/httpform"
 	http "github.com/go-kratos/kratos/v2/transport/http"
 	binding "github.com/go-kratos/kratos/v2/transport/http/binding"
 )
@@ -160,6 +161,23 @@ func _Server_QueryServerProtocolConfig0_HTTP_Handler(srv ServerHTTPServer) func(
 		var in QueryServerProtocolConfigRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
+		}
+		queryValues := ctx.Request().URL.Query()
+		if in.SecretKey == "" {
+			in.SecretKey = httpform.FirstNonEmpty(queryValues, "secret_key", "secretKey")
+		}
+		if len(in.Protocols) == 0 {
+			in.Protocols = httpform.StringSlice(queryValues, "protocols", "protocols[]")
+		}
+		if formValues, err := httpform.ParseGETBodyForm(ctx.Request()); err != nil {
+			return err
+		} else {
+			if in.SecretKey == "" {
+				in.SecretKey = httpform.FirstNonEmpty(formValues, "secret_key", "secretKey")
+			}
+			if len(in.Protocols) == 0 {
+				in.Protocols = httpform.StringSlice(formValues, "protocols", "protocols[]")
+			}
 		}
 		if err := ctx.BindVars(&in); err != nil {
 			return err

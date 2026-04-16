@@ -17,6 +17,14 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldIsExpiredGroup holds the string denoting the is_expired_group field in the database.
+	FieldIsExpiredGroup = "is_expired_group"
+	// FieldExpiredDaysLimit holds the string denoting the expired_days_limit field in the database.
+	FieldExpiredDaysLimit = "expired_days_limit"
+	// FieldMaxTrafficGBExpired holds the string denoting the max_traffic_gb_expired field in the database.
+	FieldMaxTrafficGBExpired = "max_traffic_gb_expired"
+	// FieldSpeedLimit holds the string denoting the speed_limit field in the database.
+	FieldSpeedLimit = "speed_limit"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -30,6 +38,10 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 	FieldDescription,
+	FieldIsExpiredGroup,
+	FieldExpiredDaysLimit,
+	FieldMaxTrafficGBExpired,
+	FieldSpeedLimit,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 }
@@ -49,6 +61,14 @@ var (
 	DefaultName string
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// DefaultIsExpiredGroup holds the default value on creation for the "is_expired_group" field.
+	DefaultIsExpiredGroup bool
+	// DefaultExpiredDaysLimit holds the default value on creation for the "expired_days_limit" field.
+	DefaultExpiredDaysLimit int64
+	// DefaultMaxTrafficGBExpired holds the default value on creation for the "max_traffic_gb_expired" field.
+	DefaultMaxTrafficGBExpired int64
+	// DefaultSpeedLimit holds the default value on creation for the "speed_limit" field.
+	DefaultSpeedLimit int64
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -75,6 +95,26 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByIsExpiredGroup orders the results by the is_expired_group field.
+func ByIsExpiredGroup(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIsExpiredGroup, opts...).ToFunc()
+}
+
+// ByExpiredDaysLimit orders the results by the expired_days_limit field.
+func ByExpiredDaysLimit(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExpiredDaysLimit, opts...).ToFunc()
+}
+
+// ByMaxTrafficGBExpired orders the results by the max_traffic_gb_expired field.
+func ByMaxTrafficGBExpired(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMaxTrafficGBExpired, opts...).ToFunc()
+}
+
+// BySpeedLimit orders the results by the speed_limit field.
+func BySpeedLimit(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpeedLimit, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

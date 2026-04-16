@@ -9,7 +9,6 @@ import (
 	v1 "github.com/OmnTeam/ppanel-pro/api/public/portal/v1"
 	portalBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/portal"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 )
 
 // Helper functions for type conversion
@@ -141,9 +140,6 @@ func (s *PortalService) PrePurchaseOrder(ctx context.Context, req *v1.PrePurchas
 // Purchase 购买/创建订单（未登录）
 func (s *PortalService) Purchase(ctx context.Context, req *v1.PurchaseRequest) (*v1.PurchaseReply, error) {
 
-	// 密码加密
-	encryptedPassword := tool.EncodePassWord(req.Password)
-
 	// 构建请求
 	var coupon, inviteCode *string
 	if req.Coupon != nil {
@@ -160,7 +156,7 @@ func (s *PortalService) Purchase(ctx context.Context, req *v1.PurchaseRequest) (
 		Coupon:      coupon,
 		Identifier:  req.Identifier,
 		AuthType:    req.AuthType,
-		Password:    encryptedPassword, // 已加密
+		Password:    req.Password,
 		InviteCode:  inviteCode,
 	}
 

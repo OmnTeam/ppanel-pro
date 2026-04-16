@@ -6,8 +6,13 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyserver"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribeapplication"
 	applicationbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/application"
+	publicsubscriptionbiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
+	servermodel "github.com/OmnTeam/ppanel-pro/internal/model/server"
+	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 )
 
 type subscribeApplicationRepo struct {
@@ -120,6 +125,101 @@ func (r *subscribeApplicationRepo) List(ctx context.Context) ([]*applicationbiz.
 	}
 
 	return apps, nil
+}
+
+// GetPreviewNodes returns all enabled nodes converted for template preview rendering.
+func (r *subscribeApplicationRepo) GetPreviewNodes(ctx context.Context) ([]*publicsubscriptionbiz.NodeInfo, error) {
+	nodes, err := r.data.db.ProxyNode.Query().
+		Where(proxynode.Enabled(true)).
+		Order(ent.Asc(proxynode.FieldSort), ent.Asc(proxynode.FieldID)).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]*publicsubscriptionbiz.NodeInfo, 0, len(nodes))
+	for _, node := range nodes {
+		server, err := r.data.db.ProxyServer.Query().
+			Where(proxyserver.IDEQ(node.ServerID)).
+			Only(ctx)
+		if err != nil {
+			r.log.Warnf("preview skip node %d: query server failed: %v", node.ID, err)
+			continue
+		}
+
+		protocols, err := servermodel.UnmarshalProtocols(server.Protocol)
+		if err != nil {
+			r.log.Warnf("preview skip server %d: unmarshal protocols failed: %v", server.ID, err)
+			continue
+		}
+
+		var matched *servermodel.Protocol
+		for _, protocol := range protocols {
+			if protocol != nil && protocol.Type == node.Protocol {
+				matched = protocol
+				break
+			}
+		}
+		if matched == nil {
+			r.log.Warnf("preview skip node %d: no protocol match for %s", node.ID, node.Protocol)
+			continue
+		}
+
+		result = append(result, &publicsubscriptionbiz.NodeInfo{
+			ID:          node.ID,
+			Sort:        node.Sort,
+			Name:        node.Name,
+			Server:      node.Address,
+			Port:        node.Port,
+			Type:        node.Protocol,
+			Tags:        tool.StringToStringSlice(node.Tags),
+			NodeGroupID: 0,
+
+			Security:                matched.Security,
+			SNI:                     matched.SNI,
+			AllowInsecure:           matched.AllowInsecure,
+			Fingerprint:             matched.Fingerprint,
+			RealityServerAddr:       matched.RealityServerAddr,
+			RealityServerPort:       int(matched.RealityServerPort),
+			RealityPrivateKey:       matched.RealityPrivateKey,
+			RealityPublicKey:        matched.RealityPublicKey,
+			RealityShortId:          matched.RealityShortId,
+			Transport:               matched.Transport,
+			Host:                    matched.Host,
+			Path:                    matched.Path,
+			ServiceName:             matched.ServiceName,
+			Method:                  matched.Cipher,
+			ServerKey:               matched.ServerKey,
+			Flow:                    matched.Flow,
+			HopPorts:                matched.HopPorts,
+			HopInterval:             int(matched.HopInterval),
+			ObfsPassword:            matched.ObfsPassword,
+			UpMbps:                  int(matched.UpMbps),
+			DownMbps:                int(matched.DownMbps),
+			DisableSNI:              matched.DisableSNI,
+			ReduceRtt:               matched.ReduceRtt,
+			UDPRelayMode:            matched.UDPRelayMode,
+			CongestionController:    matched.CongestionController,
+			PaddingScheme:           matched.PaddingScheme,
+			Multiplex:               matched.Multiplex,
+			XhttpMode:               matched.XhttpMode,
+			XhttpExtra:              matched.XhttpExtra,
+			Encryption:              matched.Encryption,
+			EncryptionMode:          matched.EncryptionMode,
+			EncryptionRtt:           matched.EncryptionRtt,
+			EncryptionTicket:        matched.EncryptionTicket,
+			EncryptionServerPadding: matched.EncryptionServerPadding,
+			EncryptionPrivateKey:    matched.EncryptionPrivateKey,
+			EncryptionClientPadding: matched.EncryptionClientPadding,
+			EncryptionPassword:      matched.EncryptionPassword,
+			Ratio:                   matched.Ratio,
+			CertMode:                matched.CertMode,
+			CertDNSProvider:         matched.CertDNSProvider,
+			CertDNSEnv:              matched.CertDNSEnv,
+		})
+	}
+
+	return result, nil
 }
 
 // Delete 删除订阅应用配置

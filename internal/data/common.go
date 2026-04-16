@@ -125,8 +125,7 @@ func (r *commonRepo) GetTosConfig(ctx context.Context, key string) (string, erro
 	values, err := loadSystemConfigMap(ctx, r.data.db, "tos")
 	if err != nil {
 		r.log.Warnw("GetTosConfig query failed", "error", err, "key", key)
-		// Return empty string if not found (not an error)
-		return "", nil
+		return "", err
 	}
 
 	return systemConfigString(values, key), nil
@@ -459,7 +458,7 @@ func (r *commonRepo) CheckVerificationCode(ctx context.Context, method, account,
 		cacheKey = verifyCodeTelephoneCacheKey(parseVerifyType(verifyType), "+"+account)
 	} else {
 		r.log.Warnw("CheckVerificationCode invalid method", "method", method)
-		return false, nil
+		return false, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	// Get from Redis

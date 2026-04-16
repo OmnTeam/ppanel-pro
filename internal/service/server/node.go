@@ -159,10 +159,25 @@ func (s *ServerService) PushOnlineUsers(ctx context.Context, req *v1.PushOnlineU
 
 // QueryServerProtocolConfig 查询服务器协议配置
 func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.QueryServerProtocolConfigRequest) (*v1.QueryServerProtocolConfigReply, error) {
+	s.log.Infof(
+		"[QueryServerProtocolConfig] request received server_id=%d secret_present=%t protocols=%v",
+		req.ServerId,
+		req.SecretKey != "",
+		req.Protocols,
+	)
 	config, err := s.uc.QueryServerProtocolConfig(ctx, req.ServerId, req.SecretKey, req.Protocols)
 	if err != nil {
+		s.log.Errorf("[QueryServerProtocolConfig] usecase failed server_id=%d err=%v", req.ServerId, err)
 		return nil, err
 	}
+	s.log.Infof(
+		"[QueryServerProtocolConfig] usecase returned server_id=%d total=%d dns=%d outbound=%d protocols=%d",
+		req.ServerId,
+		config.Total,
+		len(config.DNS),
+		len(config.Outbound),
+		len(config.Protocols),
+	)
 
 	// 转换DNS配置
 	dnsConfigs := make([]*v1.NodeDNS, 0, len(config.DNS))
@@ -190,7 +205,7 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 		// 解析Config JSON字符串为map
 		var configMap map[string]string
 		if err := json.Unmarshal([]byte(protocol.Config), &configMap); err != nil {
-			s.log.Errorf("Failed to parse protocol config: %v", err)
+			s.log.Errorf("[QueryServerProtocolConfig] failed to parse protocol config type=%s err=%v", protocol.Type, err)
 			configMap = make(map[string]string)
 		}
 
@@ -200,7 +215,7 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 		})
 	}
 
-	return &v1.QueryServerProtocolConfigReply{
+	reply := &v1.QueryServerProtocolConfigReply{
 		Code:                   0,
 		Message:                "success",
 		TrafficReportThreshold: config.TrafficReportThreshold,
@@ -210,5 +225,14 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 		Outbound:               outboundConfigs,
 		Protocols:              protocolConfigs,
 		Total:                  config.Total,
-	}, nil
+	}
+	s.log.Infof(
+		"[QueryServerProtocolConfig] reply ready server_id=%d total=%d dns=%d outbound=%d protocols=%d",
+		req.ServerId,
+		reply.Total,
+		len(reply.Dns),
+		len(reply.Outbound),
+		len(reply.Protocols),
+	)
+	return reply, nil
 }

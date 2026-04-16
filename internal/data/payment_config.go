@@ -29,9 +29,10 @@ func (c *AlipayF2FConfig) Unmarshal(data []byte) error {
 
 // EPayConfig EPay支付配置
 type EPayConfig struct {
-	Pid string `json:"pid"`
-	Url string `json:"url"`
-	Key string `json:"key"`
+	Pid  string `json:"pid"`
+	Url  string `json:"url"`
+	Key  string `json:"key"`
+	Type string `json:"type"`
 }
 
 func (c *EPayConfig) Unmarshal(data []byte) error {
@@ -43,6 +44,7 @@ type CryptoSaaSConfig struct {
 	Endpoint  string `json:"endpoint"`
 	AccountID string `json:"account_id"`
 	SecretKey string `json:"secret_key"`
+	Type      string `json:"type"`
 }
 
 func (c *CryptoSaaSConfig) Unmarshal(data []byte) error {

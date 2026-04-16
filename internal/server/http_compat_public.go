@@ -534,7 +534,11 @@ func registerLegacyPublicCompatRoutes(r *khttp.Router, dataLayer *data.Data, app
 				_ = tx.Rollback()
 				return nil, responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
 			}
-			if _, err := tx.ProxyUser.Delete().Where(proxyuser.IDEQ(user.ID)).Exec(inner); err != nil {
+			if _, err := tx.ProxyUser.Update().
+				Where(proxyuser.IDEQ(user.ID)).
+				SetDeletedAt(time.Now()).
+				SetIsDel(0).
+				Save(inner); err != nil {
 				_ = tx.Rollback()
 				return nil, responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
 			}

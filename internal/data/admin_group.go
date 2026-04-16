@@ -54,10 +54,10 @@ func (r *adminGroupRepo) CreateNodeGroup(ctx context.Context, req *v1.CreateNode
 		SetDescription(req.Description).
 		SetSort(int(req.Sort)).
 		SetForCalculation(req.ForCalculation).
-		SetMinTrafficGB(req.MinTrafficGb).
-		SetMaxTrafficGB(req.MaxTrafficGb).
 		SetCreatedAt(time.Now()).
 		SetUpdatedAt(time.Now()).
+		SetMinTrafficGB(req.MinTrafficGb).
+		SetMaxTrafficGB(req.MaxTrafficGb).
 		Save(ctx)
 
 	if err != nil {
@@ -238,57 +238,190 @@ func (r *adminGroupRepo) GetNodeGroupList(ctx context.Context, req *v1.GetNodeGr
 
 // GetGroupConfig gets group config
 func (r *adminGroupRepo) GetGroupConfig(ctx context.Context) (*v1.GroupConfig, error) {
-	// 从proxy_system表读取分组配置
-	var enabledStr string
-	var mode string
-	var configStr string
+	enabled := false
+	mode := "average"
+	configMap := make(map[string]interface{})
 
-	// 查询enabled
 	enabledSys, err := r.data.db.ProxySystem.Query().
 		Where(
 			proxysystem.CategoryEQ("group"),
 			proxysystem.KeyEQ("enabled"),
 		).
-		Only(ctx)
-	if err != nil {
-		r.logger.Warnf("Failed to query group enabled config: %v", err)
-		enabledStr = "false"
-	} else {
-		enabledStr = enabledSys.Value
+		First(ctx)
+	if err == nil {
+		enabled = enabledSys.Value == "true" || enabledSys.Value == "1"
+	} else if !ent.IsNotFound(err) {
+		r.logger.Errorf("Failed to query group enabled config: %v", err)
+		return nil, err
 	}
-	enabled := enabledStr == "true" || enabledStr == "1"
 
-	// 查询mode
 	modeSys, err := r.data.db.ProxySystem.Query().
 		Where(
 			proxysystem.CategoryEQ("group"),
 			proxysystem.KeyEQ("mode"),
 		).
-		Only(ctx)
-	if err != nil {
-		r.logger.Warnf("Failed to query group mode config: %v", err)
-		mode = "average" // 默认模式
-	} else {
+		First(ctx)
+	if err == nil && modeSys.Value != "" {
 		mode = modeSys.Value
+	} else if err != nil && !ent.IsNotFound(err) {
+		r.logger.Errorf("Failed to query group mode config: %v", err)
+		return nil, err
 	}
 
-	config := &v1.GroupConfig{
+	if averageSys, err := r.data.db.ProxySystem.Query().
+		Where(
+			proxysystem.CategoryEQ("group"),
+			proxysystem.KeyEQ("average_config"),
+		).
+		First(ctx); err == nil {
+		var averageCfg map[string]interface{}
+		if json.Unmarshal([]byte(averageSys.Value), &averageCfg) == nil {
+			configMap["average_config"] = averageCfg
+		}
+	}
+
+	if subscribeSys, err := r.data.db.ProxySystem.Query().
+		Where(
+			proxysystem.CategoryEQ("group"),
+			proxysystem.KeyEQ("subscribe_config"),
+		).
+		First(ctx); err == nil {
+		var subscribeCfg map[string]interface{}
+		if json.Unmarshal([]byte(subscribeSys.Value), &subscribeCfg) == nil {
+			configMap["subscribe_config"] = subscribeCfg
+		}
+	}
+
+	if trafficSys, err := r.data.db.ProxySystem.Query().
+		Where(
+			proxysystem.CategoryEQ("group"),
+			proxysystem.KeyEQ("traffic_config"),
+		).
+		First(ctx); err == nil {
+		var trafficCfg map[string]interface{}
+		if json.Unmarshal([]byte(trafficSys.Value), &trafficCfg) == nil {
+			configMap["traffic_config"] = trafficCfg
+		}
+	}
+
+	configBytes, err := json.Marshal(configMap)
+	if err != nil {
+		r.logger.Errorf("Failed to marshal group config: %v", err)
+		return nil, err
+	}
+
+	return &v1.GroupConfig{
 		Enabled: enabled,
 		Mode:    mode,
-		Config:  configStr,
-	}
-
-	return config, nil
+		Config:  string(configBytes),
+	}, nil
 }
 
 // UpdateGroupConfig updates group config
 func (r *adminGroupRepo) UpdateGroupConfig(ctx context.Context, req *v1.UpdateGroupConfigRequest) error {
-	// 使用事务更新配置
-	// 注意：这里简化处理，实际应该使用UPSERT或者检查记录是否存在
-	// TODO: 实现完整的配置更新逻辑
+	if req.Mode != "" && req.Mode != "average" && req.Mode != "subscribe" && req.Mode != "traffic" {
+		return fmt.Errorf("invalid mode: %s", req.Mode)
+	}
+
+	tx, err := r.data.db.Tx(ctx)
+	if err != nil {
+		r.logger.Errorf("Failed to begin group config transaction: %v", err)
+		return err
+	}
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+
+	enabledValue := "false"
+	if req.Enabled {
+		enabledValue = "true"
+	}
+	if err = upsertGroupSystemConfigTx(ctx, tx, "enabled", enabledValue, "Group Feature Enabled"); err != nil {
+		return err
+	}
+
+	if req.Mode != "" {
+		if err = upsertGroupSystemConfigTx(ctx, tx, "mode", req.Mode, "Group Mode"); err != nil {
+			return err
+		}
+	}
+
+	if req.Config != "" {
+		configMap := make(map[string]interface{})
+		if err = json.Unmarshal([]byte(req.Config), &configMap); err != nil {
+			r.logger.Errorf("Failed to unmarshal group config json: %v", err)
+			return err
+		}
+
+		if averageConfig, ok := configMap["average_config"]; ok {
+			jsonBytes, marshalErr := json.Marshal(averageConfig)
+			if marshalErr != nil {
+				return marshalErr
+			}
+			if err = upsertGroupSystemConfigTx(ctx, tx, "average_config", string(jsonBytes), "Average Group Config"); err != nil {
+				return err
+			}
+		}
+
+		if subscribeConfig, ok := configMap["subscribe_config"]; ok {
+			jsonBytes, marshalErr := json.Marshal(subscribeConfig)
+			if marshalErr != nil {
+				return marshalErr
+			}
+			if err = upsertGroupSystemConfigTx(ctx, tx, "subscribe_config", string(jsonBytes), "Subscribe Group Config"); err != nil {
+				return err
+			}
+		}
+
+		if trafficConfig, ok := configMap["traffic_config"]; ok {
+			jsonBytes, marshalErr := json.Marshal(trafficConfig)
+			if marshalErr != nil {
+				return marshalErr
+			}
+			if err = upsertGroupSystemConfigTx(ctx, tx, "traffic_config", string(jsonBytes), "Traffic Group Config"); err != nil {
+				return err
+			}
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		r.logger.Errorf("Failed to commit group config transaction: %v", err)
+		return err
+	}
 
 	r.logger.Infof("Group config updated: enabled=%v, mode=%s", req.Enabled, req.Mode)
 	return nil
+}
+
+func upsertGroupSystemConfigTx(ctx context.Context, tx *ent.Tx, key string, value string, desc string) error {
+	existing, err := tx.ProxySystem.Query().
+		Where(
+			proxysystem.CategoryEQ("group"),
+			proxysystem.KeyEQ(key),
+		).
+		First(ctx)
+	if err == nil {
+		return tx.ProxySystem.UpdateOneID(existing.ID).
+			SetValue(value).
+			SetDesc(desc).
+			SetUpdatedAt(time.Now()).
+			Exec(ctx)
+	}
+	if !ent.IsNotFound(err) {
+		return err
+	}
+
+	_, err = tx.ProxySystem.Create().
+		SetCategory("group").
+		SetKey(key).
+		SetValue(value).
+		SetDesc(desc).
+		SetCreatedAt(time.Now()).
+		SetUpdatedAt(time.Now()).
+		Save(ctx)
+	return err
 }
 
 // ===== Group Recalculation =====
@@ -1050,14 +1183,57 @@ func (r *adminGroupRepo) PreviewUserNodes(ctx context.Context, userID int64) ([]
 
 // ResetGroups resets all user groups
 func (r *adminGroupRepo) ResetGroups(ctx context.Context) error {
-	// 将所有user_subscribe的node_group_id设置为0
-	err := r.data.db.ProxyUserSubscribe.Update().
-		SetNodeGroupID(0).
-		Where(proxyusersubscribe.NodeGroupIDNEQ(0)).
-		Exec(ctx)
-
+	tx, err := r.data.db.Tx(ctx)
 	if err != nil {
-		r.logger.Errorf("Failed to reset groups: %v", err)
+		r.logger.Errorf("Failed to begin reset groups transaction: %v", err)
+		return err
+	}
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+
+	if _, err = tx.ProxyServerGroup.Delete().Exec(ctx); err != nil {
+		r.logger.Errorf("Failed to delete all node groups: %v", err)
+		return err
+	}
+	if err = tx.ProxySubscribe.Update().
+		SetNodeGroupIds([]int64{}).
+		ClearNodeGroupID().
+		Exec(ctx); err != nil {
+		r.logger.Errorf("Failed to clear subscribe node groups: %v", err)
+		return err
+	}
+	if err = tx.ProxyNode.Update().
+		SetNodeGroupIds([]int64{}).
+		Exec(ctx); err != nil {
+		r.logger.Errorf("Failed to clear node node_group_ids: %v", err)
+		return err
+	}
+	if err = tx.ProxyUserSubscribe.Update().
+		SetNodeGroupID(0).
+		Exec(ctx); err != nil {
+		r.logger.Errorf("Failed to clear user subscribe node_group_id: %v", err)
+		return err
+	}
+	if _, err = tx.ProxyGroupHistoryDetail.Delete().Exec(ctx); err != nil {
+		r.logger.Errorf("Failed to delete group history details: %v", err)
+		return err
+	}
+	if _, err = tx.ProxyGroupHistory.Delete().Exec(ctx); err != nil {
+		r.logger.Errorf("Failed to delete group history: %v", err)
+		return err
+	}
+	if _, err = tx.ProxySystem.Delete().
+		Where(proxysystem.CategoryEQ("group")).
+		Exec(ctx); err != nil {
+		r.logger.Errorf("Failed to delete group config: %v", err)
+		return err
+	}
+
+	if err = tx.Commit(); err != nil {
+		r.logger.Errorf("Failed to commit reset groups transaction: %v", err)
 		return err
 	}
 

@@ -189,6 +189,9 @@ func (r *adminUserSubscribeRepo) CreateUserSubscribe(ctx context.Context, req *v
 	// TODO: 清除缓存
 	// 1. 清除用户缓存
 	// 2. 清除订阅套餐缓存
+	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
+		r.logger.Warnf("Failed to clear legacy server caches after creating user subscribe %d: %v", created.ID, err)
+	}
 
 	return created.ID, nil
 }
@@ -267,6 +270,9 @@ func (r *adminUserSubscribeRepo) UpdateUserSubscribe(ctx context.Context, req *v
 	// TODO: 清除缓存
 	// 1. 清除用户订阅缓存
 	// 2. 清除订阅套餐缓存（新旧两个套餐都需要清除）
+	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
+		r.logger.Warnf("Failed to clear legacy server caches after updating user subscribe %d: %v", id, err)
+	}
 
 	return nil
 }
@@ -298,6 +304,9 @@ func (r *adminUserSubscribeRepo) DeleteUserSubscribe(ctx context.Context, id int
 	// TODO: 清除缓存
 	// 1. 清除用户订阅缓存
 	// 2. 清除订阅套餐缓存
+	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
+		r.logger.Warnf("Failed to clear legacy server caches after deleting user subscribe %d: %v", id, err)
+	}
 
 	return nil
 }

@@ -3,6 +3,7 @@ package data
 import (
 	"context"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v2/log"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
@@ -90,6 +91,12 @@ func (r *couponRepo) BatchDeleteCoupon(ctx context.Context, ids []int) error {
 // GetCouponList 获取优惠券列表
 func (r *couponRepo) GetCouponList(ctx context.Context, page, size, subscribe int64, search string) ([]*ent.ProxyCoupon, int64, error) {
 	query := r.data.db.ProxyCoupon.Query()
+
+	if subscribe != 0 {
+		query = query.Where(func(s *sql.Selector) {
+			s.Where(sql.ExprP("FIND_IN_SET(?, "+proxycoupon.FieldSubscribe+")", subscribe))
+		})
+	}
 
 	// 如果有搜索关键字
 	if search != "" {

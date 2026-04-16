@@ -16,6 +16,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxysystemlog"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
 	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
 	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
@@ -181,18 +182,18 @@ func (r *adminUserRepo) DeleteUser(ctx context.Context, userID int) error {
 		return responsecode.NewKratosError(503) // Demo mode restriction
 	}
 
-	// 验证用户存在
-	deleted, err := r.data.db.ProxyUser.Delete().
+	// 对齐旧项目：用户删除是软删除，且不存在时静默成功。
+	_, err := r.data.db.ProxyUser.Update().
 		Where(
 			proxyuser.IDEQ(int64(userID)),
+			proxyuser.DeletedAtIsNil(),
+			proxyuser.Or(proxyuser.IsDelIsNil(), proxyuser.IsDelEQ(1)),
 		).
-		Exec(ctx)
+		SetDeletedAt(time.Now()).
+		SetIsDel(0).
+		Save(ctx)
 	if err != nil {
 		return err
-	}
-
-	if deleted == 0 {
-		return responsecode.NewKratosError(responsecode.ErrUserNotExist)
 	}
 
 	return nil
@@ -216,11 +217,15 @@ func (r *adminUserRepo) BatchDeleteUser(ctx context.Context, userIDs []int) (int
 		int64IDs[i] = int64(id)
 	}
 
-	deleted, err := r.data.db.ProxyUser.Delete().
+	deleted, err := r.data.db.ProxyUser.Update().
 		Where(
 			proxyuser.IDIn(int64IDs...),
+			proxyuser.DeletedAtIsNil(),
+			proxyuser.Or(proxyuser.IsDelIsNil(), proxyuser.IsDelEQ(1)),
 		).
-		Exec(ctx)
+		SetDeletedAt(time.Now()).
+		SetIsDel(0).
+		Save(ctx)
 	if err != nil {
 		return 0, err
 	}
@@ -247,16 +252,21 @@ func (r *adminUserRepo) GetUserByID(ctx context.Context, userID int) (*ent.Proxy
 
 // GetUserList 获取用户列表
 func (r *adminUserRepo) GetUserList(ctx context.Context, page, size int32, search string, userID, subscribeID, userSubscribeID *int64) ([]*ent.ProxyUser, int64, error) {
-	query := r.data.db.ProxyUser.Query()
+	query := r.data.db.ProxyUser.Query().
+		Where(
+			proxyuser.DeletedAtIsNil(),
+			proxyuser.Or(proxyuser.IsDelIsNil(), proxyuser.IsDelEQ(1)),
+		)
 
 	// 按用户ID过滤
 	if userID != nil && *userID > 0 {
 		query = query.Where(proxyuser.IDEQ(*userID))
 	}
 
-	// 按搜索关键字过滤（邮箱或手机号）
+	// 按搜索关键字过滤（邮箱、手机号或推荐码）
 	if search != "" {
-		// 先查找匹配的认证方法
+		matchedIDs := map[int64]struct{}{}
+
 		authMethods, err := r.data.db.ProxyUserAuthMethod.Query().
 			Where(
 				proxyuserauthmethod.AuthIdentifierContains(search),
@@ -266,20 +276,84 @@ func (r *adminUserRepo) GetUserList(ctx context.Context, page, size int32, searc
 			return nil, 0, err
 		}
 
-		if len(authMethods) > 0 {
-			userIDs := make([]int64, 0, len(authMethods))
-			for _, am := range authMethods {
-				userIDs = append(userIDs, am.UserID)
-			}
-			query = query.Where(proxyuser.IDIn(userIDs...))
-		} else {
-			// 如果没有匹配的认证方法，返回空结果
+		for _, am := range authMethods {
+			matchedIDs[am.UserID] = struct{}{}
+		}
+
+		referUsers, err := r.data.db.ProxyUser.Query().
+			Where(
+				proxyuser.ReferCodeContains(search),
+				proxyuser.DeletedAtIsNil(),
+				proxyuser.Or(proxyuser.IsDelIsNil(), proxyuser.IsDelEQ(1)),
+			).
+			All(ctx)
+		if err != nil {
+			return nil, 0, err
+		}
+		for _, user := range referUsers {
+			matchedIDs[user.ID] = struct{}{}
+		}
+
+		if len(matchedIDs) == 0 {
 			return []*ent.ProxyUser{}, 0, nil
 		}
+
+		filterUserIDs := make([]int64, 0, len(matchedIDs))
+		for id := range matchedIDs {
+			filterUserIDs = append(filterUserIDs, id)
+		}
+		query = query.Where(proxyuser.IDIn(filterUserIDs...))
 	}
 
-	// TODO: 按订阅套餐ID和用户订阅ID过滤
-	// 这需要关联proxy_user_subscribe表，暂时跳过
+	if userSubscribeID != nil && *userSubscribeID > 0 {
+		userSubs, err := r.data.db.ProxyUserSubscribe.Query().
+			Where(
+				proxyusersubscribe.IDEQ(*userSubscribeID),
+				proxyusersubscribe.StatusIn(0, 1),
+			).
+			All(ctx)
+		if err != nil {
+			return nil, 0, err
+		}
+		if len(userSubs) == 0 {
+			return []*ent.ProxyUser{}, 0, nil
+		}
+		filterUserIDs := make([]int64, 0, len(userSubs))
+		seen := make(map[int64]struct{}, len(userSubs))
+		for _, userSub := range userSubs {
+			if _, ok := seen[userSub.UserID]; ok {
+				continue
+			}
+			seen[userSub.UserID] = struct{}{}
+			filterUserIDs = append(filterUserIDs, userSub.UserID)
+		}
+		query = query.Where(proxyuser.IDIn(filterUserIDs...))
+	}
+
+	if subscribeID != nil && *subscribeID > 0 {
+		userSubs, err := r.data.db.ProxyUserSubscribe.Query().
+			Where(
+				proxyusersubscribe.SubscribeIDEQ(*subscribeID),
+				proxyusersubscribe.StatusIn(0, 1),
+			).
+			All(ctx)
+		if err != nil {
+			return nil, 0, err
+		}
+		if len(userSubs) == 0 {
+			return []*ent.ProxyUser{}, 0, nil
+		}
+		filterUserIDs := make([]int64, 0, len(userSubs))
+		seen := make(map[int64]struct{}, len(userSubs))
+		for _, userSub := range userSubs {
+			if _, ok := seen[userSub.UserID]; ok {
+				continue
+			}
+			seen[userSub.UserID] = struct{}{}
+			filterUserIDs = append(filterUserIDs, userSub.UserID)
+		}
+		query = query.Where(proxyuser.IDIn(filterUserIDs...))
+	}
 
 	// 获取总数
 	total, err := query.Count(ctx)

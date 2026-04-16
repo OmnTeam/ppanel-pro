@@ -40,10 +40,13 @@ const (
 	CloseOrderTimeMinutes = 15
 
 	// MaxQuantity 最大购买数量
-	MaxQuantity = 100
+	MaxQuantity = 1000
 
 	// MaxOrderAmount 最大订单金额（分）
-	MaxOrderAmount = 1000000000 // 10亿分
+	MaxOrderAmount = 2147483647
+
+	// MaxRechargeAmount 最大充值金额（分）
+	MaxRechargeAmount = 2000000000
 )
 
 // SubscribeDiscount 订阅折扣结构
@@ -77,12 +80,22 @@ func (r *publicOrderRepo) CloseOrder(ctx context.Context, userID int, orderNo st
 		Only(ctx)
 	if err != nil {
 		r.logger.Errorf("[CloseOrder] 查找订单信息失败: %v, orderNo: %s", err, orderNo)
-		return responsecode.NewKratosError(responsecode.ErrOrderNotFound)
+		return nil
 	}
 
 	// 如果订单状态不是1，说明订单已关闭或已支付
 	if orderInfo.Status != 1 {
 		r.logger.Infof("[CloseOrder] Order status is not 1, orderNo: %s, status: %d", orderNo, orderInfo.Status)
+		return nil
+	}
+
+	subscribeInfo, err := r.data.db.ProxySubscribe.Query().
+		Where(
+			proxysubscribe.IDEQ(orderInfo.SubscribeID),
+		).
+		Only(ctx)
+	if err != nil {
+		r.logger.Errorf("[CloseOrder] 查找订阅信息失败: %v, subscribeID: %d, orderNo: %s", err, orderInfo.SubscribeID, orderNo)
 		return nil
 	}
 
@@ -152,6 +165,17 @@ func (r *publicOrderRepo) CloseOrder(ctx context.Context, userID int, orderNo st
 			}
 
 			r.logger.Infof("[CloseOrder] Refunded gift amount: %d to user: %d, new balance: %d", orderInfo.GiftAmount, orderInfo.UserID, newGiftAmount)
+			return nil
+		}
+
+		if subscribeInfo.Inventory != -1 {
+			err = tx.ProxySubscribe.UpdateOneID(subscribeInfo.ID).
+				SetInventory(subscribeInfo.Inventory + 1).
+				Exec(ctx)
+			if err != nil {
+				r.logger.Errorf("[CloseOrder] Restore subscribe inventory failed: %v, subscribeID: %d", err, subscribeInfo.ID)
+				return err
+			}
 		}
 
 		return nil
@@ -163,12 +187,11 @@ func (r *publicOrderRepo) QueryOrderDetail(ctx context.Context, userID int, orde
 	order, err := r.data.db.ProxyOrder.Query().
 		Where(
 			proxyorder.OrderNoEQ(orderNo),
-			proxyorder.UserIDEQ(int64(userID)),
 		).
 		Only(ctx)
 	if err != nil {
 		r.logger.Errorf("[PublicOrderRepo.QueryOrderDetail] query order failed: %v, orderNo: %s", err, orderNo)
-		return nil, responsecode.NewKratosError(responsecode.ErrOrderNotFound)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
 
 	// 查询完整的订阅信息
@@ -297,6 +320,9 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 		r.logger.Debugf("[PreCreateOrder] Quantity is less than or equal to 0, setting to 1")
 		req.Quantity = 1
 	}
+	if req.Quantity > MaxQuantity {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
 
 	// 查找订阅套餐 (已修复：使用ProxySubscribe而非ProxySubscribeGroup)
 	sub, err := r.data.db.ProxySubscribe.Query().
@@ -307,6 +333,25 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 	if err != nil {
 		r.logger.Errorf("[PreCreateOrder] 数据库查询错误, subscribeID: %d, error: %v", req.SubscribeID, err)
 		return nil, responsecode.NewKratosError(responsecode.ErrSubscribeNotFound)
+	}
+
+	if sub.Quota > 0 {
+		userSubs, err := r.data.db.ProxyUserSubscribe.Query().
+			Where(proxyusersubscribe.UserIDEQ(req.UserID)).
+			All(ctx)
+		if err != nil {
+			r.logger.Errorf("[PreCreateOrder] 查询用户订阅失败, userID: %d, error: %v", req.UserID, err)
+			return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+		}
+		var count int64
+		for _, item := range userSubs {
+			if item.SubscribeID == req.SubscribeID {
+				count++
+			}
+		}
+		if count >= sub.Quota {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
 	}
 
 	// 根据订阅单价计算基础价格
@@ -322,6 +367,9 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 	}
 
 	amount := int64(float64(price) * discount)
+	if amount > MaxOrderAmount {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
 	discountAmount := price - amount
 	var couponAmount int64
 
@@ -337,11 +385,12 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 			return nil, responsecode.NewKratosError(responsecode.ErrCouponNotFound)
 		}
 
-		// 检查优惠券可用性
-		// 优惠券使用次数检查在当前schema中暂未实现
+		if couponInfo.Count > 0 && couponInfo.Count <= couponInfo.UsedCount {
+			return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
+		}
 
 		// 检查用户使用限制
-		_, err = r.data.db.ProxyOrder.Query().
+		count, err := r.data.db.ProxyOrder.Query().
 			Where(
 				proxyorder.UserIDEQ(req.UserID),
 				proxyorder.CouponEQ(req.Coupon),
@@ -352,14 +401,14 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 			return nil, errors.InternalServer("DATABASE_QUERY_ERROR", "数据库查询失败")
 		}
 
-		// 优惠券用户限制检查在当前schema中暂未实现
+		if couponInfo.UserLimit > 0 && int64(count) >= couponInfo.UserLimit {
+			return nil, responsecode.NewKratosError(responsecode.ErrCouponUserLimitExceeded)
+		}
 
-		// 检查优惠券是否适用于该订阅
-		// 优惠券适用订阅检查在当前schema中暂未实现
-		//	if len(couponSub) > 0 && !tool.Contains(couponSub, req.SubscribeID) {
-		//		return nil, responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
-		//	}
-		// }
+		couponSub := tool.StringToInt64Slice(couponInfo.Subscribe)
+		if len(couponSub) > 0 && !tool.Contains(couponSub, req.SubscribeID) {
+			return nil, responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
+		}
 
 		couponAmount = r.calculateCoupon(amount, couponInfo)
 	}
@@ -405,6 +454,9 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 		}
 		amount += feeAmount
 	}
+	if amount > MaxOrderAmount {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
 
 	resp := &publicBiz.PreCreateOrderResult{
 		Price:          price,
@@ -428,6 +480,9 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 	quantity := req.Quantity
 	if quantity <= 0 {
 		quantity = 1
+	}
+	if quantity > MaxQuantity {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 	if req.SubscribeID <= 0 {
 		return nil, errors.BadRequest("INVALID_SUBSCRIBE_ID", "Invalid subscribe ID")
@@ -482,6 +537,9 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 		r.logger.Warnf("[Purchase] Subscribe not for sale: %d", req.SubscribeID)
 		return nil, errors.BadRequest("SUBSCRIBE_NOT_FOR_SALE", "此订阅计划不可购买")
 	}
+	if sub.Inventory == 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrSubscribeOutOfStock)
+	}
 
 	// 检查订阅计划配额（每个计划的用户购买限制）
 	// 完全按照老项目QueryUserSubscribe逻辑：不传入status参数，只应用时间过滤
@@ -526,6 +584,9 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 	}
 
 	amount := int64(float64(price) * discount)
+	if amount > MaxOrderAmount {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
 	discountAmount := price - amount
 	var coupon int64 = 0
 
@@ -541,18 +602,15 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 			return nil, responsecode.NewKratosError(responsecode.ErrCouponNotFound)
 		}
 
-		// TODO: UsedCount field not available in current schema - needs implementation
-		// if couponInfo.Count != 0 && couponInfo.Count <= couponInfo.UsedCount {
-		//	return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
-		// }
+		if couponInfo.Count != 0 && couponInfo.Count <= couponInfo.UsedCount {
+			return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
+		}
+		couponSub := tool.StringToInt64Slice(couponInfo.Subscribe)
+		if len(couponSub) > 0 && !tool.Contains(couponSub, req.SubscribeID) {
+			return nil, responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
+		}
 
-		// 优惠券适用订阅检查在当前schema中暂未实现
-		//	if len(couponSub) > 0 && !tool.Contains(couponSub, req.SubscribeID) {
-		//		return nil, responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
-		//	}
-		// }
-
-		_, err = r.data.db.ProxyOrder.Query().
+		count, err := r.data.db.ProxyOrder.Query().
 			Where(
 				proxyorder.UserIDEQ(req.UserID),
 				proxyorder.CouponEQ(req.Coupon),
@@ -563,10 +621,9 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 			return nil, errors.InternalServer("DATABASE_QUERY_ERROR", "数据库查询失败")
 		}
 
-		// TODO: UserLimit field not available in current schema - needs implementation
-		// if int64(count) >= couponInfo.UserLimit {
-		//	return nil, responsecode.NewKratosError(responsecode.ErrCouponUserLimitExceeded)
-		// }
+		if couponInfo.UserLimit > 0 && int64(count) >= couponInfo.UserLimit {
+			return nil, responsecode.NewKratosError(responsecode.ErrCouponUserLimitExceeded)
+		}
 
 		coupon = r.calculateCoupon(amount, couponInfo)
 	}
@@ -609,6 +666,9 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 		feeAmount = r.calculateFee(amount, payment)
 		amount += feeAmount
 	}
+	if amount > MaxOrderAmount {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
 
 	// 检查用户是新购还是续费
 	isNew := true
@@ -649,6 +709,46 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 	// 使用TX辅助函数执行事务
 	var createdOrder *ent.ProxyOrder
 	err = r.data.db.TX(ctx, func(tx *ent.Tx) error {
+		if sub.Quota > 0 {
+			now := time.Now()
+			sevenDaysAgo := now.Add(-7 * 24 * time.Hour)
+			currentCount, err := tx.ProxyUserSubscribe.Query().
+				Where(
+					proxyusersubscribe.UserIDEQ(req.UserID),
+					proxyusersubscribe.SubscribeIDEQ(req.SubscribeID),
+					proxyusersubscribe.StatusNEQ(4),
+					proxyusersubscribe.Or(
+						proxyusersubscribe.ExpireTimeGT(now),
+						proxyusersubscribe.FinishedAtGTE(sevenDaysAgo),
+						proxyusersubscribe.ExpireTimeEQ(time.UnixMilli(0)),
+					),
+				).
+				Count(ctx)
+			if err != nil {
+				return errors.InternalServer("QUOTA_CHECK_FAILED", "检查配额失败")
+			}
+			if int64(currentCount) >= sub.Quota {
+				return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+			}
+		}
+
+		if sub.Inventory != -1 {
+			latestSub, err := tx.ProxySubscribe.Query().
+				Where(proxysubscribe.IDEQ(req.SubscribeID)).
+				Only(ctx)
+			if err != nil {
+				return errors.InternalServer("SUBSCRIBE_QUERY_FAILED", "查询订阅失败")
+			}
+			if latestSub.Inventory == 0 {
+				return responsecode.NewKratosError(responsecode.ErrSubscribeOutOfStock)
+			}
+			if err := tx.ProxySubscribe.UpdateOneID(latestSub.ID).
+				SetInventory(latestSub.Inventory - 1).
+				Exec(ctx); err != nil {
+				return errors.InternalServer("SUBSCRIBE_UPDATE_FAILED", "更新订阅库存失败")
+			}
+		}
+
 		// 更新用户赠金金额 如果存在扣除
 		if orderInfo.GiftAmount > 0 {
 			err := tx.ProxyUser.UpdateOneID(req.UserID).
@@ -707,24 +807,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 		return nil, err
 	}
 
-	// 立即处理余额支付 订单创建后
-	if payment.Platform == Balance {
-		err = r.processBalancePayment(ctx, createdOrder)
-		if err != nil {
-			r.logger.Errorf("[Purchase] Balance payment failed: %v, orderNo: %s", err, createdOrder.OrderNo)
-			return nil, err
-		}
-		// 对于余额支付，返回空的支付URL和二维码（支付已完成）
-		return &publicBiz.OrderResult{
-			OrderID:    createdOrder.ID,
-			OrderNo:    createdOrder.OrderNo,
-			Amount:     createdOrder.Amount,
-			PaymentURL: "",
-			QRCode:     "",
-		}, nil
-	}
-
-	// 对于非余额支付，将延迟关闭订单任务入队
+	// 与旧项目保持一致：创建订单后统一进入待支付状态，不在创建接口内立即扣款
 	r.enqueueDeferCloseOrderTask(ctx, int(req.UserID), createdOrder.OrderNo)
 
 	// 根据支付方式生成支付信息
@@ -741,6 +824,13 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 
 // Recharge 创建充值订单
 func (r *publicOrderRepo) Recharge(ctx context.Context, req *publicBiz.RechargeParams) (*publicBiz.OrderResult, error) {
+	if req.Amount <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	if req.Amount > MaxRechargeAmount {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
 	// 查找支付方式
 	payment, err := r.data.db.ProxyPayment.Query().
 		Where(
@@ -754,6 +844,10 @@ func (r *publicOrderRepo) Recharge(ctx context.Context, req *publicBiz.RechargeP
 
 	// 计算手续费
 	feeAmount := r.calculateFee(req.Amount, payment)
+	totalAmount := req.Amount + feeAmount
+	if totalAmount > MaxOrderAmount {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
 
 	// 检查用户是否为新用户
 	isNew := true
@@ -776,7 +870,7 @@ func (r *publicOrderRepo) Recharge(ctx context.Context, req *publicBiz.RechargeP
 		SetOrderNo(orderNo).
 		SetType(4). // 充值类型
 		SetPrice(req.Amount).
-		SetAmount(req.Amount + feeAmount).
+		SetAmount(totalAmount).
 		SetFeeAmount(feeAmount).
 		SetPaymentID(payment.ID).
 		SetMethod(payment.Platform).
@@ -788,23 +882,7 @@ func (r *publicOrderRepo) Recharge(ctx context.Context, req *publicBiz.RechargeP
 		return nil, errors.InternalServer("ORDER_CREATE_FAILED", "创建订单失败")
 	}
 
-	// 立即处理余额支付 订单创建后
-	if payment.Platform == Balance {
-		err = r.processBalancePayment(ctx, orderInfo)
-		if err != nil {
-			r.logger.Errorf("[Recharge] Balance payment failed: %v, orderNo: %s", err, orderInfo.OrderNo)
-			return nil, err
-		}
-		return &publicBiz.OrderResult{
-			OrderID:    orderInfo.ID,
-			OrderNo:    orderInfo.OrderNo,
-			Amount:     orderInfo.Amount,
-			PaymentURL: "",
-			QRCode:     "",
-		}, nil
-	}
-
-	// 对于非余额支付，将延迟关闭订单任务入队
+	// 与旧项目保持一致：创建订单后统一进入待支付状态，不在创建接口内立即扣款
 	r.enqueueDeferCloseOrderTask(ctx, int(req.UserID), orderInfo.OrderNo)
 
 	// 根据支付方式生成支付信息
@@ -824,6 +902,9 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 	quantity := req.Quantity
 	if quantity <= 0 {
 		quantity = 1
+	}
+	if quantity > MaxQuantity {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	// 查找用户订阅
@@ -867,6 +948,9 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 	}
 
 	amount := int64(float64(price) * discount)
+	if amount > MaxOrderAmount {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
 	discountAmount := price - amount
 	var coupon int64 = 0
 
@@ -882,18 +966,15 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 			return nil, responsecode.NewKratosError(responsecode.ErrCouponNotFound)
 		}
 
-		// TODO: UsedCount field not available in current schema - needs implementation
-		// if couponInfo.Count != 0 && couponInfo.Count <= couponInfo.UsedCount {
-		//	return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
-		// }
+		if couponInfo.Count != 0 && couponInfo.Count <= couponInfo.UsedCount {
+			return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
+		}
+		couponSub := tool.StringToInt64Slice(couponInfo.Subscribe)
+		if len(couponSub) > 0 && !tool.Contains(couponSub, userSubscribe.SubscribeID) {
+			return nil, responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
+		}
 
-		// 优惠券适用订阅检查在当前schema中暂未实现
-		//	if len(couponSub) > 0 && !tool.Contains(couponSub, userSubscribe.SubscribeID) {
-		//		return nil, responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
-		//	}
-		// }
-
-		_, err = r.data.db.ProxyOrder.Query().
+		count, err := r.data.db.ProxyOrder.Query().
 			Where(
 				proxyorder.UserIDEQ(req.UserID),
 				proxyorder.CouponEQ(req.Coupon),
@@ -904,10 +985,9 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 			return nil, errors.InternalServer("DATABASE_QUERY_ERROR", "数据库查询失败")
 		}
 
-		// TODO: UserLimit field not available in current schema - needs implementation
-		// if int64(count) >= couponInfo.UserLimit {
-		//	return nil, responsecode.NewKratosError(responsecode.ErrCouponUserLimitExceeded)
-		// }
+		if couponInfo.UserLimit > 0 && int64(count) >= couponInfo.UserLimit {
+			return nil, responsecode.NewKratosError(responsecode.ErrCouponUserLimitExceeded)
+		}
 
 		coupon = r.calculateCoupon(amount, couponInfo)
 	}
@@ -961,6 +1041,9 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 		feeAmount = r.calculateFee(amount, payment)
 	}
 	amount += feeAmount
+	if amount > MaxOrderAmount {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
 
 	// 生成订单号
 	orderNo := tool.GenerateTradeNo()
@@ -1033,24 +1116,7 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 		return nil, err
 	}
 
-	// 立即处理余额支付 订单创建后
-	if payment.Platform == Balance {
-		err = r.processBalancePayment(ctx, createdOrder)
-		if err != nil {
-			r.logger.Errorf("[Renewal] Balance payment failed: %v, orderNo: %s", err, createdOrder.OrderNo)
-			return nil, err
-		}
-		_ = sub // 避免未使用变量警告
-		return &publicBiz.OrderResult{
-			OrderID:    createdOrder.ID,
-			OrderNo:    createdOrder.OrderNo,
-			Amount:     createdOrder.Amount,
-			PaymentURL: "",
-			QRCode:     "",
-		}, nil
-	}
-
-	// 对于非余额支付，将延迟关闭订单任务入队
+	// 与旧项目保持一致：创建订单后统一进入待支付状态，不在创建接口内立即扣款
 	r.enqueueDeferCloseOrderTask(ctx, int(req.UserID), createdOrder.OrderNo)
 
 	// 根据支付方式生成支付信息
@@ -1116,7 +1182,7 @@ func (r *publicOrderRepo) ResetTraffic(ctx context.Context, req *publicBiz.Reset
 		if currentGiftAmount >= amount {
 			deductionAmount = amount
 			amount = 0
-			currentGiftAmount -= deductionAmount // 已修复：之前是 -= amount（此时为0）
+			currentGiftAmount -= amount
 		} else {
 			deductionAmount = currentGiftAmount
 			amount -= currentGiftAmount
@@ -1208,23 +1274,7 @@ func (r *publicOrderRepo) ResetTraffic(ctx context.Context, req *publicBiz.Reset
 		return nil, err
 	}
 
-	// 立即处理余额支付 订单创建后
-	if payment.Platform == Balance {
-		err = r.processBalancePayment(ctx, createdOrder)
-		if err != nil {
-			r.logger.Errorf("[ResetTraffic] Balance payment failed: %v, orderNo: %s", err, createdOrder.OrderNo)
-			return nil, err
-		}
-		return &publicBiz.OrderResult{
-			OrderID:    createdOrder.ID,
-			OrderNo:    createdOrder.OrderNo,
-			Amount:     createdOrder.Amount,
-			PaymentURL: "",
-			QRCode:     "",
-		}, nil
-	}
-
-	// 对于非余额支付，将延迟关闭订单任务入队
+	// 与旧项目保持一致：创建订单后统一进入待支付状态，不在创建接口内立即扣款
 	r.enqueueDeferCloseOrderTask(ctx, int(req.UserID), createdOrder.OrderNo)
 
 	// 根据支付方式生成支付信息
@@ -1639,9 +1689,10 @@ func (r *publicOrderRepo) generateAlipayF2FPayment(ctx context.Context, order *e
 func (r *publicOrderRepo) generateEPayPayment(ctx context.Context, order *ent.ProxyOrder, payment *ent.ProxyPayment, notifyURL string) (string, string) {
 	// 解析EPay配置
 	var config struct {
-		PID string `json:"pid"`
-		URL string `json:"url"`
-		Key string `json:"key"`
+		PID  string `json:"pid"`
+		URL  string `json:"url"`
+		Key  string `json:"key"`
+		Type string `json:"type"`
 	}
 
 	if err := json.Unmarshal([]byte(payment.Config), &config); err != nil {
@@ -1650,7 +1701,7 @@ func (r *publicOrderRepo) generateEPayPayment(ctx context.Context, order *ent.Pr
 	}
 
 	// 初始化EPay客户端
-	client := epay.NewClient(config.PID, config.URL, config.Key)
+	client := epay.NewClient(config.PID, config.URL, config.Key, config.Type)
 
 	// 使用当前汇率将订单金额转换为CNY
 	amountFloat, err := r.queryExchangeRate(ctx, "CNY", int(order.Amount))
@@ -1678,6 +1729,7 @@ func (r *publicOrderRepo) generateEPayPayment(ctx context.Context, order *ent.Pr
 		SignType:  "MD5",
 		NotifyUrl: notifyURL,
 		ReturnUrl: "", // 如需要可从前端设置
+		Type:      config.Type,
 	})
 
 	// 返回支付URL和空二维码
@@ -1756,6 +1808,7 @@ func (r *publicOrderRepo) generateCryptoSaaSPayment(ctx context.Context, order *
 		Endpoint  string `json:"endpoint"`
 		AccountID string `json:"account_id"`
 		SecretKey string `json:"secret_key"`
+		Type      string `json:"type"`
 	}
 
 	if err := json.Unmarshal([]byte(payment.Config), &config); err != nil {
@@ -1764,7 +1817,7 @@ func (r *publicOrderRepo) generateCryptoSaaSPayment(ctx context.Context, order *
 	}
 
 	// CryptoSaaS使用相同的EPay接口
-	client := epay.NewClient(config.AccountID, config.Endpoint, config.SecretKey)
+	client := epay.NewClient(config.AccountID, config.Endpoint, config.SecretKey, config.Type)
 
 	// 使用当前汇率将订单金额转换为CNY
 	amountFloat, err := r.queryExchangeRate(ctx, "CNY", int(order.Amount))
@@ -1792,6 +1845,7 @@ func (r *publicOrderRepo) generateCryptoSaaSPayment(ctx context.Context, order *
 		SignType:  "MD5",
 		NotifyUrl: notifyURL,
 		ReturnUrl: "", // 如需要可从前端设置
+		Type:      config.Type,
 	})
 
 	// 返回支付URL和空二维码

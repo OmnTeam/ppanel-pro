@@ -17921,17 +17921,24 @@ func (m *ProxySubscribeApplicationMutation) ResetEdge(name string) error {
 // ProxySubscribeGroupMutation represents an operation that mutates the ProxySubscribeGroup nodes in the graph.
 type ProxySubscribeGroupMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int64
-	name          *string
-	description   *string
-	created_at    *time.Time
-	updated_at    *time.Time
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*ProxySubscribeGroup, error)
-	predicates    []predicate.ProxySubscribeGroup
+	op                        Op
+	typ                       string
+	id                        *int64
+	name                      *string
+	description               *string
+	is_expired_group          *bool
+	expired_days_limit        *int64
+	addexpired_days_limit     *int64
+	max_traffic_gb_expired    *int64
+	addmax_traffic_gb_expired *int64
+	speed_limit               *int64
+	addspeed_limit            *int64
+	created_at                *time.Time
+	updated_at                *time.Time
+	clearedFields             map[string]struct{}
+	done                      bool
+	oldValue                  func(context.Context) (*ProxySubscribeGroup, error)
+	predicates                []predicate.ProxySubscribeGroup
 }
 
 var _ ent.Mutation = (*ProxySubscribeGroupMutation)(nil)
@@ -18123,6 +18130,252 @@ func (m *ProxySubscribeGroupMutation) ResetDescription() {
 	delete(m.clearedFields, proxysubscribegroup.FieldDescription)
 }
 
+// SetIsExpiredGroup sets the "is_expired_group" field.
+func (m *ProxySubscribeGroupMutation) SetIsExpiredGroup(b bool) {
+	m.is_expired_group = &b
+}
+
+// IsExpiredGroup returns the value of the "is_expired_group" field in the mutation.
+func (m *ProxySubscribeGroupMutation) IsExpiredGroup() (r bool, exists bool) {
+	v := m.is_expired_group
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsExpiredGroup returns the old "is_expired_group" field's value of the ProxySubscribeGroup entity.
+// If the ProxySubscribeGroup object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxySubscribeGroupMutation) OldIsExpiredGroup(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsExpiredGroup is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsExpiredGroup requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsExpiredGroup: %w", err)
+	}
+	return oldValue.IsExpiredGroup, nil
+}
+
+// ResetIsExpiredGroup resets all changes to the "is_expired_group" field.
+func (m *ProxySubscribeGroupMutation) ResetIsExpiredGroup() {
+	m.is_expired_group = nil
+}
+
+// SetExpiredDaysLimit sets the "expired_days_limit" field.
+func (m *ProxySubscribeGroupMutation) SetExpiredDaysLimit(i int64) {
+	m.expired_days_limit = &i
+	m.addexpired_days_limit = nil
+}
+
+// ExpiredDaysLimit returns the value of the "expired_days_limit" field in the mutation.
+func (m *ProxySubscribeGroupMutation) ExpiredDaysLimit() (r int64, exists bool) {
+	v := m.expired_days_limit
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExpiredDaysLimit returns the old "expired_days_limit" field's value of the ProxySubscribeGroup entity.
+// If the ProxySubscribeGroup object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxySubscribeGroupMutation) OldExpiredDaysLimit(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExpiredDaysLimit is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExpiredDaysLimit requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExpiredDaysLimit: %w", err)
+	}
+	return oldValue.ExpiredDaysLimit, nil
+}
+
+// AddExpiredDaysLimit adds i to the "expired_days_limit" field.
+func (m *ProxySubscribeGroupMutation) AddExpiredDaysLimit(i int64) {
+	if m.addexpired_days_limit != nil {
+		*m.addexpired_days_limit += i
+	} else {
+		m.addexpired_days_limit = &i
+	}
+}
+
+// AddedExpiredDaysLimit returns the value that was added to the "expired_days_limit" field in this mutation.
+func (m *ProxySubscribeGroupMutation) AddedExpiredDaysLimit() (r int64, exists bool) {
+	v := m.addexpired_days_limit
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearExpiredDaysLimit clears the value of the "expired_days_limit" field.
+func (m *ProxySubscribeGroupMutation) ClearExpiredDaysLimit() {
+	m.expired_days_limit = nil
+	m.addexpired_days_limit = nil
+	m.clearedFields[proxysubscribegroup.FieldExpiredDaysLimit] = struct{}{}
+}
+
+// ExpiredDaysLimitCleared returns if the "expired_days_limit" field was cleared in this mutation.
+func (m *ProxySubscribeGroupMutation) ExpiredDaysLimitCleared() bool {
+	_, ok := m.clearedFields[proxysubscribegroup.FieldExpiredDaysLimit]
+	return ok
+}
+
+// ResetExpiredDaysLimit resets all changes to the "expired_days_limit" field.
+func (m *ProxySubscribeGroupMutation) ResetExpiredDaysLimit() {
+	m.expired_days_limit = nil
+	m.addexpired_days_limit = nil
+	delete(m.clearedFields, proxysubscribegroup.FieldExpiredDaysLimit)
+}
+
+// SetMaxTrafficGBExpired sets the "max_traffic_gb_expired" field.
+func (m *ProxySubscribeGroupMutation) SetMaxTrafficGBExpired(i int64) {
+	m.max_traffic_gb_expired = &i
+	m.addmax_traffic_gb_expired = nil
+}
+
+// MaxTrafficGBExpired returns the value of the "max_traffic_gb_expired" field in the mutation.
+func (m *ProxySubscribeGroupMutation) MaxTrafficGBExpired() (r int64, exists bool) {
+	v := m.max_traffic_gb_expired
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMaxTrafficGBExpired returns the old "max_traffic_gb_expired" field's value of the ProxySubscribeGroup entity.
+// If the ProxySubscribeGroup object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxySubscribeGroupMutation) OldMaxTrafficGBExpired(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMaxTrafficGBExpired is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMaxTrafficGBExpired requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMaxTrafficGBExpired: %w", err)
+	}
+	return oldValue.MaxTrafficGBExpired, nil
+}
+
+// AddMaxTrafficGBExpired adds i to the "max_traffic_gb_expired" field.
+func (m *ProxySubscribeGroupMutation) AddMaxTrafficGBExpired(i int64) {
+	if m.addmax_traffic_gb_expired != nil {
+		*m.addmax_traffic_gb_expired += i
+	} else {
+		m.addmax_traffic_gb_expired = &i
+	}
+}
+
+// AddedMaxTrafficGBExpired returns the value that was added to the "max_traffic_gb_expired" field in this mutation.
+func (m *ProxySubscribeGroupMutation) AddedMaxTrafficGBExpired() (r int64, exists bool) {
+	v := m.addmax_traffic_gb_expired
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearMaxTrafficGBExpired clears the value of the "max_traffic_gb_expired" field.
+func (m *ProxySubscribeGroupMutation) ClearMaxTrafficGBExpired() {
+	m.max_traffic_gb_expired = nil
+	m.addmax_traffic_gb_expired = nil
+	m.clearedFields[proxysubscribegroup.FieldMaxTrafficGBExpired] = struct{}{}
+}
+
+// MaxTrafficGBExpiredCleared returns if the "max_traffic_gb_expired" field was cleared in this mutation.
+func (m *ProxySubscribeGroupMutation) MaxTrafficGBExpiredCleared() bool {
+	_, ok := m.clearedFields[proxysubscribegroup.FieldMaxTrafficGBExpired]
+	return ok
+}
+
+// ResetMaxTrafficGBExpired resets all changes to the "max_traffic_gb_expired" field.
+func (m *ProxySubscribeGroupMutation) ResetMaxTrafficGBExpired() {
+	m.max_traffic_gb_expired = nil
+	m.addmax_traffic_gb_expired = nil
+	delete(m.clearedFields, proxysubscribegroup.FieldMaxTrafficGBExpired)
+}
+
+// SetSpeedLimit sets the "speed_limit" field.
+func (m *ProxySubscribeGroupMutation) SetSpeedLimit(i int64) {
+	m.speed_limit = &i
+	m.addspeed_limit = nil
+}
+
+// SpeedLimit returns the value of the "speed_limit" field in the mutation.
+func (m *ProxySubscribeGroupMutation) SpeedLimit() (r int64, exists bool) {
+	v := m.speed_limit
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpeedLimit returns the old "speed_limit" field's value of the ProxySubscribeGroup entity.
+// If the ProxySubscribeGroup object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProxySubscribeGroupMutation) OldSpeedLimit(ctx context.Context) (v *int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpeedLimit is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpeedLimit requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpeedLimit: %w", err)
+	}
+	return oldValue.SpeedLimit, nil
+}
+
+// AddSpeedLimit adds i to the "speed_limit" field.
+func (m *ProxySubscribeGroupMutation) AddSpeedLimit(i int64) {
+	if m.addspeed_limit != nil {
+		*m.addspeed_limit += i
+	} else {
+		m.addspeed_limit = &i
+	}
+}
+
+// AddedSpeedLimit returns the value that was added to the "speed_limit" field in this mutation.
+func (m *ProxySubscribeGroupMutation) AddedSpeedLimit() (r int64, exists bool) {
+	v := m.addspeed_limit
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearSpeedLimit clears the value of the "speed_limit" field.
+func (m *ProxySubscribeGroupMutation) ClearSpeedLimit() {
+	m.speed_limit = nil
+	m.addspeed_limit = nil
+	m.clearedFields[proxysubscribegroup.FieldSpeedLimit] = struct{}{}
+}
+
+// SpeedLimitCleared returns if the "speed_limit" field was cleared in this mutation.
+func (m *ProxySubscribeGroupMutation) SpeedLimitCleared() bool {
+	_, ok := m.clearedFields[proxysubscribegroup.FieldSpeedLimit]
+	return ok
+}
+
+// ResetSpeedLimit resets all changes to the "speed_limit" field.
+func (m *ProxySubscribeGroupMutation) ResetSpeedLimit() {
+	m.speed_limit = nil
+	m.addspeed_limit = nil
+	delete(m.clearedFields, proxysubscribegroup.FieldSpeedLimit)
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (m *ProxySubscribeGroupMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
@@ -18229,12 +18482,24 @@ func (m *ProxySubscribeGroupMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ProxySubscribeGroupMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 8)
 	if m.name != nil {
 		fields = append(fields, proxysubscribegroup.FieldName)
 	}
 	if m.description != nil {
 		fields = append(fields, proxysubscribegroup.FieldDescription)
+	}
+	if m.is_expired_group != nil {
+		fields = append(fields, proxysubscribegroup.FieldIsExpiredGroup)
+	}
+	if m.expired_days_limit != nil {
+		fields = append(fields, proxysubscribegroup.FieldExpiredDaysLimit)
+	}
+	if m.max_traffic_gb_expired != nil {
+		fields = append(fields, proxysubscribegroup.FieldMaxTrafficGBExpired)
+	}
+	if m.speed_limit != nil {
+		fields = append(fields, proxysubscribegroup.FieldSpeedLimit)
 	}
 	if m.created_at != nil {
 		fields = append(fields, proxysubscribegroup.FieldCreatedAt)
@@ -18254,6 +18519,14 @@ func (m *ProxySubscribeGroupMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case proxysubscribegroup.FieldDescription:
 		return m.Description()
+	case proxysubscribegroup.FieldIsExpiredGroup:
+		return m.IsExpiredGroup()
+	case proxysubscribegroup.FieldExpiredDaysLimit:
+		return m.ExpiredDaysLimit()
+	case proxysubscribegroup.FieldMaxTrafficGBExpired:
+		return m.MaxTrafficGBExpired()
+	case proxysubscribegroup.FieldSpeedLimit:
+		return m.SpeedLimit()
 	case proxysubscribegroup.FieldCreatedAt:
 		return m.CreatedAt()
 	case proxysubscribegroup.FieldUpdatedAt:
@@ -18271,6 +18544,14 @@ func (m *ProxySubscribeGroupMutation) OldField(ctx context.Context, name string)
 		return m.OldName(ctx)
 	case proxysubscribegroup.FieldDescription:
 		return m.OldDescription(ctx)
+	case proxysubscribegroup.FieldIsExpiredGroup:
+		return m.OldIsExpiredGroup(ctx)
+	case proxysubscribegroup.FieldExpiredDaysLimit:
+		return m.OldExpiredDaysLimit(ctx)
+	case proxysubscribegroup.FieldMaxTrafficGBExpired:
+		return m.OldMaxTrafficGBExpired(ctx)
+	case proxysubscribegroup.FieldSpeedLimit:
+		return m.OldSpeedLimit(ctx)
 	case proxysubscribegroup.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case proxysubscribegroup.FieldUpdatedAt:
@@ -18298,6 +18579,34 @@ func (m *ProxySubscribeGroupMutation) SetField(name string, value ent.Value) err
 		}
 		m.SetDescription(v)
 		return nil
+	case proxysubscribegroup.FieldIsExpiredGroup:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsExpiredGroup(v)
+		return nil
+	case proxysubscribegroup.FieldExpiredDaysLimit:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExpiredDaysLimit(v)
+		return nil
+	case proxysubscribegroup.FieldMaxTrafficGBExpired:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMaxTrafficGBExpired(v)
+		return nil
+	case proxysubscribegroup.FieldSpeedLimit:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpeedLimit(v)
+		return nil
 	case proxysubscribegroup.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -18319,13 +18628,31 @@ func (m *ProxySubscribeGroupMutation) SetField(name string, value ent.Value) err
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *ProxySubscribeGroupMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addexpired_days_limit != nil {
+		fields = append(fields, proxysubscribegroup.FieldExpiredDaysLimit)
+	}
+	if m.addmax_traffic_gb_expired != nil {
+		fields = append(fields, proxysubscribegroup.FieldMaxTrafficGBExpired)
+	}
+	if m.addspeed_limit != nil {
+		fields = append(fields, proxysubscribegroup.FieldSpeedLimit)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *ProxySubscribeGroupMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case proxysubscribegroup.FieldExpiredDaysLimit:
+		return m.AddedExpiredDaysLimit()
+	case proxysubscribegroup.FieldMaxTrafficGBExpired:
+		return m.AddedMaxTrafficGBExpired()
+	case proxysubscribegroup.FieldSpeedLimit:
+		return m.AddedSpeedLimit()
+	}
 	return nil, false
 }
 
@@ -18334,6 +18661,27 @@ func (m *ProxySubscribeGroupMutation) AddedField(name string) (ent.Value, bool) 
 // type.
 func (m *ProxySubscribeGroupMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case proxysubscribegroup.FieldExpiredDaysLimit:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddExpiredDaysLimit(v)
+		return nil
+	case proxysubscribegroup.FieldMaxTrafficGBExpired:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddMaxTrafficGBExpired(v)
+		return nil
+	case proxysubscribegroup.FieldSpeedLimit:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpeedLimit(v)
+		return nil
 	}
 	return fmt.Errorf("unknown ProxySubscribeGroup numeric field %s", name)
 }
@@ -18344,6 +18692,15 @@ func (m *ProxySubscribeGroupMutation) ClearedFields() []string {
 	var fields []string
 	if m.FieldCleared(proxysubscribegroup.FieldDescription) {
 		fields = append(fields, proxysubscribegroup.FieldDescription)
+	}
+	if m.FieldCleared(proxysubscribegroup.FieldExpiredDaysLimit) {
+		fields = append(fields, proxysubscribegroup.FieldExpiredDaysLimit)
+	}
+	if m.FieldCleared(proxysubscribegroup.FieldMaxTrafficGBExpired) {
+		fields = append(fields, proxysubscribegroup.FieldMaxTrafficGBExpired)
+	}
+	if m.FieldCleared(proxysubscribegroup.FieldSpeedLimit) {
+		fields = append(fields, proxysubscribegroup.FieldSpeedLimit)
 	}
 	return fields
 }
@@ -18362,6 +18719,15 @@ func (m *ProxySubscribeGroupMutation) ClearField(name string) error {
 	case proxysubscribegroup.FieldDescription:
 		m.ClearDescription()
 		return nil
+	case proxysubscribegroup.FieldExpiredDaysLimit:
+		m.ClearExpiredDaysLimit()
+		return nil
+	case proxysubscribegroup.FieldMaxTrafficGBExpired:
+		m.ClearMaxTrafficGBExpired()
+		return nil
+	case proxysubscribegroup.FieldSpeedLimit:
+		m.ClearSpeedLimit()
+		return nil
 	}
 	return fmt.Errorf("unknown ProxySubscribeGroup nullable field %s", name)
 }
@@ -18375,6 +18741,18 @@ func (m *ProxySubscribeGroupMutation) ResetField(name string) error {
 		return nil
 	case proxysubscribegroup.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case proxysubscribegroup.FieldIsExpiredGroup:
+		m.ResetIsExpiredGroup()
+		return nil
+	case proxysubscribegroup.FieldExpiredDaysLimit:
+		m.ResetExpiredDaysLimit()
+		return nil
+	case proxysubscribegroup.FieldMaxTrafficGBExpired:
+		m.ResetMaxTrafficGBExpired()
+		return nil
+	case proxysubscribegroup.FieldSpeedLimit:
+		m.ResetSpeedLimit()
 		return nil
 	case proxysubscribegroup.FieldCreatedAt:
 		m.ResetCreatedAt()

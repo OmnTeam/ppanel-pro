@@ -1073,12 +1073,28 @@ func init() {
 	proxysubscribegroup.DefaultName = proxysubscribegroupDescName.Default.(string)
 	// proxysubscribegroup.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	proxysubscribegroup.NameValidator = proxysubscribegroupDescName.Validators[0].(func(string) error)
+	// proxysubscribegroupDescIsExpiredGroup is the schema descriptor for is_expired_group field.
+	proxysubscribegroupDescIsExpiredGroup := proxysubscribegroupFields[3].Descriptor()
+	// proxysubscribegroup.DefaultIsExpiredGroup holds the default value on creation for the is_expired_group field.
+	proxysubscribegroup.DefaultIsExpiredGroup = proxysubscribegroupDescIsExpiredGroup.Default.(bool)
+	// proxysubscribegroupDescExpiredDaysLimit is the schema descriptor for expired_days_limit field.
+	proxysubscribegroupDescExpiredDaysLimit := proxysubscribegroupFields[4].Descriptor()
+	// proxysubscribegroup.DefaultExpiredDaysLimit holds the default value on creation for the expired_days_limit field.
+	proxysubscribegroup.DefaultExpiredDaysLimit = proxysubscribegroupDescExpiredDaysLimit.Default.(int64)
+	// proxysubscribegroupDescMaxTrafficGBExpired is the schema descriptor for max_traffic_gb_expired field.
+	proxysubscribegroupDescMaxTrafficGBExpired := proxysubscribegroupFields[5].Descriptor()
+	// proxysubscribegroup.DefaultMaxTrafficGBExpired holds the default value on creation for the max_traffic_gb_expired field.
+	proxysubscribegroup.DefaultMaxTrafficGBExpired = proxysubscribegroupDescMaxTrafficGBExpired.Default.(int64)
+	// proxysubscribegroupDescSpeedLimit is the schema descriptor for speed_limit field.
+	proxysubscribegroupDescSpeedLimit := proxysubscribegroupFields[6].Descriptor()
+	// proxysubscribegroup.DefaultSpeedLimit holds the default value on creation for the speed_limit field.
+	proxysubscribegroup.DefaultSpeedLimit = proxysubscribegroupDescSpeedLimit.Default.(int64)
 	// proxysubscribegroupDescCreatedAt is the schema descriptor for created_at field.
-	proxysubscribegroupDescCreatedAt := proxysubscribegroupFields[3].Descriptor()
+	proxysubscribegroupDescCreatedAt := proxysubscribegroupFields[7].Descriptor()
 	// proxysubscribegroup.DefaultCreatedAt holds the default value on creation for the created_at field.
 	proxysubscribegroup.DefaultCreatedAt = proxysubscribegroupDescCreatedAt.Default.(func() time.Time)
 	// proxysubscribegroupDescUpdatedAt is the schema descriptor for updated_at field.
-	proxysubscribegroupDescUpdatedAt := proxysubscribegroupFields[4].Descriptor()
+	proxysubscribegroupDescUpdatedAt := proxysubscribegroupFields[8].Descriptor()
 	// proxysubscribegroup.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	proxysubscribegroup.DefaultUpdatedAt = proxysubscribegroupDescUpdatedAt.Default.(func() time.Time)
 	// proxysubscribegroup.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

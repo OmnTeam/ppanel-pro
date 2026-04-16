@@ -44,7 +44,6 @@ const (
 	legacyCacheUserSubscribeIDPrefix    = "cache:user:subscribe:id:"
 	legacyCacheSubscribeIDPrefix        = "cache:subscribe:id:"
 	legacyCacheSubscribeServersPrefix   = "cache:subscribe:servers:"
-	legacyServerUserListCachePrefix     = "server:user:"
 	legacyDeviceIdentifierSessionPrefix = "auth:device_identifier"
 	legacyTelegramUnbindMessageTemplate = "Your account has been unbound.\n\nUser ID: {{.Id}}\nTime: {{.Time}}\n"
 )
@@ -300,32 +299,12 @@ func (r *publicUserRepo) clearLegacyDeviceSessionCaches(ctx context.Context, ide
 }
 
 func (r *publicUserRepo) clearLegacyServerUserCaches(ctx context.Context) {
-	if r == nil || r.data == nil || r.data.rdb == nil {
+	if r == nil || r.data == nil {
 		return
 	}
-
-	var (
-		cursor uint64
-		keys   []string
-	)
-	for {
-		scanKeys, newCursor, err := r.data.rdb.Scan(ctx, cursor, legacyServerUserListCachePrefix+"*", 999).Result()
-		if err != nil {
-			r.logger.Warnw("scan legacy server user caches failed", "error", err)
-			return
-		}
-		if len(scanKeys) > 0 {
-			keys = append(keys, scanKeys...)
-		}
-		cursor = newCursor
-		if cursor == 0 {
-			break
-		}
+	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
+		r.logger.Warnw("delete legacy server caches failed", "error", err)
 	}
-	if len(keys) == 0 {
-		return
-	}
-	r.deleteRedisKeys(ctx, tool.RemoveDuplicateElements(keys...)...)
 }
 
 func (r *publicUserRepo) loadVerifyCodePayload(ctx context.Context, keys ...string) (*verifyCodePayload, string, error) {
@@ -1069,14 +1048,14 @@ func (r *publicUserRepo) UnbindTelegram(ctx context.Context, userID int) error {
 		).
 		Only(ctx)
 	if err != nil {
-		if ent.IsNotFound(err) {
-			return responsecode.NewKratosError(responsecode.ErrTelegramNotBound)
-		}
 		return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
 
 	chatID, err := strconv.ParseInt(strings.TrimSpace(method.AuthIdentifier), 10, 64)
-	if err != nil || chatID == 0 {
+	if err != nil {
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
+	}
+	if chatID == 0 {
 		return responsecode.NewKratosError(responsecode.ErrTelegramNotBound)
 	}
 
@@ -1362,16 +1341,13 @@ func (r *publicUserRepo) UpdateBindMobile(ctx context.Context, userID int, areaC
 	existing, err := r.data.db.ProxyUserAuthMethod.Query().
 		Where(
 			proxyuserauthmethod.AuthTypeEQ("mobile"),
-			proxyuserauthmethod.Or(
-				proxyuserauthmethod.AuthIdentifierEQ(phoneNumber),
-				proxyuserauthmethod.AuthIdentifierEQ(mobile),
-			),
+			proxyuserauthmethod.AuthIdentifierEQ(mobile),
 		).
 		Only(ctx)
 	if err != nil && !ent.IsNotFound(err) {
 		return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
-	if err == nil && existing != nil && existing.UserID != int64(userID) {
+	if err == nil && existing != nil {
 		return responsecode.NewKratosError(responsecode.ErrTelephoneExist)
 	}
 
@@ -1389,14 +1365,14 @@ func (r *publicUserRepo) UpdateBindMobile(ctx context.Context, userID int, areaC
 		if _, err := r.data.db.ProxyUserAuthMethod.Create().
 			SetUserID(int64(userID)).
 			SetAuthType("mobile").
-			SetAuthIdentifier(phoneNumber).
+			SetAuthIdentifier(mobile).
 			SetVerified(true).
 			Save(ctx); err != nil {
 			return responsecode.NewKratosError(responsecode.ErrDatabaseInsert)
 		}
 	} else {
 		if err := r.data.db.ProxyUserAuthMethod.UpdateOneID(current.ID).
-			SetAuthIdentifier(phoneNumber).
+			SetAuthIdentifier(mobile).
 			SetVerified(true).
 			Exec(ctx); err != nil {
 			return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
@@ -1417,7 +1393,7 @@ func (r *publicUserRepo) UpdateBindEmail(ctx context.Context, userID int, email 
 	if err != nil && !ent.IsNotFound(err) {
 		return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
-	if err == nil && existing != nil && existing.UserID != int64(userID) {
+	if err == nil && existing != nil {
 		return responsecode.NewKratosError(responsecode.ErrDuplicateEmail)
 	}
 

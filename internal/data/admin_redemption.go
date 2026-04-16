@@ -138,6 +138,9 @@ func (r *adminRedemptionRepo) UpdateRedemptionCode(ctx context.Context, req *v1.
 	update := code.Update()
 
 	if req.TotalCount > 0 {
+		if req.TotalCount < code.UsedCount {
+			return responsecode.NewKratosError(responsecode.ErrInvalidParams)
+		}
 		update.SetTotalCount(req.TotalCount)
 	}
 	if req.SubscribePlan > 0 {
@@ -158,9 +161,6 @@ func (r *adminRedemptionRepo) UpdateRedemptionCode(ctx context.Context, req *v1.
 	}
 	if req.Quantity > 0 {
 		update.SetQuantity(req.Quantity)
-	}
-	if req.Status == 0 || req.Status == 1 {
-		update.SetStatus(int8(req.Status))
 	}
 
 	update.SetUpdatedAt(time.Now())
@@ -205,17 +205,13 @@ func (r *adminRedemptionRepo) ToggleRedemptionCodeStatus(ctx context.Context, re
 
 // DeleteRedemptionCode deletes redemption code
 func (r *adminRedemptionRepo) DeleteRedemptionCode(ctx context.Context, id int64) error {
-	deletedCount, err := r.data.db.ProxyRedemptionCode.Delete().
+	_, err := r.data.db.ProxyRedemptionCode.Delete().
 		Where(proxyredemptioncode.IDEQ(id)).
 		Exec(ctx)
 
 	if err != nil {
 		r.logger.Errorf("Failed to delete redemption code: %v", err)
 		return err
-	}
-
-	if deletedCount == 0 {
-		return responsecode.NewKratosError(responsecode.ErrRedemptionCodeNotFound)
 	}
 
 	return nil

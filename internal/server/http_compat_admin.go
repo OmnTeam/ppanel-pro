@@ -2,15 +2,23 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
+	adminpaymentv1 "github.com/OmnTeam/ppanel-pro/api/admin/payment/v1"
 	adminticketv1 "github.com/OmnTeam/ppanel-pro/api/admin/ticket/v1"
+	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
 	"github.com/OmnTeam/ppanel-pro/internal/data"
+	admingroupservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/group"
+	adminpaymentservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/payment"
+	adminsystemservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/system"
 	adminticketservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/ticket"
+	paymentpkg "github.com/OmnTeam/ppanel-pro/pkg/payment"
 	"github.com/OmnTeam/ppanel-pro/pkg/uuidx"
 	khttp "github.com/go-kratos/kratos/v2/transport/http"
 )
@@ -20,10 +28,50 @@ type compatUpdateTicketStatusRequest struct {
 	Status *uint8 `json:"status"`
 }
 
-func registerLegacyAdminCompatRoutes(r *khttp.Router, dataLayer *data.Data, adminTicket *adminticketservice.TicketService) {
+type compatLegacyPaymentConfig struct {
+	ID          int64       `json:"id,string"`
+	Name        string      `json:"name"`
+	Platform    string      `json:"platform"`
+	Description string      `json:"description"`
+	Icon        string      `json:"icon,omitempty"`
+	Domain      string      `json:"domain,omitempty"`
+	Config      interface{} `json:"config"`
+	FeeMode     uint        `json:"fee_mode"`
+	FeePercent  int64       `json:"fee_percent,omitempty"`
+	FeeAmount   int64       `json:"fee_amount,omitempty"`
+	Sort        int64       `json:"sort,omitempty"`
+	Enable      *bool       `json:"enable"`
+}
+
+type compatLegacyPaymentMethodDetail struct {
+	ID          int64       `json:"id,string"`
+	Name        string      `json:"name"`
+	Platform    string      `json:"platform"`
+	Description string      `json:"description"`
+	Icon        string      `json:"icon"`
+	Domain      string      `json:"domain"`
+	Config      interface{} `json:"config"`
+	FeeMode     uint        `json:"fee_mode"`
+	FeePercent  int64       `json:"fee_percent"`
+	FeeAmount   int64       `json:"fee_amount"`
+	Sort        int64       `json:"sort"`
+	Enable      bool        `json:"enable"`
+	NotifyURL   string      `json:"notify_url"`
+}
+
+func registerLegacyAdminCompatRoutes(r *khttp.Router, dataLayer *data.Data, adminGroup *admingroupservice.GroupService, adminPayment *adminpaymentservice.PaymentService, adminSystem *adminsystemservice.SystemService, adminTicket *adminticketservice.TicketService) {
 	if r == nil {
 		return
 	}
+
+	registerLegacyAdminSystemCompatRoutes(r, dataLayer, adminSystem)
+	registerLegacyAdminGroupCompatRoutes(r, dataLayer, adminGroup)
+	registerLegacyAdminUserSubscribeCompatRoutes(r, dataLayer)
+
+	r.POST("/v1/admin/payment", compatCreatePaymentMethodHandler(dataLayer, adminPayment))
+	r.PUT("/v1/admin/payment", compatUpdatePaymentMethodHandler(dataLayer, adminPayment))
+	r.DELETE("/v1/admin/payment", compatDeletePaymentMethodHandler(adminPayment))
+	r.GET("/v1/admin/payment/list", compatGetPaymentMethodListHandler(dataLayer, adminPayment))
 
 	r.GET("/v1/admin/system/module", func(ctx khttp.Context) error {
 		out, err := compatMiddleware(ctx, nil, func(inner context.Context, req interface{}) (interface{}, error) {
@@ -120,4 +168,272 @@ func registerLegacyAdminCompatRoutes(r *khttp.Router, dataLayer *data.Data, admi
 		}
 		return compatJSON(ctx, out)
 	})
+}
+
+func compatCreatePaymentMethodHandler(dataLayer *data.Data, adminPayment *adminpaymentservice.PaymentService) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		if adminPayment == nil {
+			return compatJSONError(ctx, compatCodeError(500, "payment service unavailable"))
+		}
+
+		var req adminpaymentv1.CreatePaymentMethodRequest
+		if err := ctx.Bind(&req); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if err := ctx.BindQuery(&req); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if err := compatValidateRequiredString(req.Name, "CreatePaymentMethodRequest", "Name"); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if err := compatValidateRequiredString(req.Platform, "CreatePaymentMethodRequest", "Platform"); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if req.Config == nil {
+			return compatJSONError(ctx, compatRequiredFieldError("CreatePaymentMethodRequest", "Config"))
+		}
+		if req.Enable == nil {
+			return compatJSONError(ctx, compatRequiredFieldError("CreatePaymentMethodRequest", "Enable"))
+		}
+
+		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			return adminPayment.CreatePaymentMethod(inner, request.(*adminpaymentv1.CreatePaymentMethodRequest))
+		})
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+
+		reply, _ := out.(*adminpaymentv1.CreatePaymentMethodReply)
+		paymentInfo, err := compatLoadLegacyPaymentByID(ctx, dataLayer, reply.GetData().GetId())
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, compatLegacyPaymentConfigFromEntity(paymentInfo))
+	}
+}
+
+func compatUpdatePaymentMethodHandler(dataLayer *data.Data, adminPayment *adminpaymentservice.PaymentService) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		if adminPayment == nil {
+			return compatJSONError(ctx, compatCodeError(500, "payment service unavailable"))
+		}
+
+		var req adminpaymentv1.UpdatePaymentMethodRequest
+		if err := ctx.Bind(&req); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if err := ctx.BindQuery(&req); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if err := compatValidateRequiredString(req.Id, "UpdatePaymentMethodRequest", "Id"); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if err := compatValidateRequiredString(req.Name, "UpdatePaymentMethodRequest", "Name"); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if err := compatValidateRequiredString(req.Platform, "UpdatePaymentMethodRequest", "Platform"); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if req.Config == nil {
+			return compatJSONError(ctx, compatRequiredFieldError("UpdatePaymentMethodRequest", "Config"))
+		}
+		if req.Enable == nil {
+			return compatJSONError(ctx, compatRequiredFieldError("UpdatePaymentMethodRequest", "Enable"))
+		}
+
+		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			return adminPayment.UpdatePaymentMethod(inner, request.(*adminpaymentv1.UpdatePaymentMethodRequest))
+		})
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+
+		reply, _ := out.(*adminpaymentv1.UpdatePaymentMethodReply)
+		paymentInfo, err := compatLoadLegacyPaymentByID(ctx, dataLayer, reply.GetData().GetId())
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, compatLegacyPaymentConfigFromEntity(paymentInfo))
+	}
+}
+
+func compatDeletePaymentMethodHandler(adminPayment *adminpaymentservice.PaymentService) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		if adminPayment == nil {
+			return compatJSONError(ctx, compatCodeError(500, "payment service unavailable"))
+		}
+
+		var req adminpaymentv1.DeletePaymentMethodRequest
+		if err := ctx.BindQuery(&req); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if err := compatValidateRequiredString(req.Id, "DeletePaymentMethodRequest", "Id"); err != nil {
+			return compatJSONError(ctx, err)
+		}
+
+		if _, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			return adminPayment.DeletePaymentMethod(inner, request.(*adminpaymentv1.DeletePaymentMethodRequest))
+		}); err != nil {
+			return compatJSONError(ctx, err)
+		}
+
+		return compatJSON(ctx, nil)
+	}
+}
+
+func compatGetPaymentMethodListHandler(dataLayer *data.Data, adminPayment *adminpaymentservice.PaymentService) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		if adminPayment == nil {
+			return compatJSONError(ctx, compatCodeError(500, "payment service unavailable"))
+		}
+
+		var req adminpaymentv1.GetPaymentMethodListRequest
+		if err := ctx.BindQuery(&req); err != nil {
+			return compatJSONError(ctx, err)
+		}
+
+		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			return adminPayment.GetPaymentMethodList(inner, request.(*adminpaymentv1.GetPaymentMethodListRequest))
+		})
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+
+		reply, _ := out.(*adminpaymentv1.GetPaymentMethodListReply)
+		result := map[string]interface{}{
+			"total": int64(0),
+			"list":  []compatLegacyPaymentMethodDetail{},
+		}
+		if reply == nil || reply.Data == nil {
+			return compatJSON(ctx, result)
+		}
+
+		result["total"] = reply.Data.Total
+		if len(reply.Data.List) == 0 || dataLayer == nil || dataLayer.DB() == nil {
+			return compatJSON(ctx, result)
+		}
+
+		idOrder := make([]int64, 0, len(reply.Data.List))
+		for _, item := range reply.Data.List {
+			id, err := strconv.ParseInt(strings.TrimSpace(item.GetId()), 10, 64)
+			if err != nil {
+				return compatJSONError(ctx, err)
+			}
+			idOrder = append(idOrder, id)
+		}
+
+		records, err := dataLayer.DB().ProxyPayment.Query().
+			Where(proxypayment.IDIn(idOrder...)).
+			All(ctx)
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+
+		recordMap := make(map[int64]*ent.ProxyPayment, len(records))
+		for _, item := range records {
+			recordMap[item.ID] = item
+		}
+
+		siteHost := compatLegacySiteHost(ctx, dataLayer, strings.TrimSpace(ctx.Request().Host))
+		gatewayMode := legacyGatewayModeEnabled()
+		list := make([]compatLegacyPaymentMethodDetail, 0, len(idOrder))
+		for _, id := range idOrder {
+			item := recordMap[id]
+			if item == nil {
+				continue
+			}
+			list = append(list, compatLegacyPaymentDetailFromEntity(item, siteHost, gatewayMode))
+		}
+		result["list"] = list
+		return compatJSON(ctx, result)
+	}
+}
+
+func compatLoadLegacyPaymentByID(ctx context.Context, dataLayer *data.Data, idText string) (*ent.ProxyPayment, error) {
+	if dataLayer == nil || dataLayer.DB() == nil {
+		return nil, compatCodeError(500, "data layer unavailable")
+	}
+	id, err := strconv.ParseInt(strings.TrimSpace(idText), 10, 64)
+	if err != nil {
+		return nil, compatParamError("invalid payment id")
+	}
+	return dataLayer.DB().ProxyPayment.Get(ctx, id)
+}
+
+func compatLegacyPaymentConfigFromEntity(item *ent.ProxyPayment) compatLegacyPaymentConfig {
+	enable := item.Enable
+	return compatLegacyPaymentConfig{
+		ID:          item.ID,
+		Name:        item.Name,
+		Platform:    item.Platform,
+		Description: item.Description,
+		Icon:        item.Icon,
+		Domain:      item.Domain,
+		Config:      compatLegacyPaymentJSON(item.Config),
+		FeeMode:     uint(item.FeeMode),
+		FeePercent:  item.FeePercent,
+		FeeAmount:   item.FeeAmount,
+		Sort:        item.Sort,
+		Enable:      &enable,
+	}
+}
+
+func compatLegacyPaymentDetailFromEntity(item *ent.ProxyPayment, siteHost string, gatewayMode bool) compatLegacyPaymentMethodDetail {
+	return compatLegacyPaymentMethodDetail{
+		ID:          item.ID,
+		Name:        item.Name,
+		Platform:    item.Platform,
+		Description: item.Description,
+		Icon:        item.Icon,
+		Domain:      item.Domain,
+		Config:      compatLegacyPaymentJSON(item.Config),
+		FeeMode:     uint(item.FeeMode),
+		FeePercent:  item.FeePercent,
+		FeeAmount:   item.FeeAmount,
+		Sort:        item.Sort,
+		Enable:      item.Enable,
+		NotifyURL:   compatLegacyPaymentNotifyURL(item, siteHost, gatewayMode),
+	}
+}
+
+func compatLegacyPaymentJSON(raw string) interface{} {
+	if strings.TrimSpace(raw) == "" {
+		return map[string]interface{}{}
+	}
+	var result interface{}
+	if err := json.Unmarshal([]byte(raw), &result); err != nil {
+		return map[string]interface{}{}
+	}
+	return result
+}
+
+func compatLegacySiteHost(ctx context.Context, dataLayer *data.Data, fallback string) string {
+	if value, err := compatSystemValue(ctx, dataLayer, "site", "Host", "host"); err == nil && strings.TrimSpace(value) != "" {
+		return strings.TrimSpace(value)
+	}
+	if dataLayer != nil && dataLayer.AppConf() != nil && dataLayer.AppConf().Site != nil && strings.TrimSpace(dataLayer.AppConf().Site.Host) != "" {
+		return strings.TrimSpace(dataLayer.AppConf().Site.Host)
+	}
+	return strings.TrimSpace(fallback)
+}
+
+func compatLegacyPaymentNotifyURL(item *ent.ProxyPayment, siteHost string, gatewayMode bool) string {
+	if item == nil || paymentpkg.ParsePlatform(item.Platform) == paymentpkg.Balance {
+		return ""
+	}
+	domain := strings.TrimSpace(item.Domain)
+	if domain != "" {
+		if gatewayMode {
+			return domain + "/api//v1/notify/" + item.Platform + "/" + item.Token
+		}
+		return domain + "/v1/notify/" + item.Platform + "/" + item.Token
+	}
+	siteHost = strings.TrimSpace(siteHost)
+	if siteHost == "" {
+		return ""
+	}
+	if gatewayMode {
+		return "https://" + siteHost + "/api/v1/notify/" + item.Platform + "/" + item.Token
+	}
+	return "https://" + siteHost + "/v1/notify/" + item.Platform + "/" + item.Token
 }

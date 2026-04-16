@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
@@ -19,6 +18,28 @@ type adminSystemRepo struct {
 	log  *log.Helper
 }
 
+func LoadNodeConfigForServer(ctx context.Context, data *Data, logger log.Logger) (*systembiz.NodeConfig, error) {
+	repo := &adminSystemRepo{
+		data: data,
+		log:  log.NewHelper(logger),
+	}
+	configs, err := repo.GetConfigByCategory(ctx, "server")
+	if err != nil {
+		return nil, err
+	}
+	result := &systembiz.NodeConfig{}
+	tool.SystemConfigSliceReflectToStruct(configs, result)
+	repo.log.Infof(
+		"[LoadNodeConfigForServer] node_secret=%q node_pull_interval=%d node_push_interval=%d traffic_report_threshold=%d ip_strategy=%q",
+		result.NodeSecret,
+		result.NodePullInterval,
+		result.NodePushInterval,
+		result.TrafficReportThreshold,
+		result.IPStrategy,
+	)
+	return result, nil
+}
+
 // NewAdminSystemRepo creates a new admin system repository
 func NewAdminSystemRepo(data *Data, logger log.Logger) systembiz.SystemRepo {
 	return &adminSystemRepo{
@@ -29,41 +50,8 @@ func NewAdminSystemRepo(data *Data, logger log.Logger) systembiz.SystemRepo {
 
 // GetConfigByCategory 根据分类获取配置
 func (r *adminSystemRepo) GetConfigByCategory(ctx context.Context, category string) ([]*tool.SystemConfig, error) {
-	// Determine cache key based on category
-	var cacheKey string
-	switch category {
-	case "currency":
-		cacheKey = CurrencyConfigKey
-	case "invite":
-		cacheKey = InviteConfigKey
-	case "server":
-		cacheKey = NodeConfigKey
-	case "tos":
-		cacheKey = TosConfigKey
-	case "register":
-		cacheKey = RegisterConfigKey
-	case "site":
-		cacheKey = SiteConfigKey
-	case "subscribe":
-		cacheKey = SubscribeConfigKey
-	case "verify_code":
-		cacheKey = VerifyCodeConfigKey
-	case "verify":
-		cacheKey = VerifyConfigKey
-	default:
-		cacheKey = fmt.Sprintf("system:%s_config", category)
-	}
-
-	// Try to get from cache first
-	var configs []*tool.SystemConfig
-	result, err := r.data.rdb.Get(ctx, cacheKey).Result()
-	if err == nil && result != "" {
-		if err := json.Unmarshal([]byte(result), &configs); err == nil {
-			return configs, nil
-		}
-	}
-
-	// Query from database
+	// Query from database directly. Anonymous server interfaces are sensitive to
+	// stale configuration, so system config caching is intentionally disabled.
 	systems, err := r.data.db.ProxySystem.Query().
 		Where(func(s *sql.Selector) {
 			s.Where(sql.EQ(s.C(proxysystem.FieldCategory), category))
@@ -73,7 +61,6 @@ func (r *adminSystemRepo) GetConfigByCategory(ctx context.Context, category stri
 		r.log.Errorf("[GetConfigByCategory] Failed to query system config for category %s: %v", category, err)
 		return nil, responsecode.NewDatabaseQueryError()
 	}
-
 	// Convert to tool.SystemConfig and normalize any legacy alias keys back to old-project keys.
 	configByKey := make(map[string]*tool.SystemConfig, len(systems))
 	for _, sys := range systems {
@@ -87,17 +74,9 @@ func (r *adminSystemRepo) GetConfigByCategory(ctx context.Context, category stri
 			Type:  sys.Type,
 		}
 	}
-	configs = make([]*tool.SystemConfig, 0, len(configByKey))
+	configs := make([]*tool.SystemConfig, 0, len(configByKey))
 	for _, config := range configByKey {
 		configs = append(configs, config)
-	}
-
-	// Cache the result
-	if data, err := json.Marshal(configs); err == nil {
-		// Cache for 5 minutes
-		if err := r.data.rdb.Set(ctx, cacheKey, data, 300).Err(); err != nil {
-			r.log.Warnf("Failed to cache system config for category %s: %v", category, err)
-		}
 	}
 
 	return configs, nil
@@ -234,6 +213,11 @@ func (r *adminSystemRepo) UpdateConfigByCategory(ctx context.Context, category s
 			r.log.Warnf("Failed to delete cache key %s: %v", cacheKey, err)
 		}
 	}
+	if category == "server" {
+		if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
+			r.log.Warnf("Failed to clear legacy server caches after updating server config: %v", err)
+		}
+	}
 
 	syncRuntimeAppConfig(ctx, r.data.db, r.data.conf, r.log)
 
@@ -304,6 +288,9 @@ func (r *adminSystemRepo) UpdateNodeMultiplier(ctx context.Context, value string
 		if err := r.data.rdb.Del(ctx, cacheKey).Err(); err != nil && err != redis.Nil {
 			r.log.Warnf("Failed to delete cache key %s: %v", cacheKey, err)
 		}
+	}
+	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
+		r.log.Warnf("Failed to clear legacy server caches after updating node multiplier: %v", err)
 	}
 
 	return nil

@@ -416,6 +416,9 @@ func (h *CheckSubscriptionHandler) clearServerCache(ctx context.Context, userSub
 	}
 
 	h.deleteRedisKeys(ctx, keys...)
+	if err := clearLegacyServerAllCaches(ctx, h.rdb); err != nil {
+		h.logger.Warnf("[CheckSubscription] Clear legacy server cache failed: %v", err)
+	}
 	h.logger.Infof("[CheckSubscription] Cleared cache for %d unique subscribe_ids", len(subs))
 }
 

@@ -77,6 +77,7 @@ func main() {
 	if err := c.Scan(&bc); err != nil {
 		panic(err)
 	}
+	conf.SetLegacyDebugMode(bc.GetDebug())
 
 	// 调试：打印bootstrap配置
 	if bc.App != nil {

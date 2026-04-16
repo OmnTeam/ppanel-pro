@@ -12,6 +12,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/data"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/constant"
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -98,23 +99,64 @@ func compatSystemValue(ctx context.Context, dataLayer *data.Data, category strin
 	if dataLayer == nil || dataLayer.DB() == nil {
 		return "", fmt.Errorf("data layer unavailable")
 	}
+	helper := log.NewHelper(log.With(log.DefaultLogger, "module", "server/compat/config"))
 
 	entries, err := dataLayer.DB().ProxySystem.Query().
 		Where(proxysystem.CategoryEQ(category)).
+		Order(
+			ent.Desc(proxysystem.FieldUpdatedAt),
+			ent.Desc(proxysystem.FieldID),
+		).
 		All(ctx)
 	if err != nil {
 		return "", err
 	}
 
 	for _, lookupKey := range keys {
-		normalizedLookup := compatNormalizeConfigKey(lookupKey)
 		for _, entry := range entries {
-			if compatNormalizeConfigKey(entry.Key) == normalizedLookup {
+			if strings.TrimSpace(entry.Key) == strings.TrimSpace(lookupKey) {
+				helper.Infof(
+					"[compatSystemValue] category=%s lookup_keys=%v matched_key=%q matched_value=%q mode=exact",
+					category,
+					keys,
+					entry.Key,
+					entry.Value,
+				)
 				return entry.Value, nil
 			}
 		}
 	}
 
+	for _, lookupKey := range keys {
+		normalizedLookup := compatNormalizeConfigKey(lookupKey)
+		candidates := make([]string, 0)
+		for _, entry := range entries {
+			if compatNormalizeConfigKey(entry.Key) != normalizedLookup {
+				continue
+			}
+			candidates = append(candidates, fmt.Sprintf("%s=%s", entry.Key, entry.Value))
+		}
+		if len(candidates) == 0 {
+			continue
+		}
+		entry := candidates[0]
+		parts := strings.SplitN(entry, "=", 2)
+		value := ""
+		if len(parts) == 2 {
+			value = parts[1]
+		}
+		helper.Infof(
+			"[compatSystemValue] category=%s lookup_keys=%v matched_key=%q matched_value=%q mode=normalized candidates=%v",
+			category,
+			keys,
+			parts[0],
+			value,
+			candidates,
+		)
+		return value, nil
+	}
+
+	helper.Errorf("[compatSystemValue] category=%s lookup_keys=%v not found", category, keys)
 	return "", fmt.Errorf("system config not found: %s", strings.Join(keys, ","))
 }
 

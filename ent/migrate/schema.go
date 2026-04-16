@@ -411,6 +411,10 @@ var (
 		{Name: "id", Type: field.TypeInt64, Increment: true, Comment: "订阅组ID"},
 		{Name: "name", Type: field.TypeString, Size: 255, Comment: "订阅组名称", Default: ""},
 		{Name: "description", Type: field.TypeString, Nullable: true, Size: 2147483647, Comment: "订阅组描述"},
+		{Name: "is_expired_group", Type: field.TypeBool, Comment: "是否为过期节点组", Default: false},
+		{Name: "expired_days_limit", Type: field.TypeInt64, Nullable: true, Comment: "过期天数限制", Default: 0},
+		{Name: "max_traffic_gb_expired", Type: field.TypeInt64, Nullable: true, Comment: "过期组最大流量GB", Default: 0},
+		{Name: "speed_limit", Type: field.TypeInt64, Nullable: true, Comment: "过期组限速", Default: 0},
 		{Name: "created_at", Type: field.TypeTime, Comment: "创建时间"},
 		{Name: "updated_at", Type: field.TypeTime, Comment: "更新时间"},
 	}

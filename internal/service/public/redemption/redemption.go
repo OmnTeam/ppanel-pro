@@ -2,11 +2,13 @@ package redemption
 
 import (
 	"context"
+	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/public/redemption/v1"
 	redemptionBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/redemption"
 	"github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	kerrors "github.com/go-kratos/kratos/v2/errors"
 )
 
 // RedemptionService 兑换码服务
@@ -36,9 +38,21 @@ func (s *RedemptionService) RedeemCode(ctx context.Context, req *v1.RedeemCodeRe
 	// 调用业务逻辑
 	result, err := s.uc.RedeemCode(ctx, userID, req.Code)
 	if err != nil {
+		code := responsecode.ErrInternalError
+		message := err.Error()
+		if se := kerrors.FromError(err); se != nil {
+			if customCode, ok := se.Metadata["custom_code"]; ok {
+				if parsed, parseErr := strconv.Atoi(customCode); parseErr == nil {
+					code = parsed
+				}
+			}
+			if se.Message != "" {
+				message = se.Message
+			}
+		}
 		return &v1.RedeemCodeReply{
-			Code:    responsecode.ErrInternalError,
-			Message: err.Error(),
+			Code:    int32(code),
+			Message: message,
 		}, nil
 	}
 

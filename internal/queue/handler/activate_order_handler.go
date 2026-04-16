@@ -993,6 +993,10 @@ func (h *ActivateOrderHandler) clearServerCache(ctx context.Context, sub *ent.Pr
 		h.logger.Errorf("[ActivateOrder] 清理服务器缓存失败: %v, subscribeID=%d", err, sub.ID)
 		return
 	}
+	if err := clearLegacyServerAllCaches(ctx, h.rdb); err != nil {
+		h.logger.Errorf("[ActivateOrder] 清理兼容 server 缓存失败: %v, subscribeID=%d", err, sub.ID)
+		return
+	}
 
 	h.logger.Infof("[ActivateOrder] 清理服务器缓存成功: subscribeID=%d", sub.ID)
 }

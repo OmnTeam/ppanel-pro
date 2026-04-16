@@ -6,6 +6,7 @@ import (
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/group/v1"
 	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
 
@@ -49,7 +50,7 @@ func NewGroupUseCase(repo GroupRepo, logger log.Logger) *GroupUseCase {
 // CreateNodeGroup creates node group
 func (uc *GroupUseCase) CreateNodeGroup(ctx context.Context, req *v1.CreateNodeGroupRequest) (int64, error) {
 	if req.Name == "" {
-		return 0, nil
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	id, err := uc.repo.CreateNodeGroup(ctx, req)
@@ -64,7 +65,7 @@ func (uc *GroupUseCase) CreateNodeGroup(ctx context.Context, req *v1.CreateNodeG
 // UpdateNodeGroup updates node group
 func (uc *GroupUseCase) UpdateNodeGroup(ctx context.Context, req *v1.UpdateNodeGroupRequest) error {
 	if req.Id <= 0 {
-		return nil
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	err := uc.repo.UpdateNodeGroup(ctx, req)
@@ -79,7 +80,7 @@ func (uc *GroupUseCase) UpdateNodeGroup(ctx context.Context, req *v1.UpdateNodeG
 // DeleteNodeGroup deletes node group
 func (uc *GroupUseCase) DeleteNodeGroup(ctx context.Context, id int64) error {
 	if id <= 0 {
-		return nil
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	err := uc.repo.DeleteNodeGroup(ctx, id)
@@ -94,7 +95,7 @@ func (uc *GroupUseCase) DeleteNodeGroup(ctx context.Context, id int64) error {
 // GetNodeGroupList gets node group list
 func (uc *GroupUseCase) GetNodeGroupList(ctx context.Context, req *v1.GetNodeGroupListRequest) ([]*ent.ProxyServerGroup, int64, error) {
 	if req.Page <= 0 || req.Size <= 0 {
-		return nil, 0, nil
+		return nil, 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	list, total, err := uc.repo.GetNodeGroupList(ctx, req)

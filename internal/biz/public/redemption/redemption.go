@@ -12,6 +12,8 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptionrecord"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribe"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
+	queueTypes "github.com/OmnTeam/ppanel-pro/internal/queue/types"
+	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/hibiken/asynq"
@@ -55,10 +57,10 @@ func (uc *RedemptionUseCase) RedeemCode(ctx context.Context, userID int64, code 
 	lockKey := fmt.Sprintf("redemption_lock:%d:%s", userID, code)
 	lockSuccess, err := redis.SetNX(ctx, lockKey, "1", 10*time.Second).Result()
 	if err != nil {
-		return nil, fmt.Errorf("获取锁失败: %w", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 	if !lockSuccess {
-		return nil, fmt.Errorf("兑换进行中，请稍候")
+		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 	defer redis.Del(ctx, lockKey)
 
@@ -69,19 +71,19 @@ func (uc *RedemptionUseCase) RedeemCode(ctx context.Context, userID int64, code 
 
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, fmt.Errorf("兑换码不存在")
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 		}
-		return nil, fmt.Errorf("查询兑换码失败: %w", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
 
 	// 检查兑换码是否启用
 	if redemptionCode.Status != 1 {
-		return nil, fmt.Errorf("兑换码已禁用")
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	// 检查兑换码是否还有剩余次数
 	if redemptionCode.TotalCount > 0 && redemptionCode.UsedCount >= redemptionCode.TotalCount {
-		return nil, fmt.Errorf("兑换码已用完")
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	// 检查用户是否已经兑换过此码
@@ -93,7 +95,7 @@ func (uc *RedemptionUseCase) RedeemCode(ctx context.Context, userID int64, code 
 		First(ctx)
 
 	if err == nil && existingRecord != nil {
-		return nil, fmt.Errorf("您已经兑换过此兑换码")
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	// 查询订阅套餐
@@ -102,12 +104,12 @@ func (uc *RedemptionUseCase) RedeemCode(ctx context.Context, userID int64, code 
 		Only(ctx)
 
 	if err != nil {
-		return nil, fmt.Errorf("订阅套餐不存在: %w", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
 
 	// 检查订阅套餐是否可售
 	if !subscribePlan.Sell {
-		return nil, fmt.Errorf("订阅套餐不可用")
+		return nil, responsecode.NewKratosError(responsecode.ErrSubscribeNotAvailable)
 	}
 
 	// 检查配额限制
@@ -120,11 +122,11 @@ func (uc *RedemptionUseCase) RedeemCode(ctx context.Context, userID int64, code 
 			Count(ctx)
 
 		if err != nil {
-			return nil, fmt.Errorf("检查配额失败: %w", err)
+			return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 		}
 
 		if int64(count) >= subscribePlan.Quota {
-			return nil, fmt.Errorf("订阅配额已达上限")
+			return nil, responsecode.NewKratosError(responsecode.ErrSubscribeQuotaLimit)
 		}
 	}
 
@@ -165,7 +167,7 @@ func (uc *RedemptionUseCase) RedeemCode(ctx context.Context, userID int64, code 
 		Save(ctx)
 
 	if err != nil {
-		return nil, fmt.Errorf("创建订单失败: %w", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseInsert)
 	}
 
 	// 缓存兑换码信息到Redis
@@ -180,21 +182,19 @@ func (uc *RedemptionUseCase) RedeemCode(ctx context.Context, userID int64, code 
 	if err != nil {
 		// 删除已创建的订单
 		db.ProxyOrder.DeleteOneID(order.ID).Exec(ctx)
-		return nil, fmt.Errorf("缓存数据失败: %w", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	// 触发队列任务
-	payload := map[string]interface{}{
-		"order_no": orderNo,
-	}
+	payload := queueTypes.ForthwithActivateOrderPayload{OrderNo: orderNo}
 	payloadBytes, _ := json.Marshal(payload)
-	task := asynq.NewTask("order:activate", payloadBytes, asynq.MaxRetry(5))
+	task := asynq.NewTask(queueTypes.ForthwithActivateOrder, payloadBytes, asynq.MaxRetry(5))
 	_, err = queue.EnqueueContext(ctx, task)
 	if err != nil {
 		// 删除订单和缓存
 		redis.Del(ctx, cacheKey)
 		db.ProxyOrder.DeleteOneID(order.ID).Exec(ctx)
-		return nil, fmt.Errorf("入队任务失败: %w", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrQueueEnqueueError)
 	}
 
 	uc.logger.Infof("Redemption order created: order_no=%s, user_id=%d", orderNo, userID)

@@ -16,6 +16,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	portalBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/portal"
+	"github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
 	queueTypes "github.com/OmnTeam/ppanel-pro/internal/queue/types"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/constant"
@@ -211,13 +212,10 @@ func (r *publicPortalRepo) CalculateOrderPrice(ctx context.Context, subscribeID,
 			}
 			// 优惠券不存在时，couponAmount为0
 		} else {
-			/* ⚠️ 暂未实现：优惠券使用次数检查
 			if couponInfo.Count != 0 && couponInfo.Count <= couponInfo.UsedCount {
 				r.logger.Warnf("[CalculateOrderPrice] 优惠券已用完: coupon=%s", *coupon)
 				return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
 			}
-			*/
-			/* ⚠️ 暂未实现：优惠券适用订阅检查
 			if couponInfo.Subscribe != "" {
 				allowedSubs := stringToInt64Slice(couponInfo.Subscribe)
 				allowed := false
@@ -232,7 +230,6 @@ func (r *publicPortalRepo) CalculateOrderPrice(ctx context.Context, subscribeID,
 					return nil, responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
 				}
 			}
-			*/
 
 			// 计算优惠券折扣（使用helper函数）
 			couponAmount = int64(calculateCoupon(amount, couponInfo))
@@ -305,6 +302,9 @@ func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, req *portalBiz
 		r.logger.Warnf("[CreatePortalOrder] 订阅计划未在售: subscribeID=%d", req.SubscribeID)
 		return "", errors.BadRequest("SUBSCRIBE_NOT_SELL", "订阅计划未在售")
 	}
+	if subscribe.Inventory == 0 {
+		return "", responsecode.NewKratosError(responsecode.ErrSubscribeOutOfStock)
+	}
 
 	// 3. 计算订阅折扣（复刻原项目逻辑 - purchaseLogic.go line 62-67）
 	var discount float64 = 1.0
@@ -336,31 +336,29 @@ func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, req *portalBiz
 			return "", errors.InternalServer("DATABASE_ERROR", "查询优惠券失败")
 		}
 
-		// 验证优惠券使用次数 (简化版本)
-		// 优惠券使用逻辑已根据当前数据结构调整
-		/*
-			if coupon.Count != 0 && coupon.Count <= coupon.UsedCount {
-				return "", responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
-			}
-
-			// ⚠️ 验证优惠券是否适用于当前订阅（复刻原项目 purchaseLogic.go line 86-89）
-			if coupon.Subscribe != "" {
-				subscribes := stringToInt64Slice(coupon.Subscribe)
-				if len(subscribes) > 0 {
-					found := false
-					for _, sid := range subscribes {
-						if sid == req.SubscribeID {
-							found = true
-							break
-						}
-					}
-					if !found {
-						r.logger.Warnf("[CreatePortalOrder] 优惠券不适用于此订阅: coupon=%s, subscribeID=%d", couponStr, req.SubscribeID)
-						return "", responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
+		if coupon.Count != 0 && coupon.Count <= coupon.UsedCount {
+			return "", responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
+		}
+		expireTime := time.Unix(coupon.ExpireTime, 0)
+		if time.Now().After(expireTime) {
+			return "", responsecode.NewKratosError(responsecode.ErrCouponExpired)
+		}
+		if coupon.Subscribe != "" {
+			subscribes := stringToInt64Slice(coupon.Subscribe)
+			if len(subscribes) > 0 {
+				found := false
+				for _, sid := range subscribes {
+					if sid == req.SubscribeID {
+						found = true
+						break
 					}
 				}
+				if !found {
+					r.logger.Warnf("[CreatePortalOrder] 优惠券不适用于此订阅: coupon=%s, subscribeID=%d", couponStr, req.SubscribeID)
+					return "", responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
+				}
 			}
-		*/
+		}
 
 		// 计算优惠券折扣（复刻原项目 purchaseLogic.go line 91）
 		couponAmount = calculateCoupon(amount, coupon)
@@ -421,7 +419,7 @@ func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, req *portalBiz
 	}
 
 	cacheKey := fmt.Sprintf(constant.TempOrderCacheKey, orderNo)
-	if err := r.data.rdb.Set(ctx, cacheKey, string(tempInfoBytes), 15*time.Minute).Err(); err != nil {
+	if err := r.data.rdb.Set(ctx, cacheKey, string(tempInfoBytes), 24*time.Hour).Err(); err != nil {
 		r.logger.Errorf("[CreatePortalOrder] Redis保存临时订单失败: %v", err)
 		return "", errors.InternalServer("REDIS_ERROR", "保存临时订单信息失败")
 	}
@@ -431,29 +429,51 @@ func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, req *portalBiz
 	// ⚠️ userId=0 表示Portal订单
 	// ⚠️ is_new=true 标记为新订单（用于佣金计算）
 	// ⚠️ Amount 不含手续费，FeeAmount 单独存储
-	_, err = r.data.db.ProxyOrder.Create().
-		SetUserID(0). // ⚠️ Portal订单userId为0
-		SetOrderNo(orderNo).
-		SetType(1). // 订阅类型
-		SetQuantity(req.Quantity).
-		SetPrice(price).
-		SetAmount(amount). // ⚠️ 不含手续费（= 原价*折扣 - 优惠券）
-		SetDiscount(discountAmount).
-		SetGiftAmount(0). // Portal订单无赠送金额
-		SetCoupon(couponStr).
-		SetCouponDiscount(int64(couponAmount)).
-		SetPaymentID(int64(req.PaymentID)).
-		SetMethod(payment.Platform).
-		SetFeeAmount(int64(feeAmount)). // ⚠️ 手续费单独存储
-		SetCommission(0).               // Portal订单无佣金
-		SetSubscribeID(req.SubscribeID).
-		SetIsNew(true). // ⚠️ 标记为新订单
-		SetStatus(1).   // 待支付
-		Save(ctx)
+	err = r.data.db.TX(ctx, func(tx *ent.Tx) error {
+		if subscribe.Inventory != -1 {
+			latestSubscribe, err := tx.ProxySubscribe.Query().
+				Where(proxysubscribe.IDEQ(req.SubscribeID)).
+				Only(ctx)
+			if err != nil {
+				return errors.InternalServer("DATABASE_ERROR", "查询订阅计划失败")
+			}
+			if latestSubscribe.Inventory == 0 {
+				return responsecode.NewKratosError(responsecode.ErrSubscribeOutOfStock)
+			}
+			if err := tx.ProxySubscribe.UpdateOneID(latestSubscribe.ID).
+				SetInventory(latestSubscribe.Inventory - 1).
+				Exec(ctx); err != nil {
+				return errors.InternalServer("DATABASE_ERROR", "更新订阅库存失败")
+			}
+		}
 
+		_, err := tx.ProxyOrder.Create().
+			SetUserID(0). // ⚠️ Portal订单userId为0
+			SetOrderNo(orderNo).
+			SetType(1). // 订阅类型
+			SetQuantity(req.Quantity).
+			SetPrice(price).
+			SetAmount(amount). // ⚠️ 不含手续费（= 原价*折扣 - 优惠券）
+			SetDiscount(discountAmount).
+			SetGiftAmount(0). // Portal订单无赠送金额
+			SetCoupon(couponStr).
+			SetCouponDiscount(int64(couponAmount)).
+			SetPaymentID(int64(req.PaymentID)).
+			SetMethod(payment.Platform).
+			SetFeeAmount(int64(feeAmount)). // ⚠️ 手续费单独存储
+			SetCommission(0).               // Portal订单无佣金
+			SetSubscribeID(req.SubscribeID).
+			SetIsNew(true). // ⚠️ 标记为新订单
+			SetStatus(1).   // 待支付
+			Save(ctx)
+		if err != nil {
+			return errors.InternalServer("DATABASE_ERROR", "创建订单失败")
+		}
+		return nil
+	})
 	if err != nil {
 		r.logger.Errorf("[CreatePortalOrder] 创建订单失败: %v", err)
-		return "", errors.InternalServer("DATABASE_ERROR", "创建订单失败")
+		return "", err
 	}
 
 	// 13. 入队延迟关闭订单任务（复刻原项目 purchaseLogic.go line 156-170）
@@ -724,17 +744,66 @@ func (r *publicPortalRepo) CheckOrderStatus(ctx context.Context, orderNo, authTy
 		}
 	}
 
-	// 3. 查询订阅信息
-	subscribeInfo, err := r.GetSubscribeList(ctx, "")
-	if err != nil {
-		return nil, "", err
-	}
-	// 查找匹配的订阅
+	// 3. 直接按订单上的订阅ID查询，避免默认语言过滤导致拿不到非默认语言套餐。
 	var subscribe *portalBiz.SubscribeInfo
-	for _, sub := range subscribeInfo {
-		if sub.ID == order.SubscribeID {
-			subscribe = sub
-			break
+	subscribeEntity, err := r.data.db.ProxySubscribe.Query().
+		Where(proxysubscribe.IDEQ(order.SubscribeID)).
+		Only(ctx)
+	if err != nil {
+		if !ent.IsNotFound(err) {
+			return nil, "", errors.InternalServer("DATABASE_ERROR", "查询订阅失败")
+		}
+	} else {
+		var discounts []portalBiz.SubscribeDiscount
+		if subscribeEntity.Discount != nil && *subscribeEntity.Discount != "" {
+			_ = json.Unmarshal([]byte(*subscribeEntity.Discount), &discounts)
+		}
+		nodes64 := stringToInt64Slice(subscribeEntity.Nodes)
+		nodes := make([]int, len(nodes64))
+		for i, v := range nodes64 {
+			nodes[i] = int(v)
+		}
+		var nodeTags []string
+		if subscribeEntity.NodeTags != "" {
+			nodeTags = strings.Split(subscribeEntity.NodeTags, ",")
+			for i := range nodeTags {
+				nodeTags[i] = strings.TrimSpace(nodeTags[i])
+			}
+		}
+		deductionRatio := int64(0)
+		if subscribeEntity.DeductionRatio != nil {
+			deductionRatio = int64(*subscribeEntity.DeductionRatio)
+		}
+		resetCycle := int64(0)
+		if subscribeEntity.ResetCycle != nil {
+			resetCycle = int64(*subscribeEntity.ResetCycle)
+		}
+
+		subscribe = &portalBiz.SubscribeInfo{
+			ID:             int64(subscribeEntity.ID),
+			Name:           subscribeEntity.Name,
+			Language:       subscribeEntity.Language,
+			Description:    subscribeEntity.Description,
+			UnitPrice:      subscribeEntity.UnitPrice,
+			UnitTime:       subscribeEntity.UnitTime,
+			Discount:       discounts,
+			Replacement:    subscribeEntity.Replacement,
+			Inventory:      subscribeEntity.Inventory,
+			Traffic:        subscribeEntity.Traffic,
+			SpeedLimit:     subscribeEntity.SpeedLimit,
+			DeviceLimit:    subscribeEntity.DeviceLimit,
+			Quota:          subscribeEntity.Quota,
+			Nodes:          nodes,
+			NodeTags:       nodeTags,
+			Show:           subscribeEntity.Show,
+			Sell:           subscribeEntity.Sell,
+			Sort:           subscribeEntity.Sort,
+			DeductionRatio: deductionRatio,
+			AllowDeduction: subscribeEntity.AllowDeduction,
+			ResetCycle:     resetCycle,
+			RenewalReset:   subscribeEntity.RenewalReset,
+			CreatedAt:      subscribeEntity.CreatedAt.Unix(),
+			UpdatedAt:      subscribeEntity.UpdatedAt.Unix(),
 		}
 	}
 
@@ -885,7 +954,7 @@ func (r *publicPortalRepo) epayPayment(ctx context.Context, paymentConfig *ent.P
 	}
 
 	// 2. 初始化EPay客户端
-	client := epay.NewClient(config.Pid, config.Url, config.Key)
+	client := epay.NewClient(config.Pid, config.Url, config.Key, config.Type)
 
 	// 3. 汇率转换（转换为CNY）
 	amount, err := r.queryExchangeRate(ctx, "CNY", int(order.Amount))
@@ -907,6 +976,7 @@ func (r *publicPortalRepo) epayPayment(ctx context.Context, paymentConfig *ent.P
 		SignType:  "MD5",
 		NotifyUrl: notifyURL,
 		ReturnUrl: returnURL,
+		Type:      config.Type,
 	})
 
 	r.logger.Infof("[epayPayment] EPay支付URL生成成功: orderNo=%s", order.OrderNo)
@@ -1019,7 +1089,7 @@ func (r *publicPortalRepo) cryptoSaaSPayment(ctx context.Context, paymentConfig 
 	}
 
 	// 2. 初始化EPay客户端（CryptoSaaS使用EPay协议）
-	client := epay.NewClient(config.AccountID, config.Endpoint, config.SecretKey)
+	client := epay.NewClient(config.AccountID, config.Endpoint, config.SecretKey, config.Type)
 
 	// 3. 汇率转换（转换为CNY）
 	amount, err := r.queryExchangeRate(ctx, "CNY", int(order.Amount))
@@ -1041,6 +1111,7 @@ func (r *publicPortalRepo) cryptoSaaSPayment(ctx context.Context, paymentConfig 
 		SignType:  "MD5",
 		NotifyUrl: notifyURL,
 		ReturnUrl: returnURL,
+		Type:      config.Type,
 	})
 
 	r.logger.Infof("[cryptoSaaSPayment] CryptoSaaS支付URL生成成功: orderNo=%s", order.OrderNo)
@@ -1091,9 +1162,15 @@ func (r *publicPortalRepo) queryExchangeRate(ctx context.Context, targetCurrency
 // buildNotifyURL 构建回调URL
 // ⚠️ 复刻原项目逻辑（purchaseCheckoutLogic.go line 279-288）
 func (r *publicPortalRepo) buildNotifyURL(ctx context.Context, paymentConfig *ent.ProxyPayment) string {
+	gatewayMode := middleware.GetGatewayMode(ctx)
+
 	// 1. 优先使用payment配置的domain
 	if paymentConfig.Domain != "" {
-		return paymentConfig.Domain + "/v1/notify/" + paymentConfig.Platform + "/" + paymentConfig.Token
+		notifyURL := paymentConfig.Domain
+		if gatewayMode {
+			notifyURL += "/api"
+		}
+		return notifyURL + "/v1/notify/" + paymentConfig.Platform + "/" + paymentConfig.Token
 	}
 
 	// 2. 尝试从context获取request host（原项目 line 283-286）
@@ -1112,7 +1189,11 @@ func (r *publicPortalRepo) buildNotifyURL(ctx context.Context, paymentConfig *en
 		}
 	}
 
-	return "https://" + host + "/v1/notify/" + paymentConfig.Platform + "/" + paymentConfig.Token
+	notifyURL := "https://" + host
+	if gatewayMode {
+		notifyURL += "/api"
+	}
+	return notifyURL + "/v1/notify/" + paymentConfig.Platform + "/" + paymentConfig.Token
 }
 
 // getSiteName 获取站点名称

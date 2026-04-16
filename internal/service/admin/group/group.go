@@ -129,13 +129,25 @@ func (s *GroupService) GetNodeGroupList(ctx context.Context, req *v1.GetNodeGrou
 	// Convert ent entities to proto messages
 	nodeGroups := make([]*v1.NodeGroup, 0, len(list))
 	for _, item := range list {
+		minTrafficGB := int64(0)
+		if item.MinTrafficGB != nil {
+			minTrafficGB = *item.MinTrafficGB
+		}
+		maxTrafficGB := int64(0)
+		if item.MaxTrafficGB != nil {
+			maxTrafficGB = *item.MaxTrafficGB
+		}
+
 		nodeGroups = append(nodeGroups, &v1.NodeGroup{
-			Id:          item.ID,
-			Name:        item.Name,
-			Description: item.Description,
-			Sort:        int32(item.Sort),
-			CreatedAt:   item.CreatedAt.Unix(),
-			UpdatedAt:   item.UpdatedAt.Unix(),
+			Id:             item.ID,
+			Name:           item.Name,
+			Description:    item.Description,
+			Sort:           int32(item.Sort),
+			ForCalculation: item.ForCalculation,
+			MinTrafficGb:   minTrafficGB,
+			MaxTrafficGb:   maxTrafficGB,
+			CreatedAt:      item.CreatedAt.Unix(),
+			UpdatedAt:      item.UpdatedAt.Unix(),
 		})
 	}
 

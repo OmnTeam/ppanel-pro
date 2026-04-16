@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
@@ -89,9 +90,52 @@ func syncRuntimeSystemConfig(ctx context.Context, client *ent.Client, appConf *c
 	if values, err := loadSystemConfigMap(ctx, client, "server"); err != nil {
 		logger.Warnw("sync runtime node config failed", "error", err)
 	} else if len(values) > 0 {
-		appConf.Node = &conf.Node{
-			NodeSecret: getStringConfigWithDefault(values, "", "NodeSecret", "node_secret"),
+		var dns []*conf.NodeDNS
+		if raw := getStringConfigWithDefault(values, "", "DNS", "dns"); raw != "" {
+			var decoded []*conf.NodeDNS
+			if err := json.Unmarshal([]byte(raw), &decoded); err != nil {
+				logger.Warnw("sync runtime node dns config failed", "error", err)
+			} else {
+				dns = decoded
+			}
 		}
+
+		block := make([]string, 0)
+		if raw := getStringConfigWithDefault(values, "", "Block", "block"); raw != "" {
+			if err := json.Unmarshal([]byte(raw), &block); err != nil {
+				logger.Warnw("sync runtime node block config failed", "error", err)
+				block = nil
+			}
+		}
+
+		var outbound []*conf.NodeOutbound
+		if raw := getStringConfigWithDefault(values, "", "Outbound", "outbound"); raw != "" {
+			var decoded []*conf.NodeOutbound
+			if err := json.Unmarshal([]byte(raw), &decoded); err != nil {
+				logger.Warnw("sync runtime node outbound config failed", "error", err)
+			} else {
+				outbound = decoded
+			}
+		}
+
+		appConf.Node = &conf.Node{
+			NodeSecret:             getStringConfigWithDefault(values, "", "NodeSecret", "node_secret"),
+			NodePullInterval:       getInt64Config(values, 0, "NodePullInterval", "node_pull_interval"),
+			NodePushInterval:       getInt64Config(values, 0, "NodePushInterval", "node_push_interval"),
+			TrafficReportThreshold: getInt64Config(values, 0, "TrafficReportThreshold", "traffic_report_threshold"),
+			IpStrategy:             getStringConfigWithDefault(values, "", "IPStrategy", "ip_strategy"),
+			Dns:                    dns,
+			Block:                  block,
+			Outbound:               outbound,
+		}
+		logger.Infof(
+			"sync runtime node config applied node_secret=%q node_pull_interval=%d node_push_interval=%d traffic_report_threshold=%d ip_strategy=%q",
+			appConf.Node.NodeSecret,
+			appConf.Node.NodePullInterval,
+			appConf.Node.NodePushInterval,
+			appConf.Node.TrafficReportThreshold,
+			appConf.Node.IpStrategy,
+		)
 	}
 }
 

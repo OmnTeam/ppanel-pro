@@ -118,6 +118,12 @@ func normalizeSystemConfigKey(key string) string {
 		return "TrafficReportThreshold"
 	case "ip_strategy":
 		return "IPStrategy"
+	case "dns":
+		return "DNS"
+	case "block":
+		return "Block"
+	case "outbound":
+		return "Outbound"
 	case "node_multiplier", "node_multiplier_config", "NodeMultiplier":
 		return "NodeMultiplierConfig"
 	case "web_ad":

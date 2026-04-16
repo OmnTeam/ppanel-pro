@@ -62,6 +62,101 @@ func (_u *ProxySubscribeGroupUpdate) ClearDescription() *ProxySubscribeGroupUpda
 	return _u
 }
 
+// SetIsExpiredGroup sets the "is_expired_group" field.
+func (_u *ProxySubscribeGroupUpdate) SetIsExpiredGroup(v bool) *ProxySubscribeGroupUpdate {
+	_u.mutation.SetIsExpiredGroup(v)
+	return _u
+}
+
+// SetNillableIsExpiredGroup sets the "is_expired_group" field if the given value is not nil.
+func (_u *ProxySubscribeGroupUpdate) SetNillableIsExpiredGroup(v *bool) *ProxySubscribeGroupUpdate {
+	if v != nil {
+		_u.SetIsExpiredGroup(*v)
+	}
+	return _u
+}
+
+// SetExpiredDaysLimit sets the "expired_days_limit" field.
+func (_u *ProxySubscribeGroupUpdate) SetExpiredDaysLimit(v int64) *ProxySubscribeGroupUpdate {
+	_u.mutation.ResetExpiredDaysLimit()
+	_u.mutation.SetExpiredDaysLimit(v)
+	return _u
+}
+
+// SetNillableExpiredDaysLimit sets the "expired_days_limit" field if the given value is not nil.
+func (_u *ProxySubscribeGroupUpdate) SetNillableExpiredDaysLimit(v *int64) *ProxySubscribeGroupUpdate {
+	if v != nil {
+		_u.SetExpiredDaysLimit(*v)
+	}
+	return _u
+}
+
+// AddExpiredDaysLimit adds value to the "expired_days_limit" field.
+func (_u *ProxySubscribeGroupUpdate) AddExpiredDaysLimit(v int64) *ProxySubscribeGroupUpdate {
+	_u.mutation.AddExpiredDaysLimit(v)
+	return _u
+}
+
+// ClearExpiredDaysLimit clears the value of the "expired_days_limit" field.
+func (_u *ProxySubscribeGroupUpdate) ClearExpiredDaysLimit() *ProxySubscribeGroupUpdate {
+	_u.mutation.ClearExpiredDaysLimit()
+	return _u
+}
+
+// SetMaxTrafficGBExpired sets the "max_traffic_gb_expired" field.
+func (_u *ProxySubscribeGroupUpdate) SetMaxTrafficGBExpired(v int64) *ProxySubscribeGroupUpdate {
+	_u.mutation.ResetMaxTrafficGBExpired()
+	_u.mutation.SetMaxTrafficGBExpired(v)
+	return _u
+}
+
+// SetNillableMaxTrafficGBExpired sets the "max_traffic_gb_expired" field if the given value is not nil.
+func (_u *ProxySubscribeGroupUpdate) SetNillableMaxTrafficGBExpired(v *int64) *ProxySubscribeGroupUpdate {
+	if v != nil {
+		_u.SetMaxTrafficGBExpired(*v)
+	}
+	return _u
+}
+
+// AddMaxTrafficGBExpired adds value to the "max_traffic_gb_expired" field.
+func (_u *ProxySubscribeGroupUpdate) AddMaxTrafficGBExpired(v int64) *ProxySubscribeGroupUpdate {
+	_u.mutation.AddMaxTrafficGBExpired(v)
+	return _u
+}
+
+// ClearMaxTrafficGBExpired clears the value of the "max_traffic_gb_expired" field.
+func (_u *ProxySubscribeGroupUpdate) ClearMaxTrafficGBExpired() *ProxySubscribeGroupUpdate {
+	_u.mutation.ClearMaxTrafficGBExpired()
+	return _u
+}
+
+// SetSpeedLimit sets the "speed_limit" field.
+func (_u *ProxySubscribeGroupUpdate) SetSpeedLimit(v int64) *ProxySubscribeGroupUpdate {
+	_u.mutation.ResetSpeedLimit()
+	_u.mutation.SetSpeedLimit(v)
+	return _u
+}
+
+// SetNillableSpeedLimit sets the "speed_limit" field if the given value is not nil.
+func (_u *ProxySubscribeGroupUpdate) SetNillableSpeedLimit(v *int64) *ProxySubscribeGroupUpdate {
+	if v != nil {
+		_u.SetSpeedLimit(*v)
+	}
+	return _u
+}
+
+// AddSpeedLimit adds value to the "speed_limit" field.
+func (_u *ProxySubscribeGroupUpdate) AddSpeedLimit(v int64) *ProxySubscribeGroupUpdate {
+	_u.mutation.AddSpeedLimit(v)
+	return _u
+}
+
+// ClearSpeedLimit clears the value of the "speed_limit" field.
+func (_u *ProxySubscribeGroupUpdate) ClearSpeedLimit() *ProxySubscribeGroupUpdate {
+	_u.mutation.ClearSpeedLimit()
+	return _u
+}
+
 // SetUpdatedAt sets the "updated_at" field.
 func (_u *ProxySubscribeGroupUpdate) SetUpdatedAt(v time.Time) *ProxySubscribeGroupUpdate {
 	_u.mutation.SetUpdatedAt(v)
@@ -140,6 +235,36 @@ func (_u *ProxySubscribeGroupUpdate) sqlSave(ctx context.Context) (_node int, er
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(proxysubscribegroup.FieldDescription, field.TypeString)
 	}
+	if value, ok := _u.mutation.IsExpiredGroup(); ok {
+		_spec.SetField(proxysubscribegroup.FieldIsExpiredGroup, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.ExpiredDaysLimit(); ok {
+		_spec.SetField(proxysubscribegroup.FieldExpiredDaysLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedExpiredDaysLimit(); ok {
+		_spec.AddField(proxysubscribegroup.FieldExpiredDaysLimit, field.TypeInt64, value)
+	}
+	if _u.mutation.ExpiredDaysLimitCleared() {
+		_spec.ClearField(proxysubscribegroup.FieldExpiredDaysLimit, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.MaxTrafficGBExpired(); ok {
+		_spec.SetField(proxysubscribegroup.FieldMaxTrafficGBExpired, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedMaxTrafficGBExpired(); ok {
+		_spec.AddField(proxysubscribegroup.FieldMaxTrafficGBExpired, field.TypeInt64, value)
+	}
+	if _u.mutation.MaxTrafficGBExpiredCleared() {
+		_spec.ClearField(proxysubscribegroup.FieldMaxTrafficGBExpired, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpeedLimit(); ok {
+		_spec.SetField(proxysubscribegroup.FieldSpeedLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpeedLimit(); ok {
+		_spec.AddField(proxysubscribegroup.FieldSpeedLimit, field.TypeInt64, value)
+	}
+	if _u.mutation.SpeedLimitCleared() {
+		_spec.ClearField(proxysubscribegroup.FieldSpeedLimit, field.TypeInt64)
+	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxysubscribegroup.FieldUpdatedAt, field.TypeTime, value)
 	}
@@ -194,6 +319,101 @@ func (_u *ProxySubscribeGroupUpdateOne) SetNillableDescription(v *string) *Proxy
 // ClearDescription clears the value of the "description" field.
 func (_u *ProxySubscribeGroupUpdateOne) ClearDescription() *ProxySubscribeGroupUpdateOne {
 	_u.mutation.ClearDescription()
+	return _u
+}
+
+// SetIsExpiredGroup sets the "is_expired_group" field.
+func (_u *ProxySubscribeGroupUpdateOne) SetIsExpiredGroup(v bool) *ProxySubscribeGroupUpdateOne {
+	_u.mutation.SetIsExpiredGroup(v)
+	return _u
+}
+
+// SetNillableIsExpiredGroup sets the "is_expired_group" field if the given value is not nil.
+func (_u *ProxySubscribeGroupUpdateOne) SetNillableIsExpiredGroup(v *bool) *ProxySubscribeGroupUpdateOne {
+	if v != nil {
+		_u.SetIsExpiredGroup(*v)
+	}
+	return _u
+}
+
+// SetExpiredDaysLimit sets the "expired_days_limit" field.
+func (_u *ProxySubscribeGroupUpdateOne) SetExpiredDaysLimit(v int64) *ProxySubscribeGroupUpdateOne {
+	_u.mutation.ResetExpiredDaysLimit()
+	_u.mutation.SetExpiredDaysLimit(v)
+	return _u
+}
+
+// SetNillableExpiredDaysLimit sets the "expired_days_limit" field if the given value is not nil.
+func (_u *ProxySubscribeGroupUpdateOne) SetNillableExpiredDaysLimit(v *int64) *ProxySubscribeGroupUpdateOne {
+	if v != nil {
+		_u.SetExpiredDaysLimit(*v)
+	}
+	return _u
+}
+
+// AddExpiredDaysLimit adds value to the "expired_days_limit" field.
+func (_u *ProxySubscribeGroupUpdateOne) AddExpiredDaysLimit(v int64) *ProxySubscribeGroupUpdateOne {
+	_u.mutation.AddExpiredDaysLimit(v)
+	return _u
+}
+
+// ClearExpiredDaysLimit clears the value of the "expired_days_limit" field.
+func (_u *ProxySubscribeGroupUpdateOne) ClearExpiredDaysLimit() *ProxySubscribeGroupUpdateOne {
+	_u.mutation.ClearExpiredDaysLimit()
+	return _u
+}
+
+// SetMaxTrafficGBExpired sets the "max_traffic_gb_expired" field.
+func (_u *ProxySubscribeGroupUpdateOne) SetMaxTrafficGBExpired(v int64) *ProxySubscribeGroupUpdateOne {
+	_u.mutation.ResetMaxTrafficGBExpired()
+	_u.mutation.SetMaxTrafficGBExpired(v)
+	return _u
+}
+
+// SetNillableMaxTrafficGBExpired sets the "max_traffic_gb_expired" field if the given value is not nil.
+func (_u *ProxySubscribeGroupUpdateOne) SetNillableMaxTrafficGBExpired(v *int64) *ProxySubscribeGroupUpdateOne {
+	if v != nil {
+		_u.SetMaxTrafficGBExpired(*v)
+	}
+	return _u
+}
+
+// AddMaxTrafficGBExpired adds value to the "max_traffic_gb_expired" field.
+func (_u *ProxySubscribeGroupUpdateOne) AddMaxTrafficGBExpired(v int64) *ProxySubscribeGroupUpdateOne {
+	_u.mutation.AddMaxTrafficGBExpired(v)
+	return _u
+}
+
+// ClearMaxTrafficGBExpired clears the value of the "max_traffic_gb_expired" field.
+func (_u *ProxySubscribeGroupUpdateOne) ClearMaxTrafficGBExpired() *ProxySubscribeGroupUpdateOne {
+	_u.mutation.ClearMaxTrafficGBExpired()
+	return _u
+}
+
+// SetSpeedLimit sets the "speed_limit" field.
+func (_u *ProxySubscribeGroupUpdateOne) SetSpeedLimit(v int64) *ProxySubscribeGroupUpdateOne {
+	_u.mutation.ResetSpeedLimit()
+	_u.mutation.SetSpeedLimit(v)
+	return _u
+}
+
+// SetNillableSpeedLimit sets the "speed_limit" field if the given value is not nil.
+func (_u *ProxySubscribeGroupUpdateOne) SetNillableSpeedLimit(v *int64) *ProxySubscribeGroupUpdateOne {
+	if v != nil {
+		_u.SetSpeedLimit(*v)
+	}
+	return _u
+}
+
+// AddSpeedLimit adds value to the "speed_limit" field.
+func (_u *ProxySubscribeGroupUpdateOne) AddSpeedLimit(v int64) *ProxySubscribeGroupUpdateOne {
+	_u.mutation.AddSpeedLimit(v)
+	return _u
+}
+
+// ClearSpeedLimit clears the value of the "speed_limit" field.
+func (_u *ProxySubscribeGroupUpdateOne) ClearSpeedLimit() *ProxySubscribeGroupUpdateOne {
+	_u.mutation.ClearSpeedLimit()
 	return _u
 }
 
@@ -304,6 +524,36 @@ func (_u *ProxySubscribeGroupUpdateOne) sqlSave(ctx context.Context) (_node *Pro
 	}
 	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(proxysubscribegroup.FieldDescription, field.TypeString)
+	}
+	if value, ok := _u.mutation.IsExpiredGroup(); ok {
+		_spec.SetField(proxysubscribegroup.FieldIsExpiredGroup, field.TypeBool, value)
+	}
+	if value, ok := _u.mutation.ExpiredDaysLimit(); ok {
+		_spec.SetField(proxysubscribegroup.FieldExpiredDaysLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedExpiredDaysLimit(); ok {
+		_spec.AddField(proxysubscribegroup.FieldExpiredDaysLimit, field.TypeInt64, value)
+	}
+	if _u.mutation.ExpiredDaysLimitCleared() {
+		_spec.ClearField(proxysubscribegroup.FieldExpiredDaysLimit, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.MaxTrafficGBExpired(); ok {
+		_spec.SetField(proxysubscribegroup.FieldMaxTrafficGBExpired, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedMaxTrafficGBExpired(); ok {
+		_spec.AddField(proxysubscribegroup.FieldMaxTrafficGBExpired, field.TypeInt64, value)
+	}
+	if _u.mutation.MaxTrafficGBExpiredCleared() {
+		_spec.ClearField(proxysubscribegroup.FieldMaxTrafficGBExpired, field.TypeInt64)
+	}
+	if value, ok := _u.mutation.SpeedLimit(); ok {
+		_spec.SetField(proxysubscribegroup.FieldSpeedLimit, field.TypeInt64, value)
+	}
+	if value, ok := _u.mutation.AddedSpeedLimit(); ok {
+		_spec.AddField(proxysubscribegroup.FieldSpeedLimit, field.TypeInt64, value)
+	}
+	if _u.mutation.SpeedLimitCleared() {
+		_spec.ClearField(proxysubscribegroup.FieldSpeedLimit, field.TypeInt64)
 	}
 	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(proxysubscribegroup.FieldUpdatedAt, field.TypeTime, value)

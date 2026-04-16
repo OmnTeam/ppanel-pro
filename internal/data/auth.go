@@ -889,6 +889,9 @@ func (r *authRepo) clearTrialCaches(ctx context.Context, userSub *ent.ProxyUserS
 	if err := r.data.rdb.Del(ctx, serverCacheKeys...).Err(); err != nil {
 		r.log.Warnw("clearTrialCaches delete subscribe cache failed", "error", err, "subscribe_id", userSub.SubscribeID)
 	}
+	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
+		r.log.Warnw("clearTrialCaches delete legacy server caches failed", "error", err, "subscribe_id", userSub.SubscribeID)
+	}
 }
 
 func (r *authRepo) triggerGroupRecalculation(ctx context.Context) {

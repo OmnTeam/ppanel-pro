@@ -313,6 +313,16 @@ func (r *adminNodeRepo) ClearNodeCache(ctx context.Context, serverIDs []int) err
 		}
 	}
 
+	legacyServerIDs := make([]int64, 0, len(serverIDs))
+	for _, serverID := range serverIDs {
+		if serverID > 0 {
+			legacyServerIDs = append(legacyServerIDs, int64(serverID))
+		}
+	}
+	if err := ClearLegacyServerCachesByServerIDs(ctx, r.data.rdb, legacyServerIDs); err != nil {
+		r.log.Warnf("Failed to clear legacy server cache for servers %v: %v", serverIDs, err)
+	}
+
 	r.log.Infof("Cleared cache for %d nodes across %d servers", len(nodes), len(serverIDs))
 	return nil
 }

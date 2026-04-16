@@ -22,6 +22,14 @@ type ProxySubscribeGroup struct {
 	Name string `json:"name,omitempty"`
 	// 订阅组描述
 	Description *string `json:"description,omitempty"`
+	// 是否为过期节点组
+	IsExpiredGroup bool `json:"is_expired_group,omitempty"`
+	// 过期天数限制
+	ExpiredDaysLimit *int64 `json:"expired_days_limit,omitempty"`
+	// 过期组最大流量GB
+	MaxTrafficGBExpired *int64 `json:"max_traffic_gb_expired,omitempty"`
+	// 过期组限速
+	SpeedLimit *int64 `json:"speed_limit,omitempty"`
 	// 创建时间
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// 更新时间
@@ -34,7 +42,9 @@ func (*ProxySubscribeGroup) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case proxysubscribegroup.FieldID:
+		case proxysubscribegroup.FieldIsExpiredGroup:
+			values[i] = new(sql.NullBool)
+		case proxysubscribegroup.FieldID, proxysubscribegroup.FieldExpiredDaysLimit, proxysubscribegroup.FieldMaxTrafficGBExpired, proxysubscribegroup.FieldSpeedLimit:
 			values[i] = new(sql.NullInt64)
 		case proxysubscribegroup.FieldName, proxysubscribegroup.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -73,6 +83,33 @@ func (_m *ProxySubscribeGroup) assignValues(columns []string, values []any) erro
 			} else if value.Valid {
 				_m.Description = new(string)
 				*_m.Description = value.String
+			}
+		case proxysubscribegroup.FieldIsExpiredGroup:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field is_expired_group", values[i])
+			} else if value.Valid {
+				_m.IsExpiredGroup = value.Bool
+			}
+		case proxysubscribegroup.FieldExpiredDaysLimit:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field expired_days_limit", values[i])
+			} else if value.Valid {
+				_m.ExpiredDaysLimit = new(int64)
+				*_m.ExpiredDaysLimit = value.Int64
+			}
+		case proxysubscribegroup.FieldMaxTrafficGBExpired:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field max_traffic_gb_expired", values[i])
+			} else if value.Valid {
+				_m.MaxTrafficGBExpired = new(int64)
+				*_m.MaxTrafficGBExpired = value.Int64
+			}
+		case proxysubscribegroup.FieldSpeedLimit:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field speed_limit", values[i])
+			} else if value.Valid {
+				_m.SpeedLimit = new(int64)
+				*_m.SpeedLimit = value.Int64
 			}
 		case proxysubscribegroup.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -128,6 +165,24 @@ func (_m *ProxySubscribeGroup) String() string {
 	if v := _m.Description; v != nil {
 		builder.WriteString("description=")
 		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	builder.WriteString("is_expired_group=")
+	builder.WriteString(fmt.Sprintf("%v", _m.IsExpiredGroup))
+	builder.WriteString(", ")
+	if v := _m.ExpiredDaysLimit; v != nil {
+		builder.WriteString("expired_days_limit=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.MaxTrafficGBExpired; v != nil {
+		builder.WriteString("max_traffic_gb_expired=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := _m.SpeedLimit; v != nil {
+		builder.WriteString("speed_limit=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")

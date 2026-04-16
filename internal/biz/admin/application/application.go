@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
+	publicsubscriptionbiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -55,6 +56,7 @@ type SubscribeApplicationRepo interface {
 	Delete(ctx context.Context, id int64) error
 	FindByID(ctx context.Context, id int64) (*SubscribeApplication, error)
 	List(ctx context.Context) ([]*SubscribeApplication, error)
+	GetPreviewNodes(ctx context.Context) ([]*publicsubscriptionbiz.NodeInfo, error)
 }
 
 // SubscribeApplicationUsecase 订阅应用配置用例
@@ -125,12 +127,48 @@ func (uc *SubscribeApplicationUsecase) PreviewSubscribeTemplate(ctx context.Cont
 		uc.logger.WithContext(ctx).Errorf("find subscribe application error: %v", err)
 		return "", responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
-
-	// TODO: 实现模板预览逻辑
-	// 这里需要调用adapter来生成预览内容
-	// 暂时返回模板内容
-	if app.SubscribeTemplate != nil {
-		return *app.SubscribeTemplate, nil
+	if app == nil {
+		return "", responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
-	return "", nil
+
+	nodes, err := uc.repo.GetPreviewNodes(ctx)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorf("get preview nodes error: %v", err)
+		return "", responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	templateStr := ""
+	if app.SubscribeTemplate != nil {
+		templateStr = *app.SubscribeTemplate
+	}
+
+	userSubscribe := &publicsubscriptionbiz.UserSubscribe{
+		UUID:          "test-password",
+		SubscribeName: "Test Subscribe",
+	}
+	userInfo := publicsubscriptionbiz.UserInfo{
+		Password:     "test-password",
+		ExpiredAt:    time.Now().AddDate(1, 0, 0),
+		Download:     0,
+		Upload:       0,
+		Traffic:      1000,
+		SubscribeURL: "https://example.com/subscribe",
+	}
+
+	rendered, err := publicsubscriptionbiz.RenderTemplate(
+		templateStr,
+		app.OutputFormat,
+		"PerfectPanel",
+		"Test Subscribe",
+		nodes,
+		userSubscribe,
+		userInfo,
+		map[string]string{},
+	)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorf("render subscribe template error: %v", err)
+		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
+	}
+
+	return string(rendered), nil
 }

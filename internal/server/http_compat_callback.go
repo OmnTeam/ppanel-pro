@@ -6,20 +6,15 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strconv"
 	"strings"
-	"time"
 
 	publicpaymentv1 "github.com/OmnTeam/ppanel-pro/api/public/payment/v1"
-	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
 	"github.com/OmnTeam/ppanel-pro/internal/data"
 	authmodel "github.com/OmnTeam/ppanel-pro/internal/model/auth"
 	publicpaymentservice "github.com/OmnTeam/ppanel-pro/internal/service/public/payment"
-	"github.com/OmnTeam/ppanel-pro/pkg/constant"
 	"github.com/OmnTeam/ppanel-pro/pkg/payment"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/log"
@@ -71,80 +66,7 @@ func registerLegacyCallbackCompatRoutes(r *khttp.Router, dataLayer *data.Data, a
 		}
 
 		_, _ = compatMiddleware(ctx, &update, func(inner context.Context, req interface{}) (interface{}, error) {
-			in := req.(*tgbotapi.Update)
-			if in.Message == nil || strings.TrimSpace(in.Message.Text) == "" {
-				return nil, nil
-			}
-			if in.Message.Command() != "start" {
-				return nil, nil
-			}
-
-			chatID := in.Message.Chat.ID
-			sessionID := strings.TrimSpace(in.Message.CommandArguments())
-			if sessionID == "" {
-				compatSendTelegramMessage(botToken, chatID, "Please bind account!")
-				return nil, nil
-			}
-
-			sessionKey := fmt.Sprintf("%s:%s", constant.SessionIdKey, sessionID)
-			userIDText, err := dataLayer.Redis().Get(inner, sessionKey).Result()
-			if err != nil || strings.TrimSpace(userIDText) == "" {
-				compatSendTelegramMessage(botToken, chatID, "Bind failed!")
-				return nil, nil
-			}
-
-			userID, err := strconv.ParseInt(userIDText, 10, 64)
-			if err != nil {
-				compatSendTelegramMessage(botToken, chatID, "Bind failed!")
-				return nil, nil
-			}
-
-			method, err := dataLayer.DB().ProxyUserAuthMethod.Query().
-				Where(
-					proxyuserauthmethod.UserIDEQ(userID),
-					proxyuserauthmethod.AuthTypeEQ("telegram"),
-				).
-				Only(inner)
-			if err != nil && !ent.IsNotFound(err) {
-				helper.Errorf("[compatTelegramWebhook] query auth method failed: %v", err)
-				compatSendTelegramMessage(botToken, chatID, "Bind failed!")
-				return nil, nil
-			}
-
-			identifier := strconv.FormatInt(chatID, 10)
-			if ent.IsNotFound(err) {
-				if _, err := dataLayer.DB().ProxyUserAuthMethod.Create().
-					SetUserID(userID).
-					SetAuthType("telegram").
-					SetAuthIdentifier(identifier).
-					SetVerified(true).
-					Save(inner); err != nil {
-					helper.Errorf("[compatTelegramWebhook] create auth method failed: %v", err)
-					compatSendTelegramMessage(botToken, chatID, "Bind failed!")
-					return nil, nil
-				}
-			} else {
-				if _, err := dataLayer.DB().ProxyUserAuthMethod.UpdateOneID(method.ID).
-					SetAuthIdentifier(identifier).
-					SetVerified(true).
-					Save(inner); err != nil {
-					helper.Errorf("[compatTelegramWebhook] update auth method failed: %v", err)
-					compatSendTelegramMessage(botToken, chatID, "Bind failed!")
-					return nil, nil
-				}
-			}
-
-			emails, _ := compatUserEmails(inner, dataLayer, userID)
-			compatClearUserCache(inner, dataLayer.Redis(), userID, emails...)
-
-			text, renderErr := tool.RenderTemplateToString(compatTelegramBindMessage, map[string]string{
-				"Id":   strconv.FormatInt(userID, 10),
-				"Time": time.Now().Format("2006-01-02 15:04:05"),
-			})
-			if renderErr != nil {
-				text = "Bind success!"
-			}
-			compatSendTelegramMessage(botToken, chatID, text)
+			compatHandleTelegramUpdate(inner, dataLayer, req.(*tgbotapi.Update), botToken, logger)
 			return nil, nil
 		})
 
@@ -267,7 +189,7 @@ func compatAppleLoginCallbackHandler(dataLayer *data.Data, appConf *conf.Applica
 }
 
 func compatBuildEPayNotifyRequest(ctx khttp.Context, token string) *publicpaymentv1.EPayNotifyRequest {
-	form := ctx.Form()
+	form := ctx.Request().URL.Query()
 	extras := make(map[string]string)
 	for key, values := range form {
 		if len(values) == 0 {

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -20,8 +21,10 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/data"
 	servermodel "github.com/OmnTeam/ppanel-pro/internal/model/server"
 	queueTypes "github.com/OmnTeam/ppanel-pro/internal/queue/types"
+	"github.com/OmnTeam/ppanel-pro/pkg/httpform"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 	"github.com/OmnTeam/ppanel-pro/pkg/uuidx"
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport"
 	khttp "github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/hibiken/asynq"
@@ -40,8 +43,8 @@ type compatLegacyGetServerConfigRequest struct{ compatLegacyServerCommon }
 type compatLegacyGetServerUserListRequest struct{ compatLegacyServerCommon }
 
 type compatLegacyServerBasic struct {
-	PullInterval int64 `json:"pull_interval"`
 	PushInterval int64 `json:"push_interval"`
+	PullInterval int64 `json:"pull_interval"`
 }
 
 type compatLegacyGetServerConfigResponse struct {
@@ -137,7 +140,8 @@ func registerLegacyServerCompatRoutes(r *khttp.Router, dataLayer *data.Data) {
 		var req compatLegacyGetServerConfigRequest
 		_ = ctx.Bind(&req)
 		_ = ctx.BindQuery(&req)
-		if !compatLegacyServerSecretAllowed(ctx, dataLayer, req.SecretKey) {
+		compatLegacyPopulateV1ServerCommon(ctx.Request(), &req.compatLegacyServerCommon)
+		if !compatLegacyV1ServerSecretAllowed(ctx, dataLayer, req.SecretKey) {
 			return ctx.String(http.StatusForbidden, "Forbidden")
 		}
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
@@ -156,7 +160,8 @@ func registerLegacyServerCompatRoutes(r *khttp.Router, dataLayer *data.Data) {
 		var req compatLegacyGetServerUserListRequest
 		_ = ctx.Bind(&req)
 		_ = ctx.BindQuery(&req)
-		if !compatLegacyServerSecretAllowed(ctx, dataLayer, req.SecretKey) {
+		compatLegacyPopulateV1ServerCommon(ctx.Request(), &req.compatLegacyServerCommon)
+		if !compatLegacyV1ServerSecretAllowed(ctx, dataLayer, req.SecretKey) {
 			return ctx.String(http.StatusForbidden, "Forbidden")
 		}
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
@@ -175,7 +180,7 @@ func registerLegacyServerCompatRoutes(r *khttp.Router, dataLayer *data.Data) {
 		var req compatLegacyPushUserTrafficRequest
 		_ = ctx.Bind(&req)
 		_ = ctx.BindQuery(&req)
-		if !compatLegacyServerSecretAllowed(ctx, dataLayer, req.SecretKey) {
+		if !compatLegacyV1ServerSecretAllowed(ctx, dataLayer, req.SecretKey) {
 			return ctx.String(http.StatusForbidden, "Forbidden")
 		}
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
@@ -191,7 +196,7 @@ func registerLegacyServerCompatRoutes(r *khttp.Router, dataLayer *data.Data) {
 		var req compatLegacyPushServerStatusRequest
 		_ = ctx.Bind(&req)
 		_ = ctx.BindQuery(&req)
-		if !compatLegacyServerSecretAllowed(ctx, dataLayer, req.SecretKey) {
+		if !compatLegacyV1ServerSecretAllowed(ctx, dataLayer, req.SecretKey) {
 			return ctx.String(http.StatusForbidden, "Forbidden")
 		}
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
@@ -207,7 +212,7 @@ func registerLegacyServerCompatRoutes(r *khttp.Router, dataLayer *data.Data) {
 		var req compatLegacyPushOnlineUsersRequest
 		_ = ctx.Bind(&req)
 		_ = ctx.BindQuery(&req)
-		if !compatLegacyServerSecretAllowed(ctx, dataLayer, req.SecretKey) {
+		if !compatLegacyV1ServerSecretAllowed(ctx, dataLayer, req.SecretKey) {
 			return ctx.String(http.StatusForbidden, "Forbidden")
 		}
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
@@ -220,23 +225,105 @@ func registerLegacyServerCompatRoutes(r *khttp.Router, dataLayer *data.Data) {
 	})
 
 	r.GET("/v2/server/{server_id}", func(ctx khttp.Context) error {
-		serverID, err := strconv.ParseInt(strings.TrimSpace(ctx.Vars().Get("server_id")), 10, 64)
+		helper := log.NewHelper(log.With(log.DefaultLogger, "module", "server/compat/v2"))
+		request := ctx.Request()
+		helper.Infof(
+			"[QueryServerProtocolConfig] request received method=%s path=%s raw_query=%s content_type=%s",
+			request.Method,
+			request.URL.Path,
+			request.URL.RawQuery,
+			request.Header.Get("Content-Type"),
+		)
+
+		vars := ctx.Vars()
+		rawServerID := strings.TrimSpace(vars.Get("server_id"))
+		helper.Infof("[QueryServerProtocolConfig] parsing path server_id=%q", rawServerID)
+		serverID, err := strconv.ParseInt(rawServerID, 10, 64)
 		if err != nil {
+			helper.Errorf("[QueryServerProtocolConfig] invalid path server_id=%q err=%v", rawServerID, err)
 			return ctx.String(http.StatusBadRequest, "Invalid Params")
 		}
 		var req compatLegacyQueryServerConfigRequest
 		req.ServerID = serverID
 		if err := ctx.BindQuery(&req); err != nil {
+			helper.Errorf("[QueryServerProtocolConfig] bind query failed server_id=%d err=%v", serverID, err)
 			return ctx.String(http.StatusBadRequest, "Invalid Params")
 		}
+		queryValues := request.URL.Query()
+		if strings.TrimSpace(req.SecretKey) == "" {
+			req.SecretKey = httpform.FirstNonEmpty(queryValues, "secret_key", "secretKey")
+		}
+		if len(req.Protocols) == 0 {
+			req.Protocols = httpform.StringSlice(queryValues, "protocols", "protocols[]")
+		}
+		req.Protocols = compatLegacySanitizeStringList(req.Protocols)
+		helper.Infof(
+			"[QueryServerProtocolConfig] query parsed server_id=%d secret_present=%t secret_value=%q protocols=%v query_keys=%d",
+			req.ServerID,
+			strings.TrimSpace(req.SecretKey) != "",
+			req.SecretKey,
+			req.Protocols,
+			len(queryValues),
+		)
+		if formValues, err := httpform.ParseGETBodyForm(ctx.Request()); err != nil {
+			helper.Errorf("[QueryServerProtocolConfig] parse GET body form failed server_id=%d err=%v", serverID, err)
+			return ctx.String(http.StatusBadRequest, "Invalid Params")
+		} else {
+			if strings.TrimSpace(req.SecretKey) == "" {
+				req.SecretKey = httpform.FirstNonEmpty(formValues, "secret_key", "secretKey")
+			}
+			if len(req.Protocols) == 0 {
+				req.Protocols = httpform.StringSlice(formValues, "protocols", "protocols[]")
+			}
+			req.Protocols = compatLegacySanitizeStringList(req.Protocols)
+			helper.Infof(
+				"[QueryServerProtocolConfig] GET body form merged server_id=%d secret_present=%t secret_value=%q protocols=%v form_keys=%d",
+				req.ServerID,
+				strings.TrimSpace(req.SecretKey) != "",
+				req.SecretKey,
+				req.Protocols,
+				len(formValues),
+			)
+		}
 		if !compatLegacyServerSecretAllowed(ctx, dataLayer, req.SecretKey) {
+			helper.Errorf(
+				"[QueryServerProtocolConfig] secret validation failed server_id=%d secret_present=%t secret_value=%q protocols=%v",
+				req.ServerID,
+				strings.TrimSpace(req.SecretKey) != "",
+				req.SecretKey,
+				req.Protocols,
+			)
 			return ctx.String(http.StatusUnauthorized, "Unauthorized")
 		}
+		helper.Infof(
+			"[QueryServerProtocolConfig] secret validated server_id=%d secret_value=%q protocols=%v",
+			req.ServerID,
+			req.SecretKey,
+			req.Protocols,
+		)
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			helper.Infof(
+				"[QueryServerProtocolConfig] invoking compat usecase server_id=%d protocols=%v",
+				req.ServerID,
+				req.Protocols,
+			)
 			return compatLegacyQueryServerProtocolConfig(inner, dataLayer, request.(*compatLegacyQueryServerConfigRequest))
 		})
 		if err != nil {
+			helper.Errorf("[QueryServerProtocolConfig] compat usecase failed server_id=%d err=%v", req.ServerID, err)
 			return compatLegacyServerJSONError(ctx, err)
+		}
+		if typedOut, ok := out.(*compatLegacyQueryServerConfigResponse); ok && typedOut != nil {
+			helper.Infof(
+				"[QueryServerProtocolConfig] success server_id=%d total=%d dns=%d outbound=%d protocols=%d",
+				req.ServerID,
+				typedOut.Total,
+				len(typedOut.DNS),
+				len(typedOut.Outbound),
+				len(typedOut.Protocols),
+			)
+		} else {
+			helper.Infof("[QueryServerProtocolConfig] success server_id=%d response_type=%T", req.ServerID, out)
 		}
 		return compatLegacyServerJSON(ctx, out)
 	})
@@ -255,6 +342,70 @@ func compatLegacyServerJSONError(ctx khttp.Context, err error) error {
 		msg = typedErr.msg
 	}
 	return ctx.JSON(http.StatusOK, compatEnvelope{Code: code, Msg: msg})
+}
+
+func compatLegacyPopulateV1ServerCommon(request *http.Request, req *compatLegacyServerCommon) {
+	if request == nil || req == nil {
+		return
+	}
+	compatLegacyMergeV1ServerCommon(req, request.URL.Query())
+	if formValues, err := httpform.ParseGETBodyForm(request); err == nil {
+		compatLegacyMergeV1ServerCommon(req, formValues)
+	}
+}
+
+func compatLegacyMergeV1ServerCommon(req *compatLegacyServerCommon, values url.Values) {
+	if req == nil || values == nil {
+		return
+	}
+	if strings.TrimSpace(req.Protocol) == "" {
+		req.Protocol = httpform.FirstNonEmpty(values, "protocol")
+	}
+	if req.ServerID <= 0 {
+		if serverID, ok := compatLegacyInt64FromValues(values, "server_id", "serverId"); ok {
+			req.ServerID = serverID
+		}
+	}
+	if strings.TrimSpace(req.SecretKey) == "" {
+		req.SecretKey = httpform.FirstNonEmpty(values, "secret_key", "secretKey")
+	}
+}
+
+func compatLegacyInt64FromValues(values url.Values, keys ...string) (int64, bool) {
+	raw := httpform.FirstNonEmpty(values, keys...)
+	if raw == "" {
+		return 0, false
+	}
+	parsed, err := strconv.ParseInt(raw, 10, 64)
+	if err != nil {
+		return 0, false
+	}
+	return parsed, true
+}
+
+func compatLegacyV1ServerSecretAllowed(ctx context.Context, dataLayer *data.Data, provided string) bool {
+	if strings.TrimSpace(provided) == "" {
+		return false
+	}
+	expected, ok := compatLegacyExpectedServerSecret(ctx, dataLayer)
+	if !ok {
+		return false
+	}
+	return strings.TrimSpace(provided) == strings.TrimSpace(expected)
+}
+
+func compatLegacyExpectedServerSecret(ctx context.Context, dataLayer *data.Data) (string, bool) {
+	if dataLayer == nil {
+		return "", false
+	}
+	if appConf := dataLayer.AppConf(); appConf != nil && appConf.Node != nil {
+		return appConf.Node.NodeSecret, true
+	}
+	nodeConfig, err := data.LoadNodeConfigForServer(ctx, dataLayer, log.With(log.DefaultLogger, "module", "server/compat/v1"))
+	if err != nil {
+		return "", false
+	}
+	return nodeConfig.NodeSecret, true
 }
 
 type compatLegacySecurityConfig struct {
@@ -337,33 +488,53 @@ type compatLegacyTrafficLimitRule struct {
 }
 
 func compatLegacyServerSecretAllowed(ctx context.Context, dataLayer *data.Data, provided string) bool {
+	helper := log.NewHelper(log.With(log.DefaultLogger, "module", "server/compat/v2"))
 	if dataLayer == nil {
+		helper.Errorf("[QueryServerProtocolConfig] secret validation aborted: data layer unavailable provided=%q", provided)
 		return false
 	}
-	expected, err := compatSystemValue(ctx, dataLayer, "server", "NodeSecret", "node_secret")
-	if err == nil && strings.TrimSpace(expected) != "" {
-		return strings.TrimSpace(expected) == strings.TrimSpace(provided)
+	if appConf := dataLayer.AppConf(); appConf != nil && appConf.Node != nil {
+		expected := appConf.Node.NodeSecret
+		matched := strings.TrimSpace(expected) != "" && strings.TrimSpace(expected) == strings.TrimSpace(provided)
+		helper.Infof(
+			"[QueryServerProtocolConfig] secret compare source=runtime_node_config provided=%q expected=%q matched=%t",
+			provided,
+			expected,
+			matched,
+		)
+		return matched
 	}
-	if appConf := dataLayer.AppConf(); appConf != nil && appConf.GetNode() != nil {
-		expected = appConf.GetNode().GetNodeSecret()
+	nodeConfig, err := data.LoadNodeConfigForServer(ctx, dataLayer, log.With(log.DefaultLogger, "module", "server/compat/v2"))
+	if err != nil {
+		helper.Errorf("[QueryServerProtocolConfig] secret load failed source=admin_node_config err=%v", err)
+		return false
 	}
-	return strings.TrimSpace(expected) != "" && strings.TrimSpace(expected) == strings.TrimSpace(provided)
+	expected := nodeConfig.NodeSecret
+	matched := strings.TrimSpace(expected) != "" && strings.TrimSpace(expected) == strings.TrimSpace(provided)
+	helper.Infof(
+		"[QueryServerProtocolConfig] secret compare source=admin_node_config_fallback provided=%q expected=%q matched=%t",
+		provided,
+		expected,
+		matched,
+	)
+	return matched
 }
 
 func compatLegacyGetServerConfig(ctx context.Context, dataLayer *data.Data, req *compatLegacyGetServerConfigRequest) (*compatLegacyGetServerConfigResponse, error) {
-	cacheKey := fmt.Sprintf("server:config:%d:%s", req.ServerID, req.Protocol)
-	if dataLayer.Redis() != nil {
-		if cache, err := dataLayer.Redis().Get(ctx, cacheKey).Result(); err == nil && cache != "" {
-			etag := tool.GenerateETag([]byte(cache))
+	if redisClient := dataLayer.Redis(); redisClient != nil {
+		cacheKey := data.LegacyServerConfigCacheKey(req.ServerID, req.Protocol)
+		if cached, err := redisClient.Get(ctx, cacheKey).Result(); err == nil && cached != "" {
+			etag := tool.GenerateETag([]byte(cached))
 			if compatLegacyIfNoneMatch(ctx) == etag {
 				return nil, errCompatLegacyServerNotModified
 			}
 			compatLegacySetReplyHeader(ctx, "ETag", etag)
-			var resp compatLegacyGetServerConfigResponse
-			if err := json.Unmarshal([]byte(cache), &resp); err != nil {
+
+			resp := &compatLegacyGetServerConfigResponse{}
+			if err := json.Unmarshal([]byte(cached), resp); err != nil {
 				return nil, err
 			}
-			return &resp, nil
+			return resp, nil
 		}
 	}
 
@@ -386,11 +557,24 @@ func compatLegacyGetServerConfig(ctx context.Context, dataLayer *data.Data, req 
 			break
 		}
 	}
+	pullInterval := int64(0)
+	pushInterval := int64(0)
+	if appConf := dataLayer.AppConf(); appConf != nil && appConf.Node != nil {
+		pullInterval = appConf.Node.NodePullInterval
+		pushInterval = appConf.Node.NodePushInterval
+	} else {
+		nodeConfig, err := data.LoadNodeConfigForServer(ctx, dataLayer, log.With(log.DefaultLogger, "module", "server/compat/v1"))
+		if err != nil {
+			return nil, err
+		}
+		pullInterval = int64(nodeConfig.NodePullInterval)
+		pushInterval = int64(nodeConfig.NodePushInterval)
+	}
 
 	resp := &compatLegacyGetServerConfigResponse{
 		Basic: compatLegacyServerBasic{
-			PullInterval: compatLegacySystemInt64(ctx, dataLayer, "server", 10, "NodePullInterval", "node_pull_interval"),
-			PushInterval: compatLegacySystemInt64(ctx, dataLayer, "server", 60, "NodePushInterval", "node_push_interval"),
+			PullInterval: pullInterval,
+			PushInterval: pushInterval,
 		},
 		Protocol: req.Protocol,
 		Config:   config,
@@ -401,8 +585,8 @@ func compatLegacyGetServerConfig(ctx context.Context, dataLayer *data.Data, req 
 	}
 	etag := tool.GenerateETag(encoded)
 	compatLegacySetReplyHeader(ctx, "ETag", etag)
-	if dataLayer.Redis() != nil {
-		_ = dataLayer.Redis().Set(ctx, cacheKey, encoded, -1).Err()
+	if redisClient := dataLayer.Redis(); redisClient != nil {
+		_ = redisClient.Set(ctx, data.LegacyServerConfigCacheKey(req.ServerID, req.Protocol), encoded, -1).Err()
 	}
 	if compatLegacyIfNoneMatch(ctx) == etag {
 		return nil, errCompatLegacyServerNotModified
@@ -411,19 +595,20 @@ func compatLegacyGetServerConfig(ctx context.Context, dataLayer *data.Data, req 
 }
 
 func compatLegacyGetServerUserList(ctx context.Context, dataLayer *data.Data, req *compatLegacyGetServerUserListRequest) (*compatLegacyGetServerUserListResponse, error) {
-	cacheKey := fmt.Sprintf("server:user:%d", req.ServerID)
-	if dataLayer.Redis() != nil {
-		if cache, err := dataLayer.Redis().Get(ctx, cacheKey).Result(); err == nil && cache != "" {
-			etag := tool.GenerateETag([]byte(cache))
+	if redisClient := dataLayer.Redis(); redisClient != nil {
+		cacheKey := data.LegacyServerUserListCacheKey(req.ServerID)
+		if cached, err := redisClient.Get(ctx, cacheKey).Result(); err == nil && cached != "" {
+			etag := tool.GenerateETag([]byte(cached))
 			if compatLegacyIfNoneMatch(ctx) == etag {
 				return nil, errCompatLegacyServerNotModified
 			}
 			compatLegacySetReplyHeader(ctx, "ETag", etag)
-			var resp compatLegacyGetServerUserListResponse
-			if err := json.Unmarshal([]byte(cache), &resp); err != nil {
+
+			resp := &compatLegacyGetServerUserListResponse{}
+			if err := json.Unmarshal([]byte(cached), resp); err != nil {
 				return nil, err
 			}
-			return &resp, nil
+			return resp, nil
 		}
 	}
 
@@ -433,6 +618,7 @@ func compatLegacyGetServerUserList(ctx context.Context, dataLayer *data.Data, re
 	nodes, err := dataLayer.DB().ProxyNode.Query().
 		Where(proxynode.ServerIDEQ(req.ServerID), proxynode.ProtocolEQ(req.Protocol)).
 		Order(ent.Asc(proxynode.FieldSort)).
+		Limit(1000).
 		All(ctx)
 	if err != nil {
 		return nil, err
@@ -510,8 +696,8 @@ func compatLegacyGetServerUserList(ctx context.Context, dataLayer *data.Data, re
 	}
 	etag := tool.GenerateETag(encoded)
 	compatLegacySetReplyHeader(ctx, "ETag", etag)
-	if dataLayer.Redis() != nil {
-		_ = dataLayer.Redis().Set(ctx, cacheKey, encoded, -1).Err()
+	if redisClient := dataLayer.Redis(); redisClient != nil {
+		_ = redisClient.Set(ctx, data.LegacyServerUserListCacheKey(req.ServerID), encoded, -1).Err()
 	}
 	if compatLegacyIfNoneMatch(ctx) == etag {
 		return nil, errCompatLegacyServerNotModified
@@ -626,36 +812,86 @@ func compatLegacyQueryServerProtocolConfig(ctx context.Context, dataLayer *data.
 	if len(req.Protocols) > 0 {
 		requested := make(map[string]struct{}, len(req.Protocols))
 		for _, item := range req.Protocols {
-			requested[item] = struct{}{}
+			if item = strings.TrimSpace(item); item != "" {
+				requested[item] = struct{}{}
+			}
 		}
-		filtered := make([]*servermodel.Protocol, 0, len(protocols))
-		for _, protocol := range protocols {
-			if protocol == nil {
+		if len(requested) > 0 {
+			var filtered []*servermodel.Protocol
+			for _, protocol := range protocols {
+				if protocol == nil {
+					continue
+				}
+				if _, ok := requested[protocol.Type]; ok {
+					filtered = append(filtered, protocol)
+				}
+			}
+			protocols = filtered
+		}
+	}
+	trafficReportThreshold := int64(0)
+	ipStrategy := ""
+	var dns []compatLegacyNodeDNS
+	var block []string
+	var outbound []compatLegacyNodeOutbound
+
+	if appConf := dataLayer.AppConf(); appConf != nil && appConf.Node != nil {
+		trafficReportThreshold = appConf.Node.TrafficReportThreshold
+		ipStrategy = appConf.Node.IpStrategy
+		for _, item := range appConf.Node.Dns {
+			if item == nil {
 				continue
 			}
-			if _, ok := requested[protocol.Type]; ok {
-				filtered = append(filtered, protocol)
+			dns = append(dns, compatLegacyNodeDNS{
+				Proto:   item.Proto,
+				Address: item.Address,
+				Domains: append([]string(nil), item.Domains...),
+			})
+		}
+		block = append(block, appConf.Node.Block...)
+		for _, item := range appConf.Node.Outbound {
+			if item == nil {
+				continue
+			}
+			outbound = append(outbound, compatLegacyNodeOutbound{
+				Name:     item.Name,
+				Protocol: item.Protocol,
+				Address:  item.Address,
+				Port:     item.Port,
+				Password: item.Password,
+				Rules:    append([]string(nil), item.Rules...),
+			})
+		}
+	} else {
+		nodeConfig, err := data.LoadNodeConfigForServer(ctx, dataLayer, log.With(log.DefaultLogger, "module", "server/compat/v2"))
+		if err != nil {
+			return nil, err
+		}
+		trafficReportThreshold = int64(nodeConfig.TrafficReportThreshold)
+		ipStrategy = nodeConfig.IPStrategy
+		if raw := strings.TrimSpace(nodeConfig.DNS); raw != "" {
+			if err := json.Unmarshal([]byte(raw), &dns); err != nil {
+				return nil, err
 			}
 		}
-		protocols = filtered
+		if raw := strings.TrimSpace(nodeConfig.Block); raw != "" {
+			if err := json.Unmarshal([]byte(raw), &block); err != nil {
+				return nil, err
+			}
+		}
+		if raw := strings.TrimSpace(nodeConfig.Outbound); raw != "" {
+			if err := json.Unmarshal([]byte(raw), &outbound); err != nil {
+				return nil, err
+			}
+		}
 	}
-
-	dns := make([]compatLegacyNodeDNS, 0)
-	if rawDNS := compatLegacySystemString(ctx, dataLayer, "server", "", "DNS", "dns"); rawDNS != "" {
-		_ = json.Unmarshal([]byte(rawDNS), &dns)
-	}
-	block := make([]string, 0)
-	if rawBlock := compatLegacySystemString(ctx, dataLayer, "server", "", "Block", "block"); rawBlock != "" {
-		_ = json.Unmarshal([]byte(rawBlock), &block)
-	}
-	outbound := make([]compatLegacyNodeOutbound, 0)
-	if rawOutbound := compatLegacySystemString(ctx, dataLayer, "server", "", "Outbound", "outbound"); rawOutbound != "" {
-		_ = json.Unmarshal([]byte(rawOutbound), &outbound)
-	}
+	dns = compatLegacySanitizeDNSList(dns)
+	block = compatLegacySanitizeStringList(block)
+	outbound = compatLegacySanitizeOutboundList(outbound)
 
 	return &compatLegacyQueryServerConfigResponse{
-		TrafficReportThreshold: compatLegacySystemInt64(ctx, dataLayer, "server", 0, "TrafficReportThreshold", "traffic_report_threshold"),
-		IPStrategy:             compatLegacySystemString(ctx, dataLayer, "server", "", "IPStrategy", "ip_strategy"),
+		TrafficReportThreshold: trafficReportThreshold,
+		IPStrategy:             ipStrategy,
 		DNS:                    dns,
 		Block:                  block,
 		Outbound:               outbound,
@@ -665,7 +901,10 @@ func compatLegacyQueryServerProtocolConfig(ctx context.Context, dataLayer *data.
 }
 
 func compatLegacyMatchedSubscribePlans(ctx context.Context, dataLayer *data.Data, nodeGroupIDs, nodeIDs []int64, nodeTags []string) ([]*ent.ProxySubscribe, error) {
-	plans, err := dataLayer.DB().ProxySubscribe.Query().Order(ent.Asc(proxysubscribe.FieldSort)).All(ctx)
+	plans, err := dataLayer.DB().ProxySubscribe.Query().
+		Order(ent.Asc(proxysubscribe.FieldSort)).
+		Limit(9999).
+		All(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -746,6 +985,11 @@ func compatLegacyShouldIncludeServerUser(ctx context.Context, dataLayer *data.Da
 	if userSub == nil {
 		return false
 	}
+	// Legacy project uses non-pointer time.Time; when DB expire_time is NULL it is
+	// effectively treated as zero-value/unlimited. Mirror that behavior here.
+	if userSub.ExpireTime == nil {
+		return true
+	}
 	if compatIsLegacyUnlimitedTime(userSub.ExpireTime) {
 		return true
 	}
@@ -797,8 +1041,8 @@ func compatLegacyExpiredUserEligible(userSub *ent.ProxyUserSubscribe, expiredGro
 		return false
 	}
 	if expiredGroup.MaxTrafficGBExpired != nil && *expiredGroup.MaxTrafficGBExpired > 0 {
-		usedTrafficGB := float64(compatInt64Value(userSub.ExpiredDownload)+compatInt64Value(userSub.ExpiredUpload)) / (1024 * 1024 * 1024)
-		if usedTrafficGB >= float64(*expiredGroup.MaxTrafficGBExpired) {
+		usedTrafficGB := (compatInt64Value(userSub.ExpiredDownload) + compatInt64Value(userSub.ExpiredUpload)) / (1024 * 1024 * 1024)
+		if usedTrafficGB >= compatInt64Value(expiredGroup.MaxTrafficGBExpired) {
 			return false
 		}
 	}
@@ -895,7 +1139,6 @@ func compatLegacyProtocolConfigMap(config *servermodel.Protocol) map[string]inte
 		RealityPrivateKey:    config.RealityPrivateKey,
 		RealityPublicKey:     config.RealityPublicKey,
 		RealityShortID:       config.RealityShortId,
-		PaddingScheme:        config.PaddingScheme,
 	}
 	transportConfig := &compatLegacyTransportConfig{
 		Path:                 config.Path,
@@ -918,7 +1161,9 @@ func compatLegacyProtocolConfigMap(config *servermodel.Protocol) map[string]inte
 	case "trojan":
 		result = compatLegacyTrojanNode{Port: uint16(config.Port), Network: config.Transport, TransportConfig: transportConfig, Security: config.Security, SecurityConfig: securityConfig}
 	case "anytls":
-		result = compatLegacyAnyTLSNode{Port: uint16(config.Port), SecurityConfig: securityConfig}
+		anyTLSSecurityConfig := *securityConfig
+		anyTLSSecurityConfig.PaddingScheme = config.PaddingScheme
+		result = compatLegacyAnyTLSNode{Port: uint16(config.Port), SecurityConfig: &anyTLSSecurityConfig}
 	case "tuic":
 		result = compatLegacyTuicNode{Port: uint16(config.Port), SecurityConfig: securityConfig}
 	case "hysteria", "hysteria2":
@@ -965,4 +1210,62 @@ func compatLegacySystemInt64(ctx context.Context, dataLayer *data.Data, category
 		return fallback
 	}
 	return parsed
+}
+
+func compatLegacySanitizeStringList(values []string) []string {
+	if len(values) == 0 {
+		return nil
+	}
+	result := make([]string, 0, len(values))
+	for _, value := range values {
+		if trimmed := strings.TrimSpace(value); trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	if len(result) == 0 {
+		return nil
+	}
+	return result
+}
+
+func compatLegacySanitizeDNSList(values []compatLegacyNodeDNS) []compatLegacyNodeDNS {
+	if len(values) == 0 {
+		return nil
+	}
+	result := make([]compatLegacyNodeDNS, 0, len(values))
+	for _, item := range values {
+		item.Proto = strings.TrimSpace(item.Proto)
+		item.Address = strings.TrimSpace(item.Address)
+		item.Domains = compatLegacySanitizeStringList(item.Domains)
+		if item.Proto == "" && item.Address == "" && len(item.Domains) == 0 {
+			continue
+		}
+		result = append(result, item)
+	}
+	if len(result) == 0 {
+		return nil
+	}
+	return result
+}
+
+func compatLegacySanitizeOutboundList(values []compatLegacyNodeOutbound) []compatLegacyNodeOutbound {
+	if len(values) == 0 {
+		return nil
+	}
+	result := make([]compatLegacyNodeOutbound, 0, len(values))
+	for _, item := range values {
+		item.Name = strings.TrimSpace(item.Name)
+		item.Protocol = strings.TrimSpace(item.Protocol)
+		item.Address = strings.TrimSpace(item.Address)
+		item.Password = strings.TrimSpace(item.Password)
+		item.Rules = compatLegacySanitizeStringList(item.Rules)
+		if item.Name == "" && item.Protocol == "" && item.Address == "" && item.Port == 0 && item.Password == "" && len(item.Rules) == 0 {
+			continue
+		}
+		result = append(result, item)
+	}
+	if len(result) == 0 {
+		return nil
+	}
+	return result
 }
