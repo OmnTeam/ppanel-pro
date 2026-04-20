@@ -115,7 +115,7 @@ message GetServerUserListReply {
 
 // UserTraffic 用户流量信息
 message UserTraffic {
-	int64 sid = 1;            // 订阅ID
+  string sid = 1;            // 订阅ID
 	int64 upload = 2;         // 上传流量
 	int64 download = 3;       // 下载流量
 }
@@ -161,7 +161,7 @@ message PushServerStatusReply {
 
 // OnlineUser 在线用户信息
 message OnlineUser {
-	int64 sid = 1;            // 订阅ID
+  string sid = 1;            // 订阅ID
 	string ip = 2;            // IP地址
 }
 
