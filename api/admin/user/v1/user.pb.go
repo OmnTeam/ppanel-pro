@@ -818,12 +818,12 @@ type GetUserListRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Page            int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	Size            int32                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	Search          string                 `protobuf:"bytes,3,opt,name=search,proto3" json:"search,omitempty"`                                                   // 搜索关键字
-	UserId          *string                `protobuf:"bytes,4,opt,name=user_id,json=userId,proto3,oneof" json:"user_id,omitempty"`                               // 过滤特定用户ID
-	Unscoped        bool                   `protobuf:"varint,5,opt,name=unscoped,proto3" json:"unscoped,omitempty"`                                              // 包含已删除
-	SubscribeId     *string                `protobuf:"bytes,6,opt,name=subscribe_id,json=subscribeId,proto3,oneof" json:"subscribe_id,omitempty"`                // 过滤订阅套餐ID
-	UserSubscribeId *int64                 `protobuf:"varint,7,opt,name=user_subscribe_id,json=userSubscribeId,proto3,oneof" json:"user_subscribe_id,omitempty"` // 过滤用户订阅ID
-	ShortCode       string                 `protobuf:"bytes,8,opt,name=short_code,json=shortCode,proto3" json:"short_code,omitempty"`                            // 短码
+	Search          string                 `protobuf:"bytes,3,opt,name=search,proto3" json:"search,omitempty"`                                                  // 搜索关键字
+	UserId          *string                `protobuf:"bytes,4,opt,name=user_id,json=userId,proto3,oneof" json:"user_id,omitempty"`                              // 过滤特定用户ID
+	Unscoped        bool                   `protobuf:"varint,5,opt,name=unscoped,proto3" json:"unscoped,omitempty"`                                             // 包含已删除
+	SubscribeId     *string                `protobuf:"bytes,6,opt,name=subscribe_id,json=subscribeId,proto3,oneof" json:"subscribe_id,omitempty"`               // 过滤订阅套餐ID
+	UserSubscribeId *string                `protobuf:"bytes,7,opt,name=user_subscribe_id,json=userSubscribeId,proto3,oneof" json:"user_subscribe_id,omitempty"` // 过滤用户订阅ID
+	ShortCode       string                 `protobuf:"bytes,8,opt,name=short_code,json=shortCode,proto3" json:"short_code,omitempty"`                           // 短码
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -900,11 +900,11 @@ func (x *GetUserListRequest) GetSubscribeId() string {
 	return ""
 }
 
-func (x *GetUserListRequest) GetUserSubscribeId() int64 {
+func (x *GetUserListRequest) GetUserSubscribeId() string {
 	if x != nil && x.UserSubscribeId != nil {
 		return *x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 func (x *GetUserListRequest) GetShortCode() string {
@@ -1916,7 +1916,7 @@ const file_admin_user_v1_user_proto_rawDesc = "" +
 	"\auser_id\x18\x04 \x01(\tH\x00R\x06userId\x88\x01\x01\x12\x1a\n" +
 	"\bunscoped\x18\x05 \x01(\bR\bunscoped\x12&\n" +
 	"\fsubscribe_id\x18\x06 \x01(\tH\x01R\vsubscribeId\x88\x01\x01\x12/\n" +
-	"\x11user_subscribe_id\x18\a \x01(\x03H\x02R\x0fuserSubscribeId\x88\x01\x01\x12\x1d\n" +
+	"\x11user_subscribe_id\x18\a \x01(\tH\x02R\x0fuserSubscribeId\x88\x01\x01\x12\x1d\n" +
 	"\n" +
 	"short_code\x18\b \x01(\tR\tshortCodeB\n" +
 	"\n" +

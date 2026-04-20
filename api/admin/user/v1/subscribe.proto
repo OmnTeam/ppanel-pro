@@ -135,7 +135,7 @@ message CreateUserSubscribeReply {
 // ===== UpdateUserSubscribe =====
 
 message UpdateUserSubscribeRequest {
-  int64 user_subscribe_id = 1; // 用户订阅ID
+  string user_subscribe_id = 1; // 用户订阅ID
   string subscribe_id = 2;      // 订阅套餐ID
   int64 traffic = 3;           // 总流量（字节）
   int64 expired_at = 4;        // 过期时间（Unix时间戳，秒）
@@ -151,7 +151,7 @@ message UpdateUserSubscribeReply {
 // ===== DeleteUserSubscribe =====
 
 message DeleteUserSubscribeRequest {
-  int64 user_subscribe_id = 1;  // 用户订阅ID
+  string user_subscribe_id = 1;  // 用户订阅ID
 }
 
 message DeleteUserSubscribeReply {
@@ -216,7 +216,7 @@ message GetUserSubscribeLogsReply {
 message GetUserSubscribeResetTrafficLogsRequest {
   int32 page = 1;
   int32 size = 2;
-  int64 user_subscribe_id = 3;  // 用户订阅ID
+  string user_subscribe_id = 3;  // 用户订阅ID
 }
 
 message GetUserSubscribeResetTrafficLogsData {
@@ -255,7 +255,7 @@ message GetUserSubscribeTrafficLogsReply {
 // ===== ResetUserSubscribeToken =====
 
 message ResetUserSubscribeTokenRequest {
-  int64 user_subscribe_id = 1;  // 用户订阅ID
+  string user_subscribe_id = 1;  // 用户订阅ID
 }
 
 message ResetUserSubscribeTokenReply {
@@ -266,7 +266,7 @@ message ResetUserSubscribeTokenReply {
 // ===== ToggleUserSubscribeStatus =====
 
 message ToggleUserSubscribeStatusRequest {
-  int64 user_subscribe_id = 1;  // 用户订阅ID
+  string user_subscribe_id = 1;  // 用户订阅ID
 }
 
 message ToggleUserSubscribeStatusReply {
@@ -277,7 +277,7 @@ message ToggleUserSubscribeStatusReply {
 // ===== ResetUserSubscribeTraffic =====
 
 message ResetUserSubscribeTrafficRequest {
-  int64 user_subscribe_id = 1;  // 用户订阅ID
+  string user_subscribe_id = 1;  // 用户订阅ID
 }
 
 message ResetUserSubscribeTrafficReply {
@@ -332,7 +332,7 @@ message UserSubscribeDetail {
 message UserSubscribeLog {
   string id = 1;
   string user_id = 2;
-  int64 user_subscribe_id = 3;
+  string user_subscribe_id = 3;
   string token = 4;
   string ip = 5;
   string user_agent = 6;
@@ -343,7 +343,7 @@ message UserSubscribeLog {
 message ResetSubscribeTrafficLog {
   string id = 1;
   int32 type = 2;              // 类型
-  int64 user_subscribe_id = 3;
+  string user_subscribe_id = 3;
   string order_no = 4;         // 订单号（可选）
   int64 timestamp = 5;         // Unix timestamp in seconds
 }

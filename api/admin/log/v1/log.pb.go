@@ -2811,7 +2811,7 @@ type FilterResetSubscribeLogRequest struct {
 	Page            int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	Size            int32                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
 	Date            string                 `protobuf:"bytes,3,opt,name=date,proto3" json:"date,omitempty"`
-	UserSubscribeId int64                  `protobuf:"varint,4,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
+	UserSubscribeId string                 `protobuf:"bytes,4,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -2867,18 +2867,18 @@ func (x *FilterResetSubscribeLogRequest) GetDate() string {
 	return ""
 }
 
-func (x *FilterResetSubscribeLogRequest) GetUserSubscribeId() int64 {
+func (x *FilterResetSubscribeLogRequest) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 type ResetSubscribeLog struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Type            int32                  `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`
 	UserId          string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	UserSubscribeId int64                  `protobuf:"varint,3,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
+	UserSubscribeId string                 `protobuf:"bytes,3,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
 	OrderNo         string                 `protobuf:"bytes,4,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"`
 	Timestamp       int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	unknownFields   protoimpl.UnknownFields
@@ -2929,11 +2929,11 @@ func (x *ResetSubscribeLog) GetUserId() string {
 	return ""
 }
 
-func (x *ResetSubscribeLog) GetUserSubscribeId() int64 {
+func (x *ResetSubscribeLog) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 func (x *ResetSubscribeLog) GetOrderNo() string {
@@ -3069,7 +3069,7 @@ type FilterUserSubscribeTrafficLogRequest struct {
 	Size            int32                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
 	Date            string                 `protobuf:"bytes,3,opt,name=date,proto3" json:"date,omitempty"`
 	UserId          string                 `protobuf:"bytes,4,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	UserSubscribeId int64                  `protobuf:"varint,5,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
+	UserSubscribeId string                 `protobuf:"bytes,5,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -3132,11 +3132,11 @@ func (x *FilterUserSubscribeTrafficLogRequest) GetUserId() string {
 	return ""
 }
 
-func (x *FilterUserSubscribeTrafficLogRequest) GetUserSubscribeId() int64 {
+func (x *FilterUserSubscribeTrafficLogRequest) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 type UserSubscribeTrafficLog struct {
@@ -4119,11 +4119,11 @@ const file_admin_log_v1_log_proto_rawDesc = "" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x05R\x04size\x12\x12\n" +
 	"\x04date\x18\x03 \x01(\tR\x04date\x12*\n" +
-	"\x11user_subscribe_id\x18\x04 \x01(\x03R\x0fuserSubscribeId\"\xa5\x01\n" +
+	"\x11user_subscribe_id\x18\x04 \x01(\tR\x0fuserSubscribeId\"\xa5\x01\n" +
 	"\x11ResetSubscribeLog\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\x05R\x04type\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12*\n" +
-	"\x11user_subscribe_id\x18\x03 \x01(\x03R\x0fuserSubscribeId\x12\x19\n" +
+	"\x11user_subscribe_id\x18\x03 \x01(\tR\x0fuserSubscribeId\x12\x19\n" +
 	"\border_no\x18\x04 \x01(\tR\aorderNo\x12\x1c\n" +
 	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\"l\n" +
 	"\x1bFilterResetSubscribeLogData\x12\x14\n" +
@@ -4138,7 +4138,7 @@ const file_admin_log_v1_log_proto_rawDesc = "" +
 	"\x04size\x18\x02 \x01(\x05R\x04size\x12\x12\n" +
 	"\x04date\x18\x03 \x01(\tR\x04date\x12\x17\n" +
 	"\auser_id\x18\x04 \x01(\tR\x06userId\x12*\n" +
-	"\x11user_subscribe_id\x18\x05 \x01(\x03R\x0fuserSubscribeId\"\xcd\x01\n" +
+	"\x11user_subscribe_id\x18\x05 \x01(\tR\x0fuserSubscribeId\"\xcd\x01\n" +
 	"\x17UserSubscribeTrafficLog\x12!\n" +
 	"\fsubscribe_id\x18\x01 \x01(\tR\vsubscribeId\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x16\n" +

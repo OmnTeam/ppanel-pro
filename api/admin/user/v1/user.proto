@@ -173,7 +173,7 @@ message GetUserListRequest {
   optional string user_id = 4;      // 过滤特定用户ID
   bool unscoped = 5;               // 包含已删除
   optional string subscribe_id = 6; // 过滤订阅套餐ID
-  optional int64 user_subscribe_id = 7; // 过滤用户订阅ID
+  optional string user_subscribe_id = 7; // 过滤用户订阅ID
   string short_code = 8;           // 短码
 }
 

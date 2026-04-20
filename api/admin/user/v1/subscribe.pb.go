@@ -316,12 +316,12 @@ func (x *CreateUserSubscribeReply) GetMessage() string {
 
 type UpdateUserSubscribeRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	UserSubscribeId int64                  `protobuf:"varint,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID
-	SubscribeId     string                 `protobuf:"bytes,2,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`                // 订阅套餐ID
-	Traffic         int64                  `protobuf:"varint,3,opt,name=traffic,proto3" json:"traffic,omitempty"`                                          // 总流量（字节）
-	ExpiredAt       int64                  `protobuf:"varint,4,opt,name=expired_at,json=expiredAt,proto3" json:"expired_at,omitempty"`                     // 过期时间（Unix时间戳，秒）
-	Upload          int64                  `protobuf:"varint,5,opt,name=upload,proto3" json:"upload,omitempty"`                                            // 上传流量（字节）
-	Download        int64                  `protobuf:"varint,6,opt,name=download,proto3" json:"download,omitempty"`                                        // 下载流量（字节）
+	UserSubscribeId string                 `protobuf:"bytes,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID
+	SubscribeId     string                 `protobuf:"bytes,2,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`               // 订阅套餐ID
+	Traffic         int64                  `protobuf:"varint,3,opt,name=traffic,proto3" json:"traffic,omitempty"`                                         // 总流量（字节）
+	ExpiredAt       int64                  `protobuf:"varint,4,opt,name=expired_at,json=expiredAt,proto3" json:"expired_at,omitempty"`                    // 过期时间（Unix时间戳，秒）
+	Upload          int64                  `protobuf:"varint,5,opt,name=upload,proto3" json:"upload,omitempty"`                                           // 上传流量（字节）
+	Download        int64                  `protobuf:"varint,6,opt,name=download,proto3" json:"download,omitempty"`                                       // 下载流量（字节）
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -356,11 +356,11 @@ func (*UpdateUserSubscribeRequest) Descriptor() ([]byte, []int) {
 	return file_admin_user_v1_subscribe_proto_rawDescGZIP(), []int{5}
 }
 
-func (x *UpdateUserSubscribeRequest) GetUserSubscribeId() int64 {
+func (x *UpdateUserSubscribeRequest) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 func (x *UpdateUserSubscribeRequest) GetSubscribeId() string {
@@ -452,7 +452,7 @@ func (x *UpdateUserSubscribeReply) GetMessage() string {
 
 type DeleteUserSubscribeRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	UserSubscribeId int64                  `protobuf:"varint,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID
+	UserSubscribeId string                 `protobuf:"bytes,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -487,11 +487,11 @@ func (*DeleteUserSubscribeRequest) Descriptor() ([]byte, []int) {
 	return file_admin_user_v1_subscribe_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *DeleteUserSubscribeRequest) GetUserSubscribeId() int64 {
+func (x *DeleteUserSubscribeRequest) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 type DeleteUserSubscribeReply struct {
@@ -1014,7 +1014,7 @@ type GetUserSubscribeResetTrafficLogsRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Page            int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	Size            int32                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	UserSubscribeId int64                  `protobuf:"varint,3,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID
+	UserSubscribeId string                 `protobuf:"bytes,3,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1063,11 +1063,11 @@ func (x *GetUserSubscribeResetTrafficLogsRequest) GetSize() int32 {
 	return 0
 }
 
-func (x *GetUserSubscribeResetTrafficLogsRequest) GetUserSubscribeId() int64 {
+func (x *GetUserSubscribeResetTrafficLogsRequest) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 type GetUserSubscribeResetTrafficLogsData struct {
@@ -1380,7 +1380,7 @@ func (x *GetUserSubscribeTrafficLogsReply) GetData() *GetUserSubscribeTrafficLog
 
 type ResetUserSubscribeTokenRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	UserSubscribeId int64                  `protobuf:"varint,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID
+	UserSubscribeId string                 `protobuf:"bytes,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1415,11 +1415,11 @@ func (*ResetUserSubscribeTokenRequest) Descriptor() ([]byte, []int) {
 	return file_admin_user_v1_subscribe_proto_rawDescGZIP(), []int{23}
 }
 
-func (x *ResetUserSubscribeTokenRequest) GetUserSubscribeId() int64 {
+func (x *ResetUserSubscribeTokenRequest) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 type ResetUserSubscribeTokenReply struct {
@@ -1476,7 +1476,7 @@ func (x *ResetUserSubscribeTokenReply) GetMessage() string {
 
 type ToggleUserSubscribeStatusRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	UserSubscribeId int64                  `protobuf:"varint,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID
+	UserSubscribeId string                 `protobuf:"bytes,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1511,11 +1511,11 @@ func (*ToggleUserSubscribeStatusRequest) Descriptor() ([]byte, []int) {
 	return file_admin_user_v1_subscribe_proto_rawDescGZIP(), []int{25}
 }
 
-func (x *ToggleUserSubscribeStatusRequest) GetUserSubscribeId() int64 {
+func (x *ToggleUserSubscribeStatusRequest) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 type ToggleUserSubscribeStatusReply struct {
@@ -1572,7 +1572,7 @@ func (x *ToggleUserSubscribeStatusReply) GetMessage() string {
 
 type ResetUserSubscribeTrafficRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	UserSubscribeId int64                  `protobuf:"varint,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID
+	UserSubscribeId string                 `protobuf:"bytes,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1607,11 +1607,11 @@ func (*ResetUserSubscribeTrafficRequest) Descriptor() ([]byte, []int) {
 	return file_admin_user_v1_subscribe_proto_rawDescGZIP(), []int{27}
 }
 
-func (x *ResetUserSubscribeTrafficRequest) GetUserSubscribeId() int64 {
+func (x *ResetUserSubscribeTrafficRequest) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 type ResetUserSubscribeTrafficReply struct {
@@ -2009,7 +2009,7 @@ type UserSubscribeLog struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	UserId          string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	UserSubscribeId int64                  `protobuf:"varint,3,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
+	UserSubscribeId string                 `protobuf:"bytes,3,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
 	Token           string                 `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
 	Ip              string                 `protobuf:"bytes,5,opt,name=ip,proto3" json:"ip,omitempty"`
 	UserAgent       string                 `protobuf:"bytes,6,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
@@ -2062,11 +2062,11 @@ func (x *UserSubscribeLog) GetUserId() string {
 	return ""
 }
 
-func (x *UserSubscribeLog) GetUserSubscribeId() int64 {
+func (x *UserSubscribeLog) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 func (x *UserSubscribeLog) GetToken() string {
@@ -2102,7 +2102,7 @@ type ResetSubscribeTrafficLog struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Type            int32                  `protobuf:"varint,2,opt,name=type,proto3" json:"type,omitempty"` // 类型
-	UserSubscribeId int64                  `protobuf:"varint,3,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
+	UserSubscribeId string                 `protobuf:"bytes,3,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
 	OrderNo         string                 `protobuf:"bytes,4,opt,name=order_no,json=orderNo,proto3" json:"order_no,omitempty"` // 订单号（可选）
 	Timestamp       int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`           // Unix timestamp in seconds
 	unknownFields   protoimpl.UnknownFields
@@ -2153,11 +2153,11 @@ func (x *ResetSubscribeTrafficLog) GetType() int32 {
 	return 0
 }
 
-func (x *ResetSubscribeTrafficLog) GetUserSubscribeId() int64 {
+func (x *ResetSubscribeTrafficLog) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 func (x *ResetSubscribeTrafficLog) GetOrderNo() string {
@@ -2293,7 +2293,7 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"\xd8\x01\n" +
 	"\x1aUpdateUserSubscribeRequest\x12*\n" +
-	"\x11user_subscribe_id\x18\x01 \x01(\x03R\x0fuserSubscribeId\x12!\n" +
+	"\x11user_subscribe_id\x18\x01 \x01(\tR\x0fuserSubscribeId\x12!\n" +
 	"\fsubscribe_id\x18\x02 \x01(\tR\vsubscribeId\x12\x18\n" +
 	"\atraffic\x18\x03 \x01(\x03R\atraffic\x12\x1d\n" +
 	"\n" +
@@ -2304,7 +2304,7 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"H\n" +
 	"\x1aDeleteUserSubscribeRequest\x12*\n" +
-	"\x11user_subscribe_id\x18\x01 \x01(\x03R\x0fuserSubscribeId\"H\n" +
+	"\x11user_subscribe_id\x18\x01 \x01(\tR\x0fuserSubscribeId\"H\n" +
 	"\x18DeleteUserSubscribeReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"-\n" +
@@ -2341,7 +2341,7 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"'GetUserSubscribeResetTrafficLogsRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x05R\x04size\x12*\n" +
-	"\x11user_subscribe_id\x18\x03 \x01(\x03R\x0fuserSubscribeId\"}\n" +
+	"\x11user_subscribe_id\x18\x03 \x01(\tR\x0fuserSubscribeId\"}\n" +
 	"$GetUserSubscribeResetTrafficLogsData\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x03R\x05total\x12?\n" +
 	"\x04list\x18\x02 \x03(\v2+.api.admin.user.v1.ResetSubscribeTrafficLogR\x04list\"\xa2\x01\n" +
@@ -2365,17 +2365,17 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12F\n" +
 	"\x04data\x18\x03 \x01(\v22.api.admin.user.v1.GetUserSubscribeTrafficLogsDataR\x04data\"L\n" +
 	"\x1eResetUserSubscribeTokenRequest\x12*\n" +
-	"\x11user_subscribe_id\x18\x01 \x01(\x03R\x0fuserSubscribeId\"L\n" +
+	"\x11user_subscribe_id\x18\x01 \x01(\tR\x0fuserSubscribeId\"L\n" +
 	"\x1cResetUserSubscribeTokenReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"N\n" +
 	" ToggleUserSubscribeStatusRequest\x12*\n" +
-	"\x11user_subscribe_id\x18\x01 \x01(\x03R\x0fuserSubscribeId\"N\n" +
+	"\x11user_subscribe_id\x18\x01 \x01(\tR\x0fuserSubscribeId\"N\n" +
 	"\x1eToggleUserSubscribeStatusReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"N\n" +
 	" ResetUserSubscribeTrafficRequest\x12*\n" +
-	"\x11user_subscribe_id\x18\x01 \x01(\x03R\x0fuserSubscribeId\"N\n" +
+	"\x11user_subscribe_id\x18\x01 \x01(\tR\x0fuserSubscribeId\"N\n" +
 	"\x1eResetUserSubscribeTrafficReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"\xec\x03\n" +
@@ -2429,7 +2429,7 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\x10UserSubscribeLog\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12*\n" +
-	"\x11user_subscribe_id\x18\x03 \x01(\x03R\x0fuserSubscribeId\x12\x14\n" +
+	"\x11user_subscribe_id\x18\x03 \x01(\tR\x0fuserSubscribeId\x12\x14\n" +
 	"\x05token\x18\x04 \x01(\tR\x05token\x12\x0e\n" +
 	"\x02ip\x18\x05 \x01(\tR\x02ip\x12\x1d\n" +
 	"\n" +
@@ -2438,7 +2438,7 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\x18ResetSubscribeTrafficLog\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\x05R\x04type\x12*\n" +
-	"\x11user_subscribe_id\x18\x03 \x01(\x03R\x0fuserSubscribeId\x12\x19\n" +
+	"\x11user_subscribe_id\x18\x03 \x01(\tR\x0fuserSubscribeId\x12\x19\n" +
 	"\border_no\x18\x04 \x01(\tR\aorderNo\x12\x1c\n" +
 	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\"\xc7\x01\n" +
 	"\n" +

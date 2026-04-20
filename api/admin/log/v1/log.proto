@@ -405,13 +405,13 @@ message FilterResetSubscribeLogRequest {
   int32 page = 1;
   int32 size = 2;
   string date = 3;
-  int64 user_subscribe_id = 4;
+  string user_subscribe_id = 4;
 }
 
 message ResetSubscribeLog {
   int32 type = 1;
   string user_id = 2;
-  int64 user_subscribe_id = 3;
+  string user_subscribe_id = 3;
   string order_no = 4;
   int64 timestamp = 5;
 }
@@ -433,7 +433,7 @@ message FilterUserSubscribeTrafficLogRequest {
   int32 size = 2;
   string date = 3;
   string user_id = 4;
-  int64 user_subscribe_id = 5;
+  string user_subscribe_id = 5;
 }
 
 message UserSubscribeTrafficLog {
