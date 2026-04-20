@@ -407,7 +407,7 @@ func (x *GetServerUserListReply) GetUsers() []*ServerUser {
 // UserTraffic 用户流量信息
 type UserTraffic struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Sid           int64                  `protobuf:"varint,1,opt,name=sid,proto3" json:"sid,omitempty"`           // 订阅ID
+	Sid           string                 `protobuf:"bytes,1,opt,name=sid,proto3" json:"sid,omitempty"`            // 订阅ID
 	Upload        int64                  `protobuf:"varint,2,opt,name=upload,proto3" json:"upload,omitempty"`     // 上传流量
 	Download      int64                  `protobuf:"varint,3,opt,name=download,proto3" json:"download,omitempty"` // 下载流量
 	unknownFields protoimpl.UnknownFields
@@ -444,11 +444,11 @@ func (*UserTraffic) Descriptor() ([]byte, []int) {
 	return file_server_v1_server_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *UserTraffic) GetSid() int64 {
+func (x *UserTraffic) GetSid() string {
 	if x != nil {
 		return x.Sid
 	}
-	return 0
+	return ""
 }
 
 func (x *UserTraffic) GetUpload() int64 {
@@ -736,8 +736,8 @@ func (x *PushServerStatusReply) GetMessage() string {
 // OnlineUser 在线用户信息
 type OnlineUser struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Sid           int64                  `protobuf:"varint,1,opt,name=sid,proto3" json:"sid,omitempty"` // 订阅ID
-	Ip            string                 `protobuf:"bytes,2,opt,name=ip,proto3" json:"ip,omitempty"`    // IP地址
+	Sid           string                 `protobuf:"bytes,1,opt,name=sid,proto3" json:"sid,omitempty"` // 订阅ID
+	Ip            string                 `protobuf:"bytes,2,opt,name=ip,proto3" json:"ip,omitempty"`   // IP地址
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -772,11 +772,11 @@ func (*OnlineUser) Descriptor() ([]byte, []int) {
 	return file_server_v1_server_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *OnlineUser) GetSid() int64 {
+func (x *OnlineUser) GetSid() string {
 	if x != nil {
 		return x.Sid
 	}
-	return 0
+	return ""
 }
 
 func (x *OnlineUser) GetIp() string {
@@ -1292,7 +1292,7 @@ const file_server_v1_server_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12/\n" +
 	"\x05users\x18\x03 \x03(\v2\x19.api.server.v1.ServerUserR\x05users\"S\n" +
 	"\vUserTraffic\x12\x10\n" +
-	"\x03sid\x18\x01 \x01(\x03R\x03sid\x12\x16\n" +
+	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x16\n" +
 	"\x06upload\x18\x02 \x01(\x03R\x06upload\x12\x1a\n" +
 	"\bdownload\x18\x03 \x01(\x03R\bdownload\"\xa6\x01\n" +
 	"\x16PushUserTrafficRequest\x12\x1b\n" +
@@ -1319,7 +1319,7 @@ const file_server_v1_server_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\".\n" +
 	"\n" +
 	"OnlineUser\x12\x10\n" +
-	"\x03sid\x18\x01 \x01(\x03R\x03sid\x12\x0e\n" +
+	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x0e\n" +
 	"\x02ip\x18\x02 \x01(\tR\x02ip\"\xa1\x01\n" +
 	"\x16PushOnlineUsersRequest\x12\x1b\n" +
 	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1a\n" +
