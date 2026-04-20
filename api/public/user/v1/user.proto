@@ -235,7 +235,7 @@ message UserInfoData {
   int64 gift_amount = 7;
   int64 telegram = 8;
   string refer_code = 9;
-  int64 referer_id = 10;
+  string referer_id = 10;
   bool enable = 11;
   bool is_admin = 12;
   bool enable_balance_notify = 13;
@@ -520,7 +520,7 @@ message UserSubscribeLog {
 
 // ResetUserSubscribeTokenRequest 重置订阅令牌请求
 message ResetUserSubscribeTokenRequest {
-  int64 user_subscribe_id = 1;
+  string user_subscribe_id = 1;
 }
 
 // CommonReply 通用响应
