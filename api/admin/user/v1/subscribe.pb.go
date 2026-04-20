@@ -2178,7 +2178,7 @@ func (x *ResetSubscribeTrafficLog) GetTimestamp() int64 {
 type TrafficLog struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	ServerId      int64                  `protobuf:"varint,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	ServerId      string                 `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	SubscribeId   string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`
 	Download      int64                  `protobuf:"varint,5,opt,name=download,proto3" json:"download,omitempty"`
@@ -2225,11 +2225,11 @@ func (x *TrafficLog) GetId() string {
 	return ""
 }
 
-func (x *TrafficLog) GetServerId() int64 {
+func (x *TrafficLog) GetServerId() string {
 	if x != nil {
 		return x.ServerId
 	}
-	return 0
+	return ""
 }
 
 func (x *TrafficLog) GetUserId() string {
@@ -2444,7 +2444,7 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\n" +
 	"TrafficLog\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
-	"\tserver_id\x18\x02 \x01(\x03R\bserverId\x12\x17\n" +
+	"\tserver_id\x18\x02 \x01(\tR\bserverId\x12\x17\n" +
 	"\auser_id\x18\x03 \x01(\tR\x06userId\x12!\n" +
 	"\fsubscribe_id\x18\x04 \x01(\tR\vsubscribeId\x12\x1a\n" +
 	"\bdownload\x18\x05 \x01(\x03R\bdownload\x12\x16\n" +

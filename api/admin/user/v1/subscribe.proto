@@ -351,7 +351,7 @@ message ResetSubscribeTrafficLog {
 // TrafficLog 流量日志
 message TrafficLog {
   string id = 1;
-  int64 server_id = 2;
+  string  server_id = 2;
   string user_id = 3;
   string subscribe_id = 4;
   int64 download = 5;

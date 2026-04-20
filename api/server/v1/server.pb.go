@@ -25,7 +25,7 @@ const (
 // GetServerConfigRequest 获取服务器配置请求
 type GetServerConfigRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ServerId      int64                  `protobuf:"varint,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`   // 服务器ID
+	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`    // 服务器ID
 	Protocol      string                 `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"`                    // 协议类型
 	SecretKey     string                 `protobuf:"bytes,3,opt,name=secret_key,json=secretKey,proto3" json:"secret_key,omitempty"` // 密钥
 	unknownFields protoimpl.UnknownFields
@@ -62,11 +62,11 @@ func (*GetServerConfigRequest) Descriptor() ([]byte, []int) {
 	return file_server_v1_server_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetServerConfigRequest) GetServerId() int64 {
+func (x *GetServerConfigRequest) GetServerId() string {
 	if x != nil {
 		return x.ServerId
 	}
-	return 0
+	return ""
 }
 
 func (x *GetServerConfigRequest) GetProtocol() string {
@@ -216,7 +216,7 @@ func (x *GetServerConfigReply) GetConfig() map[string]string {
 // GetServerUserListRequest 获取用户列表请求
 type GetServerUserListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ServerId      int64                  `protobuf:"varint,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`   // 服务器ID
+	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`    // 服务器ID
 	Protocol      string                 `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"`                    // 协议类型
 	SecretKey     string                 `protobuf:"bytes,3,opt,name=secret_key,json=secretKey,proto3" json:"secret_key,omitempty"` // 密钥
 	unknownFields protoimpl.UnknownFields
@@ -253,11 +253,11 @@ func (*GetServerUserListRequest) Descriptor() ([]byte, []int) {
 	return file_server_v1_server_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *GetServerUserListRequest) GetServerId() int64 {
+func (x *GetServerUserListRequest) GetServerId() string {
 	if x != nil {
 		return x.ServerId
 	}
-	return 0
+	return ""
 }
 
 func (x *GetServerUserListRequest) GetProtocol() string {
@@ -468,7 +468,7 @@ func (x *UserTraffic) GetDownload() int64 {
 // PushUserTrafficRequest 推送用户流量请求
 type PushUserTrafficRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ServerId      int64                  `protobuf:"varint,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`   // 服务器ID
+	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`    // 服务器ID
 	Protocol      string                 `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"`                    // 协议类型
 	SecretKey     string                 `protobuf:"bytes,3,opt,name=secret_key,json=secretKey,proto3" json:"secret_key,omitempty"` // 密钥
 	Traffic       []*UserTraffic         `protobuf:"bytes,4,rep,name=traffic,proto3" json:"traffic,omitempty"`                      // 流量数据
@@ -506,11 +506,11 @@ func (*PushUserTrafficRequest) Descriptor() ([]byte, []int) {
 	return file_server_v1_server_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *PushUserTrafficRequest) GetServerId() int64 {
+func (x *PushUserTrafficRequest) GetServerId() string {
 	if x != nil {
 		return x.ServerId
 	}
-	return 0
+	return ""
 }
 
 func (x *PushUserTrafficRequest) GetProtocol() string {
@@ -590,7 +590,7 @@ func (x *PushUserTrafficReply) GetMessage() string {
 // PushServerStatusRequest 推送服务器状态请求
 type PushServerStatusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ServerId      int64                  `protobuf:"varint,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`    // 服务器ID
+	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`     // 服务器ID
 	Protocol      string                 `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"`                     // 协议类型
 	SecretKey     string                 `protobuf:"bytes,3,opt,name=secret_key,json=secretKey,proto3" json:"secret_key,omitempty"`  // 密钥
 	Cpu           float64                `protobuf:"fixed64,4,opt,name=cpu,proto3" json:"cpu,omitempty"`                             // CPU使用率
@@ -631,11 +631,11 @@ func (*PushServerStatusRequest) Descriptor() ([]byte, []int) {
 	return file_server_v1_server_proto_rawDescGZIP(), []int{9}
 }
 
-func (x *PushServerStatusRequest) GetServerId() int64 {
+func (x *PushServerStatusRequest) GetServerId() string {
 	if x != nil {
 		return x.ServerId
 	}
-	return 0
+	return ""
 }
 
 func (x *PushServerStatusRequest) GetProtocol() string {
@@ -789,7 +789,7 @@ func (x *OnlineUser) GetIp() string {
 // PushOnlineUsersRequest 推送在线用户请求
 type PushOnlineUsersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ServerId      int64                  `protobuf:"varint,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`   // 服务器ID
+	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`    // 服务器ID
 	Protocol      string                 `protobuf:"bytes,2,opt,name=protocol,proto3" json:"protocol,omitempty"`                    // 协议类型
 	SecretKey     string                 `protobuf:"bytes,3,opt,name=secret_key,json=secretKey,proto3" json:"secret_key,omitempty"` // 密钥
 	Users         []*OnlineUser          `protobuf:"bytes,4,rep,name=users,proto3" json:"users,omitempty"`                          // 在线用户列表
@@ -827,11 +827,11 @@ func (*PushOnlineUsersRequest) Descriptor() ([]byte, []int) {
 	return file_server_v1_server_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *PushOnlineUsersRequest) GetServerId() int64 {
+func (x *PushOnlineUsersRequest) GetServerId() string {
 	if x != nil {
 		return x.ServerId
 	}
-	return 0
+	return ""
 }
 
 func (x *PushOnlineUsersRequest) GetProtocol() string {
@@ -911,7 +911,7 @@ func (x *PushOnlineUsersReply) GetMessage() string {
 // QueryServerProtocolConfigRequest 查询服务器协议配置请求
 type QueryServerProtocolConfigRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ServerId      int64                  `protobuf:"varint,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`   // 服务器ID（路径参数）
+	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`    // 服务器ID（路径参数）
 	SecretKey     string                 `protobuf:"bytes,2,opt,name=secret_key,json=secretKey,proto3" json:"secret_key,omitempty"` // 密钥
 	Protocols     []string               `protobuf:"bytes,3,rep,name=protocols,proto3" json:"protocols,omitempty"`                  // 协议列表
 	unknownFields protoimpl.UnknownFields
@@ -948,11 +948,11 @@ func (*QueryServerProtocolConfigRequest) Descriptor() ([]byte, []int) {
 	return file_server_v1_server_proto_rawDescGZIP(), []int{14}
 }
 
-func (x *QueryServerProtocolConfigRequest) GetServerId() int64 {
+func (x *QueryServerProtocolConfigRequest) GetServerId() string {
 	if x != nil {
 		return x.ServerId
 	}
-	return 0
+	return ""
 }
 
 func (x *QueryServerProtocolConfigRequest) GetSecretKey() string {
@@ -1259,7 +1259,7 @@ const file_server_v1_server_proto_rawDesc = "" +
 	"\n" +
 	"\x16server/v1/server.proto\x12\rapi.server.v1\x1a\x1cgoogle/api/annotations.proto\"p\n" +
 	"\x16GetServerConfigRequest\x12\x1b\n" +
-	"\tserver_id\x18\x01 \x01(\x03R\bserverId\x12\x1a\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1a\n" +
 	"\bprotocol\x18\x02 \x01(\tR\bprotocol\x12\x1d\n" +
 	"\n" +
 	"secret_key\x18\x03 \x01(\tR\tsecretKey\"W\n" +
@@ -1276,7 +1276,7 @@ const file_server_v1_server_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"r\n" +
 	"\x18GetServerUserListRequest\x12\x1b\n" +
-	"\tserver_id\x18\x01 \x01(\x03R\bserverId\x12\x1a\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1a\n" +
 	"\bprotocol\x18\x02 \x01(\tR\bprotocol\x12\x1d\n" +
 	"\n" +
 	"secret_key\x18\x03 \x01(\tR\tsecretKey\"t\n" +
@@ -1296,7 +1296,7 @@ const file_server_v1_server_proto_rawDesc = "" +
 	"\x06upload\x18\x02 \x01(\x03R\x06upload\x12\x1a\n" +
 	"\bdownload\x18\x03 \x01(\x03R\bdownload\"\xa6\x01\n" +
 	"\x16PushUserTrafficRequest\x12\x1b\n" +
-	"\tserver_id\x18\x01 \x01(\x03R\bserverId\x12\x1a\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1a\n" +
 	"\bprotocol\x18\x02 \x01(\tR\bprotocol\x12\x1d\n" +
 	"\n" +
 	"secret_key\x18\x03 \x01(\tR\tsecretKey\x124\n" +
@@ -1305,7 +1305,7 @@ const file_server_v1_server_proto_rawDesc = "" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"\xc8\x01\n" +
 	"\x17PushServerStatusRequest\x12\x1b\n" +
-	"\tserver_id\x18\x01 \x01(\x03R\bserverId\x12\x1a\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1a\n" +
 	"\bprotocol\x18\x02 \x01(\tR\bprotocol\x12\x1d\n" +
 	"\n" +
 	"secret_key\x18\x03 \x01(\tR\tsecretKey\x12\x10\n" +
@@ -1322,7 +1322,7 @@ const file_server_v1_server_proto_rawDesc = "" +
 	"\x03sid\x18\x01 \x01(\x03R\x03sid\x12\x0e\n" +
 	"\x02ip\x18\x02 \x01(\tR\x02ip\"\xa1\x01\n" +
 	"\x16PushOnlineUsersRequest\x12\x1b\n" +
-	"\tserver_id\x18\x01 \x01(\x03R\bserverId\x12\x1a\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1a\n" +
 	"\bprotocol\x18\x02 \x01(\tR\bprotocol\x12\x1d\n" +
 	"\n" +
 	"secret_key\x18\x03 \x01(\tR\tsecretKey\x12/\n" +
@@ -1331,7 +1331,7 @@ const file_server_v1_server_proto_rawDesc = "" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"|\n" +
 	" QueryServerProtocolConfigRequest\x12\x1b\n" +
-	"\tserver_id\x18\x01 \x01(\x03R\bserverId\x12\x1d\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1d\n" +
 	"\n" +
 	"secret_key\x18\x02 \x01(\tR\tsecretKey\x12\x1c\n" +
 	"\tprotocols\x18\x03 \x03(\tR\tprotocols\"M\n" +

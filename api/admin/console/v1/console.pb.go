@@ -724,7 +724,7 @@ func (*QueryServerTotalDataRequest) Descriptor() ([]byte, []int) {
 
 type ServerTrafficData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ServerId      int64                  `protobuf:"varint,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Upload        int64                  `protobuf:"varint,3,opt,name=upload,proto3" json:"upload,omitempty"`
 	Download      int64                  `protobuf:"varint,4,opt,name=download,proto3" json:"download,omitempty"`
@@ -762,11 +762,11 @@ func (*ServerTrafficData) Descriptor() ([]byte, []int) {
 	return file_admin_console_v1_console_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *ServerTrafficData) GetServerId() int64 {
+func (x *ServerTrafficData) GetServerId() string {
 	if x != nil {
 		return x.ServerId
 	}
-	return 0
+	return ""
 }
 
 func (x *ServerTrafficData) GetName() string {
@@ -1090,7 +1090,7 @@ const file_admin_console_v1_console_proto_rawDesc = "" +
 	"\x04data\x18\x03 \x01(\v2&.api.admin.v1.QueryTicketWaitReplyDataR\x04data\"\x1d\n" +
 	"\x1bQueryServerTotalDataRequest\"x\n" +
 	"\x11ServerTrafficData\x12\x1b\n" +
-	"\tserver_id\x18\x01 \x01(\x03R\bserverId\x12\x12\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
 	"\x06upload\x18\x03 \x01(\x03R\x06upload\x12\x1a\n" +
 	"\bdownload\x18\x04 \x01(\x03R\bdownload\"W\n" +

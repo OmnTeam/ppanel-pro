@@ -63,7 +63,7 @@ service Server {
 
 // GetServerConfigRequest 获取服务器配置请求
 message GetServerConfigRequest {
-	int64 server_id = 1;      // 服务器ID
+	string  server_id = 1;      // 服务器ID
 	string protocol = 2;      // 协议类型
 	string secret_key = 3;    // 密钥
 }
@@ -89,7 +89,7 @@ message GetServerConfigReply {
 
 // GetServerUserListRequest 获取用户列表请求
 message GetServerUserListRequest {
-	int64 server_id = 1;      // 服务器ID
+	string  server_id = 1;      // 服务器ID
 	string protocol = 2;      // 协议类型
 	string secret_key = 3;    // 密钥
 }
@@ -122,7 +122,7 @@ message UserTraffic {
 
 // PushUserTrafficRequest 推送用户流量请求
 message PushUserTrafficRequest {
-	int64 server_id = 1;      // 服务器ID
+	string  server_id = 1;      // 服务器ID
 	string protocol = 2;      // 协议类型
 	string secret_key = 3;    // 密钥
 	repeated UserTraffic traffic = 4;  // 流量数据
@@ -140,7 +140,7 @@ message PushUserTrafficReply {
 
 // PushServerStatusRequest 推送服务器状态请求
 message PushServerStatusRequest {
-	int64 server_id = 1;      // 服务器ID
+	string  server_id = 1;      // 服务器ID
 	string protocol = 2;      // 协议类型
 	string secret_key = 3;    // 密钥
 	double cpu = 4;           // CPU使用率
@@ -167,7 +167,7 @@ message OnlineUser {
 
 // PushOnlineUsersRequest 推送在线用户请求
 message PushOnlineUsersRequest {
-	int64 server_id = 1;      // 服务器ID
+	string  server_id = 1;      // 服务器ID
 	string protocol = 2;      // 协议类型
 	string secret_key = 3;    // 密钥
 	repeated OnlineUser users = 4;  // 在线用户列表
@@ -185,7 +185,7 @@ message PushOnlineUsersReply {
 
 // QueryServerProtocolConfigRequest 查询服务器协议配置请求
 message QueryServerProtocolConfigRequest {
-	int64 server_id = 1;      // 服务器ID（路径参数）
+	string  server_id = 1;      // 服务器ID（路径参数）
 	string secret_key = 2;    // 密钥
 	repeated string protocols = 3;  // 协议列表
 }

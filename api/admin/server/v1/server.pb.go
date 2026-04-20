@@ -838,7 +838,7 @@ type Node struct {
 	Tags          []string               `protobuf:"bytes,4,rep,name=tags,proto3" json:"tags,omitempty"`
 	Port          uint32                 `protobuf:"varint,5,opt,name=port,proto3" json:"port,omitempty"` // Proto3 不支持 uint16，使用 uint32（值范围 0-65535，对应数据库 smallint32unsigned）
 	Address       string                 `protobuf:"bytes,6,opt,name=address,proto3" json:"address,omitempty"`
-	ServerId      int64                  `protobuf:"varint,7,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	ServerId      string                 `protobuf:"bytes,7,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	Protocol      string                 `protobuf:"bytes,8,opt,name=protocol,proto3" json:"protocol,omitempty"`
 	Enabled       *bool                  `protobuf:"varint,9,opt,name=enabled,proto3,oneof" json:"enabled,omitempty"` // 使用 optional 支持 null 和布尔值，与老项目兼容
 	Sort          int64                  `protobuf:"varint,10,opt,name=sort,proto3" json:"sort,omitempty"`
@@ -915,11 +915,11 @@ func (x *Node) GetAddress() string {
 	return ""
 }
 
-func (x *Node) GetServerId() int64 {
+func (x *Node) GetServerId() string {
 	if x != nil {
 		return x.ServerId
 	}
-	return 0
+	return ""
 }
 
 func (x *Node) GetProtocol() string {
@@ -1831,7 +1831,7 @@ type CreateNodeRequest struct {
 	Tags          []string               `protobuf:"bytes,2,rep,name=tags,proto3" json:"tags,omitempty"`
 	Port          uint32                 `protobuf:"varint,3,opt,name=port,proto3" json:"port,omitempty"` // Proto3 不支持 uint16，使用 uint32（值范围 0-65535）
 	Address       string                 `protobuf:"bytes,4,opt,name=address,proto3" json:"address,omitempty"`
-	ServerId      int64                  `protobuf:"varint,5,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	ServerId      string                 `protobuf:"bytes,5,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	Protocol      string                 `protobuf:"bytes,6,opt,name=protocol,proto3" json:"protocol,omitempty"`
 	Enabled       *bool                  `protobuf:"varint,7,opt,name=enabled,proto3,oneof" json:"enabled,omitempty"` // 使用 optional 支持 null 和布尔值，与老项目兼容
 	NodeGroupIds  []int64                `protobuf:"varint,8,rep,packed,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`
@@ -1897,11 +1897,11 @@ func (x *CreateNodeRequest) GetAddress() string {
 	return ""
 }
 
-func (x *CreateNodeRequest) GetServerId() int64 {
+func (x *CreateNodeRequest) GetServerId() string {
 	if x != nil {
 		return x.ServerId
 	}
-	return 0
+	return ""
 }
 
 func (x *CreateNodeRequest) GetProtocol() string {
@@ -2036,7 +2036,7 @@ type UpdateNodeRequest struct {
 	Tags          []string               `protobuf:"bytes,3,rep,name=tags,proto3" json:"tags,omitempty"`
 	Port          uint32                 `protobuf:"varint,4,opt,name=port,proto3" json:"port,omitempty"` // Proto3 不支持 uint16，使用 uint32（值范围 0-65535）
 	Address       string                 `protobuf:"bytes,5,opt,name=address,proto3" json:"address,omitempty"`
-	ServerId      int64                  `protobuf:"varint,6,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	ServerId      string                 `protobuf:"bytes,6,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	Protocol      string                 `protobuf:"bytes,7,opt,name=protocol,proto3" json:"protocol,omitempty"`
 	Enabled       *bool                  `protobuf:"varint,8,opt,name=enabled,proto3,oneof" json:"enabled,omitempty"` // 使用 optional 支持 null 和布尔值，与老项目兼容
 	NodeGroupIds  []int64                `protobuf:"varint,9,rep,packed,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`
@@ -2109,11 +2109,11 @@ func (x *UpdateNodeRequest) GetAddress() string {
 	return ""
 }
 
-func (x *UpdateNodeRequest) GetServerId() int64 {
+func (x *UpdateNodeRequest) GetServerId() string {
 	if x != nil {
 		return x.ServerId
 	}
-	return 0
+	return ""
 }
 
 func (x *UpdateNodeRequest) GetProtocol() string {
@@ -3399,7 +3399,7 @@ const file_admin_server_v1_server_proto_rawDesc = "" +
 	"\x04tags\x18\x04 \x03(\tR\x04tags\x12\x12\n" +
 	"\x04port\x18\x05 \x01(\rR\x04port\x12\x18\n" +
 	"\aaddress\x18\x06 \x01(\tR\aaddress\x12\x1b\n" +
-	"\tserver_id\x18\a \x01(\x03R\bserverId\x12\x1a\n" +
+	"\tserver_id\x18\a \x01(\tR\bserverId\x12\x1a\n" +
 	"\bprotocol\x18\b \x01(\tR\bprotocol\x12\x1d\n" +
 	"\aenabled\x18\t \x01(\bH\x00R\aenabled\x88\x01\x01\x12\x12\n" +
 	"\x04sort\x18\n" +
@@ -3471,7 +3471,7 @@ const file_admin_server_v1_server_proto_rawDesc = "" +
 	"\x04tags\x18\x02 \x03(\tR\x04tags\x12\x12\n" +
 	"\x04port\x18\x03 \x01(\rR\x04port\x12\x18\n" +
 	"\aaddress\x18\x04 \x01(\tR\aaddress\x12\x1b\n" +
-	"\tserver_id\x18\x05 \x01(\x03R\bserverId\x12\x1a\n" +
+	"\tserver_id\x18\x05 \x01(\tR\bserverId\x12\x1a\n" +
 	"\bprotocol\x18\x06 \x01(\tR\bprotocol\x12\x1d\n" +
 	"\aenabled\x18\a \x01(\bH\x00R\aenabled\x88\x01\x01\x12$\n" +
 	"\x0enode_group_ids\x18\b \x03(\x03R\fnodeGroupIdsB\n" +
@@ -3489,7 +3489,7 @@ const file_admin_server_v1_server_proto_rawDesc = "" +
 	"\x04tags\x18\x03 \x03(\tR\x04tags\x12\x12\n" +
 	"\x04port\x18\x04 \x01(\rR\x04port\x12\x18\n" +
 	"\aaddress\x18\x05 \x01(\tR\aaddress\x12\x1b\n" +
-	"\tserver_id\x18\x06 \x01(\x03R\bserverId\x12\x1a\n" +
+	"\tserver_id\x18\x06 \x01(\tR\bserverId\x12\x1a\n" +
 	"\bprotocol\x18\a \x01(\tR\bprotocol\x12\x1d\n" +
 	"\aenabled\x18\b \x01(\bH\x00R\aenabled\x88\x01\x01\x12$\n" +
 	"\x0enode_group_ids\x18\t \x03(\x03R\fnodeGroupIdsB\n" +
