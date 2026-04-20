@@ -44,10 +44,10 @@ func (s *UserSubscribeService) GetUserSubscribe(ctx context.Context, req *v1.Get
 	protoList := make([]*v1.UserSubscribe, 0, len(list))
 	for _, item := range list {
 		protoItem := &v1.UserSubscribe{
-			Id:          strconv.FormatInt(int64(item.ID), 10),
-			UserId:      strconv.FormatInt(int64(item.UserID), 10),
-			OrderId:     strconv.FormatInt(int64(item.OrderID), 10),
-			SubscribeId: strconv.FormatInt(int64(item.SubscribeID), 10),
+			Id:          strconv.FormatInt(item.ID, 10),
+			UserId:      strconv.FormatInt(item.UserID, 10),
+			OrderId:     strconv.FormatInt(item.OrderID, 10),
+			SubscribeId: strconv.FormatInt(item.SubscribeID, 10),
 			StartTime:   strconv.FormatInt(item.StartTime.UnixMilli(), 10),
 			CreatedAt:   strconv.FormatInt(item.CreatedAt.UnixMilli(), 10),
 			UpdatedAt:   strconv.FormatInt(item.UpdatedAt.UnixMilli(), 10),

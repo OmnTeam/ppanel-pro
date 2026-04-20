@@ -96,7 +96,7 @@ message GetServerUserListRequest {
 
 // ServerUser 服务器用户信息
 message ServerUser {
-	int64 id = 1;             // 用户ID
+	string id = 1;             // 用户ID
 	string uuid = 2;          // UUID
 	int64 speed_limit = 3;    // 速度限制
 	int64 device_limit = 4;   // 设备限制

@@ -62,7 +62,7 @@ message DownloadLink {
 
 // 订阅应用配置信息
 message SubscribeApplication {
-  int64 id = 1;
+  string id = 1;
   string name = 2;
   string icon = 3;
   string description = 4;
@@ -91,7 +91,7 @@ message CreateSubscribeApplicationRequest {
 
 // 更新订阅应用配置请求
 message UpdateSubscribeApplicationRequest {
-  int64 id = 1;
+  string id = 1;
   string name = 2;
   string icon = 3;
   string description = 4;
@@ -105,12 +105,12 @@ message UpdateSubscribeApplicationRequest {
 
 // 删除订阅应用配置请求
 message DeleteSubscribeApplicationRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 // 预览订阅模板请求
 message PreviewSubscribeTemplateRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 // 获取订阅应用配置列表请求

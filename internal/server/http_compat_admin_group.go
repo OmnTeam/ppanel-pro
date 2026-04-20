@@ -1,0 +1,1532 @@
+package server
+
+import (
+	"bytes"
+	"context"
+	"encoding/csv"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"sort"
+	"strconv"
+	"strings"
+	"time"
+
+	"entgo.io/ent/dialect/sql"
+	admingroupv1 "github.com/OmnTeam/ppanel-pro/api/admin/group/v1"
+	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/ppanel-pro/ent/proxygrouphistory"
+	"github.com/OmnTeam/ppanel-pro/ent/proxygrouphistorydetail"
+	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyservergroup"
+	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribe"
+	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
+	"github.com/OmnTeam/ppanel-pro/internal/data"
+	admingroupservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/group"
+	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	khttp "github.com/go-kratos/kratos/v2/transport/http"
+)
+
+type compatLegacyGetNodeGroupListRequest struct {
+	Page    int    `json:"page" form:"page"`
+	Size    int    `json:"size" form:"size"`
+	GroupID string `json:"group_id,omitempty" form:"group_id,omitempty"`
+}
+
+type compatLegacyCreateNodeGroupRequest struct {
+	Name                string `json:"name"`
+	Type                string `json:"type,omitempty"`
+	Description         string `json:"description"`
+	Sort                int    `json:"sort"`
+	ForCalculation      *bool  `json:"for_calculation"`
+	IsExpiredGroup      *bool  `json:"is_expired_group"`
+	ExpiredDaysLimit    *int   `json:"expired_days_limit"`
+	MaxTrafficGBExpired *int64 `json:"max_traffic_gb_expired,omitempty"`
+	SpeedLimit          *int   `json:"speed_limit"`
+	MinTrafficGB        *int64 `json:"min_traffic_gb,omitempty"`
+	MaxTrafficGB        *int64 `json:"max_traffic_gb,omitempty"`
+}
+
+type compatLegacyUpdateNodeGroupRequest struct {
+	ID                  string `json:"id"`
+	Name                string `json:"name"`
+	Type                string `json:"type,omitempty"`
+	Description         string `json:"description"`
+	Sort                int    `json:"sort"`
+	ForCalculation      *bool  `json:"for_calculation"`
+	IsExpiredGroup      *bool  `json:"is_expired_group"`
+	ExpiredDaysLimit    *int   `json:"expired_days_limit"`
+	MaxTrafficGBExpired *int64 `json:"max_traffic_gb_expired,omitempty"`
+	SpeedLimit          *int   `json:"speed_limit"`
+	MinTrafficGB        *int64 `json:"min_traffic_gb,omitempty"`
+	MaxTrafficGB        *int64 `json:"max_traffic_gb,omitempty"`
+}
+
+type compatLegacyPreviewUserNodesRequest struct {
+	UserID int64 `json:"user_id" form:"user_id"`
+}
+
+type compatLegacyDeleteNodeGroupRequest struct {
+	ID string `json:"id" form:"id"`
+}
+
+type compatLegacyGetGroupConfigResponse struct {
+	Enabled bool                           `json:"enabled"`
+	Mode    string                         `json:"mode"`
+	Config  map[string]interface{}         `json:"config"`
+	State   compatLegacyRecalculationState `json:"state"`
+}
+
+type compatLegacyUpdateGroupConfigRequest struct {
+	Enabled bool                   `json:"enabled"`
+	Mode    string                 `json:"mode"`
+	Config  map[string]interface{} `json:"config"`
+}
+
+type compatLegacyRecalculateGroupRequest struct {
+	Mode        string `json:"mode"`
+	TriggerType string `json:"trigger_type"`
+}
+
+type compatLegacyRecalculationState struct {
+	State    string `json:"state"`
+	Progress int    `json:"progress"`
+	Total    int    `json:"total"`
+}
+
+type compatLegacyGetGroupHistoryRequest struct {
+	Page        int    `json:"page" form:"page"`
+	Size        int    `json:"size" form:"size"`
+	GroupMode   string `json:"group_mode,omitempty" form:"group_mode,omitempty"`
+	TriggerType string `json:"trigger_type,omitempty" form:"trigger_type,omitempty"`
+}
+
+type compatLegacyGroupHistory struct {
+	ID           int64  `json:"id,string"`
+	GroupMode    string `json:"group_mode"`
+	TriggerType  string `json:"trigger_type"`
+	TotalUsers   int    `json:"total_users"`
+	SuccessCount int    `json:"success_count"`
+	FailedCount  int    `json:"failed_count"`
+	StartTime    *int64 `json:"start_time,omitempty"`
+	EndTime      *int64 `json:"end_time,omitempty"`
+	Operator     string `json:"operator,omitempty"`
+	ErrorLog     string `json:"error_log,omitempty"`
+	CreatedAt    int64  `json:"created_at"`
+}
+
+type compatLegacyGetGroupHistoryResponse struct {
+	Total int64                      `json:"total"`
+	List  []compatLegacyGroupHistory `json:"list"`
+}
+
+type compatLegacyGetGroupHistoryDetailRequest struct {
+	ID int64 `json:"id" form:"id"`
+}
+
+type compatLegacyGroupHistoryDetail struct {
+	compatLegacyGroupHistory
+	ConfigSnapshot map[string]interface{} `json:"config_snapshot,omitempty"`
+}
+
+type compatLegacyExportGroupResultRequest struct {
+	HistoryID *int64 `json:"history_id,omitempty" form:"history_id,omitempty"`
+}
+
+type compatLegacySubscribeGroupMappingItem struct {
+	SubscribeName string `json:"subscribe_name"`
+	NodeGroupName string `json:"node_group_name"`
+}
+
+type compatLegacyGetSubscribeGroupMappingResponse struct {
+	List []compatLegacySubscribeGroupMappingItem `json:"list"`
+}
+
+type compatLegacyNodeGroup struct {
+	ID                  int64  `json:"id,string"`
+	Name                string `json:"name"`
+	Type                string `json:"type,omitempty"`
+	Description         string `json:"description"`
+	Sort                int    `json:"sort"`
+	ForCalculation      bool   `json:"for_calculation"`
+	IsExpiredGroup      bool   `json:"is_expired_group"`
+	ExpiredDaysLimit    int    `json:"expired_days_limit"`
+	MaxTrafficGBExpired int64  `json:"max_traffic_gb_expired"`
+	SpeedLimit          int    `json:"speed_limit"`
+	MinTrafficGB        int64  `json:"min_traffic_gb"`
+	MaxTrafficGB        int64  `json:"max_traffic_gb"`
+	NodeCount           int64  `json:"node_count"`
+	CreatedAt           int64  `json:"created_at"`
+	UpdatedAt           int64  `json:"updated_at"`
+}
+
+type compatLegacyPreviewNode struct {
+	ID           int64    `json:"id,string"`
+	Name         string   `json:"name"`
+	Tags         []string `json:"tags"`
+	Port         uint16   `json:"port"`
+	Address      string   `json:"address"`
+	ServerID     int64    `json:"server_id,string"`
+	Protocol     string   `json:"protocol"`
+	Enabled      *bool    `json:"enabled"`
+	NodeType     string   `json:"node_type"`
+	IsHidden     *bool    `json:"is_hidden"`
+	Sort         int      `json:"sort,omitempty"`
+	NodeGroupID  int64    `json:"node_group_id,omitempty,string"`
+	NodeGroupIDs []string `json:"node_group_ids,omitempty"`
+	CreatedAt    int64    `json:"created_at"`
+	UpdatedAt    int64    `json:"updated_at"`
+}
+
+type compatLegacyPreviewNodeGroupItem struct {
+	ID    int64                     `json:"id,string"`
+	Name  string                    `json:"name"`
+	Nodes []compatLegacyPreviewNode `json:"nodes"`
+}
+
+type compatLegacyPreviewUserNodesResponse struct {
+	UserID     int64                              `json:"user_id,string"`
+	NodeGroups []compatLegacyPreviewNodeGroupItem `json:"node_groups"`
+}
+
+func registerLegacyAdminGroupCompatRoutes(r *khttp.Router, dataLayer *data.Data, adminGroup *admingroupservice.GroupService) {
+	if r == nil || dataLayer == nil || dataLayer.DB() == nil {
+		return
+	}
+
+	r.GET("/v1/admin/group/node/list", compatGetNodeGroupListHandler(dataLayer))
+	r.POST("/v1/admin/group/node", compatCreateNodeGroupHandler(dataLayer))
+	r.PUT("/v1/admin/group/node", compatUpdateNodeGroupHandler(dataLayer))
+	r.DELETE("/v1/admin/group/node", compatDeleteNodeGroupHandler(dataLayer))
+	r.GET("/v1/admin/group/config", compatGetGroupConfigHandler(dataLayer))
+	r.PUT("/v1/admin/group/config", compatUpdateGroupConfigHandler(dataLayer))
+	r.POST("/v1/admin/group/recalculate", compatRecalculateGroupHandler(dataLayer, adminGroup))
+	r.GET("/v1/admin/group/recalculation/status", compatGetRecalculationStatusHandler(dataLayer))
+	r.GET("/v1/admin/group/history", compatGetGroupHistoryHandler(dataLayer))
+	r.GET("/v1/admin/group/history/detail", compatGetGroupHistoryDetailHandler(dataLayer))
+	r.GET("/v1/admin/group/export", compatExportGroupResultHandler(dataLayer))
+	r.GET("/v1/admin/group/subscribe/mapping", compatGetSubscribeGroupMappingHandler(dataLayer))
+	r.GET("/v1/admin/group/preview", compatPreviewUserNodesHandler(dataLayer))
+	r.POST("/v1/admin/group/reset", compatResetGroupsHandler(dataLayer))
+}
+
+func compatGetNodeGroupListHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		var req compatLegacyGetNodeGroupListRequest
+		_ = ctx.BindQuery(&req)
+		compatFillLegacyNodeGroupListQuery(ctx, &req)
+		if req.Page <= 0 {
+			return compatJSONError(ctx, compatRequiredFieldError("GetNodeGroupListRequest", "Page"))
+		}
+		if req.Size <= 0 {
+			return compatJSONError(ctx, compatRequiredFieldError("GetNodeGroupListRequest", "Size"))
+		}
+
+		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			in := request.(*compatLegacyGetNodeGroupListRequest)
+			query := dataLayer.DB().ProxyServerGroup.Query()
+
+			if groupIDText := strings.TrimSpace(in.GroupID); groupIDText != "" {
+				groupID, parseErr := strconv.ParseInt(groupIDText, 10, 64)
+				if parseErr != nil {
+					return nil, compatParamError("invalid group_id")
+				}
+				query = query.Where(proxyservergroup.IDEQ(groupID))
+			}
+
+			total, err := query.Count(inner)
+			if err != nil {
+				return nil, err
+			}
+
+			offset := (in.Page - 1) * in.Size
+			items, err := query.
+				Order(ent.Asc(proxyservergroup.FieldSort), ent.Asc(proxyservergroup.FieldID)).
+				Offset(offset).
+				Limit(in.Size).
+				All(inner)
+			if err != nil {
+				return nil, err
+			}
+
+			list := make([]compatLegacyNodeGroup, 0, len(items))
+			for _, item := range items {
+				nodeCount, countErr := dataLayer.DB().ProxyNode.Query().
+					Where(func(s *sql.Selector) {
+						s.Where(sql.ExprP("JSON_CONTAINS(node_group_ids, ?)", fmt.Sprintf("[%d]", item.ID)))
+					}).
+					Count(inner)
+				if countErr != nil {
+					return nil, countErr
+				}
+				list = append(list, compatLegacyNodeGroupFromEntity(item, int64(nodeCount)))
+			}
+
+			return map[string]interface{}{
+				"total": int64(total),
+				"list":  list,
+			}, nil
+		})
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, out)
+	}
+}
+
+func compatCreateNodeGroupHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		var req compatLegacyCreateNodeGroupRequest
+		if err := ctx.Bind(&req); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if err := ctx.BindQuery(&req); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if err := compatValidateRequiredString(req.Name, "CreateNodeGroupRequest", "Name"); err != nil {
+			return compatJSONError(ctx, err)
+		}
+
+		if _, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			return nil, compatCreateLegacyNodeGroup(inner, dataLayer, request.(*compatLegacyCreateNodeGroupRequest))
+		}); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, nil)
+	}
+}
+
+func compatUpdateNodeGroupHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		var req compatLegacyUpdateNodeGroupRequest
+		if err := ctx.Bind(&req); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if err := ctx.BindQuery(&req); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if err := compatValidateRequiredString(req.ID, "UpdateNodeGroupRequest", "Id"); err != nil {
+			return compatJSONError(ctx, err)
+		}
+
+		if _, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			return nil, compatUpdateLegacyNodeGroup(inner, dataLayer, request.(*compatLegacyUpdateNodeGroupRequest))
+		}); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, nil)
+	}
+}
+
+func compatPreviewUserNodesHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		var req compatLegacyPreviewUserNodesRequest
+		_ = ctx.BindQuery(&req)
+		compatFillLegacyPreviewUserNodesQuery(ctx, &req)
+		if req.UserID == 0 {
+			return compatJSONError(ctx, compatRequiredFieldError("PreviewUserNodesRequest", "UserId"))
+		}
+
+		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			return compatBuildPreviewUserNodes(inner, dataLayer, request.(*compatLegacyPreviewUserNodesRequest).UserID)
+		})
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, out)
+	}
+}
+
+func compatDeleteNodeGroupHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		var req compatLegacyDeleteNodeGroupRequest
+		_ = ctx.Bind(&req)
+		_ = ctx.BindQuery(&req)
+		if err := compatValidateRequiredString(req.ID, "DeleteNodeGroupRequest", "Id"); err != nil {
+			return compatJSONError(ctx, err)
+		}
+
+		if _, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			in := request.(*compatLegacyDeleteNodeGroupRequest)
+			return nil, compatDeleteLegacyNodeGroup(inner, dataLayer, in.ID)
+		}); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, nil)
+	}
+}
+
+func compatGetGroupConfigHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		out, err := compatMiddleware(ctx, nil, func(inner context.Context, request interface{}) (interface{}, error) {
+			return compatLoadLegacyGroupConfig(inner, dataLayer)
+		})
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, out)
+	}
+}
+
+func compatUpdateGroupConfigHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		var req compatLegacyUpdateGroupConfigRequest
+		_ = ctx.Bind(&req)
+		_ = ctx.BindQuery(&req)
+
+		if _, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			return nil, compatUpdateLegacyGroupConfig(inner, dataLayer, request.(*compatLegacyUpdateGroupConfigRequest))
+		}); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, nil)
+	}
+}
+
+func compatRecalculateGroupHandler(_ *data.Data, adminGroup *admingroupservice.GroupService) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		var req compatLegacyRecalculateGroupRequest
+		_ = ctx.Bind(&req)
+		_ = ctx.BindQuery(&req)
+		if err := compatValidateRequiredString(req.Mode, "RecalculateGroupRequest", "Mode"); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if adminGroup == nil {
+			return compatJSONError(ctx, compatCodeError(500, "group service unavailable"))
+		}
+
+		if _, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			in := request.(*compatLegacyRecalculateGroupRequest)
+			_, callErr := adminGroup.RecalculateGroup(inner, &admingroupv1.RecalculateGroupRequest{
+				Mode:        in.Mode,
+				TriggerType: in.TriggerType,
+			})
+			return nil, callErr
+		}); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, nil)
+	}
+}
+
+func compatGetRecalculationStatusHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		out, err := compatMiddleware(ctx, nil, func(inner context.Context, request interface{}) (interface{}, error) {
+			return compatGetLegacyRecalculationState(inner, dataLayer)
+		})
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, out)
+	}
+}
+
+func compatGetGroupHistoryHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		var req compatLegacyGetGroupHistoryRequest
+		_ = ctx.BindQuery(&req)
+		if req.Page <= 0 {
+			req.Page = 1
+		}
+		if req.Size <= 0 {
+			req.Size = 10
+		}
+
+		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			return compatGetLegacyGroupHistory(inner, dataLayer, request.(*compatLegacyGetGroupHistoryRequest))
+		})
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, out)
+	}
+}
+
+func compatGetGroupHistoryDetailHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		var req compatLegacyGetGroupHistoryDetailRequest
+		_ = ctx.BindQuery(&req)
+		if req.ID <= 0 {
+			return compatJSONError(ctx, compatRequiredFieldError("GetGroupHistoryDetailRequest", "Id"))
+		}
+
+		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			return compatGetLegacyGroupHistoryDetail(inner, dataLayer, request.(*compatLegacyGetGroupHistoryDetailRequest).ID)
+		})
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, out)
+	}
+}
+
+func compatExportGroupResultHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		var req compatLegacyExportGroupResultRequest
+		_ = ctx.BindQuery(&req)
+
+		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
+			in := request.(*compatLegacyExportGroupResultRequest)
+			data, filename, exportErr := compatExportLegacyGroupResult(inner, dataLayer, in)
+			if exportErr != nil {
+				return nil, exportErr
+			}
+			return map[string]interface{}{
+				"filename": filename,
+				"content":  data,
+			}, nil
+		})
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+
+		payload, _ := out.(map[string]interface{})
+		filename, _ := payload["filename"].(string)
+		content, _ := payload["content"].([]byte)
+
+		ctx.Response().Header().Set("Content-Type", "text/csv")
+		ctx.Response().Header().Set("Content-Disposition", "attachment; filename="+filename)
+		ctx.Response().WriteHeader(http.StatusOK)
+		_, _ = ctx.Response().Write(content)
+		return nil
+	}
+}
+
+func compatGetSubscribeGroupMappingHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		out, err := compatMiddleware(ctx, nil, func(inner context.Context, request interface{}) (interface{}, error) {
+			return compatGetLegacySubscribeGroupMapping(inner, dataLayer)
+		})
+		if err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, out)
+	}
+}
+
+func compatResetGroupsHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
+	return func(ctx khttp.Context) error {
+		if _, err := compatMiddleware(ctx, nil, func(inner context.Context, request interface{}) (interface{}, error) {
+			return nil, compatResetLegacyGroups(inner, dataLayer)
+		}); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		return compatJSON(ctx, nil)
+	}
+}
+
+func compatDeleteLegacyNodeGroup(ctx context.Context, dataLayer *data.Data, rawID string) error {
+	groupID, err := strconv.ParseInt(strings.TrimSpace(rawID), 10, 64)
+	if err != nil || groupID <= 0 {
+		return compatParamError("invalid id")
+	}
+
+	_, err = dataLayer.DB().ProxyServerGroup.Query().
+		Where(proxyservergroup.IDEQ(groupID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return compatCodeError(500, "node group not found")
+		}
+		return compatCodeError(500, err.Error())
+	}
+
+	nodeCount, err := dataLayer.DB().ProxyNode.Query().
+		Where(func(s *sql.Selector) {
+			s.Where(sql.ExprP("JSON_CONTAINS(node_group_ids, ?)", fmt.Sprintf("[%d]", groupID)))
+		}).
+		Count(ctx)
+	if err != nil {
+		return compatCodeError(500, err.Error())
+	}
+	if nodeCount > 0 {
+		return compatCodeError(500, fmt.Sprintf("cannot delete group with %d associated nodes, please migrate nodes first", nodeCount))
+	}
+
+	_, err = dataLayer.DB().ProxyServerGroup.Delete().
+		Where(proxyservergroup.IDEQ(groupID)).
+		Exec(ctx)
+	if err != nil {
+		return compatCodeError(500, err.Error())
+	}
+	return nil
+}
+
+func compatLoadLegacyGroupConfig(ctx context.Context, dataLayer *data.Data) (*compatLegacyGetGroupConfigResponse, error) {
+	config := make(map[string]interface{})
+
+	enabledValue, _ := compatSystemValue(ctx, dataLayer, "group", "enabled")
+	modeValue, _ := compatSystemValue(ctx, dataLayer, "group", "mode")
+	if strings.TrimSpace(modeValue) == "" {
+		modeValue = "average"
+	}
+
+	for _, key := range []string{"average_config", "subscribe_config", "traffic_config"} {
+		raw, err := compatSystemValue(ctx, dataLayer, "group", key)
+		if err != nil || strings.TrimSpace(raw) == "" {
+			continue
+		}
+		var parsed map[string]interface{}
+		if json.Unmarshal([]byte(raw), &parsed) == nil {
+			config[key] = parsed
+		}
+	}
+
+	state, err := compatGetLegacyRecalculationState(ctx, dataLayer)
+	if err != nil {
+		state = &compatLegacyRecalculationState{
+			State:    "idle",
+			Progress: 0,
+			Total:    0,
+		}
+	}
+
+	return &compatLegacyGetGroupConfigResponse{
+		Enabled: enabledValue == "true" || enabledValue == "1",
+		Mode:    modeValue,
+		Config:  config,
+		State:   *state,
+	}, nil
+}
+
+func compatUpdateLegacyGroupConfig(ctx context.Context, dataLayer *data.Data, req *compatLegacyUpdateGroupConfigRequest) error {
+	if req == nil {
+		return compatParamError("invalid request")
+	}
+	if req.Mode != "" && req.Mode != "average" && req.Mode != "subscribe" && req.Mode != "traffic" {
+		return compatCodeError(500, "invalid mode, must be one of: average, subscribe, traffic")
+	}
+
+	tx, err := dataLayer.DB().Tx(ctx)
+	if err != nil {
+		return compatCodeError(500, err.Error())
+	}
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+
+	enabledValue := "false"
+	if req.Enabled {
+		enabledValue = "true"
+	}
+	if err = compatUpsertLegacyGroupConfig(ctx, tx, "enabled", enabledValue, "Group Feature Enabled"); err != nil {
+		return compatCodeError(500, err.Error())
+	}
+	if req.Mode != "" {
+		if err = compatUpsertLegacyGroupConfig(ctx, tx, "mode", req.Mode, "Group Mode"); err != nil {
+			return compatCodeError(500, err.Error())
+		}
+	}
+
+	for _, key := range []string{"average_config", "subscribe_config", "traffic_config"} {
+		if value, ok := req.Config[key]; ok {
+			jsonBytes, marshalErr := json.Marshal(value)
+			if marshalErr != nil {
+				return compatCodeError(500, marshalErr.Error())
+			}
+			desc := map[string]string{
+				"average_config":   "Average Group Config",
+				"subscribe_config": "Subscribe Group Config",
+				"traffic_config":   "Traffic Group Config",
+			}[key]
+			if err = compatUpsertLegacyGroupConfig(ctx, tx, key, string(jsonBytes), desc); err != nil {
+				return compatCodeError(500, err.Error())
+			}
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return compatCodeError(500, err.Error())
+	}
+	return nil
+}
+
+func compatUpsertLegacyGroupConfig(ctx context.Context, tx *ent.Tx, key, value, desc string) error {
+	item, err := tx.ProxySystem.Query().
+		Where(
+			proxysystem.CategoryEQ("group"),
+			proxysystem.KeyEQ(key),
+		).
+		First(ctx)
+	if err == nil {
+		return tx.ProxySystem.UpdateOneID(item.ID).
+			SetValue(value).
+			SetDesc(desc).
+			SetUpdatedAt(time.Now()).
+			Exec(ctx)
+	}
+	if !ent.IsNotFound(err) {
+		return err
+	}
+	_, err = tx.ProxySystem.Create().
+		SetCategory("group").
+		SetKey(key).
+		SetValue(value).
+		SetDesc(desc).
+		SetCreatedAt(time.Now()).
+		SetUpdatedAt(time.Now()).
+		Save(ctx)
+	return err
+}
+
+func compatGetLegacyRecalculationState(ctx context.Context, dataLayer *data.Data) (*compatLegacyRecalculationState, error) {
+	history, err := dataLayer.DB().ProxyGroupHistory.Query().
+		Order(ent.Desc(proxygrouphistory.FieldID)).
+		First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return &compatLegacyRecalculationState{State: "idle", Progress: 0, Total: 0}, nil
+		}
+		return nil, err
+	}
+
+	return &compatLegacyRecalculationState{
+		State:    history.State,
+		Progress: history.SuccessCount + history.FailedCount,
+		Total:    history.TotalUsers,
+	}, nil
+}
+
+func compatGetLegacyGroupHistory(ctx context.Context, dataLayer *data.Data, req *compatLegacyGetGroupHistoryRequest) (*compatLegacyGetGroupHistoryResponse, error) {
+	query := dataLayer.DB().ProxyGroupHistory.Query()
+	if strings.TrimSpace(req.GroupMode) != "" {
+		query = query.Where(proxygrouphistory.GroupModeEQ(req.GroupMode))
+	}
+	if strings.TrimSpace(req.TriggerType) != "" {
+		query = query.Where(proxygrouphistory.TriggerTypeEQ(req.TriggerType))
+	}
+
+	total, err := query.Count(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	items, err := query.
+		Order(ent.Desc(proxygrouphistory.FieldID)).
+		Offset((req.Page - 1) * req.Size).
+		Limit(req.Size).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]compatLegacyGroupHistory, 0, len(items))
+	for _, item := range items {
+		list = append(list, compatLegacyGroupHistoryFromEntity(item))
+	}
+
+	return &compatLegacyGetGroupHistoryResponse{
+		Total: int64(total),
+		List:  list,
+	}, nil
+}
+
+func compatGetLegacyGroupHistoryDetail(ctx context.Context, dataLayer *data.Data, historyID int64) (*compatLegacyGroupHistoryDetail, error) {
+	history, err := dataLayer.DB().ProxyGroupHistory.Query().
+		Where(proxygrouphistory.IDEQ(historyID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, compatCodeError(500, "group history not found")
+		}
+		return nil, err
+	}
+
+	detail := &compatLegacyGroupHistoryDetail{
+		compatLegacyGroupHistory: compatLegacyGroupHistoryFromEntity(history),
+	}
+
+	items, err := dataLayer.DB().ProxyGroupHistoryDetail.Query().
+		Where(proxygrouphistorydetail.HistoryIDEQ(historyID)).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(items) > 0 {
+		configSnapshot := map[string]interface{}{
+			"group_details": items,
+		}
+
+		configKey := ""
+		switch history.GroupMode {
+		case "average":
+			configKey = "average_config"
+		case "traffic":
+			configKey = "traffic_config"
+		case "subscribe":
+			configKey = "subscribe_config"
+		}
+		if configKey != "" {
+			if raw, cfgErr := compatSystemValue(ctx, dataLayer, "group", configKey); cfgErr == nil && strings.TrimSpace(raw) != "" {
+				var cfg map[string]interface{}
+				if json.Unmarshal([]byte(raw), &cfg) == nil {
+					configSnapshot["config"] = cfg
+				}
+			}
+		}
+
+		detail.ConfigSnapshot = configSnapshot
+	}
+
+	return detail, nil
+}
+
+func compatExportLegacyGroupResult(ctx context.Context, dataLayer *data.Data, req *compatLegacyExportGroupResultRequest) ([]byte, string, error) {
+	records := [][]string{{"用户ID", "节点组ID", "节点组名称"}}
+
+	if req.HistoryID != nil {
+		items, err := dataLayer.DB().ProxyGroupHistoryDetail.Query().
+			Where(proxygrouphistorydetail.HistoryIDEQ(*req.HistoryID)).
+			All(ctx)
+		if err != nil {
+			return nil, "", err
+		}
+
+		for _, item := range items {
+			groupName := ""
+			groupInfo, err := dataLayer.DB().ProxyServerGroup.Query().
+				Where(proxyservergroup.IDEQ(item.NodeGroupID)).
+				Only(ctx)
+			if err == nil {
+				groupName = groupInfo.Name
+			}
+
+			var users []map[string]interface{}
+			if json.Unmarshal([]byte(item.UserData), &users) != nil {
+				continue
+			}
+
+			for _, user := range users {
+				userID := fmt.Sprintf("%v", user["id"])
+				records = append(records, []string{
+					userID,
+					strconv.FormatInt(item.NodeGroupID, 10),
+					groupName,
+				})
+			}
+		}
+	} else {
+		items, err := dataLayer.DB().ProxyUserSubscribe.Query().
+			Where(proxyusersubscribe.NodeGroupIDGT(0)).
+			All(ctx)
+		if err != nil {
+			return nil, "", err
+		}
+
+		type record struct {
+			userID      int64
+			nodeGroupID int64
+		}
+		seen := make(map[string]struct{})
+		uniq := make([]record, 0, len(items))
+		for _, item := range items {
+			key := fmt.Sprintf("%d:%d", item.UserID, item.NodeGroupID)
+			if _, ok := seen[key]; ok {
+				continue
+			}
+			seen[key] = struct{}{}
+			uniq = append(uniq, record{userID: item.UserID, nodeGroupID: item.NodeGroupID})
+		}
+
+		for _, item := range uniq {
+			groupName := ""
+			groupInfo, err := dataLayer.DB().ProxyServerGroup.Query().
+				Where(proxyservergroup.IDEQ(item.nodeGroupID)).
+				Only(ctx)
+			if err == nil {
+				groupName = groupInfo.Name
+			}
+			records = append(records, []string{
+				strconv.FormatInt(item.userID, 10),
+				strconv.FormatInt(item.nodeGroupID, 10),
+				groupName,
+			})
+		}
+	}
+
+	var buf bytes.Buffer
+	writer := csv.NewWriter(&buf)
+	writer.WriteAll(records)
+	writer.Flush()
+	if err := writer.Error(); err != nil {
+		return nil, "", err
+	}
+
+	bom := []byte{0xEF, 0xBB, 0xBF}
+	content := append(append([]byte{}, bom...), buf.Bytes()...)
+	filename := fmt.Sprintf("group_result_%d.csv", req.HistoryID)
+	return content, filename, nil
+}
+
+func compatGetLegacySubscribeGroupMapping(ctx context.Context, dataLayer *data.Data) (*compatLegacyGetSubscribeGroupMappingResponse, error) {
+	subscribes, err := dataLayer.DB().ProxySubscribe.Query().
+		Order(ent.Asc(proxysubscribe.FieldID)).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	groups, err := dataLayer.DB().ProxyServerGroup.Query().All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	groupMap := make(map[int64]string, len(groups))
+	for _, item := range groups {
+		groupMap[item.ID] = item.Name
+	}
+
+	resp := &compatLegacyGetSubscribeGroupMappingResponse{
+		List: make([]compatLegacySubscribeGroupMappingItem, 0, len(subscribes)),
+	}
+	for _, sub := range subscribes {
+		nodeGroupName := ""
+		if len(sub.NodeGroupIds) > 0 {
+			nodeGroupName = groupMap[sub.NodeGroupIds[0]]
+		}
+		resp.List = append(resp.List, compatLegacySubscribeGroupMappingItem{
+			SubscribeName: sub.Name,
+			NodeGroupName: nodeGroupName,
+		})
+	}
+	return resp, nil
+}
+
+func compatCreateLegacyNodeGroup(ctx context.Context, dataLayer *data.Data, req *compatLegacyCreateNodeGroupRequest) error {
+	if req == nil {
+		return compatParamError("invalid request")
+	}
+
+	groupType := strings.TrimSpace(req.Type)
+	if groupType == "" {
+		groupType = "common"
+	}
+
+	isExpired := req.IsExpiredGroup != nil && *req.IsExpiredGroup
+	if isExpired {
+		count, err := dataLayer.DB().ProxyServerGroup.Query().
+			Where(proxyservergroup.IsExpiredGroupEQ(true)).
+			Count(ctx)
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			return compatCodeError(400, "system already has an expired node group, cannot create multiple")
+		}
+	}
+
+	forCalculation := true
+	if req.ForCalculation != nil {
+		forCalculation = *req.ForCalculation
+	}
+	if isExpired {
+		forCalculation = false
+	}
+
+	expiredDaysLimit := 0
+	if req.ExpiredDaysLimit != nil {
+		expiredDaysLimit = *req.ExpiredDaysLimit
+	} else if isExpired {
+		expiredDaysLimit = 7
+	}
+
+	builder := dataLayer.DB().ProxyServerGroup.Create().
+		SetName(req.Name).
+		SetGroupType(groupType).
+		SetDescription(req.Description).
+		SetSort(req.Sort).
+		SetForCalculation(forCalculation).
+		SetIsExpiredGroup(isExpired).
+		SetExpiredDaysLimit(expiredDaysLimit).
+		SetCreatedAt(time.Now()).
+		SetUpdatedAt(time.Now())
+
+	if req.SpeedLimit != nil {
+		builder = builder.SetSpeedLimit(*req.SpeedLimit)
+	}
+	if req.MaxTrafficGBExpired != nil {
+		builder = builder.SetMaxTrafficGBExpired(*req.MaxTrafficGBExpired)
+	}
+	if req.MinTrafficGB != nil {
+		builder = builder.SetMinTrafficGB(*req.MinTrafficGB)
+	}
+	if req.MaxTrafficGB != nil {
+		builder = builder.SetMaxTrafficGB(*req.MaxTrafficGB)
+	}
+
+	_, err := builder.Save(ctx)
+	return err
+}
+
+func compatResetLegacyGroups(ctx context.Context, dataLayer *data.Data) error {
+	tx, err := dataLayer.DB().Tx(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			_ = tx.Rollback()
+		}
+	}()
+
+	if _, err = tx.ProxyServerGroup.Delete().Exec(ctx); err != nil {
+		return err
+	}
+	if err = tx.ProxySubscribe.Update().
+		SetNodeGroupIds([]int64{}).
+		ClearNodeGroupID().
+		Exec(ctx); err != nil {
+		return err
+	}
+	if err = tx.ProxyNode.Update().
+		SetNodeGroupIds([]int64{}).
+		Exec(ctx); err != nil {
+		return err
+	}
+	if err = tx.ProxyUserSubscribe.Update().
+		SetNodeGroupID(0).
+		Exec(ctx); err != nil {
+		return err
+	}
+	if _, err = tx.ProxyGroupHistoryDetail.Delete().Exec(ctx); err != nil {
+		return err
+	}
+	if _, err = tx.ProxyGroupHistory.Delete().Exec(ctx); err != nil {
+		return err
+	}
+	if _, err = tx.ProxySystem.Delete().
+		Where(proxysystem.CategoryEQ("group")).
+		Exec(ctx); err != nil {
+		return err
+	}
+
+	return tx.Commit()
+}
+
+func compatUpdateLegacyNodeGroup(ctx context.Context, dataLayer *data.Data, req *compatLegacyUpdateNodeGroupRequest) error {
+	if req == nil {
+		return compatParamError("invalid request")
+	}
+
+	groupID, err := strconv.ParseInt(strings.TrimSpace(req.ID), 10, 64)
+	if err != nil || groupID <= 0 {
+		return compatParamError("invalid id")
+	}
+
+	current, err := dataLayer.DB().ProxyServerGroup.Query().
+		Where(proxyservergroup.IDEQ(groupID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return compatCodeError(400, "node group not found")
+		}
+		return err
+	}
+
+	if req.IsExpiredGroup != nil && *req.IsExpiredGroup {
+		count, err := dataLayer.DB().ProxyServerGroup.Query().
+			Where(
+				proxyservergroup.IsExpiredGroupEQ(true),
+				proxyservergroup.IDNEQ(groupID),
+			).
+			Count(ctx)
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			return compatCodeError(400, "system already has an expired node group, cannot create multiple")
+		}
+
+		subscribeCount, err := dataLayer.DB().ProxySubscribe.Query().
+			Where(proxysubscribe.NodeGroupIDEQ(groupID)).
+			Count(ctx)
+		if err != nil {
+			return err
+		}
+		if subscribeCount > 0 {
+			return compatCodeError(400, "this node group is used as default node group in subscription products, cannot set as expired group")
+		}
+	}
+
+	newMin := current.MinTrafficGB
+	newMax := current.MaxTrafficGB
+	if req.MinTrafficGB != nil {
+		newMin = req.MinTrafficGB
+	}
+	if req.MaxTrafficGB != nil {
+		newMax = req.MaxTrafficGB
+	}
+	if err := compatValidateLegacyNodeGroupTrafficRange(ctx, dataLayer, groupID, newMin, newMax); err != nil {
+		return err
+	}
+
+	update := dataLayer.DB().ProxyServerGroup.UpdateOneID(groupID).
+		SetUpdatedAt(time.Now())
+
+	if req.Name != "" {
+		update = update.SetName(req.Name)
+	}
+	if req.Description != "" {
+		update = update.SetDescription(req.Description)
+	}
+	if req.Type != "" {
+		update = update.SetGroupType(req.Type)
+	}
+	if req.Sort != 0 {
+		update = update.SetSort(req.Sort)
+	}
+	if req.ForCalculation != nil {
+		update = update.SetForCalculation(*req.ForCalculation)
+	}
+	if req.IsExpiredGroup != nil {
+		update = update.SetIsExpiredGroup(*req.IsExpiredGroup)
+		if *req.IsExpiredGroup {
+			update = update.SetForCalculation(false)
+		}
+	}
+	if req.ExpiredDaysLimit != nil {
+		update = update.SetExpiredDaysLimit(*req.ExpiredDaysLimit)
+	}
+	if req.MaxTrafficGBExpired != nil {
+		update = update.SetMaxTrafficGBExpired(*req.MaxTrafficGBExpired)
+	}
+	if req.SpeedLimit != nil {
+		update = update.SetSpeedLimit(*req.SpeedLimit)
+	}
+	if req.MinTrafficGB != nil {
+		update = update.SetMinTrafficGB(*req.MinTrafficGB)
+	}
+	if req.MaxTrafficGB != nil {
+		update = update.SetMaxTrafficGB(*req.MaxTrafficGB)
+	}
+
+	return update.Exec(ctx)
+}
+
+func compatValidateLegacyNodeGroupTrafficRange(ctx context.Context, dataLayer *data.Data, currentGroupID int64, newMin, newMax *int64) error {
+	minVal := int64(0)
+	maxVal := int64(0)
+	if newMin != nil {
+		minVal = *newMin
+	}
+	if newMax != nil {
+		maxVal = *newMax
+	}
+
+	if minVal > maxVal && maxVal > 0 {
+		return compatCodeError(400, "minimum traffic cannot exceed maximum traffic")
+	}
+	if minVal == 0 && maxVal == 0 {
+		return nil
+	}
+
+	items, err := dataLayer.DB().ProxyServerGroup.Query().
+		Where(
+			proxyservergroup.IDNEQ(currentGroupID),
+			proxyservergroup.Or(
+				proxyservergroup.MinTrafficGBGT(0),
+				proxyservergroup.MaxTrafficGBGT(0),
+			),
+		).
+		All(ctx)
+	if err != nil {
+		return err
+	}
+
+	for _, item := range items {
+		otherMin := compatInt64Value(item.MinTrafficGB)
+		otherMax := compatInt64Value(item.MaxTrafficGB)
+		if otherMin == 0 && otherMax == 0 {
+			continue
+		}
+		if !(maxVal <= otherMin || (otherMax > 0 && minVal >= otherMax)) {
+			return compatCodeError(400, "traffic range overlaps with another node group")
+		}
+	}
+	return nil
+}
+
+func compatBuildPreviewUserNodes(ctx context.Context, dataLayer *data.Data, userID int64) (*compatLegacyPreviewUserNodesResponse, error) {
+	userSubs, err := dataLayer.DB().ProxyUserSubscribe.Query().
+		Where(
+			proxyusersubscribe.UserIDEQ(userID),
+			proxyusersubscribe.StatusIn(0, 1),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &compatLegacyPreviewUserNodesResponse{
+		UserID:     userID,
+		NodeGroups: []compatLegacyPreviewNodeGroupItem{},
+	}
+	if len(userSubs) == 0 {
+		return resp, nil
+	}
+
+	subscribeIDs := make([]int64, 0, len(userSubs))
+	for _, item := range userSubs {
+		subscribeIDs = append(subscribeIDs, item.SubscribeID)
+	}
+	subscribeIDs = compatUniqueInt64(subscribeIDs)
+
+	subscribes, err := dataLayer.DB().ProxySubscribe.Query().
+		Where(proxysubscribe.IDIn(subscribeIDs...)).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	subscribeMap := make(map[int64]*ent.ProxySubscribe, len(subscribes))
+	for _, item := range subscribes {
+		subscribeMap[item.ID] = item
+	}
+
+	var allNodeGroupIDs []int64
+	var allDirectNodeIDs []int64
+	var allTags []string
+
+	for _, userSub := range userSubs {
+		groupID := int64(0)
+		if userSub.NodeGroupID > 0 {
+			groupID = userSub.NodeGroupID
+		} else if sub := subscribeMap[userSub.SubscribeID]; sub != nil {
+			if sub.NodeGroupID != nil && *sub.NodeGroupID > 0 {
+				groupID = *sub.NodeGroupID
+			} else if len(sub.NodeGroupIds) > 0 {
+				groupID = sub.NodeGroupIds[0]
+			}
+
+			for _, rawID := range strings.Split(strings.TrimSpace(sub.Nodes), ",") {
+				rawID = strings.TrimSpace(rawID)
+				if rawID == "" {
+					continue
+				}
+				nodeID, parseErr := strconv.ParseInt(rawID, 10, 64)
+				if parseErr == nil && nodeID > 0 {
+					allDirectNodeIDs = append(allDirectNodeIDs, nodeID)
+				}
+			}
+			allTags = append(allTags, compatSplitCSVNonEmpty(sub.NodeTags)...)
+		}
+
+		if groupID > 0 {
+			allNodeGroupIDs = append(allNodeGroupIDs, groupID)
+		}
+	}
+
+	allNodeGroupIDs = compatUniqueInt64(allNodeGroupIDs)
+	allDirectNodeIDs = compatUniqueInt64(allDirectNodeIDs)
+	allTags = tool.RemoveDuplicateElements(allTags...)
+
+	groupEnabled := false
+	if sysValue, sysErr := compatSystemValue(ctx, dataLayer, "group", "enabled"); sysErr == nil {
+		groupEnabled = sysValue == "true" || sysValue == "1"
+	}
+
+	query := dataLayer.DB().ProxyNode.Query().
+		Where(
+			proxynode.EnabledEQ(true),
+			proxynode.IsHiddenEQ(false),
+		).
+		Order(ent.Asc(proxynode.FieldSort), ent.Asc(proxynode.FieldID))
+
+	nodes, err := query.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if groupEnabled {
+		resp.NodeGroups = compatBuildPreviewNodeGroupsByGroup(ctx, dataLayer, nodes, allNodeGroupIDs)
+	} else {
+		resp.NodeGroups = compatBuildPreviewNodeGroupsByTag(nodes, allTags)
+	}
+
+	if len(allDirectNodeIDs) > 0 {
+		directNodes, err := dataLayer.DB().ProxyNode.Query().
+			Where(
+				proxynode.IDIn(allDirectNodeIDs...),
+				proxynode.EnabledEQ(true),
+				proxynode.IsHiddenEQ(false),
+			).
+			Order(ent.Asc(proxynode.FieldSort), ent.Asc(proxynode.FieldID)).
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if len(directNodes) > 0 {
+			resp.NodeGroups = append(resp.NodeGroups, compatLegacyPreviewNodeGroupItem{
+				ID:    -1,
+				Name:  "",
+				Nodes: compatLegacyPreviewNodes(directNodes),
+			})
+		}
+	}
+
+	return resp, nil
+}
+
+func compatBuildPreviewNodeGroupsByGroup(ctx context.Context, dataLayer *data.Data, nodes []*ent.ProxyNode, userGroupIDs []int64) []compatLegacyPreviewNodeGroupItem {
+	grouped := make(map[int64][]compatLegacyPreviewNode)
+	order := make([]int64, 0)
+
+	for _, item := range nodes {
+		if len(item.NodeGroupIds) == 0 {
+			if _, ok := grouped[0]; !ok {
+				order = append(order, 0)
+			}
+			grouped[0] = append(grouped[0], compatLegacyPreviewNodeFromEntity(item))
+			continue
+		}
+		for _, nodeGroupID := range item.NodeGroupIds {
+			if tool.Contains(userGroupIDs, nodeGroupID) {
+				if _, ok := grouped[nodeGroupID]; !ok {
+					order = append(order, nodeGroupID)
+				}
+				grouped[nodeGroupID] = append(grouped[nodeGroupID], compatLegacyPreviewNodeFromEntity(item))
+				break
+			}
+		}
+	}
+
+	validGroupNames := make(map[int64]string)
+	validGroupIDs := make([]int64, 0, len(order))
+	for _, groupID := range order {
+		if groupID == 0 {
+			continue
+		}
+		item, err := dataLayer.DB().ProxyServerGroup.Get(ctx, groupID)
+		if err != nil {
+			continue
+		}
+		validGroupNames[groupID] = item.Name
+		validGroupIDs = append(validGroupIDs, groupID)
+	}
+
+	result := make([]compatLegacyPreviewNodeGroupItem, 0, len(order)+1)
+	publicNodes := make([]compatLegacyPreviewNode, 0)
+	for _, groupID := range order {
+		nodesForGroup := grouped[groupID]
+		if groupID == 0 {
+			publicNodes = append(publicNodes, nodesForGroup...)
+			continue
+		}
+		if name, ok := validGroupNames[groupID]; ok {
+			result = append(result, compatLegacyPreviewNodeGroupItem{
+				ID:    groupID,
+				Name:  name,
+				Nodes: nodesForGroup,
+			})
+		} else {
+			publicNodes = append(publicNodes, nodesForGroup...)
+		}
+	}
+	if len(publicNodes) > 0 {
+		result = append(result, compatLegacyPreviewNodeGroupItem{
+			ID:    0,
+			Name:  "",
+			Nodes: publicNodes,
+		})
+	}
+
+	_ = validGroupIDs
+	return result
+}
+
+func compatBuildPreviewNodeGroupsByTag(nodes []*ent.ProxyNode, tags []string) []compatLegacyPreviewNodeGroupItem {
+	if len(tags) == 0 {
+		return []compatLegacyPreviewNodeGroupItem{}
+	}
+
+	grouped := make(map[string][]compatLegacyPreviewNode)
+	for _, item := range nodes {
+		nodeTags := compatSplitCSVNonEmpty(item.Tags)
+		for _, tag := range nodeTags {
+			if tool.Contains(tags, tag) {
+				grouped[tag] = append(grouped[tag], compatLegacyPreviewNodeFromEntity(item))
+				break
+			}
+		}
+	}
+
+	keys := make([]string, 0, len(grouped))
+	for key := range grouped {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+
+	result := make([]compatLegacyPreviewNodeGroupItem, 0, len(keys))
+	for _, key := range keys {
+		result = append(result, compatLegacyPreviewNodeGroupItem{
+			ID:    0,
+			Name:  key,
+			Nodes: grouped[key],
+		})
+	}
+	return result
+}
+
+func compatLegacyPreviewNodes(nodes []*ent.ProxyNode) []compatLegacyPreviewNode {
+	result := make([]compatLegacyPreviewNode, 0, len(nodes))
+	for _, item := range nodes {
+		result = append(result, compatLegacyPreviewNodeFromEntity(item))
+	}
+	return result
+}
+
+func compatLegacyPreviewNodeFromEntity(item *ent.ProxyNode) compatLegacyPreviewNode {
+	enabled := item.Enabled
+	isHidden := item.IsHidden
+
+	nodeGroupID := int64(0)
+	if len(item.NodeGroupIds) > 0 {
+		nodeGroupID = item.NodeGroupIds[0]
+	}
+
+	return compatLegacyPreviewNode{
+		ID:           item.ID,
+		Name:         item.Name,
+		Tags:         compatSplitCSVNonEmpty(item.Tags),
+		Port:         item.Port,
+		Address:      item.Address,
+		ServerID:     item.ServerID,
+		Protocol:     item.Protocol,
+		Enabled:      &enabled,
+		NodeType:     item.NodeType,
+		IsHidden:     &isHidden,
+		Sort:         item.Sort,
+		NodeGroupID:  nodeGroupID,
+		NodeGroupIDs: compatInt64Strings(item.NodeGroupIds),
+		CreatedAt:    item.CreatedAt.Unix(),
+		UpdatedAt:    item.UpdatedAt.Unix(),
+	}
+}
+
+func compatLegacyNodeGroupFromEntity(item *ent.ProxyServerGroup, nodeCount int64) compatLegacyNodeGroup {
+	return compatLegacyNodeGroup{
+		ID:                  item.ID,
+		Name:                item.Name,
+		Type:                item.GroupType,
+		Description:         item.Description,
+		Sort:                item.Sort,
+		ForCalculation:      item.ForCalculation,
+		IsExpiredGroup:      item.IsExpiredGroup,
+		ExpiredDaysLimit:    item.ExpiredDaysLimit,
+		MaxTrafficGBExpired: compatInt64Value(item.MaxTrafficGBExpired),
+		SpeedLimit:          item.SpeedLimit,
+		MinTrafficGB:        compatInt64Value(item.MinTrafficGB),
+		MaxTrafficGB:        compatInt64Value(item.MaxTrafficGB),
+		NodeCount:           nodeCount,
+		CreatedAt:           item.CreatedAt.Unix(),
+		UpdatedAt:           item.UpdatedAt.Unix(),
+	}
+}
+
+func compatLegacyGroupHistoryFromEntity(item *ent.ProxyGroupHistory) compatLegacyGroupHistory {
+	var startTime *int64
+	if item.StartTime != nil {
+		value := item.StartTime.Unix()
+		startTime = &value
+	}
+
+	var endTime *int64
+	if item.EndTime != nil {
+		value := item.EndTime.Unix()
+		endTime = &value
+	}
+
+	operator := ""
+	if item.Operator != nil {
+		operator = *item.Operator
+	}
+
+	return compatLegacyGroupHistory{
+		ID:           item.ID,
+		GroupMode:    item.GroupMode,
+		TriggerType:  item.TriggerType,
+		TotalUsers:   item.TotalUsers,
+		SuccessCount: item.SuccessCount,
+		FailedCount:  item.FailedCount,
+		StartTime:    startTime,
+		EndTime:      endTime,
+		Operator:     operator,
+		ErrorLog:     item.ErrorMessage,
+		CreatedAt:    item.CreatedAt.Unix(),
+	}
+}
+
+func compatSplitCSVNonEmpty(raw string) []string {
+	if strings.TrimSpace(raw) == "" {
+		return []string{}
+	}
+	parts := strings.Split(raw, ",")
+	result := make([]string, 0, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part != "" {
+			result = append(result, part)
+		}
+	}
+	return result
+}
+
+func compatInt64Strings(values []int64) []string {
+	result := make([]string, 0, len(values))
+	for _, value := range values {
+		result = append(result, strconv.FormatInt(value, 10))
+	}
+	return result
+}
+
+func compatUniqueInt64(values []int64) []int64 {
+	seen := make(map[int64]struct{}, len(values))
+	result := make([]int64, 0, len(values))
+	for _, value := range values {
+		if _, ok := seen[value]; ok {
+			continue
+		}
+		seen[value] = struct{}{}
+		result = append(result, value)
+	}
+	return result
+}
+
+func compatFillLegacyNodeGroupListQuery(ctx khttp.Context, req *compatLegacyGetNodeGroupListRequest) {
+	if ctx == nil || req == nil || ctx.Request() == nil || ctx.Request().URL == nil {
+		return
+	}
+
+	query := ctx.Request().URL.Query()
+	if req.Page <= 0 {
+		if value, err := strconv.Atoi(strings.TrimSpace(query.Get("page"))); err == nil {
+			req.Page = value
+		}
+	}
+	if req.Size <= 0 {
+		if value, err := strconv.Atoi(strings.TrimSpace(query.Get("size"))); err == nil {
+			req.Size = value
+		}
+	}
+	if strings.TrimSpace(req.GroupID) == "" {
+		req.GroupID = strings.TrimSpace(query.Get("group_id"))
+	}
+}
+
+func compatFillLegacyPreviewUserNodesQuery(ctx khttp.Context, req *compatLegacyPreviewUserNodesRequest) {
+	if ctx == nil || req == nil || ctx.Request() == nil || ctx.Request().URL == nil {
+		return
+	}
+
+	if req.UserID > 0 {
+		return
+	}
+
+	value, err := strconv.ParseInt(strings.TrimSpace(ctx.Request().URL.Query().Get("user_id")), 10, 64)
+	if err == nil {
+		req.UserID = value
+	}
+}

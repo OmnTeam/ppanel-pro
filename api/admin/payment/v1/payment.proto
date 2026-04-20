@@ -50,7 +50,7 @@ service PaymentService {
 
 // 支付方式信息
 message PaymentMethod {
-  int64 id = 1;
+  string id = 1;
   string name = 2;
   string platform = 3;
   string description = 4;
@@ -95,7 +95,7 @@ message CreatePaymentMethodReply {
 
 // 更新支付方式请求
 message UpdatePaymentMethodRequest {
-  int64 id = 1 [(validate.rules).int64.gt = 0];
+  string id = 1 [(validate.rules).int64.gt = 0];
   string name = 2 [(validate.rules).string.min_len = 1];
   string platform = 3 [(validate.rules).string.min_len = 1];
   string description = 4;
@@ -117,7 +117,7 @@ message UpdatePaymentMethodReply {
 
 // 删除支付方式请求
 message DeletePaymentMethodRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 // 删除支付方式响应

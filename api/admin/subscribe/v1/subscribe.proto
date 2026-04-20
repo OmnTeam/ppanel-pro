@@ -129,7 +129,7 @@ message TrafficLimit {
 
 // SubscribeInfo 订阅套餐信息
 message SubscribeInfo {
-  int64 id = 1;                             // 订阅套餐ID
+  string id = 1;                             // 订阅套餐ID
   string name = 2;                          // 订阅套餐名称
   string language = 3;                      // 语言
   string description = 4;                   // 订阅套餐描述
@@ -161,7 +161,7 @@ message SubscribeInfo {
 
 // SubscribeItem 订阅套餐列表项（包含销量）
 message SubscribeItem {
-  int64 id = 1;
+  string id = 1;
   string name = 2;
   string language = 3;
   string description = 4;
@@ -236,7 +236,7 @@ message CreateSubscribeReply {
 
 // UpdateSubscribeRequest 更新订阅套餐请求
 message UpdateSubscribeRequest {
-  int64 id = 1;                             // 订阅套餐ID
+  string id = 1;                             // 订阅套餐ID
   string name = 2;                          // 订阅套餐名称
   string language = 3;                      // 语言
   string description = 4;                   // 订阅套餐描述
@@ -278,7 +278,7 @@ message UpdateSubscribeReply {
 
 // DeleteSubscribeRequest 删除订阅套餐请求
 message DeleteSubscribeRequest {
-int64 id = 1;  // 订阅套餐ID
+string id = 1;  // 订阅套餐ID
 }
 
 // DeleteSubscribeData 删除订阅套餐数据
@@ -295,7 +295,7 @@ message DeleteSubscribeReply {
 
 // BatchDeleteSubscribeRequest 批量删除订阅套餐请求
 message BatchDeleteSubscribeRequest {
-  repeated int64 ids = 1;  // 订阅套餐ID列表
+  repeated string  ids = 1;  // 订阅套餐ID列表
 }
 
 // BatchDeleteSubscribeData 批量删除订阅套餐数据
@@ -312,7 +312,7 @@ message BatchDeleteSubscribeReply {
 
 // GetSubscribeDetailsRequest 获取订阅套餐详情请求
 message GetSubscribeDetailsRequest {
-int64 id = 1;  // 订阅套餐ID
+string id = 1;  // 订阅套餐ID
 }
 
 // GetSubscribeDetailsData 获取订阅套餐详情数据
@@ -351,7 +351,7 @@ message GetSubscribeListReply {
 
 // SortItem 排序项
 message SortItem {
-  int64 id = 1;    // 订阅套餐ID
+  string id = 1;    // 订阅套餐ID
   int64 sort = 2;  // 排序值
 }
 
@@ -376,7 +376,7 @@ message SubscribeSortReply {
 
 // SubscribeGroupInfo 订阅组信息
 message SubscribeGroupInfo {
-  int64 id = 1;            // 订阅组ID
+  string id = 1;            // 订阅组ID
   string name = 2;         // 订阅组名称
   string description = 3;  // 订阅组描述
   int64 created_at = 4;    // 创建时间
@@ -403,7 +403,7 @@ message CreateSubscribeGroupReply {
 
 // UpdateSubscribeGroupRequest 更新订阅组请求
 message UpdateSubscribeGroupRequest {
-int64 id = 1;           // 订阅组ID
+string id = 1;           // 订阅组ID
   string name = 2;        // 订阅组名称
   string description = 3; // 订阅组描述
 }
@@ -422,7 +422,7 @@ message UpdateSubscribeGroupReply {
 
 // DeleteSubscribeGroupRequest 删除订阅组请求
 message DeleteSubscribeGroupRequest {
-int64 id = 1;  // 订阅组ID
+string id = 1;  // 订阅组ID
 }
 
 // DeleteSubscribeGroupData 删除订阅组数据
@@ -439,7 +439,7 @@ message DeleteSubscribeGroupReply {
 
 // BatchDeleteSubscribeGroupRequest 批量删除订阅组请求
 message BatchDeleteSubscribeGroupRequest {
-  repeated int64 ids = 1;  // 订阅组ID列表
+  repeated string  ids = 1;  // 订阅组ID列表
 }
 
 // BatchDeleteSubscribeGroupData 批量删除订阅组数据

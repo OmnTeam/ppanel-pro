@@ -35,7 +35,7 @@ service OrderService {
 
 // CreateOrderRequest 创建订单请求
 message CreateOrderRequest {
-  int64 user_id = 1;            // 用户ID
+  string user_id = 1;            // 用户ID
   int32 type = 2;               // 订单类型：1:订阅 2:续费 3:重置流量 4:充值
   int64 quantity = 3;           // 数量
   int64 price = 4;              // 原价（分）
@@ -48,7 +48,7 @@ message CreateOrderRequest {
   int64 payment_id = 11;        // 支付方式ID
   string trade_no = 12;         // 交易号
   int32 status = 13;            // 订单状态：1:待付款 2:已付款 3:关闭 4:失败 5:已完成
-  int64 subscribe_id = 14;      // 订阅ID
+  string subscribe_id = 14;      // 订阅ID
 }
 
 // CreateOrderReply 创建订单响应
@@ -59,7 +59,7 @@ message CreateOrderReply {
 
 // UpdateOrderStatusRequest 更新订单状态请求
 message UpdateOrderStatusRequest {
-  int64 id = 1;            // 订单ID
+  string id = 1;            // 订单ID
   int32 status = 2;        // 订单状态
   int64 payment_id = 3;    // 支付方式ID（可选）
   string trade_no = 4;     // 交易号（可选）
@@ -75,9 +75,9 @@ message UpdateOrderStatusReply {
 message GetOrderListRequest {
   int64 page = 1;          // 页码
   int64 size = 2;          // 每页数量
-  int64 user_id = 3;       // 用户ID（可选）
+  string user_id = 3;       // 用户ID（可选）
   int32 status = 4;        // 订单状态（可选）
-  int64 subscribe_id = 5;  // 订阅ID（可选）
+  string subscribe_id = 5;  // 订阅ID（可选）
   string search = 6;       // 搜索关键字
 }
 
@@ -96,9 +96,9 @@ message GetOrderListReply {
 
 // OrderItem 订单项
 message OrderItem {
-  int64 id = 1;                 // 订单ID
+  string id = 1;                 // 订单ID
   string parent_id = 2;         // 父订单ID
-  int64 user_id = 3;            // 用户ID
+  string user_id = 3;            // 用户ID
   string order_no = 4;          // 订单号
   int32 type = 5;               // 订单类型
   int64 quantity = 6;           // 数量
@@ -114,7 +114,7 @@ message OrderItem {
   int64 fee_amount = 16;        // 手续费金额（分）
   string trade_no = 17;         // 交易号
   int32 status = 18;            // 订单状态
-  int64 subscribe_id = 19;      // 订阅ID
+  string subscribe_id = 19;      // 订阅ID
   string subscribe_token = 20;  // 续费订阅令牌
   bool is_new = 21;             // 是否新订单
   int64 created_at = 22;        // 创建时间（Unix时间戳，秒）

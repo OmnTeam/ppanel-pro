@@ -35,12 +35,12 @@ func seedTestData(t *testing.T, client *ent.Client, ctx context.Context) {
 	users := make([]*ent.ProxyUser, 5)
 	for i := 0; i < 5; i++ {
 		user, err := client.ProxyUser.Create()
-			SetTenantID(tenantID)
-			SetPassword("password")
-			SetEnable(true)
-			SetIsAdmin(false)
-			SetCreatedAt(time.Now().Add(-time.Duration(i) * 24 * time.Hour))
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetPassword("password")
+		SetEnable(true)
+		SetIsAdmin(false)
+		SetCreatedAt(time.Now().Add(-time.Duration(i) * 24 * time.Hour))
+		Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create user: %v", err)
 		}
@@ -50,12 +50,12 @@ func seedTestData(t *testing.T, client *ent.Client, ctx context.Context) {
 	// 创建用户认证方法（邮箱）
 	for i, user := range users {
 		_, err := client.ProxyUserAuthMethod.Create()
-			SetTenantID(tenantID)
-			SetUserID(user.ID)
-			SetAuthType(model.AuthTypeEmail)
-			SetAuthIdentifier("user" + string(rune('0'+i)) + "@test.com")
-			SetVerified(true)
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetUserID(user.ID)
+		SetAuthType(model.AuthTypeEmail)
+		SetAuthIdentifier("user" + string(rune('0'+i)) + "@test.com")
+		SetVerified(true)
+		Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create auth method: %v", err)
 		}
@@ -63,12 +63,12 @@ func seedTestData(t *testing.T, client *ent.Client, ctx context.Context) {
 
 	// 创建订阅套餐
 	subscribe, err := client.ProxySubscribe.Create()
-		SetTenantID(tenantID)
-		SetName("Test Subscribe")
-		SetTraffic(10000)
-		SetShow(true)
-		SetSell(true)
-		Save(ctx)
+	SetTenantID(tenantID)
+	SetName("Test Subscribe")
+	SetTraffic(10000)
+	SetShow(true)
+	SetSell(true)
+	Save(ctx)
 	if err != nil {
 		t.Fatalf("Failed to create subscribe: %v", err)
 	}
@@ -76,45 +76,45 @@ func seedTestData(t *testing.T, client *ent.Client, ctx context.Context) {
 	// 创建用户订阅
 	// User 0: Active (status=1)
 	_, err = client.ProxyUserSubscribe.Create()
-		SetTenantID(tenantID)
-		SetUserID(users[0].ID)
-		SetOrderID(1001)
-		SetSubscribeID(subscribe.ID)
-		SetStatus(uint8(model.UserSubscribeStatusActive))
-		SetStartTime(time.Now().Add(-10 * 24 * time.Hour))
-		SetExpireTime(time.Now().Add(20 * 24 * time.Hour))
-		SetTraffic(5000)
-		Save(ctx)
+	SetTenantID(tenantID)
+	SetUserID(users[0].ID)
+	SetOrderID(1001)
+	SetSubscribeID(subscribe.ID)
+	SetStatus(uint8(model.UserSubscribeStatusActive))
+	SetStartTime(time.Now().Add(-10 * 24 * time.Hour))
+	SetExpireTime(time.Now().Add(20 * 24 * time.Hour))
+	SetTraffic(5000)
+	Save(ctx)
 	if err != nil {
 		t.Fatalf("Failed to create user subscribe: %v", err)
 	}
 
 	// User 1: Finish (status=2)
 	_, err = client.ProxyUserSubscribe.Create()
-		SetTenantID(tenantID)
-		SetUserID(users[1].ID)
-		SetOrderID(1002)
-		SetSubscribeID(subscribe.ID)
-		SetStatus(uint8(model.UserSubscribeStatusFinish))
-		SetStartTime(time.Now().Add(-10 * 24 * time.Hour))
-		SetExpireTime(time.Now().Add(20 * 24 * time.Hour))
-		SetTraffic(5000)
-		Save(ctx)
+	SetTenantID(tenantID)
+	SetUserID(users[1].ID)
+	SetOrderID(1002)
+	SetSubscribeID(subscribe.ID)
+	SetStatus(uint8(model.UserSubscribeStatusFinish))
+	SetStartTime(time.Now().Add(-10 * 24 * time.Hour))
+	SetExpireTime(time.Now().Add(20 * 24 * time.Hour))
+	SetTraffic(5000)
+	Save(ctx)
 	if err != nil {
 		t.Fatalf("Failed to create user subscribe: %v", err)
 	}
 
 	// User 2: Expired (status=3)
 	_, err = client.ProxyUserSubscribe.Create()
-		SetTenantID(tenantID)
-		SetUserID(users[2].ID)
-		SetOrderID(1003)
-		SetSubscribeID(subscribe.ID)
-		SetStatus(uint8(model.UserSubscribeStatusExpired))
-		SetStartTime(time.Now().Add(-30 * 24 * time.Hour))
-		SetExpireTime(time.Now().Add(-1 * 24 * time.Hour))
-		SetTraffic(5000)
-		Save(ctx)
+	SetTenantID(tenantID)
+	SetUserID(users[2].ID)
+	SetOrderID(1003)
+	SetSubscribeID(subscribe.ID)
+	SetStatus(uint8(model.UserSubscribeStatusExpired))
+	SetStartTime(time.Now().Add(-30 * 24 * time.Hour))
+	SetExpireTime(time.Now().Add(-1 * 24 * time.Hour))
+	SetTraffic(5000)
+	Save(ctx)
 	if err != nil {
 		t.Fatalf("Failed to create user subscribe: %v", err)
 	}
@@ -501,23 +501,23 @@ func TestMultiTenantIsolation(t *testing.T) {
 	for tenantID := int64(1); tenantID <= 2; tenantID++ {
 		// 创建用户
 		user, err := client.ProxyUser.Create()
-			SetTenantID(tenantID)
-			SetPassword("password")
-			SetEnable(true)
-			SetIsAdmin(false)
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetPassword("password")
+		SetEnable(true)
+		SetIsAdmin(false)
+		Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create user for tenant %d: %v", tenantID, err)
 		}
 
 		// 创建认证方法
 		_, err = client.ProxyUserAuthMethod.Create()
-			SetTenantID(tenantID)
-			SetUserID(user.ID)
-			SetAuthType(model.AuthTypeEmail)
-			SetAuthIdentifier("user@tenant" + string(rune('0'+int(tenantID))) + ".com")
-			SetVerified(true)
-			Save(ctx)
+		SetTenantID(tenantID)
+		SetUserID(user.ID)
+		SetAuthType(model.AuthTypeEmail)
+		SetAuthIdentifier("user@tenant" + string(rune('0'+int(tenantID))) + ".com")
+		SetVerified(true)
+		Save(ctx)
 		if err != nil {
 			t.Fatalf("Failed to create auth method for tenant %d: %v", tenantID, err)
 		}

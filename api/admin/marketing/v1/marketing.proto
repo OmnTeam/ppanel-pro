@@ -108,7 +108,7 @@ message GetBatchSendEmailTaskListRequest {
 
 // BatchSendEmailTask 批量发送邮件任务
 message BatchSendEmailTask {
-  int64 id = 1;                          // 任务ID
+  string id = 1;                          // 任务ID
   string subject = 2;                    // 邮件主题
   string content = 3;                    // 邮件内容
   string recipients = 4;                 // 收件人列表(换行分隔)
@@ -142,7 +142,7 @@ message GetBatchSendEmailTaskListReply {
 
 // StopBatchSendEmailTaskRequest 停止批量发送邮件任务请求
 message StopBatchSendEmailTaskRequest {
-  int64 id = 1;                          // 任务ID
+  string id = 1;                          // 任务ID
 }
 
 // StopBatchSendEmailTaskData 停止批量发送邮件任务数据
@@ -178,7 +178,7 @@ message GetPreSendEmailCountReply {
 
 // GetBatchSendEmailTaskStatusRequest 获取批量发送邮件任务状态请求
 message GetBatchSendEmailTaskStatusRequest {
-  int64 id = 1;                          // 任务ID
+  string id = 1;                          // 任务ID
 }
 
 // GetBatchSendEmailTaskStatusData 获取批量发送邮件任务状态数据
@@ -200,7 +200,7 @@ message GetBatchSendEmailTaskStatusReply {
 
 // CreateQuotaTaskRequest 创建配额任务请求
 message CreateQuotaTaskRequest {
-  repeated int64 subscribers = 1;        // 订阅ID列表
+  repeated string  subscribers = 1;        // 订阅ID列表
   optional bool is_active = 2;           // 是否仅活跃订阅
   int64 start_time = 3;                  // 开始时间过滤(Unix时间戳)
   int64 end_time = 4;                    // 结束时间过滤(Unix时间戳)
@@ -224,7 +224,7 @@ message CreateQuotaTaskReply {
 
 // QueryQuotaTaskPreCountRequest 查询配额任务预计数量请求
 message QueryQuotaTaskPreCountRequest {
-  repeated int64 subscribers = 1;        // 订阅ID列表
+  repeated string  subscribers = 1;        // 订阅ID列表
   optional bool is_active = 2;           // 是否仅活跃订阅
   int64 start_time = 3;                  // 开始时间过滤(Unix时间戳)
   int64 end_time = 4;                    // 结束时间过滤(Unix时间戳)
@@ -244,8 +244,8 @@ message QueryQuotaTaskPreCountReply {
 
 // QuotaTask 配额任务
 message QuotaTask {
-  int64 id = 1;                          // 任务ID
-  repeated int64 subscribers = 2;        // 订阅ID列表
+  string id = 1;                          // 任务ID
+  repeated string  subscribers = 2;        // 订阅ID列表
   optional bool is_active = 3;           // 是否仅活跃订阅
   int64 start_time = 4;                  // 开始时间过滤(Unix时间戳)
   int64 end_time = 5;                    // 结束时间过滤(Unix时间戳)

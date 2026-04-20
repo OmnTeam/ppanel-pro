@@ -226,7 +226,7 @@ service User {
 
 // UserInfoData 用户信息数据
 message UserInfoData {
-  int64 id = 1;
+  string id = 1;
   string avatar = 2;
   int64 balance = 3;
   int64 commission = 4;
@@ -286,8 +286,8 @@ message LoginLogReply {
 
 // UserLoginLog 用户登录日志
 message UserLoginLog {
-  int64 id = 1;
-  int64 user_id = 2;
+  string id = 1;
+  string user_id = 2;
   string login_ip = 3;
   string user_agent = 4;
   bool success = 5;
@@ -314,7 +314,7 @@ message BalanceLogReply {
 // BalanceLog 余额日志
 message BalanceLog {
   int32 type = 1;
-  int64 user_id = 2;
+  string user_id = 2;
   int64 amount = 3;
   string order_no = 4;
   int64 balance = 5;
@@ -347,7 +347,7 @@ message CommissionLogReply {
 // CommissionLog 佣金日志
 message CommissionLog {
   int32 type = 1;
-  int64 user_id = 2;
+  string user_id = 2;
   int64 amount = 3;
   string order_no = 4;
   int64 timestamp = 5;
@@ -436,10 +436,10 @@ message UserSubscribeReply {
 
 // UserSubscribe 用户订阅信息
 message UserSubscribe {
-  int64 id = 1;
-  int64 user_id = 2;
-  int64 order_id = 3;
-  int64 subscribe_id = 4;
+  string id = 1;
+  string user_id = 2;
+  string order_id = 3;
+  string subscribe_id = 4;
   Subscribe subscribe = 5;
   int64 start_time = 6;
   int64 expire_time = 7;
@@ -456,7 +456,7 @@ message UserSubscribe {
 
 // Subscribe 订阅套餐信息
 message Subscribe {
-  int64 id = 1;
+  string id = 1;
   string name = 2;
   string description = 3;
   int64 price = 4;
@@ -505,9 +505,9 @@ message SubscribeLogReply {
 
 // UserSubscribeLog 用户订阅日志
 message UserSubscribeLog {
-  int64 id = 1;
-  int64 user_id = 2;
-  int64 user_subscribe_id = 3;
+  string id = 1;
+  string user_id = 2;
+  string user_subscribe_id = 3;
   string token = 4;
   string ip = 5;
   string user_agent = 6;
@@ -535,7 +535,7 @@ message CommonReply {
 
 // PreUnsubscribeRequest 预退订请求
 message PreUnsubscribeRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 // UnsubscribeInfoData 退订信息数据
@@ -556,7 +556,7 @@ message UnsubscribeInfoReply {
 
 // UnsubscribeRequest 退订请求
 message UnsubscribeRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 // ============================================================================
@@ -674,7 +674,7 @@ message UpdateBindEmailRequest {
 
 // UserDevice 用户设备信息
 message UserDevice {
-  int64  id = 1;         // 设备ID
+  string  id = 1;         // 设备ID
   string ip = 2;         // IP地址
   string identifier = 3; // 设备标识符
   string user_agent = 4; // 用户代理
@@ -703,7 +703,7 @@ message GetDeviceListReply {
 
 // UnbindDeviceRequest 解绑设备请求
 message UnbindDeviceRequest {
-  int64 id = 1;  // 设备ID
+  string id = 1;  // 设备ID
 }
 
 // ============================================================================

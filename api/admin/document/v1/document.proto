@@ -57,7 +57,7 @@ service DocumentService {
 
 // 文档信息
 message Document {
-  int64 id = 1;
+  string id = 1;
   string title = 2;
   string content = 3;
   repeated string tags = 4;
@@ -82,7 +82,7 @@ message CreateDocumentReply {
 
 // 更新文档请求
 message UpdateDocumentRequest {
-  int64 id = 1;
+  string id = 1;
   string title = 2 [(validate.rules).string.min_len = 1];
   string content = 3 [(validate.rules).string.min_len = 1];
   repeated string tags = 4;
@@ -97,7 +97,7 @@ message UpdateDocumentReply {
 
 // 删除文档请求
 message DeleteDocumentRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 // 删除文档数据
@@ -114,7 +114,7 @@ message DeleteDocumentReply {
 
 // 批量删除文档请求
 message BatchDeleteDocumentRequest {
-  repeated int64 ids = 1;
+  repeated string  ids = 1;
 }
 
 // 批量删除文档数据
@@ -152,7 +152,7 @@ message GetDocumentListReply {
 
 // 获取文档详情请求
 message GetDocumentDetailRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 // 获取文档详情数据

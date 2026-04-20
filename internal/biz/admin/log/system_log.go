@@ -78,11 +78,11 @@ func (uc *SystemLogUsecase) FilterCommissionLog(ctx context.Context, page, size 
 // FilterEmailLog 过滤邮件日志
 func (uc *SystemLogUsecase) FilterEmailLog(ctx context.Context, page, size int32, date, search string) ([]*ent.ProxySystemLog, int64, error) {
 	return uc.repo.FilterSystemLog(ctx, &FilterParams{
-		Page:     page,
-		Size:     size,
-		Type:     LogTypeEmail,
-		Date:     date,
-		Search:   search,
+		Page:   page,
+		Size:   size,
+		Type:   LogTypeEmail,
+		Date:   date,
+		Search: search,
 	})
 }
 
@@ -121,21 +121,21 @@ func (uc *SystemLogUsecase) GetMessageLogList(ctx context.Context, page, size in
 	}
 
 	return uc.repo.FilterSystemLog(ctx, &FilterParams{
-		Page:     page,
-		Size:     size,
-		Type:     messageType,
-		Search:   search,
+		Page:   page,
+		Size:   size,
+		Type:   messageType,
+		Search: search,
 	})
 }
 
 // FilterMobileLog 过滤手机日志
 func (uc *SystemLogUsecase) FilterMobileLog(ctx context.Context, page, size int32, date, search string) ([]*ent.ProxySystemLog, int64, error) {
 	return uc.repo.FilterSystemLog(ctx, &FilterParams{
-		Page:     page,
-		Size:     size,
-		Type:     LogTypeMobile,
-		Date:     date,
-		Search:   search,
+		Page:   page,
+		Size:   size,
+		Type:   LogTypeMobile,
+		Date:   date,
+		Search: search,
 	})
 }
 

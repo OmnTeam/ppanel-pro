@@ -71,7 +71,7 @@ message Platform {
 
 // 认证方法配置
 message AuthMethodConfig {
-  int64 id = 1;
+  string id = 1;
   string method = 2;
   google.protobuf.Struct config = 3;
   bool enabled = 4;

@@ -131,7 +131,7 @@ service Group {
 
 // NodeGroup 节点组信息
 message NodeGroup {
-  int64 id = 1;                    // 节点组ID
+  string id = 1;                    // 节点组ID
   string name = 2;                  // 节点组名称
   string description = 3;           // 节点组描述
   int32 sort = 4;                   // 排序
@@ -185,7 +185,7 @@ message CreateNodeGroupRequest {
 
 // CreateNodeGroupData 创建节点组数据
 message CreateNodeGroupData {
-  int64 id = 1; // 创建的节点组ID
+  string id = 1; // 创建的节点组ID
 }
 
 // CreateNodeGroupReply 创建节点组响应
@@ -197,7 +197,7 @@ message CreateNodeGroupReply {
 
 // UpdateNodeGroupRequest 更新节点组请求
 message UpdateNodeGroupRequest {
-  int64 id = 1;                      // 节点组ID
+  string id = 1;                      // 节点组ID
   string name = 2;                   // 节点组名称
   string description = 3;            // 节点组描述
   int32 sort = 4;                    // 排序
@@ -224,7 +224,7 @@ message UpdateNodeGroupReply {
 
 // DeleteNodeGroupRequest 删除节点组请求
 message DeleteNodeGroupRequest {
-  int64 id = 1; // 节点组ID
+  string id = 1; // 节点组ID
 }
 
 // DeleteNodeGroupData 删除节点组数据
@@ -319,7 +319,7 @@ message GetRecalculationStatusReply {
 
 // GroupHistory 分组历史
 message GroupHistory {
-  int64 id = 1;               // 历史记录ID
+  string id = 1;               // 历史记录ID
   string group_mode = 2;      // 分组模式
   string trigger_type = 3;    // 触发类型
   int32 total_users = 4;      // 用户总数
@@ -355,12 +355,12 @@ message GetGroupHistoryReply {
 
 // GetGroupHistoryDetailRequest 获取分组历史详情请求
 message GetGroupHistoryDetailRequest {
-  int64 id = 1; // 历史记录ID
+  string id = 1; // 历史记录ID
 }
 
 // GroupHistoryDetailItem 分组历史详情条目
 message GroupHistoryDetailItem {
-  int64 id = 1;              // 条目ID
+  string id = 1;              // 条目ID
   int64 history_id = 2;     // 历史记录ID
   string user_group_id = 3; // 用户组ID
   string node_group_id = 4; // 节点组ID
@@ -372,7 +372,7 @@ message GroupHistoryDetailItem {
 
 // GroupHistoryDetail 分组历史详情
 message GroupHistoryDetail {
-  int64 id = 1;                              // 历史记录ID
+  string id = 1;                              // 历史记录ID
   string group_mode = 2;                    // 分组模式
   string trigger_type = 3;                  // 触发类型
   int32 total_users = 4;                    // 用户总数
@@ -434,12 +434,12 @@ message MigrateUsersReply {
 
 // PreviewUserNodesRequest 预览用户节点请求
 message PreviewUserNodesRequest {
-  int64 user_id = 1; // 用户ID
+  string user_id = 1; // 用户ID
 }
 
 // Node 节点信息
 message Node {
-  int64 id = 1;       // 节点ID
+  string id = 1;       // 节点ID
   string name = 2;    // 节点名称
   string address = 3; // 节点地址
   int32 port = 4;     // 节点端口
@@ -447,14 +447,14 @@ message Node {
 
 // NodeGroupItem 节点组条目（含节点列表）
 message NodeGroupItem {
-  int64 id = 1;              // 节点组ID
+  string id = 1;              // 节点组ID
   string name = 2;           // 节点组名称
   repeated Node nodes = 3;   // 节点列表
 }
 
 // PreviewUserNodesData 预览用户节点数据
 message PreviewUserNodesData {
-  int64 user_id = 1;                       // 用户ID
+  string user_id = 1;                       // 用户ID
   repeated NodeGroupItem node_groups = 2;  // 节点组列表
 }
 

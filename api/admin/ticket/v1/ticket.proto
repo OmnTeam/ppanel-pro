@@ -42,7 +42,7 @@ service Ticket {
 
 // UpdateTicketStatusRequest 更新工单状态请求
 message UpdateTicketStatusRequest {
-  int64 id = 1;       // 工单ID
+  string id = 1;       // 工单ID
   int32 status = 2;   // 状态: 1=Pending, 2=Waiting, 3=Processed, 4=Closed
 }
 
@@ -54,7 +54,7 @@ message UpdateTicketStatusReply {
 
 // GetTicketRequest 获取工单详情请求
 message GetTicketRequest {
-  int64 id = 1;  // 工单ID
+  string id = 1;  // 工单ID
 }
 
 // GetTicketReply 获取工单详情响应
@@ -66,10 +66,10 @@ message GetTicketReply {
 
 // TicketInfo 工单信息
 message TicketInfo {
-  int64 id = 1;                     // 工单ID
+  string id = 1;                     // 工单ID
   string title = 2;                 // 工单标题
   string description = 3;           // 工单描述
-  int64 user_id = 4;                // 用户ID
+  string user_id = 4;                // 用户ID
   repeated TicketFollow follow = 5; // 工单跟进列表
   int32 status = 6;                 // 状态
   int64 created_at = 7;             // Unix timestamp in seconds
@@ -78,7 +78,7 @@ message TicketInfo {
 
 // TicketFollow 工单跟进
 message TicketFollow {
-  int64 id = 1;           // 跟进ID
+  string id = 1;           // 跟进ID
   int64 ticket_id = 2;    // 工单ID
   string from = 3;        // 来源/操作人
   int32 type = 4;         // 类型: 1=文本, 2=图片
@@ -104,7 +104,7 @@ message CreateTicketFollowReply {
 message GetTicketListRequest {
   int64 page = 1;        // 页码
   int64 size = 2;        // 每页数量
-  int64 user_id = 3;     // 用户ID (可选)
+  string user_id = 3;     // 用户ID (可选)
   int32 status = 4;      // 状态 (可选)
   string search = 5;     // 搜索关键词 (可选)
 }

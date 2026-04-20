@@ -5,8 +5,8 @@ package api.admin.user.v1;
 option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/user/v1;v1";
 
 import "google/api/annotations.proto";
-import "api/admin/user/v1/auth_method.proto";
-import "api/admin/user/v1/device.proto";
+import "admin/user/v1/auth_method.proto";
+import "admin/user/v1/device.proto";
 
 // UserService 用户基本管理服务
 service UserService {
@@ -77,20 +77,22 @@ service UserService {
   }
 }
 
+// ===== CreateUser =====
+
 message CreateUserRequest {
   string email = 1;
   string telephone = 2;
   string telephone_area_code = 3;
   string password = 4;
-  string product_id = 5;
-  string duration = 6;
+  int64 product_id = 5;
+  int64 duration = 6;
   int32 referral_percentage = 7;
   bool only_first_purchase = 8;
-  string referer_user = 9;
+  string referer_user = 9;   // 推荐人邮箱
   string refer_code = 10;
-  string balance = 11;
-  string commission = 12;
-  string gift_amount = 13;
+  int64 balance = 11;
+  int64 commission = 12;
+  int64 gift_amount = 13;
   bool is_admin = 14;
 }
 
@@ -99,13 +101,15 @@ message CreateUserData {
 }
 
 message CreateUserReply {
-  int32 code = 1;
-  string message = 2;
-  CreateUserData data = 3;
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  CreateUserData data = 3; // 响应数据
 }
 
+// ===== DeleteUser =====
+
 message DeleteUserRequest {
-  string user_id = 1;
+  string id = 1;  // 用户ID
 }
 
 message DeleteUserData {
@@ -113,89 +117,101 @@ message DeleteUserData {
 }
 
 message DeleteUserReply {
-  int32 code = 1;
-  string message = 2;
-  DeleteUserData data = 3;
+  int32 code = 1;        // 状态码
+  string message = 2;    // 消息内容
+  DeleteUserData data = 3; // 响应数据
 }
 
+// ===== BatchDeleteUser =====
+
 message BatchDeleteUserRequest {
-  repeated string user_ids = 1;
+  repeated string  ids = 1;  // 用户ID列表
 }
 
 message BatchDeleteUserData {
-  string deleted_count = 1;
+  int64 deleted_count = 1;
 }
 
 message BatchDeleteUserReply {
-  int32 code = 1;
-  string message = 2;
-  BatchDeleteUserData data = 3;
+  int32 code = 1;              // 状态码
+  string message = 2;          // 消息内容
+  BatchDeleteUserData data = 3; // 响应数据
 }
 
-message CurrentUserRequest {
-  string user_id = 1;
-}
+// ===== CurrentUser =====
+
+message CurrentUserRequest {}
 
 message CurrentUserData {
   User user = 1;
 }
 
 message CurrentUserReply {
-  int32 code = 1;
-  string message = 2;
-  CurrentUserData data = 3;
+  int32 code = 1;          // 状态码
+  string message = 2;      // 消息内容
+  CurrentUserData data = 3; // 响应数据
 }
 
+// ===== GetUserDetail =====
+
 message GetUserDetailRequest {
-  string id = 1;
+  string id = 1;  // 用户ID
 }
 
 message GetUserDetailReply {
-  int32 code = 1;
-  string message = 2;
-  User data = 3;
+  int32 code = 1;            // 状态码
+  string message = 2;        // 消息内容
+  User data = 3;             // 响应数据（直接返回用户对象）
 }
+
+// ===== GetUserList =====
 
 message GetUserListRequest {
   int32 page = 1;
   int32 size = 2;
-  string search = 3;
-  string user_id = 4;
-  string subscribe_id = 5;
-  string user_subscribe_id = 6;
+  string search = 3;               // 搜索关键字
+  optional string user_id = 4;      // 过滤特定用户ID
+  bool unscoped = 5;               // 包含已删除
+  optional string subscribe_id = 6; // 过滤订阅套餐ID
+  optional int64 user_subscribe_id = 7; // 过滤用户订阅ID
+  string short_code = 8;           // 短码
 }
 
 message GetUserListData {
-  string total = 1;
+  int64 total = 1;
   repeated User list = 2;
 }
 
 message GetUserListReply {
-  int32 code = 1;
-  string message = 2;
-  GetUserListData data = 3;
+  int32 code = 1;          // 状态码
+  string message = 2;      // 消息内容
+  GetUserListData data = 3; // 响应数据
 }
 
+// ===== UpdateUserBasicInfo =====
+
 message UpdateUserBasicInfoRequest {
-  string user_id = 1;
-  string password = 2;
-  string avatar = 3;
-  string balance = 4;
-  string commission = 5;
-  int32 referral_percentage = 6;
-  bool only_first_purchase = 7;
-  string gift_amount = 8;
-  string telegram = 9;
-  string refer_code = 10;
-  string referer_id = 11;
-  bool enable = 12;
-  bool is_admin = 13;
+  string user_id = 1;              // 用户ID
+  string password = 2;            // 新密码（可选）
+  string avatar = 3;              // 头像
+  int64 balance = 4;              // 余额（分）
+  int64 commission = 5;           // 佣金（分）
+  int32 referral_percentage = 6;  // 推荐返利比例
+  bool only_first_purchase = 7;   // 仅首次购买返利
+  int64 gift_amount = 8;          // 赠送金额（分）
+  int64 telegram = 9;             // Telegram ID
+  string refer_code = 10;         // 推荐码
+  int64 referer_id = 11;          // 推荐人ID
+  bool enable = 12;               // 是否启用
+  bool is_admin = 13;             // 是否管理员
 }
 
 message UpdateUserBasicInfoReply {
-  int32 code = 1;
-  string message = 2;
+  int32 code = 1;     // 状态码
+  string message = 2; // 消息内容
 }
+
+// ===== UpdateUserNotifySettings =====
 
 message UpdateUserNotifySettingsRequest {
   string user_id = 1;
@@ -206,59 +222,67 @@ message UpdateUserNotifySettingsRequest {
 }
 
 message UpdateUserNotifySettingsReply {
-  int32 code = 1;
-  string message = 2;
+  int32 code = 1;     // 状态码
+  string message = 2; // 消息内容
 }
+
+// ===== GetUserLoginLogs =====
 
 message GetUserLoginLogsRequest {
   int32 page = 1;
   int32 size = 2;
-  string user_id = 3;
-  string date = 4;
+  string user_id = 3;  // 可选：过滤特定用户
 }
 
 message GetUserLoginLogsData {
-  string total = 1;
+  int64 total = 1;
   repeated LoginLog list = 2;
 }
 
 message GetUserLoginLogsReply {
-  int32 code = 1;
-  string message = 2;
-  GetUserLoginLogsData data = 3;
+  int32 code = 1;                // 状态码
+  string message = 2;            // 消息内容
+  GetUserLoginLogsData data = 3; // 响应数据
 }
 
+// ===== Common Messages =====
+
+// User 用户信息
 message User {
   string id = 1;
   string email = 2;
   string telephone = 3;
   string telephone_area_code = 4;
   string avatar = 5;
-  string balance = 6;
+  int64 balance = 6;               // 余额（分）
   string refer_code = 7;
-  string referer_id = 8;
-  string commission = 9;
+  int64 referer_id = 8;
+  int64 commission = 9;            // 佣金（分）
   int32 referral_percentage = 10;
   bool only_first_purchase = 11;
-  string gift_amount = 12;
+  int64 gift_amount = 12;          // 赠送金额（分）
   bool enable = 13;
   bool is_admin = 14;
   bool enable_balance_notify = 15;
   bool enable_login_notify = 16;
   bool enable_subscribe_notify = 17;
   bool enable_trade_notify = 18;
-  string created_at = 19;
-  string updated_at = 20;
-  string telegram = 21;
-  repeated UserAuthMethod auth_methods = 22;
-  repeated UserDevice user_devices = 23;
+  int64 created_at = 19;           // Unix timestamp in seconds
+  int64 updated_at = 20;           // Unix timestamp in seconds
+  int64 telegram = 21;             // Telegram ID
+  repeated UserAuthMethod auth_methods = 22;  // 用户认证方法列表
+  repeated UserDevice user_devices = 23;       // 用户设备列表
+  repeated string rules = 24;                  // 权限规则
+  int64 deleted_at = 25;           // Unix timestamp in seconds
+  bool is_del = 26;                // 是否已删除
 }
 
+// LoginLog 登录日志
 message LoginLog {
   string user_id = 1;
-  string method = 2;
-  string login_ip = 3;
-  string user_agent = 4;
-  bool success = 5;
-  string timestamp = 6;
+  string method = 2;       // 登录方法
+  string login_ip = 3;     // 登录IP
+  string user_agent = 4;   // 用户代理
+  bool success = 5;        // 是否成功
+  int64 timestamp = 6;     // Unix timestamp in seconds
 }

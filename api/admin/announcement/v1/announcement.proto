@@ -49,7 +49,7 @@ service AnnouncementService {
 
 // 公告信息
 message Announcement {
-  int64 id = 1;
+  string id = 1;
   string title = 2;
   string content = 3;
   optional bool show = 4;
@@ -79,7 +79,7 @@ message AnnouncementReply {
 
 // 更新公告请求
 message UpdateAnnouncementRequest {
-  int64 id = 1;
+  string id = 1;
   string title = 2 [(validate.rules).string = {min_len: 1, max_len: 255}];
   string content = 3;
   optional bool show = 4;
@@ -89,7 +89,7 @@ message UpdateAnnouncementRequest {
 
 // 获取公告详情请求
 message GetAnnouncementRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 // 获取公告列表请求
@@ -117,7 +117,7 @@ message ListAnnouncementsReply {
 
 // 删除公告请求
 message DeleteAnnouncementRequest {
-  int64 id = 1;
+  string id = 1;
 }
 
 // 删除公告数据
