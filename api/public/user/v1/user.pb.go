@@ -35,7 +35,7 @@ type UserInfoData struct {
 	GiftAmount            int64                  `protobuf:"varint,7,opt,name=gift_amount,json=giftAmount,proto3" json:"gift_amount,omitempty"`
 	Telegram              int64                  `protobuf:"varint,8,opt,name=telegram,proto3" json:"telegram,omitempty"`
 	ReferCode             string                 `protobuf:"bytes,9,opt,name=refer_code,json=referCode,proto3" json:"refer_code,omitempty"`
-	RefererId             int64                  `protobuf:"varint,10,opt,name=referer_id,json=refererId,proto3" json:"referer_id,omitempty"`
+	RefererId             string                 `protobuf:"bytes,10,opt,name=referer_id,json=refererId,proto3" json:"referer_id,omitempty"`
 	Enable                bool                   `protobuf:"varint,11,opt,name=enable,proto3" json:"enable,omitempty"`
 	IsAdmin               bool                   `protobuf:"varint,12,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
 	EnableBalanceNotify   bool                   `protobuf:"varint,13,opt,name=enable_balance_notify,json=enableBalanceNotify,proto3" json:"enable_balance_notify,omitempty"`
@@ -142,11 +142,11 @@ func (x *UserInfoData) GetReferCode() string {
 	return ""
 }
 
-func (x *UserInfoData) GetRefererId() int64 {
+func (x *UserInfoData) GetRefererId() string {
 	if x != nil {
 		return x.RefererId
 	}
-	return 0
+	return ""
 }
 
 func (x *UserInfoData) GetEnable() bool {
@@ -2245,7 +2245,7 @@ func (x *UserSubscribeLog) GetTimestamp() int64 {
 // ResetUserSubscribeTokenRequest 重置订阅令牌请求
 type ResetUserSubscribeTokenRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	UserSubscribeId int64                  `protobuf:"varint,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
+	UserSubscribeId string                 `protobuf:"bytes,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -2280,11 +2280,11 @@ func (*ResetUserSubscribeTokenRequest) Descriptor() ([]byte, []int) {
 	return file_public_user_v1_user_proto_rawDescGZIP(), []int{31}
 }
 
-func (x *ResetUserSubscribeTokenRequest) GetUserSubscribeId() int64 {
+func (x *ResetUserSubscribeTokenRequest) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 // CommonReply 通用响应
@@ -4079,7 +4079,7 @@ const file_public_user_v1_user_proto_rawDesc = "" +
 	"refer_code\x18\t \x01(\tR\treferCode\x12\x1d\n" +
 	"\n" +
 	"referer_id\x18\n" +
-	" \x01(\x03R\trefererId\x12\x16\n" +
+	" \x01(\tR\trefererId\x12\x16\n" +
 	"\x06enable\x18\v \x01(\bR\x06enable\x12\x19\n" +
 	"\bis_admin\x18\f \x01(\bR\aisAdmin\x122\n" +
 	"\x15enable_balance_notify\x18\r \x01(\bR\x13enableBalanceNotify\x12.\n" +
@@ -4257,7 +4257,7 @@ const file_public_user_v1_user_proto_rawDesc = "" +
 	"user_agent\x18\x06 \x01(\tR\tuserAgent\x12\x1c\n" +
 	"\ttimestamp\x18\a \x01(\x03R\ttimestamp\"L\n" +
 	"\x1eResetUserSubscribeTokenRequest\x12*\n" +
-	"\x11user_subscribe_id\x18\x01 \x01(\x03R\x0fuserSubscribeId\";\n" +
+	"\x11user_subscribe_id\x18\x01 \x01(\tR\x0fuserSubscribeId\";\n" +
 	"\vCommonReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"'\n" +

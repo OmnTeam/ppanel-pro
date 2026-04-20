@@ -2539,7 +2539,7 @@ type FilterSubscribeLogRequest struct {
 	Size            int32                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
 	Date            string                 `protobuf:"bytes,3,opt,name=date,proto3" json:"date,omitempty"`
 	UserId          string                 `protobuf:"bytes,4,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	UserSubscribeId int64                  `protobuf:"varint,5,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
+	UserSubscribeId string                 `protobuf:"bytes,5,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -2602,11 +2602,11 @@ func (x *FilterSubscribeLogRequest) GetUserId() string {
 	return ""
 }
 
-func (x *FilterSubscribeLogRequest) GetUserSubscribeId() int64 {
+func (x *FilterSubscribeLogRequest) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 type SubscribeLog struct {
@@ -2615,7 +2615,7 @@ type SubscribeLog struct {
 	Token           string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"`
 	UserAgent       string                 `protobuf:"bytes,3,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
 	ClientIp        string                 `protobuf:"bytes,4,opt,name=client_ip,json=clientIp,proto3" json:"client_ip,omitempty"`
-	UserSubscribeId int64                  `protobuf:"varint,5,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
+	UserSubscribeId string                 `protobuf:"bytes,5,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
 	Timestamp       int64                  `protobuf:"varint,6,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -2679,11 +2679,11 @@ func (x *SubscribeLog) GetClientIp() string {
 	return ""
 }
 
-func (x *SubscribeLog) GetUserSubscribeId() int64 {
+func (x *SubscribeLog) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 func (x *SubscribeLog) GetTimestamp() int64 {
@@ -4099,14 +4099,14 @@ const file_admin_log_v1_log_proto_rawDesc = "" +
 	"\x04size\x18\x02 \x01(\x05R\x04size\x12\x12\n" +
 	"\x04date\x18\x03 \x01(\tR\x04date\x12\x17\n" +
 	"\auser_id\x18\x04 \x01(\tR\x06userId\x12*\n" +
-	"\x11user_subscribe_id\x18\x05 \x01(\x03R\x0fuserSubscribeId\"\xc3\x01\n" +
+	"\x11user_subscribe_id\x18\x05 \x01(\tR\x0fuserSubscribeId\"\xc3\x01\n" +
 	"\fSubscribeLog\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
 	"\x05token\x18\x02 \x01(\tR\x05token\x12\x1d\n" +
 	"\n" +
 	"user_agent\x18\x03 \x01(\tR\tuserAgent\x12\x1b\n" +
 	"\tclient_ip\x18\x04 \x01(\tR\bclientIp\x12*\n" +
-	"\x11user_subscribe_id\x18\x05 \x01(\x03R\x0fuserSubscribeId\x12\x1c\n" +
+	"\x11user_subscribe_id\x18\x05 \x01(\tR\x0fuserSubscribeId\x12\x1c\n" +
 	"\ttimestamp\x18\x06 \x01(\x03R\ttimestamp\"b\n" +
 	"\x16FilterSubscribeLogData\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x03R\x05total\x122\n" +
