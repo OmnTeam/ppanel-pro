@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"strings"
 	"time"
 
@@ -318,6 +319,20 @@ func (r *serverNodeRepo) PushServerStatus(ctx context.Context, req *serverBiz.Pu
 
 // PushOnlineUsers 推送在线用户
 func (r *serverNodeRepo) PushOnlineUsers(ctx context.Context, req *serverBiz.PushOnlineUsersRequest) error {
+	if req == nil || req.ServerID <= 0 || len(req.Users) == 0 {
+		return fmt.Errorf("invalid request parameters")
+	}
+	for _, user := range req.Users {
+		if user == nil {
+			return fmt.Errorf("invalid user data: uid=%d, ip=%s", 0, "")
+		}
+		normalizedIP, ok := serverNodeNormalizeOnlineUserIP(user.IP)
+		if user.SID <= 0 || !ok {
+			return fmt.Errorf("invalid user data: uid=%d, ip=%s", user.SID, user.IP)
+		}
+		user.IP = normalizedIP
+	}
+
 	// 验证服务器是否存在
 	_, err := r.data.db.ProxyServer.Get(ctx, req.ServerID)
 	if err != nil {
@@ -325,16 +340,14 @@ func (r *serverNodeRepo) PushOnlineUsers(ctx context.Context, req *serverBiz.Pus
 		return fmt.Errorf("server not found")
 	}
 
+	if r.data.rdb == nil {
+		return nil
+	}
+
 	// 构建在线用户映射 map[subscribeID][]IP
 	onlineUsers := make(map[int64][]string)
 	for _, user := range req.Users {
-		if ips, ok := onlineUsers[user.SID]; ok {
-			// 如果用户已存在，追加IP
-			onlineUsers[user.SID] = append(ips, user.IP)
-		} else {
-			// 新用户
-			onlineUsers[user.SID] = []string{user.IP}
-		}
+		onlineUsers[user.SID] = serverNodeAppendUniqueOnlineUserIP(onlineUsers[user.SID], user.IP)
 	}
 
 	// 存储到Redis缓存
@@ -374,6 +387,23 @@ func (r *serverNodeRepo) PushOnlineUsers(ctx context.Context, req *serverBiz.Pus
 		req.ServerID, req.Protocol, len(onlineUsers))
 
 	return nil
+}
+
+func serverNodeNormalizeOnlineUserIP(ip string) (string, bool) {
+	normalizedIP := strings.TrimSpace(ip)
+	if normalizedIP == "" || net.ParseIP(normalizedIP) == nil {
+		return "", false
+	}
+	return normalizedIP, true
+}
+
+func serverNodeAppendUniqueOnlineUserIP(ips []string, ip string) []string {
+	for _, existingIP := range ips {
+		if existingIP == ip {
+			return ips
+		}
+	}
+	return append(ips, ip)
 }
 
 // QueryServerProtocolConfig 查询服务器协议配置

@@ -63,7 +63,7 @@ func (s *LogService) FilterBalanceLog(ctx context.Context, req *v1.FilterBalance
 		return nil, err
 	}
 
-	list := make([]*v1.BalanceLog, len(logs))
+	list := make([]*v1.BalanceLog, 0, len(logs))
 	for _, l := range logs {
 		var content logmodel.Balance
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -105,7 +105,7 @@ func (s *LogService) FilterCommissionLog(ctx context.Context, req *v1.FilterComm
 		return nil, err
 	}
 
-	list := make([]*v1.CommissionLog, len(logs))
+	list := make([]*v1.CommissionLog, 0, len(logs))
 	for _, l := range logs {
 		var content logmodel.Commission
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -141,7 +141,7 @@ func (s *LogService) FilterEmailLog(ctx context.Context, req *v1.FilterEmailLogR
 		return nil, err
 	}
 
-	list := make([]*v1.EmailLog, len(logs))
+	list := make([]*v1.EmailLog, 0, len(logs))
 	for _, l := range logs {
 		var content logmodel.Message
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -189,7 +189,7 @@ func (s *LogService) FilterGiftLog(ctx context.Context, req *v1.FilterGiftLogReq
 		return nil, err
 	}
 
-	list := make([]*v1.GiftLog, len(logs))
+	list := make([]*v1.GiftLog, 0, len(logs))
 	for _, l := range logs {
 		var content logmodel.Gift
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -234,7 +234,7 @@ func (s *LogService) FilterLoginLog(ctx context.Context, req *v1.FilterLoginLogR
 		return nil, err
 	}
 
-	list := make([]*v1.LoginLog, len(logs))
+	list := make([]*v1.LoginLog, 0, len(logs))
 	for _, l := range logs {
 		var content logmodel.Login
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -271,7 +271,7 @@ func (s *LogService) GetMessageLogList(ctx context.Context, req *v1.GetMessageLo
 		return nil, err
 	}
 
-	list := make([]*v1.MessageLog, len(logs))
+	list := make([]*v1.MessageLog, 0, len(logs))
 	for _, l := range logs {
 		var content logmodel.Message
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -313,7 +313,7 @@ func (s *LogService) FilterMobileLog(ctx context.Context, req *v1.FilterMobileLo
 		return nil, err
 	}
 
-	list := make([]*v1.MobileLog, len(logs))
+	list := make([]*v1.MobileLog, 0, len(logs))
 	for _, l := range logs {
 		var content logmodel.Message
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -361,7 +361,7 @@ func (s *LogService) FilterRegisterLog(ctx context.Context, req *v1.FilterRegist
 		return nil, err
 	}
 
-	list := make([]*v1.RegisterLog, len(logs))
+	list := make([]*v1.RegisterLog, 0, len(logs))
 	for _, l := range logs {
 		var content logmodel.Register
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -404,7 +404,7 @@ func (s *LogService) FilterServerTrafficLog(ctx context.Context, req *v1.FilterS
 		return nil, err
 	}
 
-	list := make([]*v1.ServerTrafficLog, len(logs))
+	list := make([]*v1.ServerTrafficLog, 0, len(logs))
 	for _, l := range logs {
 		var content logmodel.Traffic
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -445,7 +445,7 @@ func (s *LogService) FilterSubscribeLog(ctx context.Context, req *v1.FilterSubsc
 		return nil, err
 	}
 
-	list := make([]*v1.SubscribeLog, len(logs))
+	list := make([]*v1.SubscribeLog, 0, len(logs))
 	for _, l := range logs {
 		var content logmodel.Subscribe
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -488,7 +488,7 @@ func (s *LogService) FilterResetSubscribeLog(ctx context.Context, req *v1.Filter
 		return nil, err
 	}
 
-	list := make([]*v1.ResetSubscribeLog, len(logs))
+	list := make([]*v1.ResetSubscribeLog, 0, len(logs))
 	for _, l := range logs {
 		var content logmodel.ResetSubscribe
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -534,7 +534,7 @@ func (s *LogService) FilterUserSubscribeTrafficLog(ctx context.Context, req *v1.
 		return nil, err
 	}
 
-	list := make([]*v1.UserSubscribeTrafficLog, len(logs))
+	list := make([]*v1.UserSubscribeTrafficLog, 0, len(logs))
 	for _, l := range logs {
 		var content logmodel.Traffic
 		if err := json.Unmarshal([]byte(l.Content), &content); err != nil {
@@ -587,7 +587,7 @@ func (s *LogService) FilterTrafficLogDetails(ctx context.Context, req *v1.Filter
 		return nil, err
 	}
 
-	list := make([]*v1.TrafficLogDetail, len(logs))
+	list := make([]*v1.TrafficLogDetail, 0, len(logs))
 	for _, l := range logs {
 		list = append(list, &v1.TrafficLogDetail{
 			Id:          formatInt64(int64(l.ID)),

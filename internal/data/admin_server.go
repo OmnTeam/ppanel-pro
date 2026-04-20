@@ -292,8 +292,27 @@ func (r *adminServerRepo) GetOnlineUsers(ctx context.Context, serverID int64, pr
 	if err := json.Unmarshal([]byte(result), &onlineUsers); err != nil {
 		return nil, err
 	}
+	for subscribeID, ips := range onlineUsers {
+		onlineUsers[subscribeID] = dedupeStringSlicePreserveOrder(ips)
+	}
 
 	return onlineUsers, nil
+}
+
+func dedupeStringSlicePreserveOrder(values []string) []string {
+	if len(values) <= 1 {
+		return values
+	}
+	seen := make(map[string]struct{}, len(values))
+	result := make([]string, 0, len(values))
+	for _, value := range values {
+		if _, ok := seen[value]; ok {
+			continue
+		}
+		seen[value] = struct{}{}
+		result = append(result, value)
+	}
+	return result
 }
 
 // GetUserSubscribeInfo gets user subscribe information

@@ -73,19 +73,19 @@ type compatTicketListRequest struct {
 }
 
 type compatTicketDetailRequest struct {
-	ID int64 `form:"id"`
+	ID compatFlexibleInt64 `form:"id" json:"id"`
 }
 
 type compatTicketFollowRequest struct {
-	TicketID int64  `json:"ticket_id"`
-	From     string `json:"from"`
-	Type     int32  `json:"type"`
-	Content  string `json:"content"`
+	TicketID compatFlexibleInt64 `json:"ticket_id" form:"ticket_id"`
+	From     string              `json:"from"`
+	Type     int32               `json:"type"`
+	Content  string              `json:"content"`
 }
 
 type compatTicketStatusRequest struct {
-	ID     int64  `json:"id"`
-	Status *int32 `json:"status"`
+	ID     compatFlexibleInt64 `json:"id" form:"id"`
+	Status *int32              `json:"status"`
 }
 
 type compatLoginLogRequest struct {
@@ -165,8 +165,8 @@ type compatUnbindDeviceRequest struct {
 }
 
 type compatCommissionWithdrawRequest struct {
-	Amount  int64  `json:"amount"`
-	Content string `json:"content"`
+	Amount  compatFlexibleInt64 `json:"amount" form:"amount"`
+	Content string              `json:"content"`
 }
 
 type compatWithdrawalLogRequest struct {
@@ -480,14 +480,14 @@ func registerLegacyPublicTicketCompatRoutes(r *khttp.Router, publicTicket legacy
 		var req compatTicketDetailRequest
 		_ = ctx.Bind(&req)
 		_ = ctx.BindQuery(&req)
-		if req.ID == 0 {
+		if int64(req.ID) == 0 {
 			return compatJSONError(ctx, compatParamError("Key: 'GetUserTicketDetailRequest.Id' Error:Field validation for 'Id' failed on the 'required' tag"))
 		}
 
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatTicketDetailRequest)
 			reply, err := publicTicket.GetUserTicketDetails(inner, &publicticketv1.GetUserTicketDetailsRequest{
-				Id: strconv.FormatInt(in.ID, 10),
+				Id: strconv.FormatInt(int64(in.ID), 10),
 			})
 			if err != nil {
 				return nil, err
@@ -504,7 +504,7 @@ func registerLegacyPublicTicketCompatRoutes(r *khttp.Router, publicTicket legacy
 		var req compatTicketStatusRequest
 		_ = ctx.Bind(&req)
 		_ = ctx.BindQuery(&req)
-		if req.ID == 0 {
+		if int64(req.ID) == 0 {
 			return compatJSONError(ctx, compatParamError("Key: 'UpdateUserTicketStatusRequest.Id' Error:Field validation for 'Id' failed on the 'required' tag"))
 		}
 		if req.Status == nil {
@@ -514,7 +514,7 @@ func registerLegacyPublicTicketCompatRoutes(r *khttp.Router, publicTicket legacy
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatTicketStatusRequest)
 			_, err := publicTicket.UpdateUserTicketStatus(inner, &publicticketv1.UpdateUserTicketStatusRequest{
-				Id:     strconv.FormatInt(in.ID, 10),
+				Id:     strconv.FormatInt(int64(in.ID), 10),
 				Status: *in.Status,
 			})
 			return nil, err
@@ -529,7 +529,7 @@ func registerLegacyPublicTicketCompatRoutes(r *khttp.Router, publicTicket legacy
 		var req compatTicketFollowRequest
 		_ = ctx.Bind(&req)
 		_ = ctx.BindQuery(&req)
-		if req.TicketID == 0 {
+		if int64(req.TicketID) == 0 {
 			return compatJSONError(ctx, compatParamError("Key: 'CreateUserTicketFollowRequest.TicketId' Error:Field validation for 'TicketId' failed on the 'required' tag"))
 		}
 		if err := compatValidateRequiredString(req.From, "CreateUserTicketFollowRequest", "From"); err != nil {
@@ -545,7 +545,7 @@ func registerLegacyPublicTicketCompatRoutes(r *khttp.Router, publicTicket legacy
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatTicketFollowRequest)
 			_, err := publicTicket.CreateUserTicketFollow(inner, &publicticketv1.CreateUserTicketFollowRequest{
-				TicketId: strconv.FormatInt(in.TicketID, 10),
+				TicketId: strconv.FormatInt(int64(in.TicketID), 10),
 				From:     in.From,
 				Type:     in.Type,
 				Content:  in.Content,
@@ -1096,7 +1096,7 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatCommissionWithdrawRequest)
 			reply, err := publicUser.CommissionWithdraw(inner, &publicuserv1.CommissionWithdrawRequest{
-				Amount:  strconv.FormatInt(in.Amount, 10),
+				Amount:  strconv.FormatInt(int64(in.Amount), 10),
 				Content: in.Content,
 			})
 			if err != nil {

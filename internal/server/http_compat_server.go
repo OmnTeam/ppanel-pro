@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -34,9 +35,9 @@ import (
 var errCompatLegacyServerNotModified = errors.New("304 Not Modified")
 
 type compatLegacyServerCommon struct {
-	Protocol  string `form:"protocol"`
-	ServerID  int64  `form:"server_id"`
-	SecretKey string `form:"secret_key"`
+	Protocol  string `form:"protocol"json:"protocol"`
+	ServerID  int64  `form:"server_id"json:"server_id"`
+	SecretKey string `form:"secret_key"json:"secret_key"`
 }
 
 type compatLegacyGetServerConfigRequest struct{ compatLegacyServerCommon }
@@ -173,6 +174,8 @@ func registerLegacyServerCompatRoutes(r *khttp.Router, dataLayer *data.Data) {
 		if err != nil {
 			return ctx.String(http.StatusNotFound, "Not Found")
 		}
+		marshal, _ := json.Marshal(out)
+		log.Infof("out users %s", marshal)
 		return ctx.JSON(http.StatusOK, out)
 	})
 
@@ -195,7 +198,7 @@ func registerLegacyServerCompatRoutes(r *khttp.Router, dataLayer *data.Data) {
 	r.POST("/v1/server/status", func(ctx khttp.Context) error {
 		var req compatLegacyPushServerStatusRequest
 		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		_ = ctx.BindQuery(&req.compatLegacyServerCommon)
 		if !compatLegacyV1ServerSecretAllowed(ctx, dataLayer, req.SecretKey) {
 			return ctx.String(http.StatusForbidden, "Forbidden")
 		}
@@ -760,13 +763,15 @@ func compatLegacyPushServerStatus(ctx context.Context, dataLayer *data.Data, req
 }
 
 func compatLegacyPushOnlineUsers(ctx context.Context, dataLayer *data.Data, req *compatLegacyPushOnlineUsersRequest) error {
-	if req.ServerID <= 0 || len(req.Users) == 0 {
+	if req == nil || req.ServerID <= 0 || len(req.Users) == 0 {
 		return errors.New("invalid request parameters")
 	}
-	for _, user := range req.Users {
-		if user.SID <= 0 || strings.TrimSpace(user.IP) == "" {
-			return fmt.Errorf("invalid user data: uid=%d, ip=%s", user.SID, user.IP)
+	for i := range req.Users {
+		normalizedIP, ok := compatLegacyNormalizeOnlineUserIP(req.Users[i].IP)
+		if req.Users[i].SID <= 0 || !ok {
+			return fmt.Errorf("invalid user data: uid=%d, ip=%s", req.Users[i].SID, req.Users[i].IP)
 		}
+		req.Users[i].IP = normalizedIP
 	}
 	if _, err := dataLayer.DB().ProxyServer.Get(ctx, req.ServerID); err != nil {
 		return fmt.Errorf("server not found: %w", err)
@@ -777,7 +782,7 @@ func compatLegacyPushOnlineUsers(ctx context.Context, dataLayer *data.Data, req 
 
 	onlineUsers := make(map[int64][]string)
 	for _, user := range req.Users {
-		onlineUsers[user.SID] = append(onlineUsers[user.SID], user.IP)
+		onlineUsers[user.SID] = compatLegacyAppendUniqueOnlineUserIP(onlineUsers[user.SID], user.IP)
 	}
 
 	encoded, err := json.Marshal(onlineUsers)
@@ -797,6 +802,23 @@ func compatLegacyPushOnlineUsers(ctx context.Context, dataLayer *data.Data, req 
 	}
 	_, err = pipe.Exec(ctx)
 	return err
+}
+
+func compatLegacyNormalizeOnlineUserIP(ip string) (string, bool) {
+	normalizedIP := strings.TrimSpace(ip)
+	if normalizedIP == "" || net.ParseIP(normalizedIP) == nil {
+		return "", false
+	}
+	return normalizedIP, true
+}
+
+func compatLegacyAppendUniqueOnlineUserIP(ips []string, ip string) []string {
+	for _, existingIP := range ips {
+		if existingIP == ip {
+			return ips
+		}
+	}
+	return append(ips, ip)
 }
 
 func compatLegacyQueryServerProtocolConfig(ctx context.Context, dataLayer *data.Data, req *compatLegacyQueryServerConfigRequest) (*compatLegacyQueryServerConfigResponse, error) {

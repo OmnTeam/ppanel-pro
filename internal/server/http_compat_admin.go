@@ -24,8 +24,8 @@ import (
 )
 
 type compatUpdateTicketStatusRequest struct {
-	ID     int64  `json:"id"`
-	Status *uint8 `json:"status"`
+	ID     compatFlexibleInt64 `json:"id" form:"id"`
+	Status *uint8              `json:"status" form:"status"`
 }
 
 type compatLegacyPaymentConfig struct {
@@ -100,7 +100,7 @@ func registerLegacyAdminCompatRoutes(r *khttp.Router, dataLayer *data.Data, admi
 		_ = ctx.Bind(&req)
 		_ = ctx.BindQuery(&req)
 
-		if req.ID == 0 {
+		if int64(req.ID) == 0 {
 			return compatJSONError(ctx, compatParamError("Key: 'UpdateTicketStatusRequest.Id' Error:Field validation for 'Id' failed on the 'required' tag"))
 		}
 		if req.Status == nil {
@@ -110,7 +110,7 @@ func registerLegacyAdminCompatRoutes(r *khttp.Router, dataLayer *data.Data, admi
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatUpdateTicketStatusRequest)
 			return adminTicket.UpdateTicketStatus(inner, &adminticketv1.UpdateTicketStatusRequest{
-				Id:     strconv.FormatInt(in.ID, 10),
+				Id:     strconv.FormatInt(int64(in.ID), 10),
 				Status: int32(*in.Status),
 			})
 		})

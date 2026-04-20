@@ -188,15 +188,15 @@ type compatOrderListRequest struct {
 }
 
 type compatPurchaseOrderRequest struct {
-	SubscribeID int64  `json:"subscribe_id"`
-	Quantity    int64  `json:"quantity"`
-	Payment     int64  `json:"payment"`
-	Coupon      string `json:"coupon,omitempty"`
+	SubscribeID compatFlexibleInt64 `json:"subscribe_id" form:"subscribe_id"`
+	Quantity    int64               `json:"quantity"`
+	Payment     int64               `json:"payment"`
+	Coupon      string              `json:"coupon,omitempty"`
 }
 
 type compatRechargeOrderRequest struct {
-	Amount  int64 `json:"amount"`
-	Payment int64 `json:"payment"`
+	Amount  compatFlexibleInt64 `json:"amount" form:"amount"`
+	Payment int64               `json:"payment"`
 }
 
 type compatRenewalOrderRequest struct {
@@ -212,22 +212,22 @@ type compatResetTrafficOrderRequest struct {
 }
 
 type compatPortalPurchaseRequest struct {
-	AuthType       string `json:"auth_type"`
-	Identifier     string `json:"identifier"`
-	Password       string `json:"password,omitempty"`
-	Payment        int64  `json:"payment"`
-	SubscribeID    int64  `json:"subscribe_id"`
-	Quantity       int64  `json:"quantity"`
-	Coupon         string `json:"coupon,omitempty"`
-	InviteCode     string `json:"invite_code,omitempty"`
-	TurnstileToken string `json:"turnstile_token,omitempty"`
+	AuthType       string              `json:"auth_type"`
+	Identifier     string              `json:"identifier"`
+	Password       string              `json:"password,omitempty"`
+	Payment        compatFlexibleInt64 `json:"payment" form:"payment"`
+	SubscribeID    compatFlexibleInt64 `json:"subscribe_id" form:"subscribe_id"`
+	Quantity       compatFlexibleInt64 `json:"quantity" form:"quantity"`
+	Coupon         string              `json:"coupon,omitempty"`
+	InviteCode     string              `json:"invite_code,omitempty"`
+	TurnstileToken string              `json:"turnstile_token,omitempty"`
 }
 
 type compatPortalPrePurchaseOrderRequest struct {
-	Payment     int64  `json:"payment,omitempty"`
-	SubscribeID int64  `json:"subscribe_id"`
-	Quantity    int64  `json:"quantity"`
-	Coupon      string `json:"coupon,omitempty"`
+	Payment     compatFlexibleInt64 `json:"payment,omitempty" form:"payment"`
+	SubscribeID compatFlexibleInt64 `json:"subscribe_id" form:"subscribe_id"`
+	Quantity    compatFlexibleInt64 `json:"quantity" form:"quantity"`
+	Coupon      string              `json:"coupon,omitempty"`
 }
 
 type compatGetSubscriptionRequest struct {
@@ -353,7 +353,7 @@ func registerLegacyPublicOrderCompatRoutes(r *khttp.Router, dataLayer *data.Data
 			in := request.(*compatPurchaseOrderRequest)
 			reply, err := publicOrder.PreCreateOrder(inner, &publicorderv1.PreCreateOrderRequest{
 				Type:        1,
-				SubscribeId: strconv.FormatInt(in.SubscribeID, 10),
+				SubscribeId: strconv.FormatInt(int64(in.SubscribeID), 10),
 				Quantity:    int32(in.Quantity),
 				Coupon:      in.Coupon,
 				Payment:     int32(in.Payment),
@@ -401,7 +401,7 @@ func registerLegacyPublicOrderCompatRoutes(r *khttp.Router, dataLayer *data.Data
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatPurchaseOrderRequest)
 			reply, err := publicOrder.Purchase(inner, &publicorderv1.PurchaseRequest{
-				SubscribeId: strconv.FormatInt(in.SubscribeID, 10),
+				SubscribeId: strconv.FormatInt(int64(in.SubscribeID), 10),
 				Quantity:    int32(in.Quantity),
 				Coupon:      in.Coupon,
 				Payment:     int32(in.Payment),
@@ -438,7 +438,7 @@ func registerLegacyPublicOrderCompatRoutes(r *khttp.Router, dataLayer *data.Data
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatRechargeOrderRequest)
 			reply, err := publicOrder.Recharge(inner, &publicorderv1.RechargeRequest{
-				Amount:  strconv.FormatInt(in.Amount, 10),
+				Amount:  strconv.FormatInt(int64(in.Amount), 10),
 				Payment: int32(in.Payment),
 			})
 			if err != nil {
@@ -595,15 +595,15 @@ func registerLegacyPublicPortalCompatRoutes(r *khttp.Router, dataLayer *data.Dat
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatPortalPrePurchaseOrderRequest)
 			serviceReq := &publicportalv1.PrePurchaseOrderRequest{
-				SubscribeId: strconv.FormatInt(in.SubscribeID, 10),
-				Quantity:    strconv.FormatInt(in.Quantity, 10),
+				SubscribeId: strconv.FormatInt(int64(in.SubscribeID), 10),
+				Quantity:    strconv.FormatInt(int64(in.Quantity), 10),
 			}
 			if strings.TrimSpace(in.Coupon) != "" {
 				coupon := in.Coupon
 				serviceReq.Coupon = &coupon
 			}
-			if in.Payment != 0 {
-				paymentID := strconv.FormatInt(in.Payment, 10)
+			if int64(in.Payment) != 0 {
+				paymentID := strconv.FormatInt(int64(in.Payment), 10)
 				serviceReq.PaymentId = &paymentID
 			}
 			reply, err := publicPortal.PrePurchaseOrder(inner, serviceReq)
@@ -640,12 +640,12 @@ func registerLegacyPublicPortalCompatRoutes(r *khttp.Router, dataLayer *data.Dat
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatPortalPurchaseRequest)
 			serviceReq := &publicportalv1.PurchaseRequest{
-				SubscribeId: strconv.FormatInt(in.SubscribeID, 10),
-				Quantity:    strconv.FormatInt(in.Quantity, 10),
+				SubscribeId: strconv.FormatInt(int64(in.SubscribeID), 10),
+				Quantity:    strconv.FormatInt(int64(in.Quantity), 10),
 				Identifier:  in.Identifier,
 				AuthType:    in.AuthType,
 				Password:    in.Password,
-				PaymentId:   strconv.FormatInt(in.Payment, 10),
+				PaymentId:   strconv.FormatInt(int64(in.Payment), 10),
 			}
 			if strings.TrimSpace(in.Coupon) != "" {
 				coupon := in.Coupon

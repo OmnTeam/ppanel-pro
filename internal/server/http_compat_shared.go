@@ -2,7 +2,9 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -52,6 +54,44 @@ type compatUpdateUserRulesRequest struct {
 type compatUpdateUserSubscribeNoteRequest struct {
 	UserSubscribeID int64  `json:"user_subscribe_id"`
 	Note            string `json:"note"`
+}
+
+type compatFlexibleInt64 int64
+
+func (v *compatFlexibleInt64) UnmarshalJSON(data []byte) error {
+	raw := strings.TrimSpace(string(data))
+	if raw == "" || raw == "null" {
+		*v = 0
+		return nil
+	}
+	if strings.HasPrefix(raw, "\"") {
+		var text string
+		if err := json.Unmarshal(data, &text); err != nil {
+			return err
+		}
+		*v = compatFlexibleInt64(compatParseInt64String(text))
+		return nil
+	}
+	parsed, err := strconv.ParseInt(raw, 10, 64)
+	if err != nil {
+		return err
+	}
+	*v = compatFlexibleInt64(parsed)
+	return nil
+}
+
+func (v *compatFlexibleInt64) UnmarshalText(text []byte) error {
+	raw := strings.TrimSpace(string(text))
+	if raw == "" {
+		*v = 0
+		return nil
+	}
+	parsed, err := strconv.ParseInt(raw, 10, 64)
+	if err != nil {
+		return err
+	}
+	*v = compatFlexibleInt64(parsed)
+	return nil
 }
 
 func compatCurrentUser(ctx context.Context) (*ent.ProxyUser, error) {
