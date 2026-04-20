@@ -9,7 +9,6 @@ option java_package = "api.admin.log.v1";
 import "google/api/annotations.proto";
 
 service LogService {
-  // System Log APIs (proxy_system_log table)
   rpc FilterBalanceLog(FilterBalanceLogRequest) returns (FilterBalanceLogReply) {
     option (google.api.http) = {
       get: "/v1/admin/log/balance/list"
@@ -82,14 +81,12 @@ service LogService {
     };
   }
 
-  // Traffic Log APIs (proxy_traffic_log table)
   rpc FilterTrafficLogDetails(FilterTrafficLogDetailsRequest) returns (FilterTrafficLogDetailsReply) {
     option (google.api.http) = {
       get: "/v1/admin/log/traffic/details"
     };
   }
 
-  // Log Setting APIs (proxy_system table)
   rpc GetLogSetting(GetLogSettingRequest) returns (GetLogSettingReply) {
     option (google.api.http) = {
       get: "/v1/admin/log/setting"
@@ -104,415 +101,405 @@ service LogService {
   }
 }
 
-// Common filter parameters
 message FilterLogParams {
-  int32 page = 1;
-  int32 size = 2;
-  string date = 3;      // 日期过滤，格式如 "2025-01-01"
-  string search = 4;    // 搜索关键词
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string search = 5;
 }
 
-// ==================== Balance Log ====================
 message FilterBalanceLogRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string date = 3;
-  int64 user_id = 4;    // 可选，过滤特定用户
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string user_id = 5;
 }
 
 message BalanceLog {
   int32 type = 1;
-  int64 user_id = 2;
-  int64 amount = 3;
+  string user_id = 2;
+  string amount = 3;
   string order_no = 4;
-  int64 balance = 5;
-  int64 timestamp = 6;
+  string balance = 5;
+  string timestamp = 6;
 }
 
 message FilterBalanceLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated BalanceLog list = 2;
 }
 
 message FilterBalanceLogReply {
-  int32 code = 1;                   // 状态码
-  string message = 2;               // 消息内容
-  FilterBalanceLogData data = 3;    // 响应数据
+  int32 code = 1;
+  string message = 2;
+  FilterBalanceLogData data = 3;
 }
 
-// ==================== Commission Log ====================
 message FilterCommissionLogRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string date = 3;
-  int64 user_id = 4;
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string user_id = 5;
 }
 
 message CommissionLog {
   int32 type = 1;
-  int64 user_id = 2;
-  int64 amount = 3;
+  string user_id = 2;
+  string amount = 3;
   string order_no = 4;
-  int64 timestamp = 5;
+  string timestamp = 5;
 }
 
 message FilterCommissionLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated CommissionLog list = 2;
 }
 
 message FilterCommissionLogReply {
-  int32 code = 1;                      // 状态码
-  string message = 2;                  // 消息内容
-  FilterCommissionLogData data = 3;    // 响应数据
+  int32 code = 1;
+  string message = 2;
+  FilterCommissionLogData data = 3;
 }
 
-// ==================== Email Log ====================
 message FilterEmailLogRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string date = 3;
-  string search = 4;
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string search = 5;
 }
 
 message EmailLog {
-  int64 id = 1;
+  string id = 1;
   int32 type = 2;
   string platform = 3;
   string to = 4;
   string subject = 5;
   string content = 6;
   int32 status = 7;
-  int64 created_at = 8;
+  string created_at = 8;
 }
 
 message FilterEmailLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated EmailLog list = 2;
 }
 
 message FilterEmailLogReply {
-  int32 code = 1;                 // 状态码
-  string message = 2;             // 消息内容
-  FilterEmailLogData data = 3;    // 响应数据
+  int32 code = 1;
+  string message = 2;
+  FilterEmailLogData data = 3;
 }
 
-// ==================== Gift Log ====================
 message FilterGiftLogRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string date = 3;
-  int64 user_id = 4;
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string user_id = 5;
 }
 
 message GiftLog {
   int32 type = 1;
-  int64 user_id = 2;
+  string user_id = 2;
   string order_no = 3;
-  int64 subscribe_id = 4;
-  int64 amount = 5;
-  int64 balance = 6;
+  string subscribe_id = 4;
+  string amount = 5;
+  string balance = 6;
   string remark = 7;
-  int64 timestamp = 8;
+  string timestamp = 8;
 }
 
 message FilterGiftLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated GiftLog list = 2;
 }
 
 message FilterGiftLogReply {
-  int32 code = 1;               // 状态码
-  string message = 2;           // 消息内容
-  FilterGiftLogData data = 3;   // 响应数据
+  int32 code = 1;
+  string message = 2;
+  FilterGiftLogData data = 3;
 }
 
-// ==================== Login Log ====================
 message FilterLoginLogRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string date = 3;
-  int64 user_id = 4;
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string user_id = 5;
 }
 
 message LoginLog {
-  int64 user_id = 1;
+  string user_id = 1;
   string method = 2;
   string login_ip = 3;
   string user_agent = 4;
   bool success = 5;
-  int64 timestamp = 6;
+  string timestamp = 6;
 }
 
 message FilterLoginLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated LoginLog list = 2;
 }
 
 message FilterLoginLogReply {
-  int32 code = 1;                // 状态码
-  string message = 2;            // 消息内容
-  FilterLoginLogData data = 3;   // 响应数据
+  int32 code = 1;
+  string message = 2;
+  FilterLoginLogData data = 3;
 }
 
-// ==================== Message Log ====================
 message GetMessageLogListRequest {
-  int32 page = 1;
-  int32 size = 2;
-  int32 type = 3;       // 1: Email, 2: Mobile
-  string search = 4;
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  int32 type = 4;
+  string search = 5;
 }
 
 message MessageLog {
-  int64 id = 1;
+  string id = 1;
   int32 type = 2;
   string platform = 3;
   string to = 4;
   string subject = 5;
   string content = 6;
   int32 status = 7;
-  int64 created_at = 8;
+  string created_at = 8;
 }
 
 message GetMessageLogListData {
-  int64 total = 1;
+  int32 total = 1;
   repeated MessageLog list = 2;
 }
 
 message GetMessageLogListReply {
-  int32 code = 1;                    // 状态码
-  string message = 2;                // 消息内容
-  GetMessageLogListData data = 3;    // 响应数据
+  int32 code = 1;
+  string message = 2;
+  GetMessageLogListData data = 3;
 }
 
-// ==================== Mobile Log ====================
 message FilterMobileLogRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string date = 3;
-  string search = 4;
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string search = 5;
 }
 
 message MobileLog {
-  int64 id = 1;
+  string id = 1;
   int32 type = 2;
   string platform = 3;
   string to = 4;
   string subject = 5;
   string content = 6;
   int32 status = 7;
-  int64 created_at = 8;
+  string created_at = 8;
 }
 
 message FilterMobileLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated MobileLog list = 2;
 }
 
 message FilterMobileLogReply {
-  int32 code = 1;                 // 状态码
-  string message = 2;             // 消息内容
-  FilterMobileLogData data = 3;   // 响应数据
+  int32 code = 1;
+  string message = 2;
+  FilterMobileLogData data = 3;
 }
 
-// ==================== Register Log ====================
 message FilterRegisterLogRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string date = 3;
-  int64 user_id = 4;
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string user_id = 5;
 }
 
 message RegisterLog {
-  int64 user_id = 1;
+  string user_id = 1;
   string auth_method = 2;
   string identifier = 3;
   string register_ip = 4;
   string user_agent = 5;
-  int64 timestamp = 6;
+  string timestamp = 6;
 }
 
 message FilterRegisterLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated RegisterLog list = 2;
 }
 
 message FilterRegisterLogReply {
-  int32 code = 1;                   // 状态码
-  string message = 2;               // 消息内容
-  FilterRegisterLogData data = 3;   // 响应数据
+  int32 code = 1;
+  string message = 2;
+  FilterRegisterLogData data = 3;
 }
 
-// ==================== Server Traffic Log ====================
 message FilterServerTrafficLogRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string date = 3;
-  int64 server_id = 4;
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string server_id = 5;
 }
 
 message ServerTrafficLog {
-  int64 server_id = 1;
-  int64 upload = 2;
-  int64 download = 3;
-  int64 total = 4;
-  string date = 5;
-  bool details = 6;
+  string server_id = 1;
+  string upload = 2;
+  string download = 3;
+  string timestamp = 4;
 }
 
 message FilterServerTrafficLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated ServerTrafficLog list = 2;
 }
 
 message FilterServerTrafficLogReply {
-  int32 code = 1;                        // 状态码
-  string message = 2;                    // 消息内容
-  FilterServerTrafficLogData data = 3;   // 响应数据
+  int32 code = 1;
+  string message = 2;
+  FilterServerTrafficLogData data = 3;
 }
 
-// ==================== Subscribe Log ====================
 message FilterSubscribeLogRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string date = 3;
-  int64 user_id = 4;
-  int64 user_subscribe_id = 5;
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string user_id = 5;
 }
 
 message SubscribeLog {
-  int64 user_id = 1;
+  string user_id = 1;
   string token = 2;
   string user_agent = 3;
   string client_ip = 4;
-  int64 user_subscribe_id = 5;
-  int64 timestamp = 6;
+  int32 user_subscribe_id = 5;
+  string timestamp = 6;
 }
 
 message FilterSubscribeLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated SubscribeLog list = 2;
 }
 
 message FilterSubscribeLogReply {
-  int32 code = 1;                    // 状态码
-  string message = 2;                // 消息内容
-  FilterSubscribeLogData data = 3;   // 响应数据
+  int32 code = 1;
+  string message = 2;
+  FilterSubscribeLogData data = 3;
 }
 
-// ==================== Reset Subscribe Log ====================
 message FilterResetSubscribeLogRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string date = 3;
-  int64 user_subscribe_id = 4;
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string user_id = 5;
 }
 
 message ResetSubscribeLog {
   int32 type = 1;
-  int64 user_id = 2;
-  int64 user_subscribe_id = 3;
+  string user_id = 2;
+  int32 user_subscribe_id = 3;
   string order_no = 4;
-  int64 timestamp = 5;
+  string timestamp = 5;
 }
 
 message FilterResetSubscribeLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated ResetSubscribeLog list = 2;
 }
 
 message FilterResetSubscribeLogReply {
-  int32 code = 1;                         // 状态码
-  string message = 2;                     // 消息内容
-  FilterResetSubscribeLogData data = 3;   // 响应数据
+  int32 code = 1;
+  string message = 2;
+  FilterResetSubscribeLogData data = 3;
 }
 
-// ==================== User Subscribe Traffic Log ====================
 message FilterUserSubscribeTrafficLogRequest {
-  int32 page = 1;
-  int32 size = 2;
-  string date = 3;
-  int64 user_id = 4;
-  int64 user_subscribe_id = 5;
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  string date = 4;
+  string user_id = 5;
+  string subscribe_id = 6;
 }
 
 message UserSubscribeTrafficLog {
-  int64 subscribe_id = 1;
-  int64 user_id = 2;
-  int64 upload = 3;
-  int64 download = 4;
-  int64 total = 5;
-  string date = 6;
-  bool details = 7;
+  string user_id = 1;
+  string subscribe_id = 2;
+  string upload = 3;
+  string download = 4;
+  string timestamp = 5;
 }
 
 message FilterUserSubscribeTrafficLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated UserSubscribeTrafficLog list = 2;
 }
 
 message FilterUserSubscribeTrafficLogReply {
-  int32 code = 1;                                 // 状态码
-  string message = 2;                             // 消息内容
-  FilterUserSubscribeTrafficLogData data = 3;     // 响应数据
+  int32 code = 1;
+  string message = 2;
+  FilterUserSubscribeTrafficLogData data = 3;
 }
 
-// ==================== Traffic Log Details ====================
 message FilterTrafficLogDetailsRequest {
-  int32 page = 1;
-  int32 size = 2;
-  int64 server_id = 3;
-  int64 user_id = 4;
-  int64 subscribe_id = 5;
-  int64 start_time = 6;   // Unix timestamp in seconds
-  int64 end_time = 7;     // Unix timestamp in seconds
+  reserved 1;
+  int32 page = 2;
+  int32 size = 3;
+  string server_id = 4;
+  string user_id = 5;
+  string subscribe_id = 6;
+  string start_time = 7;
+  int32 end_time = 8;
 }
 
 message TrafficLogDetail {
-  int64 id = 1;
-  int64 server_id = 2;
-  int64 user_id = 3;
-  int64 subscribe_id = 4;
-  int64 download = 5;
-  int64 upload = 6;
-  int64 timestamp = 7;
+  string id = 1;
+  string server_id = 2;
+  string user_id = 3;
+  string subscribe_id = 4;
+  string download = 5;
+  string upload = 6;
+  string timestamp = 7;
 }
 
 message FilterTrafficLogDetailsData {
-  int64 total = 1;
+  int32 total = 1;
   repeated TrafficLogDetail list = 2;
 }
 
 message FilterTrafficLogDetailsReply {
-  int32 code = 1;                           // 状态码
-  string message = 2;                       // 消息内容
-  FilterTrafficLogDetailsData data = 3;     // 响应数据
+  int32 code = 1;
+  string message = 2;
+  FilterTrafficLogDetailsData data = 3;
 }
 
-// ==================== Log Setting ====================
-message GetLogSettingRequest {
-  // 管理端日志配置查询无需额外请求参数
-}
+message GetLogSettingRequest {}
 
-// 复刻原项目：日志自动清理设置（types.go LogSetting）
 message LogSetting {
-  optional bool auto_clear = 1;    // 是否自动清理日志
-  int64 clear_days = 2;             // 清理天数
+  bool auto_clear = 1;
+  int32 clear_days = 2;
 }
 
 message GetLogSettingReply {
-  int32 code = 1;         // 状态码
-  string message = 2;     // 消息内容
-  LogSetting data = 3;    // 响应数据（直接返回配置对象）
+  int32 code = 1;
+  string message = 2;
+  LogSetting data = 3;
 }
 
 message UpdateLogSettingRequest {
-  // 管理端日志配置更新请求
-  optional bool auto_clear = 1;    // 是否自动清理日志
-  int64 clear_days = 2;             // 清理天数
+  bool auto_clear = 1;
+  int32 clear_days = 2;
 }
 
 message UpdateLogSettingReply {
-  int32 code = 1;     // 状态码
-  string message = 2; // 消息内容
+  int32 code = 1;
+  string message = 2;
 }

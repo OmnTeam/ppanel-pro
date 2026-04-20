@@ -32,46 +32,50 @@ service UserDeviceService {
   }
 }
 
-// ===== UpdateUserDevice =====
-
 message UpdateUserDeviceRequest {
-  int64 id = 1;          // 设备ID
-  int64 subscribe_id = 2; // 订阅ID
+  string id = 1;
+  string subscribe_id = 2;
   string ip = 3;
-  string identifier = 4; // 设备标识符
+  string identifier = 4;
   string user_agent = 5;
-  bool online = 6;       // 是否在线
-  bool enabled = 7;      // 是否启用
+  bool online = 6;
+  bool enabled = 7;
 }
 
 message UpdateUserDeviceReply {}
 
-// ===== DeleteUserDevice =====
-
 message DeleteUserDeviceRequest {
-  int64 id = 1;  // 设备ID
+  string id = 1;
 }
 
 message DeleteUserDeviceReply {}
 
-// ===== KickOfflineByUserDevice =====
-
 message KickOfflineByUserDeviceRequest {
-  int64 id = 1;  // 设备ID
+  string id = 1;
 }
 
 message KickOfflineByUserDeviceReply {}
 
-// ===== Common Messages =====
-
-// UserDevice 用户设备
 message UserDevice {
-  int64 id = 1;
-  string ip = 2;
-  string identifier = 3; // 设备标识符
-  string user_agent = 4;
-  bool online = 5;       // 是否在线
-  bool enabled = 6;      // 是否启用
-  int64 created_at = 7;  // Unix timestamp in seconds
-  int64 updated_at = 8;  // Unix timestamp in seconds
+  string id = 1;
+  string user_id = 2;
+  string subscribe_id = 3;
+  string ip = 4;
+  string identifier = 5;
+  string user_agent = 6;
+  bool online = 7;
+  bool enabled = 8;
+  string created_at = 9;
+  string updated_at = 10;
+}
+
+message UserDeviceOnlineRecord {
+  string id = 1;
+  string user_id = 2;
+  string identifier = 3;
+  string online_time = 4;
+  string offline_time = 5;
+  string online_seconds = 6;
+  string duration_days = 7;
+  string created_at = 8;
 }

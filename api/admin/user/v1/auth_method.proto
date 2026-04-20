@@ -39,50 +39,47 @@ service UserAuthMethodService {
   }
 }
 
-// ===== CreateUserAuthMethod =====
-
 message CreateUserAuthMethodRequest {
-  int64 user_id = 1;
-  string auth_type = 2;        // apple, google, github, facebook, telegram, email, mobile
-  string auth_identifier = 3;  // 认证标识（邮箱、手机号、OpenID等）
+  string user_id = 1;
+  string auth_type = 2;
+  string auth_identifier = 3;
+  bool verified = 4;
 }
 
-message CreateUserAuthMethodReply {}
-
-// ===== UpdateUserAuthMethod =====
+message CreateUserAuthMethodReply {
+  string id = 1;
+}
 
 message UpdateUserAuthMethodRequest {
-  int64 user_id = 1;           // 用户ID
-  string auth_type = 2;        // 认证类型
-  string auth_identifier = 3;  // 认证标识
+  string user_id = 1;
+  string auth_type = 2;
+  string auth_identifier = 3;
 }
 
 message UpdateUserAuthMethodReply {}
 
-// ===== DeleteUserAuthMethod =====
-
 message DeleteUserAuthMethodRequest {
-  int64 user_id = 1;   // 用户ID
-  string auth_type = 2; // 认证类型
+  string user_id = 1;
+  string auth_type = 2;
 }
 
 message DeleteUserAuthMethodReply {}
 
-// ===== GetUserAuthMethod =====
-
 message GetUserAuthMethodRequest {
-  int64 user_id = 1;  // 用户ID
+  string user_id = 1;
+  string auth_type = 2;
 }
 
 message GetUserAuthMethodReply {
-  repeated UserAuthMethod auth_methods = 1;
+  repeated UserAuthMethod list = 1;
 }
 
-// ===== Common Messages =====
-
-// UserAuthMethod 用户认证方法
 message UserAuthMethod {
-  string auth_type = 1;        // apple, google, github, facebook, telegram, email, mobile
-  string auth_identifier = 2;  // 认证标识
-  bool verified = 3;           // 是否已验证
+  string id = 1;
+  string user_id = 2;
+  string auth_type = 3;
+  string auth_identifier = 4;
+  bool verified = 5;
+  string created_at = 6;
+  string updated_at = 7;
 }
