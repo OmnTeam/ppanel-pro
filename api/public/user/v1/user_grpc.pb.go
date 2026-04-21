@@ -48,6 +48,10 @@ const (
 	User_DeviceWSConnect_FullMethodName           = "/api.public.user.v1.User/DeviceWSConnect"
 	User_CommissionWithdraw_FullMethodName        = "/api.public.user.v1.User/CommissionWithdraw"
 	User_QueryWithdrawalLog_FullMethodName        = "/api.public.user.v1.User/QueryWithdrawalLog"
+	User_UpdateUserSubscribeNote_FullMethodName   = "/api.public.user.v1.User/UpdateUserSubscribeNote"
+	User_UpdateUserRules_FullMethodName           = "/api.public.user.v1.User/UpdateUserRules"
+	User_DeleteCurrentUserAccount_FullMethodName  = "/api.public.user.v1.User/DeleteCurrentUserAccount"
+	User_GetUserTrafficStats_FullMethodName       = "/api.public.user.v1.User/GetUserTrafficStats"
 )
 
 // UserClient is the client API for User service.
@@ -113,6 +117,14 @@ type UserClient interface {
 	CommissionWithdraw(ctx context.Context, in *CommissionWithdrawRequest, opts ...grpc.CallOption) (*WithdrawalLogReply, error)
 	// QueryWithdrawalLog 查询提现日志
 	QueryWithdrawalLog(ctx context.Context, in *QueryWithdrawalLogRequest, opts ...grpc.CallOption) (*WithdrawalLogListReply, error)
+	// UpdateUserSubscribeNote 更新用户订阅备注
+	UpdateUserSubscribeNote(ctx context.Context, in *UpdateUserSubscribeNoteRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	// UpdateUserRules 更新用户规则
+	UpdateUserRules(ctx context.Context, in *UpdateUserRulesRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	// DeleteCurrentUserAccount 删除当前用户账号
+	DeleteCurrentUserAccount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CommonReply, error)
+	// GetUserTrafficStats 获取用户流量统计
+	GetUserTrafficStats(ctx context.Context, in *GetUserTrafficStatsRequest, opts ...grpc.CallOption) (*GetUserTrafficStatsReply, error)
 }
 
 type userClient struct {
@@ -403,6 +415,46 @@ func (c *userClient) QueryWithdrawalLog(ctx context.Context, in *QueryWithdrawal
 	return out, nil
 }
 
+func (c *userClient) UpdateUserSubscribeNote(ctx context.Context, in *UpdateUserSubscribeNoteRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CommonReply)
+	err := c.cc.Invoke(ctx, User_UpdateUserSubscribeNote_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) UpdateUserRules(ctx context.Context, in *UpdateUserRulesRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CommonReply)
+	err := c.cc.Invoke(ctx, User_UpdateUserRules_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) DeleteCurrentUserAccount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CommonReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CommonReply)
+	err := c.cc.Invoke(ctx, User_DeleteCurrentUserAccount_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetUserTrafficStats(ctx context.Context, in *GetUserTrafficStatsRequest, opts ...grpc.CallOption) (*GetUserTrafficStatsReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetUserTrafficStatsReply)
+	err := c.cc.Invoke(ctx, User_GetUserTrafficStats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility.
@@ -466,6 +518,14 @@ type UserServer interface {
 	CommissionWithdraw(context.Context, *CommissionWithdrawRequest) (*WithdrawalLogReply, error)
 	// QueryWithdrawalLog 查询提现日志
 	QueryWithdrawalLog(context.Context, *QueryWithdrawalLogRequest) (*WithdrawalLogListReply, error)
+	// UpdateUserSubscribeNote 更新用户订阅备注
+	UpdateUserSubscribeNote(context.Context, *UpdateUserSubscribeNoteRequest) (*CommonReply, error)
+	// UpdateUserRules 更新用户规则
+	UpdateUserRules(context.Context, *UpdateUserRulesRequest) (*CommonReply, error)
+	// DeleteCurrentUserAccount 删除当前用户账号
+	DeleteCurrentUserAccount(context.Context, *emptypb.Empty) (*CommonReply, error)
+	// GetUserTrafficStats 获取用户流量统计
+	GetUserTrafficStats(context.Context, *GetUserTrafficStatsRequest) (*GetUserTrafficStatsReply, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -559,6 +619,18 @@ func (UnimplementedUserServer) CommissionWithdraw(context.Context, *CommissionWi
 }
 func (UnimplementedUserServer) QueryWithdrawalLog(context.Context, *QueryWithdrawalLogRequest) (*WithdrawalLogListReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method QueryWithdrawalLog not implemented")
+}
+func (UnimplementedUserServer) UpdateUserSubscribeNote(context.Context, *UpdateUserSubscribeNoteRequest) (*CommonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserSubscribeNote not implemented")
+}
+func (UnimplementedUserServer) UpdateUserRules(context.Context, *UpdateUserRulesRequest) (*CommonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserRules not implemented")
+}
+func (UnimplementedUserServer) DeleteCurrentUserAccount(context.Context, *emptypb.Empty) (*CommonReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCurrentUserAccount not implemented")
+}
+func (UnimplementedUserServer) GetUserTrafficStats(context.Context, *GetUserTrafficStatsRequest) (*GetUserTrafficStatsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserTrafficStats not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 func (UnimplementedUserServer) testEmbeddedByValue()              {}
@@ -1085,6 +1157,78 @@ func _User_QueryWithdrawalLog_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_UpdateUserSubscribeNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserSubscribeNoteRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateUserSubscribeNote(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_UpdateUserSubscribeNote_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateUserSubscribeNote(ctx, req.(*UpdateUserSubscribeNoteRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_UpdateUserRules_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserRulesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateUserRules(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_UpdateUserRules_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateUserRules(ctx, req.(*UpdateUserRulesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_DeleteCurrentUserAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).DeleteCurrentUserAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_DeleteCurrentUserAccount_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).DeleteCurrentUserAccount(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetUserTrafficStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserTrafficStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetUserTrafficStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: User_GetUserTrafficStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetUserTrafficStats(ctx, req.(*GetUserTrafficStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1203,6 +1347,22 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "QueryWithdrawalLog",
 			Handler:    _User_QueryWithdrawalLog_Handler,
+		},
+		{
+			MethodName: "UpdateUserSubscribeNote",
+			Handler:    _User_UpdateUserSubscribeNote_Handler,
+		},
+		{
+			MethodName: "UpdateUserRules",
+			Handler:    _User_UpdateUserRules_Handler,
+		},
+		{
+			MethodName: "DeleteCurrentUserAccount",
+			Handler:    _User_DeleteCurrentUserAccount_Handler,
+		},
+		{
+			MethodName: "GetUserTrafficStats",
+			Handler:    _User_GetUserTrafficStats_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

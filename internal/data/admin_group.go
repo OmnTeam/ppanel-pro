@@ -75,7 +75,7 @@ func (r *adminGroupRepo) UpdateNodeGroup(ctx context.Context, req *v1.UpdateNode
 	if err != nil {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
-	_, err := r.data.db.ProxyServerGroup.Query().
+	_, err = r.data.db.ProxyServerGroup.Query().
 		Where(proxyservergroup.IDEQ(groupID)).
 		Only(ctx)
 
@@ -1021,8 +1021,8 @@ func (r *adminGroupRepo) GetRecalculationStatus(ctx context.Context) (*v1.Recalc
 		return nil, err
 	}
 
-	var progress int32
-	var total int32
+	var progress int64
+	var total int64
 
 	switch history.State {
 	case "pending":
@@ -1030,13 +1030,13 @@ func (r *adminGroupRepo) GetRecalculationStatus(ctx context.Context) (*v1.Recalc
 		total = 0
 	case "running":
 		progress = 50 // 运行中设为50%
-		total = int32(history.TotalUsers)
+		total = int64(history.TotalUsers)
 	case "completed":
 		progress = 100
-		total = int32(history.TotalUsers)
+		total = int64(history.TotalUsers)
 	case "failed":
 		progress = 0
-		total = int32(history.TotalUsers)
+		total = int64(history.TotalUsers)
 	}
 
 	return &v1.RecalculationState{

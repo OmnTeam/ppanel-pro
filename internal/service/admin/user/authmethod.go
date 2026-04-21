@@ -11,12 +11,6 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
 
-// Helper functions for type conversion
-func parseInt64(s string) int64 {
-	val, _ := strconv.ParseInt(s, 10, 64)
-	return val
-}
-
 func parseAuthMethodUserID(s string) (int64, error) {
 	val, err := strconv.ParseInt(s, 10, 64)
 	if err != nil {
@@ -43,14 +37,11 @@ func NewUserAuthMethodService(uc *userbiz.AuthMethodUsecase, logger log.Logger) 
 
 // CreateUserAuthMethod 创建用户认证方法
 func (s *UserAuthMethodService) CreateUserAuthMethod(ctx context.Context, req *v1.CreateUserAuthMethodRequest) (*v1.CreateUserAuthMethodReply, error) {
-	id, err := s.uc.CreateUserAuthMethod(ctx, req)
-	if err != nil {
+	if _, err := s.uc.CreateUserAuthMethod(ctx, req); err != nil {
 		return nil, err
 	}
 
-	return &v1.CreateUserAuthMethodReply{
-		Id: strconv.FormatInt(id, 10),
-	}, nil
+	return &v1.CreateUserAuthMethodReply{}, nil
 }
 
 // GetUserAuthMethod 获取用户认证方法
@@ -60,7 +51,7 @@ func (s *UserAuthMethodService) GetUserAuthMethod(ctx context.Context, req *v1.G
 		return nil, err
 	}
 
-	methods, err := s.uc.GetUserAuthMethod(ctx, userID, req.AuthType)
+	methods, err := s.uc.GetUserAuthMethod(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -69,19 +60,15 @@ func (s *UserAuthMethodService) GetUserAuthMethod(ctx context.Context, req *v1.G
 	protoMethods := make([]*v1.UserAuthMethod, 0, len(methods))
 	for _, method := range methods {
 		protoMethod := &v1.UserAuthMethod{
-			Id:             strconv.FormatInt(int64(method.ID), 10),
-			UserId:         strconv.FormatInt(int64(method.UserID), 10),
 			AuthType:       method.AuthType,
 			AuthIdentifier: method.AuthIdentifier,
 			Verified:       method.Verified,
-			CreatedAt:      strconv.FormatInt(method.CreatedAt.UnixMilli(), 10),
-			UpdatedAt:      strconv.FormatInt(method.UpdatedAt.UnixMilli(), 10),
 		}
 		protoMethods = append(protoMethods, protoMethod)
 	}
 
 	return &v1.GetUserAuthMethodReply{
-		List: protoMethods,
+		AuthMethods: protoMethods,
 	}, nil
 }
 

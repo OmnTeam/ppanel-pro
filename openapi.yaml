@@ -3382,6 +3382,15 @@ paths:
                   in: query
                   schema:
                     type: string
+                - name: subscribeId
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
             responses:
                 "200":
                     description: OK
@@ -3517,6 +3526,14 @@ paths:
                   in: query
                   schema:
                     type: string
+                - name: userSubscribeId
+                  in: query
+                  schema:
+                    type: string
+                - name: date
+                  in: query
+                  schema:
+                    type: string
             responses:
                 "200":
                     description: OK
@@ -3542,6 +3559,10 @@ paths:
                     type: integer
                     format: int32
                 - name: userSubscribeId
+                  in: query
+                  schema:
+                    type: string
+                - name: date
                   in: query
                   schema:
                     type: string
@@ -3639,6 +3660,14 @@ paths:
                   schema:
                     type: string
                 - name: endTime
+                  in: query
+                  schema:
+                    type: string
+                - name: userSubscribeId
+                  in: query
+                  schema:
+                    type: string
+                - name: date
                   in: query
                   schema:
                     type: string
@@ -4878,6 +4907,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.public.user.v1.WithdrawalLogReply'
+    /v1/public/user/current_user_account:
+        delete:
+            tags:
+                - User
+            description: DeleteCurrentUserAccount 删除当前用户账号
+            operationId: User_DeleteCurrentUserAccount
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.user.v1.CommonReply'
     /v1/public/user/device_online_statistics:
         get:
             tags:
@@ -5013,6 +5055,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.public.user.v1.CommonReply'
+    /v1/public/user/rules:
+        put:
+            tags:
+                - User
+            description: UpdateUserRules 更新用户规则
+            operationId: User_UpdateUserRules
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.public.user.v1.UpdateUserRulesRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.user.v1.CommonReply'
     /v1/public/user/subscribe:
         get:
             tags:
@@ -5048,6 +5109,25 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.public.user.v1.SubscribeLogReply'
+    /v1/public/user/subscribe_note:
+        put:
+            tags:
+                - User
+            description: UpdateUserSubscribeNote 更新用户订阅备注
+            operationId: User_UpdateUserSubscribeNote
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.public.user.v1.UpdateUserSubscribeNoteRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.user.v1.CommonReply'
     /v1/public/user/subscribe_token:
         put:
             tags:
@@ -5067,6 +5147,29 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.public.user.v1.CommonReply'
+    /v1/public/user/traffic_stats:
+        get:
+            tags:
+                - User
+            description: GetUserTrafficStats 获取用户流量统计
+            operationId: User_GetUserTrafficStats
+            parameters:
+                - name: userSubscribeId
+                  in: query
+                  schema:
+                    type: string
+                - name: days
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.user.v1.GetUserTrafficStatsReply'
     /v1/public/user/unbind_device:
         put:
             tags:
@@ -6573,6 +6676,11 @@ components:
                 address:
                     type: string
                 port:
+                    type: integer
+                    format: int32
+                tags:
+                    type: string
+                sort:
                     type: integer
                     format: int32
             description: Node 节点信息
@@ -10819,6 +10927,10 @@ components:
                     type: string
                 updatedAt:
                     type: string
+                finishedAt:
+                    type: string
+                uuid:
+                    type: string
             description: UserSubscribe 用户订阅
         api.admin.user.v1.UserSubscribeDetail:
             type: object
@@ -13052,6 +13164,17 @@ components:
                 longestSingleConnection:
                     type: string
             description: ConnectionRecords 连接记录
+        api.public.user.v1.DailyTrafficStats:
+            type: object
+            properties:
+                date:
+                    type: string
+                upload:
+                    type: string
+                download:
+                    type: string
+                total:
+                    type: string
         api.public.user.v1.GetDeviceListData:
             type: object
             properties:
@@ -13094,6 +13217,29 @@ components:
                 data:
                     $ref: '#/components/schemas/api.public.user.v1.GetDeviceOnlineStatisticsData'
             description: GetDeviceOnlineStatisticsReply 获取设备在线统计响应
+        api.public.user.v1.GetUserTrafficStatsData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.public.user.v1.DailyTrafficStats'
+                totalUpload:
+                    type: string
+                totalDownload:
+                    type: string
+                totalTraffic:
+                    type: string
+        api.public.user.v1.GetUserTrafficStatsReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.public.user.v1.GetUserTrafficStatsData'
         api.public.user.v1.LoginLogData:
             type: object
             properties:
@@ -13307,6 +13453,20 @@ components:
                 code:
                     type: string
             description: UpdateBindMobileRequest 更新绑定手机请求
+        api.public.user.v1.UpdateUserRulesRequest:
+            type: object
+            properties:
+                rules:
+                    type: array
+                    items:
+                        type: string
+        api.public.user.v1.UpdateUserSubscribeNoteRequest:
+            type: object
+            properties:
+                userSubscribeId:
+                    type: string
+                note:
+                    type: string
         api.public.user.v1.UserAffiliate:
             type: object
             properties:

@@ -24,12 +24,14 @@ const OperationUserBindOAuth = "/api.public.user.v1.User/BindOAuth"
 const OperationUserBindOAuthCallback = "/api.public.user.v1.User/BindOAuthCallback"
 const OperationUserBindTelegram = "/api.public.user.v1.User/BindTelegram"
 const OperationUserCommissionWithdraw = "/api.public.user.v1.User/CommissionWithdraw"
+const OperationUserDeleteCurrentUserAccount = "/api.public.user.v1.User/DeleteCurrentUserAccount"
 const OperationUserDeviceWSConnect = "/api.public.user.v1.User/DeviceWSConnect"
 const OperationUserGetDeviceList = "/api.public.user.v1.User/GetDeviceList"
 const OperationUserGetDeviceOnlineStatistics = "/api.public.user.v1.User/GetDeviceOnlineStatistics"
 const OperationUserGetLoginLog = "/api.public.user.v1.User/GetLoginLog"
 const OperationUserGetOAuthMethods = "/api.public.user.v1.User/GetOAuthMethods"
 const OperationUserGetSubscribeLog = "/api.public.user.v1.User/GetSubscribeLog"
+const OperationUserGetUserTrafficStats = "/api.public.user.v1.User/GetUserTrafficStats"
 const OperationUserPreUnsubscribe = "/api.public.user.v1.User/PreUnsubscribe"
 const OperationUserQueryUserAffiliate = "/api.public.user.v1.User/QueryUserAffiliate"
 const OperationUserQueryUserAffiliateList = "/api.public.user.v1.User/QueryUserAffiliateList"
@@ -47,6 +49,8 @@ const OperationUserUpdateBindEmail = "/api.public.user.v1.User/UpdateBindEmail"
 const OperationUserUpdateBindMobile = "/api.public.user.v1.User/UpdateBindMobile"
 const OperationUserUpdateUserNotify = "/api.public.user.v1.User/UpdateUserNotify"
 const OperationUserUpdateUserPassword = "/api.public.user.v1.User/UpdateUserPassword"
+const OperationUserUpdateUserRules = "/api.public.user.v1.User/UpdateUserRules"
+const OperationUserUpdateUserSubscribeNote = "/api.public.user.v1.User/UpdateUserSubscribeNote"
 const OperationUserVerifyEmail = "/api.public.user.v1.User/VerifyEmail"
 
 type UserHTTPServer interface {
@@ -58,6 +62,8 @@ type UserHTTPServer interface {
 	BindTelegram(context.Context, *emptypb.Empty) (*TelegramBindReply, error)
 	// CommissionWithdraw CommissionWithdraw 佣金提现
 	CommissionWithdraw(context.Context, *CommissionWithdrawRequest) (*WithdrawalLogReply, error)
+	// DeleteCurrentUserAccount DeleteCurrentUserAccount 删除当前用户账号
+	DeleteCurrentUserAccount(context.Context, *emptypb.Empty) (*CommonReply, error)
 	// DeviceWSConnect DeviceWSConnect 设备WebSocket连接
 	DeviceWSConnect(context.Context, *emptypb.Empty) (*CommonReply, error)
 	// GetDeviceList GetDeviceList 获取设备列表
@@ -70,6 +76,8 @@ type UserHTTPServer interface {
 	GetOAuthMethods(context.Context, *emptypb.Empty) (*OAuthMethodsReply, error)
 	// GetSubscribeLog GetSubscribeLog 获取订阅日志
 	GetSubscribeLog(context.Context, *GetSubscribeLogRequest) (*SubscribeLogReply, error)
+	// GetUserTrafficStats GetUserTrafficStats 获取用户流量统计
+	GetUserTrafficStats(context.Context, *GetUserTrafficStatsRequest) (*GetUserTrafficStatsReply, error)
 	// PreUnsubscribe PreUnsubscribe 预退订
 	PreUnsubscribe(context.Context, *PreUnsubscribeRequest) (*UnsubscribeInfoReply, error)
 	// QueryUserAffiliate QueryUserAffiliate 查询用户推荐数量
@@ -104,6 +112,10 @@ type UserHTTPServer interface {
 	UpdateUserNotify(context.Context, *UpdateUserNotifyRequest) (*CommonReply, error)
 	// UpdateUserPassword UpdateUserPassword 更新密码
 	UpdateUserPassword(context.Context, *UpdateUserPasswordRequest) (*CommonReply, error)
+	// UpdateUserRules UpdateUserRules 更新用户规则
+	UpdateUserRules(context.Context, *UpdateUserRulesRequest) (*CommonReply, error)
+	// UpdateUserSubscribeNote UpdateUserSubscribeNote 更新用户订阅备注
+	UpdateUserSubscribeNote(context.Context, *UpdateUserSubscribeNoteRequest) (*CommonReply, error)
 	// VerifyEmail VerifyEmail 验证邮箱
 	VerifyEmail(context.Context, *VerifyEmailRequest) (*CommonReply, error)
 }
@@ -138,6 +150,10 @@ func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
 	r.GET("/v1/public/user/device_ws_connect", _User_DeviceWSConnect0_HTTP_Handler(srv))
 	r.POST("/v1/public/user/commission_withdraw", _User_CommissionWithdraw0_HTTP_Handler(srv))
 	r.GET("/v1/public/user/withdrawal_log", _User_QueryWithdrawalLog0_HTTP_Handler(srv))
+	r.PUT("/v1/public/user/subscribe_note", _User_UpdateUserSubscribeNote0_HTTP_Handler(srv))
+	r.PUT("/v1/public/user/rules", _User_UpdateUserRules0_HTTP_Handler(srv))
+	r.DELETE("/v1/public/user/current_user_account", _User_DeleteCurrentUserAccount0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/traffic_stats", _User_GetUserTrafficStats0_HTTP_Handler(srv))
 }
 
 func _User_QueryUserInfo0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
@@ -705,6 +721,88 @@ func _User_QueryWithdrawalLog0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Co
 	}
 }
 
+func _User_UpdateUserSubscribeNote0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateUserSubscribeNoteRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserUpdateUserSubscribeNote)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateUserSubscribeNote(ctx, req.(*UpdateUserSubscribeNoteRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CommonReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _User_UpdateUserRules0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateUserRulesRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserUpdateUserRules)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateUserRules(ctx, req.(*UpdateUserRulesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CommonReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _User_DeleteCurrentUserAccount0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in emptypb.Empty
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserDeleteCurrentUserAccount)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteCurrentUserAccount(ctx, req.(*emptypb.Empty))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CommonReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _User_GetUserTrafficStats0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetUserTrafficStatsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationUserGetUserTrafficStats)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetUserTrafficStats(ctx, req.(*GetUserTrafficStatsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetUserTrafficStatsReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type UserHTTPClient interface {
 	// BindOAuth BindOAuth 绑定OAuth
 	BindOAuth(ctx context.Context, req *BindOAuthRequest, opts ...http.CallOption) (rsp *OAuthBindReply, err error)
@@ -714,6 +812,8 @@ type UserHTTPClient interface {
 	BindTelegram(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *TelegramBindReply, err error)
 	// CommissionWithdraw CommissionWithdraw 佣金提现
 	CommissionWithdraw(ctx context.Context, req *CommissionWithdrawRequest, opts ...http.CallOption) (rsp *WithdrawalLogReply, err error)
+	// DeleteCurrentUserAccount DeleteCurrentUserAccount 删除当前用户账号
+	DeleteCurrentUserAccount(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *CommonReply, err error)
 	// DeviceWSConnect DeviceWSConnect 设备WebSocket连接
 	DeviceWSConnect(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *CommonReply, err error)
 	// GetDeviceList GetDeviceList 获取设备列表
@@ -726,6 +826,8 @@ type UserHTTPClient interface {
 	GetOAuthMethods(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *OAuthMethodsReply, err error)
 	// GetSubscribeLog GetSubscribeLog 获取订阅日志
 	GetSubscribeLog(ctx context.Context, req *GetSubscribeLogRequest, opts ...http.CallOption) (rsp *SubscribeLogReply, err error)
+	// GetUserTrafficStats GetUserTrafficStats 获取用户流量统计
+	GetUserTrafficStats(ctx context.Context, req *GetUserTrafficStatsRequest, opts ...http.CallOption) (rsp *GetUserTrafficStatsReply, err error)
 	// PreUnsubscribe PreUnsubscribe 预退订
 	PreUnsubscribe(ctx context.Context, req *PreUnsubscribeRequest, opts ...http.CallOption) (rsp *UnsubscribeInfoReply, err error)
 	// QueryUserAffiliate QueryUserAffiliate 查询用户推荐数量
@@ -760,6 +862,10 @@ type UserHTTPClient interface {
 	UpdateUserNotify(ctx context.Context, req *UpdateUserNotifyRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 	// UpdateUserPassword UpdateUserPassword 更新密码
 	UpdateUserPassword(ctx context.Context, req *UpdateUserPasswordRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
+	// UpdateUserRules UpdateUserRules 更新用户规则
+	UpdateUserRules(ctx context.Context, req *UpdateUserRulesRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
+	// UpdateUserSubscribeNote UpdateUserSubscribeNote 更新用户订阅备注
+	UpdateUserSubscribeNote(ctx context.Context, req *UpdateUserSubscribeNoteRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 	// VerifyEmail VerifyEmail 验证邮箱
 	VerifyEmail(ctx context.Context, req *VerifyEmailRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
 }
@@ -822,6 +928,20 @@ func (c *UserHTTPClientImpl) CommissionWithdraw(ctx context.Context, in *Commiss
 	opts = append(opts, http.Operation(OperationUserCommissionWithdraw))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// DeleteCurrentUserAccount DeleteCurrentUserAccount 删除当前用户账号
+func (c *UserHTTPClientImpl) DeleteCurrentUserAccount(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*CommonReply, error) {
+	var out CommonReply
+	pattern := "/v1/public/user/current_user_account"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationUserDeleteCurrentUserAccount))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -904,6 +1024,20 @@ func (c *UserHTTPClientImpl) GetSubscribeLog(ctx context.Context, in *GetSubscri
 	pattern := "/v1/public/user/subscribe_log"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationUserGetSubscribeLog))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// GetUserTrafficStats GetUserTrafficStats 获取用户流量统计
+func (c *UserHTTPClientImpl) GetUserTrafficStats(ctx context.Context, in *GetUserTrafficStatsRequest, opts ...http.CallOption) (*GetUserTrafficStatsReply, error) {
+	var out GetUserTrafficStatsReply
+	pattern := "/v1/public/user/traffic_stats"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationUserGetUserTrafficStats))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -1144,6 +1278,34 @@ func (c *UserHTTPClientImpl) UpdateUserPassword(ctx context.Context, in *UpdateU
 	opts = append(opts, http.Operation(OperationUserUpdateUserPassword))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// UpdateUserRules UpdateUserRules 更新用户规则
+func (c *UserHTTPClientImpl) UpdateUserRules(ctx context.Context, in *UpdateUserRulesRequest, opts ...http.CallOption) (*CommonReply, error) {
+	var out CommonReply
+	pattern := "/v1/public/user/rules"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserUpdateUserRules))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// UpdateUserSubscribeNote UpdateUserSubscribeNote 更新用户订阅备注
+func (c *UserHTTPClientImpl) UpdateUserSubscribeNote(ctx context.Context, in *UpdateUserSubscribeNoteRequest, opts ...http.CallOption) (*CommonReply, error) {
+	var out CommonReply
+	pattern := "/v1/public/user/subscribe_note"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationUserUpdateUserSubscribeNote))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

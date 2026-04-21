@@ -35,7 +35,7 @@ type UserInfoData struct {
 	GiftAmount            int64                  `protobuf:"varint,7,opt,name=gift_amount,json=giftAmount,proto3" json:"gift_amount,omitempty"`
 	Telegram              int64                  `protobuf:"varint,8,opt,name=telegram,proto3" json:"telegram,omitempty"`
 	ReferCode             string                 `protobuf:"bytes,9,opt,name=refer_code,json=referCode,proto3" json:"refer_code,omitempty"`
-	RefererId             int64                  `protobuf:"varint,10,opt,name=referer_id,json=refererId,proto3" json:"referer_id,omitempty"`
+	RefererId             string                 `protobuf:"bytes,10,opt,name=referer_id,json=refererId,proto3" json:"referer_id,omitempty"`
 	Enable                bool                   `protobuf:"varint,11,opt,name=enable,proto3" json:"enable,omitempty"`
 	IsAdmin               bool                   `protobuf:"varint,12,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
 	EnableBalanceNotify   bool                   `protobuf:"varint,13,opt,name=enable_balance_notify,json=enableBalanceNotify,proto3" json:"enable_balance_notify,omitempty"`
@@ -142,11 +142,11 @@ func (x *UserInfoData) GetReferCode() string {
 	return ""
 }
 
-func (x *UserInfoData) GetRefererId() int64 {
+func (x *UserInfoData) GetRefererId() string {
 	if x != nil {
 		return x.RefererId
 	}
-	return 0
+	return ""
 }
 
 func (x *UserInfoData) GetEnable() bool {
@@ -1604,7 +1604,7 @@ type UserSubscribe struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	OrderId       int64                  `protobuf:"varint,3,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	OrderId       string                 `protobuf:"bytes,3,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
 	SubscribeId   string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`
 	Subscribe     *Subscribe             `protobuf:"bytes,5,opt,name=subscribe,proto3" json:"subscribe,omitempty"`
 	StartTime     int64                  `protobuf:"varint,6,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
@@ -1666,11 +1666,11 @@ func (x *UserSubscribe) GetUserId() string {
 	return ""
 }
 
-func (x *UserSubscribe) GetOrderId() int64 {
+func (x *UserSubscribe) GetOrderId() string {
 	if x != nil {
 		return x.OrderId
 	}
-	return 0
+	return ""
 }
 
 func (x *UserSubscribe) GetSubscribeId() string {
@@ -3183,7 +3183,7 @@ func (x *UpdateBindEmailRequest) GetEmail() string {
 // UserDevice 用户设备信息
 type UserDevice struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                // 设备ID
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                 // 设备ID
 	Ip            string                 `protobuf:"bytes,2,opt,name=ip,proto3" json:"ip,omitempty"`                                 // IP地址
 	Identifier    string                 `protobuf:"bytes,3,opt,name=identifier,proto3" json:"identifier,omitempty"`                 // 设备标识符
 	UserAgent     string                 `protobuf:"bytes,4,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`  // 用户代理
@@ -3225,11 +3225,11 @@ func (*UserDevice) Descriptor() ([]byte, []int) {
 	return file_public_user_v1_user_proto_rawDescGZIP(), []int{49}
 }
 
-func (x *UserDevice) GetId() int64 {
+func (x *UserDevice) GetId() string {
 	if x != nil {
 		return x.Id
 	}
-	return 0
+	return ""
 }
 
 func (x *UserDevice) GetIp() string {
@@ -4058,6 +4058,350 @@ func (x *WithdrawalLogListReply) GetData() *WithdrawalLogListData {
 	return nil
 }
 
+type UpdateUserSubscribeNoteRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	UserSubscribeId string                 `protobuf:"bytes,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
+	Note            string                 `protobuf:"bytes,2,opt,name=note,proto3" json:"note,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *UpdateUserSubscribeNoteRequest) Reset() {
+	*x = UpdateUserSubscribeNoteRequest{}
+	mi := &file_public_user_v1_user_proto_msgTypes[63]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserSubscribeNoteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserSubscribeNoteRequest) ProtoMessage() {}
+
+func (x *UpdateUserSubscribeNoteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_public_user_v1_user_proto_msgTypes[63]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserSubscribeNoteRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserSubscribeNoteRequest) Descriptor() ([]byte, []int) {
+	return file_public_user_v1_user_proto_rawDescGZIP(), []int{63}
+}
+
+func (x *UpdateUserSubscribeNoteRequest) GetUserSubscribeId() string {
+	if x != nil {
+		return x.UserSubscribeId
+	}
+	return ""
+}
+
+func (x *UpdateUserSubscribeNoteRequest) GetNote() string {
+	if x != nil {
+		return x.Note
+	}
+	return ""
+}
+
+type UpdateUserRulesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Rules         []string               `protobuf:"bytes,1,rep,name=rules,proto3" json:"rules,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserRulesRequest) Reset() {
+	*x = UpdateUserRulesRequest{}
+	mi := &file_public_user_v1_user_proto_msgTypes[64]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserRulesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserRulesRequest) ProtoMessage() {}
+
+func (x *UpdateUserRulesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_public_user_v1_user_proto_msgTypes[64]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserRulesRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserRulesRequest) Descriptor() ([]byte, []int) {
+	return file_public_user_v1_user_proto_rawDescGZIP(), []int{64}
+}
+
+func (x *UpdateUserRulesRequest) GetRules() []string {
+	if x != nil {
+		return x.Rules
+	}
+	return nil
+}
+
+type GetUserTrafficStatsRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	UserSubscribeId string                 `protobuf:"bytes,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"`
+	Days            int32                  `protobuf:"varint,2,opt,name=days,proto3" json:"days,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *GetUserTrafficStatsRequest) Reset() {
+	*x = GetUserTrafficStatsRequest{}
+	mi := &file_public_user_v1_user_proto_msgTypes[65]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserTrafficStatsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserTrafficStatsRequest) ProtoMessage() {}
+
+func (x *GetUserTrafficStatsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_public_user_v1_user_proto_msgTypes[65]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserTrafficStatsRequest.ProtoReflect.Descriptor instead.
+func (*GetUserTrafficStatsRequest) Descriptor() ([]byte, []int) {
+	return file_public_user_v1_user_proto_rawDescGZIP(), []int{65}
+}
+
+func (x *GetUserTrafficStatsRequest) GetUserSubscribeId() string {
+	if x != nil {
+		return x.UserSubscribeId
+	}
+	return ""
+}
+
+func (x *GetUserTrafficStatsRequest) GetDays() int32 {
+	if x != nil {
+		return x.Days
+	}
+	return 0
+}
+
+type DailyTrafficStats struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	Upload        int64                  `protobuf:"varint,2,opt,name=upload,proto3" json:"upload,omitempty"`
+	Download      int64                  `protobuf:"varint,3,opt,name=download,proto3" json:"download,omitempty"`
+	Total         int64                  `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DailyTrafficStats) Reset() {
+	*x = DailyTrafficStats{}
+	mi := &file_public_user_v1_user_proto_msgTypes[66]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DailyTrafficStats) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DailyTrafficStats) ProtoMessage() {}
+
+func (x *DailyTrafficStats) ProtoReflect() protoreflect.Message {
+	mi := &file_public_user_v1_user_proto_msgTypes[66]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DailyTrafficStats.ProtoReflect.Descriptor instead.
+func (*DailyTrafficStats) Descriptor() ([]byte, []int) {
+	return file_public_user_v1_user_proto_rawDescGZIP(), []int{66}
+}
+
+func (x *DailyTrafficStats) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *DailyTrafficStats) GetUpload() int64 {
+	if x != nil {
+		return x.Upload
+	}
+	return 0
+}
+
+func (x *DailyTrafficStats) GetDownload() int64 {
+	if x != nil {
+		return x.Download
+	}
+	return 0
+}
+
+func (x *DailyTrafficStats) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+type GetUserTrafficStatsData struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	List          []*DailyTrafficStats   `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
+	TotalUpload   int64                  `protobuf:"varint,2,opt,name=total_upload,json=totalUpload,proto3" json:"total_upload,omitempty"`
+	TotalDownload int64                  `protobuf:"varint,3,opt,name=total_download,json=totalDownload,proto3" json:"total_download,omitempty"`
+	TotalTraffic  int64                  `protobuf:"varint,4,opt,name=total_traffic,json=totalTraffic,proto3" json:"total_traffic,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserTrafficStatsData) Reset() {
+	*x = GetUserTrafficStatsData{}
+	mi := &file_public_user_v1_user_proto_msgTypes[67]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserTrafficStatsData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserTrafficStatsData) ProtoMessage() {}
+
+func (x *GetUserTrafficStatsData) ProtoReflect() protoreflect.Message {
+	mi := &file_public_user_v1_user_proto_msgTypes[67]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserTrafficStatsData.ProtoReflect.Descriptor instead.
+func (*GetUserTrafficStatsData) Descriptor() ([]byte, []int) {
+	return file_public_user_v1_user_proto_rawDescGZIP(), []int{67}
+}
+
+func (x *GetUserTrafficStatsData) GetList() []*DailyTrafficStats {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+func (x *GetUserTrafficStatsData) GetTotalUpload() int64 {
+	if x != nil {
+		return x.TotalUpload
+	}
+	return 0
+}
+
+func (x *GetUserTrafficStatsData) GetTotalDownload() int64 {
+	if x != nil {
+		return x.TotalDownload
+	}
+	return 0
+}
+
+func (x *GetUserTrafficStatsData) GetTotalTraffic() int64 {
+	if x != nil {
+		return x.TotalTraffic
+	}
+	return 0
+}
+
+type GetUserTrafficStatsReply struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Code          int32                    `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`
+	Message       string                   `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Data          *GetUserTrafficStatsData `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetUserTrafficStatsReply) Reset() {
+	*x = GetUserTrafficStatsReply{}
+	mi := &file_public_user_v1_user_proto_msgTypes[68]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetUserTrafficStatsReply) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetUserTrafficStatsReply) ProtoMessage() {}
+
+func (x *GetUserTrafficStatsReply) ProtoReflect() protoreflect.Message {
+	mi := &file_public_user_v1_user_proto_msgTypes[68]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetUserTrafficStatsReply.ProtoReflect.Descriptor instead.
+func (*GetUserTrafficStatsReply) Descriptor() ([]byte, []int) {
+	return file_public_user_v1_user_proto_rawDescGZIP(), []int{68}
+}
+
+func (x *GetUserTrafficStatsReply) GetCode() int32 {
+	if x != nil {
+		return x.Code
+	}
+	return 0
+}
+
+func (x *GetUserTrafficStatsReply) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetUserTrafficStatsReply) GetData() *GetUserTrafficStatsData {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
 var File_public_user_v1_user_proto protoreflect.FileDescriptor
 
 const file_public_user_v1_user_proto_rawDesc = "" +
@@ -4079,7 +4423,7 @@ const file_public_user_v1_user_proto_rawDesc = "" +
 	"refer_code\x18\t \x01(\tR\treferCode\x12\x1d\n" +
 	"\n" +
 	"referer_id\x18\n" +
-	" \x01(\x03R\trefererId\x12\x16\n" +
+	" \x01(\tR\trefererId\x12\x16\n" +
 	"\x06enable\x18\v \x01(\bR\x06enable\x12\x19\n" +
 	"\bis_admin\x18\f \x01(\bR\aisAdmin\x122\n" +
 	"\x15enable_balance_notify\x18\r \x01(\bR\x13enableBalanceNotify\x12.\n" +
@@ -4188,7 +4532,7 @@ const file_public_user_v1_user_proto_rawDesc = "" +
 	"\rUserSubscribe\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x19\n" +
-	"\border_id\x18\x03 \x01(\x03R\aorderId\x12!\n" +
+	"\border_id\x18\x03 \x01(\tR\aorderId\x12!\n" +
 	"\fsubscribe_id\x18\x04 \x01(\tR\vsubscribeId\x12;\n" +
 	"\tsubscribe\x18\x05 \x01(\v2\x1d.api.public.user.v1.SubscribeR\tsubscribe\x12\x1d\n" +
 	"\n" +
@@ -4311,7 +4655,7 @@ const file_public_user_v1_user_proto_rawDesc = "" +
 	"\x05email\x18\x01 \x01(\tR\x05email\"\xdb\x01\n" +
 	"\n" +
 	"UserDevice\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x0e\n" +
 	"\x02ip\x18\x02 \x01(\tR\x02ip\x12\x1e\n" +
 	"\n" +
 	"identifier\x18\x03 \x01(\tR\n" +
@@ -4376,7 +4720,29 @@ const file_public_user_v1_user_proto_rawDesc = "" +
 	"\x16WithdrawalLogListReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12=\n" +
-	"\x04data\x18\x03 \x01(\v2).api.public.user.v1.WithdrawalLogListDataR\x04data2\xb6\x1d\n" +
+	"\x04data\x18\x03 \x01(\v2).api.public.user.v1.WithdrawalLogListDataR\x04data\"`\n" +
+	"\x1eUpdateUserSubscribeNoteRequest\x12*\n" +
+	"\x11user_subscribe_id\x18\x01 \x01(\tR\x0fuserSubscribeId\x12\x12\n" +
+	"\x04note\x18\x02 \x01(\tR\x04note\".\n" +
+	"\x16UpdateUserRulesRequest\x12\x14\n" +
+	"\x05rules\x18\x01 \x03(\tR\x05rules\"\\\n" +
+	"\x1aGetUserTrafficStatsRequest\x12*\n" +
+	"\x11user_subscribe_id\x18\x01 \x01(\tR\x0fuserSubscribeId\x12\x12\n" +
+	"\x04days\x18\x02 \x01(\x05R\x04days\"q\n" +
+	"\x11DailyTrafficStats\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12\x16\n" +
+	"\x06upload\x18\x02 \x01(\x03R\x06upload\x12\x1a\n" +
+	"\bdownload\x18\x03 \x01(\x03R\bdownload\x12\x14\n" +
+	"\x05total\x18\x04 \x01(\x03R\x05total\"\xc3\x01\n" +
+	"\x17GetUserTrafficStatsData\x129\n" +
+	"\x04list\x18\x01 \x03(\v2%.api.public.user.v1.DailyTrafficStatsR\x04list\x12!\n" +
+	"\ftotal_upload\x18\x02 \x01(\x03R\vtotalUpload\x12%\n" +
+	"\x0etotal_download\x18\x03 \x01(\x03R\rtotalDownload\x12#\n" +
+	"\rtotal_traffic\x18\x04 \x01(\x03R\ftotalTraffic\"\x89\x01\n" +
+	"\x18GetUserTrafficStatsReply\x12\x12\n" +
+	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12?\n" +
+	"\x04data\x18\x03 \x01(\v2+.api.public.user.v1.GetUserTrafficStatsDataR\x04data2\xf6!\n" +
 	"\x04User\x12h\n" +
 	"\rQueryUserInfo\x12\x16.google.protobuf.Empty\x1a!.api.public.user.v1.UserInfoReply\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/v1/public/user/info\x12{\n" +
 	"\vGetLoginLog\x12&.api.public.user.v1.GetLoginLogRequest\x1a!.api.public.user.v1.LoginLogReply\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/v1/public/user/login_log\x12w\n" +
@@ -4405,7 +4771,11 @@ const file_public_user_v1_user_proto_rawDesc = "" +
 	"\x19GetDeviceOnlineStatistics\x12\x16.google.protobuf.Empty\x1a2.api.public.user.v1.GetDeviceOnlineStatisticsReply\"0\x82\xd3\xe4\x93\x02*\x12(/v1/public/user/device_online_statistics\x12u\n" +
 	"\x0fDeviceWSConnect\x12\x16.google.protobuf.Empty\x1a\x1f.api.public.user.v1.CommonReply\")\x82\xd3\xe4\x93\x02#\x12!/v1/public/user/device_ws_connect\x12\x9b\x01\n" +
 	"\x12CommissionWithdraw\x12-.api.public.user.v1.CommissionWithdrawRequest\x1a&.api.public.user.v1.WithdrawalLogReply\".\x82\xd3\xe4\x93\x02(:\x01*\"#/v1/public/user/commission_withdraw\x12\x97\x01\n" +
-	"\x12QueryWithdrawalLog\x12-.api.public.user.v1.QueryWithdrawalLogRequest\x1a*.api.public.user.v1.WithdrawalLogListReply\"&\x82\xd3\xe4\x93\x02 \x12\x1e/v1/public/user/withdrawal_logBK\n" +
+	"\x12QueryWithdrawalLog\x12-.api.public.user.v1.QueryWithdrawalLogRequest\x1a*.api.public.user.v1.WithdrawalLogListReply\"&\x82\xd3\xe4\x93\x02 \x12\x1e/v1/public/user/withdrawal_log\x12\x99\x01\n" +
+	"\x17UpdateUserSubscribeNote\x122.api.public.user.v1.UpdateUserSubscribeNoteRequest\x1a\x1f.api.public.user.v1.CommonReply\")\x82\xd3\xe4\x93\x02#:\x01*\x1a\x1e/v1/public/user/subscribe_note\x12\x80\x01\n" +
+	"\x0fUpdateUserRules\x12*.api.public.user.v1.UpdateUserRulesRequest\x1a\x1f.api.public.user.v1.CommonReply\" \x82\xd3\xe4\x93\x02\x1a:\x01*\x1a\x15/v1/public/user/rules\x12\x81\x01\n" +
+	"\x18DeleteCurrentUserAccount\x12\x16.google.protobuf.Empty\x1a\x1f.api.public.user.v1.CommonReply\",\x82\xd3\xe4\x93\x02&*$/v1/public/user/current_user_account\x12\x9a\x01\n" +
+	"\x13GetUserTrafficStats\x12..api.public.user.v1.GetUserTrafficStatsRequest\x1a,.api.public.user.v1.GetUserTrafficStatsReply\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/v1/public/user/traffic_statsBK\n" +
 	"\x12api.public.user.v1P\x01Z3github.com/OmnTeam/ppanel-pro/api/public/user/v1;v1b\x06proto3"
 
 var (
@@ -4420,7 +4790,7 @@ func file_public_user_v1_user_proto_rawDescGZIP() []byte {
 	return file_public_user_v1_user_proto_rawDescData
 }
 
-var file_public_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 63)
+var file_public_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 69)
 var file_public_user_v1_user_proto_goTypes = []any{
 	(*UserInfoData)(nil),                   // 0: api.public.user.v1.UserInfoData
 	(*UserInfoReply)(nil),                  // 1: api.public.user.v1.UserInfoReply
@@ -4485,7 +4855,13 @@ var file_public_user_v1_user_proto_goTypes = []any{
 	(*QueryWithdrawalLogRequest)(nil),      // 60: api.public.user.v1.QueryWithdrawalLogRequest
 	(*WithdrawalLogListData)(nil),          // 61: api.public.user.v1.WithdrawalLogListData
 	(*WithdrawalLogListReply)(nil),         // 62: api.public.user.v1.WithdrawalLogListReply
-	(*emptypb.Empty)(nil),                  // 63: google.protobuf.Empty
+	(*UpdateUserSubscribeNoteRequest)(nil), // 63: api.public.user.v1.UpdateUserSubscribeNoteRequest
+	(*UpdateUserRulesRequest)(nil),         // 64: api.public.user.v1.UpdateUserRulesRequest
+	(*GetUserTrafficStatsRequest)(nil),     // 65: api.public.user.v1.GetUserTrafficStatsRequest
+	(*DailyTrafficStats)(nil),              // 66: api.public.user.v1.DailyTrafficStats
+	(*GetUserTrafficStatsData)(nil),        // 67: api.public.user.v1.GetUserTrafficStatsData
+	(*GetUserTrafficStatsReply)(nil),       // 68: api.public.user.v1.GetUserTrafficStatsReply
+	(*emptypb.Empty)(nil),                  // 69: google.protobuf.Empty
 }
 var file_public_user_v1_user_proto_depIdxs = []int32{
 	2,  // 0: api.public.user.v1.UserInfoData.auth_methods:type_name -> api.public.user.v1.UserAuthMethod
@@ -4518,67 +4894,77 @@ var file_public_user_v1_user_proto_depIdxs = []int32{
 	58, // 27: api.public.user.v1.WithdrawalLogReply.data:type_name -> api.public.user.v1.WithdrawalLogData
 	58, // 28: api.public.user.v1.WithdrawalLogListData.list:type_name -> api.public.user.v1.WithdrawalLogData
 	61, // 29: api.public.user.v1.WithdrawalLogListReply.data:type_name -> api.public.user.v1.WithdrawalLogListData
-	63, // 30: api.public.user.v1.User.QueryUserInfo:input_type -> google.protobuf.Empty
-	3,  // 31: api.public.user.v1.User.GetLoginLog:input_type -> api.public.user.v1.GetLoginLogRequest
-	63, // 32: api.public.user.v1.User.QueryUserBalanceLog:input_type -> google.protobuf.Empty
-	10, // 33: api.public.user.v1.User.QueryUserCommissionLog:input_type -> api.public.user.v1.QueryUserCommissionLogRequest
-	63, // 34: api.public.user.v1.User.QueryUserAffiliate:input_type -> google.protobuf.Empty
-	16, // 35: api.public.user.v1.User.QueryUserAffiliateList:input_type -> api.public.user.v1.QueryUserAffiliateListRequest
-	63, // 36: api.public.user.v1.User.GetOAuthMethods:input_type -> google.protobuf.Empty
-	63, // 37: api.public.user.v1.User.QueryUserSubscribe:input_type -> google.protobuf.Empty
-	27, // 38: api.public.user.v1.User.GetSubscribeLog:input_type -> api.public.user.v1.GetSubscribeLogRequest
-	31, // 39: api.public.user.v1.User.ResetUserSubscribeToken:input_type -> api.public.user.v1.ResetUserSubscribeTokenRequest
-	33, // 40: api.public.user.v1.User.PreUnsubscribe:input_type -> api.public.user.v1.PreUnsubscribeRequest
-	36, // 41: api.public.user.v1.User.Unsubscribe:input_type -> api.public.user.v1.UnsubscribeRequest
-	37, // 42: api.public.user.v1.User.UpdateUserNotify:input_type -> api.public.user.v1.UpdateUserNotifyRequest
-	38, // 43: api.public.user.v1.User.UpdateUserPassword:input_type -> api.public.user.v1.UpdateUserPasswordRequest
-	63, // 44: api.public.user.v1.User.BindTelegram:input_type -> google.protobuf.Empty
-	63, // 45: api.public.user.v1.User.UnbindTelegram:input_type -> google.protobuf.Empty
-	41, // 46: api.public.user.v1.User.BindOAuth:input_type -> api.public.user.v1.BindOAuthRequest
-	44, // 47: api.public.user.v1.User.BindOAuthCallback:input_type -> api.public.user.v1.BindOAuthCallbackRequest
-	45, // 48: api.public.user.v1.User.UnbindOAuth:input_type -> api.public.user.v1.UnbindOAuthRequest
-	46, // 49: api.public.user.v1.User.VerifyEmail:input_type -> api.public.user.v1.VerifyEmailRequest
-	47, // 50: api.public.user.v1.User.UpdateBindMobile:input_type -> api.public.user.v1.UpdateBindMobileRequest
-	48, // 51: api.public.user.v1.User.UpdateBindEmail:input_type -> api.public.user.v1.UpdateBindEmailRequest
-	63, // 52: api.public.user.v1.User.GetDeviceList:input_type -> google.protobuf.Empty
-	52, // 53: api.public.user.v1.User.UnbindDevice:input_type -> api.public.user.v1.UnbindDeviceRequest
-	63, // 54: api.public.user.v1.User.GetDeviceOnlineStatistics:input_type -> google.protobuf.Empty
-	63, // 55: api.public.user.v1.User.DeviceWSConnect:input_type -> google.protobuf.Empty
-	57, // 56: api.public.user.v1.User.CommissionWithdraw:input_type -> api.public.user.v1.CommissionWithdrawRequest
-	60, // 57: api.public.user.v1.User.QueryWithdrawalLog:input_type -> api.public.user.v1.QueryWithdrawalLogRequest
-	1,  // 58: api.public.user.v1.User.QueryUserInfo:output_type -> api.public.user.v1.UserInfoReply
-	5,  // 59: api.public.user.v1.User.GetLoginLog:output_type -> api.public.user.v1.LoginLogReply
-	8,  // 60: api.public.user.v1.User.QueryUserBalanceLog:output_type -> api.public.user.v1.BalanceLogReply
-	12, // 61: api.public.user.v1.User.QueryUserCommissionLog:output_type -> api.public.user.v1.CommissionLogReply
-	15, // 62: api.public.user.v1.User.QueryUserAffiliate:output_type -> api.public.user.v1.UserAffiliateReply
-	18, // 63: api.public.user.v1.User.QueryUserAffiliateList:output_type -> api.public.user.v1.UserAffiliateListReply
-	21, // 64: api.public.user.v1.User.GetOAuthMethods:output_type -> api.public.user.v1.OAuthMethodsReply
-	23, // 65: api.public.user.v1.User.QueryUserSubscribe:output_type -> api.public.user.v1.UserSubscribeReply
-	29, // 66: api.public.user.v1.User.GetSubscribeLog:output_type -> api.public.user.v1.SubscribeLogReply
-	32, // 67: api.public.user.v1.User.ResetUserSubscribeToken:output_type -> api.public.user.v1.CommonReply
-	35, // 68: api.public.user.v1.User.PreUnsubscribe:output_type -> api.public.user.v1.UnsubscribeInfoReply
-	32, // 69: api.public.user.v1.User.Unsubscribe:output_type -> api.public.user.v1.CommonReply
-	32, // 70: api.public.user.v1.User.UpdateUserNotify:output_type -> api.public.user.v1.CommonReply
-	32, // 71: api.public.user.v1.User.UpdateUserPassword:output_type -> api.public.user.v1.CommonReply
-	40, // 72: api.public.user.v1.User.BindTelegram:output_type -> api.public.user.v1.TelegramBindReply
-	32, // 73: api.public.user.v1.User.UnbindTelegram:output_type -> api.public.user.v1.CommonReply
-	43, // 74: api.public.user.v1.User.BindOAuth:output_type -> api.public.user.v1.OAuthBindReply
-	32, // 75: api.public.user.v1.User.BindOAuthCallback:output_type -> api.public.user.v1.CommonReply
-	32, // 76: api.public.user.v1.User.UnbindOAuth:output_type -> api.public.user.v1.CommonReply
-	32, // 77: api.public.user.v1.User.VerifyEmail:output_type -> api.public.user.v1.CommonReply
-	32, // 78: api.public.user.v1.User.UpdateBindMobile:output_type -> api.public.user.v1.CommonReply
-	32, // 79: api.public.user.v1.User.UpdateBindEmail:output_type -> api.public.user.v1.CommonReply
-	51, // 80: api.public.user.v1.User.GetDeviceList:output_type -> api.public.user.v1.GetDeviceListReply
-	32, // 81: api.public.user.v1.User.UnbindDevice:output_type -> api.public.user.v1.CommonReply
-	56, // 82: api.public.user.v1.User.GetDeviceOnlineStatistics:output_type -> api.public.user.v1.GetDeviceOnlineStatisticsReply
-	32, // 83: api.public.user.v1.User.DeviceWSConnect:output_type -> api.public.user.v1.CommonReply
-	59, // 84: api.public.user.v1.User.CommissionWithdraw:output_type -> api.public.user.v1.WithdrawalLogReply
-	62, // 85: api.public.user.v1.User.QueryWithdrawalLog:output_type -> api.public.user.v1.WithdrawalLogListReply
-	58, // [58:86] is the sub-list for method output_type
-	30, // [30:58] is the sub-list for method input_type
-	30, // [30:30] is the sub-list for extension type_name
-	30, // [30:30] is the sub-list for extension extendee
-	0,  // [0:30] is the sub-list for field type_name
+	66, // 30: api.public.user.v1.GetUserTrafficStatsData.list:type_name -> api.public.user.v1.DailyTrafficStats
+	67, // 31: api.public.user.v1.GetUserTrafficStatsReply.data:type_name -> api.public.user.v1.GetUserTrafficStatsData
+	69, // 32: api.public.user.v1.User.QueryUserInfo:input_type -> google.protobuf.Empty
+	3,  // 33: api.public.user.v1.User.GetLoginLog:input_type -> api.public.user.v1.GetLoginLogRequest
+	69, // 34: api.public.user.v1.User.QueryUserBalanceLog:input_type -> google.protobuf.Empty
+	10, // 35: api.public.user.v1.User.QueryUserCommissionLog:input_type -> api.public.user.v1.QueryUserCommissionLogRequest
+	69, // 36: api.public.user.v1.User.QueryUserAffiliate:input_type -> google.protobuf.Empty
+	16, // 37: api.public.user.v1.User.QueryUserAffiliateList:input_type -> api.public.user.v1.QueryUserAffiliateListRequest
+	69, // 38: api.public.user.v1.User.GetOAuthMethods:input_type -> google.protobuf.Empty
+	69, // 39: api.public.user.v1.User.QueryUserSubscribe:input_type -> google.protobuf.Empty
+	27, // 40: api.public.user.v1.User.GetSubscribeLog:input_type -> api.public.user.v1.GetSubscribeLogRequest
+	31, // 41: api.public.user.v1.User.ResetUserSubscribeToken:input_type -> api.public.user.v1.ResetUserSubscribeTokenRequest
+	33, // 42: api.public.user.v1.User.PreUnsubscribe:input_type -> api.public.user.v1.PreUnsubscribeRequest
+	36, // 43: api.public.user.v1.User.Unsubscribe:input_type -> api.public.user.v1.UnsubscribeRequest
+	37, // 44: api.public.user.v1.User.UpdateUserNotify:input_type -> api.public.user.v1.UpdateUserNotifyRequest
+	38, // 45: api.public.user.v1.User.UpdateUserPassword:input_type -> api.public.user.v1.UpdateUserPasswordRequest
+	69, // 46: api.public.user.v1.User.BindTelegram:input_type -> google.protobuf.Empty
+	69, // 47: api.public.user.v1.User.UnbindTelegram:input_type -> google.protobuf.Empty
+	41, // 48: api.public.user.v1.User.BindOAuth:input_type -> api.public.user.v1.BindOAuthRequest
+	44, // 49: api.public.user.v1.User.BindOAuthCallback:input_type -> api.public.user.v1.BindOAuthCallbackRequest
+	45, // 50: api.public.user.v1.User.UnbindOAuth:input_type -> api.public.user.v1.UnbindOAuthRequest
+	46, // 51: api.public.user.v1.User.VerifyEmail:input_type -> api.public.user.v1.VerifyEmailRequest
+	47, // 52: api.public.user.v1.User.UpdateBindMobile:input_type -> api.public.user.v1.UpdateBindMobileRequest
+	48, // 53: api.public.user.v1.User.UpdateBindEmail:input_type -> api.public.user.v1.UpdateBindEmailRequest
+	69, // 54: api.public.user.v1.User.GetDeviceList:input_type -> google.protobuf.Empty
+	52, // 55: api.public.user.v1.User.UnbindDevice:input_type -> api.public.user.v1.UnbindDeviceRequest
+	69, // 56: api.public.user.v1.User.GetDeviceOnlineStatistics:input_type -> google.protobuf.Empty
+	69, // 57: api.public.user.v1.User.DeviceWSConnect:input_type -> google.protobuf.Empty
+	57, // 58: api.public.user.v1.User.CommissionWithdraw:input_type -> api.public.user.v1.CommissionWithdrawRequest
+	60, // 59: api.public.user.v1.User.QueryWithdrawalLog:input_type -> api.public.user.v1.QueryWithdrawalLogRequest
+	63, // 60: api.public.user.v1.User.UpdateUserSubscribeNote:input_type -> api.public.user.v1.UpdateUserSubscribeNoteRequest
+	64, // 61: api.public.user.v1.User.UpdateUserRules:input_type -> api.public.user.v1.UpdateUserRulesRequest
+	69, // 62: api.public.user.v1.User.DeleteCurrentUserAccount:input_type -> google.protobuf.Empty
+	65, // 63: api.public.user.v1.User.GetUserTrafficStats:input_type -> api.public.user.v1.GetUserTrafficStatsRequest
+	1,  // 64: api.public.user.v1.User.QueryUserInfo:output_type -> api.public.user.v1.UserInfoReply
+	5,  // 65: api.public.user.v1.User.GetLoginLog:output_type -> api.public.user.v1.LoginLogReply
+	8,  // 66: api.public.user.v1.User.QueryUserBalanceLog:output_type -> api.public.user.v1.BalanceLogReply
+	12, // 67: api.public.user.v1.User.QueryUserCommissionLog:output_type -> api.public.user.v1.CommissionLogReply
+	15, // 68: api.public.user.v1.User.QueryUserAffiliate:output_type -> api.public.user.v1.UserAffiliateReply
+	18, // 69: api.public.user.v1.User.QueryUserAffiliateList:output_type -> api.public.user.v1.UserAffiliateListReply
+	21, // 70: api.public.user.v1.User.GetOAuthMethods:output_type -> api.public.user.v1.OAuthMethodsReply
+	23, // 71: api.public.user.v1.User.QueryUserSubscribe:output_type -> api.public.user.v1.UserSubscribeReply
+	29, // 72: api.public.user.v1.User.GetSubscribeLog:output_type -> api.public.user.v1.SubscribeLogReply
+	32, // 73: api.public.user.v1.User.ResetUserSubscribeToken:output_type -> api.public.user.v1.CommonReply
+	35, // 74: api.public.user.v1.User.PreUnsubscribe:output_type -> api.public.user.v1.UnsubscribeInfoReply
+	32, // 75: api.public.user.v1.User.Unsubscribe:output_type -> api.public.user.v1.CommonReply
+	32, // 76: api.public.user.v1.User.UpdateUserNotify:output_type -> api.public.user.v1.CommonReply
+	32, // 77: api.public.user.v1.User.UpdateUserPassword:output_type -> api.public.user.v1.CommonReply
+	40, // 78: api.public.user.v1.User.BindTelegram:output_type -> api.public.user.v1.TelegramBindReply
+	32, // 79: api.public.user.v1.User.UnbindTelegram:output_type -> api.public.user.v1.CommonReply
+	43, // 80: api.public.user.v1.User.BindOAuth:output_type -> api.public.user.v1.OAuthBindReply
+	32, // 81: api.public.user.v1.User.BindOAuthCallback:output_type -> api.public.user.v1.CommonReply
+	32, // 82: api.public.user.v1.User.UnbindOAuth:output_type -> api.public.user.v1.CommonReply
+	32, // 83: api.public.user.v1.User.VerifyEmail:output_type -> api.public.user.v1.CommonReply
+	32, // 84: api.public.user.v1.User.UpdateBindMobile:output_type -> api.public.user.v1.CommonReply
+	32, // 85: api.public.user.v1.User.UpdateBindEmail:output_type -> api.public.user.v1.CommonReply
+	51, // 86: api.public.user.v1.User.GetDeviceList:output_type -> api.public.user.v1.GetDeviceListReply
+	32, // 87: api.public.user.v1.User.UnbindDevice:output_type -> api.public.user.v1.CommonReply
+	56, // 88: api.public.user.v1.User.GetDeviceOnlineStatistics:output_type -> api.public.user.v1.GetDeviceOnlineStatisticsReply
+	32, // 89: api.public.user.v1.User.DeviceWSConnect:output_type -> api.public.user.v1.CommonReply
+	59, // 90: api.public.user.v1.User.CommissionWithdraw:output_type -> api.public.user.v1.WithdrawalLogReply
+	62, // 91: api.public.user.v1.User.QueryWithdrawalLog:output_type -> api.public.user.v1.WithdrawalLogListReply
+	32, // 92: api.public.user.v1.User.UpdateUserSubscribeNote:output_type -> api.public.user.v1.CommonReply
+	32, // 93: api.public.user.v1.User.UpdateUserRules:output_type -> api.public.user.v1.CommonReply
+	32, // 94: api.public.user.v1.User.DeleteCurrentUserAccount:output_type -> api.public.user.v1.CommonReply
+	68, // 95: api.public.user.v1.User.GetUserTrafficStats:output_type -> api.public.user.v1.GetUserTrafficStatsReply
+	64, // [64:96] is the sub-list for method output_type
+	32, // [32:64] is the sub-list for method input_type
+	32, // [32:32] is the sub-list for extension type_name
+	32, // [32:32] is the sub-list for extension extendee
+	0,  // [0:32] is the sub-list for field type_name
 }
 
 func init() { file_public_user_v1_user_proto_init() }
@@ -4592,7 +4978,7 @@ func file_public_user_v1_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_public_user_v1_user_proto_rawDesc), len(file_public_user_v1_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   63,
+			NumMessages:   69,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -15,6 +15,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/constant"
 	"github.com/go-kratos/kratos/v2/log"
+	khttp "github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -302,4 +303,21 @@ func compatRequiredFieldError(typeName, fieldName string) error {
 		fieldName,
 		fieldName,
 	))
+}
+
+func compatBindQuery(ctx khttp.Context, req interface{}) error {
+	if req == nil {
+		return nil
+	}
+	return ctx.BindQuery(req)
+}
+
+func compatBindBodyAndQuery(ctx khttp.Context, req interface{}) error {
+	if req == nil {
+		return nil
+	}
+	if err := ctx.Bind(req); err != nil {
+		return err
+	}
+	return ctx.BindQuery(req)
 }

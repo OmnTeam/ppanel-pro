@@ -71,7 +71,7 @@ func (s *UserService) QueryUserInfo(ctx context.Context, req *emptypb.Empty) (*v
 			GiftAmount:            userInfo.GiftAmount,
 			Telegram:              userInfo.Telegram,
 			ReferCode:             userInfo.ReferCode,
-			RefererId:             userInfo.RefererID,
+			RefererId:             formatInt64(userInfo.RefererID),
 			Enable:                userInfo.Enable,
 			IsAdmin:               userInfo.IsAdmin,
 			EnableBalanceNotify:   userInfo.EnableBalanceNotify,
@@ -266,7 +266,7 @@ func (s *UserService) QueryUserSubscribe(ctx context.Context, req *emptypb.Empty
 		sub := &v1.UserSubscribe{
 			Id:          formatInt64(item.ID),
 			UserId:      formatInt64(item.UserID),
-			OrderId:     item.OrderID,
+			OrderId:     formatInt64(item.OrderID),
 			SubscribeId: formatInt64(item.SubscribeID),
 			StartTime:   item.StartTime,
 			ExpireTime:  item.ExpireTime,
@@ -597,7 +597,7 @@ func (s *UserService) GetDeviceList(ctx context.Context, req *emptypb.Empty) (*v
 	deviceList := make([]*v1.UserDevice, 0, len(list))
 	for _, device := range list {
 		deviceList = append(deviceList, &v1.UserDevice{
-			Id:         device.ID,
+			Id:         formatInt64(device.ID),
 			Ip:         device.IP,
 			Identifier: device.Identifier,
 			UserAgent:  device.UserAgent,
@@ -734,6 +734,101 @@ func (s *UserService) QueryWithdrawalLog(ctx context.Context, req *v1.QueryWithd
 		Data: &v1.WithdrawalLogListData{
 			List:  list,
 			Total: formatInt64(int64(total)),
+		},
+	}, nil
+}
+
+// UpdateUserSubscribeNote 更新用户订阅备注
+func (s *UserService) UpdateUserSubscribeNote(ctx context.Context, req *v1.UpdateUserSubscribeNoteRequest) (*v1.CommonReply, error) {
+	userID := middleware.GetUserID(ctx)
+
+	userSubscribeID, err := parseStringID(req.UserSubscribeId)
+	if err != nil {
+		return nil, err
+	}
+	if len(req.Note) > 500 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	if err := s.uc.UpdateUserSubscribeNote(ctx, int(userID), userSubscribeID, req.Note); err != nil {
+		return nil, err
+	}
+
+	return &v1.CommonReply{
+		Code:    int32(responsecode.UserUpdated),
+		Message: responsecode.CodeMessages[responsecode.UserUpdated],
+	}, nil
+}
+
+// UpdateUserRules 更新用户规则
+func (s *UserService) UpdateUserRules(ctx context.Context, req *v1.UpdateUserRulesRequest) (*v1.CommonReply, error) {
+	userID := middleware.GetUserID(ctx)
+
+	if len(req.Rules) == 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	if err := s.uc.UpdateUserRules(ctx, int(userID), req.Rules); err != nil {
+		return nil, err
+	}
+
+	return &v1.CommonReply{
+		Code:    int32(responsecode.UserUpdated),
+		Message: responsecode.CodeMessages[responsecode.UserUpdated],
+	}, nil
+}
+
+// DeleteCurrentUserAccount 删除当前用户账号
+func (s *UserService) DeleteCurrentUserAccount(ctx context.Context, req *emptypb.Empty) (*v1.CommonReply, error) {
+	userID := middleware.GetUserID(ctx)
+	sessionID := middleware.GetSessionID(ctx)
+
+	if err := s.uc.DeleteCurrentUserAccount(ctx, int(userID), sessionID); err != nil {
+		return nil, err
+	}
+
+	return &v1.CommonReply{
+		Code:    int32(responsecode.UserDeleted),
+		Message: responsecode.CodeMessages[responsecode.UserDeleted],
+	}, nil
+}
+
+// GetUserTrafficStats 获取用户流量统计
+func (s *UserService) GetUserTrafficStats(ctx context.Context, req *v1.GetUserTrafficStatsRequest) (*v1.GetUserTrafficStatsReply, error) {
+	userID := middleware.GetUserID(ctx)
+
+	if req.UserSubscribeId == "" || (req.Days != 7 && req.Days != 30) {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	userSubscribeID, err := parseStringID(req.UserSubscribeId)
+	if err != nil {
+		return nil, err
+	}
+
+	stats, err := s.uc.GetUserTrafficStats(ctx, int(userID), userSubscribeID, int(req.Days))
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]*v1.DailyTrafficStats, 0, len(stats.List))
+	for _, item := range stats.List {
+		list = append(list, &v1.DailyTrafficStats{
+			Date:     item.Date,
+			Upload:   item.Upload,
+			Download: item.Download,
+			Total:    item.Total,
+		})
+	}
+
+	return &v1.GetUserTrafficStatsReply{
+		Code:    int32(responsecode.UserInfoQuerySuccess),
+		Message: responsecode.CodeMessages[responsecode.UserInfoQuerySuccess],
+		Data: &v1.GetUserTrafficStatsData{
+			List:          list,
+			TotalUpload:   stats.TotalUpload,
+			TotalDownload: stats.TotalDownload,
+			TotalTraffic:  stats.TotalTraffic,
 		},
 	}, nil
 }

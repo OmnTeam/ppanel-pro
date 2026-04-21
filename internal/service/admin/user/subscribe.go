@@ -2,13 +2,13 @@ package user
 
 import (
 	"context"
-	"encoding/json"
 	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/user/v1"
 	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
+	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
 
@@ -26,12 +26,6 @@ func NewUserSubscribeService(uc *userbiz.SubscribeUsecase, logger log.Logger) *U
 		uc:     uc,
 		logger: log.NewHelper(logger),
 	}
-}
-
-// Helper function for parsing int64 from string
-func parseInt64Helper(s string) int64 {
-	val, _ := strconv.ParseInt(s, 10, 64)
-	return val
 }
 
 func parseStringInt64Helper(s string) (int64, error) {
@@ -92,20 +86,24 @@ func (s *UserSubscribeService) GetUserSubscribe(ctx context.Context, req *v1.Get
 	}
 
 	return &v1.GetUserSubscribeReply{
-		Total: total,
-		List:  protoList,
+		Code:    int32(responsecode.UserSubscribeQuerySuccess),
+		Message: responsecode.CodeMessages[responsecode.UserSubscribeQuerySuccess],
+		Data: &v1.GetUserSubscribeData{
+			Total: total,
+			List:  protoList,
+		},
 	}, nil
 }
 
 // CreateUserSubscribe 创建用户订阅
 func (s *UserSubscribeService) CreateUserSubscribe(ctx context.Context, req *v1.CreateUserSubscribeRequest) (*v1.CreateUserSubscribeReply, error) {
-	id, err := s.uc.CreateUserSubscribe(ctx, req)
-	if err != nil {
+	if _, err := s.uc.CreateUserSubscribe(ctx, req); err != nil {
 		return nil, err
 	}
 
 	return &v1.CreateUserSubscribeReply{
-		Id: strconv.FormatInt(int64(id), 10),
+		Code:    200,
+		Message: responsecode.CodeMessages[200],
 	}, nil
 }
 
@@ -116,12 +114,15 @@ func (s *UserSubscribeService) UpdateUserSubscribe(ctx context.Context, req *v1.
 		return nil, err
 	}
 
-	return &v1.UpdateUserSubscribeReply{}, nil
+	return &v1.UpdateUserSubscribeReply{
+		Code:    200,
+		Message: responsecode.CodeMessages[200],
+	}, nil
 }
 
 // DeleteUserSubscribe 删除用户订阅
 func (s *UserSubscribeService) DeleteUserSubscribe(ctx context.Context, req *v1.DeleteUserSubscribeRequest) (*v1.DeleteUserSubscribeReply, error) {
-	id, err := parseStringInt64Helper(req.Id)
+	id, err := parseStringInt64Helper(req.UserSubscribeId)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +132,10 @@ func (s *UserSubscribeService) DeleteUserSubscribe(ctx context.Context, req *v1.
 		return nil, err
 	}
 
-	return &v1.DeleteUserSubscribeReply{}, nil
+	return &v1.DeleteUserSubscribeReply{
+		Code:    200,
+		Message: responsecode.CodeMessages[200],
+	}, nil
 }
 
 // GetUserSubscribeById 根据ID获取用户订阅详情
@@ -141,23 +145,21 @@ func (s *UserSubscribeService) GetUserSubscribeById(ctx context.Context, req *v1
 		return nil, err
 	}
 
-	subscribe, subscribeName, err := s.uc.GetUserSubscribeById(ctx, id)
+	subscribe, err := s.uc.GetUserSubscribeById(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	// 注意：proto定义中只返回subscribe，subscribeName暂时无法返回
-	// 可以考虑将subscribeName添加到UserSubscribe消息中作为扩展字段
-	_ = subscribeName // 避免未使用变量警告
-
 	return &v1.GetUserSubscribeByIdReply{
-		Subscribe: subscribe,
+		Code:    int32(responsecode.UserSubscribeQuerySuccess),
+		Message: responsecode.CodeMessages[responsecode.UserSubscribeQuerySuccess],
+		Data:    subscribe,
 	}, nil
 }
 
 // GetUserSubscribeDevices 获取用户订阅设备列表
 func (s *UserSubscribeService) GetUserSubscribeDevices(ctx context.Context, req *v1.GetUserSubscribeDevicesRequest) (*v1.GetUserSubscribeDevicesReply, error) {
-	list, _, err := s.uc.GetUserSubscribeDevices(ctx, req) // 忽略total，proto中没有该字段
+	list, total, err := s.uc.GetUserSubscribeDevices(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +169,6 @@ func (s *UserSubscribeService) GetUserSubscribeDevices(ctx context.Context, req 
 	for _, item := range list {
 		protoItem := &v1.UserDevice{
 			Id:        strconv.FormatInt(int64(item.ID), 10),
-			UserId:    strconv.FormatInt(int64(item.UserID), 10),
 			Online:    item.Online,
 			Enabled:   item.Enabled,
 			CreatedAt: item.CreatedAt.UnixMilli(),
@@ -175,9 +176,6 @@ func (s *UserSubscribeService) GetUserSubscribeDevices(ctx context.Context, req 
 		}
 
 		// 处理指针字段
-		if item.SubscribeID != nil {
-			protoItem.SubscribeId = strconv.FormatInt(int64(*item.SubscribeID), 10)
-		}
 		if item.IP != nil {
 			protoItem.Ip = *item.IP
 		}
@@ -192,7 +190,12 @@ func (s *UserSubscribeService) GetUserSubscribeDevices(ctx context.Context, req 
 	}
 
 	return &v1.GetUserSubscribeDevicesReply{
-		Devices: protoList,
+		Code:    int32(responsecode.UserDeviceListQuerySuccess),
+		Message: responsecode.CodeMessages[responsecode.UserDeviceListQuerySuccess],
+		Data: &v1.GetUserSubscribeDevicesData{
+			Total: total,
+			List:  protoList,
+		},
 	}, nil
 }
 
@@ -204,13 +207,18 @@ func (s *UserSubscribeService) GetUserSubscribeLogs(ctx context.Context, req *v1
 	}
 
 	// 转换为Proto消息列表
-	protoList := make([]*v1.SubscribeLog, 0, len(list))
+	protoList := make([]*v1.UserSubscribeLog, 0, len(list))
 	for _, item := range list {
-		protoItem := &v1.SubscribeLog{
+		content := &logmodel.Subscribe{}
+		_ = content.Unmarshal([]byte(item.Content))
+
+		protoItem := &v1.UserSubscribeLog{
 			Id:              strconv.FormatInt(int64(item.ID), 10),
-			UserId:          "", // 当前实现保持简化，与原项目数据结构一致
+			UserId:          "",
 			UserSubscribeId: strconv.FormatInt(int64(item.ObjectID), 10),
-			Content:         item.Content, // 返回原始JSON内容
+			Token:           content.Token,
+			Ip:              content.ClientIP,
+			UserAgent:       content.UserAgent,
 			Timestamp:       item.CreatedAt.UnixMilli(),
 		}
 
@@ -218,8 +226,12 @@ func (s *UserSubscribeService) GetUserSubscribeLogs(ctx context.Context, req *v1
 	}
 
 	return &v1.GetUserSubscribeLogsReply{
-		Total: total,
-		List:  protoList,
+		Code:    int32(responsecode.FilterSubscribeLogSuccess),
+		Message: responsecode.CodeMessages[responsecode.FilterSubscribeLogSuccess],
+		Data: &v1.GetUserSubscribeLogsData{
+			Total: total,
+			List:  protoList,
+		},
 	}, nil
 }
 
@@ -231,22 +243,29 @@ func (s *UserSubscribeService) GetUserSubscribeResetTrafficLogs(ctx context.Cont
 	}
 
 	// 转换为Proto消息列表
-	protoList := make([]*v1.ResetTrafficLog, 0, len(list))
+	protoList := make([]*v1.ResetSubscribeTrafficLog, 0, len(list))
 	for _, item := range list {
-		protoItem := &v1.ResetTrafficLog{
+		content := &logmodel.ResetSubscribe{}
+		_ = content.Unmarshal([]byte(item.Content))
+
+		protoItem := &v1.ResetSubscribeTrafficLog{
 			Id:              strconv.FormatInt(int64(item.ID), 10),
-			UserId:          "", // 当前实现保持简化，与原项目数据结构一致
+			Type:            int32(content.Type),
 			UserSubscribeId: strconv.FormatInt(int64(item.ObjectID), 10),
-			Content:         item.Content, // 返回原始JSON内容
-			Timestamp:       item.CreatedAt.UnixMilli(),
+			OrderNo:         content.OrderNo,
+			Timestamp:       content.Timestamp,
 		}
 
 		protoList = append(protoList, protoItem)
 	}
 
 	return &v1.GetUserSubscribeResetTrafficLogsReply{
-		Total: total,
-		List:  protoList,
+		Code:    int32(responsecode.FilterResetSubscribeLogSuccess),
+		Message: responsecode.CodeMessages[responsecode.FilterResetSubscribeLogSuccess],
+		Data: &v1.GetUserSubscribeResetTrafficLogsData{
+			Total: total,
+			List:  protoList,
+		},
 	}, nil
 }
 
@@ -257,33 +276,78 @@ func (s *UserSubscribeService) GetUserSubscribeTrafficLogs(ctx context.Context, 
 		return nil, err
 	}
 
-	// 转换为Proto消息列表（需要将traffic_log转为JSON格式）
-	protoList := make([]*v1.SubscribeTrafficLog, 0, len(list))
+	protoList := make([]*v1.TrafficLog, 0, len(list))
 	for _, item := range list {
-		// 将traffic log转为JSON内容
-		// Traffic log JSON序列化，当前实现与原项目保持一致
-		// 构造content数据结构
-		contentData := map[string]interface{}{
-			"upload":    item.Upload,
-			"download":  item.Download,
-			"timestamp": item.Timestamp.Unix(),
-		}
-		contentBytes, _ := json.Marshal(contentData)
-		content := string(contentBytes)
-
-		protoItem := &v1.SubscribeTrafficLog{
-			Id:              strconv.FormatInt(int64(item.ID), 10),
-			UserId:          strconv.FormatInt(int64(item.UserID), 10),
-			UserSubscribeId: "", // traffic_log表中只有subscribe_id，需要关联查询得到user_subscribe_id
-			Content:         content,
-			Timestamp:       item.Timestamp.UnixMilli(),
+		protoItem := &v1.TrafficLog{
+			Id:          strconv.FormatInt(int64(item.ID), 10),
+			ServerId:    strconv.FormatInt(int64(item.ServerID), 10),
+			UserId:      strconv.FormatInt(int64(item.UserID), 10),
+			SubscribeId: strconv.FormatInt(int64(item.SubscribeID), 10),
+			Download:    item.Download,
+			Upload:      item.Upload,
+			Timestamp:   item.Timestamp.UnixMilli(),
 		}
 
 		protoList = append(protoList, protoItem)
 	}
 
 	return &v1.GetUserSubscribeTrafficLogsReply{
-		Total: total,
-		List:  protoList,
+		Code:    int32(responsecode.FilterUserSubscribeTrafficLogSuccess),
+		Message: responsecode.CodeMessages[responsecode.FilterUserSubscribeTrafficLogSuccess],
+		Data: &v1.GetUserSubscribeTrafficLogsData{
+			Total: total,
+			List:  protoList,
+		},
+	}, nil
+}
+
+// ResetUserSubscribeToken 重置用户订阅令牌
+func (s *UserSubscribeService) ResetUserSubscribeToken(ctx context.Context, req *v1.ResetUserSubscribeTokenRequest) (*v1.ResetUserSubscribeTokenReply, error) {
+	userSubscribeID, err := parseStringInt64Helper(req.UserSubscribeId)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.uc.ResetUserSubscribeToken(ctx, userSubscribeID); err != nil {
+		return nil, err
+	}
+
+	return &v1.ResetUserSubscribeTokenReply{
+		Code:    200,
+		Message: responsecode.CodeMessages[200],
+	}, nil
+}
+
+// ToggleUserSubscribeStatus 切换用户订阅状态
+func (s *UserSubscribeService) ToggleUserSubscribeStatus(ctx context.Context, req *v1.ToggleUserSubscribeStatusRequest) (*v1.ToggleUserSubscribeStatusReply, error) {
+	userSubscribeID, err := parseStringInt64Helper(req.UserSubscribeId)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.uc.ToggleUserSubscribeStatus(ctx, userSubscribeID); err != nil {
+		return nil, err
+	}
+
+	return &v1.ToggleUserSubscribeStatusReply{
+		Code:    200,
+		Message: responsecode.CodeMessages[200],
+	}, nil
+}
+
+// ResetUserSubscribeTraffic 重置用户订阅流量
+func (s *UserSubscribeService) ResetUserSubscribeTraffic(ctx context.Context, req *v1.ResetUserSubscribeTrafficRequest) (*v1.ResetUserSubscribeTrafficReply, error) {
+	userSubscribeID, err := parseStringInt64Helper(req.UserSubscribeId)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.uc.ResetUserSubscribeTraffic(ctx, userSubscribeID); err != nil {
+		return nil, err
+	}
+
+	return &v1.ResetUserSubscribeTrafficReply{
+		Code:    200,
+		Message: responsecode.CodeMessages[200],
 	}, nil
 }

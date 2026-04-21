@@ -129,6 +129,18 @@ type UserRepo interface {
 	// GetDeviceOnlineStatistics 获取设备在线统计
 	// 获取设备连接统计信息
 	GetDeviceOnlineStatistics(ctx context.Context, userID int) (*DeviceOnlineStatistics, error)
+
+	// UpdateUserSubscribeNote 更新用户订阅备注
+	UpdateUserSubscribeNote(ctx context.Context, userID int, userSubscribeID int64, note string) error
+
+	// UpdateUserRules 更新用户规则
+	UpdateUserRules(ctx context.Context, userID int, rules []string) error
+
+	// DeleteCurrentUserAccount 删除当前用户账号
+	DeleteCurrentUserAccount(ctx context.Context, userID int, sessionID string) error
+
+	// GetUserTrafficStats 获取用户流量统计
+	GetUserTrafficStats(ctx context.Context, userID int, userSubscribeID int64, days int) (*TrafficStats, error)
 }
 
 // UserInfo 用户信息
@@ -287,6 +299,20 @@ type DeviceOnlineStatistics struct {
 	ConnectionRecords *ConnectionRecords
 }
 
+type DailyTrafficStats struct {
+	Date     string
+	Upload   int64
+	Download int64
+	Total    int64
+}
+
+type TrafficStats struct {
+	List          []*DailyTrafficStats
+	TotalUpload   int64
+	TotalDownload int64
+	TotalTraffic  int64
+}
+
 // UserUseCase Public User用例
 type UserUseCase struct {
 	repo UserRepo
@@ -425,4 +451,24 @@ func (uc *UserUseCase) UnbindDevice(ctx context.Context, userID, deviceID int) e
 // GetDeviceOnlineStatistics 获取设备在线统计
 func (uc *UserUseCase) GetDeviceOnlineStatistics(ctx context.Context, userID int) (*DeviceOnlineStatistics, error) {
 	return uc.repo.GetDeviceOnlineStatistics(ctx, userID)
+}
+
+// UpdateUserSubscribeNote 更新用户订阅备注
+func (uc *UserUseCase) UpdateUserSubscribeNote(ctx context.Context, userID int, userSubscribeID int64, note string) error {
+	return uc.repo.UpdateUserSubscribeNote(ctx, userID, userSubscribeID, note)
+}
+
+// UpdateUserRules 更新用户规则
+func (uc *UserUseCase) UpdateUserRules(ctx context.Context, userID int, rules []string) error {
+	return uc.repo.UpdateUserRules(ctx, userID, rules)
+}
+
+// DeleteCurrentUserAccount 删除当前用户账号
+func (uc *UserUseCase) DeleteCurrentUserAccount(ctx context.Context, userID int, sessionID string) error {
+	return uc.repo.DeleteCurrentUserAccount(ctx, userID, sessionID)
+}
+
+// GetUserTrafficStats 获取用户流量统计
+func (uc *UserUseCase) GetUserTrafficStats(ctx context.Context, userID int, userSubscribeID int64, days int) (*TrafficStats, error) {
+	return uc.repo.GetUserTrafficStats(ctx, userID, userSubscribeID, days)
 }

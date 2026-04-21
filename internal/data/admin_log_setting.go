@@ -68,9 +68,10 @@ func (r *adminLogSettingRepo) GetLogSetting(ctx context.Context) (*v1.LogSetting
 	}
 
 	// 复刻原项目：使用反射映射到结构体（line 35）
+	autoClearValue := autoClear
 	setting := &v1.LogSetting{
-		AutoClear: autoClear,
-		ClearDays: int32(clearDays),
+		AutoClear: &autoClearValue,
+		ClearDays: clearDays,
 	}
 
 	return setting, nil
@@ -80,9 +81,13 @@ func (r *adminLogSettingRepo) GetLogSetting(ctx context.Context) (*v1.LogSetting
 // ⚠️ 完整复刻原项目：updateLogSettingLogic.go:33-63
 func (r *adminLogSettingRepo) UpdateLogSetting(ctx context.Context, setting *v1.LogSetting) error {
 	// 准备配置项（复刻原项目：字段名即key）
+	autoClear := false
+	if setting.AutoClear != nil {
+		autoClear = *setting.AutoClear
+	}
 	configs := map[string]string{
-		LogSettingAutoClear: strconv.FormatBool(setting.AutoClear),
-		LogSettingClearDays: strconv.FormatInt(int64(setting.ClearDays), 10),
+		LogSettingAutoClear: strconv.FormatBool(autoClear),
+		LogSettingClearDays: strconv.FormatInt(setting.ClearDays, 10),
 	}
 
 	// ✅ 使用事务确保所有配置项更新的原子性（复刻原项目 line 37）

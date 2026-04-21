@@ -218,6 +218,36 @@ service User {
       get: "/v1/public/user/withdrawal_log"
     };
   }
+
+  // UpdateUserSubscribeNote 更新用户订阅备注
+  rpc UpdateUserSubscribeNote (UpdateUserSubscribeNoteRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      put: "/v1/public/user/subscribe_note"
+      body: "*"
+    };
+  }
+
+  // UpdateUserRules 更新用户规则
+  rpc UpdateUserRules (UpdateUserRulesRequest) returns (CommonReply) {
+    option (google.api.http) = {
+      put: "/v1/public/user/rules"
+      body: "*"
+    };
+  }
+
+  // DeleteCurrentUserAccount 删除当前用户账号
+  rpc DeleteCurrentUserAccount (google.protobuf.Empty) returns (CommonReply) {
+    option (google.api.http) = {
+      delete: "/v1/public/user/current_user_account"
+    };
+  }
+
+  // GetUserTrafficStats 获取用户流量统计
+  rpc GetUserTrafficStats (GetUserTrafficStatsRequest) returns (GetUserTrafficStatsReply) {
+    option (google.api.http) = {
+      get: "/v1/public/user/traffic_stats"
+    };
+  }
 }
 
 // ============================================================================
@@ -235,7 +265,7 @@ message UserInfoData {
   int64 gift_amount = 7;
   int64 telegram = 8;
   string refer_code = 9;
-  int64 referer_id = 10;
+  string referer_id = 10;
   bool enable = 11;
   bool is_admin = 12;
   bool enable_balance_notify = 13;
@@ -438,7 +468,7 @@ message UserSubscribeReply {
 message UserSubscribe {
   string id = 1;
   string user_id = 2;
-  int64 order_id = 3;
+  string order_id = 3;
   string subscribe_id = 4;
   Subscribe subscribe = 5;
   int64 start_time = 6;
@@ -674,7 +704,7 @@ message UpdateBindEmailRequest {
 
 // UserDevice 用户设备信息
 message UserDevice {
-  int64  id = 1;         // 设备ID
+  string id = 1;         // 设备ID
   string ip = 2;         // IP地址
   string identifier = 3; // 设备标识符
   string user_agent = 4; // 用户代理
@@ -787,5 +817,51 @@ message WithdrawalLogListReply {
   int32 code = 1;                // 状态码
   string message = 2;            // 消息内容
   WithdrawalLogListData data = 3; // 响应数据
+}
+
+// ============================================================================
+// UpdateUserSubscribeNote - 更新用户订阅备注
+// ============================================================================
+
+message UpdateUserSubscribeNoteRequest {
+  string user_subscribe_id = 1;
+  string note = 2;
+}
+
+// ============================================================================
+// UpdateUserRules - 更新用户规则
+// ============================================================================
+
+message UpdateUserRulesRequest {
+  repeated string rules = 1;
+}
+
+// ============================================================================
+// GetUserTrafficStats - 获取用户流量统计
+// ============================================================================
+
+message GetUserTrafficStatsRequest {
+  string user_subscribe_id = 1;
+  int32 days = 2;
+}
+
+message DailyTrafficStats {
+  string date = 1;
+  int64 upload = 2;
+  int64 download = 3;
+  int64 total = 4;
+}
+
+message GetUserTrafficStatsData {
+  repeated DailyTrafficStats list = 1;
+  int64 total_upload = 2;
+  int64 total_download = 3;
+  int64 total_traffic = 4;
+}
+
+message GetUserTrafficStatsReply {
+  int32 code = 1;
+  string message = 2;
+  GetUserTrafficStatsData data = 3;
 }
 

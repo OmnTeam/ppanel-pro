@@ -111,10 +111,10 @@ func (r *adminUserRepo) CreateUser(ctx context.Context, req *v1.CreateUserReques
 		return 0, err
 	}
 
-	// Parse string fields to int64
-	balance, _ := strconv.ParseInt(req.Balance, 10, 64)
-	commission, _ := strconv.ParseInt(req.Commission, 10, 64)
-	giftAmount, _ := strconv.ParseInt(req.GiftAmount, 10, 64)
+	// Numeric fields are already int64 in proto
+	balance := req.Balance
+	commission := req.Commission
+	giftAmount := req.GiftAmount
 
 	// 创建用户
 	builder := tx.ProxyUser.Create().
@@ -404,13 +404,10 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	// Parse balance if provided
+	// Balance field is int64 in proto
 	var balance int64
-	if req.Balance != "" {
-		balance, err = strconv.ParseInt(req.Balance, 10, 64)
-		if err != nil {
-			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
+	if req.Balance != 0 {
+		balance = req.Balance
 
 		// 余额变更日志
 		currentBalance := int64(0)
@@ -442,11 +439,8 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 
 	// 赠送金额变更日志
 	var giftAmount int64
-	if req.GiftAmount != "" {
-		giftAmount, err = strconv.ParseInt(req.GiftAmount, 10, 64)
-		if err != nil {
-			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
+	if req.GiftAmount != 0 {
+		giftAmount = req.GiftAmount
 
 		currentGiftAmount := int64(0)
 		if userInfo.GiftAmount != nil {
@@ -485,11 +479,8 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 
 	// 佣金变更日志
 	var commission int64
-	if req.Commission != "" {
-		commission, err = strconv.ParseInt(req.Commission, 10, 64)
-		if err != nil {
-			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
+	if req.Commission != 0 {
+		commission = req.Commission
 
 		currentCommission := int64(0)
 		if userInfo.Commission != nil {
@@ -528,25 +519,24 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 		builder.SetPassword(encodedPwd)
 	}
 
-	// Parse telegram ID if provided
+	// Telegram field is int64 in proto
 	var telegramID int64
-	if req.Telegram != "" {
-		telegramID, _ = strconv.ParseInt(req.Telegram, 10, 64)
+	if req.Telegram != 0 {
+		telegramID = req.Telegram
 	}
 
 	// 无条件更新所有数值字段（允许设置为0）
-	if req.Balance != "" {
+	if req.Balance != 0 {
 		builder.SetBalance(balance)
 	}
-	if req.Commission != "" {
+	if req.Commission != 0 {
 		builder.SetCommission(commission)
 	}
-	if req.GiftAmount != "" {
+	if req.GiftAmount != 0 {
 		builder.SetGiftAmount(giftAmount)
 	}
-	if req.RefererId != "" {
-		refererID, _ := strconv.ParseInt(req.RefererId, 10, 64)
-		builder.SetRefererID(refererID)
+	if req.RefererId != 0 {
+		builder.SetRefererID(req.RefererId)
 	}
 	builder.SetReferralPercentage(int8(req.ReferralPercentage))
 	builder.SetOnlyFirstPurchase(req.OnlyFirstPurchase)

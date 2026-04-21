@@ -24,7 +24,7 @@ type SubscribeRepo interface {
 	DeleteUserSubscribe(ctx context.Context, userSubscribeID int64) error
 
 	// GetUserSubscribeById 根据ID获取用户订阅详情（包含套餐信息）
-	GetUserSubscribeById(ctx context.Context, userSubscribeID int64) (*v1.UserSubscribe, string, error)
+	GetUserSubscribeById(ctx context.Context, userSubscribeID int64) (*v1.UserSubscribeDetail, error)
 
 	// GetUserSubscribeDevices 获取用户订阅设备列表
 	GetUserSubscribeDevices(ctx context.Context, req *v1.GetUserSubscribeDevicesRequest) ([]*ent.ProxyUserDevice, int64, error)
@@ -37,6 +37,15 @@ type SubscribeRepo interface {
 
 	// GetUserSubscribeTrafficLogs 获取用户订阅流量日志
 	GetUserSubscribeTrafficLogs(ctx context.Context, req *v1.GetUserSubscribeTrafficLogsRequest) ([]*ent.ProxyTrafficLog, int64, error)
+
+	// ResetUserSubscribeToken 重置用户订阅令牌
+	ResetUserSubscribeToken(ctx context.Context, userSubscribeID int64) error
+
+	// ToggleUserSubscribeStatus 切换用户订阅状态
+	ToggleUserSubscribeStatus(ctx context.Context, userSubscribeID int64) error
+
+	// ResetUserSubscribeTraffic 重置用户订阅流量
+	ResetUserSubscribeTraffic(ctx context.Context, userSubscribeID int64) error
 }
 
 // SubscribeUsecase 订阅用例
@@ -74,7 +83,7 @@ func (uc *SubscribeUsecase) DeleteUserSubscribe(ctx context.Context, userSubscri
 }
 
 // GetUserSubscribeById 根据ID获取用户订阅详情
-func (uc *SubscribeUsecase) GetUserSubscribeById(ctx context.Context, userSubscribeID int64) (*v1.UserSubscribe, string, error) {
+func (uc *SubscribeUsecase) GetUserSubscribeById(ctx context.Context, userSubscribeID int64) (*v1.UserSubscribeDetail, error) {
 	return uc.repo.GetUserSubscribeById(ctx, userSubscribeID)
 }
 
@@ -96,4 +105,19 @@ func (uc *SubscribeUsecase) GetUserSubscribeResetTrafficLogs(ctx context.Context
 // GetUserSubscribeTrafficLogs 获取用户订阅流量日志
 func (uc *SubscribeUsecase) GetUserSubscribeTrafficLogs(ctx context.Context, req *v1.GetUserSubscribeTrafficLogsRequest) ([]*ent.ProxyTrafficLog, int64, error) {
 	return uc.repo.GetUserSubscribeTrafficLogs(ctx, req)
+}
+
+// ResetUserSubscribeToken 重置用户订阅令牌
+func (uc *SubscribeUsecase) ResetUserSubscribeToken(ctx context.Context, userSubscribeID int64) error {
+	return uc.repo.ResetUserSubscribeToken(ctx, userSubscribeID)
+}
+
+// ToggleUserSubscribeStatus 切换用户订阅状态
+func (uc *SubscribeUsecase) ToggleUserSubscribeStatus(ctx context.Context, userSubscribeID int64) error {
+	return uc.repo.ToggleUserSubscribeStatus(ctx, userSubscribeID)
+}
+
+// ResetUserSubscribeTraffic 重置用户订阅流量
+func (uc *SubscribeUsecase) ResetUserSubscribeTraffic(ctx context.Context, userSubscribeID int64) error {
+	return uc.repo.ResetUserSubscribeTraffic(ctx, userSubscribeID)
 }

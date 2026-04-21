@@ -285,8 +285,12 @@ func (r *adminRedemptionRepo) GetRedemptionRecordList(ctx context.Context, req *
 	query := r.data.db.ProxyRedemptionRecord.Query()
 
 	// Optional filters
-	if req.UserId > 0 {
-		query = query.Where(proxyredemptionrecord.UserIDEQ(req.UserId))
+	if req.UserId != "" {
+		userID, err := strconv.ParseInt(req.UserId, 10, 64)
+		if err != nil {
+			return nil, 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		query = query.Where(proxyredemptionrecord.UserIDEQ(userID))
 	}
 	if req.CodeId > 0 {
 		query = query.Where(proxyredemptionrecord.RedemptionCodeIDEQ(req.CodeId))

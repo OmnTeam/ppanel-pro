@@ -105,6 +105,8 @@ message GetUserSubscribeRequest {
   int32 page = 1;
   int32 size = 2;
   string user_id = 3;  // 用户ID
+  string subscribe_id = 4; // 订阅套餐ID
+  int32 status = 5; // 状态过滤
 }
 
 message GetUserSubscribeData {
@@ -198,6 +200,8 @@ message GetUserSubscribeLogsRequest {
   int32 size = 2;
   string user_id = 3;           // 用户ID
   string subscribe_id = 4;      // 订阅套餐ID（可选）
+  string user_subscribe_id = 5; // 用户订阅ID（可选）
+  string date = 6;              // 日期（可选）
 }
 
 message GetUserSubscribeLogsData {
@@ -217,6 +221,7 @@ message GetUserSubscribeResetTrafficLogsRequest {
   int32 page = 1;
   int32 size = 2;
   string user_subscribe_id = 3;  // 用户订阅ID
+  string date = 4;               // 日期（可选）
 }
 
 message GetUserSubscribeResetTrafficLogsData {
@@ -239,6 +244,8 @@ message GetUserSubscribeTrafficLogsRequest {
   string subscribe_id = 4;  // 订阅套餐ID
   int64 start_time = 5;    // 开始时间（Unix时间戳，秒）
   int64 end_time = 6;      // 结束时间（Unix时间戳，秒）
+  string user_subscribe_id = 7; // 用户订阅ID（可选）
+  string date = 8;              // 日期（可选）
 }
 
 message GetUserSubscribeTrafficLogsData {
@@ -306,6 +313,8 @@ message UserSubscribe {
   string short = 15;       // 短码
   int64 created_at = 16;   // Unix timestamp in seconds
   int64 updated_at = 17;   // Unix timestamp in seconds
+  int64 finished_at = 18;  // Unix timestamp in seconds
+  string uuid = 19;        // 订阅UUID
 }
 
 // UserSubscribeDetail 用户订阅详情（含关联对象）

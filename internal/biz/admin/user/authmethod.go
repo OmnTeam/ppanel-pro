@@ -15,7 +15,7 @@ type AuthMethodRepo interface {
 	CreateUserAuthMethod(ctx context.Context, req *v1.CreateUserAuthMethodRequest) (int64, error)
 
 	// GetUserAuthMethod 获取用户认证方法列表
-	GetUserAuthMethod(ctx context.Context, userID int64, authType string) ([]*ent.ProxyUserAuthMethod, error)
+	GetUserAuthMethod(ctx context.Context, userID int64) ([]*ent.ProxyUserAuthMethod, error)
 
 	// UpdateUserAuthMethod 更新用户认证方法
 	UpdateUserAuthMethod(ctx context.Context, req *v1.UpdateUserAuthMethodRequest) error
@@ -44,8 +44,8 @@ func (uc *AuthMethodUsecase) CreateUserAuthMethod(ctx context.Context, req *v1.C
 }
 
 // GetUserAuthMethod 获取用户认证方法
-func (uc *AuthMethodUsecase) GetUserAuthMethod(ctx context.Context, userID int64, authType string) ([]*ent.ProxyUserAuthMethod, error) {
-	return uc.repo.GetUserAuthMethod(ctx, userID, authType)
+func (uc *AuthMethodUsecase) GetUserAuthMethod(ctx context.Context, userID int64) ([]*ent.ProxyUserAuthMethod, error) {
+	return uc.repo.GetUserAuthMethod(ctx, userID)
 }
 
 // UpdateUserAuthMethod 更新用户认证方法

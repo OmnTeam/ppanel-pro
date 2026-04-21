@@ -42,7 +42,7 @@ func (s *DocumentService) CreateDocument(ctx context.Context, req *v1.CreateDocu
 		show = &req.Show.Value
 	}
 
-	doc, err := s.uc.CreateDocument(ctx, req.Title, req.Content, req.Tags, show)
+	_, err := s.uc.CreateDocument(ctx, req.Title, req.Content, req.Tags, show)
 	if err != nil {
 		return nil, err
 	}
@@ -50,9 +50,6 @@ func (s *DocumentService) CreateDocument(ctx context.Context, req *v1.CreateDocu
 	return &v1.CreateDocumentReply{
 		Code:    int32(responsecode.AdminCreateDocumentSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminCreateDocumentSuccess],
-		Data: &v1.CreateDocumentData{
-			Id: strconv.FormatInt(doc.ID, 10),
-		},
 	}, nil
 }
 
@@ -72,9 +69,6 @@ func (s *DocumentService) UpdateDocument(ctx context.Context, req *v1.UpdateDocu
 	return &v1.UpdateDocumentReply{
 		Code:    int32(responsecode.AdminUpdateDocumentSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminUpdateDocumentSuccess],
-		Data: &v1.UpdateDocumentData{
-			Success: true,
-		},
 	}, nil
 }
 
@@ -96,7 +90,7 @@ func (s *DocumentService) DeleteDocument(ctx context.Context, req *v1.DeleteDocu
 
 // BatchDeleteDocument 批量删除文档
 func (s *DocumentService) BatchDeleteDocument(ctx context.Context, req *v1.BatchDeleteDocumentRequest) (*v1.BatchDeleteDocumentReply, error) {
-	err := s.uc.BatchDeleteDocument(ctx, convertInt32SliceToIntSlice(req.Ids))
+	err := s.uc.BatchDeleteDocument(ctx, convertStringSliceToIntSlice(req.Ids))
 	if err != nil {
 		return nil, err
 	}
@@ -128,8 +122,8 @@ func (s *DocumentService) GetDocumentDetail(ctx context.Context, req *v1.GetDocu
 				Content:   doc.Content,
 				Tags:      tool.StringMergeAndRemoveDuplicates(doc.Tags), // 第38行：转换 tags
 				Show:      doc.Show,
-				CreatedAt: strconv.FormatInt(doc.CreatedAt.UnixMilli(), 10),
-				UpdatedAt: strconv.FormatInt(doc.UpdatedAt.UnixMilli(), 10),
+				CreatedAt: doc.CreatedAt.UnixMilli(),
+				UpdatedAt: doc.UpdatedAt.UnixMilli(),
 			},
 		},
 	}, nil
@@ -151,8 +145,8 @@ func (s *DocumentService) GetDocumentList(ctx context.Context, req *v1.GetDocume
 			Content:   doc.Content,
 			Tags:      tool.StringMergeAndRemoveDuplicates(doc.Tags), // 第43行：转换 tags
 			Show:      doc.Show,
-			CreatedAt: strconv.FormatInt(doc.CreatedAt.UnixMilli(), 10),
-			UpdatedAt: strconv.FormatInt(doc.UpdatedAt.UnixMilli(), 10),
+			CreatedAt: doc.CreatedAt.UnixMilli(),
+			UpdatedAt: doc.UpdatedAt.UnixMilli(),
 		})
 	}
 
@@ -160,20 +154,20 @@ func (s *DocumentService) GetDocumentList(ctx context.Context, req *v1.GetDocume
 		Code:    int32(responsecode.AdminGetDocumentListSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetDocumentListSuccess],
 		Data: &v1.GetDocumentListData{
-			Total: int32(total),
+			Total: total,
 			List:  list,
 		},
 	}, nil
 }
 
-// convertInt32SliceToIntSlice converts []int32 to []int
-func convertInt32SliceToIntSlice(input []int32) []int {
+// convertStringSliceToIntSlice converts []string to []int
+func convertStringSliceToIntSlice(input []string) []int {
 	if input == nil {
 		return nil
 	}
 	result := make([]int, len(input))
 	for i, v := range input {
-		result[i] = int(v)
+		result[i] = int(parseInt64(v))
 	}
 	return result
 }

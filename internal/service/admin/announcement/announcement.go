@@ -2,6 +2,7 @@ package announcement
 
 import (
 	"context"
+	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -31,9 +32,6 @@ func (s *AnnouncementService) CreateAnnouncement(ctx context.Context, req *v1.Cr
 	announcement := &announcementbiz.Announcement{
 		Title:   req.Title,
 		Content: &req.Content,
-		Show:    req.Show,
-		Pinned:  req.Pinned,
-		Popup:   req.Popup,
 	}
 
 	result, err := s.uc.CreateAnnouncement(ctx, announcement)
@@ -52,13 +50,24 @@ func (s *AnnouncementService) CreateAnnouncement(ctx context.Context, req *v1.Cr
 
 // UpdateAnnouncement 更新公告
 func (s *AnnouncementService) UpdateAnnouncement(ctx context.Context, req *v1.UpdateAnnouncementRequest) (*v1.AnnouncementReply, error) {
+	id, err := strconv.ParseInt(req.Id, 10, 64)
+	if err != nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
 	announcement := &announcementbiz.Announcement{
-		ID:      req.Id,
+		ID:      id,
 		Title:   req.Title,
 		Content: &req.Content,
-		Show:    req.Show,
-		Pinned:  req.Pinned,
-		Popup:   req.Popup,
+	}
+	if req.Show != nil {
+		announcement.Show = *req.Show
+	}
+	if req.Pinned != nil {
+		announcement.Pinned = *req.Pinned
+	}
+	if req.Popup != nil {
+		announcement.Popup = *req.Popup
 	}
 
 	result, err := s.uc.UpdateAnnouncement(ctx, announcement)
@@ -77,7 +86,12 @@ func (s *AnnouncementService) UpdateAnnouncement(ctx context.Context, req *v1.Up
 
 // GetAnnouncement 获取公告详情
 func (s *AnnouncementService) GetAnnouncement(ctx context.Context, req *v1.GetAnnouncementRequest) (*v1.AnnouncementReply, error) {
-	announcement, err := s.uc.GetAnnouncement(ctx, req.Id)
+	id, err := strconv.ParseInt(req.Id, 10, 64)
+	if err != nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	announcement, err := s.uc.GetAnnouncement(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +130,12 @@ func (s *AnnouncementService) ListAnnouncements(ctx context.Context, req *v1.Lis
 
 // DeleteAnnouncement 删除公告
 func (s *AnnouncementService) DeleteAnnouncement(ctx context.Context, req *v1.DeleteAnnouncementRequest) (*v1.DeleteAnnouncementReply, error) {
-	err := s.uc.DeleteAnnouncement(ctx, req.Id)
+	id, err := strconv.ParseInt(req.Id, 10, 64)
+	if err != nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	err = s.uc.DeleteAnnouncement(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +152,7 @@ func (s *AnnouncementService) DeleteAnnouncement(ctx context.Context, req *v1.De
 // convertToProto 将业务模型转换为protobuf消息
 func (s *AnnouncementService) convertToProto(announcement *announcementbiz.Announcement) *v1.Announcement {
 	result := &v1.Announcement{
-		Id:        announcement.ID,
+		Id:        strconv.FormatInt(announcement.ID, 10),
 		Title:     announcement.Title,
 		Show:      &announcement.Show,
 		Pinned:    &announcement.Pinned,

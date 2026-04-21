@@ -26,7 +26,9 @@ type GetUserSubscribeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	Size          int32                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"` // 用户ID
+	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                // 用户ID
+	SubscribeId   string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"` // 订阅套餐ID
+	Status        int32                  `protobuf:"varint,5,opt,name=status,proto3" json:"status,omitempty"`                             // 状态过滤
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -80,6 +82,20 @@ func (x *GetUserSubscribeRequest) GetUserId() string {
 		return x.UserId
 	}
 	return ""
+}
+
+func (x *GetUserSubscribeRequest) GetSubscribeId() string {
+	if x != nil {
+		return x.SubscribeId
+	}
+	return ""
+}
+
+func (x *GetUserSubscribeRequest) GetStatus() int32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
 }
 
 type GetUserSubscribeData struct {
@@ -831,13 +847,15 @@ func (x *GetUserSubscribeDevicesReply) GetData() *GetUserSubscribeDevicesData {
 }
 
 type GetUserSubscribeLogsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	Size          int32                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                // 用户ID
-	SubscribeId   string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"` // 订阅套餐ID（可选）
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Page            int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	Size            int32                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	UserId          string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                              // 用户ID
+	SubscribeId     string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`               // 订阅套餐ID（可选）
+	UserSubscribeId string                 `protobuf:"bytes,5,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID（可选）
+	Date            string                 `protobuf:"bytes,6,opt,name=date,proto3" json:"date,omitempty"`                                                // 日期（可选）
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *GetUserSubscribeLogsRequest) Reset() {
@@ -894,6 +912,20 @@ func (x *GetUserSubscribeLogsRequest) GetUserId() string {
 func (x *GetUserSubscribeLogsRequest) GetSubscribeId() string {
 	if x != nil {
 		return x.SubscribeId
+	}
+	return ""
+}
+
+func (x *GetUserSubscribeLogsRequest) GetUserSubscribeId() string {
+	if x != nil {
+		return x.UserSubscribeId
+	}
+	return ""
+}
+
+func (x *GetUserSubscribeLogsRequest) GetDate() string {
+	if x != nil {
+		return x.Date
 	}
 	return ""
 }
@@ -1015,6 +1047,7 @@ type GetUserSubscribeResetTrafficLogsRequest struct {
 	Page            int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
 	Size            int32                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
 	UserSubscribeId string                 `protobuf:"bytes,3,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID
+	Date            string                 `protobuf:"bytes,4,opt,name=date,proto3" json:"date,omitempty"`                                                // 日期（可选）
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1066,6 +1099,13 @@ func (x *GetUserSubscribeResetTrafficLogsRequest) GetSize() int32 {
 func (x *GetUserSubscribeResetTrafficLogsRequest) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
+	}
+	return ""
+}
+
+func (x *GetUserSubscribeResetTrafficLogsRequest) GetDate() string {
+	if x != nil {
+		return x.Date
 	}
 	return ""
 }
@@ -1183,15 +1223,17 @@ func (x *GetUserSubscribeResetTrafficLogsReply) GetData() *GetUserSubscribeReset
 }
 
 type GetUserSubscribeTrafficLogsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
-	Size          int32                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
-	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                // 用户ID
-	SubscribeId   string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"` // 订阅套餐ID
-	StartTime     int64                  `protobuf:"varint,5,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`      // 开始时间（Unix时间戳，秒）
-	EndTime       int64                  `protobuf:"varint,6,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`            // 结束时间（Unix时间戳，秒）
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Page            int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	Size            int32                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
+	UserId          string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                              // 用户ID
+	SubscribeId     string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`               // 订阅套餐ID
+	StartTime       int64                  `protobuf:"varint,5,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`                    // 开始时间（Unix时间戳，秒）
+	EndTime         int64                  `protobuf:"varint,6,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`                          // 结束时间（Unix时间戳，秒）
+	UserSubscribeId string                 `protobuf:"bytes,7,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // 用户订阅ID（可选）
+	Date            string                 `protobuf:"bytes,8,opt,name=date,proto3" json:"date,omitempty"`                                                // 日期（可选）
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *GetUserSubscribeTrafficLogsRequest) Reset() {
@@ -1264,6 +1306,20 @@ func (x *GetUserSubscribeTrafficLogsRequest) GetEndTime() int64 {
 		return x.EndTime
 	}
 	return 0
+}
+
+func (x *GetUserSubscribeTrafficLogsRequest) GetUserSubscribeId() string {
+	if x != nil {
+		return x.UserSubscribeId
+	}
+	return ""
+}
+
+func (x *GetUserSubscribeTrafficLogsRequest) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
 }
 
 type GetUserSubscribeTrafficLogsData struct {
@@ -1675,17 +1731,19 @@ type UserSubscribe struct {
 	SubscribeId   string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"` // 订阅套餐ID
 	NodeGroupId   int64                  `protobuf:"varint,5,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`
 	GroupLocked   bool                   `protobuf:"varint,6,opt,name=group_locked,json=groupLocked,proto3" json:"group_locked,omitempty"`
-	StartTime     int64                  `protobuf:"varint,7,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`    // Unix timestamp in seconds
-	ExpireTime    int64                  `protobuf:"varint,8,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"` // Unix timestamp in seconds
-	ResetTime     int64                  `protobuf:"varint,9,opt,name=reset_time,json=resetTime,proto3" json:"reset_time,omitempty"`    // Unix timestamp in seconds
-	Traffic       int64                  `protobuf:"varint,10,opt,name=traffic,proto3" json:"traffic,omitempty"`                        // 总流量（字节）
-	Download      int64                  `protobuf:"varint,11,opt,name=download,proto3" json:"download,omitempty"`                      // 下载流量（字节）
-	Upload        int64                  `protobuf:"varint,12,opt,name=upload,proto3" json:"upload,omitempty"`                          // 上传流量（字节）
-	Token         string                 `protobuf:"bytes,13,opt,name=token,proto3" json:"token,omitempty"`                             // 订阅令牌
-	Status        int32                  `protobuf:"varint,14,opt,name=status,proto3" json:"status,omitempty"`                          // 状态：0:待激活 1:激活 2:完成 3:过期 4:已扣除
-	Short         string                 `protobuf:"bytes,15,opt,name=short,proto3" json:"short,omitempty"`                             // 短码
-	CreatedAt     int64                  `protobuf:"varint,16,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`   // Unix timestamp in seconds
-	UpdatedAt     int64                  `protobuf:"varint,17,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`   // Unix timestamp in seconds
+	StartTime     int64                  `protobuf:"varint,7,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`     // Unix timestamp in seconds
+	ExpireTime    int64                  `protobuf:"varint,8,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"`  // Unix timestamp in seconds
+	ResetTime     int64                  `protobuf:"varint,9,opt,name=reset_time,json=resetTime,proto3" json:"reset_time,omitempty"`     // Unix timestamp in seconds
+	Traffic       int64                  `protobuf:"varint,10,opt,name=traffic,proto3" json:"traffic,omitempty"`                         // 总流量（字节）
+	Download      int64                  `protobuf:"varint,11,opt,name=download,proto3" json:"download,omitempty"`                       // 下载流量（字节）
+	Upload        int64                  `protobuf:"varint,12,opt,name=upload,proto3" json:"upload,omitempty"`                           // 上传流量（字节）
+	Token         string                 `protobuf:"bytes,13,opt,name=token,proto3" json:"token,omitempty"`                              // 订阅令牌
+	Status        int32                  `protobuf:"varint,14,opt,name=status,proto3" json:"status,omitempty"`                           // 状态：0:待激活 1:激活 2:完成 3:过期 4:已扣除
+	Short         string                 `protobuf:"bytes,15,opt,name=short,proto3" json:"short,omitempty"`                              // 短码
+	CreatedAt     int64                  `protobuf:"varint,16,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`    // Unix timestamp in seconds
+	UpdatedAt     int64                  `protobuf:"varint,17,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`    // Unix timestamp in seconds
+	FinishedAt    int64                  `protobuf:"varint,18,opt,name=finished_at,json=finishedAt,proto3" json:"finished_at,omitempty"` // Unix timestamp in seconds
+	Uuid          string                 `protobuf:"bytes,19,opt,name=uuid,proto3" json:"uuid,omitempty"`                                // 订阅UUID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1837,6 +1895,20 @@ func (x *UserSubscribe) GetUpdatedAt() int64 {
 		return x.UpdatedAt
 	}
 	return 0
+}
+
+func (x *UserSubscribe) GetFinishedAt() int64 {
+	if x != nil {
+		return x.FinishedAt
+	}
+	return 0
+}
+
+func (x *UserSubscribe) GetUuid() string {
+	if x != nil {
+		return x.Uuid
+	}
+	return ""
 }
 
 // UserSubscribeDetail 用户订阅详情（含关联对象）
@@ -2271,11 +2343,13 @@ var File_admin_user_v1_subscribe_proto protoreflect.FileDescriptor
 
 const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\n" +
-	"\x1dadmin/user/v1/subscribe.proto\x12\x11api.admin.user.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1aadmin/user/v1/device.proto\"Z\n" +
+	"\x1dadmin/user/v1/subscribe.proto\x12\x11api.admin.user.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1aadmin/user/v1/device.proto\"\x95\x01\n" +
 	"\x17GetUserSubscribeRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x05R\x04size\x12\x17\n" +
-	"\auser_id\x18\x03 \x01(\tR\x06userId\"b\n" +
+	"\auser_id\x18\x03 \x01(\tR\x06userId\x12!\n" +
+	"\fsubscribe_id\x18\x04 \x01(\tR\vsubscribeId\x12\x16\n" +
+	"\x06status\x18\x05 \x01(\x05R\x06status\"b\n" +
 	"\x14GetUserSubscribeData\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x03R\x05total\x124\n" +
 	"\x04list\x18\x02 \x03(\v2 .api.admin.user.v1.UserSubscribeR\x04list\"\x82\x01\n" +
@@ -2325,30 +2399,33 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\x1cGetUserSubscribeDevicesReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12B\n" +
-	"\x04data\x18\x03 \x01(\v2..api.admin.user.v1.GetUserSubscribeDevicesDataR\x04data\"\x81\x01\n" +
+	"\x04data\x18\x03 \x01(\v2..api.admin.user.v1.GetUserSubscribeDevicesDataR\x04data\"\xc1\x01\n" +
 	"\x1bGetUserSubscribeLogsRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x05R\x04size\x12\x17\n" +
 	"\auser_id\x18\x03 \x01(\tR\x06userId\x12!\n" +
-	"\fsubscribe_id\x18\x04 \x01(\tR\vsubscribeId\"i\n" +
+	"\fsubscribe_id\x18\x04 \x01(\tR\vsubscribeId\x12*\n" +
+	"\x11user_subscribe_id\x18\x05 \x01(\tR\x0fuserSubscribeId\x12\x12\n" +
+	"\x04date\x18\x06 \x01(\tR\x04date\"i\n" +
 	"\x18GetUserSubscribeLogsData\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x03R\x05total\x127\n" +
 	"\x04list\x18\x02 \x03(\v2#.api.admin.user.v1.UserSubscribeLogR\x04list\"\x8a\x01\n" +
 	"\x19GetUserSubscribeLogsReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12?\n" +
-	"\x04data\x18\x03 \x01(\v2+.api.admin.user.v1.GetUserSubscribeLogsDataR\x04data\"}\n" +
+	"\x04data\x18\x03 \x01(\v2+.api.admin.user.v1.GetUserSubscribeLogsDataR\x04data\"\x91\x01\n" +
 	"'GetUserSubscribeResetTrafficLogsRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x05R\x04size\x12*\n" +
-	"\x11user_subscribe_id\x18\x03 \x01(\tR\x0fuserSubscribeId\"}\n" +
+	"\x11user_subscribe_id\x18\x03 \x01(\tR\x0fuserSubscribeId\x12\x12\n" +
+	"\x04date\x18\x04 \x01(\tR\x04date\"}\n" +
 	"$GetUserSubscribeResetTrafficLogsData\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x03R\x05total\x12?\n" +
 	"\x04list\x18\x02 \x03(\v2+.api.admin.user.v1.ResetSubscribeTrafficLogR\x04list\"\xa2\x01\n" +
 	"%GetUserSubscribeResetTrafficLogsReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12K\n" +
-	"\x04data\x18\x03 \x01(\v27.api.admin.user.v1.GetUserSubscribeResetTrafficLogsDataR\x04data\"\xc2\x01\n" +
+	"\x04data\x18\x03 \x01(\v27.api.admin.user.v1.GetUserSubscribeResetTrafficLogsDataR\x04data\"\x82\x02\n" +
 	"\"GetUserSubscribeTrafficLogsRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x05R\x04size\x12\x17\n" +
@@ -2356,7 +2433,9 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\fsubscribe_id\x18\x04 \x01(\tR\vsubscribeId\x12\x1d\n" +
 	"\n" +
 	"start_time\x18\x05 \x01(\x03R\tstartTime\x12\x19\n" +
-	"\bend_time\x18\x06 \x01(\x03R\aendTime\"j\n" +
+	"\bend_time\x18\x06 \x01(\x03R\aendTime\x12*\n" +
+	"\x11user_subscribe_id\x18\a \x01(\tR\x0fuserSubscribeId\x12\x12\n" +
+	"\x04date\x18\b \x01(\tR\x04date\"j\n" +
 	"\x1fGetUserSubscribeTrafficLogsData\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x03R\x05total\x121\n" +
 	"\x04list\x18\x02 \x03(\v2\x1d.api.admin.user.v1.TrafficLogR\x04list\"\x98\x01\n" +
@@ -2378,7 +2457,7 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\x11user_subscribe_id\x18\x01 \x01(\tR\x0fuserSubscribeId\"N\n" +
 	"\x1eResetUserSubscribeTrafficReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\xec\x03\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xa1\x04\n" +
 	"\rUserSubscribe\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x19\n" +
@@ -2402,7 +2481,10 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x10 \x01(\x03R\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\x11 \x01(\x03R\tupdatedAt\"\xdc\x03\n" +
+	"updated_at\x18\x11 \x01(\x03R\tupdatedAt\x12\x1f\n" +
+	"\vfinished_at\x18\x12 \x01(\x03R\n" +
+	"finishedAt\x12\x12\n" +
+	"\x04uuid\x18\x13 \x01(\tR\x04uuid\"\xdc\x03\n" +
 	"\x13UserSubscribeDetail\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x19\n" +

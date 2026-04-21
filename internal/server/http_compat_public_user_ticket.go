@@ -405,8 +405,9 @@ func registerLegacyPublicSubscribeCompatRoutes(r *khttp.Router, dataLayer *data.
 
 	r.GET("/v1/public/subscribe/list", func(ctx khttp.Context) error {
 		var req compatQuerySubscribeListRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatQuerySubscribeListRequest)
@@ -433,8 +434,9 @@ func registerLegacyPublicTicketCompatRoutes(r *khttp.Router, publicTicket legacy
 
 	r.POST("/v1/public/ticket", func(ctx khttp.Context) error {
 		var req publicticketv1.CreateUserTicketRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			_, err := publicTicket.CreateUserTicket(inner, request.(*publicticketv1.CreateUserTicketRequest))
@@ -448,8 +450,9 @@ func registerLegacyPublicTicketCompatRoutes(r *khttp.Router, publicTicket legacy
 
 	r.GET("/v1/public/ticket/list", func(ctx khttp.Context) error {
 		var req compatTicketListRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatTicketListRequest)
@@ -478,8 +481,9 @@ func registerLegacyPublicTicketCompatRoutes(r *khttp.Router, publicTicket legacy
 
 	r.GET("/v1/public/ticket/detail", func(ctx khttp.Context) error {
 		var req compatTicketDetailRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 		if int64(req.ID) == 0 {
 			return compatJSONError(ctx, compatParamError("Key: 'GetUserTicketDetailRequest.Id' Error:Field validation for 'Id' failed on the 'required' tag"))
 		}
@@ -502,8 +506,9 @@ func registerLegacyPublicTicketCompatRoutes(r *khttp.Router, publicTicket legacy
 
 	r.PUT("/v1/public/ticket", func(ctx khttp.Context) error {
 		var req compatTicketStatusRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 		if int64(req.ID) == 0 {
 			return compatJSONError(ctx, compatParamError("Key: 'UpdateUserTicketStatusRequest.Id' Error:Field validation for 'Id' failed on the 'required' tag"))
 		}
@@ -527,8 +532,9 @@ func registerLegacyPublicTicketCompatRoutes(r *khttp.Router, publicTicket legacy
 
 	r.POST("/v1/public/ticket/follow", func(ctx khttp.Context) error {
 		var req compatTicketFollowRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 		if int64(req.TicketID) == 0 {
 			return compatJSONError(ctx, compatParamError("Key: 'CreateUserTicketFollowRequest.TicketId' Error:Field validation for 'TicketId' failed on the 'required' tag"))
 		}
@@ -652,8 +658,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.GET("/v1/public/user/login_log", func(ctx khttp.Context) error {
 		var req compatLoginLogRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatLoginLogRequest)
@@ -685,8 +692,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.GET("/v1/public/user/commission_log", func(ctx khttp.Context) error {
 		var req compatCommissionLogRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatCommissionLogRequest)
@@ -718,8 +726,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.GET("/v1/public/user/affiliate/list", func(ctx khttp.Context) error {
 		var req compatAffiliateListRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatAffiliateListRequest)
@@ -761,8 +770,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.GET("/v1/public/user/subscribe_log", func(ctx khttp.Context) error {
 		var req compatSubscribeLogRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatSubscribeLogRequest)
@@ -780,15 +790,16 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.PUT("/v1/public/user/subscribe_token", func(ctx khttp.Context) error {
 		var req compatResetSubscribeTokenRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 		if req.UserSubscribeID == 0 {
 			return compatJSONError(ctx, compatParamError("Key: 'ResetUserSubscribeTokenRequest.UserSubscribeId' Error:Field validation for 'UserSubscribeId' failed on the 'required' tag"))
 		}
 
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatResetSubscribeTokenRequest)
-			_, err := publicUser.ResetUserSubscribeToken(inner, &publicuserv1.ResetUserSubscribeTokenRequest{UserSubscribeId: in.UserSubscribeID})
+			_, err := publicUser.ResetUserSubscribeToken(inner, &publicuserv1.ResetUserSubscribeTokenRequest{UserSubscribeId: strconv.FormatInt(in.UserSubscribeID, 10)})
 			return nil, err
 		})
 		if err != nil {
@@ -799,12 +810,13 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.POST("/v1/public/user/unsubscribe/pre", func(ctx khttp.Context) error {
 		var req compatPreUnsubscribeRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatPreUnsubscribeRequest)
-			reply, err := publicUser.PreUnsubscribe(inner, &publicuserv1.PreUnsubscribeRequest{Id: in.ID})
+			reply, err := publicUser.PreUnsubscribe(inner, &publicuserv1.PreUnsubscribeRequest{Id: strconv.FormatInt(in.ID, 10)})
 			if err != nil {
 				return nil, err
 			}
@@ -818,12 +830,13 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.POST("/v1/public/user/unsubscribe", func(ctx khttp.Context) error {
 		var req compatUnsubscribeRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatUnsubscribeRequest)
-			_, err := publicUser.Unsubscribe(inner, &publicuserv1.UnsubscribeRequest{Id: in.ID})
+			_, err := publicUser.Unsubscribe(inner, &publicuserv1.UnsubscribeRequest{Id: strconv.FormatInt(in.ID, 10)})
 			return nil, err
 		})
 		if err != nil {
@@ -834,8 +847,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.PUT("/v1/public/user/notify", func(ctx khttp.Context) error {
 		var req compatUpdateUserNotifyRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatUpdateUserNotifyRequest)
@@ -855,8 +869,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.PUT("/v1/public/user/password", func(ctx khttp.Context) error {
 		var req compatUpdateUserPasswordRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 		if err := compatValidateRequiredString(req.Password, "UpdateUserPasswordRequest", "Password"); err != nil {
 			return compatJSONError(ctx, err)
 		}
@@ -899,8 +914,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.POST("/v1/public/user/bind_oauth", func(ctx khttp.Context) error {
 		var req compatBindOAuthRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatBindOAuthRequest)
@@ -921,8 +937,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.POST("/v1/public/user/bind_oauth/callback", func(ctx khttp.Context) error {
 		var req compatBindOAuthCallbackRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatBindOAuthCallbackRequest)
@@ -944,8 +961,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.POST("/v1/public/user/unbind_oauth", func(ctx khttp.Context) error {
 		var req compatUnbindOAuthRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatUnbindOAuthRequest)
@@ -960,8 +978,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.POST("/v1/public/user/verify_email", func(ctx khttp.Context) error {
 		var req compatVerifyEmailRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 		if err := compatValidateRequiredString(req.Email, "VerifyEmailRequest", "Email"); err != nil {
 			return compatJSONError(ctx, err)
 		}
@@ -985,8 +1004,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.PUT("/v1/public/user/bind_mobile", func(ctx khttp.Context) error {
 		var req compatBindMobileRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 		if err := compatValidateRequiredString(req.AreaCode, "UpdateBindMobileRequest", "AreaCode"); err != nil {
 			return compatJSONError(ctx, err)
 		}
@@ -1014,8 +1034,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.PUT("/v1/public/user/bind_email", func(ctx khttp.Context) error {
 		var req compatBindEmailRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 		if err := compatValidateRequiredString(req.Email, "UpdateBindEmailRequest", "Email"); err != nil {
 			return compatJSONError(ctx, err)
 		}
@@ -1047,15 +1068,16 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.PUT("/v1/public/user/unbind_device", func(ctx khttp.Context) error {
 		var req compatUnbindDeviceRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 		if req.ID == 0 {
 			return compatJSONError(ctx, compatParamError("Key: 'UnbindDeviceRequest.Id' Error:Field validation for 'Id' failed on the 'required' tag"))
 		}
 
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatUnbindDeviceRequest)
-			_, err := publicUser.UnbindDevice(inner, &publicuserv1.UnbindDeviceRequest{Id: in.ID})
+			_, err := publicUser.UnbindDevice(inner, &publicuserv1.UnbindDeviceRequest{Id: strconv.FormatInt(in.ID, 10)})
 			return nil, err
 		})
 		if err != nil {
@@ -1090,8 +1112,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.POST("/v1/public/user/commission_withdraw", func(ctx khttp.Context) error {
 		var req compatCommissionWithdrawRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatCommissionWithdrawRequest)
@@ -1112,8 +1135,9 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 	r.GET("/v1/public/user/withdrawal_log", func(ctx khttp.Context) error {
 		var req compatWithdrawalLogRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		if err := compatBindBodyAndQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
 
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatWithdrawalLogRequest)
@@ -1356,8 +1380,8 @@ func compatLegacyLoginLog(data *publicuserv1.LoginLogData) *compatLoginLogListDa
 	result.Total = data.Total
 	for _, item := range data.List {
 		result.List = append(result.List, compatLoginLog{
-			ID:        item.Id,
-			UserID:    item.UserId,
+			ID:        compatParseInt64String(item.Id),
+			UserID:    compatParseInt64String(item.UserId),
 			LoginIP:   item.LoginIp,
 			UserAgent: item.UserAgent,
 			Success:   item.Success,
@@ -1376,7 +1400,7 @@ func compatLegacyBalanceLog(data *publicuserv1.BalanceLogData) *compatBalanceLog
 	for _, item := range data.List {
 		result.List = append(result.List, compatBalanceLog{
 			Type:      uint16(item.Type),
-			UserID:    item.UserId,
+			UserID:    compatParseInt64String(item.UserId),
 			Amount:    item.Amount,
 			OrderNo:   item.OrderNo,
 			Balance:   item.Balance,
@@ -1395,7 +1419,7 @@ func compatLegacyCommissionLog(data *publicuserv1.CommissionLogData) *compatComm
 	for _, item := range data.List {
 		result.List = append(result.List, compatCommissionLog{
 			Type:      uint16(item.Type),
-			UserID:    item.UserId,
+			UserID:    compatParseInt64String(item.UserId),
 			Amount:    item.Amount,
 			OrderNo:   item.OrderNo,
 			Timestamp: item.Timestamp,
@@ -1454,9 +1478,9 @@ func compatLegacySubscribeLog(data *publicuserv1.SubscribeLogData) *compatUserSu
 	result.Total = data.Total
 	for _, item := range data.List {
 		result.List = append(result.List, compatUserSubscribeLog{
-			ID:              item.Id,
-			UserID:          item.UserId,
-			UserSubscribeID: item.UserSubscribeId,
+			ID:              compatParseInt64String(item.Id),
+			UserID:          compatParseInt64String(item.UserId),
+			UserSubscribeID: compatParseInt64String(item.UserSubscribeId),
 			Token:           item.Token,
 			IP:              item.Ip,
 			UserAgent:       item.UserAgent,
@@ -1498,7 +1522,7 @@ func compatLegacyDeviceList(data *publicuserv1.GetDeviceListData) *compatUserDev
 	result.Total = data.Total
 	for _, item := range data.List {
 		result.List = append(result.List, compatUserDevice{
-			ID:         item.Id,
+			ID:         compatParseInt64String(item.Id),
 			IP:         item.Ip,
 			Identifier: item.Identifier,
 			UserAgent:  item.UserAgent,

@@ -13,6 +13,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyorder"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysystemlog"
+	"github.com/OmnTeam/ppanel-pro/ent/proxytrafficlog"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdevice"
@@ -1594,4 +1595,163 @@ func (r *publicUserRepo) GetDeviceOnlineStatistics(ctx context.Context, userID i
 			LongestSingleConnection: longestSingleConnection,
 		},
 	}, nil
+}
+
+func (r *publicUserRepo) UpdateUserSubscribeNote(ctx context.Context, userID int, userSubscribeID int64, note string) error {
+	userSub, err := r.data.db.ProxyUserSubscribe.Query().
+		Where(proxyusersubscribe.IDEQ(userSubscribeID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+		}
+		return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if userSub.UserID != int64(userID) {
+		return responsecode.NewKratosError(responsecode.ErrInvalidAccess)
+	}
+
+	if _, err := r.data.db.ProxyUserSubscribe.UpdateOneID(userSub.ID).SetNote(note).Save(ctx); err != nil {
+		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
+	}
+
+	r.clearLegacyUserSubscribeCaches(ctx, userSub)
+	r.clearLegacySubscribeCaches(ctx, userSub.SubscribeID)
+	return nil
+}
+
+func (r *publicUserRepo) UpdateUserRules(ctx context.Context, userID int, rules []string) error {
+	if len(rules) == 0 {
+		return nil
+	}
+
+	payload, err := json.Marshal(rules)
+	if err != nil {
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
+	}
+
+	if _, err := r.data.db.ProxyUser.UpdateOneID(int64(userID)).SetRules(string(payload)).Save(ctx); err != nil {
+		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
+	}
+
+	r.clearLegacyUserCaches(ctx, int64(userID))
+	return nil
+}
+
+func (r *publicUserRepo) DeleteCurrentUserAccount(ctx context.Context, userID int, sessionID string) error {
+	emails := make([]string, 0)
+	methods, err := r.data.db.ProxyUserAuthMethod.Query().
+		Where(
+			proxyuserauthmethod.UserIDEQ(int64(userID)),
+			proxyuserauthmethod.AuthTypeEQ("email"),
+		).
+		All(ctx)
+	if err == nil {
+		for _, method := range methods {
+			if strings.TrimSpace(method.AuthIdentifier) != "" {
+				emails = append(emails, method.AuthIdentifier)
+			}
+		}
+	}
+	userSubs, _ := r.data.db.ProxyUserSubscribe.Query().
+		Where(proxyusersubscribe.UserIDEQ(int64(userID))).
+		All(ctx)
+
+	if err := r.data.db.TX(ctx, func(tx *ent.Tx) error {
+		if _, err := tx.ProxyUserDeviceOnlineRecord.Delete().Where(proxyuserdeviceonlinerecord.UserIDEQ(int64(userID))).Exec(ctx); err != nil {
+			return responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
+		}
+		if _, err := tx.ProxyUserDevice.Delete().Where(proxyuserdevice.UserIDEQ(int64(userID))).Exec(ctx); err != nil {
+			return responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
+		}
+		if _, err := tx.ProxyUserAuthMethod.Delete().Where(proxyuserauthmethod.UserIDEQ(int64(userID))).Exec(ctx); err != nil {
+			return responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
+		}
+		if _, err := tx.ProxyUserSubscribe.Delete().Where(proxyusersubscribe.UserIDEQ(int64(userID))).Exec(ctx); err != nil {
+			return responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
+		}
+		if _, err := tx.ProxyUser.Update().
+			Where(proxyuser.IDEQ(int64(userID))).
+			SetDeletedAt(time.Now()).
+			SetIsDel(0).
+			Save(ctx); err != nil {
+			return responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
+		}
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	for _, item := range userSubs {
+		r.clearLegacyUserSubscribeCaches(ctx, item)
+		r.clearLegacySubscribeCaches(ctx, item.SubscribeID)
+	}
+	r.clearLegacyUserCaches(ctx, int64(userID), emails...)
+	if strings.TrimSpace(sessionID) != "" {
+		r.deleteRedisKeys(ctx, fmt.Sprintf("%s:%s", constant.SessionIdKey, sessionID))
+	}
+	return nil
+}
+
+func (r *publicUserRepo) GetUserTrafficStats(ctx context.Context, userID int, userSubscribeID int64, days int) (*userBiz.TrafficStats, error) {
+	userSub, err := r.data.db.ProxyUserSubscribe.Query().
+		Where(proxyusersubscribe.IDEQ(userSubscribeID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidAccess)
+		}
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if userSub.UserID != int64(userID) {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidAccess)
+	}
+
+	now := time.Now()
+	startDate := now.AddDate(0, 0, -days+1)
+	startDate = time.Date(startDate.Year(), startDate.Month(), startDate.Day(), 0, 0, 0, 0, time.Local)
+	endDate := startDate.AddDate(0, 0, days).Add(-time.Nanosecond)
+
+	logs, err := r.data.db.ProxyTrafficLog.Query().
+		Where(
+			proxytrafficlog.UserIDEQ(int64(userID)),
+			proxytrafficlog.SubscribeIDEQ(userSubscribeID),
+			proxytrafficlog.TimestampGTE(startDate),
+			proxytrafficlog.TimestampLTE(endDate),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	trafficByDay := make(map[string]*userBiz.DailyTrafficStats)
+	for _, item := range logs {
+		dateKey := item.Timestamp.In(time.Local).Format("2006-01-02")
+		stat, ok := trafficByDay[dateKey]
+		if !ok {
+			stat = &userBiz.DailyTrafficStats{Date: dateKey}
+			trafficByDay[dateKey] = stat
+		}
+		stat.Upload += item.Upload
+		stat.Download += item.Download
+		stat.Total = stat.Upload + stat.Download
+	}
+
+	resp := &userBiz.TrafficStats{
+		List: make([]*userBiz.DailyTrafficStats, 0, days),
+	}
+	for i := 0; i < days; i++ {
+		currentDate := startDate.AddDate(0, 0, i)
+		dateKey := currentDate.Format("2006-01-02")
+		stat, ok := trafficByDay[dateKey]
+		if !ok {
+			stat = &userBiz.DailyTrafficStats{Date: dateKey}
+		}
+		resp.List = append(resp.List, stat)
+		resp.TotalUpload += stat.Upload
+		resp.TotalDownload += stat.Download
+	}
+	resp.TotalTraffic = resp.TotalUpload + resp.TotalDownload
+
+	return resp, nil
 }

@@ -226,8 +226,10 @@ func (s *GroupService) GetGroupConfig(ctx context.Context, req *v1.GetGroupConfi
 		Code:    int32(responsecode.AdminGetGroupConfigSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetGroupConfigSuccess],
 		Data: &v1.GetGroupConfigData{
-			Config: config,
-			State:  state,
+			Enabled: config.Enabled,
+			Mode:    config.Mode,
+			Config:  config.Config,
+			State:   state,
 		},
 	}, nil
 }
@@ -275,9 +277,7 @@ func (s *GroupService) GetRecalculationStatus(ctx context.Context, req *v1.GetRe
 	return &v1.GetRecalculationStatusReply{
 		Code:    int32(responsecode.AdminGetRecalculationStatusSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetRecalculationStatusSuccess],
-		Data: &v1.GetRecalculationStatusData{
-			State: state,
-		},
+		Data:    state,
 	}, nil
 }
 
@@ -292,13 +292,14 @@ func (s *GroupService) GetGroupHistory(ctx context.Context, req *v1.GetGroupHist
 	histories := make([]*v1.GroupHistory, 0, len(list))
 	for _, item := range list {
 		histories = append(histories, &v1.GroupHistory{
-			Id:          strconv.FormatInt(item.ID, 10),
-			GroupMode:   item.GroupMode,
-			TriggerType: item.TriggerType,
-			Status:      item.State,
-			Progress:    int32(item.SuccessCount),
-			Total:       int32(item.TotalUsers),
-			CreatedAt:   item.CreatedAt.Unix(),
+			Id:           strconv.FormatInt(item.ID, 10),
+			GroupMode:    item.GroupMode,
+			TriggerType:  item.TriggerType,
+			TotalUsers:   int32(item.TotalUsers),
+			SuccessCount: int32(item.SuccessCount),
+			FailedCount:  int32(item.FailedCount),
+			ErrorLog:     item.ErrorMessage,
+			CreatedAt:    item.CreatedAt.Unix(),
 		})
 	}
 
@@ -326,28 +327,28 @@ func (s *GroupService) GetGroupHistoryDetail(ctx context.Context, req *v1.GetGro
 
 	// Convert ent entity to proto message
 	historyMsg := &v1.GroupHistory{
-		Id:          strconv.FormatInt(history.ID, 10),
-		GroupMode:   history.GroupMode,
-		TriggerType: history.TriggerType,
-		Status:      history.State,
-		Progress:    int32(history.SuccessCount),
-		Total:       int32(history.TotalUsers),
-		CreatedAt:   history.CreatedAt.Unix(),
+		Id:           strconv.FormatInt(history.ID, 10),
+		GroupMode:    history.GroupMode,
+		TriggerType:  history.TriggerType,
+		TotalUsers:   int32(history.TotalUsers),
+		SuccessCount: int32(history.SuccessCount),
+		FailedCount:  int32(history.FailedCount),
+		ErrorLog:     history.ErrorMessage,
+		CreatedAt:    history.CreatedAt.Unix(),
 	}
-
-	// 当前历史记录仅存储错误信息，结果详情保持为空
-	result := ""
-	errorMsg := history.ErrorMessage
 
 	return &v1.GetGroupHistoryDetailReply{
 		Code:    int32(responsecode.AdminGetGroupHistoryDetailSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetGroupHistoryDetailSuccess],
-		Data: &v1.GetGroupHistoryDetailData{
-			Detail: &v1.GroupHistoryDetail{
-				History: historyMsg,
-				Result:  result,
-				Error:   errorMsg,
-			},
+		Data: &v1.GroupHistoryDetail{
+			Id:           historyMsg.Id,
+			GroupMode:    historyMsg.GroupMode,
+			TriggerType:  historyMsg.TriggerType,
+			TotalUsers:   historyMsg.TotalUsers,
+			SuccessCount: historyMsg.SuccessCount,
+			FailedCount:  historyMsg.FailedCount,
+			ErrorLog:     historyMsg.ErrorLog,
+			CreatedAt:    historyMsg.CreatedAt,
 		},
 	}, nil
 }
@@ -403,20 +404,29 @@ func (s *GroupService) PreviewUserNodes(ctx context.Context, req *v1.PreviewUser
 	nodeList := make([]*v1.Node, 0, len(nodes))
 	for _, item := range nodes {
 		nodeList = append(nodeList, &v1.Node{
-			Id:   strconv.FormatInt(item.ID, 10),
-			Name: item.Name,
-			Tags: item.Tags,
-			Sort: int32(item.Sort),
+			Id:      strconv.FormatInt(item.ID, 10),
+			Name:    item.Name,
+			Address: item.Address,
+			Port:    int32(item.Port),
+			Tags:    item.Tags,
+			Sort:    int32(item.Sort),
 		})
+	}
+
+	nodeGroups := []*v1.NodeGroupItem{
+		{
+			Id:    strconv.FormatInt(userGroupId, 10),
+			Name:  "",
+			Nodes: nodeList,
+		},
 	}
 
 	return &v1.PreviewUserNodesReply{
 		Code:    int32(responsecode.AdminPreviewUserNodesSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminPreviewUserNodesSuccess],
 		Data: &v1.PreviewUserNodesData{
-			UserId:      req.UserId,
-			NodeGroupId: userGroupId,
-			Nodes:       nodeList,
+			UserId:     req.UserId,
+			NodeGroups: nodeGroups,
 		},
 	}, nil
 }

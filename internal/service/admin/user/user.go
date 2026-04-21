@@ -24,6 +24,11 @@ func parseStringInt64(s string) (int64, error) {
 	return val, nil
 }
 
+func parseInt64(s string) int64 {
+	val, _ := strconv.ParseInt(s, 10, 64)
+	return val
+}
+
 // UserService 用户服务
 type UserService struct {
 	v1.UnimplementedUserServiceServer
@@ -60,7 +65,12 @@ func (s *UserService) CreateUser(ctx context.Context, req *v1.CreateUserRequest)
 
 // DeleteUser 删除用户
 func (s *UserService) DeleteUser(ctx context.Context, req *v1.DeleteUserRequest) (*v1.DeleteUserReply, error) {
-	err := s.uc.DeleteUser(ctx, int(parseInt64(req.UserId)))
+	userID, err := parseStringInt64(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.DeleteUser(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +86,13 @@ func (s *UserService) DeleteUser(ctx context.Context, req *v1.DeleteUserRequest)
 
 // BatchDeleteUser 批量删除用户
 func (s *UserService) BatchDeleteUser(ctx context.Context, req *v1.BatchDeleteUserRequest) (*v1.BatchDeleteUserReply, error) {
-	idsInt := make([]int, len(req.UserIds))
-	for i, v := range req.UserIds {
-		idsInt[i] = int(parseInt64(v))
+	idsInt := make([]int, len(req.Ids))
+	for i, v := range req.Ids {
+		id, err := parseStringInt64(v)
+		if err != nil {
+			return nil, err
+		}
+		idsInt[i] = int(id)
 	}
 	deletedCount, err := s.uc.BatchDeleteUser(ctx, idsInt)
 	if err != nil {
@@ -122,7 +136,12 @@ func (s *UserService) CurrentUser(ctx context.Context, req *v1.CurrentUserReques
 
 // GetUserDetail 获取用户详情
 func (s *UserService) GetUserDetail(ctx context.Context, req *v1.GetUserDetailRequest) (*v1.GetUserDetailReply, error) {
-	user, err := s.uc.GetUserDetail(ctx, int(parseInt64(req.Id)))
+	userID, err := parseStringInt64(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.uc.GetUserDetail(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
@@ -144,22 +163,22 @@ func (s *UserService) GetUserDetail(ctx context.Context, req *v1.GetUserDetailRe
 func (s *UserService) GetUserList(ctx context.Context, req *v1.GetUserListRequest) (*v1.GetUserListReply, error) {
 
 	var userID, subscribeID, userSubscribeID *int64
-	if req.UserId != "" {
-		parsedID, err := parseStringInt64(req.UserId)
+	if req.UserId != nil && *req.UserId != "" {
+		parsedID, err := parseStringInt64(*req.UserId)
 		if err != nil {
 			return nil, err
 		}
 		userID = &parsedID
 	}
-	if req.SubscribeId != "" {
-		parsedID, err := parseStringInt64(req.SubscribeId)
+	if req.SubscribeId != nil && *req.SubscribeId != "" {
+		parsedID, err := parseStringInt64(*req.SubscribeId)
 		if err != nil {
 			return nil, err
 		}
 		subscribeID = &parsedID
 	}
-	if req.UserSubscribeId != "" {
-		parsedID, err := parseStringInt64(req.UserSubscribeId)
+	if req.UserSubscribeId != nil && *req.UserSubscribeId != "" {
+		parsedID, err := parseStringInt64(*req.UserSubscribeId)
 		if err != nil {
 			return nil, err
 		}
@@ -229,7 +248,7 @@ func (s *UserService) GetUserLoginLogs(ctx context.Context, req *v1.GetUserLogin
 		userID = &parsedID
 	}
 
-	logs, total, err := s.uc.GetUserLoginLogs(ctx, req.Page, req.Size, userID, req.Date)
+	logs, total, err := s.uc.GetUserLoginLogs(ctx, req.Page, req.Size, userID, "")
 	if err != nil {
 		return nil, err
 	}
@@ -310,13 +329,9 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 	protoAuthMethods := make([]*v1.UserAuthMethod, 0, len(authMethods))
 	for _, am := range authMethods {
 		protoAuthMethods = append(protoAuthMethods, &v1.UserAuthMethod{
-			Id:             strconv.FormatInt(int64(am.ID), 10),
-			UserId:         strconv.FormatInt(int64(am.UserID), 10),
 			AuthType:       am.AuthType,
 			AuthIdentifier: am.AuthIdentifier,
 			Verified:       am.Verified,
-			CreatedAt:      strconv.FormatInt(am.CreatedAt.UnixMilli(), 10),
-			UpdatedAt:      strconv.FormatInt(am.UpdatedAt.UnixMilli(), 10),
 		})
 	}
 
@@ -324,10 +339,6 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 	protoUserDevices := make([]*v1.UserDevice, 0, len(userDevices))
 	for _, ud := range userDevices {
 		// 处理设备的指针字段
-		subscribeID := ""
-		if ud.SubscribeID != nil {
-			subscribeID = strconv.FormatInt(int64(*ud.SubscribeID), 10)
-		}
 		ip := ""
 		if ud.IP != nil {
 			ip = *ud.IP
@@ -342,16 +353,14 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 		}
 
 		protoUserDevices = append(protoUserDevices, &v1.UserDevice{
-			Id:          strconv.FormatInt(int64(ud.ID), 10),
-			UserId:      strconv.FormatInt(int64(ud.UserID), 10),
-			SubscribeId: subscribeID,
-			Ip:          ip,
-			Identifier:  identifier,
-			UserAgent:   userAgent,
-			Online:      ud.Online,
-			Enabled:     ud.Enabled,
-			CreatedAt:   ud.CreatedAt.UnixMilli(),
-			UpdatedAt:   ud.UpdatedAt.UnixMilli(),
+			Id:         strconv.FormatInt(int64(ud.ID), 10),
+			Ip:         ip,
+			Identifier: identifier,
+			UserAgent:  userAgent,
+			Online:     ud.Online,
+			Enabled:    ud.Enabled,
+			CreatedAt:  ud.CreatedAt.UnixMilli(),
+			UpdatedAt:  ud.UpdatedAt.UnixMilli(),
 		})
 	}
 

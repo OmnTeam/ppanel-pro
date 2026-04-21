@@ -36,6 +36,17 @@ func NewAdminUserSubscribeRepo(d *Data, logger log.Logger) userbiz.SubscribeRepo
 	}
 }
 
+func (r *adminUserSubscribeRepo) isSingleSubscribeModeEnabled(ctx context.Context) bool {
+	enabled := r.data.conf != nil && r.data.conf.Subscribe != nil && r.data.conf.Subscribe.SingleModel
+
+	values, err := loadSystemConfigMap(ctx, r.data.db, "subscribe")
+	if err == nil {
+		enabled = systemConfigBool(values, enabled, "SingleModel", "single_model")
+	}
+
+	return enabled
+}
+
 // GetUserSubscribe 获取用户订阅列表
 func (r *adminUserSubscribeRepo) GetUserSubscribe(ctx context.Context, req *v1.GetUserSubscribeRequest) ([]*ent.ProxyUserSubscribe, int64, error) {
 	query := r.data.db.ProxyUserSubscribe.Query()
@@ -103,9 +114,18 @@ func (r *adminUserSubscribeRepo) CreateUserSubscribe(ctx context.Context, req *v
 		return 0, responsecode.NewKratosError(responsecode.ErrUserNotExist)
 	}
 
-	// TODO: 检查单订阅模式限制
-	// 需要从proxy_system表读取single_subscribe_mode配置
-	// 如果启用了单订阅模式且用户已有订阅，则返回错误
+	if r.isSingleSubscribeModeEnabled(ctx) {
+		count, err := r.data.db.ProxyUserSubscribe.Query().
+			Where(proxyusersubscribe.UserIDEQ(userID)).
+			Count(ctx)
+		if err != nil {
+			r.logger.Errorf("Failed to count user subscribes: %v", err)
+			return 0, err
+		}
+		if count >= 1 {
+			return 0, responsecode.NewKratosError(responsecode.ErrSingleSubscribeModeExceedsLimit)
+		}
+	}
 
 	// Parse subscribe ID
 	subscribeID, err := strconv.ParseInt(req.SubscribeId, 10, 64)
@@ -128,58 +148,40 @@ func (r *adminUserSubscribeRepo) CreateUserSubscribe(ctx context.Context, req *v
 		return 0, err
 	}
 
-	// Parse traffic if provided
-	var traffic *int64
-	if req.Traffic != "" {
-		trafficVal, err := strconv.ParseInt(req.Traffic, 10, 64)
-		if err != nil {
-			return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
-		traffic = &trafficVal
-	} else if subscribePlan.Traffic > 0 {
-		traffic = &subscribePlan.Traffic
+	trafficVal := req.Traffic
+	if trafficVal == 0 {
+		trafficVal = subscribePlan.Traffic
 	}
 
 	// 生成Token和UUID
 	tokenStr := uuidx.SubscribeToken(fmt.Sprintf("adminCreate:%d", time.Now().UnixMilli()))
 	subscribeUUID := uuid.New().String()
 
-	// 处理开始时间和过期时间
 	startTime := time.Now()
-	if req.StartTime != "" {
-		startTimeVal, _ := strconv.ParseInt(req.StartTime, 10, 64)
-		startTime = time.UnixMilli(startTimeVal)
+	var expireTime *time.Time
+	if req.ExpiredAt > 0 {
+		t := time.UnixMilli(req.ExpiredAt)
+		expireTime = &t
 	}
-	expireTimeVal, _ := strconv.ParseInt(req.ExpireTime, 10, 64)
-	expireTime := time.UnixMilli(expireTimeVal)
-
-	// 处理状态
-	var status *int8
-	if req.Status > 0 {
-		s := int8(req.Status)
-		status = &s
-	} else {
-		s := int8(1) // 默认激活
-		status = &s
-	}
-
-	// Parse order ID
-	orderID, _ := strconv.ParseInt(req.OrderId, 10, 64)
 
 	// 创建用户订阅
-	created, err := r.data.db.ProxyUserSubscribe.Create().
+	create := r.data.db.ProxyUserSubscribe.Create().
 		SetUserID(userID).
-		SetOrderID(orderID).
+		SetOrderID(0).
 		SetSubscribeID(subscribeID).
 		SetStartTime(startTime).
-		SetExpireTime(expireTime).
-		SetNillableTraffic(traffic).
-		SetNillableDownload(nil).
-		SetNillableUpload(nil).
-		SetNillableToken(&tokenStr).
-		SetNillableUUID(&subscribeUUID).
-		SetNillableStatus(status).
-		Save(ctx)
+		SetTraffic(trafficVal).
+		SetDownload(0).
+		SetUpload(0).
+		SetNodeGroupID(getInt64ValueFromPointer(subscribePlan.NodeGroupID)).
+		SetGroupLocked(false).
+		SetToken(tokenStr).
+		SetUUID(subscribeUUID).
+		SetStatus(1)
+	if expireTime != nil {
+		create = create.SetExpireTime(*expireTime)
+	}
+	created, err := create.Save(ctx)
 
 	if err != nil {
 		r.logger.Errorf("Failed to create user subscribe: %v", err)
@@ -198,8 +200,7 @@ func (r *adminUserSubscribeRepo) CreateUserSubscribe(ctx context.Context, req *v
 
 // UpdateUserSubscribe 更新用户订阅
 func (r *adminUserSubscribeRepo) UpdateUserSubscribe(ctx context.Context, req *v1.UpdateUserSubscribeRequest) error {
-	// Parse ID
-	id, err := strconv.ParseInt(req.Id, 10, 64)
+	id, err := strconv.ParseInt(req.UserSubscribeId, 10, 64)
 	if err != nil {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
@@ -219,45 +220,33 @@ func (r *adminUserSubscribeRepo) UpdateUserSubscribe(ctx context.Context, req *v
 		return err
 	}
 
-	// 处理时间
-	startTimeVal, _ := strconv.ParseInt(req.StartTime, 10, 64)
-	startTime := time.UnixMilli(startTimeVal)
-	expireTimeVal, _ := strconv.ParseInt(req.ExpireTime, 10, 64)
-	expireTime := time.UnixMilli(expireTimeVal)
-
-	// 处理状态（如果指定了状态则使用，否则根据过期时间计算）
-	var status *int8
-	if req.Status > 0 {
-		s := int8(req.Status)
-		status = &s
-	} else {
-		// 自动计算状态
-		s := int8(1) // 默认激活
-		if time.Now().After(expireTime) {
-			s = int8(3) // 过期
+	status := int8(1)
+	var expireTime *time.Time
+	if req.ExpiredAt > 0 {
+		t := time.UnixMilli(req.ExpiredAt)
+		expireTime = &t
+		if time.Since(t).Minutes() > 0 {
+			status = 3
 		}
-		status = &s
 	}
 
-	// 更新用户订阅
 	update := userSub.Update().
-		SetStartTime(startTime).
-		SetExpireTime(expireTime).
-		SetNillableStatus(status).
+		SetTraffic(req.Traffic).
+		SetDownload(req.Download).
+		SetUpload(req.Upload).
+		SetStatus(status).
 		SetUpdatedAt(time.Now())
-
-	// 只设置非零值
-	if req.Traffic != "" {
-		trafficVal, _ := strconv.ParseInt(req.Traffic, 10, 64)
-		update.SetNillableTraffic(&trafficVal)
+	if expireTime != nil {
+		update.SetExpireTime(*expireTime)
+	} else {
+		update.ClearExpireTime()
 	}
-	if req.Download != "" {
-		downloadVal, _ := strconv.ParseInt(req.Download, 10, 64)
-		update.SetNillableDownload(&downloadVal)
-	}
-	if req.Upload != "" {
-		uploadVal, _ := strconv.ParseInt(req.Upload, 10, 64)
-		update.SetNillableUpload(&uploadVal)
+	if req.SubscribeId != "" {
+		subscribeID, err := strconv.ParseInt(req.SubscribeId, 10, 64)
+		if err != nil {
+			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		update.SetSubscribeID(subscribeID)
 	}
 
 	err = update.Exec(ctx)
@@ -312,7 +301,7 @@ func (r *adminUserSubscribeRepo) DeleteUserSubscribe(ctx context.Context, id int
 }
 
 // GetUserSubscribeById 根据ID获取用户订阅详情（包含套餐信息）
-func (r *adminUserSubscribeRepo) GetUserSubscribeById(ctx context.Context, id int64) (*v1.UserSubscribe, string, error) {
+func (r *adminUserSubscribeRepo) GetUserSubscribeById(ctx context.Context, id int64) (*v1.UserSubscribeDetail, error) {
 	// 查询用户订阅
 	userSub, err := r.data.db.ProxyUserSubscribe.Query().
 		Where(
@@ -322,92 +311,51 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeById(ctx context.Context, id in
 
 	if err != nil {
 		if ent.IsNotFound(err) {
-			return nil, "", responsecode.NewKratosError(responsecode.ErrSubscribeNotFound)
+			return nil, responsecode.NewKratosError(responsecode.ErrSubscribeNotFound)
 		}
 		r.logger.Errorf("Failed to query user subscribe: %v", err)
-		return nil, "", err
+		return nil, err
 	}
 
-	// 查询订阅套餐信息
-	subscribePlan, err := r.data.db.ProxySubscribe.Query().
-		Where(
-			proxysubscribe.IDEQ(userSub.SubscribeID),
-		).
-		Only(ctx)
-
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, "", responsecode.NewKratosError(responsecode.ErrSubscribeNotFound)
-		}
-		r.logger.Errorf("Failed to query subscribe plan: %v", err)
-		return nil, "", err
-	}
-
-	// 构建返回结果
-	subscribe := &v1.UserSubscribe{
+	detail := &v1.UserSubscribeDetail{
 		Id:          strconv.FormatInt(int64(userSub.ID), 10),
 		UserId:      strconv.FormatInt(int64(userSub.UserID), 10),
-		OrderId:     strconv.FormatInt(int64(userSub.OrderID), 10),
+		OrderId:     userSub.OrderID,
 		SubscribeId: strconv.FormatInt(int64(userSub.SubscribeID), 10),
-		StartTime:   strconv.FormatInt(userSub.StartTime.UnixMilli(), 10),
-		CreatedAt:   strconv.FormatInt(userSub.CreatedAt.UnixMilli(), 10),
-		UpdatedAt:   strconv.FormatInt(userSub.UpdatedAt.UnixMilli(), 10),
-		// 处理指针字段
-		Traffic:  formatInt64Value(userSub.Traffic),
-		Download: formatInt64Value(userSub.Download),
-		Upload:   formatInt64Value(userSub.Upload),
-		Token:    getStringValue(userSub.Token),
-		Uuid:     getStringValue(userSub.UUID),
-		Status:   int32(getInt8Value(userSub.Status)),
+		NodeGroupId: userSub.NodeGroupID,
+		GroupLocked: userSub.GroupLocked,
+		StartTime:   userSub.StartTime.UnixMilli(),
+		Traffic:     getInt64ValueFromPointer(userSub.Traffic),
+		Download:    getInt64ValueFromPointer(userSub.Download),
+		Upload:      getInt64ValueFromPointer(userSub.Upload),
+		Token:       getStringValue(userSub.Token),
+		Status:      int32(getInt8Value(userSub.Status)),
+		CreatedAt:   userSub.CreatedAt.UnixMilli(),
+		UpdatedAt:   userSub.UpdatedAt.UnixMilli(),
 	}
-
-	// 处理expire_time
 	if userSub.ExpireTime != nil {
-		subscribe.ExpireTime = strconv.FormatInt(userSub.ExpireTime.UnixMilli(), 10)
+		detail.ExpireTime = userSub.ExpireTime.UnixMilli()
 	}
-
-	// 处理finished_at
-	if userSub.FinishedAt != nil {
-		subscribe.FinishedAt = strconv.FormatInt(userSub.FinishedAt.UnixMilli(), 10)
-	}
-
-	// 套餐名称
-	subscribeName := subscribePlan.Name
-
-	return subscribe, subscribeName, nil
+	return detail, nil
 }
 
 // GetUserSubscribeDevices 获取用户订阅设备列表
 func (r *adminUserSubscribeRepo) GetUserSubscribeDevices(ctx context.Context, req *v1.GetUserSubscribeDevicesRequest) ([]*ent.ProxyUserDevice, int64, error) {
-	// Parse user subscribe ID
-	userSubID, err := strconv.ParseInt(req.UserSubscribeId, 10, 64)
-	if err != nil {
-		return nil, 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-
-	// 查询用户订阅信息以获取 user_id 和 subscribe_id
-	userSub, err := r.data.db.ProxyUserSubscribe.Query().
-		Where(
-			proxyusersubscribe.IDEQ(userSubID),
-		).
-		Only(ctx)
-
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, 0, responsecode.NewKratosError(responsecode.ErrSubscribeNotFound)
+	query := r.data.db.ProxyUserDevice.Query()
+	if req.UserId != "" {
+		userID, err := strconv.ParseInt(req.UserId, 10, 64)
+		if err != nil {
+			return nil, 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 		}
-		r.logger.Errorf("Failed to query user subscribe: %v", err)
-		return nil, 0, err
+		query = query.Where(proxyuserdevice.UserIDEQ(userID))
 	}
-
-	// 查询设备列表
-	query := r.data.db.ProxyUserDevice.Query().
-		Where(
-			proxyuserdevice.UserIDEQ(userSub.UserID),
-		)
-
-	// 添加subscribe_id过滤
-	query = query.Where(proxyuserdevice.SubscribeIDEQ(userSub.SubscribeID))
+	if req.SubscribeId != "" {
+		subscribeID, err := strconv.ParseInt(req.SubscribeId, 10, 64)
+		if err != nil {
+			return nil, 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		query = query.Where(proxyuserdevice.SubscribeIDEQ(subscribeID))
+	}
 
 	// 查询总数
 	total, err := query.Count(ctx)
@@ -416,9 +364,10 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeDevices(ctx context.Context, re
 		return nil, 0, err
 	}
 
-	// 查询所有设备（不分页）
 	list, err := query.
 		Order(ent.Desc(proxyuserdevice.FieldCreatedAt)).
+		Offset(int((req.Page - 1) * req.Size)).
+		Limit(int(req.Size)).
 		All(ctx)
 
 	if err != nil {
@@ -436,15 +385,15 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeLogs(ctx context.Context, req *
 			proxysystemlog.TypeEQ(int8(logmodel.TypeSubscribe)), // Type = 20
 		)
 
-	// 可选：过滤特定用户订阅
+	userSubID := int64(0)
 	if req.UserSubscribeId != "" {
-		userSubID, _ := strconv.ParseInt(req.UserSubscribeId, 10, 64)
-		query = query.Where(proxysystemlog.ObjectIDEQ(userSubID))
+		userSubID, _ = strconv.ParseInt(req.UserSubscribeId, 10, 64)
 	}
-
-	// 可选：过滤日期
-	if req.Date != "" {
-		query = query.Where(proxysystemlog.DateEQ(req.Date))
+	if userSubID == 0 && req.SubscribeId != "" {
+		userSubID, _ = strconv.ParseInt(req.SubscribeId, 10, 64)
+	}
+	if userSubID > 0 {
+		query = query.Where(proxysystemlog.ObjectIDEQ(userSubID))
 	}
 
 	// 注意：user_id 在系统日志中没有直接字段，需要通过 object_id 关联查询，这里暂不实现该过滤
@@ -478,15 +427,9 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeResetTrafficLogs(ctx context.Co
 			proxysystemlog.TypeEQ(int8(logmodel.TypeResetSubscribe)), // Type = 23
 		)
 
-	// 可选：过滤特定用户订阅
 	if req.UserSubscribeId != "" {
 		userSubID, _ := strconv.ParseInt(req.UserSubscribeId, 10, 64)
 		query = query.Where(proxysystemlog.ObjectIDEQ(userSubID))
-	}
-
-	// 可选：过滤日期
-	if req.Date != "" {
-		query = query.Where(proxysystemlog.DateEQ(req.Date))
 	}
 
 	// 查询总数
@@ -521,7 +464,10 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeTrafficLogs(ctx context.Context
 		query = query.Where(proxytrafficlog.UserIDEQ(userID))
 	}
 
-	// 可选：过滤特定用户订阅（需要通过user_subscribe_id查询subscribe_id）
+	if req.SubscribeId != "" {
+		subscribeID, _ := strconv.ParseInt(req.SubscribeId, 10, 64)
+		query = query.Where(proxytrafficlog.SubscribeIDEQ(subscribeID))
+	}
 	if req.UserSubscribeId != "" {
 		userSubID, _ := strconv.ParseInt(req.UserSubscribeId, 10, 64)
 		userSub, err := r.data.db.ProxyUserSubscribe.Query().
@@ -534,9 +480,12 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeTrafficLogs(ctx context.Context
 			query = query.Where(proxytrafficlog.SubscribeIDEQ(subscribeId))
 		}
 	}
-
-	// TODO: 可选过滤日期 - traffic_log表没有date字段，需要通过timestamp范围查询实现
-	// if req.Date != "" { ... }
+	if req.StartTime > 0 {
+		query = query.Where(proxytrafficlog.TimestampGTE(time.UnixMilli(req.StartTime)))
+	}
+	if req.EndTime > 0 {
+		query = query.Where(proxytrafficlog.TimestampLTE(time.UnixMilli(req.EndTime)))
+	}
 
 	// 查询总数
 	total, err := query.Count(ctx)
@@ -558,6 +507,98 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeTrafficLogs(ctx context.Context
 	}
 
 	return list, int64(total), nil
+}
+
+// ResetUserSubscribeToken 重置用户订阅令牌
+func (r *adminUserSubscribeRepo) ResetUserSubscribeToken(ctx context.Context, userSubscribeID int64) error {
+	userSub, err := r.data.db.ProxyUserSubscribe.Query().
+		Where(proxyusersubscribe.IDEQ(userSubscribeID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return responsecode.NewKratosError(responsecode.ErrSubscribeNotFound)
+		}
+		return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	newToken := uuidx.SubscribeToken(fmt.Sprintf("AdminUpdate:%d", time.Now().UnixMilli()))
+	if err = r.data.db.ProxyUserSubscribe.UpdateOneID(userSub.ID).
+		SetToken(newToken).
+		SetUpdatedAt(time.Now()).
+		Exec(ctx); err != nil {
+		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
+	}
+
+	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
+		r.logger.Warnf("Failed to clear legacy server caches after resetting user subscribe token %d: %v", userSubscribeID, err)
+	}
+	return nil
+}
+
+// ToggleUserSubscribeStatus 切换用户订阅状态
+func (r *adminUserSubscribeRepo) ToggleUserSubscribeStatus(ctx context.Context, userSubscribeID int64) error {
+	userSub, err := r.data.db.ProxyUserSubscribe.Query().
+		Where(proxyusersubscribe.IDEQ(userSubscribeID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return responsecode.NewKratosError(responsecode.ErrSubscribeNotFound)
+		}
+		return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	currentStatus := int8(0)
+	if userSub.Status != nil {
+		currentStatus = *userSub.Status
+	}
+
+	var nextStatus int8
+	switch currentStatus {
+	case 2:
+		nextStatus = 5
+	case 5:
+		nextStatus = 2
+	default:
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	if err = r.data.db.ProxyUserSubscribe.UpdateOneID(userSub.ID).
+		SetStatus(nextStatus).
+		SetUpdatedAt(time.Now()).
+		Exec(ctx); err != nil {
+		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
+	}
+
+	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
+		r.logger.Warnf("Failed to clear legacy server caches after toggling user subscribe status %d: %v", userSubscribeID, err)
+	}
+	return nil
+}
+
+// ResetUserSubscribeTraffic 重置用户订阅流量
+func (r *adminUserSubscribeRepo) ResetUserSubscribeTraffic(ctx context.Context, userSubscribeID int64) error {
+	_, err := r.data.db.ProxyUserSubscribe.Query().
+		Where(proxyusersubscribe.IDEQ(userSubscribeID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return responsecode.NewKratosError(responsecode.ErrSubscribeNotFound)
+		}
+		return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	if err = r.data.db.ProxyUserSubscribe.UpdateOneID(userSubscribeID).
+		SetDownload(0).
+		SetUpload(0).
+		SetUpdatedAt(time.Now()).
+		Exec(ctx); err != nil {
+		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
+	}
+
+	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
+		r.logger.Warnf("Failed to clear legacy server caches after resetting user subscribe traffic %d: %v", userSubscribeID, err)
+	}
+	return nil
 }
 
 // 辅助函数：获取int64指针的值，nil返回0
