@@ -125,7 +125,7 @@ message DeleteUserReply {
 // ===== BatchDeleteUser =====
 
 message BatchDeleteUserRequest {
-  repeated string  ids = 1;  // 用户ID列表
+  repeated string ids = 1;  // 用户ID列表
 }
 
 message BatchDeleteUserData {

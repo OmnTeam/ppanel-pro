@@ -1671,7 +1671,7 @@ type UserSubscribe struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	OrderId       string                 `protobuf:"bytes,3,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	OrderId       int64                  `protobuf:"varint,3,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
 	SubscribeId   string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"` // 订阅套餐ID
 	NodeGroupId   int64                  `protobuf:"varint,5,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`
 	GroupLocked   bool                   `protobuf:"varint,6,opt,name=group_locked,json=groupLocked,proto3" json:"group_locked,omitempty"`
@@ -1734,11 +1734,11 @@ func (x *UserSubscribe) GetUserId() string {
 	return ""
 }
 
-func (x *UserSubscribe) GetOrderId() string {
+func (x *UserSubscribe) GetOrderId() int64 {
 	if x != nil {
 		return x.OrderId
 	}
-	return ""
+	return 0
 }
 
 func (x *UserSubscribe) GetSubscribeId() string {
@@ -1844,7 +1844,7 @@ type UserSubscribeDetail struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	OrderId       string                 `protobuf:"bytes,3,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	OrderId       int64                  `protobuf:"varint,3,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
 	SubscribeId   string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`
 	NodeGroupId   int64                  `protobuf:"varint,5,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`
 	GroupLocked   bool                   `protobuf:"varint,6,opt,name=group_locked,json=groupLocked,proto3" json:"group_locked,omitempty"`
@@ -1906,11 +1906,11 @@ func (x *UserSubscribeDetail) GetUserId() string {
 	return ""
 }
 
-func (x *UserSubscribeDetail) GetOrderId() string {
+func (x *UserSubscribeDetail) GetOrderId() int64 {
 	if x != nil {
 		return x.OrderId
 	}
-	return ""
+	return 0
 }
 
 func (x *UserSubscribeDetail) GetSubscribeId() string {
@@ -2382,7 +2382,7 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\rUserSubscribe\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x19\n" +
-	"\border_id\x18\x03 \x01(\tR\aorderId\x12!\n" +
+	"\border_id\x18\x03 \x01(\x03R\aorderId\x12!\n" +
 	"\fsubscribe_id\x18\x04 \x01(\tR\vsubscribeId\x12\"\n" +
 	"\rnode_group_id\x18\x05 \x01(\x03R\vnodeGroupId\x12!\n" +
 	"\fgroup_locked\x18\x06 \x01(\bR\vgroupLocked\x12\x1d\n" +
@@ -2406,7 +2406,7 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\x13UserSubscribeDetail\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x19\n" +
-	"\border_id\x18\x03 \x01(\tR\aorderId\x12!\n" +
+	"\border_id\x18\x03 \x01(\x03R\aorderId\x12!\n" +
 	"\fsubscribe_id\x18\x04 \x01(\tR\vsubscribeId\x12\"\n" +
 	"\rnode_group_id\x18\x05 \x01(\x03R\vnodeGroupId\x12!\n" +
 	"\fgroup_locked\x18\x06 \x01(\bR\vgroupLocked\x12\x1d\n" +

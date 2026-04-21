@@ -235,7 +235,7 @@ message UserInfoData {
   int64 gift_amount = 7;
   int64 telegram = 8;
   string refer_code = 9;
-  string referer_id = 10;
+  int64 referer_id = 10;
   bool enable = 11;
   bool is_admin = 12;
   bool enable_balance_notify = 13;
@@ -438,7 +438,7 @@ message UserSubscribeReply {
 message UserSubscribe {
   string id = 1;
   string user_id = 2;
-  string order_id = 3;
+  int64 order_id = 3;
   string subscribe_id = 4;
   Subscribe subscribe = 5;
   int64 start_time = 6;
@@ -674,7 +674,7 @@ message UpdateBindEmailRequest {
 
 // UserDevice 用户设备信息
 message UserDevice {
-  string  id = 1;         // 设备ID
+  int64  id = 1;         // 设备ID
   string ip = 2;         // IP地址
   string identifier = 3; // 设备标识符
   string user_agent = 4; // 用户代理

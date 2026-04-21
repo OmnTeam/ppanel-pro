@@ -291,7 +291,7 @@ message ResetUserSubscribeTrafficReply {
 message UserSubscribe {
   string id = 1;
   string user_id = 2;
-  string order_id = 3;
+  int64 order_id = 3;
   string subscribe_id = 4;  // 订阅套餐ID
   int64 node_group_id = 5;
   bool group_locked = 6;
@@ -312,7 +312,7 @@ message UserSubscribe {
 message UserSubscribeDetail {
   string id = 1;
   string user_id = 2;
-  string order_id = 3;
+  int64 order_id = 3;
   string subscribe_id = 4;
   int64 node_group_id = 5;
   bool group_locked = 6;
@@ -351,7 +351,7 @@ message ResetSubscribeTrafficLog {
 // TrafficLog 流量日志
 message TrafficLog {
   string id = 1;
-  string  server_id = 2;
+  string server_id = 2;
   string user_id = 3;
   string subscribe_id = 4;
   int64 download = 5;

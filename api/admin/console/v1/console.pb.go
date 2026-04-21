@@ -792,7 +792,7 @@ func (x *ServerTrafficData) GetDownload() int64 {
 
 type UserTrafficData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Sid           string                 `protobuf:"bytes,1,opt,name=sid,proto3" json:"sid,omitempty"`
+	Sid           int64                  `protobuf:"varint,1,opt,name=sid,proto3" json:"sid,omitempty"`
 	Upload        int64                  `protobuf:"varint,2,opt,name=upload,proto3" json:"upload,omitempty"`
 	Download      int64                  `protobuf:"varint,3,opt,name=download,proto3" json:"download,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -829,11 +829,11 @@ func (*UserTrafficData) Descriptor() ([]byte, []int) {
 	return file_admin_console_v1_console_proto_rawDescGZIP(), []int{14}
 }
 
-func (x *UserTrafficData) GetSid() string {
+func (x *UserTrafficData) GetSid() int64 {
 	if x != nil {
 		return x.Sid
 	}
-	return ""
+	return 0
 }
 
 func (x *UserTrafficData) GetUpload() int64 {
@@ -1095,7 +1095,7 @@ const file_admin_console_v1_console_proto_rawDesc = "" +
 	"\x06upload\x18\x03 \x01(\x03R\x06upload\x12\x1a\n" +
 	"\bdownload\x18\x04 \x01(\x03R\bdownload\"W\n" +
 	"\x0fUserTrafficData\x12\x10\n" +
-	"\x03sid\x18\x01 \x01(\tR\x03sid\x12\x16\n" +
+	"\x03sid\x18\x01 \x01(\x03R\x03sid\x12\x16\n" +
 	"\x06upload\x18\x02 \x01(\x03R\x06upload\x12\x1a\n" +
 	"\bdownload\x18\x03 \x01(\x03R\bdownload\"\xd4\x05\n" +
 	"\x18QueryServerTotalDataData\x12!\n" +

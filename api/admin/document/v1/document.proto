@@ -114,7 +114,7 @@ message DeleteDocumentReply {
 
 // 批量删除文档请求
 message BatchDeleteDocumentRequest {
-  repeated string  ids = 1;
+  repeated string ids = 1;
 }
 
 // 批量删除文档数据

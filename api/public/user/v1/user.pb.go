@@ -35,7 +35,7 @@ type UserInfoData struct {
 	GiftAmount            int64                  `protobuf:"varint,7,opt,name=gift_amount,json=giftAmount,proto3" json:"gift_amount,omitempty"`
 	Telegram              int64                  `protobuf:"varint,8,opt,name=telegram,proto3" json:"telegram,omitempty"`
 	ReferCode             string                 `protobuf:"bytes,9,opt,name=refer_code,json=referCode,proto3" json:"refer_code,omitempty"`
-	RefererId             string                 `protobuf:"bytes,10,opt,name=referer_id,json=refererId,proto3" json:"referer_id,omitempty"`
+	RefererId             int64                  `protobuf:"varint,10,opt,name=referer_id,json=refererId,proto3" json:"referer_id,omitempty"`
 	Enable                bool                   `protobuf:"varint,11,opt,name=enable,proto3" json:"enable,omitempty"`
 	IsAdmin               bool                   `protobuf:"varint,12,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
 	EnableBalanceNotify   bool                   `protobuf:"varint,13,opt,name=enable_balance_notify,json=enableBalanceNotify,proto3" json:"enable_balance_notify,omitempty"`
@@ -142,11 +142,11 @@ func (x *UserInfoData) GetReferCode() string {
 	return ""
 }
 
-func (x *UserInfoData) GetRefererId() string {
+func (x *UserInfoData) GetRefererId() int64 {
 	if x != nil {
 		return x.RefererId
 	}
-	return ""
+	return 0
 }
 
 func (x *UserInfoData) GetEnable() bool {
@@ -1604,7 +1604,7 @@ type UserSubscribe struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	OrderId       string                 `protobuf:"bytes,3,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	OrderId       int64                  `protobuf:"varint,3,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
 	SubscribeId   string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`
 	Subscribe     *Subscribe             `protobuf:"bytes,5,opt,name=subscribe,proto3" json:"subscribe,omitempty"`
 	StartTime     int64                  `protobuf:"varint,6,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
@@ -1666,11 +1666,11 @@ func (x *UserSubscribe) GetUserId() string {
 	return ""
 }
 
-func (x *UserSubscribe) GetOrderId() string {
+func (x *UserSubscribe) GetOrderId() int64 {
 	if x != nil {
 		return x.OrderId
 	}
-	return ""
+	return 0
 }
 
 func (x *UserSubscribe) GetSubscribeId() string {
@@ -3183,7 +3183,7 @@ func (x *UpdateBindEmailRequest) GetEmail() string {
 // UserDevice 用户设备信息
 type UserDevice struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                 // 设备ID
+	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                // 设备ID
 	Ip            string                 `protobuf:"bytes,2,opt,name=ip,proto3" json:"ip,omitempty"`                                 // IP地址
 	Identifier    string                 `protobuf:"bytes,3,opt,name=identifier,proto3" json:"identifier,omitempty"`                 // 设备标识符
 	UserAgent     string                 `protobuf:"bytes,4,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`  // 用户代理
@@ -3225,11 +3225,11 @@ func (*UserDevice) Descriptor() ([]byte, []int) {
 	return file_public_user_v1_user_proto_rawDescGZIP(), []int{49}
 }
 
-func (x *UserDevice) GetId() string {
+func (x *UserDevice) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 func (x *UserDevice) GetIp() string {
@@ -4079,7 +4079,7 @@ const file_public_user_v1_user_proto_rawDesc = "" +
 	"refer_code\x18\t \x01(\tR\treferCode\x12\x1d\n" +
 	"\n" +
 	"referer_id\x18\n" +
-	" \x01(\tR\trefererId\x12\x16\n" +
+	" \x01(\x03R\trefererId\x12\x16\n" +
 	"\x06enable\x18\v \x01(\bR\x06enable\x12\x19\n" +
 	"\bis_admin\x18\f \x01(\bR\aisAdmin\x122\n" +
 	"\x15enable_balance_notify\x18\r \x01(\bR\x13enableBalanceNotify\x12.\n" +
@@ -4188,7 +4188,7 @@ const file_public_user_v1_user_proto_rawDesc = "" +
 	"\rUserSubscribe\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x19\n" +
-	"\border_id\x18\x03 \x01(\tR\aorderId\x12!\n" +
+	"\border_id\x18\x03 \x01(\x03R\aorderId\x12!\n" +
 	"\fsubscribe_id\x18\x04 \x01(\tR\vsubscribeId\x12;\n" +
 	"\tsubscribe\x18\x05 \x01(\v2\x1d.api.public.user.v1.SubscribeR\tsubscribe\x12\x1d\n" +
 	"\n" +
@@ -4311,7 +4311,7 @@ const file_public_user_v1_user_proto_rawDesc = "" +
 	"\x05email\x18\x01 \x01(\tR\x05email\"\xdb\x01\n" +
 	"\n" +
 	"UserDevice\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x0e\n" +
 	"\x02ip\x18\x02 \x01(\tR\x02ip\x12\x1e\n" +
 	"\n" +
 	"identifier\x18\x03 \x01(\tR\n" +

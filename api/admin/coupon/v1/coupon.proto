@@ -58,7 +58,7 @@ message CreateCouponRequest {
   int64 start_time = 6;           // 开始时间（Unix时间戳，秒）
   int64 expire_time = 7;          // 过期时间（Unix时间戳，秒）
   int64 user_limit = 8;           // 用户限制
-  repeated string  subscribe = 9;   // 订阅限制（订阅ID列表）
+  repeated string subscribe = 9;   // 订阅限制（订阅ID列表）
   int64 used_count = 10;          // 已使用数量
   optional bool enable = 11;      // 启用
 }
@@ -80,7 +80,7 @@ message UpdateCouponRequest {
   int64 start_time = 7;           // 开始时间
   int64 expire_time = 8;          // 过期时间
   int64 user_limit = 9;           // 用户限制
-  repeated string  subscribe = 10;  // 订阅限制
+  repeated string subscribe = 10;  // 订阅限制
   int64 used_count = 11;          // 已使用数量
   optional bool enable = 12;      // 启用
 }
@@ -104,7 +104,7 @@ message DeleteCouponReply {
 
 // BatchDeleteCouponRequest 批量删除优惠券请求
 message BatchDeleteCouponRequest {
-  repeated string  ids = 1;  // 优惠券ID列表
+  repeated string ids = 1;  // 优惠券ID列表
 }
 
 // BatchDeleteCouponReply 批量删除优惠券响应
@@ -117,7 +117,7 @@ message BatchDeleteCouponReply {
 message GetCouponListRequest {
   int64 page = 1;      // 页码
   int64 size = 2;      // 每页数量
-  string  subscribe = 3; // 订阅筛选
+  string subscribe = 3; // 订阅筛选
   string search = 4;   // 搜索关键字
 }
 
@@ -145,7 +145,7 @@ message CouponItem {
   int64 start_time = 7;            // 开始时间（Unix时间戳，秒）
   int64 expire_time = 8;           // 过期时间（Unix时间戳，秒）
   int64 user_limit = 9;            // 用户限制
-  repeated string  subscribe = 10;   // 订阅限制
+  repeated string subscribe = 10;   // 订阅限制
   int64 used_count = 11;           // 已使用数量
   bool enable = 12;                // 启用
   int64 created_at = 13;           // 创建时间（Unix时间戳，秒）
