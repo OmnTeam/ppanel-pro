@@ -336,8 +336,17 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 	}
 
 	if sub.Quota > 0 {
+		now := time.Now()
+		sevenDaysAgo := now.Add(-7 * 24 * time.Hour)
 		userSubs, err := r.data.db.ProxyUserSubscribe.Query().
-			Where(proxyusersubscribe.UserIDEQ(req.UserID)).
+			Where(
+				proxyusersubscribe.UserIDEQ(req.UserID),
+				proxyusersubscribe.Or(
+					proxyusersubscribe.ExpireTimeGT(now),
+					proxyusersubscribe.FinishedAtGTE(sevenDaysAgo),
+					proxyusersubscribe.ExpireTimeEQ(time.UnixMilli(0)),
+				),
+			).
 			All(ctx)
 		if err != nil {
 			r.logger.Errorf("[PreCreateOrder] 查询用户订阅失败, userID: %d, error: %v", req.UserID, err)
@@ -414,6 +423,25 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 	}
 	amount -= couponAmount
 
+	var feeAmount int64
+	if req.Payment > 0 {
+		payment, err := r.data.db.ProxyPayment.Query().
+			Where(
+				proxypayment.IDEQ(req.Payment),
+			).
+			Only(ctx)
+		if err != nil {
+			r.logger.Errorf("[PreCreateOrder] Payment method not found: %d", req.Payment)
+			return nil, responsecode.NewKratosError(responsecode.ErrPaymentNotFound)
+		}
+
+		// 按老项目顺序：先加手续费，再计算赠金抵扣
+		if amount > 0 {
+			feeAmount = r.calculateFee(amount, payment)
+			amount += feeAmount
+		}
+	}
+
 	var deductionAmount int64
 	// 检查用户赠金金额
 	userInfo, err := r.data.db.ProxyUser.Query().
@@ -434,25 +462,6 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 			deductionAmount = *userInfo.GiftAmount
 			amount -= *userInfo.GiftAmount
 		}
-	}
-
-	var feeAmount int64
-	if req.Payment != 0 {
-		payment, err := r.data.db.ProxyPayment.Query().
-			Where(
-				proxypayment.IDEQ(req.Payment),
-			).
-			Only(ctx)
-		if err != nil {
-			r.logger.Errorf("[PreCreateOrder] Payment method not found: %d", req.Payment)
-			return nil, responsecode.NewKratosError(responsecode.ErrPaymentNotFound)
-		}
-
-		// 计算手续费
-		if amount > 0 {
-			feeAmount = r.calculateFee(amount, payment)
-		}
-		amount += feeAmount
 	}
 	if amount > MaxOrderAmount {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
@@ -506,9 +515,16 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 		singleModelEnabled = systemConfigBool(subscribeValues, singleModelEnabled, "SingleModel", "single_model")
 	}
 	if singleModelEnabled {
+		now := time.Now()
+		sevenDaysAgo := now.Add(-7 * 24 * time.Hour)
 		existingSubscriptions, err := r.data.db.ProxyUserSubscribe.Query().
 			Where(
 				proxyusersubscribe.UserIDEQ(req.UserID),
+				proxyusersubscribe.Or(
+					proxyusersubscribe.ExpireTimeGT(now),
+					proxyusersubscribe.FinishedAtGTE(sevenDaysAgo),
+					proxyusersubscribe.ExpireTimeEQ(time.UnixMilli(0)),
+				),
 			).
 			Count(ctx)
 		if err != nil {
@@ -551,9 +567,6 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 			Where(
 				proxyusersubscribe.UserIDEQ(req.UserID),
 				proxyusersubscribe.SubscribeIDEQ(req.SubscribeID),
-				proxyusersubscribe.StatusNEQ(4), // 不等于已取消
-				// 完全按照老项目逻辑：只应用时间过滤，不应用状态过滤
-				// 老项目QueryUserSubscribe(l.ctx, u.Id)没有传入status参数
 				proxyusersubscribe.Or(
 					proxyusersubscribe.ExpireTimeGT(now),
 					proxyusersubscribe.FinishedAtGTE(sevenDaysAgo),
@@ -628,27 +641,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 		coupon = r.calculateCoupon(amount, couponInfo)
 	}
 
-	// 计算手续费
 	amount -= coupon
-	var deductionAmount int64
-	currentGiftAmount := int64(0)
-	if userInfo.GiftAmount != nil {
-		currentGiftAmount = *userInfo.GiftAmount
-	}
-
-	// 检查用户扣除金额
-	if currentGiftAmount > 0 {
-		if currentGiftAmount >= amount {
-			deductionAmount = amount
-			amount = 0
-			currentGiftAmount -= deductionAmount
-		} else {
-			deductionAmount = currentGiftAmount
-			amount -= currentGiftAmount
-			currentGiftAmount = 0
-		}
-	}
-
 	// 查找支付方式
 	payment, err := r.data.db.ProxyPayment.Query().
 		Where(
@@ -661,11 +654,30 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 	}
 
 	var feeAmount int64
-	// 计算手续费
+	// 按老项目顺序：先加手续费，再计算赠金抵扣
 	if amount > 0 {
 		feeAmount = r.calculateFee(amount, payment)
 		amount += feeAmount
 	}
+
+	var deductionAmount int64
+	currentGiftAmount := int64(0)
+	if userInfo.GiftAmount != nil {
+		currentGiftAmount = *userInfo.GiftAmount
+	}
+
+	if currentGiftAmount > 0 {
+		if currentGiftAmount >= amount {
+			deductionAmount = amount
+			amount = 0
+			currentGiftAmount -= deductionAmount
+		} else {
+			deductionAmount = currentGiftAmount
+			amount -= currentGiftAmount
+			currentGiftAmount = 0
+		}
+	}
+
 	if amount > MaxOrderAmount {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
@@ -716,7 +728,6 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 				Where(
 					proxyusersubscribe.UserIDEQ(req.UserID),
 					proxyusersubscribe.SubscribeIDEQ(req.SubscribeID),
-					proxyusersubscribe.StatusNEQ(4),
 					proxyusersubscribe.Or(
 						proxyusersubscribe.ExpireTimeGT(now),
 						proxyusersubscribe.FinishedAtGTE(sevenDaysAgo),

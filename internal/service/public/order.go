@@ -23,9 +23,28 @@ func NewPublicOrderService(uc *publicBiz.OrderUsecase) *PublicOrderService {
 }
 
 // Helper functions for type conversion
-func parseInt64(s string) int64 {
-	val, _ := strconv.ParseInt(s, 10, 64)
-	return val
+func parseInt64Optional(fieldName, s string) (int64, error) {
+	if s == "" {
+		return 0, nil
+	}
+	val, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		_ = fieldName
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return val, nil
+}
+
+func parseInt64Required(fieldName, s string) (int64, error) {
+	if s == "" {
+		_ = fieldName
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	val, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return val, nil
 }
 
 // CloseOrder closes an order
@@ -93,15 +112,27 @@ func (s *PublicOrderService) QueryOrderList(ctx context.Context, req *pb.QueryOr
 func (s *PublicOrderService) PreCreateOrder(ctx context.Context, req *pb.PreCreateOrderRequest) (*pb.OrderPreCreateReply, error) {
 	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
+	subscribeID, err := parseInt64Optional("subscribe_id", req.SubscribeId)
+	if err != nil {
+		return nil, err
+	}
+	subscribeGroupID, err := parseInt64Optional("subscribe_group_id", req.SubscribeGroupId)
+	if err != nil {
+		return nil, err
+	}
+	paymentID, err := parseInt64Optional("payment", req.Payment)
+	if err != nil {
+		return nil, err
+	}
 
 	params := &publicBiz.PreCreateOrderParams{
 		UserID:           userID,
 		Type:             req.Type,
-		SubscribeID:      parseInt64(req.SubscribeId),
-		SubscribeGroupID: parseInt64(req.SubscribeGroupId),
+		SubscribeID:      subscribeID,
+		SubscribeGroupID: subscribeGroupID,
 		Quantity:         int64(req.Quantity),
 		Coupon:           req.Coupon,
-		Payment:          parseInt64(req.Payment),
+		Payment:          paymentID,
 	}
 
 	result, err := s.uc.PreCreateOrder(ctx, params)
@@ -130,13 +161,21 @@ func (s *PublicOrderService) PreCreateOrder(ctx context.Context, req *pb.PreCrea
 func (s *PublicOrderService) Purchase(ctx context.Context, req *pb.PurchaseRequest) (*pb.PurchaseReply, error) {
 	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
+	subscribeID, err := parseInt64Required("subscribe_id", req.SubscribeId)
+	if err != nil {
+		return nil, err
+	}
+	paymentID, err := parseInt64Required("payment", req.Payment)
+	if err != nil {
+		return nil, err
+	}
 
 	params := &publicBiz.PurchaseParams{
 		UserID:      userID,
-		SubscribeID: parseInt64(req.SubscribeId),
+		SubscribeID: subscribeID,
 		Quantity:    int64(req.Quantity),
 		Coupon:      req.Coupon,
-		Payment:     parseInt64(req.Payment),
+		Payment:     paymentID,
 	}
 
 	result, err := s.uc.Purchase(ctx, params)
@@ -157,11 +196,19 @@ func (s *PublicOrderService) Purchase(ctx context.Context, req *pb.PurchaseReque
 func (s *PublicOrderService) Recharge(ctx context.Context, req *pb.RechargeRequest) (*pb.RechargeReply, error) {
 	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
+	amount, err := parseInt64Required("amount", req.Amount)
+	if err != nil {
+		return nil, err
+	}
+	paymentID, err := parseInt64Required("payment", req.Payment)
+	if err != nil {
+		return nil, err
+	}
 
 	params := &publicBiz.RechargeParams{
 		UserID:  userID,
-		Amount:  parseInt64(req.Amount),
-		Payment: parseInt64(req.Payment),
+		Amount:  amount,
+		Payment: paymentID,
 	}
 
 	result, err := s.uc.Recharge(ctx, params)
@@ -182,13 +229,21 @@ func (s *PublicOrderService) Recharge(ctx context.Context, req *pb.RechargeReque
 func (s *PublicOrderService) Renewal(ctx context.Context, req *pb.RenewalRequest) (*pb.RenewalReply, error) {
 	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
+	userSubscribeID, err := parseInt64Required("user_subscribe_id", req.UserSubscribeId)
+	if err != nil {
+		return nil, err
+	}
+	paymentID, err := parseInt64Required("payment", req.Payment)
+	if err != nil {
+		return nil, err
+	}
 
 	params := &publicBiz.RenewalParams{
 		UserID:          userID,
-		UserSubscribeID: parseInt64(req.UserSubscribeId),
+		UserSubscribeID: userSubscribeID,
 		Quantity:        int64(req.Quantity),
 		Coupon:          req.Coupon,
-		Payment:         parseInt64(req.Payment),
+		Payment:         paymentID,
 	}
 
 	result, err := s.uc.Renewal(ctx, params)
@@ -209,11 +264,19 @@ func (s *PublicOrderService) Renewal(ctx context.Context, req *pb.RenewalRequest
 func (s *PublicOrderService) ResetTraffic(ctx context.Context, req *pb.ResetTrafficRequest) (*pb.TrafficResetReply, error) {
 	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
+	userSubscribeID, err := parseInt64Required("user_subscribe_id", req.UserSubscribeId)
+	if err != nil {
+		return nil, err
+	}
+	paymentID, err := parseInt64Required("payment", req.Payment)
+	if err != nil {
+		return nil, err
+	}
 
 	params := &publicBiz.ResetTrafficParams{
 		UserID:          userID,
-		UserSubscribeID: parseInt64(req.UserSubscribeId),
-		Payment:         parseInt64(req.Payment),
+		UserSubscribeID: userSubscribeID,
+		Payment:         paymentID,
 	}
 
 	result, err := s.uc.ResetTraffic(ctx, params)
