@@ -200,7 +200,7 @@ message GetBatchSendEmailTaskStatusReply {
 
 // CreateQuotaTaskRequest 创建配额任务请求
 message CreateQuotaTaskRequest {
-  repeated int64 subscribers = 1;        // 订阅ID列表
+  repeated string subscribers = 1;        // 订阅ID列表
   optional bool is_active = 2;           // 是否仅活跃订阅
   int64 start_time = 3;                  // 开始时间过滤(Unix时间戳)
   int64 end_time = 4;                    // 结束时间过滤(Unix时间戳)
@@ -224,7 +224,7 @@ message CreateQuotaTaskReply {
 
 // QueryQuotaTaskPreCountRequest 查询配额任务预计数量请求
 message QueryQuotaTaskPreCountRequest {
-  repeated int64 subscribers = 1;        // 订阅ID列表
+  repeated string subscribers = 1;        // 订阅ID列表
   optional bool is_active = 2;           // 是否仅活跃订阅
   int64 start_time = 3;                  // 开始时间过滤(Unix时间戳)
   int64 end_time = 4;                    // 结束时间过滤(Unix时间戳)
@@ -245,7 +245,7 @@ message QueryQuotaTaskPreCountReply {
 // QuotaTask 配额任务
 message QuotaTask {
   string id = 1;                          // 任务ID
-  repeated int64 subscribers = 2;        // 订阅ID列表
+  repeated string subscribers = 2;        // 订阅ID列表
   optional bool is_active = 3;           // 是否仅活跃订阅
   int64 start_time = 4;                  // 开始时间过滤(Unix时间戳)
   int64 end_time = 5;                    // 结束时间过滤(Unix时间戳)
@@ -253,7 +253,7 @@ message QuotaTask {
   int64 days = 7;                        // 增加天数
   int32 gift_type = 8;                   // 赠送类型: 1:Fixed, 2:Ratio
   int64 gift_value = 9;                  // 赠送值
-  repeated int64 objects = 10;           // 用户订阅ID列表(实际影响的对象)
+  repeated string objects = 10;           // 用户订阅ID列表(实际影响的对象)
   int32 status = 11;                     // 任务状态: 0:Pending, 1:In Progress, 2:Completed, 3:Failed
   int64 total = 12;                      // 总数
   int64 current = 13;                    // 当前处理数

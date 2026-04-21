@@ -1089,7 +1089,7 @@ func (x *GetBatchSendEmailTaskStatusReply) GetData() *GetBatchSendEmailTaskStatu
 // CreateQuotaTaskRequest 创建配额任务请求
 type CreateQuotaTaskRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Subscribers   []int64                `protobuf:"varint,1,rep,packed,name=subscribers,proto3" json:"subscribers,omitempty"`                // 订阅ID列表
+	Subscribers   []string               `protobuf:"bytes,1,rep,name=subscribers,proto3" json:"subscribers,omitempty"`                        // 订阅ID列表
 	IsActive      *bool                  `protobuf:"varint,2,opt,name=is_active,json=isActive,proto3,oneof" json:"is_active,omitempty"`       // 是否仅活跃订阅
 	StartTime     int64                  `protobuf:"varint,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`          // 开始时间过滤(Unix时间戳)
 	EndTime       int64                  `protobuf:"varint,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`                // 结束时间过滤(Unix时间戳)
@@ -1131,7 +1131,7 @@ func (*CreateQuotaTaskRequest) Descriptor() ([]byte, []int) {
 	return file_admin_marketing_v1_marketing_proto_rawDescGZIP(), []int{16}
 }
 
-func (x *CreateQuotaTaskRequest) GetSubscribers() []int64 {
+func (x *CreateQuotaTaskRequest) GetSubscribers() []string {
 	if x != nil {
 		return x.Subscribers
 	}
@@ -1296,7 +1296,7 @@ func (x *CreateQuotaTaskReply) GetData() *CreateQuotaTaskData {
 // QueryQuotaTaskPreCountRequest 查询配额任务预计数量请求
 type QueryQuotaTaskPreCountRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Subscribers   []int64                `protobuf:"varint,1,rep,packed,name=subscribers,proto3" json:"subscribers,omitempty"`          // 订阅ID列表
+	Subscribers   []string               `protobuf:"bytes,1,rep,name=subscribers,proto3" json:"subscribers,omitempty"`                  // 订阅ID列表
 	IsActive      *bool                  `protobuf:"varint,2,opt,name=is_active,json=isActive,proto3,oneof" json:"is_active,omitempty"` // 是否仅活跃订阅
 	StartTime     int64                  `protobuf:"varint,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`    // 开始时间过滤(Unix时间戳)
 	EndTime       int64                  `protobuf:"varint,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`          // 结束时间过滤(Unix时间戳)
@@ -1334,7 +1334,7 @@ func (*QueryQuotaTaskPreCountRequest) Descriptor() ([]byte, []int) {
 	return file_admin_marketing_v1_marketing_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *QueryQuotaTaskPreCountRequest) GetSubscribers() []int64 {
+func (x *QueryQuotaTaskPreCountRequest) GetSubscribers() []string {
 	if x != nil {
 		return x.Subscribers
 	}
@@ -1472,7 +1472,7 @@ func (x *QueryQuotaTaskPreCountReply) GetData() *QueryQuotaTaskPreCountData {
 type QuotaTask struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                          // 任务ID
-	Subscribers   []int64                `protobuf:"varint,2,rep,packed,name=subscribers,proto3" json:"subscribers,omitempty"`                // 订阅ID列表
+	Subscribers   []string               `protobuf:"bytes,2,rep,name=subscribers,proto3" json:"subscribers,omitempty"`                        // 订阅ID列表
 	IsActive      *bool                  `protobuf:"varint,3,opt,name=is_active,json=isActive,proto3,oneof" json:"is_active,omitempty"`       // 是否仅活跃订阅
 	StartTime     int64                  `protobuf:"varint,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`          // 开始时间过滤(Unix时间戳)
 	EndTime       int64                  `protobuf:"varint,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`                // 结束时间过滤(Unix时间戳)
@@ -1480,7 +1480,7 @@ type QuotaTask struct {
 	Days          int64                  `protobuf:"varint,7,opt,name=days,proto3" json:"days,omitempty"`                                     // 增加天数
 	GiftType      int32                  `protobuf:"varint,8,opt,name=gift_type,json=giftType,proto3" json:"gift_type,omitempty"`             // 赠送类型: 1:Fixed, 2:Ratio
 	GiftValue     int64                  `protobuf:"varint,9,opt,name=gift_value,json=giftValue,proto3" json:"gift_value,omitempty"`          // 赠送值
-	Objects       []int64                `protobuf:"varint,10,rep,packed,name=objects,proto3" json:"objects,omitempty"`                       // 用户订阅ID列表(实际影响的对象)
+	Objects       []string               `protobuf:"bytes,10,rep,name=objects,proto3" json:"objects,omitempty"`                               // 用户订阅ID列表(实际影响的对象)
 	Status        int32                  `protobuf:"varint,11,opt,name=status,proto3" json:"status,omitempty"`                                // 任务状态: 0:Pending, 1:In Progress, 2:Completed, 3:Failed
 	Total         int64                  `protobuf:"varint,12,opt,name=total,proto3" json:"total,omitempty"`                                  // 总数
 	Current       int64                  `protobuf:"varint,13,opt,name=current,proto3" json:"current,omitempty"`                              // 当前处理数
@@ -1528,7 +1528,7 @@ func (x *QuotaTask) GetId() string {
 	return ""
 }
 
-func (x *QuotaTask) GetSubscribers() []int64 {
+func (x *QuotaTask) GetSubscribers() []string {
 	if x != nil {
 		return x.Subscribers
 	}
@@ -1584,7 +1584,7 @@ func (x *QuotaTask) GetGiftValue() int64 {
 	return 0
 }
 
-func (x *QuotaTask) GetObjects() []int64 {
+func (x *QuotaTask) GetObjects() []string {
 	if x != nil {
 		return x.Objects
 	}
@@ -1900,7 +1900,7 @@ const file_admin_marketing_v1_marketing_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12K\n" +
 	"\x04data\x18\x03 \x01(\v27.api.admin.marketing.v1.GetBatchSendEmailTaskStatusDataR\x04data\"\x99\x02\n" +
 	"\x16CreateQuotaTaskRequest\x12 \n" +
-	"\vsubscribers\x18\x01 \x03(\x03R\vsubscribers\x12 \n" +
+	"\vsubscribers\x18\x01 \x03(\tR\vsubscribers\x12 \n" +
 	"\tis_active\x18\x02 \x01(\bH\x00R\bisActive\x88\x01\x01\x12\x1d\n" +
 	"\n" +
 	"start_time\x18\x03 \x01(\x03R\tstartTime\x12\x19\n" +
@@ -1919,7 +1919,7 @@ const file_admin_marketing_v1_marketing_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12?\n" +
 	"\x04data\x18\x03 \x01(\v2+.api.admin.marketing.v1.CreateQuotaTaskDataR\x04data\"\xab\x01\n" +
 	"\x1dQueryQuotaTaskPreCountRequest\x12 \n" +
-	"\vsubscribers\x18\x01 \x03(\x03R\vsubscribers\x12 \n" +
+	"\vsubscribers\x18\x01 \x03(\tR\vsubscribers\x12 \n" +
 	"\tis_active\x18\x02 \x01(\bH\x00R\bisActive\x88\x01\x01\x12\x1d\n" +
 	"\n" +
 	"start_time\x18\x03 \x01(\x03R\tstartTime\x12\x19\n" +
@@ -1934,7 +1934,7 @@ const file_admin_marketing_v1_marketing_proto_rawDesc = "" +
 	"\x04data\x18\x03 \x01(\v22.api.admin.marketing.v1.QueryQuotaTaskPreCountDataR\x04data\"\xd4\x03\n" +
 	"\tQuotaTask\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
-	"\vsubscribers\x18\x02 \x03(\x03R\vsubscribers\x12 \n" +
+	"\vsubscribers\x18\x02 \x03(\tR\vsubscribers\x12 \n" +
 	"\tis_active\x18\x03 \x01(\bH\x00R\bisActive\x88\x01\x01\x12\x1d\n" +
 	"\n" +
 	"start_time\x18\x04 \x01(\x03R\tstartTime\x12\x19\n" +
@@ -1945,7 +1945,7 @@ const file_admin_marketing_v1_marketing_proto_rawDesc = "" +
 	"\n" +
 	"gift_value\x18\t \x01(\x03R\tgiftValue\x12\x18\n" +
 	"\aobjects\x18\n" +
-	" \x03(\x03R\aobjects\x12\x16\n" +
+	" \x03(\tR\aobjects\x12\x16\n" +
 	"\x06status\x18\v \x01(\x05R\x06status\x12\x14\n" +
 	"\x05total\x18\f \x01(\x03R\x05total\x12\x18\n" +
 	"\acurrent\x18\r \x01(\x03R\acurrent\x12\x16\n" +

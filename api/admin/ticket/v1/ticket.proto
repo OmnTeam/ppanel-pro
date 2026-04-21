@@ -79,7 +79,7 @@ message TicketInfo {
 // TicketFollow 工单跟进
 message TicketFollow {
   string id = 1;           // 跟进ID
-  int64 ticket_id = 2;    // 工单ID
+  string ticket_id = 2;    // 工单ID
   string from = 3;        // 来源/操作人
   int32 type = 4;         // 类型: 1=文本, 2=图片
   string content = 5;     // 跟进内容
@@ -88,7 +88,7 @@ message TicketFollow {
 
 // CreateTicketFollowRequest 创建工单跟进请求
 message CreateTicketFollowRequest {
-  int64 ticket_id = 1;  // 工单ID
+  string ticket_id = 1;  // 工单ID
   string from = 2;      // 来源/操作人
   int32 type = 3;       // 类型: 1=文本, 2=图片
   string content = 4;   // 跟进内容

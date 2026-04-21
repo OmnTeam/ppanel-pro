@@ -339,7 +339,7 @@ func (x *TicketInfo) GetUpdatedAt() int64 {
 type TicketFollow struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                 // 跟进ID
-	TicketId      int64                  `protobuf:"varint,2,opt,name=ticket_id,json=ticketId,proto3" json:"ticket_id,omitempty"`    // 工单ID
+	TicketId      string                 `protobuf:"bytes,2,opt,name=ticket_id,json=ticketId,proto3" json:"ticket_id,omitempty"`     // 工单ID
 	From          string                 `protobuf:"bytes,3,opt,name=from,proto3" json:"from,omitempty"`                             // 来源/操作人
 	Type          int32                  `protobuf:"varint,4,opt,name=type,proto3" json:"type,omitempty"`                            // 类型: 1=文本, 2=图片
 	Content       string                 `protobuf:"bytes,5,opt,name=content,proto3" json:"content,omitempty"`                       // 跟进内容
@@ -385,11 +385,11 @@ func (x *TicketFollow) GetId() string {
 	return ""
 }
 
-func (x *TicketFollow) GetTicketId() int64 {
+func (x *TicketFollow) GetTicketId() string {
 	if x != nil {
 		return x.TicketId
 	}
-	return 0
+	return ""
 }
 
 func (x *TicketFollow) GetFrom() string {
@@ -423,10 +423,10 @@ func (x *TicketFollow) GetCreatedAt() int64 {
 // CreateTicketFollowRequest 创建工单跟进请求
 type CreateTicketFollowRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TicketId      int64                  `protobuf:"varint,1,opt,name=ticket_id,json=ticketId,proto3" json:"ticket_id,omitempty"` // 工单ID
-	From          string                 `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`                          // 来源/操作人
-	Type          int32                  `protobuf:"varint,3,opt,name=type,proto3" json:"type,omitempty"`                         // 类型: 1=文本, 2=图片
-	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`                    // 跟进内容
+	TicketId      string                 `protobuf:"bytes,1,opt,name=ticket_id,json=ticketId,proto3" json:"ticket_id,omitempty"` // 工单ID
+	From          string                 `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`                         // 来源/操作人
+	Type          int32                  `protobuf:"varint,3,opt,name=type,proto3" json:"type,omitempty"`                        // 类型: 1=文本, 2=图片
+	Content       string                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`                   // 跟进内容
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -461,11 +461,11 @@ func (*CreateTicketFollowRequest) Descriptor() ([]byte, []int) {
 	return file_admin_ticket_v1_ticket_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *CreateTicketFollowRequest) GetTicketId() int64 {
+func (x *CreateTicketFollowRequest) GetTicketId() string {
 	if x != nil {
 		return x.TicketId
 	}
-	return 0
+	return ""
 }
 
 func (x *CreateTicketFollowRequest) GetFrom() string {
@@ -764,14 +764,14 @@ const file_admin_ticket_v1_ticket_proto_rawDesc = "" +
 	"updated_at\x18\b \x01(\x03R\tupdatedAt\"\x9c\x01\n" +
 	"\fTicketFollow\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
-	"\tticket_id\x18\x02 \x01(\x03R\bticketId\x12\x12\n" +
+	"\tticket_id\x18\x02 \x01(\tR\bticketId\x12\x12\n" +
 	"\x04from\x18\x03 \x01(\tR\x04from\x12\x12\n" +
 	"\x04type\x18\x04 \x01(\x05R\x04type\x12\x18\n" +
 	"\acontent\x18\x05 \x01(\tR\acontent\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\x06 \x01(\x03R\tcreatedAt\"z\n" +
 	"\x19CreateTicketFollowRequest\x12\x1b\n" +
-	"\tticket_id\x18\x01 \x01(\x03R\bticketId\x12\x12\n" +
+	"\tticket_id\x18\x01 \x01(\tR\bticketId\x12\x12\n" +
 	"\x04from\x18\x02 \x01(\tR\x04from\x12\x12\n" +
 	"\x04type\x18\x03 \x01(\x05R\x04type\x12\x18\n" +
 	"\acontent\x18\x04 \x01(\tR\acontent\"G\n" +

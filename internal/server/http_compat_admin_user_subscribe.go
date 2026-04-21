@@ -179,18 +179,22 @@ func registerLegacyAdminUserSubscribeCompatRoutes(r *khttp.Router, dataLayer *da
 		return
 	}
 
-	r.GET("/v1/admin/user/subscribe", compatGetUserSubscribeHandler(dataLayer))
-	r.POST("/v1/admin/user/subscribe", compatCreateUserSubscribeHandler(dataLayer))
-	r.PUT("/v1/admin/user/subscribe", compatUpdateUserSubscribeHandler(dataLayer))
-	r.DELETE("/v1/admin/user/subscribe", compatDeleteUserSubscribeHandler(dataLayer))
-	r.GET("/v1/admin/user/subscribe/detail", compatGetUserSubscribeDetailHandler(dataLayer))
-	r.GET("/v1/admin/user/subscribe/device", compatGetUserSubscribeDevicesHandler(dataLayer))
-	r.GET("/v1/admin/user/subscribe/logs", compatGetUserSubscribeLogsHandler(dataLayer))
-	r.GET("/v1/admin/user/subscribe/reset/logs", compatGetUserSubscribeResetTrafficLogsHandler(dataLayer))
-	r.GET("/v1/admin/user/subscribe/traffic_logs", compatGetUserSubscribeTrafficLogsHandler(dataLayer))
-	r.POST("/v1/admin/user/subscribe/reset/token", compatResetUserSubscribeTokenHandler(dataLayer))
-	r.POST("/v1/admin/user/subscribe/toggle", compatToggleUserSubscribeStatusHandler(dataLayer))
-	r.POST("/v1/admin/user/subscribe/reset/traffic", compatResetUserSubscribeTrafficHandler(dataLayer))
+	// 前端当前需要的接口已具备标准 Kratos proto/service 实现，
+	// 这里不再注册 compat 路由，避免覆盖标准生成路由。
+	// 标准 Kratos 路由：
+	// GET    /v1/admin/user/subscribe
+	// POST   /v1/admin/user/subscribe
+	// PUT    /v1/admin/user/subscribe
+	// DELETE /v1/admin/user/subscribe
+	// GET    /v1/admin/user/subscribe/detail
+	// GET    /v1/admin/user/subscribe/device
+	// GET    /v1/admin/user/subscribe/logs
+	// GET    /v1/admin/user/subscribe/reset/logs
+	// GET    /v1/admin/user/subscribe/traffic_logs
+	// POST   /v1/admin/user/subscribe/reset/token
+	// POST   /v1/admin/user/subscribe/toggle
+	// POST   /v1/admin/user/subscribe/reset/traffic
+
 }
 
 func compatGetUserSubscribeHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
@@ -251,8 +255,12 @@ func compatUpdateUserSubscribeHandler(dataLayer *data.Data) func(ctx khttp.Conte
 func compatDeleteUserSubscribeHandler(dataLayer *data.Data) func(ctx khttp.Context) error {
 	return func(ctx khttp.Context) error {
 		var req compatLegacyDeleteUserSubscribeRequest
-		_ = ctx.BindQuery(&req)
-		compatFillLegacyDeleteUserSubscribeQuery(ctx, &req)
+		if err := compatBindQuery(ctx, &req); err != nil {
+			return compatJSONError(ctx, err)
+		}
+		if strings.TrimSpace(req.UserSubscribeID) == "" {
+			return compatJSONError(ctx, compatRequiredFieldError("DeleteUserSubscribeRequest", "UserSubscribeId"))
+		}
 
 		if _, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			return nil, compatDeleteLegacyUserSubscribe(inner, dataLayer, compatParseInt64String(request.(*compatLegacyDeleteUserSubscribeRequest).UserSubscribeID))
@@ -444,13 +452,13 @@ func compatLegacyAdminUserSubscribeList(ctx context.Context, dataLayer *data.Dat
 		token := compatStringValue(item.Token)
 		short, _ := tool.FixedUniqueString(token, 8, "")
 		entry := compatUserSubscribe{
-			ID:          item.ID,
+			ID:          strconv.FormatInt(item.ID, 10),
 			IDStr:       strconv.FormatInt(item.ID, 10),
-			UserID:      item.UserID,
-			OrderID:     item.OrderID,
-			SubscribeID: item.SubscribeID,
+			UserID:      strconv.FormatInt(item.UserID, 10),
+			OrderID:     strconv.FormatInt(item.OrderID, 10),
+			SubscribeID: strconv.FormatInt(item.SubscribeID, 10),
 			Subscribe:   compatLegacySubscribeFromEntity(subscribePlan),
-			NodeGroupID: item.NodeGroupID,
+			NodeGroupID: strconv.FormatInt(item.NodeGroupID, 10),
 			GroupLocked: item.GroupLocked,
 			StartTime:   item.StartTime.UnixMilli(),
 			ExpireTime:  compatLegacyUnixMillis(item.ExpireTime),
@@ -725,9 +733,9 @@ func compatLegacyAdminUserSubscribeLogs(ctx context.Context, dataLayer *data.Dat
 			}
 		}
 		result.List = append(result.List, compatUserSubscribeLog{
-			ID:              item.ID,
-			UserID:          userID,
-			UserSubscribeID: item.ObjectID,
+			ID:              strconv.FormatInt(item.ID, 10),
+			UserID:          strconv.FormatInt(userID, 10),
+			UserSubscribeID: strconv.FormatInt(item.ObjectID, 10),
 			Token:           content.Token,
 			IP:              content.ClientIP,
 			UserAgent:       content.UserAgent,
@@ -1026,15 +1034,6 @@ func compatFillLegacyUserSubscribeListQuery(ctx khttp.Context, req *compatLegacy
 	}
 	if strings.TrimSpace(req.UserID) == "" {
 		req.UserID = strings.TrimSpace(query.Get("user_id"))
-	}
-}
-
-func compatFillLegacyDeleteUserSubscribeQuery(ctx khttp.Context, req *compatLegacyDeleteUserSubscribeRequest) {
-	if ctx == nil || req == nil || ctx.Request() == nil || ctx.Request().URL == nil {
-		return
-	}
-	if strings.TrimSpace(req.UserSubscribeID) == "" {
-		req.UserSubscribeID = strings.TrimSpace(ctx.Request().URL.Query().Get("user_subscribe_id"))
 	}
 }
 

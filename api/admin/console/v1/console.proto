@@ -123,7 +123,7 @@ message ServerTrafficData {
 }
 
 message UserTrafficData {
-  int64 sid = 1;
+  string sid = 1;
   int64 upload = 2;
   int64 download = 3;
 }

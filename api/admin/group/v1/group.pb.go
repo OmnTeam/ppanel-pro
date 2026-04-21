@@ -1471,7 +1471,7 @@ func (x *RecalculateGroupRequest) GetTriggerType() string {
 // RecalculateGroupData 重新计算分组数据
 type RecalculateGroupData struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	HistoryId     int64                  `protobuf:"varint,1,opt,name=history_id,json=historyId,proto3" json:"history_id,omitempty"` // 历史记录ID
+	HistoryId     string                 `protobuf:"bytes,1,opt,name=history_id,json=historyId,proto3" json:"history_id,omitempty"` // 历史记录ID
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1506,11 +1506,11 @@ func (*RecalculateGroupData) Descriptor() ([]byte, []int) {
 	return file_admin_group_v1_group_proto_rawDescGZIP(), []int{22}
 }
 
-func (x *RecalculateGroupData) GetHistoryId() int64 {
+func (x *RecalculateGroupData) GetHistoryId() string {
 	if x != nil {
 		return x.HistoryId
 	}
-	return 0
+	return ""
 }
 
 // RecalculateGroupReply 重新计算分组响应
@@ -2029,7 +2029,7 @@ func (x *GetGroupHistoryDetailRequest) GetId() string {
 type GroupHistoryDetailItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                        // 条目ID
-	HistoryId     int64                  `protobuf:"varint,2,opt,name=history_id,json=historyId,proto3" json:"history_id,omitempty"`        // 历史记录ID
+	HistoryId     string                 `protobuf:"bytes,2,opt,name=history_id,json=historyId,proto3" json:"history_id,omitempty"`         // 历史记录ID
 	UserGroupId   string                 `protobuf:"bytes,3,opt,name=user_group_id,json=userGroupId,proto3" json:"user_group_id,omitempty"` // 用户组ID
 	NodeGroupId   string                 `protobuf:"bytes,4,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"` // 节点组ID
 	UserCount     int32                  `protobuf:"varint,5,opt,name=user_count,json=userCount,proto3" json:"user_count,omitempty"`        // 用户数量
@@ -2077,11 +2077,11 @@ func (x *GroupHistoryDetailItem) GetId() string {
 	return ""
 }
 
-func (x *GroupHistoryDetailItem) GetHistoryId() int64 {
+func (x *GroupHistoryDetailItem) GetHistoryId() string {
 	if x != nil {
 		return x.HistoryId
 	}
-	return 0
+	return ""
 }
 
 func (x *GroupHistoryDetailItem) GetUserGroupId() string {
@@ -2331,7 +2331,7 @@ func (x *GetGroupHistoryDetailReply) GetData() *GroupHistoryDetail {
 // ExportGroupResultRequest 导出分组结果请求
 type ExportGroupResultRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	HistoryId     int64                  `protobuf:"varint,1,opt,name=history_id,json=historyId,proto3" json:"history_id,omitempty"` // 历史记录ID（可选）
+	HistoryId     string                 `protobuf:"bytes,1,opt,name=history_id,json=historyId,proto3" json:"history_id,omitempty"` // 历史记录ID（可选）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2366,11 +2366,11 @@ func (*ExportGroupResultRequest) Descriptor() ([]byte, []int) {
 	return file_admin_group_v1_group_proto_rawDescGZIP(), []int{34}
 }
 
-func (x *ExportGroupResultRequest) GetHistoryId() int64 {
+func (x *ExportGroupResultRequest) GetHistoryId() string {
 	if x != nil {
 		return x.HistoryId
 	}
-	return 0
+	return ""
 }
 
 // ExportGroupResultData 导出分组结果数据
@@ -2483,9 +2483,9 @@ func (x *ExportGroupResultReply) GetData() *ExportGroupResultData {
 // 此API暂时保留但返回错误，提示使用分组重算功能
 type MigrateUsersRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	FromUserGroupId int64                  `protobuf:"varint,1,opt,name=from_user_group_id,json=fromUserGroupId,proto3" json:"from_user_group_id,omitempty"` // 源用户组ID（已废弃）
-	ToUserGroupId   int64                  `protobuf:"varint,2,opt,name=to_user_group_id,json=toUserGroupId,proto3" json:"to_user_group_id,omitempty"`       // 目标用户组ID（已废弃）
-	IncludeLocked   bool                   `protobuf:"varint,3,opt,name=include_locked,json=includeLocked,proto3" json:"include_locked,omitempty"`           // 是否包含锁定用户
+	FromUserGroupId string                 `protobuf:"bytes,1,opt,name=from_user_group_id,json=fromUserGroupId,proto3" json:"from_user_group_id,omitempty"` // 源用户组ID（已废弃）
+	ToUserGroupId   string                 `protobuf:"bytes,2,opt,name=to_user_group_id,json=toUserGroupId,proto3" json:"to_user_group_id,omitempty"`       // 目标用户组ID（已废弃）
+	IncludeLocked   bool                   `protobuf:"varint,3,opt,name=include_locked,json=includeLocked,proto3" json:"include_locked,omitempty"`          // 是否包含锁定用户
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -2520,18 +2520,18 @@ func (*MigrateUsersRequest) Descriptor() ([]byte, []int) {
 	return file_admin_group_v1_group_proto_rawDescGZIP(), []int{37}
 }
 
-func (x *MigrateUsersRequest) GetFromUserGroupId() int64 {
+func (x *MigrateUsersRequest) GetFromUserGroupId() string {
 	if x != nil {
 		return x.FromUserGroupId
 	}
-	return 0
+	return ""
 }
 
-func (x *MigrateUsersRequest) GetToUserGroupId() int64 {
+func (x *MigrateUsersRequest) GetToUserGroupId() string {
 	if x != nil {
 		return x.ToUserGroupId
 	}
-	return 0
+	return ""
 }
 
 func (x *MigrateUsersRequest) GetIncludeLocked() bool {
@@ -3424,7 +3424,7 @@ const file_admin_group_v1_group_proto_rawDesc = "" +
 	"\ftrigger_type\x18\x02 \x01(\tR\vtriggerType\"5\n" +
 	"\x14RecalculateGroupData\x12\x1d\n" +
 	"\n" +
-	"history_id\x18\x01 \x01(\x03R\thistoryId\"\x83\x01\n" +
+	"history_id\x18\x01 \x01(\tR\thistoryId\"\x83\x01\n" +
 	"\x15RecalculateGroupReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12<\n" +
@@ -3471,7 +3471,7 @@ const file_admin_group_v1_group_proto_rawDesc = "" +
 	"\x16GroupHistoryDetailItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1d\n" +
 	"\n" +
-	"history_id\x18\x02 \x01(\x03R\thistoryId\x12\"\n" +
+	"history_id\x18\x02 \x01(\tR\thistoryId\x12\"\n" +
 	"\ruser_group_id\x18\x03 \x01(\tR\vuserGroupId\x12\"\n" +
 	"\rnode_group_id\x18\x04 \x01(\tR\vnodeGroupId\x12\x1d\n" +
 	"\n" +
@@ -3508,7 +3508,7 @@ const file_admin_group_v1_group_proto_rawDesc = "" +
 	"\x04data\x18\x03 \x01(\v2&.api.admin.group.v1.GroupHistoryDetailR\x04data\"9\n" +
 	"\x18ExportGroupResultRequest\x12\x1d\n" +
 	"\n" +
-	"history_id\x18\x01 \x01(\x03R\thistoryId\"2\n" +
+	"history_id\x18\x01 \x01(\tR\thistoryId\"2\n" +
 	"\x15ExportGroupResultData\x12\x19\n" +
 	"\bfile_url\x18\x01 \x01(\tR\afileUrl\"\x85\x01\n" +
 	"\x16ExportGroupResultReply\x12\x12\n" +
@@ -3516,8 +3516,8 @@ const file_admin_group_v1_group_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12=\n" +
 	"\x04data\x18\x03 \x01(\v2).api.admin.group.v1.ExportGroupResultDataR\x04data\"\x92\x01\n" +
 	"\x13MigrateUsersRequest\x12+\n" +
-	"\x12from_user_group_id\x18\x01 \x01(\x03R\x0ffromUserGroupId\x12'\n" +
-	"\x10to_user_group_id\x18\x02 \x01(\x03R\rtoUserGroupId\x12%\n" +
+	"\x12from_user_group_id\x18\x01 \x01(\tR\x0ffromUserGroupId\x12'\n" +
+	"\x10to_user_group_id\x18\x02 \x01(\tR\rtoUserGroupId\x12%\n" +
 	"\x0einclude_locked\x18\x03 \x01(\bR\rincludeLocked\"Z\n" +
 	"\x10MigrateUsersData\x12#\n" +
 	"\rsuccess_count\x18\x01 \x01(\x05R\fsuccessCount\x12!\n" +

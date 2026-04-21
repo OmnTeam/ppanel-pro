@@ -53,8 +53,8 @@ type compatUpdateUserRulesRequest struct {
 }
 
 type compatUpdateUserSubscribeNoteRequest struct {
-	UserSubscribeID int64  `json:"user_subscribe_id"`
-	Note            string `json:"note"`
+	UserSubscribeID compatFlexibleInt64 `json:"user_subscribe_id"`
+	Note            string              `json:"note"`
 }
 
 type compatFlexibleInt64 int64
@@ -93,6 +93,17 @@ func (v *compatFlexibleInt64) UnmarshalText(text []byte) error {
 	}
 	*v = compatFlexibleInt64(parsed)
 	return nil
+}
+
+func compatInt64SliceToStringSlice(values []int64) []string {
+	if len(values) == 0 {
+		return nil
+	}
+	result := make([]string, 0, len(values))
+	for _, value := range values {
+		result = append(result, strconv.FormatInt(value, 10))
+	}
+	return result
 }
 
 func compatCurrentUser(ctx context.Context) (*ent.ProxyUser, error) {

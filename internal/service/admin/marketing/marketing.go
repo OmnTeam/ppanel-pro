@@ -215,7 +215,11 @@ func (s *MarketingService) CreateQuotaTask(ctx context.Context, req *v1.CreateQu
 	// 转换subscribers从[]int64到[]int
 	subscribersInt := make([]int, len(req.Subscribers))
 	for i, v := range req.Subscribers {
-		subscribersInt[i] = int(v)
+		parsed, err := strconv.Atoi(v)
+		if err != nil {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		subscribersInt[i] = parsed
 	}
 
 	err := s.uc.CreateQuotaTask(ctx, subscribersInt, isActive,
@@ -244,7 +248,11 @@ func (s *MarketingService) QueryQuotaTaskPreCount(ctx context.Context, req *v1.Q
 	// 转换subscribers从[]int64到[]int
 	subscribersInt := make([]int, len(req.Subscribers))
 	for i, v := range req.Subscribers {
-		subscribersInt[i] = int(v)
+		parsed, err := strconv.Atoi(v)
+		if err != nil {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		subscribersInt[i] = parsed
 	}
 
 	count, err := s.uc.QueryQuotaTaskPreCount(ctx, subscribersInt, isActive, int(req.StartTime), int(req.EndTime))
@@ -294,7 +302,7 @@ func (s *MarketingService) QueryQuotaTaskList(ctx context.Context, req *v1.Query
 
 		list = append(list, &v1.QuotaTask{
 			Id:           formatInt64(int64(task.ID)),
-			Subscribers:  scopeInfo.Subscribers,
+			Subscribers:  formatInt64Slice(scopeInfo.Subscribers),
 			IsActive:     scopeInfo.IsActive,
 			StartTime:    scopeInfo.StartTime,
 			EndTime:      scopeInfo.EndTime,
@@ -302,7 +310,7 @@ func (s *MarketingService) QueryQuotaTaskList(ctx context.Context, req *v1.Query
 			Days:         int64(contentInfo.Days),
 			GiftType:     int32(contentInfo.GiftType),
 			GiftValue:    int64(contentInfo.GiftValue),
-			Objects:      scopeInfo.Objects,
+			Objects:      formatInt64Slice(scopeInfo.Objects),
 			Status:       int32(task.Status),
 			Total:        int64(task.Total),
 			Current:      int64(task.Current),
@@ -320,4 +328,15 @@ func (s *MarketingService) QueryQuotaTaskList(ctx context.Context, req *v1.Query
 			List:  list,
 		},
 	}, nil
+}
+
+func formatInt64Slice(values []int64) []string {
+	if len(values) == 0 {
+		return nil
+	}
+	result := make([]string, 0, len(values))
+	for _, value := range values {
+		result = append(result, strconv.FormatInt(value, 10))
+	}
+	return result
 }

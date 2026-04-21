@@ -98,10 +98,10 @@ func (s *PublicOrderService) PreCreateOrder(ctx context.Context, req *pb.PreCrea
 		UserID:           userID,
 		Type:             req.Type,
 		SubscribeID:      parseInt64(req.SubscribeId),
-		SubscribeGroupID: int64(req.SubscribeGroupId),
+		SubscribeGroupID: parseInt64(req.SubscribeGroupId),
 		Quantity:         int64(req.Quantity),
 		Coupon:           req.Coupon,
-		Payment:          int64(req.Payment),
+		Payment:          parseInt64(req.Payment),
 	}
 
 	result, err := s.uc.PreCreateOrder(ctx, params)
@@ -136,7 +136,7 @@ func (s *PublicOrderService) Purchase(ctx context.Context, req *pb.PurchaseReque
 		SubscribeID: parseInt64(req.SubscribeId),
 		Quantity:    int64(req.Quantity),
 		Coupon:      req.Coupon,
-		Payment:     int64(req.Payment),
+		Payment:     parseInt64(req.Payment),
 	}
 
 	result, err := s.uc.Purchase(ctx, params)
@@ -161,7 +161,7 @@ func (s *PublicOrderService) Recharge(ctx context.Context, req *pb.RechargeReque
 	params := &publicBiz.RechargeParams{
 		UserID:  userID,
 		Amount:  parseInt64(req.Amount),
-		Payment: int64(req.Payment),
+		Payment: parseInt64(req.Payment),
 	}
 
 	result, err := s.uc.Recharge(ctx, params)
@@ -185,10 +185,10 @@ func (s *PublicOrderService) Renewal(ctx context.Context, req *pb.RenewalRequest
 
 	params := &publicBiz.RenewalParams{
 		UserID:          userID,
-		UserSubscribeID: int64(req.UserSubscribeId),
+		UserSubscribeID: parseInt64(req.UserSubscribeId),
 		Quantity:        int64(req.Quantity),
 		Coupon:          req.Coupon,
-		Payment:         int64(req.Payment),
+		Payment:         parseInt64(req.Payment),
 	}
 
 	result, err := s.uc.Renewal(ctx, params)
@@ -212,8 +212,8 @@ func (s *PublicOrderService) ResetTraffic(ctx context.Context, req *pb.ResetTraf
 
 	params := &publicBiz.ResetTrafficParams{
 		UserID:          userID,
-		UserSubscribeID: int64(req.UserSubscribeId),
-		Payment:         int64(req.Payment),
+		UserSubscribeID: parseInt64(req.UserSubscribeId),
+		Payment:         parseInt64(req.Payment),
 	}
 
 	result, err := s.uc.ResetTraffic(ctx, params)

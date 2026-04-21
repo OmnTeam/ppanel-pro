@@ -304,7 +304,7 @@ message RecalculateGroupRequest {
 
 // RecalculateGroupData 重新计算分组数据
 message RecalculateGroupData {
-  int64 history_id = 1; // 历史记录ID
+  string history_id = 1; // 历史记录ID
 }
 
 // RecalculateGroupReply 重新计算分组响应
@@ -368,7 +368,7 @@ message GetGroupHistoryDetailRequest {
 // GroupHistoryDetailItem 分组历史详情条目
 message GroupHistoryDetailItem {
   string id = 1;              // 条目ID
-  int64 history_id = 2;     // 历史记录ID
+  string history_id = 2;     // 历史记录ID
   string user_group_id = 3; // 用户组ID
   string node_group_id = 4; // 节点组ID
   int32 user_count = 5;     // 用户数量
@@ -403,7 +403,7 @@ message GetGroupHistoryDetailReply {
 
 // ExportGroupResultRequest 导出分组结果请求
 message ExportGroupResultRequest {
-  int64 history_id = 1; // 历史记录ID（可选）
+  string history_id = 1; // 历史记录ID（可选）
 }
 
 // ExportGroupResultData 导出分组结果数据
@@ -421,8 +421,8 @@ message ExportGroupResultReply {
 // MigrateUsersRequest 迁移用户请求（已废弃 - UserGroup已移除）
 // 此API暂时保留但返回错误，提示使用分组重算功能
 message MigrateUsersRequest {
-  int64 from_user_group_id = 1; // 源用户组ID（已废弃）
-  int64 to_user_group_id = 2;   // 目标用户组ID（已废弃）
+  string from_user_group_id = 1; // 源用户组ID（已废弃）
+  string to_user_group_id = 2;   // 目标用户组ID（已废弃）
   bool include_locked = 3;       // 是否包含锁定用户
 }
 

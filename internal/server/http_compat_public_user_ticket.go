@@ -109,15 +109,15 @@ type compatSubscribeLogRequest struct {
 }
 
 type compatResetSubscribeTokenRequest struct {
-	UserSubscribeID int64 `json:"user_subscribe_id"`
+	UserSubscribeID compatFlexibleInt64 `json:"user_subscribe_id"`
 }
 
 type compatPreUnsubscribeRequest struct {
-	ID int64 `json:"id"`
+	ID compatFlexibleInt64 `json:"id"`
 }
 
 type compatUnsubscribeRequest struct {
-	ID int64 `json:"id"`
+	ID compatFlexibleInt64 `json:"id"`
 }
 
 type compatUpdateUserNotifyRequest struct {
@@ -305,13 +305,13 @@ type compatOAuthMethodsData struct {
 }
 
 type compatUserSubscribe struct {
-	ID          int64           `json:"id"`
+	ID          string          `json:"id"`
 	IDStr       string          `json:"id_str"`
-	UserID      int64           `json:"user_id"`
-	OrderID     int64           `json:"order_id"`
-	SubscribeID int64           `json:"subscribe_id"`
+	UserID      string          `json:"user_id"`
+	OrderID     string          `json:"order_id"`
+	SubscribeID string          `json:"subscribe_id"`
 	Subscribe   compatSubscribe `json:"subscribe"`
-	NodeGroupID int64           `json:"node_group_id"`
+	NodeGroupID string          `json:"node_group_id"`
 	GroupLocked bool            `json:"group_locked"`
 	StartTime   int64           `json:"start_time"`
 	ExpireTime  int64           `json:"expire_time"`
@@ -333,9 +333,9 @@ type compatUserSubscribeListData struct {
 }
 
 type compatUserSubscribeLog struct {
-	ID              int64  `json:"id"`
-	UserID          int64  `json:"user_id"`
-	UserSubscribeID int64  `json:"user_subscribe_id"`
+	ID              string `json:"id"`
+	UserID          string `json:"user_id"`
+	UserSubscribeID string `json:"user_subscribe_id"`
 	Token           string `json:"token"`
 	IP              string `json:"ip"`
 	UserAgent       string `json:"user_agent"`
@@ -799,7 +799,7 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatResetSubscribeTokenRequest)
-			_, err := publicUser.ResetUserSubscribeToken(inner, &publicuserv1.ResetUserSubscribeTokenRequest{UserSubscribeId: strconv.FormatInt(in.UserSubscribeID, 10)})
+			_, err := publicUser.ResetUserSubscribeToken(inner, &publicuserv1.ResetUserSubscribeTokenRequest{UserSubscribeId: strconv.FormatInt(int64(in.UserSubscribeID), 10)})
 			return nil, err
 		})
 		if err != nil {
@@ -816,7 +816,7 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatPreUnsubscribeRequest)
-			reply, err := publicUser.PreUnsubscribe(inner, &publicuserv1.PreUnsubscribeRequest{Id: strconv.FormatInt(in.ID, 10)})
+			reply, err := publicUser.PreUnsubscribe(inner, &publicuserv1.PreUnsubscribeRequest{Id: strconv.FormatInt(int64(in.ID), 10)})
 			if err != nil {
 				return nil, err
 			}
@@ -836,7 +836,7 @@ func registerLegacyPublicUserCompatRoutes(r *khttp.Router, dataLayer *data.Data,
 
 		_, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatUnsubscribeRequest)
-			_, err := publicUser.Unsubscribe(inner, &publicuserv1.UnsubscribeRequest{Id: strconv.FormatInt(in.ID, 10)})
+			_, err := publicUser.Unsubscribe(inner, &publicuserv1.UnsubscribeRequest{Id: strconv.FormatInt(int64(in.ID), 10)})
 			return nil, err
 		})
 		if err != nil {
@@ -1173,7 +1173,7 @@ func compatLegacySubscribeFromEntity(item *ent.ProxySubscribe) compatSubscribe {
 	}
 
 	return compatSubscribe{
-		ID:                item.ID,
+		ID:                strconv.FormatInt(item.ID, 10),
 		Name:              item.Name,
 		Language:          item.Language,
 		Description:       compatStringPointer(item.Description),
@@ -1186,10 +1186,10 @@ func compatLegacySubscribeFromEntity(item *ent.ProxySubscribe) compatSubscribe {
 		SpeedLimit:        item.SpeedLimit,
 		DeviceLimit:       item.DeviceLimit,
 		Quota:             item.Quota,
-		Nodes:             tool.StringToInt64Slice(item.Nodes),
+		Nodes:             compatInt64SliceToStringSlice(tool.StringToInt64Slice(item.Nodes)),
 		NodeTags:          compatSplitAndUniqueCSV(item.NodeTags),
-		NodeGroupIds:      append([]int64{}, item.NodeGroupIds...),
-		NodeGroupId:       nodeGroupID,
+		NodeGroupIds:      compatInt64SliceToStringSlice(item.NodeGroupIds),
+		NodeGroupId:       strconv.FormatInt(nodeGroupID, 10),
 		TrafficLimit:      compatLegacyTrafficLimits(item.TrafficLimit),
 		Show:              item.Show,
 		Sell:              item.Sell,
@@ -1345,13 +1345,13 @@ func compatLegacyUserSubscribe(ctx context.Context, dataLayer *data.Data) (*comp
 		token := compatStringValue(item.Token)
 		short, _ := tool.FixedUniqueString(token, 8, "")
 		entry := compatUserSubscribe{
-			ID:          item.ID,
+			ID:          strconv.FormatInt(item.ID, 10),
 			IDStr:       strconv.FormatInt(item.ID, 10),
-			UserID:      item.UserID,
-			OrderID:     item.OrderID,
-			SubscribeID: item.SubscribeID,
+			UserID:      strconv.FormatInt(item.UserID, 10),
+			OrderID:     strconv.FormatInt(item.OrderID, 10),
+			SubscribeID: strconv.FormatInt(item.SubscribeID, 10),
 			Subscribe:   compatLegacySubscribeFromEntity(subscribePlan),
-			NodeGroupID: item.NodeGroupID,
+			NodeGroupID: strconv.FormatInt(item.NodeGroupID, 10),
 			GroupLocked: item.GroupLocked,
 			StartTime:   item.StartTime.UnixMilli(),
 			ExpireTime:  compatLegacyUnixMillis(item.ExpireTime),
@@ -1478,9 +1478,9 @@ func compatLegacySubscribeLog(data *publicuserv1.SubscribeLogData) *compatUserSu
 	result.Total = data.Total
 	for _, item := range data.List {
 		result.List = append(result.List, compatUserSubscribeLog{
-			ID:              compatParseInt64String(item.Id),
-			UserID:          compatParseInt64String(item.UserId),
-			UserSubscribeID: compatParseInt64String(item.UserSubscribeId),
+			ID:              item.Id,
+			UserID:          item.UserId,
+			UserSubscribeID: item.UserSubscribeId,
 			Token:           item.Token,
 			IP:              item.Ip,
 			UserAgent:       item.UserAgent,

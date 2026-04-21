@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -15,6 +16,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxysystemlog"
 	"github.com/OmnTeam/ppanel-pro/ent/proxytrafficlog"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdevice"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
 	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
@@ -317,12 +319,64 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeById(ctx context.Context, id in
 		return nil, err
 	}
 
+	userInfo, err := r.data.db.ProxyUser.Query().
+		Where(proxyuser.IDEQ(userSub.UserID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, responsecode.NewKratosError(responsecode.ErrUserNotExist)
+		}
+		r.logger.Errorf("Failed to query user info: %v", err)
+		return nil, err
+	}
+
+	subscribePlan, err := r.data.db.ProxySubscribe.Query().
+		Where(proxysubscribe.IDEQ(userSub.SubscribeID)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, responsecode.NewKratosError(responsecode.ErrSubscribeNotFound)
+		}
+		r.logger.Errorf("Failed to query subscribe plan: %v", err)
+		return nil, err
+	}
+
+	authMethods, err := r.data.db.ProxyUserAuthMethod.Query().
+		Where(proxyuserauthmethod.UserIDEQ(userSub.UserID)).
+		All(ctx)
+	if err != nil {
+		r.logger.Errorf("Failed to query user auth methods: %v", err)
+		return nil, err
+	}
+
+	email := ""
+	telephone := ""
+	telephoneAreaCode := ""
+	for _, method := range authMethods {
+		switch strings.ToLower(strings.TrimSpace(method.AuthType)) {
+		case "email":
+			if email == "" {
+				email = method.AuthIdentifier
+			}
+		case "mobile":
+			if telephone == "" {
+				parts := strings.SplitN(method.AuthIdentifier, "-", 2)
+				if len(parts) == 2 {
+					telephoneAreaCode = parts[0]
+					telephone = parts[1]
+				} else {
+					telephone = method.AuthIdentifier
+				}
+			}
+		}
+	}
+
 	detail := &v1.UserSubscribeDetail{
 		Id:          strconv.FormatInt(int64(userSub.ID), 10),
 		UserId:      strconv.FormatInt(int64(userSub.UserID), 10),
-		OrderId:     userSub.OrderID,
+		OrderId:     strconv.FormatInt(int64(userSub.OrderID), 10),
 		SubscribeId: strconv.FormatInt(int64(userSub.SubscribeID), 10),
-		NodeGroupId: userSub.NodeGroupID,
+		NodeGroupId: strconv.FormatInt(int64(userSub.NodeGroupID), 10),
 		GroupLocked: userSub.GroupLocked,
 		StartTime:   userSub.StartTime.UnixMilli(),
 		Traffic:     getInt64ValueFromPointer(userSub.Traffic),
@@ -332,6 +386,46 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeById(ctx context.Context, id in
 		Status:      int32(getInt8Value(userSub.Status)),
 		CreatedAt:   userSub.CreatedAt.UnixMilli(),
 		UpdatedAt:   userSub.UpdatedAt.UnixMilli(),
+		FinishedAt:  timePointerToUnixMilli(userSub.FinishedAt),
+		Uuid:        getStringValue(userSub.UUID),
+		User: &v1.User{
+			Id:                    strconv.FormatInt(userInfo.ID, 10),
+			Email:                 email,
+			Telephone:             telephone,
+			TelephoneAreaCode:     telephoneAreaCode,
+			Avatar:                getStringValue(userInfo.Avatar),
+			Balance:               getInt64ValueFromPointer(userInfo.Balance),
+			ReferCode:             getStringValue(userInfo.ReferCode),
+			RefererId:             getInt64ValueFromPointer(userInfo.RefererID),
+			Commission:            getInt64ValueFromPointer(userInfo.Commission),
+			ReferralPercentage:    int32(userInfo.ReferralPercentage),
+			OnlyFirstPurchase:     userInfo.OnlyFirstPurchase,
+			GiftAmount:            getInt64ValueFromPointer(userInfo.GiftAmount),
+			Enable:                userInfo.Enable,
+			IsAdmin:               userInfo.IsAdmin,
+			EnableBalanceNotify:   userInfo.EnableBalanceNotify,
+			EnableLoginNotify:     userInfo.EnableLoginNotify,
+			EnableSubscribeNotify: userInfo.EnableSubscribeNotify,
+			EnableTradeNotify:     userInfo.EnableTradeNotify,
+			CreatedAt:             userInfo.CreatedAt.UnixMilli(),
+			UpdatedAt:             userInfo.UpdatedAt.UnixMilli(),
+			Telegram:              getInt64ValueFromPointer(userInfo.Telegram),
+			DeletedAt:             timePointerToUnixMilli(userInfo.DeletedAt),
+			IsDel:                 userInfo.IsDel != nil && *userInfo.IsDel == 1,
+		},
+		Subscribe: &v1.Subscribe{
+			Id:          strconv.FormatInt(subscribePlan.ID, 10),
+			Name:        subscribePlan.Name,
+			Description: getStringValue(subscribePlan.Description),
+			UnitPrice:   subscribePlan.UnitPrice,
+			UnitTime:    subscribePlan.UnitTime,
+			Traffic:     subscribePlan.Traffic,
+			SpeedLimit:  subscribePlan.SpeedLimit,
+			DeviceLimit: subscribePlan.DeviceLimit,
+			ResetCycle:  getInt64ValueFromPointer(subscribePlan.ResetCycle),
+			CreatedAt:   subscribePlan.CreatedAt.UnixMilli(),
+			UpdatedAt:   subscribePlan.UpdatedAt.UnixMilli(),
+		},
 	}
 	if userSub.ExpireTime != nil {
 		detail.ExpireTime = userSub.ExpireTime.UnixMilli()
@@ -623,6 +717,13 @@ func getStringValue(p *string) string {
 		return ""
 	}
 	return *p
+}
+
+func timePointerToUnixMilli(t *time.Time) int64 {
+	if t == nil {
+		return 0
+	}
+	return t.UnixMilli()
 }
 
 // 辅助函数：获取int8指针的值，nil返回0

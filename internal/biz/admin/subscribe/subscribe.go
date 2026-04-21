@@ -91,7 +91,11 @@ func (uc *SubscribeUseCase) CreateSubscribe(ctx context.Context, req *v1.CreateS
 	// Convert nodes to comma-separated string
 	nodesInt := make([]int, len(req.Nodes))
 	for i, v := range req.Nodes {
-		nodesInt[i] = int(v)
+		parsed, err := strconv.Atoi(v)
+		if err != nil {
+			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		nodesInt[i] = parsed
 	}
 	nodesStr := int64SliceToString(nodesInt)
 	nodeTagsStr := stringSliceToString(req.NodeTags)
@@ -159,7 +163,11 @@ func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateS
 	// Convert nodes to comma-separated string
 	nodesInt := make([]int, len(req.Nodes))
 	for i, v := range req.Nodes {
-		nodesInt[i] = int(v)
+		parsed, err := strconv.Atoi(v)
+		if err != nil {
+			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		nodesInt[i] = parsed
 	}
 	nodesStr := int64SliceToString(nodesInt)
 	nodeTagsStr := stringSliceToString(req.NodeTags)
@@ -571,7 +579,7 @@ func convertSubscribeToProto(sub *ent.ProxySubscribe) *v1.SubscribeInfo {
 		SpeedLimit:     int64(sub.SpeedLimit),
 		DeviceLimit:    int64(sub.DeviceLimit),
 		Quota:          int64(sub.Quota),
-		Nodes:          convertIntSliceToInt64Slice(stringToInt64Slice(sub.Nodes)),
+		Nodes:          intSliceToStringSlice(stringToInt64Slice(sub.Nodes)),
 		NodeTags:       stringToStringSlice(sub.NodeTags),
 		Show:           sub.Show,
 		Sell:           sub.Sell,
@@ -643,6 +651,17 @@ func convertIntSliceToInt64Slice(input []int) []int64 {
 	result := make([]int64, len(input))
 	for i, v := range input {
 		result[i] = int64(v)
+	}
+	return result
+}
+
+func intSliceToStringSlice(input []int) []string {
+	if input == nil {
+		return nil
+	}
+	result := make([]string, len(input))
+	for i, v := range input {
+		result[i] = strconv.FormatInt(int64(v), 10)
 	}
 	return result
 }

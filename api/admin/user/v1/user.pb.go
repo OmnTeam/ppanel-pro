@@ -1038,7 +1038,7 @@ type UpdateUserBasicInfoRequest struct {
 	GiftAmount         int64                  `protobuf:"varint,8,opt,name=gift_amount,json=giftAmount,proto3" json:"gift_amount,omitempty"`                         // 赠送金额（分）
 	Telegram           int64                  `protobuf:"varint,9,opt,name=telegram,proto3" json:"telegram,omitempty"`                                               // Telegram ID
 	ReferCode          string                 `protobuf:"bytes,10,opt,name=refer_code,json=referCode,proto3" json:"refer_code,omitempty"`                            // 推荐码
-	RefererId          int64                  `protobuf:"varint,11,opt,name=referer_id,json=refererId,proto3" json:"referer_id,omitempty"`                           // 推荐人ID
+	RefererId          string                 `protobuf:"bytes,11,opt,name=referer_id,json=refererId,proto3" json:"referer_id,omitempty"`                            // 推荐人ID
 	Enable             bool                   `protobuf:"varint,12,opt,name=enable,proto3" json:"enable,omitempty"`                                                  // 是否启用
 	IsAdmin            bool                   `protobuf:"varint,13,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`                                 // 是否管理员
 	unknownFields      protoimpl.UnknownFields
@@ -1145,11 +1145,11 @@ func (x *UpdateUserBasicInfoRequest) GetReferCode() string {
 	return ""
 }
 
-func (x *UpdateUserBasicInfoRequest) GetRefererId() int64 {
+func (x *UpdateUserBasicInfoRequest) GetRefererId() string {
 	if x != nil {
 		return x.RefererId
 	}
-	return 0
+	return ""
 }
 
 func (x *UpdateUserBasicInfoRequest) GetEnable() bool {
@@ -1947,7 +1947,7 @@ const file_admin_user_v1_user_proto_rawDesc = "" +
 	"refer_code\x18\n" +
 	" \x01(\tR\treferCode\x12\x1d\n" +
 	"\n" +
-	"referer_id\x18\v \x01(\x03R\trefererId\x12\x16\n" +
+	"referer_id\x18\v \x01(\tR\trefererId\x12\x16\n" +
 	"\x06enable\x18\f \x01(\bR\x06enable\x12\x19\n" +
 	"\bis_admin\x18\r \x01(\bR\aisAdmin\"H\n" +
 	"\x18UpdateUserBasicInfoReply\x12\x12\n" +

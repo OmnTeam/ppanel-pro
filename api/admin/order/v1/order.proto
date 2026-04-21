@@ -45,7 +45,7 @@ message CreateOrderRequest {
   int64 coupon_discount = 8;    // 优惠券折扣金额（分）
   int64 commission = 9;         // 订单佣金（分）
   int64 fee_amount = 10;        // 手续费金额（分）
-  int64 payment_id = 11;        // 支付方式ID
+  string payment_id = 11;        // 支付方式ID
   string trade_no = 12;         // 交易号
   int32 status = 13;            // 订单状态：1:待付款 2:已付款 3:关闭 4:失败 5:已完成
   string subscribe_id = 14;      // 订阅ID
@@ -61,7 +61,7 @@ message CreateOrderReply {
 message UpdateOrderStatusRequest {
   string id = 1;            // 订单ID
   int32 status = 2;        // 订单状态
-  int64 payment_id = 3;    // 支付方式ID（可选）
+  string payment_id = 3;    // 支付方式ID（可选）
   string trade_no = 4;     // 交易号（可选）
 }
 
@@ -109,7 +109,7 @@ message OrderItem {
   string coupon = 11;           // 优惠券
   int64 coupon_discount = 12;   // 优惠券折扣金额（分）
   int64 commission = 13;        // 订单佣金（分）
-  int64 payment_id = 14;        // 支付方式ID
+  string payment_id = 14;        // 支付方式ID
   string method = 15;           // 支付方式名称
   int64 fee_amount = 16;        // 手续费金额（分）
   string trade_no = 17;         // 交易号

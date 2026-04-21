@@ -142,10 +142,10 @@ message SubscribeInfo {
   int64 speed_limit = 11;                   // 速度限制
   int64 device_limit = 12;                  // 设备数限制
   int64 quota = 13;                         // 配额
-  repeated int64 nodes = 14;                // 节点IDs
+  repeated string nodes = 14;                // 节点IDs
   repeated string node_tags = 15;           // 节点标签
-  repeated int64 node_group_ids = 16;       // 节点组IDs
-  int64 node_group_id = 17;                 // 节点组ID
+  repeated string node_group_ids = 16;       // 节点组IDs
+  string node_group_id = 17;                 // 节点组ID
   repeated TrafficLimit traffic_limit = 18; // 流量限制配置
   bool show = 19;                           // 是否在门户页面显示
   bool sell = 20;                           // 是否售卖
@@ -177,7 +177,7 @@ message SubscribeItem {
   repeated int64 nodes = 14;
   repeated string node_tags = 15;
   repeated int64 node_group_ids = 16;
-  int64 node_group_id = 17;
+  string node_group_id = 17;
   repeated TrafficLimit traffic_limit = 18;
   bool show = 19;
   bool sell = 20;
@@ -206,10 +206,10 @@ message CreateSubscribeRequest {
   int64 speed_limit = 10;                   // 速度限制
   int64 device_limit = 11;                  // 设备数限制
   int64 quota = 12;                         // 配额
-  repeated int64 nodes = 13;                // 节点IDs
+  repeated string nodes = 13;                // 节点IDs
   repeated string node_tags = 14;           // 节点标签
-  repeated int64 node_group_ids = 15;       // 节点组IDs
-  int64 node_group_id = 16;                 // 节点组ID
+  repeated string node_group_ids = 15;       // 节点组IDs
+  string node_group_id = 16;                 // 节点组ID
   repeated TrafficLimit traffic_limit = 17; // 流量限制配置
   optional bool show = 18;                  // 是否在门户页面显示
   optional bool sell = 19;                  // 是否售卖
@@ -249,10 +249,10 @@ message UpdateSubscribeRequest {
   int64 speed_limit = 11;                   // 速度限制
   int64 device_limit = 12;                  // 设备数限制
   int64 quota = 13;                         // 配额
-  repeated int64 nodes = 14;                // 节点IDs
+  repeated string nodes = 14;                // 节点IDs
   repeated string node_tags = 15;           // 节点标签
-  repeated int64 node_group_ids = 16;       // 节点组IDs
-  int64 node_group_id = 17;                 // 节点组ID
+  repeated string node_group_ids = 16;       // 节点组IDs
+  string node_group_id = 17;                 // 节点组ID
   repeated TrafficLimit traffic_limit = 18; // 流量限制配置
   optional bool show = 19;                  // 是否在门户页面显示
   optional bool sell = 20;                  // 是否售卖
@@ -333,7 +333,7 @@ message GetSubscribeListRequest {
   int64 size = 2;          // 每页数量
   string language = 3;     // 语言筛选
   string search = 4;       // 搜索关键词
-  int64 node_group_id = 5; // 节点组ID筛选
+  string node_group_id = 5; // 节点组ID筛选
 }
 
 // GetSubscribeListData 获取订阅套餐列表数据

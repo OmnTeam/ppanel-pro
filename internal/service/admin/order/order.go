@@ -52,7 +52,13 @@ func (s *OrderService) CreateOrder(ctx context.Context, req *v1.CreateOrderReque
 			return nil, err
 		}
 	}
-	paymentId := int(req.PaymentId)
+	paymentId := 0
+	if req.PaymentId != "" {
+		paymentId, err = parseOrderStringInt(req.PaymentId)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	// 创建订单
 	err = s.uc.CreateOrder(ctx,
@@ -94,7 +100,13 @@ func (s *OrderService) UpdateOrderStatus(ctx context.Context, req *v1.UpdateOrde
 	if err != nil {
 		return nil, err
 	}
-	paymentId := int(req.PaymentId)
+	paymentId := 0
+	if req.PaymentId != "" {
+		paymentId, err = parseOrderStringInt(req.PaymentId)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	// 更新订单状态
 	err = s.uc.UpdateOrderStatus(ctx, id, req.Status, paymentId, req.TradeNo)
@@ -160,7 +172,7 @@ func (s *OrderService) GetOrderList(ctx context.Context, req *v1.GetOrderListReq
 			Coupon:         o.Coupon,
 			CouponDiscount: int64(o.CouponDiscount),
 			Commission:     int64(o.Commission),
-			PaymentId:      int64(o.PaymentID),
+			PaymentId:      strconv.FormatInt(int64(o.PaymentID), 10),
 			Method:         o.Method,
 			FeeAmount:      int64(o.FeeAmount),
 			TradeNo:        o.TradeNo,

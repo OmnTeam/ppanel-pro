@@ -25,16 +25,16 @@ const (
 // RedemptionCode 兑换码信息
 type RedemptionCode struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                             // 兑换码ID
-	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`                                         // 兑换码
-	TotalCount    int64                  `protobuf:"varint,3,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`          // 总兑换次数
-	UsedCount     int64                  `protobuf:"varint,4,opt,name=used_count,json=usedCount,proto3" json:"used_count,omitempty"`             // 已使用次数
-	SubscribePlan int64                  `protobuf:"varint,5,opt,name=subscribe_plan,json=subscribePlan,proto3" json:"subscribe_plan,omitempty"` // 订阅套餐ID
-	UnitTime      string                 `protobuf:"bytes,6,opt,name=unit_time,json=unitTime,proto3" json:"unit_time,omitempty"`                 // 单位时间: day, month, quarter, half_year, year
-	Quantity      int64                  `protobuf:"varint,7,opt,name=quantity,proto3" json:"quantity,omitempty"`                                // 数量
-	Status        int64                  `protobuf:"varint,8,opt,name=status,proto3" json:"status,omitempty"`                                    // 状态: 1=enabled, 0=disabled
-	CreatedAt     int64                  `protobuf:"varint,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`             // 创建时间
-	UpdatedAt     int64                  `protobuf:"varint,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`            // 更新时间
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                            // 兑换码ID
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`                                        // 兑换码
+	TotalCount    int64                  `protobuf:"varint,3,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`         // 总兑换次数
+	UsedCount     int64                  `protobuf:"varint,4,opt,name=used_count,json=usedCount,proto3" json:"used_count,omitempty"`            // 已使用次数
+	SubscribePlan string                 `protobuf:"bytes,5,opt,name=subscribe_plan,json=subscribePlan,proto3" json:"subscribe_plan,omitempty"` // 订阅套餐ID
+	UnitTime      string                 `protobuf:"bytes,6,opt,name=unit_time,json=unitTime,proto3" json:"unit_time,omitempty"`                // 单位时间: day, month, quarter, half_year, year
+	Quantity      int64                  `protobuf:"varint,7,opt,name=quantity,proto3" json:"quantity,omitempty"`                               // 数量
+	Status        int64                  `protobuf:"varint,8,opt,name=status,proto3" json:"status,omitempty"`                                   // 状态: 1=enabled, 0=disabled
+	CreatedAt     int64                  `protobuf:"varint,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`            // 创建时间
+	UpdatedAt     int64                  `protobuf:"varint,10,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`           // 更新时间
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -97,11 +97,11 @@ func (x *RedemptionCode) GetUsedCount() int64 {
 	return 0
 }
 
-func (x *RedemptionCode) GetSubscribePlan() int64 {
+func (x *RedemptionCode) GetSubscribePlan() string {
 	if x != nil {
 		return x.SubscribePlan
 	}
-	return 0
+	return ""
 }
 
 func (x *RedemptionCode) GetUnitTime() string {
@@ -142,14 +142,14 @@ func (x *RedemptionCode) GetUpdatedAt() int64 {
 // RedemptionRecord 兑换记录
 type RedemptionRecord struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                                        // 记录ID
-	RedemptionCodeId int64                  `protobuf:"varint,2,opt,name=redemption_code_id,json=redemptionCodeId,proto3" json:"redemption_code_id,omitempty"` // 兑换码ID
-	UserId           string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                                  // 用户ID
-	SubscribeId      string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`                   // 订阅ID
-	UnitTime         string                 `protobuf:"bytes,5,opt,name=unit_time,json=unitTime,proto3" json:"unit_time,omitempty"`                            // 单位时间
-	Quantity         int64                  `protobuf:"varint,6,opt,name=quantity,proto3" json:"quantity,omitempty"`                                           // 数量
-	RedeemedAt       int64                  `protobuf:"varint,7,opt,name=redeemed_at,json=redeemedAt,proto3" json:"redeemed_at,omitempty"`                     // 兑换时间
-	CreatedAt        int64                  `protobuf:"varint,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`                        // 创建时间
+	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                                       // 记录ID
+	RedemptionCodeId string                 `protobuf:"bytes,2,opt,name=redemption_code_id,json=redemptionCodeId,proto3" json:"redemption_code_id,omitempty"` // 兑换码ID
+	UserId           string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`                                 // 用户ID
+	SubscribeId      string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`                  // 订阅ID
+	UnitTime         string                 `protobuf:"bytes,5,opt,name=unit_time,json=unitTime,proto3" json:"unit_time,omitempty"`                           // 单位时间
+	Quantity         int64                  `protobuf:"varint,6,opt,name=quantity,proto3" json:"quantity,omitempty"`                                          // 数量
+	RedeemedAt       int64                  `protobuf:"varint,7,opt,name=redeemed_at,json=redeemedAt,proto3" json:"redeemed_at,omitempty"`                    // 兑换时间
+	CreatedAt        int64                  `protobuf:"varint,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`                       // 创建时间
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -191,11 +191,11 @@ func (x *RedemptionRecord) GetId() string {
 	return ""
 }
 
-func (x *RedemptionRecord) GetRedemptionCodeId() int64 {
+func (x *RedemptionRecord) GetRedemptionCodeId() string {
 	if x != nil {
 		return x.RedemptionCodeId
 	}
-	return 0
+	return ""
 }
 
 func (x *RedemptionRecord) GetUserId() string {
@@ -243,11 +243,11 @@ func (x *RedemptionRecord) GetCreatedAt() int64 {
 // CreateRedemptionCodeRequest 创建兑换码请求
 type CreateRedemptionCodeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	TotalCount    int64                  `protobuf:"varint,1,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`          // 总兑换次数
-	SubscribePlan int64                  `protobuf:"varint,2,opt,name=subscribe_plan,json=subscribePlan,proto3" json:"subscribe_plan,omitempty"` // 订阅套餐ID
-	UnitTime      string                 `protobuf:"bytes,3,opt,name=unit_time,json=unitTime,proto3" json:"unit_time,omitempty"`                 // 单位时间
-	Quantity      int64                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`                                // 数量
-	BatchCount    int64                  `protobuf:"varint,5,opt,name=batch_count,json=batchCount,proto3" json:"batch_count,omitempty"`          // 批量生成数量
+	TotalCount    int64                  `protobuf:"varint,1,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`         // 总兑换次数
+	SubscribePlan string                 `protobuf:"bytes,2,opt,name=subscribe_plan,json=subscribePlan,proto3" json:"subscribe_plan,omitempty"` // 订阅套餐ID
+	UnitTime      string                 `protobuf:"bytes,3,opt,name=unit_time,json=unitTime,proto3" json:"unit_time,omitempty"`                // 单位时间
+	Quantity      int64                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`                               // 数量
+	BatchCount    int64                  `protobuf:"varint,5,opt,name=batch_count,json=batchCount,proto3" json:"batch_count,omitempty"`         // 批量生成数量
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -289,11 +289,11 @@ func (x *CreateRedemptionCodeRequest) GetTotalCount() int64 {
 	return 0
 }
 
-func (x *CreateRedemptionCodeRequest) GetSubscribePlan() int64 {
+func (x *CreateRedemptionCodeRequest) GetSubscribePlan() string {
 	if x != nil {
 		return x.SubscribePlan
 	}
-	return 0
+	return ""
 }
 
 func (x *CreateRedemptionCodeRequest) GetUnitTime() string {
@@ -426,12 +426,12 @@ func (x *CreateRedemptionCodeReply) GetData() *CreateRedemptionCodeData {
 // UpdateRedemptionCodeRequest 更新兑换码请求
 type UpdateRedemptionCodeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                             // 兑换码ID
-	TotalCount    int64                  `protobuf:"varint,2,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`          // 总兑换次数
-	SubscribePlan int64                  `protobuf:"varint,3,opt,name=subscribe_plan,json=subscribePlan,proto3" json:"subscribe_plan,omitempty"` // 订阅套餐ID
-	UnitTime      string                 `protobuf:"bytes,4,opt,name=unit_time,json=unitTime,proto3" json:"unit_time,omitempty"`                 // 单位时间
-	Quantity      int64                  `protobuf:"varint,5,opt,name=quantity,proto3" json:"quantity,omitempty"`                                // 数量
-	Status        int64                  `protobuf:"varint,6,opt,name=status,proto3" json:"status,omitempty"`                                    // 状态
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                            // 兑换码ID
+	TotalCount    int64                  `protobuf:"varint,2,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`         // 总兑换次数
+	SubscribePlan string                 `protobuf:"bytes,3,opt,name=subscribe_plan,json=subscribePlan,proto3" json:"subscribe_plan,omitempty"` // 订阅套餐ID
+	UnitTime      string                 `protobuf:"bytes,4,opt,name=unit_time,json=unitTime,proto3" json:"unit_time,omitempty"`                // 单位时间
+	Quantity      int64                  `protobuf:"varint,5,opt,name=quantity,proto3" json:"quantity,omitempty"`                               // 数量
+	Status        int64                  `protobuf:"varint,6,opt,name=status,proto3" json:"status,omitempty"`                                   // 状态
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -480,11 +480,11 @@ func (x *UpdateRedemptionCodeRequest) GetTotalCount() int64 {
 	return 0
 }
 
-func (x *UpdateRedemptionCodeRequest) GetSubscribePlan() int64 {
+func (x *UpdateRedemptionCodeRequest) GetSubscribePlan() string {
 	if x != nil {
 		return x.SubscribePlan
 	}
-	return 0
+	return ""
 }
 
 func (x *UpdateRedemptionCodeRequest) GetUnitTime() string {
@@ -1078,11 +1078,11 @@ func (x *BatchDeleteRedemptionCodeReply) GetData() *BatchDeleteRedemptionCodeDat
 // GetRedemptionCodeListRequest 获取兑换码列表请求
 type GetRedemptionCodeListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          int64                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`                                        // 页码
-	Size          int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`                                        // 每页数量
-	SubscribePlan int64                  `protobuf:"varint,3,opt,name=subscribe_plan,json=subscribePlan,proto3" json:"subscribe_plan,omitempty"` // 订阅套餐ID过滤（可选）
-	UnitTime      string                 `protobuf:"bytes,4,opt,name=unit_time,json=unitTime,proto3" json:"unit_time,omitempty"`                 // 单位时间过滤（可选）
-	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code,omitempty"`                                         // 兑换码搜索（可选）
+	Page          int64                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`                                       // 页码
+	Size          int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`                                       // 每页数量
+	SubscribePlan string                 `protobuf:"bytes,3,opt,name=subscribe_plan,json=subscribePlan,proto3" json:"subscribe_plan,omitempty"` // 订阅套餐ID过滤（可选）
+	UnitTime      string                 `protobuf:"bytes,4,opt,name=unit_time,json=unitTime,proto3" json:"unit_time,omitempty"`                // 单位时间过滤（可选）
+	Code          string                 `protobuf:"bytes,5,opt,name=code,proto3" json:"code,omitempty"`                                        // 兑换码搜索（可选）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1131,11 +1131,11 @@ func (x *GetRedemptionCodeListRequest) GetSize() int64 {
 	return 0
 }
 
-func (x *GetRedemptionCodeListRequest) GetSubscribePlan() int64 {
+func (x *GetRedemptionCodeListRequest) GetSubscribePlan() string {
 	if x != nil {
 		return x.SubscribePlan
 	}
-	return 0
+	return ""
 }
 
 func (x *GetRedemptionCodeListRequest) GetUnitTime() string {
@@ -1269,10 +1269,10 @@ func (x *GetRedemptionCodeListReply) GetData() *GetRedemptionCodeListData {
 // GetRedemptionRecordListRequest 获取兑换记录列表请求
 type GetRedemptionRecordListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          int64                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`                   // 页码
-	Size          int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`                   // 每页数量
-	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`  // 用户ID过滤（可选）
-	CodeId        int64                  `protobuf:"varint,4,opt,name=code_id,json=codeId,proto3" json:"code_id,omitempty"` // 兑换码ID过滤（可选）
+	Page          int64                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`                  // 页码
+	Size          int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`                  // 每页数量
+	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"` // 用户ID过滤（可选）
+	CodeId        string                 `protobuf:"bytes,4,opt,name=code_id,json=codeId,proto3" json:"code_id,omitempty"` // 兑换码ID过滤（可选）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1328,11 +1328,11 @@ func (x *GetRedemptionRecordListRequest) GetUserId() string {
 	return ""
 }
 
-func (x *GetRedemptionRecordListRequest) GetCodeId() int64 {
+func (x *GetRedemptionRecordListRequest) GetCodeId() string {
 	if x != nil {
 		return x.CodeId
 	}
-	return 0
+	return ""
 }
 
 // GetRedemptionRecordListData 获取兑换记录列表数据
@@ -1461,7 +1461,7 @@ const file_admin_redemption_v1_redemption_proto_rawDesc = "" +
 	"totalCount\x12\x1d\n" +
 	"\n" +
 	"used_count\x18\x04 \x01(\x03R\tusedCount\x12%\n" +
-	"\x0esubscribe_plan\x18\x05 \x01(\x03R\rsubscribePlan\x12\x1b\n" +
+	"\x0esubscribe_plan\x18\x05 \x01(\tR\rsubscribePlan\x12\x1b\n" +
 	"\tunit_time\x18\x06 \x01(\tR\bunitTime\x12\x1a\n" +
 	"\bquantity\x18\a \x01(\x03R\bquantity\x12\x16\n" +
 	"\x06status\x18\b \x01(\x03R\x06status\x12\x1d\n" +
@@ -1472,7 +1472,7 @@ const file_admin_redemption_v1_redemption_proto_rawDesc = "" +
 	" \x01(\x03R\tupdatedAt\"\x85\x02\n" +
 	"\x10RedemptionRecord\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12,\n" +
-	"\x12redemption_code_id\x18\x02 \x01(\x03R\x10redemptionCodeId\x12\x17\n" +
+	"\x12redemption_code_id\x18\x02 \x01(\tR\x10redemptionCodeId\x12\x17\n" +
 	"\auser_id\x18\x03 \x01(\tR\x06userId\x12!\n" +
 	"\fsubscribe_id\x18\x04 \x01(\tR\vsubscribeId\x12\x1b\n" +
 	"\tunit_time\x18\x05 \x01(\tR\bunitTime\x12\x1a\n" +
@@ -1484,7 +1484,7 @@ const file_admin_redemption_v1_redemption_proto_rawDesc = "" +
 	"\x1bCreateRedemptionCodeRequest\x12\x1f\n" +
 	"\vtotal_count\x18\x01 \x01(\x03R\n" +
 	"totalCount\x12%\n" +
-	"\x0esubscribe_plan\x18\x02 \x01(\x03R\rsubscribePlan\x12\x1b\n" +
+	"\x0esubscribe_plan\x18\x02 \x01(\tR\rsubscribePlan\x12\x1b\n" +
 	"\tunit_time\x18\x03 \x01(\tR\bunitTime\x12\x1a\n" +
 	"\bquantity\x18\x04 \x01(\x03R\bquantity\x12\x1f\n" +
 	"\vbatch_count\x18\x05 \x01(\x03R\n" +
@@ -1499,7 +1499,7 @@ const file_admin_redemption_v1_redemption_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x03R\n" +
 	"totalCount\x12%\n" +
-	"\x0esubscribe_plan\x18\x03 \x01(\x03R\rsubscribePlan\x12\x1b\n" +
+	"\x0esubscribe_plan\x18\x03 \x01(\tR\rsubscribePlan\x12\x1b\n" +
 	"\tunit_time\x18\x04 \x01(\tR\bunitTime\x12\x1a\n" +
 	"\bquantity\x18\x05 \x01(\x03R\bquantity\x12\x16\n" +
 	"\x06status\x18\x06 \x01(\x03R\x06status\"4\n" +
@@ -1537,7 +1537,7 @@ const file_admin_redemption_v1_redemption_proto_rawDesc = "" +
 	"\x1cGetRedemptionCodeListRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x03R\x04page\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x03R\x04size\x12%\n" +
-	"\x0esubscribe_plan\x18\x03 \x01(\x03R\rsubscribePlan\x12\x1b\n" +
+	"\x0esubscribe_plan\x18\x03 \x01(\tR\rsubscribePlan\x12\x1b\n" +
 	"\tunit_time\x18\x04 \x01(\tR\bunitTime\x12\x12\n" +
 	"\x04code\x18\x05 \x01(\tR\x04code\"n\n" +
 	"\x19GetRedemptionCodeListData\x12\x14\n" +
@@ -1551,7 +1551,7 @@ const file_admin_redemption_v1_redemption_proto_rawDesc = "" +
 	"\x04page\x18\x01 \x01(\x03R\x04page\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x17\n" +
 	"\auser_id\x18\x03 \x01(\tR\x06userId\x12\x17\n" +
-	"\acode_id\x18\x04 \x01(\x03R\x06codeId\"r\n" +
+	"\acode_id\x18\x04 \x01(\tR\x06codeId\"r\n" +
 	"\x1bGetRedemptionRecordListData\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x03R\x05total\x12=\n" +
 	"\x04list\x18\x02 \x03(\v2).api.admin.redemption.v1.RedemptionRecordR\x04list\"\x96\x01\n" +

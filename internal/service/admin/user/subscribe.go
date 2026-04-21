@@ -49,8 +49,9 @@ func (s *UserSubscribeService) GetUserSubscribe(ctx context.Context, req *v1.Get
 		protoItem := &v1.UserSubscribe{
 			Id:          strconv.FormatInt(int64(item.ID), 10),
 			UserId:      strconv.FormatInt(int64(item.UserID), 10),
-			OrderId:     int64(item.OrderID),
+			OrderId:     strconv.FormatInt(int64(item.OrderID), 10),
 			SubscribeId: strconv.FormatInt(int64(item.SubscribeID), 10),
+			NodeGroupId: strconv.FormatInt(int64(item.NodeGroupID), 10),
 			StartTime:   item.StartTime.UnixMilli(),
 			CreatedAt:   item.CreatedAt.UnixMilli(),
 			UpdatedAt:   item.UpdatedAt.UnixMilli(),
@@ -80,6 +81,9 @@ func (s *UserSubscribeService) GetUserSubscribe(ctx context.Context, req *v1.Get
 		}
 		if item.Status != nil {
 			protoItem.Status = int32(*item.Status)
+		}
+		if detail, detailErr := s.uc.GetUserSubscribeById(ctx, item.ID); detailErr == nil && detail != nil {
+			protoItem.Subscribe = detail.Subscribe
 		}
 
 		protoList = append(protoList, protoItem)

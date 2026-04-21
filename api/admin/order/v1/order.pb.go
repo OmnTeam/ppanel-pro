@@ -35,7 +35,7 @@ type CreateOrderRequest struct {
 	CouponDiscount int64                  `protobuf:"varint,8,opt,name=coupon_discount,json=couponDiscount,proto3" json:"coupon_discount,omitempty"` // 优惠券折扣金额（分）
 	Commission     int64                  `protobuf:"varint,9,opt,name=commission,proto3" json:"commission,omitempty"`                               // 订单佣金（分）
 	FeeAmount      int64                  `protobuf:"varint,10,opt,name=fee_amount,json=feeAmount,proto3" json:"fee_amount,omitempty"`               // 手续费金额（分）
-	PaymentId      int64                  `protobuf:"varint,11,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty"`               // 支付方式ID
+	PaymentId      string                 `protobuf:"bytes,11,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty"`                // 支付方式ID
 	TradeNo        string                 `protobuf:"bytes,12,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no,omitempty"`                      // 交易号
 	Status         int32                  `protobuf:"varint,13,opt,name=status,proto3" json:"status,omitempty"`                                      // 订单状态：1:待付款 2:已付款 3:关闭 4:失败 5:已完成
 	SubscribeId    string                 `protobuf:"bytes,14,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`          // 订阅ID
@@ -143,11 +143,11 @@ func (x *CreateOrderRequest) GetFeeAmount() int64 {
 	return 0
 }
 
-func (x *CreateOrderRequest) GetPaymentId() int64 {
+func (x *CreateOrderRequest) GetPaymentId() string {
 	if x != nil {
 		return x.PaymentId
 	}
-	return 0
+	return ""
 }
 
 func (x *CreateOrderRequest) GetTradeNo() string {
@@ -227,10 +227,10 @@ func (x *CreateOrderReply) GetMessage() string {
 // UpdateOrderStatusRequest 更新订单状态请求
 type UpdateOrderStatusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                 // 订单ID
-	Status        int32                  `protobuf:"varint,2,opt,name=status,proto3" json:"status,omitempty"`                        // 订单状态
-	PaymentId     int64                  `protobuf:"varint,3,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty"` // 支付方式ID（可选）
-	TradeNo       string                 `protobuf:"bytes,4,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no,omitempty"`        // 交易号（可选）
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                // 订单ID
+	Status        int32                  `protobuf:"varint,2,opt,name=status,proto3" json:"status,omitempty"`                       // 订单状态
+	PaymentId     string                 `protobuf:"bytes,3,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty"` // 支付方式ID（可选）
+	TradeNo       string                 `protobuf:"bytes,4,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no,omitempty"`       // 交易号（可选）
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -279,11 +279,11 @@ func (x *UpdateOrderStatusRequest) GetStatus() int32 {
 	return 0
 }
 
-func (x *UpdateOrderStatusRequest) GetPaymentId() int64 {
+func (x *UpdateOrderStatusRequest) GetPaymentId() string {
 	if x != nil {
 		return x.PaymentId
 	}
-	return 0
+	return ""
 }
 
 func (x *UpdateOrderStatusRequest) GetTradeNo() string {
@@ -561,7 +561,7 @@ type OrderItem struct {
 	Coupon         string                 `protobuf:"bytes,11,opt,name=coupon,proto3" json:"coupon,omitempty"`                                        // 优惠券
 	CouponDiscount int64                  `protobuf:"varint,12,opt,name=coupon_discount,json=couponDiscount,proto3" json:"coupon_discount,omitempty"` // 优惠券折扣金额（分）
 	Commission     int64                  `protobuf:"varint,13,opt,name=commission,proto3" json:"commission,omitempty"`                               // 订单佣金（分）
-	PaymentId      int64                  `protobuf:"varint,14,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty"`                // 支付方式ID
+	PaymentId      string                 `protobuf:"bytes,14,opt,name=payment_id,json=paymentId,proto3" json:"payment_id,omitempty"`                 // 支付方式ID
 	Method         string                 `protobuf:"bytes,15,opt,name=method,proto3" json:"method,omitempty"`                                        // 支付方式名称
 	FeeAmount      int64                  `protobuf:"varint,16,opt,name=fee_amount,json=feeAmount,proto3" json:"fee_amount,omitempty"`                // 手续费金额（分）
 	TradeNo        string                 `protobuf:"bytes,17,opt,name=trade_no,json=tradeNo,proto3" json:"trade_no,omitempty"`                       // 交易号
@@ -696,11 +696,11 @@ func (x *OrderItem) GetCommission() int64 {
 	return 0
 }
 
-func (x *OrderItem) GetPaymentId() int64 {
+func (x *OrderItem) GetPaymentId() string {
 	if x != nil {
 		return x.PaymentId
 	}
-	return 0
+	return ""
 }
 
 func (x *OrderItem) GetMethod() string {
@@ -787,7 +787,7 @@ const file_admin_order_v1_order_proto_rawDesc = "" +
 	"fee_amount\x18\n" +
 	" \x01(\x03R\tfeeAmount\x12\x1d\n" +
 	"\n" +
-	"payment_id\x18\v \x01(\x03R\tpaymentId\x12\x19\n" +
+	"payment_id\x18\v \x01(\tR\tpaymentId\x12\x19\n" +
 	"\btrade_no\x18\f \x01(\tR\atradeNo\x12\x16\n" +
 	"\x06status\x18\r \x01(\x05R\x06status\x12!\n" +
 	"\fsubscribe_id\x18\x0e \x01(\tR\vsubscribeId\"@\n" +
@@ -798,7 +798,7 @@ const file_admin_order_v1_order_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x16\n" +
 	"\x06status\x18\x02 \x01(\x05R\x06status\x12\x1d\n" +
 	"\n" +
-	"payment_id\x18\x03 \x01(\x03R\tpaymentId\x12\x19\n" +
+	"payment_id\x18\x03 \x01(\tR\tpaymentId\x12\x19\n" +
 	"\btrade_no\x18\x04 \x01(\tR\atradeNo\"F\n" +
 	"\x16UpdateOrderStatusReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
@@ -836,7 +836,7 @@ const file_admin_order_v1_order_proto_rawDesc = "" +
 	"commission\x18\r \x01(\x03R\n" +
 	"commission\x12\x1d\n" +
 	"\n" +
-	"payment_id\x18\x0e \x01(\x03R\tpaymentId\x12\x16\n" +
+	"payment_id\x18\x0e \x01(\tR\tpaymentId\x12\x16\n" +
 	"\x06method\x18\x0f \x01(\tR\x06method\x12\x1d\n" +
 	"\n" +
 	"fee_amount\x18\x10 \x01(\x03R\tfeeAmount\x12\x19\n" +

@@ -465,12 +465,12 @@ func (x *OrderListReply) GetData() *OrderListData {
 // PreCreateOrder Request
 type PreCreateOrderRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
-	Type             int32                  `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`                                                   // Order type: 1:订阅 2:续费 3:重置流量 4:充值
-	SubscribeId      string                 `protobuf:"bytes,2,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`                   // Subscribe ID (for renewal/reset)
-	SubscribeGroupId int32                  `protobuf:"varint,3,opt,name=subscribe_group_id,json=subscribeGroupId,proto3" json:"subscribe_group_id,omitempty"` // Subscribe group ID (for purchase)
-	Quantity         int32                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`                                           // Quantity (for recharge or purchase)
-	Coupon           string                 `protobuf:"bytes,5,opt,name=coupon,proto3" json:"coupon,omitempty"`                                                // Changed from coupon_code to coupon
-	Payment          int32                  `protobuf:"varint,6,opt,name=payment,proto3" json:"payment,omitempty"`                                             // Changed from payment_id to payment
+	Type             int32                  `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`                                                  // Order type: 1:订阅 2:续费 3:重置流量 4:充值
+	SubscribeId      string                 `protobuf:"bytes,2,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`                  // Subscribe ID (for renewal/reset)
+	SubscribeGroupId string                 `protobuf:"bytes,3,opt,name=subscribe_group_id,json=subscribeGroupId,proto3" json:"subscribe_group_id,omitempty"` // Subscribe group ID (for purchase)
+	Quantity         int32                  `protobuf:"varint,4,opt,name=quantity,proto3" json:"quantity,omitempty"`                                          // Quantity (for recharge or purchase)
+	Coupon           string                 `protobuf:"bytes,5,opt,name=coupon,proto3" json:"coupon,omitempty"`                                               // Changed from coupon_code to coupon
+	Payment          string                 `protobuf:"bytes,6,opt,name=payment,proto3" json:"payment,omitempty"`                                             // Changed from payment_id to payment
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -519,11 +519,11 @@ func (x *PreCreateOrderRequest) GetSubscribeId() string {
 	return ""
 }
 
-func (x *PreCreateOrderRequest) GetSubscribeGroupId() int32 {
+func (x *PreCreateOrderRequest) GetSubscribeGroupId() string {
 	if x != nil {
 		return x.SubscribeGroupId
 	}
-	return 0
+	return ""
 }
 
 func (x *PreCreateOrderRequest) GetQuantity() int32 {
@@ -540,11 +540,11 @@ func (x *PreCreateOrderRequest) GetCoupon() string {
 	return ""
 }
 
-func (x *PreCreateOrderRequest) GetPayment() int32 {
+func (x *PreCreateOrderRequest) GetPayment() string {
 	if x != nil {
 		return x.Payment
 	}
-	return 0
+	return ""
 }
 
 // OrderPreCreateData 预创建订单数据
@@ -723,7 +723,7 @@ type PurchaseRequest struct {
 	SubscribeId   string                 `protobuf:"bytes,1,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"` // Subscribe ID (ADDED - was missing)
 	Quantity      int32                  `protobuf:"varint,2,opt,name=quantity,proto3" json:"quantity,omitempty"`                         // Quantity (ADDED - was missing)
 	Coupon        string                 `protobuf:"bytes,3,opt,name=coupon,proto3" json:"coupon,omitempty"`                              // Changed from coupon_code to coupon
-	Payment       int32                  `protobuf:"varint,4,opt,name=payment,proto3" json:"payment,omitempty"`                           // Changed from payment_id to payment
+	Payment       string                 `protobuf:"bytes,4,opt,name=payment,proto3" json:"payment,omitempty"`                            // Changed from payment_id to payment
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -779,11 +779,11 @@ func (x *PurchaseRequest) GetCoupon() string {
 	return ""
 }
 
-func (x *PurchaseRequest) GetPayment() int32 {
+func (x *PurchaseRequest) GetPayment() string {
 	if x != nil {
 		return x.Payment
 	}
-	return 0
+	return ""
 }
 
 // PurchaseData 购买数据
@@ -896,8 +896,8 @@ func (x *PurchaseReply) GetData() *PurchaseData {
 // Recharge Request
 type RechargeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Amount        string                 `protobuf:"bytes,1,opt,name=amount,proto3" json:"amount,omitempty"`    // Changed from quantity to amount
-	Payment       int32                  `protobuf:"varint,2,opt,name=payment,proto3" json:"payment,omitempty"` // Changed from payment_id to payment
+	Amount        string                 `protobuf:"bytes,1,opt,name=amount,proto3" json:"amount,omitempty"`   // Changed from quantity to amount
+	Payment       string                 `protobuf:"bytes,2,opt,name=payment,proto3" json:"payment,omitempty"` // Changed from payment_id to payment
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -939,11 +939,11 @@ func (x *RechargeRequest) GetAmount() string {
 	return ""
 }
 
-func (x *RechargeRequest) GetPayment() int32 {
+func (x *RechargeRequest) GetPayment() string {
 	if x != nil {
 		return x.Payment
 	}
-	return 0
+	return ""
 }
 
 // RechargeData 充值数据
@@ -1056,10 +1056,10 @@ func (x *RechargeReply) GetData() *RechargeData {
 // Renewal Request
 type RenewalRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	UserSubscribeId int32                  `protobuf:"varint,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // Changed from subscribe_id to user_subscribe_id
-	Quantity        int32                  `protobuf:"varint,2,opt,name=quantity,proto3" json:"quantity,omitempty"`                                        // Quantity (ADDED - was missing)
-	Coupon          string                 `protobuf:"bytes,3,opt,name=coupon,proto3" json:"coupon,omitempty"`                                             // Changed from coupon_code to coupon
-	Payment         int32                  `protobuf:"varint,4,opt,name=payment,proto3" json:"payment,omitempty"`                                          // Changed from payment_id to payment
+	UserSubscribeId string                 `protobuf:"bytes,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // Changed from subscribe_id to user_subscribe_id
+	Quantity        int32                  `protobuf:"varint,2,opt,name=quantity,proto3" json:"quantity,omitempty"`                                       // Quantity (ADDED - was missing)
+	Coupon          string                 `protobuf:"bytes,3,opt,name=coupon,proto3" json:"coupon,omitempty"`                                            // Changed from coupon_code to coupon
+	Payment         string                 `protobuf:"bytes,4,opt,name=payment,proto3" json:"payment,omitempty"`                                          // Changed from payment_id to payment
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1094,11 +1094,11 @@ func (*RenewalRequest) Descriptor() ([]byte, []int) {
 	return file_public_order_v1_order_proto_rawDescGZIP(), []int{17}
 }
 
-func (x *RenewalRequest) GetUserSubscribeId() int32 {
+func (x *RenewalRequest) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
 func (x *RenewalRequest) GetQuantity() int32 {
@@ -1115,11 +1115,11 @@ func (x *RenewalRequest) GetCoupon() string {
 	return ""
 }
 
-func (x *RenewalRequest) GetPayment() int32 {
+func (x *RenewalRequest) GetPayment() string {
 	if x != nil {
 		return x.Payment
 	}
-	return 0
+	return ""
 }
 
 // RenewalData 续费数据
@@ -1232,8 +1232,8 @@ func (x *RenewalReply) GetData() *RenewalData {
 // ResetTraffic Request
 type ResetTrafficRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
-	UserSubscribeId int32                  `protobuf:"varint,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // Changed from subscribe_id to user_subscribe_id
-	Payment         int32                  `protobuf:"varint,2,opt,name=payment,proto3" json:"payment,omitempty"`                                          // Changed from payment_id to payment
+	UserSubscribeId string                 `protobuf:"bytes,1,opt,name=user_subscribe_id,json=userSubscribeId,proto3" json:"user_subscribe_id,omitempty"` // Changed from subscribe_id to user_subscribe_id
+	Payment         string                 `protobuf:"bytes,2,opt,name=payment,proto3" json:"payment,omitempty"`                                          // Changed from payment_id to payment
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1268,18 +1268,18 @@ func (*ResetTrafficRequest) Descriptor() ([]byte, []int) {
 	return file_public_order_v1_order_proto_rawDescGZIP(), []int{20}
 }
 
-func (x *ResetTrafficRequest) GetUserSubscribeId() int32 {
+func (x *ResetTrafficRequest) GetUserSubscribeId() string {
 	if x != nil {
 		return x.UserSubscribeId
 	}
-	return 0
+	return ""
 }
 
-func (x *ResetTrafficRequest) GetPayment() int32 {
+func (x *ResetTrafficRequest) GetPayment() string {
 	if x != nil {
 		return x.Payment
 	}
-	return 0
+	return ""
 }
 
 // TrafficResetData 重置流量数据
@@ -2036,10 +2036,10 @@ const file_public_order_v1_order_proto_rawDesc = "" +
 	"\x15PreCreateOrderRequest\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\x05R\x04type\x12!\n" +
 	"\fsubscribe_id\x18\x02 \x01(\tR\vsubscribeId\x12,\n" +
-	"\x12subscribe_group_id\x18\x03 \x01(\x05R\x10subscribeGroupId\x12\x1a\n" +
+	"\x12subscribe_group_id\x18\x03 \x01(\tR\x10subscribeGroupId\x12\x1a\n" +
 	"\bquantity\x18\x04 \x01(\x05R\bquantity\x12\x16\n" +
 	"\x06coupon\x18\x05 \x01(\tR\x06coupon\x12\x18\n" +
-	"\apayment\x18\x06 \x01(\x05R\apayment\"\xa2\x02\n" +
+	"\apayment\x18\x06 \x01(\tR\apayment\"\xa2\x02\n" +
 	"\x12OrderPreCreateData\x12\x14\n" +
 	"\x05price\x18\x01 \x01(\tR\x05price\x12\x16\n" +
 	"\x06amount\x18\x02 \x01(\tR\x06amount\x12\x1a\n" +
@@ -2062,7 +2062,7 @@ const file_public_order_v1_order_proto_rawDesc = "" +
 	"\fsubscribe_id\x18\x01 \x01(\tR\vsubscribeId\x12\x1a\n" +
 	"\bquantity\x18\x02 \x01(\x05R\bquantity\x12\x16\n" +
 	"\x06coupon\x18\x03 \x01(\tR\x06coupon\x12\x18\n" +
-	"\apayment\x18\x04 \x01(\x05R\apayment\"*\n" +
+	"\apayment\x18\x04 \x01(\tR\apayment\"*\n" +
 	"\fPurchaseData\x12\x1a\n" +
 	"\border_no\x18\x01 \x01(\tR\border_no\"t\n" +
 	"\rPurchaseReply\x12\x12\n" +
@@ -2071,7 +2071,7 @@ const file_public_order_v1_order_proto_rawDesc = "" +
 	"\x04data\x18\x03 \x01(\v2!.api.public.order.v1.PurchaseDataR\x04data\"C\n" +
 	"\x0fRechargeRequest\x12\x16\n" +
 	"\x06amount\x18\x01 \x01(\tR\x06amount\x12\x18\n" +
-	"\apayment\x18\x02 \x01(\x05R\apayment\"*\n" +
+	"\apayment\x18\x02 \x01(\tR\apayment\"*\n" +
 	"\fRechargeData\x12\x1a\n" +
 	"\border_no\x18\x01 \x01(\tR\border_no\"t\n" +
 	"\rRechargeReply\x12\x12\n" +
@@ -2079,10 +2079,10 @@ const file_public_order_v1_order_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x125\n" +
 	"\x04data\x18\x03 \x01(\v2!.api.public.order.v1.RechargeDataR\x04data\"\x8a\x01\n" +
 	"\x0eRenewalRequest\x12*\n" +
-	"\x11user_subscribe_id\x18\x01 \x01(\x05R\x0fuserSubscribeId\x12\x1a\n" +
+	"\x11user_subscribe_id\x18\x01 \x01(\tR\x0fuserSubscribeId\x12\x1a\n" +
 	"\bquantity\x18\x02 \x01(\x05R\bquantity\x12\x16\n" +
 	"\x06coupon\x18\x03 \x01(\tR\x06coupon\x12\x18\n" +
-	"\apayment\x18\x04 \x01(\x05R\apayment\")\n" +
+	"\apayment\x18\x04 \x01(\tR\apayment\")\n" +
 	"\vRenewalData\x12\x1a\n" +
 	"\border_no\x18\x01 \x01(\tR\border_no\"r\n" +
 	"\fRenewalReply\x12\x12\n" +
@@ -2090,8 +2090,8 @@ const file_public_order_v1_order_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x124\n" +
 	"\x04data\x18\x03 \x01(\v2 .api.public.order.v1.RenewalDataR\x04data\"[\n" +
 	"\x13ResetTrafficRequest\x12*\n" +
-	"\x11user_subscribe_id\x18\x01 \x01(\x05R\x0fuserSubscribeId\x12\x18\n" +
-	"\apayment\x18\x02 \x01(\x05R\apayment\".\n" +
+	"\x11user_subscribe_id\x18\x01 \x01(\tR\x0fuserSubscribeId\x12\x18\n" +
+	"\apayment\x18\x02 \x01(\tR\apayment\".\n" +
 	"\x10TrafficResetData\x12\x1a\n" +
 	"\border_no\x18\x01 \x01(\tR\border_no\"|\n" +
 	"\x11TrafficResetReply\x12\x12\n" +

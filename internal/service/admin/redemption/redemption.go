@@ -128,7 +128,7 @@ func (s *RedemptionService) GetRedemptionCodeList(ctx context.Context, req *v1.G
 			Code:          item.Code,
 			TotalCount:    item.TotalCount,
 			UsedCount:     item.UsedCount,
-			SubscribePlan: item.SubscribePlan,
+			SubscribePlan: strconv.FormatInt(item.SubscribePlan, 10),
 			UnitTime:      item.UnitTime,
 			Quantity:      item.Quantity,
 			Status:        int64(item.Status),
@@ -159,7 +159,7 @@ func (s *RedemptionService) GetRedemptionRecordList(ctx context.Context, req *v1
 	for _, item := range list {
 		redemptionRecords = append(redemptionRecords, &v1.RedemptionRecord{
 			Id:               strconv.FormatInt(item.ID, 10),
-			RedemptionCodeId: item.RedemptionCodeID,
+			RedemptionCodeId: strconv.FormatInt(item.RedemptionCodeID, 10),
 			UserId:           strconv.FormatInt(item.UserID, 10),
 			SubscribeId:      strconv.FormatInt(item.SubscribeID, 10),
 			UnitTime:         item.UnitTime,

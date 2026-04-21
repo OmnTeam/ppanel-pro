@@ -842,8 +842,8 @@ type Node struct {
 	Protocol      string                 `protobuf:"bytes,8,opt,name=protocol,proto3" json:"protocol,omitempty"`
 	Enabled       *bool                  `protobuf:"varint,9,opt,name=enabled,proto3,oneof" json:"enabled,omitempty"` // 使用 optional 支持 null 和布尔值，与老项目兼容
 	Sort          int64                  `protobuf:"varint,10,opt,name=sort,proto3" json:"sort,omitempty"`
-	NodeGroupId   int64                  `protobuf:"varint,11,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`
-	NodeGroupIds  []int64                `protobuf:"varint,12,rep,packed,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`
+	NodeGroupId   string                 `protobuf:"bytes,11,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`
+	NodeGroupIds  []string               `protobuf:"bytes,12,rep,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     int64                  `protobuf:"varint,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -943,14 +943,14 @@ func (x *Node) GetSort() int64 {
 	return 0
 }
 
-func (x *Node) GetNodeGroupId() int64 {
+func (x *Node) GetNodeGroupId() string {
 	if x != nil {
 		return x.NodeGroupId
 	}
-	return 0
+	return ""
 }
 
-func (x *Node) GetNodeGroupIds() []int64 {
+func (x *Node) GetNodeGroupIds() []string {
 	if x != nil {
 		return x.NodeGroupIds
 	}
@@ -1834,7 +1834,7 @@ type CreateNodeRequest struct {
 	ServerId      string                 `protobuf:"bytes,5,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	Protocol      string                 `protobuf:"bytes,6,opt,name=protocol,proto3" json:"protocol,omitempty"`
 	Enabled       *bool                  `protobuf:"varint,7,opt,name=enabled,proto3,oneof" json:"enabled,omitempty"` // 使用 optional 支持 null 和布尔值，与老项目兼容
-	NodeGroupIds  []int64                `protobuf:"varint,8,rep,packed,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`
+	NodeGroupIds  []string               `protobuf:"bytes,8,rep,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1918,7 +1918,7 @@ func (x *CreateNodeRequest) GetEnabled() bool {
 	return false
 }
 
-func (x *CreateNodeRequest) GetNodeGroupIds() []int64 {
+func (x *CreateNodeRequest) GetNodeGroupIds() []string {
 	if x != nil {
 		return x.NodeGroupIds
 	}
@@ -2039,7 +2039,7 @@ type UpdateNodeRequest struct {
 	ServerId      string                 `protobuf:"bytes,6,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	Protocol      string                 `protobuf:"bytes,7,opt,name=protocol,proto3" json:"protocol,omitempty"`
 	Enabled       *bool                  `protobuf:"varint,8,opt,name=enabled,proto3,oneof" json:"enabled,omitempty"` // 使用 optional 支持 null 和布尔值，与老项目兼容
-	NodeGroupIds  []int64                `protobuf:"varint,9,rep,packed,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`
+	NodeGroupIds  []string               `protobuf:"bytes,9,rep,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2130,7 +2130,7 @@ func (x *UpdateNodeRequest) GetEnabled() bool {
 	return false
 }
 
-func (x *UpdateNodeRequest) GetNodeGroupIds() []int64 {
+func (x *UpdateNodeRequest) GetNodeGroupIds() []string {
 	if x != nil {
 		return x.NodeGroupIds
 	}
@@ -3404,8 +3404,8 @@ const file_admin_server_v1_server_proto_rawDesc = "" +
 	"\aenabled\x18\t \x01(\bH\x00R\aenabled\x88\x01\x01\x12\x12\n" +
 	"\x04sort\x18\n" +
 	" \x01(\x03R\x04sort\x12\"\n" +
-	"\rnode_group_id\x18\v \x01(\x03R\vnodeGroupId\x12$\n" +
-	"\x0enode_group_ids\x18\f \x03(\x03R\fnodeGroupIds\x12\x1d\n" +
+	"\rnode_group_id\x18\v \x01(\tR\vnodeGroupId\x12$\n" +
+	"\x0enode_group_ids\x18\f \x03(\tR\fnodeGroupIds\x12\x1d\n" +
 	"\n" +
 	"created_at\x18\r \x01(\x03R\tcreatedAt\x12\x1d\n" +
 	"\n" +
@@ -3474,7 +3474,7 @@ const file_admin_server_v1_server_proto_rawDesc = "" +
 	"\tserver_id\x18\x05 \x01(\tR\bserverId\x12\x1a\n" +
 	"\bprotocol\x18\x06 \x01(\tR\bprotocol\x12\x1d\n" +
 	"\aenabled\x18\a \x01(\bH\x00R\aenabled\x88\x01\x01\x12$\n" +
-	"\x0enode_group_ids\x18\b \x03(\x03R\fnodeGroupIdsB\n" +
+	"\x0enode_group_ids\x18\b \x03(\tR\fnodeGroupIdsB\n" +
 	"\n" +
 	"\b_enabled\"?\n" +
 	"\x0eCreateNodeData\x12-\n" +
@@ -3492,7 +3492,7 @@ const file_admin_server_v1_server_proto_rawDesc = "" +
 	"\tserver_id\x18\x06 \x01(\tR\bserverId\x12\x1a\n" +
 	"\bprotocol\x18\a \x01(\tR\bprotocol\x12\x1d\n" +
 	"\aenabled\x18\b \x01(\bH\x00R\aenabled\x88\x01\x01\x12$\n" +
-	"\x0enode_group_ids\x18\t \x03(\x03R\fnodeGroupIdsB\n" +
+	"\x0enode_group_ids\x18\t \x03(\tR\fnodeGroupIdsB\n" +
 	"\n" +
 	"\b_enabled\"?\n" +
 	"\x0eUpdateNodeData\x12-\n" +

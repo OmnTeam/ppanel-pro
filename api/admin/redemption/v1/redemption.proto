@@ -72,7 +72,7 @@ message RedemptionCode {
   string code = 2;          // 兑换码
   int64 total_count = 3;    // 总兑换次数
   int64 used_count = 4;     // 已使用次数
-  int64 subscribe_plan = 5; // 订阅套餐ID
+  string subscribe_plan = 5; // 订阅套餐ID
   string unit_time = 6;     // 单位时间: day, month, quarter, half_year, year
   int64 quantity = 7;       // 数量
   int64 status = 8;         // 状态: 1=enabled, 0=disabled
@@ -83,7 +83,7 @@ message RedemptionCode {
 // RedemptionRecord 兑换记录
 message RedemptionRecord {
   string id = 1;               // 记录ID
-  int64 redemption_code_id = 2; // 兑换码ID
+  string redemption_code_id = 2; // 兑换码ID
   string user_id = 3;          // 用户ID
   string subscribe_id = 4;     // 订阅ID
   string unit_time = 5;       // 单位时间
@@ -95,7 +95,7 @@ message RedemptionRecord {
 // CreateRedemptionCodeRequest 创建兑换码请求
 message CreateRedemptionCodeRequest {
   int64 total_count = 1;    // 总兑换次数
-  int64 subscribe_plan = 2; // 订阅套餐ID
+  string subscribe_plan = 2; // 订阅套餐ID
   string unit_time = 3;     // 单位时间
   int64 quantity = 4;       // 数量
   int64 batch_count = 5;    // 批量生成数量
@@ -117,7 +117,7 @@ message CreateRedemptionCodeReply {
 message UpdateRedemptionCodeRequest {
   string id = 1;             // 兑换码ID
   int64 total_count = 2;    // 总兑换次数
-  int64 subscribe_plan = 3; // 订阅套餐ID
+  string subscribe_plan = 3; // 订阅套餐ID
   string unit_time = 4;     // 单位时间
   int64 quantity = 5;       // 数量
   int64 status = 6;         // 状态
@@ -191,7 +191,7 @@ message BatchDeleteRedemptionCodeReply {
 message GetRedemptionCodeListRequest {
   int64 page = 1;             // 页码
   int64 size = 2;             // 每页数量
-  int64 subscribe_plan = 3;   // 订阅套餐ID过滤（可选）
+  string subscribe_plan = 3;   // 订阅套餐ID过滤（可选）
   string unit_time = 4;       // 单位时间过滤（可选）
   string code = 5;            // 兑换码搜索（可选）
 }
@@ -214,7 +214,7 @@ message GetRedemptionRecordListRequest {
   int64 page = 1;     // 页码
   int64 size = 2;     // 每页数量
   string user_id = 3;  // 用户ID过滤（可选）
-  int64 code_id = 4;  // 兑换码ID过滤（可选）
+  string code_id = 4;  // 兑换码ID过滤（可选）
 }
 
 // GetRedemptionRecordListData 获取兑换记录列表数据

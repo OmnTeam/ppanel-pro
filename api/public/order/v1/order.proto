@@ -127,10 +127,10 @@ message OrderListReply {
 message PreCreateOrderRequest {
   int32 type = 1;              // Order type: 1:订阅 2:续费 3:重置流量 4:充值
   string subscribe_id = 2;      // Subscribe ID (for renewal/reset)
-  int32 subscribe_group_id = 3; // Subscribe group ID (for purchase)
+  string subscribe_group_id = 3; // Subscribe group ID (for purchase)
   int32 quantity = 4;          // Quantity (for recharge or purchase)
   string coupon = 5;           // Changed from coupon_code to coupon
-  int32 payment = 6;           // Changed from payment_id to payment
+  string payment = 6;           // Changed from payment_id to payment
 }
 
 // OrderPreCreateData 预创建订单数据
@@ -158,7 +158,7 @@ message PurchaseRequest {
   string subscribe_id = 1;       // Subscribe ID (ADDED - was missing)
   int32 quantity = 2;           // Quantity (ADDED - was missing)
   string coupon = 3;            // Changed from coupon_code to coupon
-  int32 payment = 4;            // Changed from payment_id to payment
+  string payment = 4;            // Changed from payment_id to payment
 }
 
 // PurchaseData 购买数据
@@ -177,7 +177,7 @@ message PurchaseReply {
 // Recharge Request
 message RechargeRequest {
   string amount = 1;             // Changed from quantity to amount
-  int32 payment = 2;            // Changed from payment_id to payment
+  string payment = 2;            // Changed from payment_id to payment
 }
 
 // RechargeData 充值数据
@@ -195,10 +195,10 @@ message RechargeReply {
 
 // Renewal Request
 message RenewalRequest {
-  int32 user_subscribe_id = 1;  // Changed from subscribe_id to user_subscribe_id
+  string user_subscribe_id = 1;  // Changed from subscribe_id to user_subscribe_id
   int32 quantity = 2;           // Quantity (ADDED - was missing)
   string coupon = 3;            // Changed from coupon_code to coupon
-  int32 payment = 4;            // Changed from payment_id to payment
+  string payment = 4;            // Changed from payment_id to payment
 }
 
 // RenewalData 续费数据
@@ -216,8 +216,8 @@ message RenewalReply {
 
 // ResetTraffic Request
 message ResetTrafficRequest {
-  int32 user_subscribe_id = 1;  // Changed from subscribe_id to user_subscribe_id
-  int32 payment = 2;            // Changed from payment_id to payment
+  string user_subscribe_id = 1;  // Changed from subscribe_id to user_subscribe_id
+  string payment = 2;            // Changed from payment_id to payment
 }
 
 // TrafficResetData 重置流量数据

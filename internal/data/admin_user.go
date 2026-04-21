@@ -535,8 +535,12 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 	if req.GiftAmount != 0 {
 		builder.SetGiftAmount(giftAmount)
 	}
-	if req.RefererId != 0 {
-		builder.SetRefererID(req.RefererId)
+	if req.RefererId != "" {
+		refererID, err := strconv.ParseInt(req.RefererId, 10, 64)
+		if err != nil {
+			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		builder.SetRefererID(refererID)
 	}
 	builder.SetReferralPercentage(int8(req.ReferralPercentage))
 	builder.SetOnlyFirstPurchase(req.OnlyFirstPurchase)

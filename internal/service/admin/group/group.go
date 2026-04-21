@@ -262,7 +262,7 @@ func (s *GroupService) RecalculateGroup(ctx context.Context, req *v1.Recalculate
 		Code:    int32(responsecode.AdminRecalculateGroupSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminRecalculateGroupSuccess],
 		Data: &v1.RecalculateGroupData{
-			HistoryId: historyId,
+			HistoryId: strconv.FormatInt(historyId, 10),
 		},
 	}, nil
 }
@@ -378,7 +378,16 @@ func (s *GroupService) ExportGroupResult(ctx context.Context, req *v1.ExportGrou
 
 // MigrateUsers 迁移用户
 func (s *GroupService) MigrateUsers(ctx context.Context, req *v1.MigrateUsersRequest) (*v1.MigrateUsersReply, error) {
-	successCount, failedCount, err := s.uc.MigrateUsers(ctx, req.FromUserGroupId, req.ToUserGroupId, req.IncludeLocked)
+	fromUserGroupID, err := strconv.ParseInt(req.FromUserGroupId, 10, 64)
+	if err != nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	toUserGroupID, err := strconv.ParseInt(req.ToUserGroupId, 10, 64)
+	if err != nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	successCount, failedCount, err := s.uc.MigrateUsers(ctx, fromUserGroupID, toUserGroupID, req.IncludeLocked)
 	if err != nil {
 		return nil, err
 	}

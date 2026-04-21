@@ -69,14 +69,19 @@ func (s *TicketService) GetTicket(ctx context.Context, req *pb.GetTicketRequest)
 
 // CreateTicketFollow 创建工单跟进
 func (s *TicketService) CreateTicketFollow(ctx context.Context, req *pb.CreateTicketFollowRequest) (*pb.CreateTicketFollowReply, error) {
+	ticketID, err := parseStringID(req.TicketId)
+	if err != nil {
+		return nil, err
+	}
+
 	follow := &ticketbiz.Follow{
-		TicketId: req.TicketId,
+		TicketId: ticketID,
 		From:     req.From,
 		Type:     int8(req.Type),
 		Content:  req.Content,
 	}
 
-	err := s.uc.CreateTicketFollow(ctx, follow)
+	err = s.uc.CreateTicketFollow(ctx, follow)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +144,7 @@ func (s *TicketService) convertTicketToProto(ticket *ticketbiz.Ticket) *pb.Ticke
 	for _, f := range ticket.Follow {
 		follows = append(follows, &pb.TicketFollow{
 			Id:        formatInt64(f.Id),
-			TicketId:  f.TicketId,
+			TicketId:  formatInt64(f.TicketId),
 			From:      f.From,
 			Type:      int32(f.Type),
 			Content:   f.Content,

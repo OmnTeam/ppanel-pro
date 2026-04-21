@@ -474,7 +474,7 @@ func registerLegacyPublicCompatRoutes(r *khttp.Router, dataLayer *data.Data, app
 			}
 			in := request.(*compatUpdateUserSubscribeNoteRequest)
 			userSub, err := dataLayer.DB().ProxyUserSubscribe.Query().
-				Where(proxyusersubscribe.IDEQ(in.UserSubscribeID)).
+				Where(proxyusersubscribe.IDEQ(int64(in.UserSubscribeID))).
 				Only(inner)
 			if err != nil {
 				return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)

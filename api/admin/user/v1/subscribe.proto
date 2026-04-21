@@ -6,6 +6,7 @@ option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/user/v1;v1";
 
 import "google/api/annotations.proto";
 import "admin/user/v1/device.proto";
+import "admin/user/v1/user.proto";
 
 // UserSubscribeService 用户订阅管理服务
 service UserSubscribeService {
@@ -298,9 +299,9 @@ message ResetUserSubscribeTrafficReply {
 message UserSubscribe {
   string id = 1;
   string user_id = 2;
-  int64 order_id = 3;
+  string order_id = 3;
   string subscribe_id = 4;  // 订阅套餐ID
-  int64 node_group_id = 5;
+  string node_group_id = 5;
   bool group_locked = 6;
   int64 start_time = 7;    // Unix timestamp in seconds
   int64 expire_time = 8;   // Unix timestamp in seconds
@@ -315,15 +316,16 @@ message UserSubscribe {
   int64 updated_at = 17;   // Unix timestamp in seconds
   int64 finished_at = 18;  // Unix timestamp in seconds
   string uuid = 19;        // 订阅UUID
+  Subscribe subscribe = 20;
 }
 
 // UserSubscribeDetail 用户订阅详情（含关联对象）
 message UserSubscribeDetail {
   string id = 1;
   string user_id = 2;
-  int64 order_id = 3;
+  string order_id = 3;
   string subscribe_id = 4;
-  int64 node_group_id = 5;
+  string node_group_id = 5;
   bool group_locked = 6;
   int64 start_time = 7;
   int64 expire_time = 8;
@@ -335,6 +337,24 @@ message UserSubscribeDetail {
   int32 status = 14;
   int64 created_at = 15;
   int64 updated_at = 16;
+  User user = 17;
+  Subscribe subscribe = 18;
+  int64 finished_at = 19;
+  string uuid = 20;
+}
+
+message Subscribe {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  int64 unit_price = 4;
+  string unit_time = 5;
+  int64 traffic = 6;
+  int64 speed_limit = 7;
+  int64 device_limit = 8;
+  int64 reset_cycle = 9;
+  int64 created_at = 10;
+  int64 updated_at = 11;
 }
 
 // UserSubscribeLog 用户订阅日志

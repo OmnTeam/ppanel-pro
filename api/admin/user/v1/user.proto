@@ -201,7 +201,7 @@ message UpdateUserBasicInfoRequest {
   int64 gift_amount = 8;          // 赠送金额（分）
   int64 telegram = 9;             // Telegram ID
   string refer_code = 10;         // 推荐码
-  int64 referer_id = 11;          // 推荐人ID
+  string referer_id = 11;          // 推荐人ID
   bool enable = 12;               // 是否启用
   bool is_admin = 13;             // 是否管理员
 }

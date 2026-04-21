@@ -1727,9 +1727,9 @@ type UserSubscribe struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	OrderId       int64                  `protobuf:"varint,3,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	OrderId       string                 `protobuf:"bytes,3,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
 	SubscribeId   string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"` // 订阅套餐ID
-	NodeGroupId   int64                  `protobuf:"varint,5,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`
+	NodeGroupId   string                 `protobuf:"bytes,5,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`
 	GroupLocked   bool                   `protobuf:"varint,6,opt,name=group_locked,json=groupLocked,proto3" json:"group_locked,omitempty"`
 	StartTime     int64                  `protobuf:"varint,7,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`     // Unix timestamp in seconds
 	ExpireTime    int64                  `protobuf:"varint,8,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"`  // Unix timestamp in seconds
@@ -1744,6 +1744,7 @@ type UserSubscribe struct {
 	UpdatedAt     int64                  `protobuf:"varint,17,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`    // Unix timestamp in seconds
 	FinishedAt    int64                  `protobuf:"varint,18,opt,name=finished_at,json=finishedAt,proto3" json:"finished_at,omitempty"` // Unix timestamp in seconds
 	Uuid          string                 `protobuf:"bytes,19,opt,name=uuid,proto3" json:"uuid,omitempty"`                                // 订阅UUID
+	Subscribe     *Subscribe             `protobuf:"bytes,20,opt,name=subscribe,proto3" json:"subscribe,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1792,11 +1793,11 @@ func (x *UserSubscribe) GetUserId() string {
 	return ""
 }
 
-func (x *UserSubscribe) GetOrderId() int64 {
+func (x *UserSubscribe) GetOrderId() string {
 	if x != nil {
 		return x.OrderId
 	}
-	return 0
+	return ""
 }
 
 func (x *UserSubscribe) GetSubscribeId() string {
@@ -1806,11 +1807,11 @@ func (x *UserSubscribe) GetSubscribeId() string {
 	return ""
 }
 
-func (x *UserSubscribe) GetNodeGroupId() int64 {
+func (x *UserSubscribe) GetNodeGroupId() string {
 	if x != nil {
 		return x.NodeGroupId
 	}
-	return 0
+	return ""
 }
 
 func (x *UserSubscribe) GetGroupLocked() bool {
@@ -1911,14 +1912,21 @@ func (x *UserSubscribe) GetUuid() string {
 	return ""
 }
 
+func (x *UserSubscribe) GetSubscribe() *Subscribe {
+	if x != nil {
+		return x.Subscribe
+	}
+	return nil
+}
+
 // UserSubscribeDetail 用户订阅详情（含关联对象）
 type UserSubscribeDetail struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	OrderId       int64                  `protobuf:"varint,3,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
+	OrderId       string                 `protobuf:"bytes,3,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
 	SubscribeId   string                 `protobuf:"bytes,4,opt,name=subscribe_id,json=subscribeId,proto3" json:"subscribe_id,omitempty"`
-	NodeGroupId   int64                  `protobuf:"varint,5,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`
+	NodeGroupId   string                 `protobuf:"bytes,5,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`
 	GroupLocked   bool                   `protobuf:"varint,6,opt,name=group_locked,json=groupLocked,proto3" json:"group_locked,omitempty"`
 	StartTime     int64                  `protobuf:"varint,7,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	ExpireTime    int64                  `protobuf:"varint,8,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"`
@@ -1930,6 +1938,10 @@ type UserSubscribeDetail struct {
 	Status        int32                  `protobuf:"varint,14,opt,name=status,proto3" json:"status,omitempty"`
 	CreatedAt     int64                  `protobuf:"varint,15,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     int64                  `protobuf:"varint,16,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	User          *User                  `protobuf:"bytes,17,opt,name=user,proto3" json:"user,omitempty"`
+	Subscribe     *Subscribe             `protobuf:"bytes,18,opt,name=subscribe,proto3" json:"subscribe,omitempty"`
+	FinishedAt    int64                  `protobuf:"varint,19,opt,name=finished_at,json=finishedAt,proto3" json:"finished_at,omitempty"`
+	Uuid          string                 `protobuf:"bytes,20,opt,name=uuid,proto3" json:"uuid,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1978,11 +1990,11 @@ func (x *UserSubscribeDetail) GetUserId() string {
 	return ""
 }
 
-func (x *UserSubscribeDetail) GetOrderId() int64 {
+func (x *UserSubscribeDetail) GetOrderId() string {
 	if x != nil {
 		return x.OrderId
 	}
-	return 0
+	return ""
 }
 
 func (x *UserSubscribeDetail) GetSubscribeId() string {
@@ -1992,11 +2004,11 @@ func (x *UserSubscribeDetail) GetSubscribeId() string {
 	return ""
 }
 
-func (x *UserSubscribeDetail) GetNodeGroupId() int64 {
+func (x *UserSubscribeDetail) GetNodeGroupId() string {
 	if x != nil {
 		return x.NodeGroupId
 	}
-	return 0
+	return ""
 }
 
 func (x *UserSubscribeDetail) GetGroupLocked() bool {
@@ -2076,6 +2088,158 @@ func (x *UserSubscribeDetail) GetUpdatedAt() int64 {
 	return 0
 }
 
+func (x *UserSubscribeDetail) GetUser() *User {
+	if x != nil {
+		return x.User
+	}
+	return nil
+}
+
+func (x *UserSubscribeDetail) GetSubscribe() *Subscribe {
+	if x != nil {
+		return x.Subscribe
+	}
+	return nil
+}
+
+func (x *UserSubscribeDetail) GetFinishedAt() int64 {
+	if x != nil {
+		return x.FinishedAt
+	}
+	return 0
+}
+
+func (x *UserSubscribeDetail) GetUuid() string {
+	if x != nil {
+		return x.Uuid
+	}
+	return ""
+}
+
+type Subscribe struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	UnitPrice     int64                  `protobuf:"varint,4,opt,name=unit_price,json=unitPrice,proto3" json:"unit_price,omitempty"`
+	UnitTime      string                 `protobuf:"bytes,5,opt,name=unit_time,json=unitTime,proto3" json:"unit_time,omitempty"`
+	Traffic       int64                  `protobuf:"varint,6,opt,name=traffic,proto3" json:"traffic,omitempty"`
+	SpeedLimit    int64                  `protobuf:"varint,7,opt,name=speed_limit,json=speedLimit,proto3" json:"speed_limit,omitempty"`
+	DeviceLimit   int64                  `protobuf:"varint,8,opt,name=device_limit,json=deviceLimit,proto3" json:"device_limit,omitempty"`
+	ResetCycle    int64                  `protobuf:"varint,9,opt,name=reset_cycle,json=resetCycle,proto3" json:"reset_cycle,omitempty"`
+	CreatedAt     int64                  `protobuf:"varint,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt     int64                  `protobuf:"varint,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Subscribe) Reset() {
+	*x = Subscribe{}
+	mi := &file_admin_user_v1_subscribe_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Subscribe) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Subscribe) ProtoMessage() {}
+
+func (x *Subscribe) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_user_v1_subscribe_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Subscribe.ProtoReflect.Descriptor instead.
+func (*Subscribe) Descriptor() ([]byte, []int) {
+	return file_admin_user_v1_subscribe_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *Subscribe) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Subscribe) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Subscribe) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *Subscribe) GetUnitPrice() int64 {
+	if x != nil {
+		return x.UnitPrice
+	}
+	return 0
+}
+
+func (x *Subscribe) GetUnitTime() string {
+	if x != nil {
+		return x.UnitTime
+	}
+	return ""
+}
+
+func (x *Subscribe) GetTraffic() int64 {
+	if x != nil {
+		return x.Traffic
+	}
+	return 0
+}
+
+func (x *Subscribe) GetSpeedLimit() int64 {
+	if x != nil {
+		return x.SpeedLimit
+	}
+	return 0
+}
+
+func (x *Subscribe) GetDeviceLimit() int64 {
+	if x != nil {
+		return x.DeviceLimit
+	}
+	return 0
+}
+
+func (x *Subscribe) GetResetCycle() int64 {
+	if x != nil {
+		return x.ResetCycle
+	}
+	return 0
+}
+
+func (x *Subscribe) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+func (x *Subscribe) GetUpdatedAt() int64 {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return 0
+}
+
 // UserSubscribeLog 用户订阅日志
 type UserSubscribeLog struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
@@ -2092,7 +2256,7 @@ type UserSubscribeLog struct {
 
 func (x *UserSubscribeLog) Reset() {
 	*x = UserSubscribeLog{}
-	mi := &file_admin_user_v1_subscribe_proto_msgTypes[31]
+	mi := &file_admin_user_v1_subscribe_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2104,7 +2268,7 @@ func (x *UserSubscribeLog) String() string {
 func (*UserSubscribeLog) ProtoMessage() {}
 
 func (x *UserSubscribeLog) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_user_v1_subscribe_proto_msgTypes[31]
+	mi := &file_admin_user_v1_subscribe_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2117,7 +2281,7 @@ func (x *UserSubscribeLog) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserSubscribeLog.ProtoReflect.Descriptor instead.
 func (*UserSubscribeLog) Descriptor() ([]byte, []int) {
-	return file_admin_user_v1_subscribe_proto_rawDescGZIP(), []int{31}
+	return file_admin_user_v1_subscribe_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *UserSubscribeLog) GetId() string {
@@ -2183,7 +2347,7 @@ type ResetSubscribeTrafficLog struct {
 
 func (x *ResetSubscribeTrafficLog) Reset() {
 	*x = ResetSubscribeTrafficLog{}
-	mi := &file_admin_user_v1_subscribe_proto_msgTypes[32]
+	mi := &file_admin_user_v1_subscribe_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2195,7 +2359,7 @@ func (x *ResetSubscribeTrafficLog) String() string {
 func (*ResetSubscribeTrafficLog) ProtoMessage() {}
 
 func (x *ResetSubscribeTrafficLog) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_user_v1_subscribe_proto_msgTypes[32]
+	mi := &file_admin_user_v1_subscribe_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2208,7 +2372,7 @@ func (x *ResetSubscribeTrafficLog) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResetSubscribeTrafficLog.ProtoReflect.Descriptor instead.
 func (*ResetSubscribeTrafficLog) Descriptor() ([]byte, []int) {
-	return file_admin_user_v1_subscribe_proto_rawDescGZIP(), []int{32}
+	return file_admin_user_v1_subscribe_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *ResetSubscribeTrafficLog) GetId() string {
@@ -2262,7 +2426,7 @@ type TrafficLog struct {
 
 func (x *TrafficLog) Reset() {
 	*x = TrafficLog{}
-	mi := &file_admin_user_v1_subscribe_proto_msgTypes[33]
+	mi := &file_admin_user_v1_subscribe_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2274,7 +2438,7 @@ func (x *TrafficLog) String() string {
 func (*TrafficLog) ProtoMessage() {}
 
 func (x *TrafficLog) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_user_v1_subscribe_proto_msgTypes[33]
+	mi := &file_admin_user_v1_subscribe_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2287,7 +2451,7 @@ func (x *TrafficLog) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrafficLog.ProtoReflect.Descriptor instead.
 func (*TrafficLog) Descriptor() ([]byte, []int) {
-	return file_admin_user_v1_subscribe_proto_rawDescGZIP(), []int{33}
+	return file_admin_user_v1_subscribe_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *TrafficLog) GetId() string {
@@ -2343,7 +2507,7 @@ var File_admin_user_v1_subscribe_proto protoreflect.FileDescriptor
 
 const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\n" +
-	"\x1dadmin/user/v1/subscribe.proto\x12\x11api.admin.user.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1aadmin/user/v1/device.proto\"\x95\x01\n" +
+	"\x1dadmin/user/v1/subscribe.proto\x12\x11api.admin.user.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1aadmin/user/v1/device.proto\x1a\x18admin/user/v1/user.proto\"\x95\x01\n" +
 	"\x17GetUserSubscribeRequest\x12\x12\n" +
 	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x05R\x04size\x12\x17\n" +
@@ -2457,13 +2621,13 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\x11user_subscribe_id\x18\x01 \x01(\tR\x0fuserSubscribeId\"N\n" +
 	"\x1eResetUserSubscribeTrafficReply\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\x05R\x04code\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\xa1\x04\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xdd\x04\n" +
 	"\rUserSubscribe\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x19\n" +
-	"\border_id\x18\x03 \x01(\x03R\aorderId\x12!\n" +
+	"\border_id\x18\x03 \x01(\tR\aorderId\x12!\n" +
 	"\fsubscribe_id\x18\x04 \x01(\tR\vsubscribeId\x12\"\n" +
-	"\rnode_group_id\x18\x05 \x01(\x03R\vnodeGroupId\x12!\n" +
+	"\rnode_group_id\x18\x05 \x01(\tR\vnodeGroupId\x12!\n" +
 	"\fgroup_locked\x18\x06 \x01(\bR\vgroupLocked\x12\x1d\n" +
 	"\n" +
 	"start_time\x18\a \x01(\x03R\tstartTime\x12\x1f\n" +
@@ -2484,13 +2648,14 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"updated_at\x18\x11 \x01(\x03R\tupdatedAt\x12\x1f\n" +
 	"\vfinished_at\x18\x12 \x01(\x03R\n" +
 	"finishedAt\x12\x12\n" +
-	"\x04uuid\x18\x13 \x01(\tR\x04uuid\"\xdc\x03\n" +
+	"\x04uuid\x18\x13 \x01(\tR\x04uuid\x12:\n" +
+	"\tsubscribe\x18\x14 \x01(\v2\x1c.api.admin.user.v1.SubscribeR\tsubscribe\"\xfa\x04\n" +
 	"\x13UserSubscribeDetail\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x19\n" +
-	"\border_id\x18\x03 \x01(\x03R\aorderId\x12!\n" +
+	"\border_id\x18\x03 \x01(\tR\aorderId\x12!\n" +
 	"\fsubscribe_id\x18\x04 \x01(\tR\vsubscribeId\x12\"\n" +
-	"\rnode_group_id\x18\x05 \x01(\x03R\vnodeGroupId\x12!\n" +
+	"\rnode_group_id\x18\x05 \x01(\tR\vnodeGroupId\x12!\n" +
 	"\fgroup_locked\x18\x06 \x01(\bR\vgroupLocked\x12\x1d\n" +
 	"\n" +
 	"start_time\x18\a \x01(\x03R\tstartTime\x12\x1f\n" +
@@ -2507,7 +2672,30 @@ const file_admin_user_v1_subscribe_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x0f \x01(\x03R\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\x10 \x01(\x03R\tupdatedAt\"\xca\x01\n" +
+	"updated_at\x18\x10 \x01(\x03R\tupdatedAt\x12+\n" +
+	"\x04user\x18\x11 \x01(\v2\x17.api.admin.user.v1.UserR\x04user\x12:\n" +
+	"\tsubscribe\x18\x12 \x01(\v2\x1c.api.admin.user.v1.SubscribeR\tsubscribe\x12\x1f\n" +
+	"\vfinished_at\x18\x13 \x01(\x03R\n" +
+	"finishedAt\x12\x12\n" +
+	"\x04uuid\x18\x14 \x01(\tR\x04uuid\"\xca\x02\n" +
+	"\tSubscribe\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1d\n" +
+	"\n" +
+	"unit_price\x18\x04 \x01(\x03R\tunitPrice\x12\x1b\n" +
+	"\tunit_time\x18\x05 \x01(\tR\bunitTime\x12\x18\n" +
+	"\atraffic\x18\x06 \x01(\x03R\atraffic\x12\x1f\n" +
+	"\vspeed_limit\x18\a \x01(\x03R\n" +
+	"speedLimit\x12!\n" +
+	"\fdevice_limit\x18\b \x01(\x03R\vdeviceLimit\x12\x1f\n" +
+	"\vreset_cycle\x18\t \x01(\x03R\n" +
+	"resetCycle\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\n" +
+	" \x01(\x03R\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\v \x01(\x03R\tupdatedAt\"\xca\x01\n" +
 	"\x10UserSubscribeLog\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12*\n" +
@@ -2558,7 +2746,7 @@ func file_admin_user_v1_subscribe_proto_rawDescGZIP() []byte {
 	return file_admin_user_v1_subscribe_proto_rawDescData
 }
 
-var file_admin_user_v1_subscribe_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
+var file_admin_user_v1_subscribe_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
 var file_admin_user_v1_subscribe_proto_goTypes = []any{
 	(*GetUserSubscribeRequest)(nil),                 // 0: api.admin.user.v1.GetUserSubscribeRequest
 	(*GetUserSubscribeData)(nil),                    // 1: api.admin.user.v1.GetUserSubscribeData
@@ -2591,52 +2779,57 @@ var file_admin_user_v1_subscribe_proto_goTypes = []any{
 	(*ResetUserSubscribeTrafficReply)(nil),          // 28: api.admin.user.v1.ResetUserSubscribeTrafficReply
 	(*UserSubscribe)(nil),                           // 29: api.admin.user.v1.UserSubscribe
 	(*UserSubscribeDetail)(nil),                     // 30: api.admin.user.v1.UserSubscribeDetail
-	(*UserSubscribeLog)(nil),                        // 31: api.admin.user.v1.UserSubscribeLog
-	(*ResetSubscribeTrafficLog)(nil),                // 32: api.admin.user.v1.ResetSubscribeTrafficLog
-	(*TrafficLog)(nil),                              // 33: api.admin.user.v1.TrafficLog
-	(*UserDevice)(nil),                              // 34: api.admin.user.v1.UserDevice
+	(*Subscribe)(nil),                               // 31: api.admin.user.v1.Subscribe
+	(*UserSubscribeLog)(nil),                        // 32: api.admin.user.v1.UserSubscribeLog
+	(*ResetSubscribeTrafficLog)(nil),                // 33: api.admin.user.v1.ResetSubscribeTrafficLog
+	(*TrafficLog)(nil),                              // 34: api.admin.user.v1.TrafficLog
+	(*UserDevice)(nil),                              // 35: api.admin.user.v1.UserDevice
+	(*User)(nil),                                    // 36: api.admin.user.v1.User
 }
 var file_admin_user_v1_subscribe_proto_depIdxs = []int32{
 	29, // 0: api.admin.user.v1.GetUserSubscribeData.list:type_name -> api.admin.user.v1.UserSubscribe
 	1,  // 1: api.admin.user.v1.GetUserSubscribeReply.data:type_name -> api.admin.user.v1.GetUserSubscribeData
 	30, // 2: api.admin.user.v1.GetUserSubscribeByIdReply.data:type_name -> api.admin.user.v1.UserSubscribeDetail
-	34, // 3: api.admin.user.v1.GetUserSubscribeDevicesData.list:type_name -> api.admin.user.v1.UserDevice
+	35, // 3: api.admin.user.v1.GetUserSubscribeDevicesData.list:type_name -> api.admin.user.v1.UserDevice
 	12, // 4: api.admin.user.v1.GetUserSubscribeDevicesReply.data:type_name -> api.admin.user.v1.GetUserSubscribeDevicesData
-	31, // 5: api.admin.user.v1.GetUserSubscribeLogsData.list:type_name -> api.admin.user.v1.UserSubscribeLog
+	32, // 5: api.admin.user.v1.GetUserSubscribeLogsData.list:type_name -> api.admin.user.v1.UserSubscribeLog
 	15, // 6: api.admin.user.v1.GetUserSubscribeLogsReply.data:type_name -> api.admin.user.v1.GetUserSubscribeLogsData
-	32, // 7: api.admin.user.v1.GetUserSubscribeResetTrafficLogsData.list:type_name -> api.admin.user.v1.ResetSubscribeTrafficLog
+	33, // 7: api.admin.user.v1.GetUserSubscribeResetTrafficLogsData.list:type_name -> api.admin.user.v1.ResetSubscribeTrafficLog
 	18, // 8: api.admin.user.v1.GetUserSubscribeResetTrafficLogsReply.data:type_name -> api.admin.user.v1.GetUserSubscribeResetTrafficLogsData
-	33, // 9: api.admin.user.v1.GetUserSubscribeTrafficLogsData.list:type_name -> api.admin.user.v1.TrafficLog
+	34, // 9: api.admin.user.v1.GetUserSubscribeTrafficLogsData.list:type_name -> api.admin.user.v1.TrafficLog
 	21, // 10: api.admin.user.v1.GetUserSubscribeTrafficLogsReply.data:type_name -> api.admin.user.v1.GetUserSubscribeTrafficLogsData
-	0,  // 11: api.admin.user.v1.UserSubscribeService.GetUserSubscribe:input_type -> api.admin.user.v1.GetUserSubscribeRequest
-	3,  // 12: api.admin.user.v1.UserSubscribeService.CreateUserSubscribe:input_type -> api.admin.user.v1.CreateUserSubscribeRequest
-	5,  // 13: api.admin.user.v1.UserSubscribeService.UpdateUserSubscribe:input_type -> api.admin.user.v1.UpdateUserSubscribeRequest
-	7,  // 14: api.admin.user.v1.UserSubscribeService.DeleteUserSubscribe:input_type -> api.admin.user.v1.DeleteUserSubscribeRequest
-	9,  // 15: api.admin.user.v1.UserSubscribeService.GetUserSubscribeById:input_type -> api.admin.user.v1.GetUserSubscribeByIdRequest
-	11, // 16: api.admin.user.v1.UserSubscribeService.GetUserSubscribeDevices:input_type -> api.admin.user.v1.GetUserSubscribeDevicesRequest
-	14, // 17: api.admin.user.v1.UserSubscribeService.GetUserSubscribeLogs:input_type -> api.admin.user.v1.GetUserSubscribeLogsRequest
-	17, // 18: api.admin.user.v1.UserSubscribeService.GetUserSubscribeResetTrafficLogs:input_type -> api.admin.user.v1.GetUserSubscribeResetTrafficLogsRequest
-	20, // 19: api.admin.user.v1.UserSubscribeService.GetUserSubscribeTrafficLogs:input_type -> api.admin.user.v1.GetUserSubscribeTrafficLogsRequest
-	23, // 20: api.admin.user.v1.UserSubscribeService.ResetUserSubscribeToken:input_type -> api.admin.user.v1.ResetUserSubscribeTokenRequest
-	25, // 21: api.admin.user.v1.UserSubscribeService.ToggleUserSubscribeStatus:input_type -> api.admin.user.v1.ToggleUserSubscribeStatusRequest
-	27, // 22: api.admin.user.v1.UserSubscribeService.ResetUserSubscribeTraffic:input_type -> api.admin.user.v1.ResetUserSubscribeTrafficRequest
-	2,  // 23: api.admin.user.v1.UserSubscribeService.GetUserSubscribe:output_type -> api.admin.user.v1.GetUserSubscribeReply
-	4,  // 24: api.admin.user.v1.UserSubscribeService.CreateUserSubscribe:output_type -> api.admin.user.v1.CreateUserSubscribeReply
-	6,  // 25: api.admin.user.v1.UserSubscribeService.UpdateUserSubscribe:output_type -> api.admin.user.v1.UpdateUserSubscribeReply
-	8,  // 26: api.admin.user.v1.UserSubscribeService.DeleteUserSubscribe:output_type -> api.admin.user.v1.DeleteUserSubscribeReply
-	10, // 27: api.admin.user.v1.UserSubscribeService.GetUserSubscribeById:output_type -> api.admin.user.v1.GetUserSubscribeByIdReply
-	13, // 28: api.admin.user.v1.UserSubscribeService.GetUserSubscribeDevices:output_type -> api.admin.user.v1.GetUserSubscribeDevicesReply
-	16, // 29: api.admin.user.v1.UserSubscribeService.GetUserSubscribeLogs:output_type -> api.admin.user.v1.GetUserSubscribeLogsReply
-	19, // 30: api.admin.user.v1.UserSubscribeService.GetUserSubscribeResetTrafficLogs:output_type -> api.admin.user.v1.GetUserSubscribeResetTrafficLogsReply
-	22, // 31: api.admin.user.v1.UserSubscribeService.GetUserSubscribeTrafficLogs:output_type -> api.admin.user.v1.GetUserSubscribeTrafficLogsReply
-	24, // 32: api.admin.user.v1.UserSubscribeService.ResetUserSubscribeToken:output_type -> api.admin.user.v1.ResetUserSubscribeTokenReply
-	26, // 33: api.admin.user.v1.UserSubscribeService.ToggleUserSubscribeStatus:output_type -> api.admin.user.v1.ToggleUserSubscribeStatusReply
-	28, // 34: api.admin.user.v1.UserSubscribeService.ResetUserSubscribeTraffic:output_type -> api.admin.user.v1.ResetUserSubscribeTrafficReply
-	23, // [23:35] is the sub-list for method output_type
-	11, // [11:23] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	31, // 11: api.admin.user.v1.UserSubscribe.subscribe:type_name -> api.admin.user.v1.Subscribe
+	36, // 12: api.admin.user.v1.UserSubscribeDetail.user:type_name -> api.admin.user.v1.User
+	31, // 13: api.admin.user.v1.UserSubscribeDetail.subscribe:type_name -> api.admin.user.v1.Subscribe
+	0,  // 14: api.admin.user.v1.UserSubscribeService.GetUserSubscribe:input_type -> api.admin.user.v1.GetUserSubscribeRequest
+	3,  // 15: api.admin.user.v1.UserSubscribeService.CreateUserSubscribe:input_type -> api.admin.user.v1.CreateUserSubscribeRequest
+	5,  // 16: api.admin.user.v1.UserSubscribeService.UpdateUserSubscribe:input_type -> api.admin.user.v1.UpdateUserSubscribeRequest
+	7,  // 17: api.admin.user.v1.UserSubscribeService.DeleteUserSubscribe:input_type -> api.admin.user.v1.DeleteUserSubscribeRequest
+	9,  // 18: api.admin.user.v1.UserSubscribeService.GetUserSubscribeById:input_type -> api.admin.user.v1.GetUserSubscribeByIdRequest
+	11, // 19: api.admin.user.v1.UserSubscribeService.GetUserSubscribeDevices:input_type -> api.admin.user.v1.GetUserSubscribeDevicesRequest
+	14, // 20: api.admin.user.v1.UserSubscribeService.GetUserSubscribeLogs:input_type -> api.admin.user.v1.GetUserSubscribeLogsRequest
+	17, // 21: api.admin.user.v1.UserSubscribeService.GetUserSubscribeResetTrafficLogs:input_type -> api.admin.user.v1.GetUserSubscribeResetTrafficLogsRequest
+	20, // 22: api.admin.user.v1.UserSubscribeService.GetUserSubscribeTrafficLogs:input_type -> api.admin.user.v1.GetUserSubscribeTrafficLogsRequest
+	23, // 23: api.admin.user.v1.UserSubscribeService.ResetUserSubscribeToken:input_type -> api.admin.user.v1.ResetUserSubscribeTokenRequest
+	25, // 24: api.admin.user.v1.UserSubscribeService.ToggleUserSubscribeStatus:input_type -> api.admin.user.v1.ToggleUserSubscribeStatusRequest
+	27, // 25: api.admin.user.v1.UserSubscribeService.ResetUserSubscribeTraffic:input_type -> api.admin.user.v1.ResetUserSubscribeTrafficRequest
+	2,  // 26: api.admin.user.v1.UserSubscribeService.GetUserSubscribe:output_type -> api.admin.user.v1.GetUserSubscribeReply
+	4,  // 27: api.admin.user.v1.UserSubscribeService.CreateUserSubscribe:output_type -> api.admin.user.v1.CreateUserSubscribeReply
+	6,  // 28: api.admin.user.v1.UserSubscribeService.UpdateUserSubscribe:output_type -> api.admin.user.v1.UpdateUserSubscribeReply
+	8,  // 29: api.admin.user.v1.UserSubscribeService.DeleteUserSubscribe:output_type -> api.admin.user.v1.DeleteUserSubscribeReply
+	10, // 30: api.admin.user.v1.UserSubscribeService.GetUserSubscribeById:output_type -> api.admin.user.v1.GetUserSubscribeByIdReply
+	13, // 31: api.admin.user.v1.UserSubscribeService.GetUserSubscribeDevices:output_type -> api.admin.user.v1.GetUserSubscribeDevicesReply
+	16, // 32: api.admin.user.v1.UserSubscribeService.GetUserSubscribeLogs:output_type -> api.admin.user.v1.GetUserSubscribeLogsReply
+	19, // 33: api.admin.user.v1.UserSubscribeService.GetUserSubscribeResetTrafficLogs:output_type -> api.admin.user.v1.GetUserSubscribeResetTrafficLogsReply
+	22, // 34: api.admin.user.v1.UserSubscribeService.GetUserSubscribeTrafficLogs:output_type -> api.admin.user.v1.GetUserSubscribeTrafficLogsReply
+	24, // 35: api.admin.user.v1.UserSubscribeService.ResetUserSubscribeToken:output_type -> api.admin.user.v1.ResetUserSubscribeTokenReply
+	26, // 36: api.admin.user.v1.UserSubscribeService.ToggleUserSubscribeStatus:output_type -> api.admin.user.v1.ToggleUserSubscribeStatusReply
+	28, // 37: api.admin.user.v1.UserSubscribeService.ResetUserSubscribeTraffic:output_type -> api.admin.user.v1.ResetUserSubscribeTrafficReply
+	26, // [26:38] is the sub-list for method output_type
+	14, // [14:26] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_admin_user_v1_subscribe_proto_init() }
@@ -2645,13 +2838,14 @@ func file_admin_user_v1_subscribe_proto_init() {
 		return
 	}
 	file_admin_user_v1_device_proto_init()
+	file_admin_user_v1_user_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_user_v1_subscribe_proto_rawDesc), len(file_admin_user_v1_subscribe_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   34,
+			NumMessages:   35,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

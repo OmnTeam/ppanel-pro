@@ -44,11 +44,16 @@ func NewRedemptionUseCase(repo RedemptionRepo, logger log.Logger) *RedemptionUse
 
 // CreateRedemptionCode creates redemption codes in batch
 func (uc *RedemptionUseCase) CreateRedemptionCode(ctx context.Context, req *v1.CreateRedemptionCodeRequest) (int64, error) {
+	subscribePlan, err := strconv.ParseInt(req.SubscribePlan, 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParams)
+	}
+
 	// Validate request parameters
 	if req.TotalCount <= 0 {
 		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParams)
 	}
-	if req.SubscribePlan <= 0 {
+	if subscribePlan <= 0 {
 		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParams)
 	}
 	if req.UnitTime == "" {

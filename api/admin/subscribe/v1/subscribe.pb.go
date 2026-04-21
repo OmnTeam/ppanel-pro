@@ -160,10 +160,10 @@ type SubscribeInfo struct {
 	SpeedLimit        int64                  `protobuf:"varint,11,opt,name=speed_limit,json=speedLimit,proto3" json:"speed_limit,omitempty"`                        // 速度限制
 	DeviceLimit       int64                  `protobuf:"varint,12,opt,name=device_limit,json=deviceLimit,proto3" json:"device_limit,omitempty"`                     // 设备数限制
 	Quota             int64                  `protobuf:"varint,13,opt,name=quota,proto3" json:"quota,omitempty"`                                                    // 配额
-	Nodes             []int64                `protobuf:"varint,14,rep,packed,name=nodes,proto3" json:"nodes,omitempty"`                                             // 节点IDs
+	Nodes             []string               `protobuf:"bytes,14,rep,name=nodes,proto3" json:"nodes,omitempty"`                                                     // 节点IDs
 	NodeTags          []string               `protobuf:"bytes,15,rep,name=node_tags,json=nodeTags,proto3" json:"node_tags,omitempty"`                               // 节点标签
-	NodeGroupIds      []int64                `protobuf:"varint,16,rep,packed,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`         // 节点组IDs
-	NodeGroupId       int64                  `protobuf:"varint,17,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`                   // 节点组ID
+	NodeGroupIds      []string               `protobuf:"bytes,16,rep,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`                 // 节点组IDs
+	NodeGroupId       string                 `protobuf:"bytes,17,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`                    // 节点组ID
 	TrafficLimit      []*TrafficLimit        `protobuf:"bytes,18,rep,name=traffic_limit,json=trafficLimit,proto3" json:"traffic_limit,omitempty"`                   // 流量限制配置
 	Show              bool                   `protobuf:"varint,19,opt,name=show,proto3" json:"show,omitempty"`                                                      // 是否在门户页面显示
 	Sell              bool                   `protobuf:"varint,20,opt,name=sell,proto3" json:"sell,omitempty"`                                                      // 是否售卖
@@ -300,7 +300,7 @@ func (x *SubscribeInfo) GetQuota() int64 {
 	return 0
 }
 
-func (x *SubscribeInfo) GetNodes() []int64 {
+func (x *SubscribeInfo) GetNodes() []string {
 	if x != nil {
 		return x.Nodes
 	}
@@ -314,18 +314,18 @@ func (x *SubscribeInfo) GetNodeTags() []string {
 	return nil
 }
 
-func (x *SubscribeInfo) GetNodeGroupIds() []int64 {
+func (x *SubscribeInfo) GetNodeGroupIds() []string {
 	if x != nil {
 		return x.NodeGroupIds
 	}
 	return nil
 }
 
-func (x *SubscribeInfo) GetNodeGroupId() int64 {
+func (x *SubscribeInfo) GetNodeGroupId() string {
 	if x != nil {
 		return x.NodeGroupId
 	}
-	return 0
+	return ""
 }
 
 func (x *SubscribeInfo) GetTrafficLimit() []*TrafficLimit {
@@ -424,7 +424,7 @@ type SubscribeItem struct {
 	Nodes             []int64                `protobuf:"varint,14,rep,packed,name=nodes,proto3" json:"nodes,omitempty"`
 	NodeTags          []string               `protobuf:"bytes,15,rep,name=node_tags,json=nodeTags,proto3" json:"node_tags,omitempty"`
 	NodeGroupIds      []int64                `protobuf:"varint,16,rep,packed,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`
-	NodeGroupId       int64                  `protobuf:"varint,17,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`
+	NodeGroupId       string                 `protobuf:"bytes,17,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`
 	TrafficLimit      []*TrafficLimit        `protobuf:"bytes,18,rep,name=traffic_limit,json=trafficLimit,proto3" json:"traffic_limit,omitempty"`
 	Show              bool                   `protobuf:"varint,19,opt,name=show,proto3" json:"show,omitempty"`
 	Sell              bool                   `protobuf:"varint,20,opt,name=sell,proto3" json:"sell,omitempty"`
@@ -583,11 +583,11 @@ func (x *SubscribeItem) GetNodeGroupIds() []int64 {
 	return nil
 }
 
-func (x *SubscribeItem) GetNodeGroupId() int64 {
+func (x *SubscribeItem) GetNodeGroupId() string {
 	if x != nil {
 		return x.NodeGroupId
 	}
-	return 0
+	return ""
 }
 
 func (x *SubscribeItem) GetTrafficLimit() []*TrafficLimit {
@@ -689,10 +689,10 @@ type CreateSubscribeRequest struct {
 	SpeedLimit        int64                  `protobuf:"varint,10,opt,name=speed_limit,json=speedLimit,proto3" json:"speed_limit,omitempty"`                        // 速度限制
 	DeviceLimit       int64                  `protobuf:"varint,11,opt,name=device_limit,json=deviceLimit,proto3" json:"device_limit,omitempty"`                     // 设备数限制
 	Quota             int64                  `protobuf:"varint,12,opt,name=quota,proto3" json:"quota,omitempty"`                                                    // 配额
-	Nodes             []int64                `protobuf:"varint,13,rep,packed,name=nodes,proto3" json:"nodes,omitempty"`                                             // 节点IDs
+	Nodes             []string               `protobuf:"bytes,13,rep,name=nodes,proto3" json:"nodes,omitempty"`                                                     // 节点IDs
 	NodeTags          []string               `protobuf:"bytes,14,rep,name=node_tags,json=nodeTags,proto3" json:"node_tags,omitempty"`                               // 节点标签
-	NodeGroupIds      []int64                `protobuf:"varint,15,rep,packed,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`         // 节点组IDs
-	NodeGroupId       int64                  `protobuf:"varint,16,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`                   // 节点组ID
+	NodeGroupIds      []string               `protobuf:"bytes,15,rep,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`                 // 节点组IDs
+	NodeGroupId       string                 `protobuf:"bytes,16,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`                    // 节点组ID
 	TrafficLimit      []*TrafficLimit        `protobuf:"bytes,17,rep,name=traffic_limit,json=trafficLimit,proto3" json:"traffic_limit,omitempty"`                   // 流量限制配置
 	Show              *bool                  `protobuf:"varint,18,opt,name=show,proto3,oneof" json:"show,omitempty"`                                                // 是否在门户页面显示
 	Sell              *bool                  `protobuf:"varint,19,opt,name=sell,proto3,oneof" json:"sell,omitempty"`                                                // 是否售卖
@@ -821,7 +821,7 @@ func (x *CreateSubscribeRequest) GetQuota() int64 {
 	return 0
 }
 
-func (x *CreateSubscribeRequest) GetNodes() []int64 {
+func (x *CreateSubscribeRequest) GetNodes() []string {
 	if x != nil {
 		return x.Nodes
 	}
@@ -835,18 +835,18 @@ func (x *CreateSubscribeRequest) GetNodeTags() []string {
 	return nil
 }
 
-func (x *CreateSubscribeRequest) GetNodeGroupIds() []int64 {
+func (x *CreateSubscribeRequest) GetNodeGroupIds() []string {
 	if x != nil {
 		return x.NodeGroupIds
 	}
 	return nil
 }
 
-func (x *CreateSubscribeRequest) GetNodeGroupId() int64 {
+func (x *CreateSubscribeRequest) GetNodeGroupId() string {
 	if x != nil {
 		return x.NodeGroupId
 	}
-	return 0
+	return ""
 }
 
 func (x *CreateSubscribeRequest) GetTrafficLimit() []*TrafficLimit {
@@ -1041,10 +1041,10 @@ type UpdateSubscribeRequest struct {
 	SpeedLimit        int64                  `protobuf:"varint,11,opt,name=speed_limit,json=speedLimit,proto3" json:"speed_limit,omitempty"`                        // 速度限制
 	DeviceLimit       int64                  `protobuf:"varint,12,opt,name=device_limit,json=deviceLimit,proto3" json:"device_limit,omitempty"`                     // 设备数限制
 	Quota             int64                  `protobuf:"varint,13,opt,name=quota,proto3" json:"quota,omitempty"`                                                    // 配额
-	Nodes             []int64                `protobuf:"varint,14,rep,packed,name=nodes,proto3" json:"nodes,omitempty"`                                             // 节点IDs
+	Nodes             []string               `protobuf:"bytes,14,rep,name=nodes,proto3" json:"nodes,omitempty"`                                                     // 节点IDs
 	NodeTags          []string               `protobuf:"bytes,15,rep,name=node_tags,json=nodeTags,proto3" json:"node_tags,omitempty"`                               // 节点标签
-	NodeGroupIds      []int64                `protobuf:"varint,16,rep,packed,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`         // 节点组IDs
-	NodeGroupId       int64                  `protobuf:"varint,17,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`                   // 节点组ID
+	NodeGroupIds      []string               `protobuf:"bytes,16,rep,name=node_group_ids,json=nodeGroupIds,proto3" json:"node_group_ids,omitempty"`                 // 节点组IDs
+	NodeGroupId       string                 `protobuf:"bytes,17,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"`                    // 节点组ID
 	TrafficLimit      []*TrafficLimit        `protobuf:"bytes,18,rep,name=traffic_limit,json=trafficLimit,proto3" json:"traffic_limit,omitempty"`                   // 流量限制配置
 	Show              *bool                  `protobuf:"varint,19,opt,name=show,proto3,oneof" json:"show,omitempty"`                                                // 是否在门户页面显示
 	Sell              *bool                  `protobuf:"varint,20,opt,name=sell,proto3,oneof" json:"sell,omitempty"`                                                // 是否售卖
@@ -1179,7 +1179,7 @@ func (x *UpdateSubscribeRequest) GetQuota() int64 {
 	return 0
 }
 
-func (x *UpdateSubscribeRequest) GetNodes() []int64 {
+func (x *UpdateSubscribeRequest) GetNodes() []string {
 	if x != nil {
 		return x.Nodes
 	}
@@ -1193,18 +1193,18 @@ func (x *UpdateSubscribeRequest) GetNodeTags() []string {
 	return nil
 }
 
-func (x *UpdateSubscribeRequest) GetNodeGroupIds() []int64 {
+func (x *UpdateSubscribeRequest) GetNodeGroupIds() []string {
 	if x != nil {
 		return x.NodeGroupIds
 	}
 	return nil
 }
 
-func (x *UpdateSubscribeRequest) GetNodeGroupId() int64 {
+func (x *UpdateSubscribeRequest) GetNodeGroupId() string {
 	if x != nil {
 		return x.NodeGroupId
 	}
-	return 0
+	return ""
 }
 
 func (x *UpdateSubscribeRequest) GetTrafficLimit() []*TrafficLimit {
@@ -1832,11 +1832,11 @@ func (x *GetSubscribeDetailsReply) GetData() *GetSubscribeDetailsData {
 // GetSubscribeListRequest 获取订阅套餐列表请求
 type GetSubscribeListRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Page          int64                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`                                    // 页码
-	Size          int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`                                    // 每页数量
-	Language      string                 `protobuf:"bytes,3,opt,name=language,proto3" json:"language,omitempty"`                             // 语言筛选
-	Search        string                 `protobuf:"bytes,4,opt,name=search,proto3" json:"search,omitempty"`                                 // 搜索关键词
-	NodeGroupId   int64                  `protobuf:"varint,5,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"` // 节点组ID筛选
+	Page          int64                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`                                   // 页码
+	Size          int64                  `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`                                   // 每页数量
+	Language      string                 `protobuf:"bytes,3,opt,name=language,proto3" json:"language,omitempty"`                            // 语言筛选
+	Search        string                 `protobuf:"bytes,4,opt,name=search,proto3" json:"search,omitempty"`                                // 搜索关键词
+	NodeGroupId   string                 `protobuf:"bytes,5,opt,name=node_group_id,json=nodeGroupId,proto3" json:"node_group_id,omitempty"` // 节点组ID筛选
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1899,11 +1899,11 @@ func (x *GetSubscribeListRequest) GetSearch() string {
 	return ""
 }
 
-func (x *GetSubscribeListRequest) GetNodeGroupId() int64 {
+func (x *GetSubscribeListRequest) GetNodeGroupId() string {
 	if x != nil {
 		return x.NodeGroupId
 	}
-	return 0
+	return ""
 }
 
 // GetSubscribeListData 获取订阅套餐列表数据
@@ -3255,10 +3255,10 @@ const file_admin_subscribe_v1_subscribe_proto_rawDesc = "" +
 	"speedLimit\x12!\n" +
 	"\fdevice_limit\x18\f \x01(\x03R\vdeviceLimit\x12\x14\n" +
 	"\x05quota\x18\r \x01(\x03R\x05quota\x12\x14\n" +
-	"\x05nodes\x18\x0e \x03(\x03R\x05nodes\x12\x1b\n" +
+	"\x05nodes\x18\x0e \x03(\tR\x05nodes\x12\x1b\n" +
 	"\tnode_tags\x18\x0f \x03(\tR\bnodeTags\x12$\n" +
-	"\x0enode_group_ids\x18\x10 \x03(\x03R\fnodeGroupIds\x12\"\n" +
-	"\rnode_group_id\x18\x11 \x01(\x03R\vnodeGroupId\x12I\n" +
+	"\x0enode_group_ids\x18\x10 \x03(\tR\fnodeGroupIds\x12\"\n" +
+	"\rnode_group_id\x18\x11 \x01(\tR\vnodeGroupId\x12I\n" +
 	"\rtraffic_limit\x18\x12 \x03(\v2$.api.admin.subscribe.v1.TrafficLimitR\ftrafficLimit\x12\x12\n" +
 	"\x04show\x18\x13 \x01(\bR\x04show\x12\x12\n" +
 	"\x04sell\x18\x14 \x01(\bR\x04sell\x12\x12\n" +
@@ -3293,7 +3293,7 @@ const file_admin_subscribe_v1_subscribe_proto_rawDesc = "" +
 	"\x05nodes\x18\x0e \x03(\x03R\x05nodes\x12\x1b\n" +
 	"\tnode_tags\x18\x0f \x03(\tR\bnodeTags\x12$\n" +
 	"\x0enode_group_ids\x18\x10 \x03(\x03R\fnodeGroupIds\x12\"\n" +
-	"\rnode_group_id\x18\x11 \x01(\x03R\vnodeGroupId\x12I\n" +
+	"\rnode_group_id\x18\x11 \x01(\tR\vnodeGroupId\x12I\n" +
 	"\rtraffic_limit\x18\x12 \x03(\v2$.api.admin.subscribe.v1.TrafficLimitR\ftrafficLimit\x12\x12\n" +
 	"\x04show\x18\x13 \x01(\bR\x04show\x12\x12\n" +
 	"\x04sell\x18\x14 \x01(\bR\x04sell\x12\x12\n" +
@@ -3325,10 +3325,10 @@ const file_admin_subscribe_v1_subscribe_proto_rawDesc = "" +
 	"speedLimit\x12!\n" +
 	"\fdevice_limit\x18\v \x01(\x03R\vdeviceLimit\x12\x14\n" +
 	"\x05quota\x18\f \x01(\x03R\x05quota\x12\x14\n" +
-	"\x05nodes\x18\r \x03(\x03R\x05nodes\x12\x1b\n" +
+	"\x05nodes\x18\r \x03(\tR\x05nodes\x12\x1b\n" +
 	"\tnode_tags\x18\x0e \x03(\tR\bnodeTags\x12$\n" +
-	"\x0enode_group_ids\x18\x0f \x03(\x03R\fnodeGroupIds\x12\"\n" +
-	"\rnode_group_id\x18\x10 \x01(\x03R\vnodeGroupId\x12I\n" +
+	"\x0enode_group_ids\x18\x0f \x03(\tR\fnodeGroupIds\x12\"\n" +
+	"\rnode_group_id\x18\x10 \x01(\tR\vnodeGroupId\x12I\n" +
 	"\rtraffic_limit\x18\x11 \x03(\v2$.api.admin.subscribe.v1.TrafficLimitR\ftrafficLimit\x12\x17\n" +
 	"\x04show\x18\x12 \x01(\bH\x00R\x04show\x88\x01\x01\x12\x17\n" +
 	"\x04sell\x18\x13 \x01(\bH\x01R\x04sell\x88\x01\x01\x12\x12\n" +
@@ -3367,10 +3367,10 @@ const file_admin_subscribe_v1_subscribe_proto_rawDesc = "" +
 	"speedLimit\x12!\n" +
 	"\fdevice_limit\x18\f \x01(\x03R\vdeviceLimit\x12\x14\n" +
 	"\x05quota\x18\r \x01(\x03R\x05quota\x12\x14\n" +
-	"\x05nodes\x18\x0e \x03(\x03R\x05nodes\x12\x1b\n" +
+	"\x05nodes\x18\x0e \x03(\tR\x05nodes\x12\x1b\n" +
 	"\tnode_tags\x18\x0f \x03(\tR\bnodeTags\x12$\n" +
-	"\x0enode_group_ids\x18\x10 \x03(\x03R\fnodeGroupIds\x12\"\n" +
-	"\rnode_group_id\x18\x11 \x01(\x03R\vnodeGroupId\x12I\n" +
+	"\x0enode_group_ids\x18\x10 \x03(\tR\fnodeGroupIds\x12\"\n" +
+	"\rnode_group_id\x18\x11 \x01(\tR\vnodeGroupId\x12I\n" +
 	"\rtraffic_limit\x18\x12 \x03(\v2$.api.admin.subscribe.v1.TrafficLimitR\ftrafficLimit\x12\x17\n" +
 	"\x04show\x18\x13 \x01(\bH\x00R\x04show\x88\x01\x01\x12\x17\n" +
 	"\x04sell\x18\x14 \x01(\bH\x01R\x04sell\x88\x01\x01\x12\x12\n" +
@@ -3420,7 +3420,7 @@ const file_admin_subscribe_v1_subscribe_proto_rawDesc = "" +
 	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x1a\n" +
 	"\blanguage\x18\x03 \x01(\tR\blanguage\x12\x16\n" +
 	"\x06search\x18\x04 \x01(\tR\x06search\x12\"\n" +
-	"\rnode_group_id\x18\x05 \x01(\x03R\vnodeGroupId\"g\n" +
+	"\rnode_group_id\x18\x05 \x01(\tR\vnodeGroupId\"g\n" +
 	"\x14GetSubscribeListData\x129\n" +
 	"\x04list\x18\x01 \x03(\v2%.api.admin.subscribe.v1.SubscribeItemR\x04list\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x03R\x05total\"\x87\x01\n" +

@@ -71,7 +71,7 @@ type compatTrafficLimit struct {
 }
 
 type compatSubscribe struct {
-	ID                int64                     `json:"id"`
+	ID                string                    `json:"id"`
 	Name              string                    `json:"name"`
 	Language          string                    `json:"language"`
 	Description       string                    `json:"description"`
@@ -84,10 +84,10 @@ type compatSubscribe struct {
 	SpeedLimit        int64                     `json:"speed_limit"`
 	DeviceLimit       int64                     `json:"device_limit"`
 	Quota             int64                     `json:"quota"`
-	Nodes             []int64                   `json:"nodes"`
+	Nodes             []string                  `json:"nodes"`
 	NodeTags          []string                  `json:"node_tags"`
-	NodeGroupIds      []int64                   `json:"node_group_ids,omitempty"`
-	NodeGroupId       int64                     `json:"node_group_id"`
+	NodeGroupIds      []string                  `json:"node_group_ids,omitempty"`
+	NodeGroupId       string                    `json:"node_group_id"`
 	TrafficLimit      []compatTrafficLimit      `json:"traffic_limit"`
 	Show              bool                      `json:"show"`
 	Sell              bool                      `json:"sell"`
@@ -179,7 +179,7 @@ type compatCloseOrderRequest struct {
 }
 
 type compatOrderDetailRequest struct {
-	OrderNo string `form:"order_no"`
+	OrderNo string `json:"order_no" form:"order_no"`
 }
 
 type compatOrderListRequest struct {
@@ -273,6 +273,12 @@ func registerLegacyPublicOrderCompatRoutes(r *khttp.Router, dataLayer *data.Data
 		var req compatOrderDetailRequest
 		_ = ctx.Bind(&req)
 		_ = ctx.BindQuery(&req)
+		if req.OrderNo == "" && ctx.Request() != nil && ctx.Request().URL != nil {
+			req.OrderNo = strings.TrimSpace(ctx.Request().URL.Query().Get("order_no"))
+			if req.OrderNo == "" {
+				req.OrderNo = strings.TrimSpace(ctx.Request().URL.Query().Get("orderNo"))
+			}
+		}
 		if err := compatValidateRequiredString(req.OrderNo, "QueryOrderDetailRequest", "OrderNo"); err != nil {
 			return compatJSONError(ctx, err)
 		}
@@ -356,7 +362,7 @@ func registerLegacyPublicOrderCompatRoutes(r *khttp.Router, dataLayer *data.Data
 				SubscribeId: strconv.FormatInt(int64(in.SubscribeID), 10),
 				Quantity:    int32(in.Quantity),
 				Coupon:      in.Coupon,
-				Payment:     int32(in.Payment),
+				Payment:     strconv.FormatInt(int64(in.Payment), 10),
 			})
 			if err != nil {
 				return nil, err
@@ -404,7 +410,7 @@ func registerLegacyPublicOrderCompatRoutes(r *khttp.Router, dataLayer *data.Data
 				SubscribeId: strconv.FormatInt(int64(in.SubscribeID), 10),
 				Quantity:    int32(in.Quantity),
 				Coupon:      in.Coupon,
-				Payment:     int32(in.Payment),
+				Payment:     strconv.FormatInt(int64(in.Payment), 10),
 			})
 			if err != nil {
 				return nil, err
@@ -439,7 +445,7 @@ func registerLegacyPublicOrderCompatRoutes(r *khttp.Router, dataLayer *data.Data
 			in := request.(*compatRechargeOrderRequest)
 			reply, err := publicOrder.Recharge(inner, &publicorderv1.RechargeRequest{
 				Amount:  strconv.FormatInt(int64(in.Amount), 10),
-				Payment: int32(in.Payment),
+				Payment: strconv.FormatInt(int64(in.Payment), 10),
 			})
 			if err != nil {
 				return nil, err
@@ -467,10 +473,10 @@ func registerLegacyPublicOrderCompatRoutes(r *khttp.Router, dataLayer *data.Data
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatRenewalOrderRequest)
 			reply, err := publicOrder.Renewal(inner, &publicorderv1.RenewalRequest{
-				UserSubscribeId: int32(in.UserSubscribeID),
+				UserSubscribeId: fmt.Sprintf("%d", in.UserSubscribeID),
 				Quantity:        int32(in.Quantity),
 				Coupon:          in.Coupon,
-				Payment:         int32(in.Payment),
+				Payment:         strconv.FormatInt(int64(in.Payment), 10),
 			})
 			if err != nil {
 				return nil, err
@@ -495,8 +501,8 @@ func registerLegacyPublicOrderCompatRoutes(r *khttp.Router, dataLayer *data.Data
 		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
 			in := request.(*compatResetTrafficOrderRequest)
 			reply, err := publicOrder.ResetTraffic(inner, &publicorderv1.ResetTrafficRequest{
-				UserSubscribeId: int32(in.UserSubscribeID),
-				Payment:         int32(in.Payment),
+				UserSubscribeId: fmt.Sprintf("%d", in.UserSubscribeID),
+				Payment:         strconv.FormatInt(int64(in.Payment), 10),
 			})
 			if err != nil {
 				return nil, err
@@ -959,7 +965,7 @@ func compatLegacySubscribeFromEnt(item *ent.ProxySubscribe) *compatSubscribe {
 	}
 
 	return &compatSubscribe{
-		ID:                item.ID,
+		ID:                strconv.FormatInt(item.ID, 10),
 		Name:              item.Name,
 		Language:          item.Language,
 		Description:       description,
@@ -974,8 +980,8 @@ func compatLegacySubscribeFromEnt(item *ent.ProxySubscribe) *compatSubscribe {
 		Quota:             item.Quota,
 		Nodes:             nil,
 		NodeTags:          nil,
-		NodeGroupIds:      append([]int64(nil), item.NodeGroupIds...),
-		NodeGroupId:       nodeGroupID,
+		NodeGroupIds:      compatInt64SliceToStringSlice(item.NodeGroupIds),
+		NodeGroupId:       strconv.FormatInt(nodeGroupID, 10),
 		TrafficLimit:      nil,
 		Show:              item.Show,
 		Sell:              item.Sell,
@@ -1007,7 +1013,7 @@ func compatLegacySubscribeFromPortal(item *publicportalv1.SubscribeInfo) compatS
 	}
 
 	return compatSubscribe{
-		ID:             compatParseInt64String(item.Id),
+		ID:             item.Id,
 		Name:           item.Name,
 		Language:       item.Language,
 		Description:    item.GetDescription(),
@@ -1023,7 +1029,7 @@ func compatLegacySubscribeFromPortal(item *publicportalv1.SubscribeInfo) compatS
 		Nodes:          nil,
 		NodeTags:       nil,
 		NodeGroupIds:   nil,
-		NodeGroupId:    0,
+		NodeGroupId:    "",
 		TrafficLimit:   nil,
 		Show:           item.Show,
 		Sell:           item.Sell,

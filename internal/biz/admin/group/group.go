@@ -248,7 +248,16 @@ func (uc *GroupUseCase) GetSubscribeGroupMapping(ctx context.Context) ([]*v1.Sub
 
 // ExportGroupResult exports group result as CSV
 func (uc *GroupUseCase) ExportGroupResult(ctx context.Context, req *v1.ExportGroupResultRequest) ([]byte, string, error) {
-	data, filename, err := uc.repo.ExportGroupResult(ctx, &req.HistoryId)
+	var historyID *int64
+	if req.HistoryId != "" {
+		parsed, err := parseStringID(req.HistoryId)
+		if err != nil {
+			return nil, "", err
+		}
+		historyID = &parsed
+	}
+
+	data, filename, err := uc.repo.ExportGroupResult(ctx, historyID)
 	if err != nil {
 		uc.log.Errorf("Failed to export group result: %v", err)
 		return nil, "", err
