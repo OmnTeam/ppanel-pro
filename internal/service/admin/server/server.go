@@ -12,9 +12,20 @@ import (
 )
 
 // Helper functions for type conversion
-func parseInt64(s string) int64 {
-	val, _ := strconv.ParseInt(s, 10, 64)
-	return val
+func parseInt64(s string) (int64, error) {
+	val, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return val, nil
+}
+
+func parseInt(s string) (int, error) {
+	val, err := parseInt64(s)
+	if err != nil {
+		return 0, err
+	}
+	return int(val), nil
 }
 
 // ServerService is the server service
@@ -59,7 +70,12 @@ func (s *ServerService) CreateServer(ctx context.Context, req *v1.CreateServerRe
 func (s *ServerService) UpdateServer(ctx context.Context, req *v1.UpdateServerRequest) (*v1.UpdateServerReply, error) {
 	protocols := protosToModelProtocols(req.Protocols)
 
-	server, err := s.serverUc.UpdateServer(ctx, int(parseInt64(req.Id)), req.Name, req.Country, req.City, req.Address, int64(req.Sort), protocols)
+	id, err := parseInt(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	server, err := s.serverUc.UpdateServer(ctx, id, req.Name, req.Country, req.City, req.Address, int64(req.Sort), protocols)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +91,12 @@ func (s *ServerService) UpdateServer(ctx context.Context, req *v1.UpdateServerRe
 
 // DeleteServer deletes a server
 func (s *ServerService) DeleteServer(ctx context.Context, req *v1.DeleteServerRequest) (*v1.DeleteServerReply, error) {
-	err := s.serverUc.DeleteServer(ctx, int(parseInt64(req.Id)))
+	id, err := parseInt(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.serverUc.DeleteServer(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +126,7 @@ func (s *ServerService) FilterServerList(ctx context.Context, req *v1.FilterServ
 		Code:    responsecode.AdminFilterServerListSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminFilterServerListSuccess],
 		Data: &v1.FilterServerListData{
-			Total: int32(total),
+			Total: total,
 			List:  list,
 		},
 	}, nil
@@ -113,7 +134,12 @@ func (s *ServerService) FilterServerList(ctx context.Context, req *v1.FilterServ
 
 // GetServerProtocols gets server protocols
 func (s *ServerService) GetServerProtocols(ctx context.Context, req *v1.GetServerProtocolsRequest) (*v1.GetServerProtocolsReply, error) {
-	protocols, err := s.serverUc.GetServerProtocols(ctx, int(parseInt64(req.Id)))
+	id, err := parseInt(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	protocols, err := s.serverUc.GetServerProtocols(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +157,12 @@ func (s *ServerService) GetServerProtocols(ctx context.Context, req *v1.GetServe
 
 // CreateNode creates a new node
 func (s *ServerService) CreateNode(ctx context.Context, req *v1.CreateNodeRequest) (*v1.CreateNodeReply, error) {
-	node, err := s.nodeUc.CreateNode(ctx, req.Name, req.Tags, uint16(req.Port), req.Address, parseInt64(req.ServerId), req.Protocol, req.Enabled)
+	serverID, err := parseInt64(req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	node, err := s.nodeUc.CreateNode(ctx, req.Name, req.Tags, uint16(req.Port), req.Address, serverID, req.Protocol, req.Enabled)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +178,16 @@ func (s *ServerService) CreateNode(ctx context.Context, req *v1.CreateNodeReques
 
 // UpdateNode updates an existing node
 func (s *ServerService) UpdateNode(ctx context.Context, req *v1.UpdateNodeRequest) (*v1.UpdateNodeReply, error) {
-	node, err := s.nodeUc.UpdateNode(ctx, int(parseInt64(req.Id)), req.Name, req.Tags, uint16(req.Port), req.Address, parseInt64(req.ServerId), req.Protocol, req.Enabled)
+	id, err := parseInt(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	serverID, err := parseInt64(req.ServerId)
+	if err != nil {
+		return nil, err
+	}
+
+	node, err := s.nodeUc.UpdateNode(ctx, id, req.Name, req.Tags, uint16(req.Port), req.Address, serverID, req.Protocol, req.Enabled)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +203,12 @@ func (s *ServerService) UpdateNode(ctx context.Context, req *v1.UpdateNodeReques
 
 // DeleteNode deletes a node
 func (s *ServerService) DeleteNode(ctx context.Context, req *v1.DeleteNodeRequest) (*v1.DeleteNodeReply, error) {
-	err := s.nodeUc.DeleteNode(ctx, int(parseInt64(req.Id)))
+	id, err := parseInt(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.nodeUc.DeleteNode(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +238,7 @@ func (s *ServerService) FilterNodeList(ctx context.Context, req *v1.FilterNodeLi
 		Code:    responsecode.AdminFilterNodeListSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminFilterNodeListSuccess],
 		Data: &v1.FilterNodeListData{
-			Total: int32(total),
+			Total: total,
 			List:  list,
 		},
 	}, nil
@@ -201,7 +246,12 @@ func (s *ServerService) FilterNodeList(ctx context.Context, req *v1.FilterNodeLi
 
 // ToggleNodeStatus toggles node status
 func (s *ServerService) ToggleNodeStatus(ctx context.Context, req *v1.ToggleNodeStatusRequest) (*v1.ToggleNodeStatusReply, error) {
-	node, err := s.nodeUc.ToggleNodeStatus(ctx, int(parseInt64(req.Id)), req.Enable)
+	id, err := parseInt(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	node, err := s.nodeUc.ToggleNodeStatus(ctx, id, req.Enable)
 	if err != nil {
 		return nil, err
 	}
@@ -268,9 +318,14 @@ func (s *ServerService) MigrateServerNode(ctx context.Context, req *v1.MigrateSe
 func (s *ServerService) ResetSortWithServer(ctx context.Context, req *v1.ResetSortRequest) (*v1.ResetSortReply, error) {
 	sortItems := make([]*serverbiz.SortItem, 0, len(req.Sort))
 	for _, item := range req.Sort {
+		id, err := parseInt64(item.Id)
+		if err != nil {
+			return nil, err
+		}
+
 		sortItems = append(sortItems, &serverbiz.SortItem{
-			ID:   parseInt64(item.Id),
-			Sort: int(parseInt64(item.Sort)),
+			ID:   id,
+			Sort: int(item.Sort),
 		})
 	}
 
@@ -292,9 +347,14 @@ func (s *ServerService) ResetSortWithServer(ctx context.Context, req *v1.ResetSo
 func (s *ServerService) ResetSortWithNode(ctx context.Context, req *v1.ResetSortRequest) (*v1.ResetSortReply, error) {
 	sortItems := make([]*serverbiz.SortItem, 0, len(req.Sort))
 	for _, item := range req.Sort {
+		id, err := parseInt64(item.Id)
+		if err != nil {
+			return nil, err
+		}
+
 		sortItems = append(sortItems, &serverbiz.SortItem{
-			ID:   parseInt64(item.Id),
-			Sort: int(parseInt64(item.Sort)),
+			ID:   id,
+			Sort: int(item.Sort),
 		})
 	}
 
@@ -335,8 +395,8 @@ func serverToProto(s *serverbiz.Server) *v1.Server {
 				UserId:      strconv.FormatInt(user.UserID, 10),
 				Subscribe:   user.Subscribe,
 				SubscribeId: strconv.FormatInt(user.SubscribeID, 10),
-				Traffic:     strconv.FormatInt(user.Traffic, 10),
-				ExpiredAt:   strconv.FormatInt(user.ExpiredAt, 10),
+				Traffic:     user.Traffic,
+				ExpiredAt:   user.ExpiredAt,
 			})
 		}
 
@@ -355,12 +415,12 @@ func serverToProto(s *serverbiz.Server) *v1.Server {
 		Country:        s.Country,
 		City:           s.City,
 		Address:        s.Address,
-		Sort:           strconv.FormatInt(int64(s.Sort), 10),
+		Sort:           int64(s.Sort),
 		Protocols:      modelProtocolsToProtos(s.Protocols),
-		LastReportedAt: int32(s.LastReportedAt),
+		LastReportedAt: s.LastReportedAt,
 		Status:         status,
-		CreatedAt:      strconv.FormatInt(s.CreatedAt, 10),
-		UpdatedAt:      strconv.FormatInt(s.UpdatedAt, 10),
+		CreatedAt:      s.CreatedAt,
+		UpdatedAt:      s.UpdatedAt,
 	}
 }
 
@@ -378,9 +438,9 @@ func nodeToProto(n *serverbiz.Node) *v1.Node {
 		ServerId:  strconv.FormatInt(n.ServerID, 10),
 		Protocol:  n.Protocol,
 		Enabled:   n.Enabled, // 直接使用 *bool，与老项目一致
-		Sort:      n.Sort,
-		CreatedAt: strconv.FormatInt(n.CreatedAt, 10),
-		UpdatedAt: strconv.FormatInt(n.UpdatedAt, 10),
+		Sort:      int64(n.Sort),
+		CreatedAt: n.CreatedAt,
+		UpdatedAt: n.UpdatedAt,
 	}
 }
 

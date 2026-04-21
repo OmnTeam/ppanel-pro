@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"strconv"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -70,8 +71,12 @@ func (r *adminGroupRepo) CreateNodeGroup(ctx context.Context, req *v1.CreateNode
 
 // UpdateNodeGroup updates node group
 func (r *adminGroupRepo) UpdateNodeGroup(ctx context.Context, req *v1.UpdateNodeGroupRequest) error {
+	groupID, err := strconv.ParseInt(req.Id, 10, 64)
+	if err != nil {
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
 	_, err := r.data.db.ProxyServerGroup.Query().
-		Where(proxyservergroup.IDEQ(req.Id)).
+		Where(proxyservergroup.IDEQ(groupID)).
 		Only(ctx)
 
 	if err != nil {
@@ -83,12 +88,12 @@ func (r *adminGroupRepo) UpdateNodeGroup(ctx context.Context, req *v1.UpdateNode
 
 	// 【关键】验证流量范围（完全按照原项目逻辑）
 	if req.MinTrafficGb != 0 || req.MaxTrafficGb != 0 {
-		if err := r.validateTrafficRange(ctx, req.Id, req.MinTrafficGb, req.MaxTrafficGb); err != nil {
+		if err := r.validateTrafficRange(ctx, groupID, req.MinTrafficGb, req.MaxTrafficGb); err != nil {
 			return err
 		}
 	}
 
-	update := r.data.db.ProxyServerGroup.UpdateOneID(req.Id)
+	update := r.data.db.ProxyServerGroup.UpdateOneID(groupID)
 
 	if req.Name != "" {
 		update.SetName(req.Name)

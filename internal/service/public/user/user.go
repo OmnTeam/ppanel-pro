@@ -28,18 +28,27 @@ func NewUserService(uc *userBiz.UserUseCase, withdrawalUc *withdrawalBiz.Withdra
 	}
 }
 
+func formatInt64(i int64) string {
+	return strconv.FormatInt(i, 10)
+}
+
+func parseStringID(id string) (int64, error) {
+	v, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return v, nil
+}
+
 // QueryUserInfo 查询用户信息
 func (s *UserService) QueryUserInfo(ctx context.Context, req *emptypb.Empty) (*v1.UserInfoReply, error) {
-	// 从context获取用户ID
 	userID := middleware.GetUserID(ctx)
 
-	// 调用业务层
 	userInfo, err := s.uc.QueryUserInfo(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
 
-	// 转换AuthMethods
 	authMethods := make([]*v1.UserAuthMethod, 0, len(userInfo.AuthMethods))
 	for _, method := range userInfo.AuthMethods {
 		authMethods = append(authMethods, &v1.UserAuthMethod{
@@ -49,12 +58,11 @@ func (s *UserService) QueryUserInfo(ctx context.Context, req *emptypb.Empty) (*v
 		})
 	}
 
-	// 构建响应
 	return &v1.UserInfoReply{
 		Code:    int32(responsecode.UserInfoQuerySuccess),
 		Message: responsecode.CodeMessages[responsecode.UserInfoQuerySuccess],
 		Data: &v1.UserInfoData{
-			Id:                    userInfo.ID,
+			Id:                    formatInt64(userInfo.ID),
 			Avatar:                userInfo.Avatar,
 			Balance:               userInfo.Balance,
 			Commission:            userInfo.Commission,
@@ -79,21 +87,18 @@ func (s *UserService) QueryUserInfo(ctx context.Context, req *emptypb.Empty) (*v
 
 // GetLoginLog 获取登录日志
 func (s *UserService) GetLoginLog(ctx context.Context, req *v1.GetLoginLogRequest) (*v1.LoginLogReply, error) {
-	// 从context获取用户ID
 	userID := middleware.GetUserID(ctx)
 
-	// 调用业务层
 	logs, total, err := s.uc.GetLoginLog(ctx, int(userID), int(req.Page), int(req.Size))
 	if err != nil {
 		return nil, err
 	}
 
-	// 转换结果
 	list := make([]*v1.UserLoginLog, 0, len(logs))
 	for _, log := range logs {
 		list = append(list, &v1.UserLoginLog{
-			Id:        log.ID,
-			UserId:    log.UserID,
+			Id:        formatInt64(log.ID),
+			UserId:    formatInt64(log.UserID),
 			LoginIp:   log.LoginIP,
 			UserAgent: log.UserAgent,
 			Success:   log.Success,
@@ -113,21 +118,18 @@ func (s *UserService) GetLoginLog(ctx context.Context, req *v1.GetLoginLogReques
 
 // QueryUserBalanceLog 查询用户余额日志
 func (s *UserService) QueryUserBalanceLog(ctx context.Context, req *emptypb.Empty) (*v1.BalanceLogReply, error) {
-	// 从context获取租户ID和用户ID
 	userID := middleware.GetUserID(ctx)
 
-	// 调用业务层
 	logs, total, err := s.uc.QueryUserBalanceLog(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
 
-	// 转换结果
 	list := make([]*v1.BalanceLog, 0, len(logs))
 	for _, log := range logs {
 		list = append(list, &v1.BalanceLog{
 			Type:      log.Type,
-			UserId:    log.UserID,
+			UserId:    formatInt64(log.UserID),
 			Amount:    log.Amount,
 			OrderNo:   log.OrderNo,
 			Balance:   log.Balance,
@@ -147,21 +149,18 @@ func (s *UserService) QueryUserBalanceLog(ctx context.Context, req *emptypb.Empt
 
 // QueryUserCommissionLog 查询用户佣金日志
 func (s *UserService) QueryUserCommissionLog(ctx context.Context, req *v1.QueryUserCommissionLogRequest) (*v1.CommissionLogReply, error) {
-	// 从context获取租户ID和用户ID
 	userID := middleware.GetUserID(ctx)
 
-	// 调用业务层
 	logs, total, err := s.uc.QueryUserCommissionLog(ctx, int(userID), int(req.Page), int(req.Size))
 	if err != nil {
 		return nil, err
 	}
 
-	// 转换结果
 	list := make([]*v1.CommissionLog, 0, len(logs))
 	for _, log := range logs {
 		list = append(list, &v1.CommissionLog{
 			Type:      log.Type,
-			UserId:    log.UserID,
+			UserId:    formatInt64(log.UserID),
 			Amount:    log.Amount,
 			OrderNo:   log.OrderNo,
 			Timestamp: log.Timestamp,
@@ -180,10 +179,8 @@ func (s *UserService) QueryUserCommissionLog(ctx context.Context, req *v1.QueryU
 
 // QueryUserAffiliate 查询用户推荐数量
 func (s *UserService) QueryUserAffiliate(ctx context.Context, req *emptypb.Empty) (*v1.UserAffiliateReply, error) {
-	// 从context获取租户ID和用户ID
 	userID := middleware.GetUserID(ctx)
 
-	// 调用业务层
 	registers, totalCommission, err := s.uc.QueryUserAffiliate(ctx, int(userID))
 	if err != nil {
 		return nil, err
@@ -201,16 +198,13 @@ func (s *UserService) QueryUserAffiliate(ctx context.Context, req *emptypb.Empty
 
 // QueryUserAffiliateList 查询用户推荐列表
 func (s *UserService) QueryUserAffiliateList(ctx context.Context, req *v1.QueryUserAffiliateListRequest) (*v1.UserAffiliateListReply, error) {
-	// 从context获取租户ID和用户ID
 	userID := middleware.GetUserID(ctx)
 
-	// 调用业务层
 	affiliates, total, err := s.uc.QueryUserAffiliateList(ctx, int(userID), int(req.Page), int(req.Size))
 	if err != nil {
 		return nil, err
 	}
 
-	// 转换结果
 	list := make([]*v1.UserAffiliate, 0, len(affiliates))
 	for _, affiliate := range affiliates {
 		list = append(list, &v1.UserAffiliate{
@@ -233,16 +227,13 @@ func (s *UserService) QueryUserAffiliateList(ctx context.Context, req *v1.QueryU
 
 // GetOAuthMethods 获取OAuth方法
 func (s *UserService) GetOAuthMethods(ctx context.Context, req *emptypb.Empty) (*v1.OAuthMethodsReply, error) {
-	// 从context获取租户ID和用户ID
 	userID := middleware.GetUserID(ctx)
 
-	// 调用业务层
 	methods, err := s.uc.GetOAuthMethods(ctx, int(userID))
 	if err != nil {
 		return nil, err
 	}
 
-	// 转换结果
 	list := make([]*v1.UserAuthMethod, 0, len(methods))
 	for _, method := range methods {
 		list = append(list, &v1.UserAuthMethod{
@@ -270,14 +261,13 @@ func (s *UserService) QueryUserSubscribe(ctx context.Context, req *emptypb.Empty
 		return nil, err
 	}
 
-	// 转换结果
 	subscribeList := make([]*v1.UserSubscribe, 0, len(list))
 	for _, item := range list {
 		sub := &v1.UserSubscribe{
-			Id:          item.ID,
-			UserId:      item.UserID,
+			Id:          formatInt64(item.ID),
+			UserId:      formatInt64(item.UserID),
 			OrderId:     item.OrderID,
-			SubscribeId: item.SubscribeID,
+			SubscribeId: formatInt64(item.SubscribeID),
 			StartTime:   item.StartTime,
 			ExpireTime:  item.ExpireTime,
 			FinishedAt:  item.FinishedAt,
@@ -293,7 +283,7 @@ func (s *UserService) QueryUserSubscribe(ctx context.Context, req *emptypb.Empty
 
 		if item.Subscribe != nil {
 			sub.Subscribe = &v1.Subscribe{
-				Id:             item.Subscribe.ID,
+				Id:             formatInt64(item.Subscribe.ID),
 				Name:           item.Subscribe.Name,
 				Description:    item.Subscribe.Description,
 				Price:          item.Subscribe.Price,
@@ -310,7 +300,6 @@ func (s *UserService) QueryUserSubscribe(ctx context.Context, req *emptypb.Empty
 				UpdatedAt:      item.Subscribe.UpdatedAt,
 			}
 
-			// 转换Discount
 			for _, discount := range item.Subscribe.Discount {
 				sub.Subscribe.Discount = append(sub.Subscribe.Discount, &v1.SubscribeDiscount{
 					Quantity:   discount.Quantity,
@@ -341,13 +330,12 @@ func (s *UserService) GetSubscribeLog(ctx context.Context, req *v1.GetSubscribeL
 		return nil, err
 	}
 
-	// 转换结果
 	list := make([]*v1.UserSubscribeLog, 0, len(logs))
 	for _, log := range logs {
 		list = append(list, &v1.UserSubscribeLog{
-			Id:              log.ID,
-			UserId:          log.UserID,
-			UserSubscribeId: log.UserSubscribeID,
+			Id:              formatInt64(log.ID),
+			UserId:          formatInt64(log.UserID),
+			UserSubscribeId: formatInt64(log.UserSubscribeID),
 			Token:           log.Token,
 			Ip:              log.IP,
 			UserAgent:       log.UserAgent,
@@ -369,7 +357,12 @@ func (s *UserService) GetSubscribeLog(ctx context.Context, req *v1.GetSubscribeL
 func (s *UserService) ResetUserSubscribeToken(ctx context.Context, req *v1.ResetUserSubscribeTokenRequest) (*v1.CommonReply, error) {
 	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.ResetUserSubscribeToken(ctx, int(userID), int(req.UserSubscribeId))
+	userSubscribeID, err := parseStringID(req.UserSubscribeId)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.ResetUserSubscribeToken(ctx, int(userID), int(userSubscribeID))
 	if err != nil {
 		return nil, err
 	}
@@ -384,7 +377,12 @@ func (s *UserService) ResetUserSubscribeToken(ctx context.Context, req *v1.Reset
 func (s *UserService) PreUnsubscribe(ctx context.Context, req *v1.PreUnsubscribeRequest) (*v1.UnsubscribeInfoReply, error) {
 	userID := middleware.GetUserID(ctx)
 
-	deductionAmount, err := s.uc.PreUnsubscribe(ctx, int(userID), int(req.Id))
+	id, err := parseStringID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	deductionAmount, err := s.uc.PreUnsubscribe(ctx, int(userID), int(id))
 	if err != nil {
 		return nil, err
 	}
@@ -402,7 +400,12 @@ func (s *UserService) PreUnsubscribe(ctx context.Context, req *v1.PreUnsubscribe
 func (s *UserService) Unsubscribe(ctx context.Context, req *v1.UnsubscribeRequest) (*v1.CommonReply, error) {
 	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.Unsubscribe(ctx, int(userID), int(req.Id))
+	id, err := parseStringID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.Unsubscribe(ctx, int(userID), int(id))
 	if err != nil {
 		return nil, err
 	}
@@ -445,12 +448,8 @@ func (s *UserService) UpdateUserPassword(ctx context.Context, req *v1.UpdateUser
 
 // BindTelegram 绑定Telegram
 func (s *UserService) BindTelegram(ctx context.Context, req *emptypb.Empty) (*v1.TelegramBindReply, error) {
-	// 从context获取session（JWT中的session ID）
-	// 原项目从 l.ctx.Value("session").(string) 获取
 	session := middleware.GetSessionID(ctx)
-
-	// 从配置获取Telegram Bot名称
-	botName := "" // 将从系统配置获取
+	botName := ""
 
 	url, expiredAt, err := s.uc.BindTelegram(ctx, session, botName)
 	if err != nil {
@@ -595,7 +594,6 @@ func (s *UserService) GetDeviceList(ctx context.Context, req *emptypb.Empty) (*v
 		return nil, err
 	}
 
-	// 转换结果
 	deviceList := make([]*v1.UserDevice, 0, len(list))
 	for _, device := range list {
 		deviceList = append(deviceList, &v1.UserDevice{
@@ -624,7 +622,12 @@ func (s *UserService) GetDeviceList(ctx context.Context, req *emptypb.Empty) (*v
 func (s *UserService) UnbindDevice(ctx context.Context, req *v1.UnbindDeviceRequest) (*v1.CommonReply, error) {
 	userID := middleware.GetUserID(ctx)
 
-	err := s.uc.UnbindDevice(ctx, int(userID), int(req.Id))
+	deviceID, err := parseStringID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.UnbindDevice(ctx, int(userID), int(deviceID))
 	if err != nil {
 		return nil, err
 	}
@@ -644,7 +647,6 @@ func (s *UserService) GetDeviceOnlineStatistics(ctx context.Context, req *emptyp
 		return nil, err
 	}
 
-	// 转换每周统计
 	weeklyStats := make([]*v1.WeeklyStat, 0, len(stats.WeeklyStats))
 	for _, stat := range stats.WeeklyStats {
 		weeklyStats = append(weeklyStats, &v1.WeeklyStat{
@@ -654,7 +656,6 @@ func (s *UserService) GetDeviceOnlineStatistics(ctx context.Context, req *emptyp
 		})
 	}
 
-	// 转换连接记录
 	connectionRecords := &v1.ConnectionRecords{
 		CurrentContinuousDays:   stats.ConnectionRecords.CurrentContinuousDays,
 		HistoryContinuousDays:   stats.ConnectionRecords.HistoryContinuousDays,
@@ -675,13 +676,11 @@ func (s *UserService) GetDeviceOnlineStatistics(ctx context.Context, req *emptyp
 func (s *UserService) CommissionWithdraw(ctx context.Context, req *v1.CommissionWithdrawRequest) (*v1.WithdrawalLogReply, error) {
 	userID := middleware.GetUserID(ctx)
 
-	// 转换amount string to int64
 	amount, err := strconv.ParseInt(req.Amount, 10, 64)
 	if err != nil {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	// 调用业务层
 	withdrawal, err := s.withdrawalUc.CommissionWithdraw(ctx, int64(userID), &withdrawalBiz.CommissionWithdrawRequest{
 		Amount:  amount,
 		Content: req.Content,
@@ -694,14 +693,14 @@ func (s *UserService) CommissionWithdraw(ctx context.Context, req *v1.Commission
 		Code:    int32(responsecode.UserInfoQuerySuccess),
 		Message: responsecode.CodeMessages[responsecode.UserInfoQuerySuccess],
 		Data: &v1.WithdrawalLogData{
-			Id:        strconv.FormatInt(withdrawal.ID, 10),
-			UserId:    strconv.FormatInt(withdrawal.UserID, 10),
-			Amount:    strconv.FormatInt(withdrawal.Amount, 10),
+			Id:        formatInt64(withdrawal.ID),
+			UserId:    formatInt64(withdrawal.UserID),
+			Amount:    formatInt64(withdrawal.Amount),
 			Content:   withdrawal.Content,
 			Status:    int32(withdrawal.Status),
 			Reason:    withdrawal.Reason,
-			CreatedAt: strconv.FormatInt(withdrawal.CreatedAt.UnixMilli(), 10),
-			UpdatedAt: strconv.FormatInt(withdrawal.UpdatedAt.UnixMilli(), 10),
+			CreatedAt: formatInt64(withdrawal.CreatedAt.UnixMilli()),
+			UpdatedAt: formatInt64(withdrawal.UpdatedAt.UnixMilli()),
 		},
 	}, nil
 }
@@ -710,24 +709,22 @@ func (s *UserService) CommissionWithdraw(ctx context.Context, req *v1.Commission
 func (s *UserService) QueryWithdrawalLog(ctx context.Context, req *v1.QueryWithdrawalLogRequest) (*v1.WithdrawalLogListReply, error) {
 	userID := middleware.GetUserID(ctx)
 
-	// 调用业务层
 	withdrawals, total, err := s.withdrawalUc.QueryWithdrawalLog(ctx, int64(userID), int32(req.Page), int32(req.Size))
 	if err != nil {
 		return nil, err
 	}
 
-	// 转换结果
 	list := make([]*v1.WithdrawalLogData, 0, len(withdrawals))
 	for _, w := range withdrawals {
 		list = append(list, &v1.WithdrawalLogData{
-			Id:        strconv.FormatInt(w.ID, 10),
-			UserId:    strconv.FormatInt(w.UserID, 10),
-			Amount:    strconv.FormatInt(w.Amount, 10),
+			Id:        formatInt64(w.ID),
+			UserId:    formatInt64(w.UserID),
+			Amount:    formatInt64(w.Amount),
 			Content:   w.Content,
 			Status:    int32(w.Status),
 			Reason:    w.Reason,
-			CreatedAt: strconv.FormatInt(w.CreatedAt.UnixMilli(), 10),
-			UpdatedAt: strconv.FormatInt(w.UpdatedAt.UnixMilli(), 10),
+			CreatedAt: formatInt64(w.CreatedAt.UnixMilli()),
+			UpdatedAt: formatInt64(w.UpdatedAt.UnixMilli()),
 		})
 	}
 
@@ -736,7 +733,7 @@ func (s *UserService) QueryWithdrawalLog(ctx context.Context, req *v1.QueryWithd
 		Message: responsecode.CodeMessages[responsecode.UserInfoQuerySuccess],
 		Data: &v1.WithdrawalLogListData{
 			List:  list,
-			Total: strconv.FormatInt(int64(total), 10),
+			Total: formatInt64(int64(total)),
 		},
 	}, nil
 }

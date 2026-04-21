@@ -2,13 +2,14 @@ package ads
 
 import (
 	"context"
+	"strconv"
+	"time"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/ads/v1"
 	adsbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/ads"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 
 	"github.com/go-kratos/kratos/v2/log"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // AdsService 广告服务
@@ -33,9 +34,8 @@ func (s *AdsService) GetAdsList(ctx context.Context, req *v1.GetAdsListRequest) 
 		Search: req.Search,
 	}
 
-	// 处理可选的状态过滤 - 转换 bool 到 int8
 	if req.Status != nil {
-		status := boolToInt8Ptr(req.Status)
+		status := int32ToInt8Ptr(req.Status)
 		filter.Status = status
 	}
 
@@ -44,7 +44,6 @@ func (s *AdsService) GetAdsList(ctx context.Context, req *v1.GetAdsListRequest) 
 		return nil, err
 	}
 
-	// 转换为proto对象
 	pbList := make([]*v1.Ads, len(list))
 	for i, ads := range list {
 		pbList[i] = s.bizAdsToProto(ads)
@@ -62,7 +61,12 @@ func (s *AdsService) GetAdsList(ctx context.Context, req *v1.GetAdsListRequest) 
 
 // GetAds 获取广告详情
 func (s *AdsService) GetAds(ctx context.Context, req *v1.GetAdsRequest) (*v1.GetAdsReply, error) {
-	ads, err := s.uc.GetAdsByID(ctx, req.Id)
+	id, err := strconv.ParseInt(req.Id, 10, 64)
+	if err != nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	ads, err := s.uc.GetAdsByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -84,15 +88,14 @@ func (s *AdsService) CreateAds(ctx context.Context, req *v1.CreateAdsRequest) (*
 		Content:     req.Content,
 		Description: req.Description,
 		TargetURL:   req.TargetUrl,
-		Status:      boolToInt8(req.Status), // 转换 bool 到 int8
+		Status:      int32ToInt8(req.Status),
 	}
 
-	// 处理时间字段
-	if req.StartTime != nil {
-		ads.StartTime = req.StartTime.AsTime()
+	if req.StartTime > 0 {
+		ads.StartTime = time.Unix(req.StartTime, 0)
 	}
-	if req.EndTime != nil {
-		ads.EndTime = req.EndTime.AsTime()
+	if req.EndTime > 0 {
+		ads.EndTime = time.Unix(req.EndTime, 0)
 	}
 
 	result, err := s.uc.CreateAds(ctx, ads)
@@ -111,22 +114,26 @@ func (s *AdsService) CreateAds(ctx context.Context, req *v1.CreateAdsRequest) (*
 
 // UpdateAds 更新广告
 func (s *AdsService) UpdateAds(ctx context.Context, req *v1.UpdateAdsRequest) (*v1.UpdateAdsReply, error) {
+	id, err := strconv.ParseInt(req.Id, 10, 64)
+	if err != nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
 	ads := &adsbiz.Ads{
-		ID:          req.Id,
+		ID:          id,
 		Title:       req.Title,
 		Type:        req.Type,
 		Content:     req.Content,
 		Description: req.Description,
 		TargetURL:   req.TargetUrl,
-		Status:      boolToInt8(req.Status), // 转换 bool 到 int8
+		Status:      int32ToInt8(req.Status),
 	}
 
-	// 处理时间字段
-	if req.StartTime != nil {
-		ads.StartTime = req.StartTime.AsTime()
+	if req.StartTime > 0 {
+		ads.StartTime = time.Unix(req.StartTime, 0)
 	}
-	if req.EndTime != nil {
-		ads.EndTime = req.EndTime.AsTime()
+	if req.EndTime > 0 {
+		ads.EndTime = time.Unix(req.EndTime, 0)
 	}
 
 	result, err := s.uc.UpdateAds(ctx, ads)
@@ -145,7 +152,12 @@ func (s *AdsService) UpdateAds(ctx context.Context, req *v1.UpdateAdsRequest) (*
 
 // DeleteAds 删除广告
 func (s *AdsService) DeleteAds(ctx context.Context, req *v1.DeleteAdsRequest) (*v1.DeleteAdsReply, error) {
-	err := s.uc.DeleteAds(ctx, req.Id)
+	id, err := strconv.ParseInt(req.Id, 10, 64)
+	if err != nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	err = s.uc.DeleteAds(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -166,50 +178,43 @@ func (s *AdsService) bizAdsToProto(ads *adsbiz.Ads) *v1.Ads {
 	}
 
 	pbAds := &v1.Ads{
-		Id:          ads.ID,
+		Id:          strconv.FormatInt(ads.ID, 10),
 		Title:       ads.Title,
 		Type:        ads.Type,
 		Content:     ads.Content,
 		Description: ads.Description,
 		TargetUrl:   ads.TargetURL,
-		Status:      int8ToBool(ads.Status), // 转换 int8 到 bool
+		Status:      int8ToInt32(ads.Status),
 	}
 
-	// 处理时间字段
 	if !ads.StartTime.IsZero() {
-		pbAds.StartTime = timestamppb.New(ads.StartTime)
+		pbAds.StartTime = ads.StartTime.Unix()
 	}
 	if !ads.EndTime.IsZero() {
-		pbAds.EndTime = timestamppb.New(ads.EndTime)
+		pbAds.EndTime = ads.EndTime.Unix()
 	}
 	if !ads.CreatedAt.IsZero() {
-		pbAds.CreatedAt = timestamppb.New(ads.CreatedAt)
+		pbAds.CreatedAt = ads.CreatedAt.Unix()
 	}
 	if !ads.UpdatedAt.IsZero() {
-		pbAds.UpdatedAt = timestamppb.New(ads.UpdatedAt)
+		pbAds.UpdatedAt = ads.UpdatedAt.Unix()
 	}
 
 	return pbAds
 }
 
-// boolToInt8 converts bool to int8 (false -> 0, true -> 1)
-func boolToInt8(b bool) int8 {
-	if b {
-		return 1
-	}
-	return 0
+func int32ToInt8(i int32) int8 {
+	return int8(i)
 }
 
-// int8ToBool converts int8 to bool (0 -> false, non-zero -> true)
-func int8ToBool(i int8) bool {
-	return i != 0
+func int8ToInt32(i int8) int32 {
+	return int32(i)
 }
 
-// boolToInt8Ptr converts *bool to *int8
-func boolToInt8Ptr(b *bool) *int8 {
-	if b == nil {
+func int32ToInt8Ptr(i *int32) *int8 {
+	if i == nil {
 		return nil
 	}
-	result := boolToInt8(*b)
+	result := int32ToInt8(*i)
 	return &result
 }

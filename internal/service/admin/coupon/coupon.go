@@ -11,12 +11,6 @@ import (
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 )
 
-// Helper functions for type conversion
-func parseInt64(s string) int64 {
-	val, _ := strconv.ParseInt(s, 10, 64)
-	return val
-}
-
 func formatInt64(i int64) string {
 	return strconv.FormatInt(i, 10)
 }
@@ -37,6 +31,25 @@ func parseRequiredInt64(s string) (int64, error) {
 		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 	return val, nil
+}
+
+func parseStringIDs(input []string) ([]int, error) {
+	result := make([]int, len(input))
+	for i, v := range input {
+		id, err := parseRequiredInt64(v)
+		if err != nil {
+			return nil, err
+		}
+		result[i] = int(id)
+	}
+	return result, nil
+}
+
+func optionalBool(v *bool) bool {
+	if v == nil {
+		return false
+	}
+	return *v
 }
 
 // CouponService coupon service implementation
@@ -61,23 +74,11 @@ func (s *CouponService) CreateCoupon(ctx context.Context, req *v1.CreateCouponRe
 	if req.Type == 0 {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
-	discount, err := parseRequiredInt64(req.Discount)
+	subscribeInt, err := parseStringIDs(req.Subscribe)
 	if err != nil {
 		return nil, err
 	}
-	startTime, err := parseRequiredInt64(req.StartTime)
-	if err != nil {
-		return nil, err
-	}
-	expireTime, err := parseRequiredInt64(req.ExpireTime)
-	if err != nil {
-		return nil, err
-	}
-	subscribeInt := make([]int, len(req.Subscribe))
-	for i, v := range req.Subscribe {
-		subscribeInt[i] = int(v)
-	}
-	if err := s.uc.CreateCoupon(ctx, req.Name, req.Code, int(req.Count), int32(req.Type), discount, startTime, expireTime, int64(req.UserLimit), subscribeInt, req.Enable); err != nil {
+	if err := s.uc.CreateCoupon(ctx, req.Name, req.Code, int(req.Count), int32(req.Type), req.Discount, req.StartTime, req.ExpireTime, int64(req.UserLimit), subscribeInt, optionalBool(req.Enable)); err != nil {
 		return nil, err
 	}
 	return &v1.CreateCouponReply{
@@ -98,23 +99,11 @@ func (s *CouponService) UpdateCoupon(ctx context.Context, req *v1.UpdateCouponRe
 	if req.Type == 0 {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
-	discount, err := parseRequiredInt64(req.Discount)
+	subscribeInt, err := parseStringIDs(req.Subscribe)
 	if err != nil {
 		return nil, err
 	}
-	startTime, err := parseRequiredInt64(req.StartTime)
-	if err != nil {
-		return nil, err
-	}
-	expireTime, err := parseRequiredInt64(req.ExpireTime)
-	if err != nil {
-		return nil, err
-	}
-	subscribeInt := make([]int, len(req.Subscribe))
-	for i, v := range req.Subscribe {
-		subscribeInt[i] = int(v)
-	}
-	if err := s.uc.UpdateCoupon(ctx, int(id), req.Name, req.Code, int(req.Count), int32(req.Type), discount, startTime, expireTime, int64(req.UserLimit), subscribeInt, req.Enable); err != nil {
+	if err := s.uc.UpdateCoupon(ctx, int(id), req.Name, req.Code, int(req.Count), int32(req.Type), req.Discount, req.StartTime, req.ExpireTime, int64(req.UserLimit), subscribeInt, optionalBool(req.Enable)); err != nil {
 		return nil, err
 	}
 	return &v1.UpdateCouponReply{
@@ -143,9 +132,9 @@ func (s *CouponService) BatchDeleteCoupon(ctx context.Context, req *v1.BatchDele
 	if len(req.Ids) == 0 {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
-	idsInt := make([]int, len(req.Ids))
-	for i, v := range req.Ids {
-		idsInt[i] = int(v)
+	idsInt, err := parseStringIDs(req.Ids)
+	if err != nil {
+		return nil, err
 	}
 	if err := s.uc.BatchDeleteCoupon(ctx, idsInt); err != nil {
 		return nil, err
@@ -158,7 +147,16 @@ func (s *CouponService) BatchDeleteCoupon(ctx context.Context, req *v1.BatchDele
 
 // GetCouponList 获取优惠券列表
 func (s *CouponService) GetCouponList(ctx context.Context, req *v1.GetCouponListRequest) (*v1.GetCouponListReply, error) {
-	list, total, err := s.uc.GetCouponList(ctx, int64(req.Page), int64(req.Size), int64(req.Subscribe), req.Search)
+	var subscribe int64
+	if strings.TrimSpace(req.Subscribe) != "" {
+		var err error
+		subscribe, err = parseRequiredInt64(req.Subscribe)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	list, total, err := s.uc.GetCouponList(ctx, int64(req.Page), int64(req.Size), subscribe, req.Search)
 	if err != nil {
 		return nil, err
 	}
@@ -172,17 +170,17 @@ func (s *CouponService) GetCouponList(ctx context.Context, req *v1.GetCouponList
 			Id:         formatInt64(int64(c.ID)),
 			Name:       c.Name,
 			Code:       c.Code,
-			Count:      int32(c.Count),
+			Count:      int64(c.Count),
 			Type:       int32(c.Type),
-			Discount:   formatInt64(int64(c.Discount)),
-			StartTime:  formatInt64(c.StartTime),
-			ExpireTime: formatInt64(c.ExpireTime),
-			UserLimit:  int32(c.UserLimit),
-			Subscribe:  convertIntSliceToInt32Slice(subscribeList),
-			UsedCount:  int32(c.UsedCount),
+			Discount:   int64(c.Discount),
+			StartTime:  c.StartTime,
+			ExpireTime: c.ExpireTime,
+			UserLimit:  int64(c.UserLimit),
+			Subscribe:  convertIntSliceToStringSlice(subscribeList),
+			UsedCount:  int64(c.UsedCount),
 			Enable:     c.Enable,
-			CreatedAt:  formatInt64(c.CreatedAt.Unix()),
-			UpdatedAt:  formatInt64(c.UpdatedAt.Unix()),
+			CreatedAt:  c.CreatedAt.Unix(),
+			UpdatedAt:  c.UpdatedAt.Unix(),
 		})
 	}
 
@@ -191,19 +189,19 @@ func (s *CouponService) GetCouponList(ctx context.Context, req *v1.GetCouponList
 		Message: responsecode.CodeMessages[responsecode.AdminGetCouponListSuccess],
 		Data: &v1.GetCouponListData{
 			List:  items,
-			Total: int32(total),
+			Total: total,
 		},
 	}, nil
 }
 
-// convertIntSliceToInt32Slice converts []int64 to []int32
-func convertIntSliceToInt32Slice(input []int64) []int32 {
+// convertIntSliceToStringSlice converts []int64 to []string
+func convertIntSliceToStringSlice(input []int64) []string {
 	if input == nil {
 		return nil
 	}
-	result := make([]int32, len(input))
+	result := make([]string, len(input))
 	for i, v := range input {
-		result[i] = int32(v)
+		result[i] = strconv.FormatInt(v, 10)
 	}
 	return result
 }

@@ -8,12 +8,21 @@ import (
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/user/v1"
 	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
+	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
 
 // Helper functions for type conversion
 func parseInt64(s string) int64 {
 	val, _ := strconv.ParseInt(s, 10, 64)
 	return val
+}
+
+func parseAuthMethodUserID(s string) (int64, error) {
+	val, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return val, nil
 }
 
 // UserAuthMethodService 用户认证方法服务
@@ -46,7 +55,12 @@ func (s *UserAuthMethodService) CreateUserAuthMethod(ctx context.Context, req *v
 
 // GetUserAuthMethod 获取用户认证方法
 func (s *UserAuthMethodService) GetUserAuthMethod(ctx context.Context, req *v1.GetUserAuthMethodRequest) (*v1.GetUserAuthMethodReply, error) {
-	methods, err := s.uc.GetUserAuthMethod(ctx, parseInt64(req.UserId), req.AuthType)
+	userID, err := parseAuthMethodUserID(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	methods, err := s.uc.GetUserAuthMethod(ctx, userID, req.AuthType)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +97,12 @@ func (s *UserAuthMethodService) UpdateUserAuthMethod(ctx context.Context, req *v
 
 // DeleteUserAuthMethod 删除用户认证方法
 func (s *UserAuthMethodService) DeleteUserAuthMethod(ctx context.Context, req *v1.DeleteUserAuthMethodRequest) (*v1.DeleteUserAuthMethodReply, error) {
-	err := s.uc.DeleteUserAuthMethod(ctx, parseInt64(req.UserId), req.AuthType)
+	userID, err := parseAuthMethodUserID(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.DeleteUserAuthMethod(ctx, userID, req.AuthType)
 	if err != nil {
 		return nil, err
 	}

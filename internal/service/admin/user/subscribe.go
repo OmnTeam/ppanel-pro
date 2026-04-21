@@ -9,6 +9,7 @@ import (
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/user/v1"
 	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
+	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
 
 // UserSubscribeService 用户订阅服务
@@ -33,6 +34,14 @@ func parseInt64Helper(s string) int64 {
 	return val
 }
 
+func parseStringInt64Helper(s string) (int64, error) {
+	val, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return val, nil
+}
+
 // GetUserSubscribe 获取用户订阅列表
 func (s *UserSubscribeService) GetUserSubscribe(ctx context.Context, req *v1.GetUserSubscribeRequest) (*v1.GetUserSubscribeReply, error) {
 	list, total, err := s.uc.GetUserSubscribe(ctx, req)
@@ -44,30 +53,30 @@ func (s *UserSubscribeService) GetUserSubscribe(ctx context.Context, req *v1.Get
 	protoList := make([]*v1.UserSubscribe, 0, len(list))
 	for _, item := range list {
 		protoItem := &v1.UserSubscribe{
-			Id:          strconv.FormatInt(item.ID, 10),
-			UserId:      strconv.FormatInt(item.UserID, 10),
-			OrderId:     strconv.FormatInt(item.OrderID, 10),
-			SubscribeId: strconv.FormatInt(item.SubscribeID, 10),
-			StartTime:   strconv.FormatInt(item.StartTime.UnixMilli(), 10),
-			CreatedAt:   strconv.FormatInt(item.CreatedAt.UnixMilli(), 10),
-			UpdatedAt:   strconv.FormatInt(item.UpdatedAt.UnixMilli(), 10),
+			Id:          strconv.FormatInt(int64(item.ID), 10),
+			UserId:      strconv.FormatInt(int64(item.UserID), 10),
+			OrderId:     int64(item.OrderID),
+			SubscribeId: strconv.FormatInt(int64(item.SubscribeID), 10),
+			StartTime:   item.StartTime.UnixMilli(),
+			CreatedAt:   item.CreatedAt.UnixMilli(),
+			UpdatedAt:   item.UpdatedAt.UnixMilli(),
 		}
 
 		// 处理指针字段
 		if item.ExpireTime != nil {
-			protoItem.ExpireTime = strconv.FormatInt(item.ExpireTime.UnixMilli(), 10)
+			protoItem.ExpireTime = item.ExpireTime.UnixMilli()
 		}
 		if item.FinishedAt != nil {
-			protoItem.FinishedAt = strconv.FormatInt(item.FinishedAt.UnixMilli(), 10)
+			protoItem.FinishedAt = item.FinishedAt.UnixMilli()
 		}
 		if item.Traffic != nil {
-			protoItem.Traffic = strconv.FormatInt(int64(*item.Traffic), 10)
+			protoItem.Traffic = int64(*item.Traffic)
 		}
 		if item.Download != nil {
-			protoItem.Download = strconv.FormatInt(int64(*item.Download), 10)
+			protoItem.Download = int64(*item.Download)
 		}
 		if item.Upload != nil {
-			protoItem.Upload = strconv.FormatInt(int64(*item.Upload), 10)
+			protoItem.Upload = int64(*item.Upload)
 		}
 		if item.Token != nil {
 			protoItem.Token = *item.Token
@@ -83,7 +92,7 @@ func (s *UserSubscribeService) GetUserSubscribe(ctx context.Context, req *v1.Get
 	}
 
 	return &v1.GetUserSubscribeReply{
-		Total: strconv.FormatInt(total, 10),
+		Total: total,
 		List:  protoList,
 	}, nil
 }
@@ -112,7 +121,12 @@ func (s *UserSubscribeService) UpdateUserSubscribe(ctx context.Context, req *v1.
 
 // DeleteUserSubscribe 删除用户订阅
 func (s *UserSubscribeService) DeleteUserSubscribe(ctx context.Context, req *v1.DeleteUserSubscribeRequest) (*v1.DeleteUserSubscribeReply, error) {
-	err := s.uc.DeleteUserSubscribe(ctx, parseInt64Helper(req.Id))
+	id, err := parseStringInt64Helper(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.DeleteUserSubscribe(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +136,12 @@ func (s *UserSubscribeService) DeleteUserSubscribe(ctx context.Context, req *v1.
 
 // GetUserSubscribeById 根据ID获取用户订阅详情
 func (s *UserSubscribeService) GetUserSubscribeById(ctx context.Context, req *v1.GetUserSubscribeByIdRequest) (*v1.GetUserSubscribeByIdReply, error) {
-	subscribe, subscribeName, err := s.uc.GetUserSubscribeById(ctx, parseInt64Helper(req.Id))
+	id, err := parseStringInt64Helper(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	subscribe, subscribeName, err := s.uc.GetUserSubscribeById(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -151,8 +170,8 @@ func (s *UserSubscribeService) GetUserSubscribeDevices(ctx context.Context, req 
 			UserId:    strconv.FormatInt(int64(item.UserID), 10),
 			Online:    item.Online,
 			Enabled:   item.Enabled,
-			CreatedAt: strconv.FormatInt(item.CreatedAt.UnixMilli(), 10),
-			UpdatedAt: strconv.FormatInt(item.UpdatedAt.UnixMilli(), 10),
+			CreatedAt: item.CreatedAt.UnixMilli(),
+			UpdatedAt: item.UpdatedAt.UnixMilli(),
 		}
 
 		// 处理指针字段
@@ -192,14 +211,14 @@ func (s *UserSubscribeService) GetUserSubscribeLogs(ctx context.Context, req *v1
 			UserId:          "", // 当前实现保持简化，与原项目数据结构一致
 			UserSubscribeId: strconv.FormatInt(int64(item.ObjectID), 10),
 			Content:         item.Content, // 返回原始JSON内容
-			Timestamp:       strconv.FormatInt(item.CreatedAt.UnixMilli(), 10),
+			Timestamp:       item.CreatedAt.UnixMilli(),
 		}
 
 		protoList = append(protoList, protoItem)
 	}
 
 	return &v1.GetUserSubscribeLogsReply{
-		Total: strconv.FormatInt(total, 10),
+		Total: total,
 		List:  protoList,
 	}, nil
 }
@@ -219,14 +238,14 @@ func (s *UserSubscribeService) GetUserSubscribeResetTrafficLogs(ctx context.Cont
 			UserId:          "", // 当前实现保持简化，与原项目数据结构一致
 			UserSubscribeId: strconv.FormatInt(int64(item.ObjectID), 10),
 			Content:         item.Content, // 返回原始JSON内容
-			Timestamp:       strconv.FormatInt(item.CreatedAt.UnixMilli(), 10),
+			Timestamp:       item.CreatedAt.UnixMilli(),
 		}
 
 		protoList = append(protoList, protoItem)
 	}
 
 	return &v1.GetUserSubscribeResetTrafficLogsReply{
-		Total: strconv.FormatInt(total, 10),
+		Total: total,
 		List:  protoList,
 	}, nil
 }
@@ -257,14 +276,14 @@ func (s *UserSubscribeService) GetUserSubscribeTrafficLogs(ctx context.Context, 
 			UserId:          strconv.FormatInt(int64(item.UserID), 10),
 			UserSubscribeId: "", // traffic_log表中只有subscribe_id，需要关联查询得到user_subscribe_id
 			Content:         content,
-			Timestamp:       strconv.FormatInt(item.Timestamp.UnixMilli(), 10),
+			Timestamp:       item.Timestamp.UnixMilli(),
 		}
 
 		protoList = append(protoList, protoItem)
 	}
 
 	return &v1.GetUserSubscribeTrafficLogsReply{
-		Total: strconv.FormatInt(total, 10),
+		Total: total,
 		List:  protoList,
 	}, nil
 }

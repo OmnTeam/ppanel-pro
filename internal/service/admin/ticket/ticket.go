@@ -9,16 +9,6 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
 
-// Helper functions for type conversion
-func parseInt64(s string) int64 {
-	val, _ := strconv.ParseInt(s, 10, 64)
-	return val
-}
-
-func formatInt64(i int64) string {
-	return strconv.FormatInt(i, 10)
-}
-
 type TicketService struct {
 	pb.UnimplementedTicketServer
 	uc *ticketbiz.TicketUseCase
@@ -28,9 +18,26 @@ func NewTicketService(uc *ticketbiz.TicketUseCase) *TicketService {
 	return &TicketService{uc: uc}
 }
 
+func parseStringID(s string) (int64, error) {
+	id, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return id, nil
+}
+
+func formatInt64(i int64) string {
+	return strconv.FormatInt(i, 10)
+}
+
 // UpdateTicketStatus 更新工单状态
 func (s *TicketService) UpdateTicketStatus(ctx context.Context, req *pb.UpdateTicketStatusRequest) (*pb.UpdateTicketStatusReply, error) {
-	err := s.uc.UpdateTicketStatus(ctx, int(parseInt64(req.Id)), int8(req.Status))
+	id, err := parseStringID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.UpdateTicketStatus(ctx, int(id), int8(req.Status))
 	if err != nil {
 		return nil, err
 	}
@@ -43,12 +50,16 @@ func (s *TicketService) UpdateTicketStatus(ctx context.Context, req *pb.UpdateTi
 
 // GetTicket 获取工单详情
 func (s *TicketService) GetTicket(ctx context.Context, req *pb.GetTicketRequest) (*pb.GetTicketReply, error) {
-	ticket, err := s.uc.GetTicket(ctx, int(parseInt64(req.Id)))
+	id, err := parseStringID(req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	// 转换为proto格式
+	ticket, err := s.uc.GetTicket(ctx, int(id))
+	if err != nil {
+		return nil, err
+	}
+
 	return &pb.GetTicketReply{
 		Code:    int32(responsecode.AdminGetTicketSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetTicketSuccess],
@@ -59,7 +70,7 @@ func (s *TicketService) GetTicket(ctx context.Context, req *pb.GetTicketRequest)
 // CreateTicketFollow 创建工单跟进
 func (s *TicketService) CreateTicketFollow(ctx context.Context, req *pb.CreateTicketFollowRequest) (*pb.CreateTicketFollowReply, error) {
 	follow := &ticketbiz.Follow{
-		TicketId: parseInt64(req.TicketId),
+		TicketId: req.TicketId,
 		From:     req.From,
 		Type:     int8(req.Type),
 		Content:  req.Content,
@@ -78,7 +89,6 @@ func (s *TicketService) CreateTicketFollow(ctx context.Context, req *pb.CreateTi
 
 // GetTicketList 获取工单列表
 func (s *TicketService) GetTicketList(ctx context.Context, req *pb.GetTicketListRequest) (*pb.GetTicketListReply, error) {
-	// 处理可选参数
 	var status *int8
 	if req.Status != 0 {
 		s := int8(req.Status)
@@ -94,12 +104,20 @@ func (s *TicketService) GetTicketList(ctx context.Context, req *pb.GetTicketList
 		size = 10
 	}
 
-	total, list, err := s.uc.GetTicketList(ctx, page, size, parseInt64(req.UserId), status, req.Search)
+	var userID int64
+	var err error
+	if req.UserId != "" {
+		userID, err = parseStringID(req.UserId)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	total, list, err := s.uc.GetTicketList(ctx, page, size, userID, status, req.Search)
 	if err != nil {
 		return nil, err
 	}
 
-	// 转换为proto格式
 	tickets := make([]*pb.TicketInfo, 0, len(list))
 	for _, ticket := range list {
 		tickets = append(tickets, s.convertTicketToProto(ticket))
@@ -109,7 +127,7 @@ func (s *TicketService) GetTicketList(ctx context.Context, req *pb.GetTicketList
 		Code:    int32(responsecode.AdminGetTicketListSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetTicketListSuccess],
 		Data: &pb.GetTicketListData{
-			Total: int32(total),
+			Total: total,
 			List:  tickets,
 		},
 	}, nil
@@ -120,23 +138,23 @@ func (s *TicketService) convertTicketToProto(ticket *ticketbiz.Ticket) *pb.Ticke
 	follows := make([]*pb.TicketFollow, 0, len(ticket.Follow))
 	for _, f := range ticket.Follow {
 		follows = append(follows, &pb.TicketFollow{
-			Id:        formatInt64(int64(f.Id)),
-			TicketId:  formatInt64(int64(f.TicketId)),
+			Id:        formatInt64(f.Id),
+			TicketId:  f.TicketId,
 			From:      f.From,
 			Type:      int32(f.Type),
 			Content:   f.Content,
-			CreatedAt: formatInt64(int64(f.CreatedAt)), // Already Unix milliseconds
+			CreatedAt: int64(f.CreatedAt),
 		})
 	}
 
 	return &pb.TicketInfo{
-		Id:          formatInt64(int64(ticket.Id)),
+		Id:          formatInt64(ticket.Id),
 		Title:       ticket.Title,
 		Description: ticket.Description,
-		UserId:      formatInt64(int64(ticket.UserId)),
+		UserId:      formatInt64(ticket.UserId),
 		Follow:      follows,
 		Status:      int32(ticket.Status),
-		CreatedAt:   formatInt64(int64(ticket.CreatedAt)), // Already Unix milliseconds
-		UpdatedAt:   formatInt64(int64(ticket.UpdatedAt)), // Already Unix milliseconds
+		CreatedAt:   int64(ticket.CreatedAt),
+		UpdatedAt:   int64(ticket.UpdatedAt),
 	}
 }

@@ -3,6 +3,7 @@ package group
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/group/v1"
 	"github.com/OmnTeam/ppanel-pro/ent"
@@ -47,6 +48,14 @@ func NewGroupUseCase(repo GroupRepo, logger log.Logger) *GroupUseCase {
 	}
 }
 
+func parseStringID(id string) (int64, error) {
+	v, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return v, nil
+}
+
 // CreateNodeGroup creates node group
 func (uc *GroupUseCase) CreateNodeGroup(ctx context.Context, req *v1.CreateNodeGroupRequest) (int64, error) {
 	if req.Name == "" {
@@ -64,11 +73,12 @@ func (uc *GroupUseCase) CreateNodeGroup(ctx context.Context, req *v1.CreateNodeG
 
 // UpdateNodeGroup updates node group
 func (uc *GroupUseCase) UpdateNodeGroup(ctx context.Context, req *v1.UpdateNodeGroupRequest) error {
-	if req.Id <= 0 {
+	id, err := parseStringID(req.Id)
+	if err != nil || id <= 0 {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	err := uc.repo.UpdateNodeGroup(ctx, req)
+	err = uc.repo.UpdateNodeGroup(ctx, req)
 	if err != nil {
 		uc.log.Errorf("Failed to update node group: %v", err)
 		return err
@@ -115,15 +125,10 @@ func (uc *GroupUseCase) GetGroupConfig(ctx context.Context) (*v1.GroupConfig, *v
 		return nil, nil, err
 	}
 
-	// Get recalculation status
 	state, err := uc.repo.GetRecalculationStatus(ctx)
 	if err != nil {
 		uc.log.Warnf("Failed to get recalculation status: %v", err)
-		state = &v1.RecalculationState{
-			State:    "idle",
-			Progress: 0,
-			Total:    0,
-		}
+		state = &v1.RecalculationState{State: "idle", Progress: 0, Total: 0}
 	}
 
 	return config, state, nil
@@ -144,7 +149,7 @@ func (uc *GroupUseCase) UpdateGroupConfig(ctx context.Context, req *v1.UpdateGro
 func (uc *GroupUseCase) RecalculateGroup(ctx context.Context, req *v1.RecalculateGroupRequest) (int64, error) {
 	triggerType := req.TriggerType
 	if triggerType == "" {
-		triggerType = "manual" // 默认为手动触发
+		triggerType = "manual"
 	}
 
 	historyId, err := uc.repo.RecalculateGroup(ctx, req.Mode, triggerType)
@@ -184,11 +189,12 @@ func (uc *GroupUseCase) GetGroupHistory(ctx context.Context, req *v1.GetGroupHis
 
 // PreviewUserNodes previews user nodes
 func (uc *GroupUseCase) PreviewUserNodes(ctx context.Context, req *v1.PreviewUserNodesRequest) ([]*ent.ProxyNode, int64, error) {
-	if req.UserId <= 0 {
-		return nil, 0, nil
+	userID, err := parseStringID(req.UserId)
+	if err != nil || userID <= 0 {
+		return nil, 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	nodes, nodeGroupId, err := uc.repo.PreviewUserNodes(ctx, req.UserId)
+	nodes, nodeGroupId, err := uc.repo.PreviewUserNodes(ctx, userID)
 	if err != nil {
 		uc.log.Errorf("Failed to preview user nodes: %v", err)
 		return nil, 0, err
@@ -213,7 +219,6 @@ func (uc *GroupUseCase) GetGroupHistoryDetail(ctx context.Context, historyID int
 }
 
 // MigrateUsers migrates users from one group to another (已废弃 - UserGroup已移除)
-// 此方法保留是为了API兼容，但总是返回错误
 func (uc *GroupUseCase) MigrateUsers(ctx context.Context, fromGroupID, toGroupID int64, includeLocked bool) (successCount, failedCount int32, err error) {
 	uc.log.Warnf("MigrateUsers is deprecated: UserGroup has been removed")
 	return 0, 0, fmt.Errorf("UserGroup feature has been removed, please use RecalculateGroup instead")

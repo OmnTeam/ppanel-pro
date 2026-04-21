@@ -12,14 +12,16 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 )
 
-// Helper functions for type conversion
-func parseInt64(s string) int64 {
-	val, _ := strconv.ParseInt(s, 10, 64)
-	return val
-}
-
 func formatInt64(i int64) string {
 	return strconv.FormatInt(i, 10)
+}
+
+func parseStringID(s string) (int, error) {
+	val, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return int(val), nil
 }
 
 // MarketingService 营销服务
@@ -104,18 +106,18 @@ func (s *MarketingService) GetBatchSendEmailTaskList(ctx context.Context, req *v
 			Content:           contentInfo.Content,
 			Recipients:        strings.Join(scopeInfo.Recipients, "\n"),
 			Scope:             int32(scopeInfo.Type),
-			RegisterStartTime: int32(scopeInfo.RegisterStartTime),
-			RegisterEndTime:   int32(scopeInfo.RegisterEndTime),
+			RegisterStartTime: scopeInfo.RegisterStartTime,
+			RegisterEndTime:   scopeInfo.RegisterEndTime,
 			Additional:        strings.Join(scopeInfo.Additional, "\n"),
-			Scheduled:         int32(scopeInfo.Scheduled),
+			Scheduled:         int64(scopeInfo.Scheduled),
 			Interval:          int32(scopeInfo.Interval),
-			Limit:             int32(scopeInfo.Limit),
+			Limit:             int64(scopeInfo.Limit),
 			Status:            int32(task.Status),
 			Errors:            task.Errors,
-			Total:             int32(task.Total),
-			Current:           int32(task.Current),
-			CreatedAt:         strconv.FormatInt(task.CreatedAt.UnixMilli(), 10),
-			UpdatedAt:         strconv.FormatInt(task.UpdatedAt.UnixMilli(), 10),
+			Total:             int64(task.Total),
+			Current:           int64(task.Current),
+			CreatedAt:         task.CreatedAt.UnixMilli(),
+			UpdatedAt:         task.UpdatedAt.UnixMilli(),
 		})
 	}
 
@@ -123,7 +125,7 @@ func (s *MarketingService) GetBatchSendEmailTaskList(ctx context.Context, req *v
 		Code:    int32(responsecode.AdminGetBatchSendEmailTaskListSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetBatchSendEmailTaskListSuccess],
 		Data: &v1.GetBatchSendEmailTaskListData{
-			Total: int32(total),
+			Total: total,
 			List:  list,
 		},
 	}, nil
@@ -135,7 +137,12 @@ func (s *MarketingService) StopBatchSendEmailTask(ctx context.Context, req *v1.S
 		return nil, responsecode.ErrInvalidParam()
 	}
 
-	err := s.uc.StopBatchSendEmailTask(ctx, int(parseInt64(req.Id)))
+	id, err := parseStringID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.StopBatchSendEmailTask(ctx, id)
 	if err != nil {
 		s.log.Errorw("msg", "stop batch send email task failed", "error", err)
 		return nil, responsecode.ErrTaskUpdateFailed()
@@ -162,7 +169,7 @@ func (s *MarketingService) GetPreSendEmailCount(ctx context.Context, req *v1.Get
 		Code:    int32(responsecode.AdminGetPreSendEmailCountSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetPreSendEmailCountSuccess],
 		Data: &v1.GetPreSendEmailCountData{
-			Count: int32(count),
+			Count: count,
 		},
 	}, nil
 }
@@ -173,7 +180,12 @@ func (s *MarketingService) GetBatchSendEmailTaskStatus(ctx context.Context, req 
 		return nil, responsecode.ErrInvalidParam()
 	}
 
-	task, err := s.uc.GetBatchSendEmailTaskStatus(ctx, int(parseInt64(req.Id)))
+	id, err := parseStringID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	task, err := s.uc.GetBatchSendEmailTaskStatus(ctx, id)
 	if err != nil {
 		s.log.Errorw("msg", "get batch send email task status failed", "error", err)
 		return nil, responsecode.ErrTaskQueryFailed()
@@ -184,8 +196,8 @@ func (s *MarketingService) GetBatchSendEmailTaskStatus(ctx context.Context, req 
 		Message: responsecode.CodeMessages[responsecode.AdminGetBatchSendEmailTaskStatusSuccess],
 		Data: &v1.GetBatchSendEmailTaskStatusData{
 			Status:  int32(task.Status),
-			Current: int32(task.Current),
-			Total:   int32(task.Total),
+			Current: int64(task.Current),
+			Total:   int64(task.Total),
 			Errors:  task.Errors,
 		},
 	}, nil
@@ -207,7 +219,7 @@ func (s *MarketingService) CreateQuotaTask(ctx context.Context, req *v1.CreateQu
 	}
 
 	err := s.uc.CreateQuotaTask(ctx, subscribersInt, isActive,
-		parseInt64(req.StartTime), int64(req.EndTime), req.ResetTraffic, int64(req.Days), req.GiftType, int(req.GiftValue))
+		req.StartTime, req.EndTime, req.ResetTraffic, req.Days, req.GiftType, int(req.GiftValue))
 	if err != nil {
 		s.log.Errorw("msg", "create quota task failed", "error", err)
 		return nil, responsecode.ErrTaskCreateFailed()
@@ -235,7 +247,7 @@ func (s *MarketingService) QueryQuotaTaskPreCount(ctx context.Context, req *v1.Q
 		subscribersInt[i] = int(v)
 	}
 
-	count, err := s.uc.QueryQuotaTaskPreCount(ctx, subscribersInt, isActive, int(parseInt64(req.StartTime)), int(req.EndTime))
+	count, err := s.uc.QueryQuotaTaskPreCount(ctx, subscribersInt, isActive, int(req.StartTime), int(req.EndTime))
 	if err != nil {
 		s.log.Errorw("msg", "query quota task pre count failed", "error", err)
 		return nil, responsecode.ErrTaskQueryFailed()
@@ -245,7 +257,7 @@ func (s *MarketingService) QueryQuotaTaskPreCount(ctx context.Context, req *v1.Q
 		Code:    int32(responsecode.AdminQueryQuotaTaskPreCountSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminQueryQuotaTaskPreCountSuccess],
 		Data: &v1.QueryQuotaTaskPreCountData{
-			Count: int32(count),
+			Count: count,
 		},
 	}, nil
 }
@@ -280,33 +292,23 @@ func (s *MarketingService) QueryQuotaTaskList(ctx context.Context, req *v1.Query
 			continue
 		}
 
-		// Convert []int64 to []int32 for proto
-		subscribersInt32 := make([]int32, len(scopeInfo.Subscribers))
-		for i, v := range scopeInfo.Subscribers {
-			subscribersInt32[i] = int32(v)
-		}
-		objectsInt32 := make([]int32, len(scopeInfo.Objects))
-		for i, v := range scopeInfo.Objects {
-			objectsInt32[i] = int32(v)
-		}
-
 		list = append(list, &v1.QuotaTask{
 			Id:           formatInt64(int64(task.ID)),
-			Subscribers:  subscribersInt32,
+			Subscribers:  scopeInfo.Subscribers,
 			IsActive:     scopeInfo.IsActive,
-			StartTime:    strconv.FormatInt(scopeInfo.StartTime, 10),
-			EndTime:      int32(scopeInfo.EndTime),
+			StartTime:    scopeInfo.StartTime,
+			EndTime:      scopeInfo.EndTime,
 			ResetTraffic: contentInfo.ResetTraffic,
-			Days:         int32(contentInfo.Days),
+			Days:         int64(contentInfo.Days),
 			GiftType:     int32(contentInfo.GiftType),
-			GiftValue:    int32(contentInfo.GiftValue),
-			Objects:      objectsInt32,
+			GiftValue:    int64(contentInfo.GiftValue),
+			Objects:      scopeInfo.Objects,
 			Status:       int32(task.Status),
-			Total:        int32(task.Total),
-			Current:      int32(task.Current),
+			Total:        int64(task.Total),
+			Current:      int64(task.Current),
 			Errors:       task.Errors,
-			CreatedAt:    strconv.FormatInt(task.CreatedAt.UnixMilli(), 10),
-			UpdatedAt:    strconv.FormatInt(task.UpdatedAt.UnixMilli(), 10),
+			CreatedAt:    task.CreatedAt.UnixMilli(),
+			UpdatedAt:    task.UpdatedAt.UnixMilli(),
 		})
 	}
 
@@ -314,7 +316,7 @@ func (s *MarketingService) QueryQuotaTaskList(ctx context.Context, req *v1.Query
 		Code:    int32(responsecode.AdminQueryQuotaTaskListSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminQueryQuotaTaskListSuccess],
 		Data: &v1.QueryQuotaTaskListData{
-			Total: int32(total),
+			Total: total,
 			List:  list,
 		},
 	}, nil

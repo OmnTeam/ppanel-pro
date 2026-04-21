@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	"strconv"
 	"time"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/redemption/v1"
@@ -121,9 +122,14 @@ func (r *adminRedemptionRepo) CreateRedemptionCode(ctx context.Context, req *v1.
 
 // UpdateRedemptionCode updates redemption code
 func (r *adminRedemptionRepo) UpdateRedemptionCode(ctx context.Context, req *v1.UpdateRedemptionCodeRequest) error {
+	id, err := strconv.ParseInt(req.Id, 10, 64)
+	if err != nil || id <= 0 {
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
 	// Find redemption code
 	code, err := r.data.db.ProxyRedemptionCode.Query().
-		Where(proxyredemptioncode.IDEQ(req.Id)).
+		Where(proxyredemptioncode.IDEQ(id)).
 		Only(ctx)
 
 	if err != nil {
@@ -176,9 +182,14 @@ func (r *adminRedemptionRepo) UpdateRedemptionCode(ctx context.Context, req *v1.
 
 // ToggleRedemptionCodeStatus toggles redemption code status
 func (r *adminRedemptionRepo) ToggleRedemptionCodeStatus(ctx context.Context, req *v1.ToggleRedemptionCodeStatusRequest) error {
+	id, err := strconv.ParseInt(req.Id, 10, 64)
+	if err != nil || id <= 0 {
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
 	// Find redemption code
 	code, err := r.data.db.ProxyRedemptionCode.Query().
-		Where(proxyredemptioncode.IDEQ(req.Id)).
+		Where(proxyredemptioncode.IDEQ(id)).
 		Only(ctx)
 
 	if err != nil {

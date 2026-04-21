@@ -2,6 +2,7 @@ package redemption
 
 import (
 	"context"
+	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/redemption/v1"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/redemption"
@@ -70,7 +71,12 @@ func (s *RedemptionService) ToggleRedemptionCodeStatus(ctx context.Context, req 
 
 // DeleteRedemptionCode 删除兑换码
 func (s *RedemptionService) DeleteRedemptionCode(ctx context.Context, req *v1.DeleteRedemptionCodeRequest) (*v1.DeleteRedemptionCodeReply, error) {
-	if err := s.uc.DeleteRedemptionCode(ctx, req.Id); err != nil {
+	id, err := strconv.ParseInt(req.Id, 10, 64)
+	if err != nil || id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	if err := s.uc.DeleteRedemptionCode(ctx, id); err != nil {
 		return nil, err
 	}
 
@@ -85,7 +91,16 @@ func (s *RedemptionService) DeleteRedemptionCode(ctx context.Context, req *v1.De
 
 // BatchDeleteRedemptionCode 批量删除兑换码
 func (s *RedemptionService) BatchDeleteRedemptionCode(ctx context.Context, req *v1.BatchDeleteRedemptionCodeRequest) (*v1.BatchDeleteRedemptionCodeReply, error) {
-	if err := s.uc.BatchDeleteRedemptionCode(ctx, req.Ids); err != nil {
+	ids := make([]int64, 0, len(req.Ids))
+	for _, item := range req.Ids {
+		id, err := strconv.ParseInt(item, 10, 64)
+		if err != nil || id <= 0 {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		ids = append(ids, id)
+	}
+
+	if err := s.uc.BatchDeleteRedemptionCode(ctx, ids); err != nil {
 		return nil, err
 	}
 
@@ -109,7 +124,7 @@ func (s *RedemptionService) GetRedemptionCodeList(ctx context.Context, req *v1.G
 	redemptionCodes := make([]*v1.RedemptionCode, 0, len(list))
 	for _, item := range list {
 		redemptionCodes = append(redemptionCodes, &v1.RedemptionCode{
-			Id:            item.ID,
+			Id:            strconv.FormatInt(item.ID, 10),
 			Code:          item.Code,
 			TotalCount:    item.TotalCount,
 			UsedCount:     item.UsedCount,
@@ -143,10 +158,10 @@ func (s *RedemptionService) GetRedemptionRecordList(ctx context.Context, req *v1
 	redemptionRecords := make([]*v1.RedemptionRecord, 0, len(list))
 	for _, item := range list {
 		redemptionRecords = append(redemptionRecords, &v1.RedemptionRecord{
-			Id:               item.ID,
+			Id:               strconv.FormatInt(item.ID, 10),
 			RedemptionCodeId: item.RedemptionCodeID,
-			UserId:           item.UserID,
-			SubscribeId:      item.SubscribeID,
+			UserId:           strconv.FormatInt(item.UserID, 10),
+			SubscribeId:      strconv.FormatInt(item.SubscribeID, 10),
 			UnitTime:         item.UnitTime,
 			Quantity:         item.Quantity,
 			RedeemedAt:       item.RedeemedAt.Unix(),

@@ -2,6 +2,8 @@ package application
 
 import (
 	"context"
+	"strconv"
+	"strings"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -10,6 +12,14 @@ import (
 	applicationbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/application"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
+
+func parseApplicationID(s string) (int64, error) {
+	val, err := strconv.ParseInt(strings.TrimSpace(s), 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return val, nil
+}
 
 // SubscribeApplicationService 订阅应用配置服务
 type SubscribeApplicationService struct {
@@ -76,9 +86,13 @@ func (s *SubscribeApplicationService) UpdateSubscribeApplication(ctx context.Con
 	icon := req.Icon
 	description := req.Description
 	template := req.SubscribeTemplate
+	id, err := parseApplicationID(req.Id)
+	if err != nil {
+		return nil, err
+	}
 
 	app := &applicationbiz.SubscribeApplication{
-		ID:                req.Id,
+		ID:                id,
 		Name:              req.Name,
 		Icon:              &icon,
 		Description:       &description,
@@ -106,7 +120,12 @@ func (s *SubscribeApplicationService) UpdateSubscribeApplication(ctx context.Con
 
 // DeleteSubscribeApplication 删除订阅应用配置
 func (s *SubscribeApplicationService) DeleteSubscribeApplication(ctx context.Context, req *v1.DeleteSubscribeApplicationRequest) (*v1.DeleteSubscribeApplicationReply, error) {
-	err := s.uc.DeleteSubscribeApplication(ctx, req.Id)
+	id, err := parseApplicationID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.uc.DeleteSubscribeApplication(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +177,12 @@ func (s *SubscribeApplicationService) GetSubscribeApplicationList(ctx context.Co
 
 // PreviewSubscribeTemplate 预览订阅模板
 func (s *SubscribeApplicationService) PreviewSubscribeTemplate(ctx context.Context, req *v1.PreviewSubscribeTemplateRequest) (*v1.PreviewSubscribeTemplateReply, error) {
-	template, err := s.uc.PreviewSubscribeTemplate(ctx, req.Id)
+	id, err := parseApplicationID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	template, err := s.uc.PreviewSubscribeTemplate(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +199,7 @@ func (s *SubscribeApplicationService) PreviewSubscribeTemplate(ctx context.Conte
 // convertToProto 将业务模型转换为protobuf消息
 func (s *SubscribeApplicationService) convertToProto(app *applicationbiz.SubscribeApplication, downloadLink *v1.DownloadLink) *v1.SubscribeApplication {
 	result := &v1.SubscribeApplication{
-		Id:           app.ID,
+		Id:           strconv.FormatInt(app.ID, 10),
 		Name:         app.Name,
 		Scheme:       app.Scheme,
 		UserAgent:    app.UserAgent,

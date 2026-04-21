@@ -16,6 +16,14 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
 
+func parseStringInt64(s string) (int64, error) {
+	val, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return val, nil
+}
+
 // UserService 用户服务
 type UserService struct {
 	v1.UnimplementedUserServiceServer
@@ -81,7 +89,7 @@ func (s *UserService) BatchDeleteUser(ctx context.Context, req *v1.BatchDeleteUs
 		Code:    responsecode.AdminBatchDeleteUserSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminBatchDeleteUserSuccess],
 		Data: &v1.BatchDeleteUserData{
-			DeletedCount: strconv.FormatInt(int64(deletedCount), 10),
+			DeletedCount: deletedCount,
 		},
 	}, nil
 }
@@ -137,15 +145,24 @@ func (s *UserService) GetUserList(ctx context.Context, req *v1.GetUserListReques
 
 	var userID, subscribeID, userSubscribeID *int64
 	if req.UserId != "" {
-		parsedID := parseInt64(req.UserId)
+		parsedID, err := parseStringInt64(req.UserId)
+		if err != nil {
+			return nil, err
+		}
 		userID = &parsedID
 	}
 	if req.SubscribeId != "" {
-		parsedID := parseInt64(req.SubscribeId)
+		parsedID, err := parseStringInt64(req.SubscribeId)
+		if err != nil {
+			return nil, err
+		}
 		subscribeID = &parsedID
 	}
 	if req.UserSubscribeId != "" {
-		parsedID := parseInt64(req.UserSubscribeId)
+		parsedID, err := parseStringInt64(req.UserSubscribeId)
+		if err != nil {
+			return nil, err
+		}
 		userSubscribeID = &parsedID
 	}
 
@@ -168,7 +185,7 @@ func (s *UserService) GetUserList(ctx context.Context, req *v1.GetUserListReques
 		Code:    responsecode.AdminGetUserListSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminGetUserListSuccess],
 		Data: &v1.GetUserListData{
-			Total: strconv.FormatInt(total, 10),
+			Total: total,
 			List:  protoUsers,
 		},
 	}, nil
@@ -205,7 +222,10 @@ func (s *UserService) GetUserLoginLogs(ctx context.Context, req *v1.GetUserLogin
 
 	var userID *int64
 	if req.UserId != "" {
-		parsedID := parseInt64(req.UserId)
+		parsedID, err := parseStringInt64(req.UserId)
+		if err != nil {
+			return nil, err
+		}
 		userID = &parsedID
 	}
 
@@ -230,7 +250,7 @@ func (s *UserService) GetUserLoginLogs(ctx context.Context, req *v1.GetUserLogin
 			LoginIp:   loginLog.LoginIP,
 			UserAgent: loginLog.UserAgent,
 			Success:   loginLog.Success,
-			Timestamp: strconv.FormatInt(loginLog.Timestamp, 10),
+			Timestamp: loginLog.Timestamp,
 		}
 
 		protoLogs = append(protoLogs, protoLog)
@@ -240,7 +260,7 @@ func (s *UserService) GetUserLoginLogs(ctx context.Context, req *v1.GetUserLogin
 		Code:    responsecode.AdminGetUserLoginLogsSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminGetUserLoginLogsSuccess],
 		Data: &v1.GetUserLoginLogsData{
-			Total: strconv.FormatInt(total, 10),
+			Total: total,
 			List:  protoLogs,
 		},
 	}, nil
@@ -330,31 +350,31 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 			UserAgent:   userAgent,
 			Online:      ud.Online,
 			Enabled:     ud.Enabled,
-			CreatedAt:   strconv.FormatInt(ud.CreatedAt.UnixMilli(), 10),
-			UpdatedAt:   strconv.FormatInt(ud.UpdatedAt.UnixMilli(), 10),
+			CreatedAt:   ud.CreatedAt.UnixMilli(),
+			UpdatedAt:   ud.UpdatedAt.UnixMilli(),
 		})
 	}
 
 	// 处理指针字段
-	balance := "0"
+	var balance int64
 	if user.Balance != nil {
-		balance = strconv.FormatInt(int64(*user.Balance), 10)
+		balance = int64(*user.Balance)
 	}
 	referCode := ""
 	if user.ReferCode != nil {
 		referCode = *user.ReferCode
 	}
-	refererID := ""
+	var refererID int64
 	if user.RefererID != nil {
-		refererID = strconv.FormatInt(int64(*user.RefererID), 10)
+		refererID = int64(*user.RefererID)
 	}
-	commission := "0"
+	var commission int64
 	if user.Commission != nil {
-		commission = strconv.FormatInt(int64(*user.Commission), 10)
+		commission = int64(*user.Commission)
 	}
-	giftAmount := "0"
+	var giftAmount int64
 	if user.GiftAmount != nil {
-		giftAmount = strconv.FormatInt(int64(*user.GiftAmount), 10)
+		giftAmount = int64(*user.GiftAmount)
 	}
 	avatar := ""
 	if user.Avatar != nil {
@@ -380,9 +400,9 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 		EnableSubscribeNotify: user.EnableSubscribeNotify,
 		EnableTradeNotify:     user.EnableTradeNotify,
 		Avatar:                avatar,
-		CreatedAt:             strconv.FormatInt(user.CreatedAt.UnixMilli(), 10),
-		UpdatedAt:             strconv.FormatInt(user.UpdatedAt.UnixMilli(), 10),
-		Telegram:              strconv.FormatInt(telegram, 10),
+		CreatedAt:             user.CreatedAt.UnixMilli(),
+		UpdatedAt:             user.UpdatedAt.UnixMilli(),
+		Telegram:              telegram,
 		AuthMethods:           protoAuthMethods,
 		UserDevices:           protoUserDevices,
 	}

@@ -2,6 +2,7 @@ package redemption
 
 import (
 	"context"
+	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/redemption/v1"
 	"github.com/OmnTeam/ppanel-pro/ent"
@@ -85,8 +86,9 @@ func (uc *RedemptionUseCase) CreateRedemptionCode(ctx context.Context, req *v1.C
 // UpdateRedemptionCode updates redemption code
 func (uc *RedemptionUseCase) UpdateRedemptionCode(ctx context.Context, req *v1.UpdateRedemptionCodeRequest) error {
 	// Validate request parameters
-	if req.Id <= 0 {
-		return responsecode.NewKratosError(responsecode.ErrInvalidParams)
+	id, err := strconv.ParseInt(req.Id, 10, 64)
+	if err != nil || id <= 0 {
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	// Validate unit_time if provided
@@ -109,7 +111,7 @@ func (uc *RedemptionUseCase) UpdateRedemptionCode(ctx context.Context, req *v1.U
 	}
 
 	// Call repository to update redemption code
-	err := uc.repo.UpdateRedemptionCode(ctx, req)
+	err = uc.repo.UpdateRedemptionCode(ctx, req)
 	if err != nil {
 		uc.log.Errorf("Failed to update redemption code: %v", err)
 		return err
@@ -121,8 +123,9 @@ func (uc *RedemptionUseCase) UpdateRedemptionCode(ctx context.Context, req *v1.U
 // ToggleRedemptionCodeStatus toggles redemption code status
 func (uc *RedemptionUseCase) ToggleRedemptionCodeStatus(ctx context.Context, req *v1.ToggleRedemptionCodeStatusRequest) error {
 	// Validate request parameters
-	if req.Id <= 0 {
-		return responsecode.NewKratosError(responsecode.ErrInvalidParams)
+	id, err := strconv.ParseInt(req.Id, 10, 64)
+	if err != nil || id <= 0 {
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	if req.Status != 0 && req.Status != 1 {
@@ -130,7 +133,7 @@ func (uc *RedemptionUseCase) ToggleRedemptionCodeStatus(ctx context.Context, req
 	}
 
 	// Call repository to toggle status
-	err := uc.repo.ToggleRedemptionCodeStatus(ctx, req)
+	err = uc.repo.ToggleRedemptionCodeStatus(ctx, req)
 	if err != nil {
 		uc.log.Errorf("Failed to toggle redemption code status: %v", err)
 		return err

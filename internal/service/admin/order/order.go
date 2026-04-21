@@ -11,6 +11,14 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
 
+func parseOrderStringInt(s string) (int, error) {
+	val, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return val, nil
+}
+
 type OrderService struct {
 	v1.UnimplementedOrderServiceServer
 
@@ -33,12 +41,21 @@ func (s *OrderService) CreateOrder(ctx context.Context, req *v1.CreateOrderReque
 	}
 
 	// 转换参数类型
-	userId, _ := strconv.Atoi(req.UserId)
-	subscribeId, _ := strconv.Atoi(req.SubscribeId)
-	paymentId, _ := strconv.Atoi(req.PaymentId)
+	userId, err := parseOrderStringInt(req.UserId)
+	if err != nil {
+		return nil, err
+	}
+	subscribeId := 0
+	if req.SubscribeId != "" {
+		subscribeId, err = parseOrderStringInt(req.SubscribeId)
+		if err != nil {
+			return nil, err
+		}
+	}
+	paymentId := int(req.PaymentId)
 
 	// 创建订单
-	err := s.uc.CreateOrder(ctx,
+	err = s.uc.CreateOrder(ctx,
 		userId,
 		req.Type,
 		int(req.Quantity),
@@ -73,11 +90,14 @@ func (s *OrderService) UpdateOrderStatus(ctx context.Context, req *v1.UpdateOrde
 	}
 
 	// 转换参数类型
-	id, _ := strconv.Atoi(req.Id)
-	paymentId, _ := strconv.Atoi(req.PaymentId)
+	id, err := parseOrderStringInt(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	paymentId := int(req.PaymentId)
 
 	// 更新订单状态
-	err := s.uc.UpdateOrderStatus(ctx, id, req.Status, paymentId, req.TradeNo)
+	err = s.uc.UpdateOrderStatus(ctx, id, req.Status, paymentId, req.TradeNo)
 	if err != nil {
 		s.log.Errorw("msg", "update order status failed", "error", err)
 		return nil, responsecode.ErrOrderUpdateFailed()
@@ -100,8 +120,21 @@ func (s *OrderService) GetOrderList(ctx context.Context, req *v1.GetOrderListReq
 	}
 
 	// 转换参数类型
-	userId, _ := strconv.Atoi(req.UserId)
-	subscribeId, _ := strconv.Atoi(req.SubscribeId)
+	var err error
+	userId := 0
+	if req.UserId != "" {
+		userId, err = parseOrderStringInt(req.UserId)
+		if err != nil {
+			return nil, err
+		}
+	}
+	subscribeId := 0
+	if req.SubscribeId != "" {
+		subscribeId, err = parseOrderStringInt(req.SubscribeId)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	// 获取订单列表
 	list, total, err := s.uc.GetOrderList(ctx, int(req.Page), int(req.Size), userId, req.Status, subscribeId, req.Search)
@@ -119,24 +152,24 @@ func (s *OrderService) GetOrderList(ctx context.Context, req *v1.GetOrderListReq
 			UserId:         strconv.Itoa(int(o.UserID)),
 			OrderNo:        o.OrderNo,
 			Type:           int32(o.Type),
-			Quantity:       int32(o.Quantity),
-			Price:          int32(o.Price),
-			Amount:         int32(o.Amount),
+			Quantity:       int64(o.Quantity),
+			Price:          int64(o.Price),
+			Amount:         int64(o.Amount),
 			GiftAmount:     0, // Field doesn't exist in schema
-			Discount:       int32(o.Discount),
+			Discount:       int64(o.Discount),
 			Coupon:         o.Coupon,
-			CouponDiscount: int32(o.CouponDiscount),
-			Commission:     int32(o.Commission),
-			PaymentId:      strconv.Itoa(int(o.PaymentID)),
+			CouponDiscount: int64(o.CouponDiscount),
+			Commission:     int64(o.Commission),
+			PaymentId:      int64(o.PaymentID),
 			Method:         o.Method,
-			FeeAmount:      int32(o.FeeAmount),
+			FeeAmount:      int64(o.FeeAmount),
 			TradeNo:        o.TradeNo,
 			Status:         int32(o.Status),
 			SubscribeId:    strconv.Itoa(int(o.SubscribeID)),
 			SubscribeToken: "",    // Field doesn't exist in schema
 			IsNew:          false, // Field doesn't exist in schema
-			CreatedAt:      strconv.FormatInt(o.CreatedAt.UnixMilli(), 10),
-			UpdatedAt:      strconv.FormatInt(o.UpdatedAt.UnixMilli(), 10),
+			CreatedAt:      o.CreatedAt.UnixMilli(),
+			UpdatedAt:      o.UpdatedAt.UnixMilli(),
 		}
 		items = append(items, item)
 	}
@@ -146,7 +179,7 @@ func (s *OrderService) GetOrderList(ctx context.Context, req *v1.GetOrderListReq
 		Message: responsecode.CodeMessages[responsecode.AdminGetOrderListSuccess],
 		Data: &v1.GetOrderListData{
 			List:  items,
-			Total: int32(total),
+			Total: int64(total),
 		},
 	}, nil
 }

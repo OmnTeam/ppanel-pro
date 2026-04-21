@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
-	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -16,6 +16,22 @@ import (
 )
 
 const module = "biz/admin/subscribe"
+
+func parseStringID(s string) (int, error) {
+	val, err := strconv.ParseInt(strings.TrimSpace(s), 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return int(val), nil
+}
+
+func parseStringID64(s string) (int64, error) {
+	val, err := strconv.ParseInt(strings.TrimSpace(s), 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return val, nil
+}
 
 // SubscribeUseCase subscribe use case
 type SubscribeUseCase struct {
@@ -114,7 +130,12 @@ func (uc *SubscribeUseCase) CreateSubscribe(ctx context.Context, req *v1.CreateS
 // UpdateSubscribe update subscribe
 func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateSubscribeRequest) error {
 	// Check if subscribe exists
-	_, err := uc.repo.GetSubscribeByID(ctx, int(req.Id))
+	id, err := parseStringID(req.Id)
+	if err != nil {
+		return err
+	}
+
+	_, err = uc.repo.GetSubscribeByID(ctx, id)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			uc.log.WithContext(ctx).Errorw("msg", "UpdateSubscribe subscribe not found", "error", err, "id", req.Id)
@@ -144,7 +165,7 @@ func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateS
 	nodeTagsStr := stringSliceToString(req.NodeTags)
 
 	sub := &model.Subscribe{
-		ID:             req.Id,
+		ID:             int64(id),
 		Name:           req.Name,
 		Language:       req.Language,
 		Description:    req.Description,
@@ -293,8 +314,12 @@ func (uc *SubscribeUseCase) SubscribeSort(ctx context.Context, req *v1.Subscribe
 	ids := make([]int, 0, len(req.Sort))
 	sortMap := make(map[int64]int64)
 	for i, item := range req.Sort {
-		ids = append(ids, int(item.Id))
-		sortMap[item.Id] = int64(i)
+		id, err := parseStringID(item.Id)
+		if err != nil {
+			return err
+		}
+		ids = append(ids, id)
+		sortMap[int64(id)] = int64(i)
 	}
 
 	// Get minimum sort value
@@ -355,8 +380,13 @@ func (uc *SubscribeUseCase) CreateSubscribeGroup(ctx context.Context, req *v1.Cr
 
 // UpdateSubscribeGroup update subscribe group
 func (uc *SubscribeUseCase) UpdateSubscribeGroup(ctx context.Context, req *v1.UpdateSubscribeGroupRequest) error {
+	id, err := parseStringID64(req.Id)
+	if err != nil {
+		return err
+	}
+
 	group := &model.SubscribeGroup{
-		ID:          req.Id,
+		ID:          id,
 		Name:        req.Name,
 		Description: req.Description,
 	}
@@ -405,11 +435,11 @@ func (uc *SubscribeUseCase) GetSubscribeGroupList(ctx context.Context) (*v1.GetS
 			desc = *group.Description
 		}
 		groups = append(groups, &v1.SubscribeGroupInfo{
-			Id:          int64(group.ID),
+			Id:          strconv.FormatInt(int64(group.ID), 10),
 			Name:        group.Name,
 			Description: desc,
-			CreatedAt:   group.CreatedAt.Format(time.RFC3339),
-			UpdatedAt:   group.UpdatedAt.Format(time.RFC3339),
+			CreatedAt:   group.CreatedAt.Unix(),
+			UpdatedAt:   group.UpdatedAt.Unix(),
 		})
 	}
 
@@ -528,7 +558,7 @@ func convertSubscribeToProto(sub *ent.ProxySubscribe) *v1.SubscribeInfo {
 	renewalReset := sub.RenewalReset
 
 	return &v1.SubscribeInfo{
-		Id:             int64(sub.ID),
+		Id:             strconv.FormatInt(int64(sub.ID), 10),
 		Name:           sub.Name,
 		Language:       sub.Language,
 		Description:    desc,
@@ -550,8 +580,8 @@ func convertSubscribeToProto(sub *ent.ProxySubscribe) *v1.SubscribeInfo {
 		AllowDeduction: allowDeduction,
 		ResetCycle:     resetCycle,
 		RenewalReset:   renewalReset,
-		CreatedAt:      sub.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:      sub.UpdatedAt.Format(time.RFC3339),
+		CreatedAt:      sub.CreatedAt.Unix(),
+		UpdatedAt:      sub.UpdatedAt.Unix(),
 	}
 }
 
@@ -577,7 +607,7 @@ func convertSubscribeToProtoItem(sub *ent.ProxySubscribe) *v1.SubscribeItem {
 	renewalReset := sub.RenewalReset
 
 	return &v1.SubscribeItem{
-		Id:             int64(sub.ID),
+		Id:             strconv.FormatInt(int64(sub.ID), 10),
 		Name:           sub.Name,
 		Language:       sub.Language,
 		Description:    desc,
@@ -599,8 +629,8 @@ func convertSubscribeToProtoItem(sub *ent.ProxySubscribe) *v1.SubscribeItem {
 		AllowDeduction: allowDeduction,
 		ResetCycle:     resetCycle,
 		RenewalReset:   renewalReset,
-		CreatedAt:      sub.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:      sub.UpdatedAt.Format(time.RFC3339),
+		CreatedAt:      sub.CreatedAt.Unix(),
+		UpdatedAt:      sub.UpdatedAt.Unix(),
 		Sold:           0, // Will be set by caller
 	}
 }

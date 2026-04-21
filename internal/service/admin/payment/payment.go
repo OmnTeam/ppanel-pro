@@ -15,12 +15,6 @@ import (
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 )
 
-// Helper functions for type conversion
-func parseInt64(s string) int64 {
-	val, _ := strconv.ParseInt(s, 10, 64)
-	return val
-}
-
 func requireString(value string) error {
 	if strings.TrimSpace(value) == "" {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
@@ -31,17 +25,6 @@ func requireString(value string) error {
 func parseRequiredInt64(value string) (int64, error) {
 	if err := requireString(value); err != nil {
 		return 0, err
-	}
-	parsed, err := strconv.ParseInt(strings.TrimSpace(value), 10, 64)
-	if err != nil {
-		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	return parsed, nil
-}
-
-func parseOptionalInt64(value string) (int64, error) {
-	if strings.TrimSpace(value) == "" {
-		return 0, nil
 	}
 	parsed, err := strconv.ParseInt(strings.TrimSpace(value), 10, 64)
 	if err != nil {
@@ -71,15 +54,6 @@ func (s *PaymentService) CreatePaymentMethod(ctx context.Context, req *v1.Create
 	if req.Config == nil || req.Enable == nil {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
-	feePercent, err := parseOptionalInt64(req.FeePercent)
-	if err != nil {
-		return nil, err
-	}
-	feeAmount, err := parseOptionalInt64(req.FeeAmount)
-	if err != nil {
-		return nil, err
-	}
-
 	// 转换config为JSON字符串
 	configJSON, err := tool.StructToJSON(req.Config)
 	if err != nil {
@@ -101,8 +75,8 @@ func (s *PaymentService) CreatePaymentMethod(ctx context.Context, req *v1.Create
 		req.Domain,
 		configJSON,
 		req.FeeMode,
-		feePercent,
-		feeAmount,
+		req.FeePercent,
+		req.FeeAmount,
 		enable,
 	)
 	if err != nil {
@@ -127,8 +101,8 @@ func (s *PaymentService) CreatePaymentMethod(ctx context.Context, req *v1.Create
 			Domain:      method.Domain,
 			Config:      configStruct,
 			FeeMode:     int32(method.FeeMode),
-			FeePercent:  strconv.FormatInt(method.FeePercent, 10),
-			FeeAmount:   strconv.FormatInt(method.FeeAmount, 10),
+			FeePercent:  method.FeePercent,
+			FeeAmount:   method.FeeAmount,
 			Enable:      method.Enable,
 			NotifyUrl:   method.NotifyURL,
 			Token:       method.Token,
@@ -145,15 +119,6 @@ func (s *PaymentService) UpdatePaymentMethod(ctx context.Context, req *v1.Update
 	if err != nil {
 		return nil, err
 	}
-	feePercent, err := parseOptionalInt64(req.FeePercent)
-	if err != nil {
-		return nil, err
-	}
-	feeAmount, err := parseOptionalInt64(req.FeeAmount)
-	if err != nil {
-		return nil, err
-	}
-
 	// 转换config为JSON字符串
 	configJSON, err := tool.StructToJSON(req.Config)
 	if err != nil {
@@ -176,8 +141,8 @@ func (s *PaymentService) UpdatePaymentMethod(ctx context.Context, req *v1.Update
 		req.Domain,
 		configJSON,
 		req.FeeMode,
-		feePercent,
-		feeAmount,
+		req.FeePercent,
+		req.FeeAmount,
 		enable,
 	)
 	if err != nil {
@@ -202,8 +167,8 @@ func (s *PaymentService) UpdatePaymentMethod(ctx context.Context, req *v1.Update
 			Domain:      method.Domain,
 			Config:      configStruct,
 			FeeMode:     int32(method.FeeMode),
-			FeePercent:  strconv.FormatInt(method.FeePercent, 10),
-			FeeAmount:   strconv.FormatInt(method.FeeAmount, 10),
+			FeePercent:  method.FeePercent,
+			FeeAmount:   method.FeeAmount,
 			Enable:      method.Enable,
 			NotifyUrl:   method.NotifyURL,
 			Token:       method.Token,
@@ -266,8 +231,8 @@ func (s *PaymentService) GetPaymentMethodList(ctx context.Context, req *v1.GetPa
 			Domain:      method.Domain,
 			Config:      configStruct,
 			FeeMode:     int32(method.FeeMode),
-			FeePercent:  strconv.FormatInt(method.FeePercent, 10),
-			FeeAmount:   strconv.FormatInt(method.FeeAmount, 10),
+			FeePercent:  method.FeePercent,
+			FeeAmount:   method.FeeAmount,
 			Enable:      method.Enable,
 			NotifyUrl:   method.NotifyURL,
 			Token:       method.Token,
@@ -278,7 +243,7 @@ func (s *PaymentService) GetPaymentMethodList(ctx context.Context, req *v1.GetPa
 		Code:    int32(responsecode.AdminGetPaymentMethodListSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetPaymentMethodListSuccess],
 		Data: &v1.GetPaymentMethodListData{
-			Total: int32(total),
+			Total: total,
 			List:  methods,
 		},
 	}, nil

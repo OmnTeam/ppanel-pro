@@ -2,11 +2,21 @@ package subscribe
 
 import (
 	"context"
+	"strconv"
+	"strings"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/subscribe/v1"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/subscribe"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
+
+func parseSubscribeServiceID(s string) (int, error) {
+	val, err := strconv.ParseInt(strings.TrimSpace(s), 10, 64)
+	if err != nil {
+		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	return int(val), nil
+}
 
 // SubscribeService subscribe service implementation
 type SubscribeService struct {
@@ -54,7 +64,11 @@ func (s *SubscribeService) UpdateSubscribe(ctx context.Context, req *v1.UpdateSu
 
 // DeleteSubscribe delete subscribe
 func (s *SubscribeService) DeleteSubscribe(ctx context.Context, req *v1.DeleteSubscribeRequest) (*v1.DeleteSubscribeReply, error) {
-	if err := s.uc.DeleteSubscribe(ctx, int(req.Id)); err != nil {
+	id, err := parseSubscribeServiceID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.uc.DeleteSubscribe(ctx, id); err != nil {
 		return nil, err
 	}
 	return &v1.DeleteSubscribeReply{
@@ -70,7 +84,11 @@ func (s *SubscribeService) DeleteSubscribe(ctx context.Context, req *v1.DeleteSu
 func (s *SubscribeService) BatchDeleteSubscribe(ctx context.Context, req *v1.BatchDeleteSubscribeRequest) (*v1.BatchDeleteSubscribeReply, error) {
 	idsInt := make([]int, len(req.Ids))
 	for i, v := range req.Ids {
-		idsInt[i] = int(v)
+		id, err := parseSubscribeServiceID(v)
+		if err != nil {
+			return nil, err
+		}
+		idsInt[i] = id
 	}
 	if err := s.uc.BatchDeleteSubscribe(ctx, idsInt); err != nil {
 		return nil, err
@@ -86,7 +104,11 @@ func (s *SubscribeService) BatchDeleteSubscribe(ctx context.Context, req *v1.Bat
 
 // GetSubscribeDetails get subscribe details
 func (s *SubscribeService) GetSubscribeDetails(ctx context.Context, req *v1.GetSubscribeDetailsRequest) (*v1.GetSubscribeDetailsReply, error) {
-	subscribe, err := s.uc.GetSubscribeDetails(ctx, int(req.Id))
+	id, err := parseSubscribeServiceID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	subscribe, err := s.uc.GetSubscribeDetails(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +180,11 @@ func (s *SubscribeService) UpdateSubscribeGroup(ctx context.Context, req *v1.Upd
 
 // DeleteSubscribeGroup delete subscribe group
 func (s *SubscribeService) DeleteSubscribeGroup(ctx context.Context, req *v1.DeleteSubscribeGroupRequest) (*v1.DeleteSubscribeGroupReply, error) {
-	if err := s.uc.DeleteSubscribeGroup(ctx, int(req.Id)); err != nil {
+	id, err := parseSubscribeServiceID(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.uc.DeleteSubscribeGroup(ctx, id); err != nil {
 		return nil, err
 	}
 	return &v1.DeleteSubscribeGroupReply{
@@ -174,7 +200,11 @@ func (s *SubscribeService) DeleteSubscribeGroup(ctx context.Context, req *v1.Del
 func (s *SubscribeService) BatchDeleteSubscribeGroup(ctx context.Context, req *v1.BatchDeleteSubscribeGroupRequest) (*v1.BatchDeleteSubscribeGroupReply, error) {
 	idsInt := make([]int, len(req.Ids))
 	for i, v := range req.Ids {
-		idsInt[i] = int(v)
+		id, err := parseSubscribeServiceID(v)
+		if err != nil {
+			return nil, err
+		}
+		idsInt[i] = id
 	}
 	if err := s.uc.BatchDeleteSubscribeGroup(ctx, idsInt); err != nil {
 		return nil, err
