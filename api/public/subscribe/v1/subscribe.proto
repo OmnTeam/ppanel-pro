@@ -15,6 +15,13 @@ service Subscribe {
       get: "/v1/public/subscribe/list"
     };
   }
+
+  // QueryUserSubscribeNodeList 查询当前用户订阅节点列表
+  rpc QueryUserSubscribeNodeList (QueryUserSubscribeNodeListRequest) returns (QueryUserSubscribeNodeListReply) {
+    option (google.api.http) = {
+      get: "/v1/public/subscribe/node/list"
+    };
+  }
 }
 
 // QuerySubscribeListRequest 查询订阅列表请求
@@ -66,4 +73,54 @@ message SubscribeItem {
 message SubscribeDiscount {
   int32 quantity = 1;
   int32 percentage = 2;
+}
+
+message QueryUserSubscribeNodeListRequest {}
+
+message QueryUserSubscribeNodeListData {
+  repeated UserSubscribeInfo list = 1;
+}
+
+message QueryUserSubscribeNodeListReply {
+  int32 code = 1;
+  string message = 2;
+  QueryUserSubscribeNodeListData data = 3;
+}
+
+message UserSubscribeInfo {
+  string id = 1;
+  string user_id = 2;
+  string order_id = 3;
+  string subscribe_id = 4;
+  int64 start_time = 5;
+  int64 expire_time = 6;
+  int64 finished_at = 7;
+  int64 reset_time = 8;
+  int64 traffic = 9;
+  int64 download = 10;
+  int64 upload = 11;
+  string token = 12;
+  int32 status = 13;
+  int64 created_at = 14;
+  int64 updated_at = 15;
+  bool is_try_out = 16;
+  repeated UserSubscribeNodeInfo nodes = 17;
+}
+
+message UserSubscribeNodeInfo {
+  string id = 1;
+  string name = 2;
+  string uuid = 3;
+  string protocol = 4;
+  string protocols = 5;
+  uint32 port = 6;
+  string address = 7;
+  repeated string tags = 8;
+  string country = 9;
+  string city = 10;
+  string longitude = 11;
+  string latitude = 12;
+  string latitude_center = 13;
+  string longitude_center = 14;
+  int64 created_at = 15;
 }
