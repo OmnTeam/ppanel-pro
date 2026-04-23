@@ -45,6 +45,13 @@ service Common {
     };
   }
 
+  // Heartbeat
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatReply) {
+    option (google.api.http) = {
+      get: "/v1/common/heartbeat"
+    };
+  }
+
   // Get statistics
   rpc GetStat(GetStatRequest) returns (GetStatReply) {
     option (google.api.http) = {
@@ -279,6 +286,23 @@ message GetGlobalConfigReply {
 
 // GetStat Request (empty)
 message GetStatRequest {}
+
+// Heartbeat Request (empty)
+message HeartbeatRequest {}
+
+// HeartbeatData 心跳数据
+message HeartbeatData {
+  bool status = 1;
+  string message = 2;
+  string timestamp = 3;
+}
+
+// Heartbeat Reply
+message HeartbeatReply {
+  int32 code = 1;
+  string message = 2;
+  HeartbeatData data = 3;
+}
 
 // GetStatData 统计数据
 message GetStatData {

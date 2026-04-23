@@ -651,7 +651,6 @@ func (h *ResetTrafficHandler) clearCache(ctx context.Context, list []*ent.ProxyU
 		if sub.SubscribeID > 0 {
 			subscribeIDs = append(subscribeIDs, sub.SubscribeID)
 		}
-		clearLegacyUserSubscribeCaches(ctx, h.rdb, h.logger, sub)
 		h.insertLog(ctx, sub.ID, sub.UserID)
 	}
 
@@ -680,7 +679,8 @@ func (h *ResetTrafficHandler) insertLog(ctx context.Context, subID, userID int64
 }
 
 func (h *ResetTrafficHandler) clearSubscribeCacheByIDs(ctx context.Context, subscribeIDs ...int64) {
-	clearLegacySubscribeCaches(ctx, h.rdb, h.logger, subscribeIDs...)
+	_ = ctx
+	_ = subscribeIDs
 }
 
 // monthsDiff calculates the number of months between two times

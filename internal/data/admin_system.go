@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"fmt"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
@@ -10,7 +9,6 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/redis/go-redis/v9"
 )
 
 type adminSystemRepo struct {
@@ -153,72 +151,6 @@ func (r *adminSystemRepo) UpdateConfigByCategory(ctx context.Context, category s
 		return responsecode.NewDatabaseUpdateError()
 	}
 
-	// Clear cache
-	var cacheKeys []string
-	switch category {
-	case "currency":
-		cacheKeys = []string{
-			CurrencyConfigKey,
-			GlobalConfigKey,
-		}
-	case "invite":
-		cacheKeys = []string{
-			InviteConfigKey,
-			GlobalConfigKey,
-		}
-	case "server":
-		cacheKeys = []string{
-			NodeConfigKey,
-			GlobalConfigKey,
-		}
-	case "tos":
-		cacheKeys = []string{
-			TosConfigKey,
-			GlobalConfigKey,
-		}
-	case "register":
-		cacheKeys = []string{
-			RegisterConfigKey,
-			GlobalConfigKey,
-		}
-	case "site":
-		cacheKeys = []string{
-			SiteConfigKey,
-			GlobalConfigKey,
-		}
-	case "subscribe":
-		cacheKeys = []string{
-			SubscribeConfigKey,
-			GlobalConfigKey,
-		}
-	case "verify_code":
-		cacheKeys = []string{
-			VerifyCodeConfigKey,
-			GlobalConfigKey,
-		}
-	case "verify":
-		cacheKeys = []string{
-			VerifyConfigKey,
-			GlobalConfigKey,
-		}
-	default:
-		cacheKeys = []string{
-			fmt.Sprintf("system:%s_config", category),
-			GlobalConfigKey,
-		}
-	}
-
-	for _, cacheKey := range cacheKeys {
-		if err := r.data.rdb.Del(ctx, cacheKey).Err(); err != nil && err != redis.Nil {
-			r.log.Warnf("Failed to delete cache key %s: %v", cacheKey, err)
-		}
-	}
-	if category == "server" {
-		if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
-			r.log.Warnf("Failed to clear legacy server caches after updating server config: %v", err)
-		}
-	}
-
 	syncRuntimeAppConfig(ctx, r.data.db, r.data.conf, r.log)
 
 	return nil
@@ -282,15 +214,6 @@ func (r *adminSystemRepo) UpdateNodeMultiplier(ctx context.Context, value string
 			r.log.Errorf("[UpdateNodeMultiplier] Failed to create node multiplier: %v", err)
 			return responsecode.NewDatabaseUpdateError()
 		}
-	}
-
-	for _, cacheKey := range []string{NodeConfigKey, GlobalConfigKey} {
-		if err := r.data.rdb.Del(ctx, cacheKey).Err(); err != nil && err != redis.Nil {
-			r.log.Warnf("Failed to delete cache key %s: %v", cacheKey, err)
-		}
-	}
-	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
-		r.log.Warnf("Failed to clear legacy server caches after updating node multiplier: %v", err)
 	}
 
 	return nil

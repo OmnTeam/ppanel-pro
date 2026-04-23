@@ -82,12 +82,15 @@ func (r *publicPortalRepo) GetSubscribeList(ctx context.Context, language string
 			proxysubscribe.ShowEQ(true),
 		)
 
-	// 语言过滤逻辑（复刻原项目）
+	// 语言过滤逻辑（复刻原项目 DefaultLanguage=true）
 	if language != "" {
-		// 如果指定了语言，过滤该语言的订阅
-		query = query.Where(proxysubscribe.LanguageEQ(language))
+		query = query.Where(
+			proxysubscribe.Or(
+				proxysubscribe.LanguageEQ(language),
+				proxysubscribe.LanguageEQ(""),
+			),
+		)
 	} else {
-		// 如果未指定语言，返回默认语言（language=''）
 		query = query.Where(proxysubscribe.LanguageEQ(""))
 	}
 
@@ -218,34 +221,33 @@ func (r *publicPortalRepo) CalculateOrderPrice(ctx context.Context, subscribeID,
 			).
 			Only(ctx)
 		if err != nil {
-			if !ent.IsNotFound(err) {
-				r.logger.Errorf("[CalculateOrderPrice] 查询优惠券失败: %v", err)
-				return nil, errors.InternalServer("DATABASE_ERROR", "查询优惠券失败")
+			if ent.IsNotFound(err) {
+				return nil, responsecode.NewKratosError(responsecode.ErrCouponNotFound)
 			}
-			// 优惠券不存在时，couponAmount为0
-		} else {
-			if couponInfo.Count != 0 && couponInfo.Count <= couponInfo.UsedCount {
-				r.logger.Warnf("[CalculateOrderPrice] 优惠券已用完: coupon=%s", *coupon)
-				return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
-			}
-			if couponInfo.Subscribe != "" {
-				allowedSubs := stringToInt64Slice(couponInfo.Subscribe)
-				allowed := false
-				for _, allowedID := range allowedSubs {
-					if allowedID == subscribeID {
-						allowed = true
-						break
-					}
-				}
-				if !allowed {
-					r.logger.Warnf("[CalculateOrderPrice] 优惠券不适用于此订阅: coupon=%s, subscribeID=%d", *coupon, subscribeID)
-					return nil, responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
-				}
-			}
-
-			// 计算优惠券折扣（使用helper函数）
-			couponAmount = int64(calculateCoupon(amount, couponInfo))
+			r.logger.Errorf("[CalculateOrderPrice] 查询优惠券失败: %v", err)
+			return nil, errors.InternalServer("DATABASE_ERROR", "查询优惠券失败")
 		}
+		if couponInfo.Count != 0 && couponInfo.Count <= couponInfo.UsedCount {
+			r.logger.Warnf("[CalculateOrderPrice] 优惠券已用完: coupon=%s", *coupon)
+			return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
+		}
+		if couponInfo.Subscribe != "" {
+			allowedSubs := stringToInt64Slice(couponInfo.Subscribe)
+			allowed := false
+			for _, allowedID := range allowedSubs {
+				if allowedID == subscribeID {
+					allowed = true
+					break
+				}
+			}
+			if !allowed {
+				r.logger.Warnf("[CalculateOrderPrice] 优惠券不适用于此订阅: coupon=%s, subscribeID=%d", *coupon, subscribeID)
+				return nil, responsecode.NewKratosError(responsecode.ErrCouponNotAvailable)
+			}
+		}
+
+		// 计算优惠券折扣（使用helper函数）
+		couponAmount = int64(calculateCoupon(amount, couponInfo))
 	}
 	amount = amount - couponAmount
 
@@ -258,12 +260,13 @@ func (r *publicPortalRepo) CalculateOrderPrice(ctx context.Context, subscribeID,
 			).
 			Only(ctx)
 		if err != nil {
-			if !ent.IsNotFound(err) {
-				r.logger.Errorf("[CalculateOrderPrice] 查询支付方式失败: %v", err)
-				return nil, errors.InternalServer("DATABASE_ERROR", "查询支付方式失败")
+			if ent.IsNotFound(err) {
+				return nil, responsecode.NewKratosError(responsecode.ErrPaymentNotFound)
 			}
-			// 支付方式不存在时，不计算手续费
-		} else if amount > 0 {
+			r.logger.Errorf("[CalculateOrderPrice] 查询支付方式失败: %v", err)
+			return nil, errors.InternalServer("DATABASE_ERROR", "查询支付方式失败")
+		}
+		if amount > 0 {
 			// 使用完整的手续费计算函数（支持4种模式）
 			feeAmount = calculateFee(amount, payment)
 		}
@@ -554,6 +557,7 @@ func (r *publicPortalRepo) GetAvailablePaymentMethods(ctx context.Context) ([]*p
 		Where(
 			proxypayment.EnableEQ(true),
 		).
+		Order(ent.Asc(proxypayment.FieldID)).
 		All(ctx)
 
 	if err != nil {
@@ -1426,7 +1430,6 @@ func (r *publicPortalRepo) processPortalBalancePayment(ctx context.Context, orde
 		r.logger.Errorf("[processPortalBalancePayment] 事务失败: %v, orderNo: %s", err, order.OrderNo)
 		return err
 	}
-
 	// 4. 将订单激活任务入队（复刻原项目 line 504-525）
 	// ⚠️ 关键：老项目使用 goto activation 标签跳转到这里
 	err = r.enqueueActivateOrderTask(ctx, int(userID), order.OrderNo)

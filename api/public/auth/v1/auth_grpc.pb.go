@@ -27,6 +27,9 @@ const (
 	Auth_TelephoneRegister_FullMethodName      = "/api.public.auth.v1.Auth/TelephoneRegister"
 	Auth_ResetPassword_FullMethodName          = "/api.public.auth.v1.Auth/ResetPassword"
 	Auth_TelephoneResetPassword_FullMethodName = "/api.public.auth.v1.Auth/TelephoneResetPassword"
+	Auth_GenerateCaptcha_FullMethodName        = "/api.public.auth.v1.Auth/GenerateCaptcha"
+	Auth_VerifySliderCaptcha_FullMethodName    = "/api.public.auth.v1.Auth/VerifySliderCaptcha"
+	Auth_DeviceLogin_FullMethodName            = "/api.public.auth.v1.Auth/DeviceLogin"
 )
 
 // AuthClient is the client API for Auth service.
@@ -49,6 +52,12 @@ type AuthClient interface {
 	ResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*LoginReply, error)
 	// TelephoneResetPassword resets user password with telephone
 	TelephoneResetPassword(ctx context.Context, in *TelephoneResetPasswordRequest, opts ...grpc.CallOption) (*LoginReply, error)
+	// GenerateCaptcha generates captcha data
+	GenerateCaptcha(ctx context.Context, in *GenerateCaptchaRequest, opts ...grpc.CallOption) (*GenerateCaptchaReply, error)
+	// VerifySliderCaptcha verifies slider captcha
+	VerifySliderCaptcha(ctx context.Context, in *VerifySliderCaptchaRequest, opts ...grpc.CallOption) (*VerifySliderCaptchaReply, error)
+	// DeviceLogin logs in user with device identifier
+	DeviceLogin(ctx context.Context, in *DeviceLoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
 }
 
 type authClient struct {
@@ -139,6 +148,36 @@ func (c *authClient) TelephoneResetPassword(ctx context.Context, in *TelephoneRe
 	return out, nil
 }
 
+func (c *authClient) GenerateCaptcha(ctx context.Context, in *GenerateCaptchaRequest, opts ...grpc.CallOption) (*GenerateCaptchaReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GenerateCaptchaReply)
+	err := c.cc.Invoke(ctx, Auth_GenerateCaptcha_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authClient) VerifySliderCaptcha(ctx context.Context, in *VerifySliderCaptchaRequest, opts ...grpc.CallOption) (*VerifySliderCaptchaReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VerifySliderCaptchaReply)
+	err := c.cc.Invoke(ctx, Auth_VerifySliderCaptcha_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authClient) DeviceLogin(ctx context.Context, in *DeviceLoginRequest, opts ...grpc.CallOption) (*LoginReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginReply)
+	err := c.cc.Invoke(ctx, Auth_DeviceLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServer is the server API for Auth service.
 // All implementations must embed UnimplementedAuthServer
 // for forward compatibility.
@@ -159,6 +198,12 @@ type AuthServer interface {
 	ResetPassword(context.Context, *ResetPasswordRequest) (*LoginReply, error)
 	// TelephoneResetPassword resets user password with telephone
 	TelephoneResetPassword(context.Context, *TelephoneResetPasswordRequest) (*LoginReply, error)
+	// GenerateCaptcha generates captcha data
+	GenerateCaptcha(context.Context, *GenerateCaptchaRequest) (*GenerateCaptchaReply, error)
+	// VerifySliderCaptcha verifies slider captcha
+	VerifySliderCaptcha(context.Context, *VerifySliderCaptchaRequest) (*VerifySliderCaptchaReply, error)
+	// DeviceLogin logs in user with device identifier
+	DeviceLogin(context.Context, *DeviceLoginRequest) (*LoginReply, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -192,6 +237,15 @@ func (UnimplementedAuthServer) ResetPassword(context.Context, *ResetPasswordRequ
 }
 func (UnimplementedAuthServer) TelephoneResetPassword(context.Context, *TelephoneResetPasswordRequest) (*LoginReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method TelephoneResetPassword not implemented")
+}
+func (UnimplementedAuthServer) GenerateCaptcha(context.Context, *GenerateCaptchaRequest) (*GenerateCaptchaReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method GenerateCaptcha not implemented")
+}
+func (UnimplementedAuthServer) VerifySliderCaptcha(context.Context, *VerifySliderCaptchaRequest) (*VerifySliderCaptchaReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method VerifySliderCaptcha not implemented")
+}
+func (UnimplementedAuthServer) DeviceLogin(context.Context, *DeviceLoginRequest) (*LoginReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeviceLogin not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 func (UnimplementedAuthServer) testEmbeddedByValue()              {}
@@ -358,6 +412,60 @@ func _Auth_TelephoneResetPassword_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auth_GenerateCaptcha_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GenerateCaptchaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).GenerateCaptcha(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_GenerateCaptcha_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).GenerateCaptcha(ctx, req.(*GenerateCaptchaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Auth_VerifySliderCaptcha_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifySliderCaptchaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).VerifySliderCaptcha(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_VerifySliderCaptcha_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).VerifySliderCaptcha(ctx, req.(*VerifySliderCaptchaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Auth_DeviceLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeviceLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).DeviceLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_DeviceLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).DeviceLogin(ctx, req.(*DeviceLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Auth_ServiceDesc is the grpc.ServiceDesc for Auth service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -396,6 +504,18 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TelephoneResetPassword",
 			Handler:    _Auth_TelephoneResetPassword_Handler,
+		},
+		{
+			MethodName: "GenerateCaptcha",
+			Handler:    _Auth_GenerateCaptcha_Handler,
+		},
+		{
+			MethodName: "VerifySliderCaptcha",
+			Handler:    _Auth_VerifySliderCaptcha_Handler,
+		},
+		{
+			MethodName: "DeviceLogin",
+			Handler:    _Auth_DeviceLogin_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

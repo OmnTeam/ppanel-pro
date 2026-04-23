@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"time"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
@@ -369,82 +368,18 @@ func (h *CheckSubscriptionHandler) loadSiteConfig(ctx context.Context) (map[stri
 }
 
 func (h *CheckSubscriptionHandler) clearUserSubscribeCache(ctx context.Context, userSubs []*ent.ProxyUserSubscribe) {
-	if h.rdb == nil || len(userSubs) == 0 {
-		return
-	}
-
-	keys := make([]string, 0, len(userSubs)*3)
-	for _, sub := range userSubs {
-		if sub == nil {
-			continue
-		}
-		if sub.Token != nil && *sub.Token != "" {
-			keys = append(keys, fmt.Sprintf("cache:user:subscribe:token:%s", *sub.Token))
-		}
-		keys = append(keys,
-			fmt.Sprintf("cache:user:subscribe:user:%d", sub.UserID),
-			fmt.Sprintf("cache:user:subscribe:id:%d", sub.ID),
-		)
-	}
-
-	h.deleteRedisKeys(ctx, keys...)
+	_ = ctx
+	_ = userSubs
 }
 
 // clearServerCache clears server cache by collecting unique subscribe_ids
 // 复刻原项目 checkSubscriptionLogic.go line 198-211
 func (h *CheckSubscriptionHandler) clearServerCache(ctx context.Context, userSubs []*ent.ProxyUserSubscribe) {
-	if h.rdb == nil || len(userSubs) == 0 {
-		return
-	}
-
-	// Collect unique subscribe_ids
-	subs := make(map[int64]bool)
-	for _, sub := range userSubs {
-		if sub.SubscribeID > 0 {
-			if _, ok := subs[sub.SubscribeID]; !ok {
-				subs[sub.SubscribeID] = true
-			}
-		}
-	}
-
-	keys := make([]string, 0, len(subs)*2)
-	for subID := range subs {
-		keys = append(keys,
-			fmt.Sprintf("cache:subscribe:id:%d", subID),
-			fmt.Sprintf("cache:subscribe:servers:%d", subID),
-		)
-	}
-
-	h.deleteRedisKeys(ctx, keys...)
-	if err := clearLegacyServerAllCaches(ctx, h.rdb); err != nil {
-		h.logger.Warnf("[CheckSubscription] Clear legacy server cache failed: %v", err)
-	}
-	h.logger.Infof("[CheckSubscription] Cleared cache for %d unique subscribe_ids", len(subs))
+	_ = ctx
+	_ = userSubs
 }
 
 func (h *CheckSubscriptionHandler) deleteRedisKeys(ctx context.Context, keys ...string) {
-	if h.rdb == nil || len(keys) == 0 {
-		return
-	}
-
-	unique := make(map[string]struct{}, len(keys))
-	filtered := make([]string, 0, len(keys))
-	for _, key := range keys {
-		if key == "" {
-			continue
-		}
-		if _, ok := unique[key]; ok {
-			continue
-		}
-		unique[key] = struct{}{}
-		filtered = append(filtered, key)
-	}
-
-	if len(filtered) == 0 {
-		return
-	}
-
-	if err := h.rdb.Del(ctx, filtered...).Err(); err != nil {
-		h.logger.Warnf("[CheckSubscription] Delete redis keys failed: %v, keys=%v", err, filtered)
-	}
+	_ = ctx
+	_ = keys
 }

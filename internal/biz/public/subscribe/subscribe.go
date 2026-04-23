@@ -8,6 +8,7 @@ import (
 type SubscribeRepo interface {
 	// QuerySubscribeList 查询订阅列表
 	QuerySubscribeList(ctx context.Context, language string) ([]*Subscribe, int64, error)
+	QueryUserSubscribeNodeList(ctx context.Context, userID int64) ([]*UserSubscribeInfo, error)
 }
 
 // Subscribe 订阅信息
@@ -43,6 +44,44 @@ type SubscribeDiscount struct {
 	Percentage int32
 }
 
+type UserSubscribeInfo struct {
+	ID          int64
+	UserID      int64
+	OrderID     int64
+	SubscribeID int64
+	StartTime   int64
+	ExpireTime  int64
+	FinishedAt  int64
+	ResetTime   int64
+	Traffic     int64
+	Download    int64
+	Upload      int64
+	Token       string
+	Status      int32
+	CreatedAt   int64
+	UpdatedAt   int64
+	IsTryOut    bool
+	Nodes       []*UserSubscribeNodeInfo
+}
+
+type UserSubscribeNodeInfo struct {
+	ID              int64
+	Name            string
+	Uuid            string
+	Protocol        string
+	Protocols       string
+	Port            uint32
+	Address         string
+	Tags            []string
+	Country         string
+	City            string
+	Longitude       string
+	Latitude        string
+	LatitudeCenter  string
+	LongitudeCenter string
+	CreatedAt       int64
+}
+
 // SubscribeUseCase Public Subscribe用例
 type SubscribeUseCase struct {
 	repo SubscribeRepo
@@ -56,4 +95,8 @@ func NewSubscribeUseCase(repo SubscribeRepo) *SubscribeUseCase {
 // QuerySubscribeList 查询订阅列表
 func (uc *SubscribeUseCase) QuerySubscribeList(ctx context.Context, language string) ([]*Subscribe, int64, error) {
 	return uc.repo.QuerySubscribeList(ctx, language)
+}
+
+func (uc *SubscribeUseCase) QueryUserSubscribeNodeList(ctx context.Context, userID int64) ([]*UserSubscribeInfo, error) {
+	return uc.repo.QueryUserSubscribeNodeList(ctx, userID)
 }

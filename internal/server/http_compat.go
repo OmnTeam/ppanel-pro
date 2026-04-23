@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	authservice "github.com/OmnTeam/ppanel-pro/internal/service/auth"
-	authoauthservice "github.com/OmnTeam/ppanel-pro/internal/service/auth/oauth"
 	publicpaymentservice "github.com/OmnTeam/ppanel-pro/internal/service/public/payment"
 
 	publicauthv1 "github.com/OmnTeam/ppanel-pro/api/public/auth/v1"
@@ -47,13 +45,9 @@ type compatDeviceLoginRequest struct {
 func registerLegacyCompatRoutes(
 	srv *khttp.Server,
 	authCompat *data.AuthCompat,
-	authSvc *authservice.AuthService,
-	oauthSvc *authoauthservice.OAuthService,
 	dataLayer *data.Data,
 	appConf *conf.Application,
 	publicPayment *publicpaymentservice.PaymentService,
-	publicTicket legacyPublicTicketCompat,
-	publicUser legacyPublicUserCompat,
 	logger log.Logger,
 ) {
 	if srv == nil {
@@ -62,52 +56,17 @@ func registerLegacyCompatRoutes(
 
 	r := srv.Route("/")
 
-	registerLegacyAuthCompatRoutes(r, authCompat, authSvc, oauthSvc)
-	registerLegacyCommonCompatRoutes(r, dataLayer, appConf, logger)
-	registerLegacyPublicCompatRoutes(r, dataLayer, appConf, publicTicket, publicUser)
+	registerLegacyAuthCompatRoutes(r, authCompat)
 	registerLegacyCallbackCompatRoutes(r, dataLayer, appConf, publicPayment, logger)
 	registerLegacyServerCompatRoutes(r, dataLayer)
 }
 
-func registerLegacyAuthCompatRoutes(r *khttp.Router, authCompat *data.AuthCompat, authSvc *authservice.AuthService, oauthSvc *authoauthservice.OAuthService) {
+func registerLegacyAuthCompatRoutes(r *khttp.Router, authCompat *data.AuthCompat) {
 	if r == nil {
 		return
 	}
 
 	if authCompat != nil {
-		r.GET("/v1/common/site/config", func(ctx khttp.Context) error {
-			out, err := compatMiddleware(ctx, nil, func(inner context.Context, req interface{}) (interface{}, error) {
-				return authCompat.GetLegacyGlobalConfig(inner)
-			})
-			if err != nil {
-				return compatJSONError(ctx, err)
-			}
-			return compatJSON(ctx, out)
-		})
-
-		r.GET("/v1/common/heartbeat", func(ctx khttp.Context) error {
-			out, err := compatMiddleware(ctx, nil, func(inner context.Context, req interface{}) (interface{}, error) {
-				return authCompat.Heartbeat(), nil
-			})
-			if err != nil {
-				return compatJSONError(ctx, err)
-			}
-			return compatJSON(ctx, out)
-		})
-
-		r.POST("/v1/auth/captcha/generate", func(ctx khttp.Context) error {
-			out, err := compatMiddleware(ctx, nil, func(inner context.Context, req interface{}) (interface{}, error) {
-				return authCompat.GenerateCaptcha(inner)
-			})
-			if err != nil {
-				return compatJSONError(ctx, err)
-			}
-			return compatJSON(ctx, out)
-		})
-
-		r.POST("/v1/auth/captcha/slider/verify", sliderVerifyHandler(authCompat))
-		r.POST("/v1/auth/login/device", deviceLoginHandler(authCompat))
-
 		r.POST("/v1/auth/admin/captcha/generate", func(ctx khttp.Context) error {
 			out, err := compatMiddleware(ctx, nil, func(inner context.Context, req interface{}) (interface{}, error) {
 				return authCompat.GenerateCaptcha(inner)
@@ -122,8 +81,6 @@ func registerLegacyAuthCompatRoutes(r *khttp.Router, authCompat *data.AuthCompat
 		r.POST("/v1/auth/admin/login", adminLoginHandler(authCompat))
 		r.POST("/v1/auth/admin/reset", adminResetHandler(authCompat))
 	}
-
-	registerLegacyPublicAuthCompatRoutes(r, authSvc, oauthSvc)
 }
 
 func sliderVerifyHandler(authCompat *data.AuthCompat) func(ctx khttp.Context) error {

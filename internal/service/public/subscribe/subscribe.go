@@ -6,6 +6,7 @@ import (
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/public/subscribe/v1"
 	subscribeBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscribe"
+	appmiddleware "github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
 
@@ -78,6 +79,67 @@ func (s *SubscribeService) QuerySubscribeList(ctx context.Context, req *v1.Query
 		Data: &v1.SubscribeListData{
 			List:  list,
 			Total: int32(total),
+		},
+	}, nil
+}
+
+func (s *SubscribeService) QueryUserSubscribeNodeList(ctx context.Context, req *v1.QueryUserSubscribeNodeListRequest) (*v1.QueryUserSubscribeNodeListReply, error) {
+	userID := appmiddleware.GetUserID(ctx)
+
+	list, err := s.uc.QueryUserSubscribeNodeList(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	items := make([]*v1.UserSubscribeInfo, 0, len(list))
+	for _, item := range list {
+		nodes := make([]*v1.UserSubscribeNodeInfo, 0, len(item.Nodes))
+		for _, node := range item.Nodes {
+			nodes = append(nodes, &v1.UserSubscribeNodeInfo{
+				Id:              strconv.FormatInt(node.ID, 10),
+				Name:            node.Name,
+				Uuid:            node.Uuid,
+				Protocol:        node.Protocol,
+				Protocols:       node.Protocols,
+				Port:            node.Port,
+				Address:         node.Address,
+				Tags:            node.Tags,
+				Country:         node.Country,
+				City:            node.City,
+				Longitude:       node.Longitude,
+				Latitude:        node.Latitude,
+				LatitudeCenter:  node.LatitudeCenter,
+				LongitudeCenter: node.LongitudeCenter,
+				CreatedAt:       node.CreatedAt,
+			})
+		}
+
+		items = append(items, &v1.UserSubscribeInfo{
+			Id:          strconv.FormatInt(item.ID, 10),
+			UserId:      strconv.FormatInt(item.UserID, 10),
+			OrderId:     strconv.FormatInt(item.OrderID, 10),
+			SubscribeId: strconv.FormatInt(item.SubscribeID, 10),
+			StartTime:   item.StartTime,
+			ExpireTime:  item.ExpireTime,
+			FinishedAt:  item.FinishedAt,
+			ResetTime:   item.ResetTime,
+			Traffic:     item.Traffic,
+			Download:    item.Download,
+			Upload:      item.Upload,
+			Token:       item.Token,
+			Status:      item.Status,
+			CreatedAt:   item.CreatedAt,
+			UpdatedAt:   item.UpdatedAt,
+			IsTryOut:    item.IsTryOut,
+			Nodes:       nodes,
+		})
+	}
+
+	return &v1.QueryUserSubscribeNodeListReply{
+		Code:    200,
+		Message: "success",
+		Data: &v1.QueryUserSubscribeNodeListData{
+			List: items,
 		},
 	}, nil
 }

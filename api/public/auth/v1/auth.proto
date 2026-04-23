@@ -70,6 +70,30 @@ service Auth {
       body: "*"
     };
   }
+
+  // GenerateCaptcha generates captcha data
+  rpc GenerateCaptcha(GenerateCaptchaRequest) returns (GenerateCaptchaReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/captcha/generate"
+      body: "*"
+    };
+  }
+
+  // VerifySliderCaptcha verifies slider captcha
+  rpc VerifySliderCaptcha(VerifySliderCaptchaRequest) returns (VerifySliderCaptchaReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/captcha/slider/verify"
+      body: "*"
+    };
+  }
+
+  // DeviceLogin logs in user with device identifier
+  rpc DeviceLogin(DeviceLoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/login/device"
+      body: "*"
+    };
+  }
 }
 
 // ============================================================================
@@ -247,4 +271,45 @@ message LoginReply {
   int32 code = 1;  // 状态码
   string message = 2;  // 消息内容
   LoginData data = 3;  // 响应数据
+}
+
+message GenerateCaptchaRequest {}
+
+message GenerateCaptchaData {
+  string type = 1;
+  string id = 2;
+  string image = 3;
+  string block_image = 4;
+}
+
+message GenerateCaptchaReply {
+  int32 code = 1;
+  string message = 2;
+  GenerateCaptchaData data = 3;
+}
+
+message VerifySliderCaptchaRequest {
+  string id = 1;
+  int32 x = 2;
+  int32 y = 3;
+  string trail = 4;
+}
+
+message VerifySliderCaptchaData {
+  string token = 1;
+}
+
+message VerifySliderCaptchaReply {
+  int32 code = 1;
+  string message = 2;
+  VerifySliderCaptchaData data = 3;
+}
+
+message DeviceLoginRequest {
+  string identifier = 1;
+  string ip = 2;
+  string user_agent = 3;
+  string cf_token = 4;
+  string short_code = 5;
+  string login_type = 6;
 }

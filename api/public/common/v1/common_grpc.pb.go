@@ -24,6 +24,7 @@ const (
 	Common_GetPrivacyPolicy_FullMethodName      = "/api.public.common.v1.Common/GetPrivacyPolicy"
 	Common_GetTos_FullMethodName                = "/api.public.common.v1.Common/GetTos"
 	Common_GetGlobalConfig_FullMethodName       = "/api.public.common.v1.Common/GetGlobalConfig"
+	Common_Heartbeat_FullMethodName             = "/api.public.common.v1.Common/Heartbeat"
 	Common_GetStat_FullMethodName               = "/api.public.common.v1.Common/GetStat"
 	Common_SendEmailCode_FullMethodName         = "/api.public.common.v1.Common/SendEmailCode"
 	Common_SendSmsCode_FullMethodName           = "/api.public.common.v1.Common/SendSmsCode"
@@ -46,6 +47,8 @@ type CommonClient interface {
 	GetTos(ctx context.Context, in *GetTosRequest, opts ...grpc.CallOption) (*GetTosReply, error)
 	// Get global config
 	GetGlobalConfig(ctx context.Context, in *GetGlobalConfigRequest, opts ...grpc.CallOption) (*GetGlobalConfigReply, error)
+	// Heartbeat
+	Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatReply, error)
 	// Get statistics
 	GetStat(ctx context.Context, in *GetStatRequest, opts ...grpc.CallOption) (*GetStatReply, error)
 	// Send email verification code
@@ -114,6 +117,16 @@ func (c *commonClient) GetGlobalConfig(ctx context.Context, in *GetGlobalConfigR
 	return out, nil
 }
 
+func (c *commonClient) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...grpc.CallOption) (*HeartbeatReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HeartbeatReply)
+	err := c.cc.Invoke(ctx, Common_Heartbeat_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *commonClient) GetStat(ctx context.Context, in *GetStatRequest, opts ...grpc.CallOption) (*GetStatReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetStatReply)
@@ -170,6 +183,8 @@ type CommonServer interface {
 	GetTos(context.Context, *GetTosRequest) (*GetTosReply, error)
 	// Get global config
 	GetGlobalConfig(context.Context, *GetGlobalConfigRequest) (*GetGlobalConfigReply, error)
+	// Heartbeat
+	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatReply, error)
 	// Get statistics
 	GetStat(context.Context, *GetStatRequest) (*GetStatReply, error)
 	// Send email verification code
@@ -202,6 +217,9 @@ func (UnimplementedCommonServer) GetTos(context.Context, *GetTosRequest) (*GetTo
 }
 func (UnimplementedCommonServer) GetGlobalConfig(context.Context, *GetGlobalConfigRequest) (*GetGlobalConfigReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetGlobalConfig not implemented")
+}
+func (UnimplementedCommonServer) Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method Heartbeat not implemented")
 }
 func (UnimplementedCommonServer) GetStat(context.Context, *GetStatRequest) (*GetStatReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetStat not implemented")
@@ -326,6 +344,24 @@ func _Common_GetGlobalConfig_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Common_Heartbeat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HeartbeatRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CommonServer).Heartbeat(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Common_Heartbeat_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CommonServer).Heartbeat(ctx, req.(*HeartbeatRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Common_GetStat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetStatRequest)
 	if err := dec(in); err != nil {
@@ -424,6 +460,10 @@ var Common_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetGlobalConfig",
 			Handler:    _Common_GetGlobalConfig_Handler,
+		},
+		{
+			MethodName: "Heartbeat",
+			Handler:    _Common_Heartbeat_Handler,
 		},
 		{
 			MethodName: "GetStat",

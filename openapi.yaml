@@ -2565,6 +2565,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.system.v1.UpdateInviteConfigReply'
+    /v1/admin/system/module:
+        get:
+            tags:
+                - SystemService
+            description: GetSystemModule 获取系统模块信息
+            operationId: SystemService_GetSystemModule
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.admin.system.v1.GetSystemModuleReply'
     /v1/admin/system/node_config:
         get:
             tags:
@@ -2864,7 +2877,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.system.v1.UpdateVerifyConfigReply'
-    /v1/admin/ticket/:
+    /v1/admin/ticket:
         put:
             tags:
                 - Ticket
@@ -3678,6 +3691,44 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.user.v1.GetUserSubscribeTrafficLogsReply'
+    /v1/auth/captcha/generate:
+        post:
+            tags:
+                - Auth
+            description: GenerateCaptcha generates captcha data
+            operationId: Auth_GenerateCaptcha
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.public.auth.v1.GenerateCaptchaRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.auth.v1.GenerateCaptchaReply'
+    /v1/auth/captcha/slider/verify:
+        post:
+            tags:
+                - Auth
+            description: VerifySliderCaptcha verifies slider captcha
+            operationId: Auth_VerifySliderCaptcha
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.public.auth.v1.VerifySliderCaptchaRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.auth.v1.VerifySliderCaptchaReply'
     /v1/auth/check:
         get:
             tags:
@@ -3747,6 +3798,25 @@ paths:
                     application/json:
                         schema:
                             $ref: '#/components/schemas/api.public.auth.v1.UserLoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.auth.v1.LoginReply'
+    /v1/auth/login/device:
+        post:
+            tags:
+                - Auth
+            description: DeviceLogin logs in user with device identifier
+            operationId: Auth_DeviceLogin
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.public.auth.v1.DeviceLoginRequest'
                 required: true
             responses:
                 "200":
@@ -3961,6 +4031,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.public.common.v1.GetClientReply'
+    /v1/common/heartbeat:
+        get:
+            tags:
+                - Common
+            description: Heartbeat
+            operationId: Common_Heartbeat
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.common.v1.HeartbeatReply'
     /v1/common/send_code:
         post:
             tags:
@@ -4622,6 +4705,19 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.public.subscribe.v1.SubscribeListReply'
+    /v1/public/subscribe/node/list:
+        get:
+            tags:
+                - Subscribe
+            description: QueryUserSubscribeNodeList 查询当前用户订阅节点列表
+            operationId: Subscribe_QueryUserSubscribeNodeList
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.subscribe.v1.QueryUserSubscribeNodeListReply'
     /v1/public/ticket:
         put:
             tags:
@@ -8902,9 +8998,7 @@ components:
                 unitTime:
                     type: string
                 discount:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/api.admin.subscribe.v1.SubscribeDiscount'
+                    type: string
                 replacement:
                     type: string
                 inventory:
@@ -8918,13 +9012,9 @@ components:
                 quota:
                     type: string
                 nodes:
-                    type: array
-                    items:
-                        type: string
+                    type: string
                 nodeTags:
-                    type: array
-                    items:
-                        type: string
+                    type: string
                 nodeGroupIds:
                     type: array
                     items:
@@ -8932,9 +9022,7 @@ components:
                 nodeGroupId:
                     type: string
                 trafficLimit:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/api.admin.subscribe.v1.TrafficLimit'
+                    type: string
                 show:
                     type: boolean
                 sell:
@@ -9088,14 +9176,6 @@ components:
                 sort:
                     type: string
             description: SortItem 排序项
-        api.admin.subscribe.v1.SubscribeDiscount:
-            type: object
-            properties:
-                quantity:
-                    type: string
-                discount:
-                    type: string
-            description: SubscribeDiscount 折扣配置
         api.admin.subscribe.v1.SubscribeGroupInfo:
             type: object
             properties:
@@ -9126,9 +9206,7 @@ components:
                 unitTime:
                     type: string
                 discount:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/api.admin.subscribe.v1.SubscribeDiscount'
+                    type: string
                 replacement:
                     type: string
                 inventory:
@@ -9142,13 +9220,9 @@ components:
                 quota:
                     type: string
                 nodes:
-                    type: array
-                    items:
-                        type: string
+                    type: string
                 nodeTags:
-                    type: array
-                    items:
-                        type: string
+                    type: string
                 nodeGroupIds:
                     type: array
                     items:
@@ -9156,9 +9230,7 @@ components:
                 nodeGroupId:
                     type: string
                 trafficLimit:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/api.admin.subscribe.v1.TrafficLimit'
+                    type: string
                 show:
                     type: boolean
                 sell:
@@ -9196,9 +9268,7 @@ components:
                 unitTime:
                     type: string
                 discount:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/api.admin.subscribe.v1.SubscribeDiscount'
+                    type: string
                 replacement:
                     type: string
                 inventory:
@@ -9212,13 +9282,9 @@ components:
                 quota:
                     type: string
                 nodes:
-                    type: array
-                    items:
-                        type: string
+                    type: string
                 nodeTags:
-                    type: array
-                    items:
-                        type: string
+                    type: string
                 nodeGroupIds:
                     type: array
                     items:
@@ -9226,9 +9292,7 @@ components:
                 nodeGroupId:
                     type: string
                 trafficLimit:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/api.admin.subscribe.v1.TrafficLimit'
+                    type: string
                 show:
                     type: boolean
                 sell:
@@ -9277,18 +9341,6 @@ components:
                     items:
                         $ref: '#/components/schemas/api.admin.subscribe.v1.SortItem'
             description: SubscribeSortRequest 订阅套餐排序请求
-        api.admin.subscribe.v1.TrafficLimit:
-            type: object
-            properties:
-                statType:
-                    type: string
-                statValue:
-                    type: string
-                trafficUsage:
-                    type: string
-                speedLimit:
-                    type: string
-            description: TrafficLimit 流量限制配置
         api.admin.subscribe.v1.UpdateSubscribeData:
             type: object
             properties:
@@ -9349,9 +9401,7 @@ components:
                 unitTime:
                     type: string
                 discount:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/api.admin.subscribe.v1.SubscribeDiscount'
+                    type: string
                 replacement:
                     type: string
                 inventory:
@@ -9365,13 +9415,9 @@ components:
                 quota:
                     type: string
                 nodes:
-                    type: array
-                    items:
-                        type: string
+                    type: string
                 nodeTags:
-                    type: array
-                    items:
-                        type: string
+                    type: string
                 nodeGroupIds:
                     type: array
                     items:
@@ -9379,9 +9425,7 @@ components:
                 nodeGroupId:
                     type: string
                 trafficLimit:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/api.admin.subscribe.v1.TrafficLimit'
+                    type: string
                 show:
                     type: boolean
                 sell:
@@ -9496,6 +9540,16 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.system.v1.SubscribeConfig'
+        api.admin.system.v1.GetSystemModuleReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.system.v1.SystemModule'
         api.admin.system.v1.GetTosConfigReply:
             type: object
             properties:
@@ -9716,6 +9770,15 @@ components:
                 userAgentList:
                     type: string
             description: SubscribeConfig 订阅配置
+        api.admin.system.v1.SystemModule:
+            type: object
+            properties:
+                serviceName:
+                    type: string
+                serviceVersion:
+                    type: string
+                secret:
+                    type: string
         api.admin.system.v1.TimePeriod:
             type: object
             properties:
@@ -10651,6 +10714,31 @@ components:
             properties:
                 userSubscribeId:
                     type: string
+        api.admin.user.v1.Subscribe:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                unitPrice:
+                    type: string
+                unitTime:
+                    type: string
+                traffic:
+                    type: string
+                speedLimit:
+                    type: string
+                deviceLimit:
+                    type: string
+                resetCycle:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
         api.admin.user.v1.ToggleUserSubscribeStatusReply:
             type: object
             properties:
@@ -10931,6 +11019,8 @@ components:
                     type: string
                 uuid:
                     type: string
+                subscribe:
+                    $ref: '#/components/schemas/api.admin.user.v1.Subscribe'
             description: UserSubscribe 用户订阅
         api.admin.user.v1.UserSubscribeDetail:
             type: object
@@ -10967,6 +11057,14 @@ components:
                 createdAt:
                     type: string
                 updatedAt:
+                    type: string
+                user:
+                    $ref: '#/components/schemas/api.admin.user.v1.User'
+                subscribe:
+                    $ref: '#/components/schemas/api.admin.user.v1.Subscribe'
+                finishedAt:
+                    type: string
+                uuid:
                     type: string
             description: UserSubscribeDetail 用户订阅详情（含关联对象）
         api.admin.user.v1.UserSubscribeLog:
@@ -11417,6 +11515,45 @@ components:
                 data:
                     $ref: '#/components/schemas/api.public.auth.v1.CheckUserTelephoneData'
             description: CheckUserTelephone reply
+        api.public.auth.v1.DeviceLoginRequest:
+            type: object
+            properties:
+                identifier:
+                    type: string
+                ip:
+                    type: string
+                userAgent:
+                    type: string
+                cfToken:
+                    type: string
+                shortCode:
+                    type: string
+                loginType:
+                    type: string
+        api.public.auth.v1.GenerateCaptchaData:
+            type: object
+            properties:
+                type:
+                    type: string
+                id:
+                    type: string
+                image:
+                    type: string
+                blockImage:
+                    type: string
+        api.public.auth.v1.GenerateCaptchaReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.public.auth.v1.GenerateCaptchaData'
+        api.public.auth.v1.GenerateCaptchaRequest:
+            type: object
+            properties: {}
         api.public.auth.v1.LoginData:
             type: object
             properties:
@@ -11598,6 +11735,34 @@ components:
                 sliderToken:
                     type: string
             description: UserRegister request
+        api.public.auth.v1.VerifySliderCaptchaData:
+            type: object
+            properties:
+                token:
+                    type: string
+        api.public.auth.v1.VerifySliderCaptchaReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.public.auth.v1.VerifySliderCaptchaData'
+        api.public.auth.v1.VerifySliderCaptchaRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                x:
+                    type: integer
+                    format: int32
+                y:
+                    type: integer
+                    format: int32
+                trail:
+                    type: string
         api.public.common.v1.Ads:
             type: object
             properties:
@@ -11840,6 +12005,27 @@ components:
                 data:
                     $ref: '#/components/schemas/api.public.common.v1.GetTosData'
             description: GetTos Reply
+        api.public.common.v1.HeartbeatData:
+            type: object
+            properties:
+                status:
+                    type: boolean
+                message:
+                    type: string
+                timestamp:
+                    type: string
+            description: HeartbeatData 心跳数据
+        api.public.common.v1.HeartbeatReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.public.common.v1.HeartbeatData'
+            description: Heartbeat Reply
         api.public.common.v1.InviteConfig:
             type: object
             properties:
@@ -12235,16 +12421,14 @@ components:
                 subscribeId:
                     type: string
                 subscribeGroupId:
-                    type: integer
-                    format: int32
+                    type: string
                 quantity:
                     type: integer
                     format: int32
                 coupon:
                     type: string
                 payment:
-                    type: integer
-                    format: int32
+                    type: string
             description: PreCreateOrder Request
         api.public.order.v1.PurchaseData:
             type: object
@@ -12276,8 +12460,7 @@ components:
                 coupon:
                     type: string
                 payment:
-                    type: integer
-                    format: int32
+                    type: string
             description: Purchase Request
         api.public.order.v1.RechargeData:
             type: object
@@ -12304,8 +12487,7 @@ components:
                 amount:
                     type: string
                 payment:
-                    type: integer
-                    format: int32
+                    type: string
             description: Recharge Request
         api.public.order.v1.RenewalData:
             type: object
@@ -12330,26 +12512,22 @@ components:
             type: object
             properties:
                 userSubscribeId:
-                    type: integer
-                    format: int32
+                    type: string
                 quantity:
                     type: integer
                     format: int32
                 coupon:
                     type: string
                 payment:
-                    type: integer
-                    format: int32
+                    type: string
             description: Renewal Request
         api.public.order.v1.ResetTrafficRequest:
             type: object
             properties:
                 userSubscribeId:
-                    type: integer
-                    format: int32
+                    type: string
                 payment:
-                    type: integer
-                    format: int32
+                    type: string
             description: ResetTraffic Request
         api.public.order.v1.Subscribe:
             type: object
@@ -12401,6 +12579,26 @@ components:
                     type: string
                 allowDeduction:
                     type: boolean
+                nodeGroupIds:
+                    type: array
+                    items:
+                        type: string
+                nodeGroupId:
+                    type: string
+                trafficLimit:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.public.order.v1.TrafficLimit'
+                resetCycle:
+                    type: string
+                renewalReset:
+                    type: boolean
+                showOriginalPrice:
+                    type: boolean
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
             description: Subscribe message
         api.public.order.v1.SubscribeDiscount:
             type: object
@@ -12411,6 +12609,17 @@ components:
                 discount:
                     type: string
             description: SubscribeDiscount message
+        api.public.order.v1.TrafficLimit:
+            type: object
+            properties:
+                statType:
+                    type: string
+                statValue:
+                    type: string
+                trafficUsage:
+                    type: string
+                speedLimit:
+                    type: string
         api.public.order.v1.TrafficResetData:
             type: object
             properties:
@@ -12494,7 +12703,7 @@ components:
         api.public.portal.v1.GetAvailablePaymentMethodsData:
             type: object
             properties:
-                methods:
+                list:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.public.portal.v1.PaymentMethod'
@@ -12758,6 +12967,16 @@ components:
                     type: array
                     items:
                         type: string
+                nodeGroupIds:
+                    type: array
+                    items:
+                        type: string
+                nodeGroupId:
+                    type: string
+                trafficLimit:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.public.portal.v1.TrafficLimit'
                 show:
                     type: boolean
                 sell:
@@ -12772,6 +12991,8 @@ components:
                     type: string
                 renewalReset:
                     type: boolean
+                showOriginalPrice:
+                    type: boolean
                 createdAt:
                     type: string
                 updatedAt:
@@ -12779,6 +13000,17 @@ components:
             description: |-
                 SubscribeInfo 订阅信息
                  ⚠️ 完全复刻原项目（server-master/internal/types/types.go:Subscribe）
+        api.public.portal.v1.TrafficLimit:
+            type: object
+            properties:
+                statType:
+                    type: string
+                statValue:
+                    type: string
+                trafficUsage:
+                    type: string
+                speedLimit:
+                    type: string
         api.public.redemption.v1.RedeemCodeData:
             type: object
             properties:
@@ -12804,6 +13036,23 @@ components:
                 code:
                     type: string
             description: RedeemCodeRequest 兑换码请求
+        api.public.subscribe.v1.QueryUserSubscribeNodeListData:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.public.subscribe.v1.UserSubscribeInfo'
+        api.public.subscribe.v1.QueryUserSubscribeNodeListReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.public.subscribe.v1.QueryUserSubscribeNodeListData'
         api.public.subscribe.v1.SubscribeDiscount:
             type: object
             properties:
@@ -12848,8 +13097,7 @@ components:
                 nodes:
                     type: array
                     items:
-                        type: integer
-                        format: int32
+                        type: string
                 nodeTags:
                     type: array
                     items:
@@ -12865,8 +13113,7 @@ components:
                 allowDeduction:
                     type: boolean
                 resetCycle:
-                    type: integer
-                    format: int32
+                    type: string
                 createdAt:
                     type: string
                 updatedAt:
@@ -12894,6 +13141,82 @@ components:
                 data:
                     $ref: '#/components/schemas/api.public.subscribe.v1.SubscribeListData'
             description: SubscribeListReply 查询订阅列表响应
+        api.public.subscribe.v1.UserSubscribeInfo:
+            type: object
+            properties:
+                id:
+                    type: string
+                userId:
+                    type: string
+                orderId:
+                    type: string
+                subscribeId:
+                    type: string
+                startTime:
+                    type: string
+                expireTime:
+                    type: string
+                finishedAt:
+                    type: string
+                resetTime:
+                    type: string
+                traffic:
+                    type: string
+                download:
+                    type: string
+                upload:
+                    type: string
+                token:
+                    type: string
+                status:
+                    type: integer
+                    format: int32
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                isTryOut:
+                    type: boolean
+                nodes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.public.subscribe.v1.UserSubscribeNodeInfo'
+        api.public.subscribe.v1.UserSubscribeNodeInfo:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                uuid:
+                    type: string
+                protocol:
+                    type: string
+                protocols:
+                    type: string
+                port:
+                    type: integer
+                    format: uint32
+                address:
+                    type: string
+                tags:
+                    type: array
+                    items:
+                        type: string
+                country:
+                    type: string
+                city:
+                    type: string
+                longitude:
+                    type: string
+                latitude:
+                    type: string
+                latitudeCenter:
+                    type: string
+                longitudeCenter:
+                    type: string
+                createdAt:
+                    type: string
         api.public.subscription.v1.GetSubscribeConfigData:
             type: object
             properties:
@@ -14045,7 +14368,9 @@ tags:
       description: Ticket service for users
     - name: Tool
     - name: User
-      description: "Public User service\r\n 公共用户服务（需要认证）"
+      description: |-
+        Public User service
+         公共用户服务（需要认证）
     - name: UserAuthMethodService
       description: UserAuthMethodService 用户认证方法管理服务
     - name: UserDeviceService

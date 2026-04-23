@@ -2,20 +2,14 @@ package server
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
-	"time"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	"github.com/OmnTeam/ppanel-pro/internal/data"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	"github.com/OmnTeam/ppanel-pro/pkg/constant"
 	"github.com/go-kratos/kratos/v2/log"
-	khttp "github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -34,106 +28,7 @@ type compatPathTokenRequest struct {
 	Token    string `json:"token"`
 }
 
-type compatDailyTrafficStats struct {
-	Date     string `json:"date"`
-	Upload   int64  `json:"upload"`
-	Download int64  `json:"download"`
-	Total    int64  `json:"total"`
-}
-
-type compatTrafficStatsData struct {
-	TotalUpload   int64                     `json:"total_upload"`
-	TotalDownload int64                     `json:"total_download"`
-	TotalTraffic  int64                     `json:"total_traffic"`
-	List          []compatDailyTrafficStats `json:"list"`
-}
-
-type compatUpdateUserRulesRequest struct {
-	Rules []string `json:"rules"`
-}
-
-type compatUpdateUserSubscribeNoteRequest struct {
-	UserSubscribeID compatFlexibleInt64 `json:"user_subscribe_id"`
-	Note            string              `json:"note"`
-}
-
-type compatFlexibleInt64 int64
-
-func (v *compatFlexibleInt64) UnmarshalJSON(data []byte) error {
-	raw := strings.TrimSpace(string(data))
-	if raw == "" || raw == "null" {
-		*v = 0
-		return nil
-	}
-	if strings.HasPrefix(raw, "\"") {
-		var text string
-		if err := json.Unmarshal(data, &text); err != nil {
-			return err
-		}
-		*v = compatFlexibleInt64(compatParseInt64String(text))
-		return nil
-	}
-	parsed, err := strconv.ParseInt(raw, 10, 64)
-	if err != nil {
-		return err
-	}
-	*v = compatFlexibleInt64(parsed)
-	return nil
-}
-
-func (v *compatFlexibleInt64) UnmarshalText(text []byte) error {
-	raw := strings.TrimSpace(string(text))
-	if raw == "" {
-		*v = 0
-		return nil
-	}
-	parsed, err := strconv.ParseInt(raw, 10, 64)
-	if err != nil {
-		return err
-	}
-	*v = compatFlexibleInt64(parsed)
-	return nil
-}
-
-func compatInt64SliceToStringSlice(values []int64) []string {
-	if len(values) == 0 {
-		return nil
-	}
-	result := make([]string, 0, len(values))
-	for _, value := range values {
-		result = append(result, strconv.FormatInt(value, 10))
-	}
-	return result
-}
-
-func compatCurrentUser(ctx context.Context) (*ent.ProxyUser, error) {
-	user, ok := ctx.Value(constant.CtxKeyUser).(*ent.ProxyUser)
-	if !ok || user == nil {
-		return nil, responsecode.NewKratosError(responsecode.ErrInvalidAccess)
-	}
-	return user, nil
-}
-
-func compatCurrentSessionID(ctx context.Context) string {
-	sessionID, _ := ctx.Value(constant.CtxKeySessionID).(string)
-	return strings.TrimSpace(sessionID)
-}
-
-func compatUnix(value *time.Time) int64 {
-	if value == nil {
-		return 0
-	}
-	return value.Unix()
-}
-
 func compatInt64Value(value *int64) int64 {
-	if value == nil {
-		return 0
-	}
-	return *value
-}
-
-func compatInt8Value(value *int8) int8 {
 	if value == nil {
 		return 0
 	}
@@ -314,21 +209,4 @@ func compatRequiredFieldError(typeName, fieldName string) error {
 		fieldName,
 		fieldName,
 	))
-}
-
-func compatBindQuery(ctx khttp.Context, req interface{}) error {
-	if req == nil {
-		return nil
-	}
-	return ctx.BindQuery(req)
-}
-
-func compatBindBodyAndQuery(ctx khttp.Context, req interface{}) error {
-	if req == nil {
-		return nil
-	}
-	if err := ctx.Bind(req); err != nil {
-		return err
-	}
-	return ctx.BindQuery(req)
 }

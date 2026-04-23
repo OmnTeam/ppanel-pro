@@ -40,6 +40,17 @@ type compatLegacyServerCommon struct {
 	SecretKey string `form:"secret_key"json:"secret_key"`
 }
 
+func (c *compatLegacyServerCommon) UnmarshalJSON(data []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	c.Protocol = compatLegacyStringField(raw, "protocol")
+	c.ServerID = compatLegacyInt64Field(raw, "server_id", "serverId")
+	c.SecretKey = compatLegacyStringField(raw, "secret_key", "secretKey")
+	return nil
+}
+
 type compatLegacyGetServerConfigRequest struct{ compatLegacyServerCommon }
 type compatLegacyGetServerUserListRequest struct{ compatLegacyServerCommon }
 
@@ -71,9 +82,35 @@ type compatLegacyUserTraffic struct {
 	Download int64 `json:"download"`
 }
 
+func (t *compatLegacyUserTraffic) UnmarshalJSON(data []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	t.SID = compatLegacyInt64Field(raw, "uid", "sid")
+	t.Upload = compatLegacyInt64Field(raw, "upload")
+	t.Download = compatLegacyInt64Field(raw, "download")
+	return nil
+}
+
 type compatLegacyPushUserTrafficRequest struct {
 	compatLegacyServerCommon
 	Traffic []compatLegacyUserTraffic `json:"traffic"`
+}
+
+func (r *compatLegacyPushUserTrafficRequest) UnmarshalJSON(data []byte) error {
+	type payload struct {
+		Traffic []compatLegacyUserTraffic `json:"traffic"`
+	}
+	var body payload
+	if err := json.Unmarshal(data, &body); err != nil {
+		return err
+	}
+	if err := r.compatLegacyServerCommon.UnmarshalJSON(data); err != nil {
+		return err
+	}
+	r.Traffic = body.Traffic
+	return nil
 }
 
 type compatLegacyOnlineUser struct {
@@ -81,9 +118,34 @@ type compatLegacyOnlineUser struct {
 	IP  string `json:"ip"`
 }
 
+func (u *compatLegacyOnlineUser) UnmarshalJSON(data []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	u.SID = compatLegacyInt64Field(raw, "uid", "sid")
+	u.IP = compatLegacyStringField(raw, "ip")
+	return nil
+}
+
 type compatLegacyPushOnlineUsersRequest struct {
 	compatLegacyServerCommon
 	Users []compatLegacyOnlineUser `json:"users"`
+}
+
+func (r *compatLegacyPushOnlineUsersRequest) UnmarshalJSON(data []byte) error {
+	type payload struct {
+		Users []compatLegacyOnlineUser `json:"users"`
+	}
+	var body payload
+	if err := json.Unmarshal(data, &body); err != nil {
+		return err
+	}
+	if err := r.compatLegacyServerCommon.UnmarshalJSON(data); err != nil {
+		return err
+	}
+	r.Users = body.Users
+	return nil
 }
 
 type compatLegacyPushServerStatusRequest struct {
@@ -94,10 +156,97 @@ type compatLegacyPushServerStatusRequest struct {
 	UpdatedAt int64   `json:"updated_at"`
 }
 
+func (r *compatLegacyPushServerStatusRequest) UnmarshalJSON(data []byte) error {
+	var raw map[string]interface{}
+	if err := json.Unmarshal(data, &raw); err != nil {
+		return err
+	}
+	if err := r.compatLegacyServerCommon.UnmarshalJSON(data); err != nil {
+		return err
+	}
+	r.CPU = compatLegacyFloat64Field(raw, "cpu")
+	r.Mem = compatLegacyFloat64Field(raw, "mem")
+	r.Disk = compatLegacyFloat64Field(raw, "disk")
+	r.UpdatedAt = compatLegacyInt64Field(raw, "updated_at", "updatedAt")
+	return nil
+}
+
 type compatLegacyQueryServerConfigRequest struct {
 	ServerID  int64
 	SecretKey string   `form:"secret_key"`
 	Protocols []string `form:"protocols,omitempty"`
+}
+
+func compatLegacyStringField(raw map[string]interface{}, keys ...string) string {
+	for _, key := range keys {
+		value, ok := raw[key]
+		if !ok || value == nil {
+			continue
+		}
+		switch typed := value.(type) {
+		case string:
+			if trimmed := strings.TrimSpace(typed); trimmed != "" {
+				return trimmed
+			}
+		default:
+			if trimmed := strings.TrimSpace(fmt.Sprintf("%v", typed)); trimmed != "" && trimmed != "<nil>" {
+				return trimmed
+			}
+		}
+	}
+	return ""
+}
+
+func compatLegacyInt64Field(raw map[string]interface{}, keys ...string) int64 {
+	for _, key := range keys {
+		value, ok := raw[key]
+		if !ok || value == nil {
+			continue
+		}
+		switch typed := value.(type) {
+		case float64:
+			return int64(typed)
+		case json.Number:
+			if parsed, err := typed.Int64(); err == nil {
+				return parsed
+			}
+		case string:
+			if parsed, err := strconv.ParseInt(strings.TrimSpace(typed), 10, 64); err == nil {
+				return parsed
+			}
+		default:
+			if parsed, err := strconv.ParseInt(strings.TrimSpace(fmt.Sprintf("%v", typed)), 10, 64); err == nil {
+				return parsed
+			}
+		}
+	}
+	return 0
+}
+
+func compatLegacyFloat64Field(raw map[string]interface{}, keys ...string) float64 {
+	for _, key := range keys {
+		value, ok := raw[key]
+		if !ok || value == nil {
+			continue
+		}
+		switch typed := value.(type) {
+		case float64:
+			return typed
+		case json.Number:
+			if parsed, err := typed.Float64(); err == nil {
+				return parsed
+			}
+		case string:
+			if parsed, err := strconv.ParseFloat(strings.TrimSpace(typed), 64); err == nil {
+				return parsed
+			}
+		default:
+			if parsed, err := strconv.ParseFloat(strings.TrimSpace(fmt.Sprintf("%v", typed)), 64); err == nil {
+				return parsed
+			}
+		}
+	}
+	return 0
 }
 
 type compatLegacyNodeDNS struct {
@@ -1290,4 +1439,19 @@ func compatLegacySanitizeOutboundList(values []compatLegacyNodeOutbound) []compa
 		return nil
 	}
 	return result
+}
+
+func compatIsLegacyUnlimitedTime(value *time.Time) bool {
+	return value != nil && value.Unix() == 0
+}
+
+func compatNodeMatchesTags(nodeTags string, tags []string) bool {
+	for _, tag := range tags {
+		for _, item := range strings.Split(nodeTags, ",") {
+			if strings.TrimSpace(item) == tag {
+				return true
+			}
+		}
+	}
+	return false
 }

@@ -26,6 +26,7 @@ const OperationCommonGetGlobalConfig = "/api.public.common.v1.Common/GetGlobalCo
 const OperationCommonGetPrivacyPolicy = "/api.public.common.v1.Common/GetPrivacyPolicy"
 const OperationCommonGetStat = "/api.public.common.v1.Common/GetStat"
 const OperationCommonGetTos = "/api.public.common.v1.Common/GetTos"
+const OperationCommonHeartbeat = "/api.public.common.v1.Common/Heartbeat"
 const OperationCommonSendEmailCode = "/api.public.common.v1.Common/SendEmailCode"
 const OperationCommonSendSmsCode = "/api.public.common.v1.Common/SendSmsCode"
 
@@ -44,6 +45,8 @@ type CommonHTTPServer interface {
 	GetStat(context.Context, *GetStatRequest) (*GetStatReply, error)
 	// GetTos Get TOS (Terms of Service)
 	GetTos(context.Context, *GetTosRequest) (*GetTosReply, error)
+	// Heartbeat Heartbeat
+	Heartbeat(context.Context, *HeartbeatRequest) (*HeartbeatReply, error)
 	// SendEmailCode Send email verification code
 	SendEmailCode(context.Context, *SendEmailCodeRequest) (*SendCodeReply, error)
 	// SendSmsCode Send SMS verification code
@@ -57,6 +60,7 @@ func RegisterCommonHTTPServer(s *http.Server, srv CommonHTTPServer) {
 	r.GET("/v1/common/site/privacy", _Common_GetPrivacyPolicy0_HTTP_Handler(srv))
 	r.GET("/v1/common/site/tos", _Common_GetTos0_HTTP_Handler(srv))
 	r.GET("/v1/common/site/config", _Common_GetGlobalConfig0_HTTP_Handler(srv))
+	r.GET("/v1/common/heartbeat", _Common_Heartbeat0_HTTP_Handler(srv))
 	r.GET("/v1/common/site/stat", _Common_GetStat0_HTTP_Handler(srv))
 	r.POST("/v1/common/send_code", _Common_SendEmailCode0_HTTP_Handler(srv))
 	r.POST("/v1/common/send_sms_code", _Common_SendSmsCode0_HTTP_Handler(srv))
@@ -158,6 +162,25 @@ func _Common_GetGlobalConfig0_HTTP_Handler(srv CommonHTTPServer) func(ctx http.C
 	}
 }
 
+func _Common_Heartbeat0_HTTP_Handler(srv CommonHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in HeartbeatRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationCommonHeartbeat)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.Heartbeat(ctx, req.(*HeartbeatRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*HeartbeatReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _Common_GetStat0_HTTP_Handler(srv CommonHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in GetStatRequest
@@ -251,6 +274,7 @@ type CommonHTTPClient interface {
 	GetPrivacyPolicy(ctx context.Context, req *GetPrivacyPolicyRequest, opts ...http.CallOption) (rsp *GetPrivacyPolicyReply, err error)
 	GetStat(ctx context.Context, req *GetStatRequest, opts ...http.CallOption) (rsp *GetStatReply, err error)
 	GetTos(ctx context.Context, req *GetTosRequest, opts ...http.CallOption) (rsp *GetTosReply, err error)
+	Heartbeat(ctx context.Context, req *HeartbeatRequest, opts ...http.CallOption) (rsp *HeartbeatReply, err error)
 	SendEmailCode(ctx context.Context, req *SendEmailCodeRequest, opts ...http.CallOption) (rsp *SendCodeReply, err error)
 	SendSmsCode(ctx context.Context, req *SendSmsCodeRequest, opts ...http.CallOption) (rsp *SendCodeReply, err error)
 }
@@ -346,6 +370,19 @@ func (c *CommonHTTPClientImpl) GetTos(ctx context.Context, in *GetTosRequest, op
 	pattern := "/v1/common/site/tos"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationCommonGetTos))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *CommonHTTPClientImpl) Heartbeat(ctx context.Context, in *HeartbeatRequest, opts ...http.CallOption) (*HeartbeatReply, error) {
+	var out HeartbeatReply
+	pattern := "/v1/common/heartbeat"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationCommonHeartbeat))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

@@ -3,6 +3,7 @@ package common
 import (
 	"context"
 	"strconv"
+	"time"
 
 	pb "github.com/OmnTeam/ppanel-pro/api/public/common/v1"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/common"
@@ -254,6 +255,19 @@ func getMapValue(values map[string]string, keys ...string) string {
 		}
 	}
 	return ""
+}
+
+// Heartbeat returns service liveness info
+func (s *CommonService) Heartbeat(ctx context.Context, req *pb.HeartbeatRequest) (*pb.HeartbeatReply, error) {
+	return &pb.HeartbeatReply{
+		Code:    int32(responsecode.GetGlobalConfigSuccess),
+		Message: responsecode.CodeMessages[responsecode.GetGlobalConfigSuccess],
+		Data: &pb.HeartbeatData{
+			Status:    true,
+			Message:   "service is alive",
+			Timestamp: strconv.FormatInt(time.Now().Unix(), 10),
+		},
+	}, nil
 }
 
 // GetStat gets system statistics

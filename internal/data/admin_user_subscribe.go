@@ -190,13 +190,6 @@ func (r *adminUserSubscribeRepo) CreateUserSubscribe(ctx context.Context, req *v
 		return 0, err
 	}
 
-	// TODO: 清除缓存
-	// 1. 清除用户缓存
-	// 2. 清除订阅套餐缓存
-	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
-		r.logger.Warnf("Failed to clear legacy server caches after creating user subscribe %d: %v", created.ID, err)
-	}
-
 	return created.ID, nil
 }
 
@@ -258,13 +251,6 @@ func (r *adminUserSubscribeRepo) UpdateUserSubscribe(ctx context.Context, req *v
 		return err
 	}
 
-	// TODO: 清除缓存
-	// 1. 清除用户订阅缓存
-	// 2. 清除订阅套餐缓存（新旧两个套餐都需要清除）
-	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
-		r.logger.Warnf("Failed to clear legacy server caches after updating user subscribe %d: %v", id, err)
-	}
-
 	return nil
 }
 
@@ -290,13 +276,6 @@ func (r *adminUserSubscribeRepo) DeleteUserSubscribe(ctx context.Context, id int
 	if err != nil {
 		r.logger.Errorf("Failed to delete user subscribe: %v", err)
 		return err
-	}
-
-	// TODO: 清除缓存
-	// 1. 清除用户订阅缓存
-	// 2. 清除订阅套餐缓存
-	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
-		r.logger.Warnf("Failed to clear legacy server caches after deleting user subscribe %d: %v", id, err)
 	}
 
 	return nil
@@ -623,9 +602,6 @@ func (r *adminUserSubscribeRepo) ResetUserSubscribeToken(ctx context.Context, us
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
 	}
 
-	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
-		r.logger.Warnf("Failed to clear legacy server caches after resetting user subscribe token %d: %v", userSubscribeID, err)
-	}
 	return nil
 }
 
@@ -663,9 +639,6 @@ func (r *adminUserSubscribeRepo) ToggleUserSubscribeStatus(ctx context.Context, 
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
 	}
 
-	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
-		r.logger.Warnf("Failed to clear legacy server caches after toggling user subscribe status %d: %v", userSubscribeID, err)
-	}
 	return nil
 }
 
@@ -689,9 +662,6 @@ func (r *adminUserSubscribeRepo) ResetUserSubscribeTraffic(ctx context.Context, 
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
 	}
 
-	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
-		r.logger.Warnf("Failed to clear legacy server caches after resetting user subscribe traffic %d: %v", userSubscribeID, err)
-	}
 	return nil
 }
 

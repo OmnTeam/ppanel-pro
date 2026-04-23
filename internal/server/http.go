@@ -103,10 +103,10 @@ func NewHTTPServer(c *conf.Server, appConf *conf.Application, authMiddleware *ap
 			middleware.Logging(logger), // Logging middleware，记录请求日志
 			authMiddleware.Auth(),      // 对齐旧项目认证语义
 		),
-		http.ErrorEncoder(CustomErrorEncoder),       // 使用自定义错误编码器，所有错误返回HTTP 200
-		http.RequestDecoder(CustomRequestDecoder),   // 使用自定义请求解码器，处理前端空对象问题
-		http.ResponseEncoder(CustomResponseEncoder), // 使用自定义响应编码器，解决 int64 序列化问题
-		http.StrictSlash(false),                     // 禁用尾部斜杠自动重定向，通过手动注册两个路由来支持
+		http.ErrorEncoder(CustomErrorEncoder), // 使用自定义错误编码器，所有错误返回HTTP 200
+		//http.RequestDecoder(CustomRequestDecoder),   // 使用自定义请求解码器，处理前端空对象问题
+		//http.ResponseEncoder(CustomResponseEncoder), // 使用自定义响应编码器，解决 int64 序列化问题
+		http.StrictSlash(false), // 禁用尾部斜杠自动重定向，通过手动注册两个路由来支持
 		http.NotFoundHandler(newCORSAwareFallbackHandler(c.Cors, nethttp.StatusNotFound)),
 		http.MethodNotAllowedHandler(newCORSAwareFallbackHandler(c.Cors, nethttp.StatusMethodNotAllowed)),
 	}
@@ -120,7 +120,7 @@ func NewHTTPServer(c *conf.Server, appConf *conf.Application, authMiddleware *ap
 		opts = append(opts, http.Timeout(httpConf.Timeout.AsDuration()))
 	}
 	srv := http.NewServer(opts...)
-	registerLegacyCompatRoutes(srv, authCompat, auth, oauthSvc, d, appConf, publicPayment, publicTicket, publicUser, logger)
+	registerLegacyCompatRoutes(srv, authCompat, d, appConf, publicPayment, logger)
 	adsv1.RegisterAdsServiceHTTPServer(srv, ads)
 	announcementv1.RegisterAnnouncementServiceHTTPServer(srv, announcement)
 	applicationv1.RegisterSubscribeApplicationServiceHTTPServer(srv, application)
@@ -145,6 +145,7 @@ func NewHTTPServer(c *conf.Server, appConf *conf.Application, authMiddleware *ap
 	adminuserv1.RegisterUserDeviceServiceHTTPServer(srv, adminUserDevice)
 	adminuserv1.RegisterUserSubscribeServiceHTTPServer(srv, adminUserSubscribe)
 	// Auth模块服务注册
+	auth.SetAuthCompat(newAuthCompatAdapter(authCompat))
 	publicauthv1.RegisterAuthHTTPServer(srv, auth)
 	// Auth OAuth模块服务注册
 	authoauthv1.RegisterOAuthHTTPServer(srv, oauthSvc)

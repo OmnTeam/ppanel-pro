@@ -38,13 +38,6 @@ import (
 )
 
 const (
-	legacyCacheUserIDPrefix             = "cache:user:id:"
-	legacyCacheUserEmailPrefix          = "cache:user:email:"
-	legacyCacheUserSubscribeTokenPrefix = "cache:user:subscribe:token:"
-	legacyCacheUserSubscribeUserPrefix  = "cache:user:subscribe:user:"
-	legacyCacheUserSubscribeIDPrefix    = "cache:user:subscribe:id:"
-	legacyCacheSubscribeIDPrefix        = "cache:subscribe:id:"
-	legacyCacheSubscribeServersPrefix   = "cache:subscribe:servers:"
 	legacyDeviceIdentifierSessionPrefix = "auth:device_identifier"
 	legacyTelegramUnbindMessageTemplate = "Your account has been unbound.\n\nUser ID: {{.Id}}\nTime: {{.Time}}\n"
 )
@@ -240,51 +233,6 @@ func (r *publicUserRepo) deleteRedisKeys(ctx context.Context, keys ...string) {
 	}
 }
 
-func (r *publicUserRepo) clearLegacyUserCaches(ctx context.Context, userID int64, extraEmails ...string) {
-	keys := []string{
-		fmt.Sprintf("%s%d", legacyCacheUserIDPrefix, userID),
-	}
-
-	methods, err := r.data.db.ProxyUserAuthMethod.Query().
-		Where(proxyuserauthmethod.UserIDEQ(userID)).
-		All(ctx)
-	if err == nil {
-		for _, item := range methods {
-			if strings.EqualFold(item.AuthType, "email") {
-				keys = append(keys, fmt.Sprintf("%s%s", legacyCacheUserEmailPrefix, item.AuthIdentifier))
-			}
-		}
-	}
-	for _, email := range extraEmails {
-		email = strings.TrimSpace(email)
-		if email != "" {
-			keys = append(keys, fmt.Sprintf("%s%s", legacyCacheUserEmailPrefix, email))
-		}
-	}
-	r.deleteRedisKeys(ctx, keys...)
-}
-
-func (r *publicUserRepo) clearLegacyUserSubscribeCaches(ctx context.Context, userSub *ent.ProxyUserSubscribe) {
-	if userSub == nil {
-		return
-	}
-	keys := []string{
-		fmt.Sprintf("%s%d", legacyCacheUserSubscribeUserPrefix, userSub.UserID),
-		fmt.Sprintf("%s%d", legacyCacheUserSubscribeIDPrefix, userSub.ID),
-	}
-	if userSub.Token != nil && strings.TrimSpace(*userSub.Token) != "" {
-		keys = append(keys, fmt.Sprintf("%s%s", legacyCacheUserSubscribeTokenPrefix, *userSub.Token))
-	}
-	r.deleteRedisKeys(ctx, keys...)
-}
-
-func (r *publicUserRepo) clearLegacySubscribeCaches(ctx context.Context, subscribeID int64) {
-	r.deleteRedisKeys(ctx,
-		fmt.Sprintf("%s%d", legacyCacheSubscribeIDPrefix, subscribeID),
-		fmt.Sprintf("%s%d", legacyCacheSubscribeServersPrefix, subscribeID),
-	)
-}
-
 func (r *publicUserRepo) clearLegacyDeviceSessionCaches(ctx context.Context, identifier string) {
 	identifier = strings.TrimSpace(identifier)
 	if identifier == "" {
@@ -297,15 +245,6 @@ func (r *publicUserRepo) clearLegacyDeviceSessionCaches(ctx context.Context, ide
 		return
 	}
 	r.deleteRedisKeys(ctx, deviceKey)
-}
-
-func (r *publicUserRepo) clearLegacyServerUserCaches(ctx context.Context) {
-	if r == nil || r.data == nil {
-		return
-	}
-	if err := ClearLegacyServerAllCaches(ctx, r.data.rdb); err != nil {
-		r.logger.Warnw("delete legacy server caches failed", "error", err)
-	}
 }
 
 func (r *publicUserRepo) loadVerifyCodePayload(ctx context.Context, keys ...string) (*verifyCodePayload, string, error) {
@@ -784,7 +723,7 @@ func (r *publicUserRepo) ResetUserSubscribeToken(ctx context.Context, userID, us
 	newToken := uuidx.SubscribeToken(orderNo + time.Now().Format("20060102150405.000"))
 	newUUID := uuidx.NewUUID().String()
 
-	updated, err := r.data.db.ProxyUserSubscribe.UpdateOneID(userSub.ID).
+	_, err = r.data.db.ProxyUserSubscribe.UpdateOneID(userSub.ID).
 		SetToken(newToken).
 		SetUUID(newUUID).
 		Save(ctx)
@@ -792,9 +731,6 @@ func (r *publicUserRepo) ResetUserSubscribeToken(ctx context.Context, userID, us
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
 	}
 
-	r.clearLegacyUserSubscribeCaches(ctx, updated)
-	r.clearLegacySubscribeCaches(ctx, updated.SubscribeID)
-	r.clearLegacyServerUserCaches(ctx)
 	return nil
 }
 
@@ -822,7 +758,11 @@ func (r *publicUserRepo) calculateRemainingAmount(ctx context.Context, userID, u
 	if err != nil {
 		return 0, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
-	if !subscribePlan.AllowDeduction {
+	singleModelEnabled := r.data.AppConf() != nil && r.data.AppConf().Subscribe != nil && r.data.AppConf().Subscribe.SingleModel
+	if values, configErr := loadSystemConfigMap(ctx, r.data.db, "subscribe"); configErr == nil {
+		singleModelEnabled = systemConfigBool(values, singleModelEnabled, "SingleModel", "single_model")
+	}
+	if !subscribePlan.AllowDeduction && !singleModelEnabled {
 		return 0, kratoserrors.BadRequest("DEDUCTION_NOT_ALLOWED", "The subscription package does not support deductions")
 	}
 
@@ -993,9 +933,6 @@ func (r *publicUserRepo) Unsubscribe(ctx context.Context, userID, id int) error 
 		return err
 	}
 
-	r.clearLegacyUserCaches(ctx, int64(userID))
-	r.clearLegacyUserSubscribeCaches(ctx, updatedSub)
-	r.clearLegacySubscribeCaches(ctx, updatedSub.SubscribeID)
 	return nil
 }
 
@@ -1008,7 +945,6 @@ func (r *publicUserRepo) UpdateUserNotify(ctx context.Context, userID int, enabl
 		Exec(ctx); err != nil {
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
 	}
-	r.clearLegacyUserCaches(ctx, int64(userID))
 	return nil
 }
 
@@ -1020,7 +956,6 @@ func (r *publicUserRepo) UpdateUserPassword(ctx context.Context, userID int, pas
 		Exec(ctx); err != nil {
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
 	}
-	r.clearLegacyUserCaches(ctx, int64(userID))
 	return nil
 }
 
@@ -1063,8 +998,6 @@ func (r *publicUserRepo) UnbindTelegram(ctx context.Context, userID int) error {
 	if err := r.data.db.ProxyUserAuthMethod.DeleteOneID(method.ID).Exec(ctx); err != nil {
 		return responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
 	}
-
-	r.clearLegacyUserCaches(ctx, int64(userID))
 
 	text, renderErr := tool.RenderTemplateToString(legacyTelegramUnbindMessageTemplate, map[string]string{
 		"Id":   strconv.FormatInt(int64(userID), 10),
@@ -1262,8 +1195,6 @@ func (r *publicUserRepo) BindOAuthCallback(ctx context.Context, userID int, meth
 	default:
 		return kratoserrors.BadRequest("UNSUPPORTED_OAUTH_METHOD", fmt.Sprintf("oauth login method not support: %s", method))
 	}
-
-	r.clearLegacyUserCaches(ctx, int64(userID))
 	return nil
 }
 
@@ -1280,7 +1211,6 @@ func (r *publicUserRepo) UnbindOAuth(ctx context.Context, userID int, method str
 		Exec(ctx); err != nil {
 		return responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
 	}
-	r.clearLegacyUserCaches(ctx, int64(userID))
 	return nil
 }
 
@@ -1316,7 +1246,6 @@ func (r *publicUserRepo) VerifyEmail(ctx context.Context, userID int, email, cod
 		Exec(ctx); err != nil {
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
 	}
-	r.clearLegacyUserCaches(ctx, int64(userID), email)
 	return nil
 }
 
@@ -1379,8 +1308,6 @@ func (r *publicUserRepo) UpdateBindMobile(ctx context.Context, userID int, areaC
 			return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
 		}
 	}
-
-	r.clearLegacyUserCaches(ctx, int64(userID))
 	return nil
 }
 
@@ -1425,8 +1352,6 @@ func (r *publicUserRepo) UpdateBindEmail(ctx context.Context, userID int, email 
 			return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
 		}
 	}
-
-	r.clearLegacyUserCaches(ctx, int64(userID), email)
 	return nil
 }
 
@@ -1510,7 +1435,6 @@ func (r *publicUserRepo) UnbindDevice(ctx context.Context, userID, deviceID int)
 	}
 
 	r.clearLegacyDeviceSessionCaches(ctx, stringPointerValue(deviceInfo.Identifier))
-	r.clearLegacyUserCaches(ctx, int64(userID))
 	return nil
 }
 
@@ -1615,8 +1539,6 @@ func (r *publicUserRepo) UpdateUserSubscribeNote(ctx context.Context, userID int
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
 	}
 
-	r.clearLegacyUserSubscribeCaches(ctx, userSub)
-	r.clearLegacySubscribeCaches(ctx, userSub.SubscribeID)
 	return nil
 }
 
@@ -1634,29 +1556,10 @@ func (r *publicUserRepo) UpdateUserRules(ctx context.Context, userID int, rules 
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
 	}
 
-	r.clearLegacyUserCaches(ctx, int64(userID))
 	return nil
 }
 
 func (r *publicUserRepo) DeleteCurrentUserAccount(ctx context.Context, userID int, sessionID string) error {
-	emails := make([]string, 0)
-	methods, err := r.data.db.ProxyUserAuthMethod.Query().
-		Where(
-			proxyuserauthmethod.UserIDEQ(int64(userID)),
-			proxyuserauthmethod.AuthTypeEQ("email"),
-		).
-		All(ctx)
-	if err == nil {
-		for _, method := range methods {
-			if strings.TrimSpace(method.AuthIdentifier) != "" {
-				emails = append(emails, method.AuthIdentifier)
-			}
-		}
-	}
-	userSubs, _ := r.data.db.ProxyUserSubscribe.Query().
-		Where(proxyusersubscribe.UserIDEQ(int64(userID))).
-		All(ctx)
-
 	if err := r.data.db.TX(ctx, func(tx *ent.Tx) error {
 		if _, err := tx.ProxyUserDeviceOnlineRecord.Delete().Where(proxyuserdeviceonlinerecord.UserIDEQ(int64(userID))).Exec(ctx); err != nil {
 			return responsecode.NewKratosError(responsecode.ErrDatabaseDelete)
@@ -1682,11 +1585,6 @@ func (r *publicUserRepo) DeleteCurrentUserAccount(ctx context.Context, userID in
 		return err
 	}
 
-	for _, item := range userSubs {
-		r.clearLegacyUserSubscribeCaches(ctx, item)
-		r.clearLegacySubscribeCaches(ctx, item.SubscribeID)
-	}
-	r.clearLegacyUserCaches(ctx, int64(userID), emails...)
 	if strings.TrimSpace(sessionID) != "" {
 		r.deleteRedisKeys(ctx, fmt.Sprintf("%s:%s", constant.SessionIdKey, sessionID))
 	}

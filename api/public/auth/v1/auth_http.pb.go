@@ -21,18 +21,25 @@ const _ = http.SupportPackageIsVersion1
 
 const OperationAuthCheckUser = "/api.public.auth.v1.Auth/CheckUser"
 const OperationAuthCheckUserTelephone = "/api.public.auth.v1.Auth/CheckUserTelephone"
+const OperationAuthDeviceLogin = "/api.public.auth.v1.Auth/DeviceLogin"
+const OperationAuthGenerateCaptcha = "/api.public.auth.v1.Auth/GenerateCaptcha"
 const OperationAuthResetPassword = "/api.public.auth.v1.Auth/ResetPassword"
 const OperationAuthTelephoneLogin = "/api.public.auth.v1.Auth/TelephoneLogin"
 const OperationAuthTelephoneRegister = "/api.public.auth.v1.Auth/TelephoneRegister"
 const OperationAuthTelephoneResetPassword = "/api.public.auth.v1.Auth/TelephoneResetPassword"
 const OperationAuthUserLogin = "/api.public.auth.v1.Auth/UserLogin"
 const OperationAuthUserRegister = "/api.public.auth.v1.Auth/UserRegister"
+const OperationAuthVerifySliderCaptcha = "/api.public.auth.v1.Auth/VerifySliderCaptcha"
 
 type AuthHTTPServer interface {
 	// CheckUser CheckUser checks if user email exists
 	CheckUser(context.Context, *CheckUserRequest) (*CheckUserReply, error)
 	// CheckUserTelephone CheckUserTelephone checks if user telephone exists
 	CheckUserTelephone(context.Context, *CheckUserTelephoneRequest) (*CheckUserTelephoneReply, error)
+	// DeviceLogin DeviceLogin logs in user with device identifier
+	DeviceLogin(context.Context, *DeviceLoginRequest) (*LoginReply, error)
+	// GenerateCaptcha GenerateCaptcha generates captcha data
+	GenerateCaptcha(context.Context, *GenerateCaptchaRequest) (*GenerateCaptchaReply, error)
 	// ResetPassword ResetPassword resets user password with email
 	ResetPassword(context.Context, *ResetPasswordRequest) (*LoginReply, error)
 	// TelephoneLogin TelephoneLogin logs in user with telephone and password or code
@@ -45,6 +52,8 @@ type AuthHTTPServer interface {
 	UserLogin(context.Context, *UserLoginRequest) (*LoginReply, error)
 	// UserRegister UserRegister registers a new user with email
 	UserRegister(context.Context, *UserRegisterRequest) (*LoginReply, error)
+	// VerifySliderCaptcha VerifySliderCaptcha verifies slider captcha
+	VerifySliderCaptcha(context.Context, *VerifySliderCaptchaRequest) (*VerifySliderCaptchaReply, error)
 }
 
 func RegisterAuthHTTPServer(s *http.Server, srv AuthHTTPServer) {
@@ -57,6 +66,9 @@ func RegisterAuthHTTPServer(s *http.Server, srv AuthHTTPServer) {
 	r.POST("/v1/auth/register/telephone", _Auth_TelephoneRegister0_HTTP_Handler(srv))
 	r.POST("/v1/auth/reset", _Auth_ResetPassword1_HTTP_Handler(srv))
 	r.POST("/v1/auth/reset/telephone", _Auth_TelephoneResetPassword1_HTTP_Handler(srv))
+	r.POST("/v1/auth/captcha/generate", _Auth_GenerateCaptcha0_HTTP_Handler(srv))
+	r.POST("/v1/auth/captcha/slider/verify", _Auth_VerifySliderCaptcha0_HTTP_Handler(srv))
+	r.POST("/v1/auth/login/device", _Auth_DeviceLogin0_HTTP_Handler(srv))
 }
 
 func _Auth_CheckUser1_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error {
@@ -229,15 +241,84 @@ func _Auth_TelephoneResetPassword1_HTTP_Handler(srv AuthHTTPServer) func(ctx htt
 	}
 }
 
+func _Auth_GenerateCaptcha0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GenerateCaptchaRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthGenerateCaptcha)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GenerateCaptcha(ctx, req.(*GenerateCaptchaRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GenerateCaptchaReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Auth_VerifySliderCaptcha0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in VerifySliderCaptchaRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthVerifySliderCaptcha)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.VerifySliderCaptcha(ctx, req.(*VerifySliderCaptchaRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*VerifySliderCaptchaReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Auth_DeviceLogin0_HTTP_Handler(srv AuthHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeviceLoginRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthDeviceLogin)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeviceLogin(ctx, req.(*DeviceLoginRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*LoginReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 type AuthHTTPClient interface {
 	CheckUser(ctx context.Context, req *CheckUserRequest, opts ...http.CallOption) (rsp *CheckUserReply, err error)
 	CheckUserTelephone(ctx context.Context, req *CheckUserTelephoneRequest, opts ...http.CallOption) (rsp *CheckUserTelephoneReply, err error)
+	DeviceLogin(ctx context.Context, req *DeviceLoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
+	GenerateCaptcha(ctx context.Context, req *GenerateCaptchaRequest, opts ...http.CallOption) (rsp *GenerateCaptchaReply, err error)
 	ResetPassword(ctx context.Context, req *ResetPasswordRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
 	TelephoneLogin(ctx context.Context, req *TelephoneLoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
 	TelephoneRegister(ctx context.Context, req *TelephoneRegisterRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
 	TelephoneResetPassword(ctx context.Context, req *TelephoneResetPasswordRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
 	UserLogin(ctx context.Context, req *UserLoginRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
 	UserRegister(ctx context.Context, req *UserRegisterRequest, opts ...http.CallOption) (rsp *LoginReply, err error)
+	VerifySliderCaptcha(ctx context.Context, req *VerifySliderCaptchaRequest, opts ...http.CallOption) (rsp *VerifySliderCaptchaReply, err error)
 }
 
 type AuthHTTPClientImpl struct {
@@ -268,6 +349,32 @@ func (c *AuthHTTPClientImpl) CheckUserTelephone(ctx context.Context, in *CheckUs
 	opts = append(opts, http.Operation(OperationAuthCheckUserTelephone))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuthHTTPClientImpl) DeviceLogin(ctx context.Context, in *DeviceLoginRequest, opts ...http.CallOption) (*LoginReply, error) {
+	var out LoginReply
+	pattern := "/v1/auth/login/device"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAuthDeviceLogin))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuthHTTPClientImpl) GenerateCaptcha(ctx context.Context, in *GenerateCaptchaRequest, opts ...http.CallOption) (*GenerateCaptchaReply, error) {
+	var out GenerateCaptchaReply
+	pattern := "/v1/auth/captcha/generate"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAuthGenerateCaptcha))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -344,6 +451,19 @@ func (c *AuthHTTPClientImpl) UserRegister(ctx context.Context, in *UserRegisterR
 	pattern := "/v1/auth/register"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationAuthUserRegister))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AuthHTTPClientImpl) VerifySliderCaptcha(ctx context.Context, in *VerifySliderCaptchaRequest, opts ...http.CallOption) (*VerifySliderCaptchaReply, error) {
+	var out VerifySliderCaptchaReply
+	pattern := "/v1/auth/captcha/slider/verify"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAuthVerifySliderCaptcha))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

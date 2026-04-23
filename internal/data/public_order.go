@@ -192,7 +192,7 @@ func (r *publicOrderRepo) CloseOrder(ctx context.Context, userID int, orderNo st
 				Save(ctx)
 			if err != nil {
 				r.logger.Errorf("[CloseOrder] Create gift refund log failed: %v", err)
-				// 日志失败不回滚，仅记录错误
+				return errors.InternalServer("GIFT_REFUND_LOG_FAILED", "记录赠金退款日志失败")
 			}
 
 			r.logger.Infof("[CloseOrder] Refunded gift amount: %d to user: %d, new balance: %d", orderInfo.GiftAmount, orderInfo.UserID, newGiftAmount)
@@ -814,7 +814,6 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 	if err != nil {
 		return nil, err
 	}
-
 	// 与旧项目保持一致：创建订单后统一进入待支付状态，不在创建接口内立即扣款
 	r.enqueueDeferCloseOrderTask(ctx, int(req.UserID), createdOrder.OrderNo)
 
@@ -1118,7 +1117,6 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 	if err != nil {
 		return nil, err
 	}
-
 	// 与旧项目保持一致：创建订单后统一进入待支付状态，不在创建接口内立即扣款
 	r.enqueueDeferCloseOrderTask(ctx, int(req.UserID), createdOrder.OrderNo)
 
@@ -1276,7 +1274,6 @@ func (r *publicOrderRepo) ResetTraffic(ctx context.Context, req *publicBiz.Reset
 	if err != nil {
 		return nil, err
 	}
-
 	// 与旧项目保持一致：创建订单后统一进入待支付状态，不在创建接口内立即扣款
 	r.enqueueDeferCloseOrderTask(ctx, int(req.UserID), createdOrder.OrderNo)
 
@@ -1966,7 +1963,6 @@ func (r *publicOrderRepo) processBalancePayment(ctx context.Context, order *ent.
 		r.logger.Errorf("[processBalancePayment] Transaction failed: %v, orderNo: %s", err, order.OrderNo)
 		return responsecode.NewKratosError(responsecode.ErrOrderPaymentFailed)
 	}
-
 	// 将立即激活任务入队 (在事务外)
 	err = r.enqueueActivateOrderTask(ctx, int(userID), order.OrderNo)
 	if err != nil {

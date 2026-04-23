@@ -1,10 +1,10 @@
 server:
   http:
-    addr: 0.0.0.0:8088
-    timeout: 1s
+    addr: 0.0.0.0:8081
+    timeout: 55s
   grpc:
     addr: 0.0.0.0:9012
-    timeout: 1s
+    timeout: 55s
   auth:
     enable_jwt: true
     jwt_secret: "your-secret-key-change-in-production"
@@ -13,6 +13,7 @@ server:
       - "/api.public.common.v1."
       - "/api/public/auth/"
       - "/api/public/common/"
+      - "/api.server."
   cors:
     enable: true
     allowed_origins:
@@ -33,7 +34,7 @@ server:
 data:
   database:
     driver: mysql
-    source: root:password@tcp(127.0.0.1:3306)/ppanel-pro?parseTime=True&loc=Local
+    source: root:password@tcp(127.0.0.1:3306)/ppanel?parseTime=True&loc=Local
   redis:
     addr: 127.0.0.1:6379
     password:

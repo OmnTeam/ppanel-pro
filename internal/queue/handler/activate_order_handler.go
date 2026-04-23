@@ -981,84 +981,23 @@ func (h *ActivateOrderHandler) findTelegramID(ctx context.Context, user *ent.Pro
 // clearServerCache 清理与订阅关联的所有服务器的用户列表缓存
 // 复刻原项目 line 466-470
 func (h *ActivateOrderHandler) clearServerCache(ctx context.Context, sub *ent.ProxySubscribe) {
-	// 从原项目 subscribe/model.go:54-68 逻辑：
-	// 清理 cache:subscribe:id:{id} 和 cache:subscribe:servers:{id}
-	cacheKeys := []string{
-		fmt.Sprintf("cache:subscribe:id:%d", sub.ID),
-		fmt.Sprintf("cache:subscribe:servers:%d", sub.ID),
-	}
-
-	// 批量删除缓存
-	if err := h.rdb.Del(ctx, cacheKeys...).Err(); err != nil {
-		h.logger.Errorf("[ActivateOrder] 清理服务器缓存失败: %v, subscribeID=%d", err, sub.ID)
-		return
-	}
-	if err := clearLegacyServerAllCaches(ctx, h.rdb); err != nil {
-		h.logger.Errorf("[ActivateOrder] 清理兼容 server 缓存失败: %v, subscribeID=%d", err, sub.ID)
-		return
-	}
-
-	h.logger.Infof("[ActivateOrder] 清理服务器缓存成功: subscribeID=%d", sub.ID)
+	_ = ctx
+	_ = sub
 }
 
 // clearUserSubscribeCache 清理用户订阅缓存
 // 复刻原项目 line 495-502
 func (h *ActivateOrderHandler) clearUserSubscribeCache(ctx context.Context, userSub *ent.ProxyUserSubscribe) error {
-	// 从原项目 user/cache.go:63-79 逻辑：
-	// 清理用户订阅相关的所有缓存键
-	cacheKeys := []string{
-		fmt.Sprintf("cache:user:subscribe:token:%s", func() string {
-			if userSub.Token != nil {
-				return *userSub.Token
-			}
-			return ""
-		}()),
-		fmt.Sprintf("cache:user:subscribe:user:%d", userSub.UserID),
-		fmt.Sprintf("cache:user:subscribe:id:%d", userSub.ID),
-	}
-
-	// 批量删除缓存
-	if err := h.rdb.Del(ctx, cacheKeys...).Err(); err != nil {
-		h.logger.Errorf("[ActivateOrder] 清理用户订阅缓存失败: %v, userSubID=%d", err, userSub.ID)
-		return err
-	}
-
-	h.logger.Infof("[ActivateOrder] 清理用户订阅缓存成功: userSubID=%d", userSub.ID)
+	_ = ctx
+	_ = userSub
 	return nil
 }
 
 // updateUserCache 更新用户缓存
 // 复刻原项目 line 415-419, line 665-667
 func (h *ActivateOrderHandler) updateUserCache(ctx context.Context, user *ent.ProxyUser) error {
-	// 从原项目 user/cache.go:46-61, model.go:231-233 逻辑：
-	// 清理用户相关的所有缓存键（使用清理方式更新缓存）
-	cacheKeys := []string{
-		fmt.Sprintf("cache:user:id:%d", user.ID),
-	}
-
-	// 查询用户的认证方法，添加email缓存键
-	authMethods, err := h.db.ProxyUserAuthMethod.Query().
-		Where(
-			proxyuserauthmethod.UserIDEQ(user.ID),
-		).
-		All(ctx)
-
-	if err == nil {
-		for _, auth := range authMethods {
-			if auth.AuthType == "email" {
-				cacheKeys = append(cacheKeys, fmt.Sprintf("cache:user:email:%s", auth.AuthIdentifier))
-				break
-			}
-		}
-	}
-
-	// 批量删除缓存（清理即更新）
-	if err := h.rdb.Del(ctx, cacheKeys...).Err(); err != nil {
-		h.logger.Errorf("[ActivateOrder] 更新用户缓存失败: %v, userID=%d", err, user.ID)
-		return err
-	}
-
-	h.logger.Infof("[ActivateOrder] 更新用户缓存成功: userID=%d", user.ID)
+	_ = ctx
+	_ = user
 	return nil
 }
 

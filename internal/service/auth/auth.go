@@ -11,14 +11,42 @@ import (
 	"github.com/go-kratos/kratos/v2/transport"
 )
 
+type CompatGenerateCaptchaResult struct {
+	ID         string
+	Image      string
+	Type       string
+	BlockImage string
+}
+
+type CompatSliderVerifyResult struct {
+	Token string
+}
+
+type CompatDeviceLoginParams struct {
+	Identifier string
+	ShortCode  string
+	Meta       authbiz.RequestMeta
+}
+
+type AuthCompatProvider interface {
+	GenerateCaptcha(ctx context.Context) (*CompatGenerateCaptchaResult, error)
+	VerifySliderCaptcha(ctx context.Context, id string, x, y int, trail string) (*CompatSliderVerifyResult, error)
+	DeviceLogin(ctx context.Context, params *CompatDeviceLoginParams) (*authbiz.LoginResult, error)
+}
+
 type AuthService struct {
 	pb.UnimplementedAuthServer
 
-	uc *authbiz.AuthUsecase
+	uc         *authbiz.AuthUsecase
+	authCompat AuthCompatProvider
 }
 
 func NewAuthService(uc *authbiz.AuthUsecase) *AuthService {
 	return &AuthService{uc: uc}
+}
+
+func (s *AuthService) SetAuthCompat(authCompat AuthCompatProvider) {
+	s.authCompat = authCompat
 }
 
 func (s *AuthService) CheckUser(ctx context.Context, req *pb.CheckUserRequest) (*pb.CheckUserReply, error) {
@@ -137,6 +165,64 @@ func (s *AuthService) TelephoneResetPassword(ctx context.Context, req *pb.Teleph
 	}
 
 	return loginReply(result.Token, responsecode.PasswordResetSuccess), nil
+}
+
+func (s *AuthService) GenerateCaptcha(ctx context.Context, req *pb.GenerateCaptchaRequest) (*pb.GenerateCaptchaReply, error) {
+	if s.authCompat == nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
+	}
+
+	result, err := s.authCompat.GenerateCaptcha(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.GenerateCaptchaReply{
+		Code:    200,
+		Message: "success",
+		Data: &pb.GenerateCaptchaData{
+			Type:       result.Type,
+			Id:         result.ID,
+			Image:      result.Image,
+			BlockImage: result.BlockImage,
+		},
+	}, nil
+}
+
+func (s *AuthService) VerifySliderCaptcha(ctx context.Context, req *pb.VerifySliderCaptchaRequest) (*pb.VerifySliderCaptchaReply, error) {
+	if s.authCompat == nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
+	}
+
+	result, err := s.authCompat.VerifySliderCaptcha(ctx, req.Id, int(req.X), int(req.Y), req.Trail)
+	if err != nil {
+		return nil, err
+	}
+
+	return &pb.VerifySliderCaptchaReply{
+		Code:    200,
+		Message: "success",
+		Data: &pb.VerifySliderCaptchaData{
+			Token: result.Token,
+		},
+	}, nil
+}
+
+func (s *AuthService) DeviceLogin(ctx context.Context, req *pb.DeviceLoginRequest) (*pb.LoginReply, error) {
+	if s.authCompat == nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
+	}
+
+	result, err := s.authCompat.DeviceLogin(ctx, &CompatDeviceLoginParams{
+		Identifier: req.Identifier,
+		ShortCode:  req.ShortCode,
+		Meta:       buildRequestMeta(ctx, req.Ip, req.UserAgent, req.LoginType, req.Identifier, req.CfToken, "", "", ""),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return loginReply(result.Token, responsecode.UserLoginSuccess), nil
 }
 
 func loginReply(token string, code int) *pb.LoginReply {

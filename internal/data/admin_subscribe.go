@@ -348,21 +348,6 @@ func (r *subscribeRepo) ResetAllSubscribeToken(ctx context.Context) error {
 		return err
 	}
 
-	if r.data.Redis() != nil {
-		for _, userSub := range userSubs {
-			keys := []string{
-				fmt.Sprintf("cache:user:subscribe:user:%d", userSub.UserID),
-				fmt.Sprintf("cache:user:subscribe:id:%d", userSub.ID),
-				fmt.Sprintf("cache:subscribe:id:%d", userSub.SubscribeID),
-				fmt.Sprintf("cache:subscribe:servers:%d", userSub.SubscribeID),
-			}
-			if token := oldTokens[userSub.ID]; token != "" {
-				keys = append(keys, fmt.Sprintf("cache:user:subscribe:token:%s", token))
-			}
-			_ = r.data.Redis().Del(ctx, keys...).Err()
-		}
-	}
-
 	return nil
 }
 

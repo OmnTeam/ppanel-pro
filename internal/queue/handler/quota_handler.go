@@ -71,19 +71,6 @@ func (h *QuotaTaskHandler) ProcessTask(ctx context.Context, task *asynq.Task) er
 		return err
 	}
 
-	if content.GiftValue != 0 {
-		userIDs := make([]int64, 0, len(subscribes))
-		for _, sub := range subscribes {
-			if sub == nil {
-				continue
-			}
-			userIDs = append(userIDs, sub.UserID)
-		}
-		clearLegacyUserCaches(ctx, h.db, h.rdb, h.log, userIDs...)
-	}
-
-	clearLegacyUserSubscribeCaches(ctx, h.rdb, h.log, subscribes...)
-
 	h.log.WithContext(ctx).Infof("[QuotaTaskHandler] Successfully completed quota task %d, processed %d subscriptions",
 		taskID, len(subscribes))
 	return nil
