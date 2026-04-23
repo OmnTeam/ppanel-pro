@@ -53,26 +53,33 @@ type SubscribeDiscount struct {
 
 // Subscribe represents subscribe
 type Subscribe struct {
-	ID             int64
-	Name           string
-	Language       string
-	Description    string
-	UnitPrice      int64
-	UnitTime       string
-	Discount       []SubscribeDiscount
-	Replacement    int64
-	Inventory      int64
-	Traffic        int64
-	SpeedLimit     int64
-	DeviceLimit    int64
-	Quota          int64
-	Nodes          []int
-	NodeTags       []string
-	Show           bool
-	Sell           bool
-	Sort           int64
-	DeductionRatio int64
-	AllowDeduction bool
+	ID                int64
+	Name              string
+	Language          string
+	Description       string
+	UnitPrice         int64
+	UnitTime          string
+	Discount          []SubscribeDiscount
+	Replacement       int64
+	Inventory         int64
+	Traffic           int64
+	SpeedLimit        int64
+	DeviceLimit       int64
+	Quota             int64
+	Nodes             []int
+	NodeTags          []string
+	Show              bool
+	Sell              bool
+	Sort              int64
+	DeductionRatio    int64
+	AllowDeduction    bool
+	NodeGroupIds      []string
+	NodeGroupId       string
+	ResetCycle        int64
+	RenewalReset      bool
+	ShowOriginalPrice bool
+	CreatedAt         int64
+	UpdatedAt         int64
 }
 
 // OrderDetail represents order detail

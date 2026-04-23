@@ -17,6 +17,62 @@ func parseInt64(s string) int64 {
 	return val
 }
 
+func convertPortalTrafficLimits(items []portalBiz.TrafficLimit) []*v1.TrafficLimit {
+	result := make([]*v1.TrafficLimit, 0, len(items))
+	for _, item := range items {
+		result = append(result, &v1.TrafficLimit{
+			StatType:     item.StatType,
+			StatValue:    strconv.FormatInt(item.StatValue, 10),
+			TrafficUsage: strconv.FormatInt(item.TrafficUsage, 10),
+			SpeedLimit:   strconv.FormatInt(item.SpeedLimit, 10),
+		})
+	}
+	return result
+}
+
+func convertPortalSubscribe(item *portalBiz.SubscribeInfo) *v1.SubscribeInfo {
+	if item == nil {
+		return nil
+	}
+	discounts := make([]*v1.SubscribeDiscount, 0, len(item.Discount))
+	for _, d := range item.Discount {
+		discounts = append(discounts, &v1.SubscribeDiscount{
+			Quantity: strconv.FormatInt(int64(d.Quantity), 10),
+			Discount: strconv.FormatInt(int64(d.Discount), 10),
+		})
+	}
+	return &v1.SubscribeInfo{
+		Id:                strconv.FormatInt(item.ID, 10),
+		Name:              item.Name,
+		Language:          item.Language,
+		Description:       item.Description,
+		UnitPrice:         strconv.FormatInt(item.UnitPrice, 10),
+		UnitTime:          item.UnitTime,
+		Discount:          discounts,
+		Replacement:       strconv.FormatInt(item.Replacement, 10),
+		Inventory:         strconv.FormatInt(item.Inventory, 10),
+		Traffic:           strconv.FormatInt(item.Traffic, 10),
+		SpeedLimit:        strconv.FormatInt(item.SpeedLimit, 10),
+		DeviceLimit:       strconv.FormatInt(item.DeviceLimit, 10),
+		Quota:             strconv.FormatInt(item.Quota, 10),
+		Nodes:             convertIntSliceToStringSlice(item.Nodes),
+		NodeTags:          item.NodeTags,
+		NodeGroupIds:      item.NodeGroupIds,
+		NodeGroupId:       item.NodeGroupId,
+		TrafficLimit:      convertPortalTrafficLimits(item.TrafficLimit),
+		Show:              item.Show,
+		Sell:              item.Sell,
+		Sort:              strconv.FormatInt(item.Sort, 10),
+		DeductionRatio:    strconv.FormatInt(item.DeductionRatio, 10),
+		AllowDeduction:    item.AllowDeduction,
+		ResetCycle:        strconv.FormatInt(item.ResetCycle, 10),
+		RenewalReset:      item.RenewalReset,
+		ShowOriginalPrice: item.ShowOriginalPrice,
+		CreatedAt:         strconv.FormatInt(item.CreatedAt, 10),
+		UpdatedAt:         strconv.FormatInt(item.UpdatedAt, 10),
+	}
+}
+
 // PortalService Portal服务实现
 type PortalService struct {
 	v1.UnimplementedPortalServer
@@ -46,41 +102,7 @@ func (s *PortalService) GetSubscription(ctx context.Context, req *v1.GetSubscrip
 
 	items := make([]*v1.SubscribeInfo, 0, len(list))
 	for _, item := range list {
-		// 转换Discount数组
-		discounts := make([]*v1.SubscribeDiscount, 0, len(item.Discount))
-		for _, d := range item.Discount {
-			discounts = append(discounts, &v1.SubscribeDiscount{
-				Quantity: strconv.FormatInt(int64(d.Quantity), 10),
-				Discount: strconv.FormatInt(int64(d.Discount), 10),
-			})
-		}
-
-		items = append(items, &v1.SubscribeInfo{
-			Id:             strconv.FormatInt(item.ID, 10),
-			Name:           item.Name,
-			Language:       item.Language,
-			Description:    item.Description,
-			UnitPrice:      strconv.FormatInt(item.UnitPrice, 10),
-			UnitTime:       item.UnitTime,
-			Discount:       discounts,
-			Replacement:    strconv.FormatInt(item.Replacement, 10),
-			Inventory:      strconv.FormatInt(item.Inventory, 10),
-			Traffic:        strconv.FormatInt(item.Traffic, 10),
-			SpeedLimit:     strconv.FormatInt(item.SpeedLimit, 10),
-			DeviceLimit:    strconv.FormatInt(item.DeviceLimit, 10),
-			Quota:          strconv.FormatInt(item.Quota, 10),
-			Nodes:          convertIntSliceToStringSlice(item.Nodes),
-			NodeTags:       item.NodeTags,
-			Show:           item.Show,
-			Sell:           item.Sell,
-			Sort:           strconv.FormatInt(item.Sort, 10),
-			DeductionRatio: strconv.FormatInt(item.DeductionRatio, 10),
-			AllowDeduction: item.AllowDeduction,
-			ResetCycle:     strconv.FormatInt(item.ResetCycle, 10),
-			RenewalReset:   item.RenewalReset,
-			CreatedAt:      strconv.FormatInt(item.CreatedAt, 10),
-			UpdatedAt:      strconv.FormatInt(item.UpdatedAt, 10),
-		})
+		items = append(items, convertPortalSubscribe(item))
 	}
 
 	return &v1.GetSubscriptionReply{
@@ -200,7 +222,7 @@ func (s *PortalService) GetAvailablePaymentMethods(ctx context.Context, req *emp
 		Code:    int32(responsecode.GetAvailablePaymentMethodsSuccess),
 		Message: responsecode.CodeMessages[responsecode.GetAvailablePaymentMethodsSuccess],
 		Data: &v1.GetAvailablePaymentMethodsData{
-			Methods: items,
+			List: items,
 		},
 	}, nil
 }
@@ -255,41 +277,7 @@ func (s *PortalService) QueryPurchaseOrder(ctx context.Context, req *v1.QueryPur
 	// 构建Subscribe对象
 	var subscribeInfo *v1.SubscribeInfo
 	if statusInfo.Subscribe != nil {
-		// 转换Discount数组
-		discounts := make([]*v1.SubscribeDiscount, 0, len(statusInfo.Subscribe.Discount))
-		for _, d := range statusInfo.Subscribe.Discount {
-			discounts = append(discounts, &v1.SubscribeDiscount{
-				Quantity: strconv.FormatInt(int64(d.Quantity), 10),
-				Discount: strconv.FormatInt(int64(d.Discount), 10),
-			})
-		}
-
-		subscribeInfo = &v1.SubscribeInfo{
-			Id:             strconv.FormatInt(statusInfo.Subscribe.ID, 10),
-			Name:           statusInfo.Subscribe.Name,
-			Language:       statusInfo.Subscribe.Language,
-			Description:    statusInfo.Subscribe.Description,
-			UnitPrice:      strconv.FormatInt(statusInfo.Subscribe.UnitPrice, 10),
-			UnitTime:       statusInfo.Subscribe.UnitTime,
-			Discount:       discounts,
-			Replacement:    strconv.FormatInt(statusInfo.Subscribe.Replacement, 10),
-			Inventory:      strconv.FormatInt(statusInfo.Subscribe.Inventory, 10),
-			Traffic:        strconv.FormatInt(statusInfo.Subscribe.Traffic, 10),
-			SpeedLimit:     strconv.FormatInt(statusInfo.Subscribe.SpeedLimit, 10),
-			DeviceLimit:    strconv.FormatInt(statusInfo.Subscribe.DeviceLimit, 10),
-			Quota:          strconv.FormatInt(statusInfo.Subscribe.Quota, 10),
-			Nodes:          convertIntSliceToStringSlice(statusInfo.Subscribe.Nodes),
-			NodeTags:       statusInfo.Subscribe.NodeTags,
-			Show:           statusInfo.Subscribe.Show,
-			Sell:           statusInfo.Subscribe.Sell,
-			Sort:           strconv.FormatInt(statusInfo.Subscribe.Sort, 10),
-			DeductionRatio: strconv.FormatInt(statusInfo.Subscribe.DeductionRatio, 10),
-			AllowDeduction: statusInfo.Subscribe.AllowDeduction,
-			ResetCycle:     strconv.FormatInt(statusInfo.Subscribe.ResetCycle, 10),
-			RenewalReset:   statusInfo.Subscribe.RenewalReset,
-			CreatedAt:      strconv.FormatInt(statusInfo.Subscribe.CreatedAt, 10),
-			UpdatedAt:      strconv.FormatInt(statusInfo.Subscribe.UpdatedAt, 10),
-		}
+		subscribeInfo = convertPortalSubscribe(statusInfo.Subscribe)
 	}
 
 	// 构建Payment对象

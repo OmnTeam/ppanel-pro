@@ -230,3 +230,17 @@ func (s *SubscribeService) GetSubscribeGroupList(ctx context.Context, req *v1.Ge
 		Data:    data,
 	}, nil
 }
+
+func (s *SubscribeService) ResetAllSubscribeToken(ctx context.Context, req *v1.ResetAllSubscribeTokenRequest) (*v1.ResetAllSubscribeTokenReply, error) {
+	if err := s.uc.ResetAllSubscribeToken(ctx); err != nil {
+		return nil, err
+	}
+
+	return &v1.ResetAllSubscribeTokenReply{
+		Code:    200,
+		Message: "success",
+		Data: &v1.ResetAllSubscribeTokenData{
+			Success: true,
+		},
+	}, nil
+}

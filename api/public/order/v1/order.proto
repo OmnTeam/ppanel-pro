@@ -273,6 +273,21 @@ message Subscribe {
   string sort = 18;
   string deduction_ratio = 19;
   bool allow_deduction = 20;
+  repeated string node_group_ids = 21;
+  string node_group_id = 22;
+  repeated TrafficLimit traffic_limit = 23;
+  string reset_cycle = 24;
+  bool renewal_reset = 25;
+  bool show_original_price = 26;
+  string created_at = 27;
+  string updated_at = 28;
+}
+
+message TrafficLimit {
+  string stat_type = 1;
+  string stat_value = 2;
+  string traffic_usage = 3;
+  string speed_limit = 4;
 }
 
 // OrderDetail message

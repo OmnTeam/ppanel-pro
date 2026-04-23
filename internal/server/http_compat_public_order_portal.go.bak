@@ -190,25 +190,25 @@ type compatOrderListRequest struct {
 type compatPurchaseOrderRequest struct {
 	SubscribeID compatFlexibleInt64 `json:"subscribe_id" form:"subscribe_id"`
 	Quantity    int64               `json:"quantity"`
-	Payment     int64               `json:"payment"`
+	Payment     compatFlexibleInt64 `json:"payment" form:"payment"`
 	Coupon      string              `json:"coupon,omitempty"`
 }
 
 type compatRechargeOrderRequest struct {
 	Amount  compatFlexibleInt64 `json:"amount" form:"amount"`
-	Payment int64               `json:"payment"`
+	Payment compatFlexibleInt64 `json:"payment" form:"payment"`
 }
 
 type compatRenewalOrderRequest struct {
-	UserSubscribeID int64  `json:"user_subscribe_id"`
-	Quantity        int64  `json:"quantity"`
-	Payment         int64  `json:"payment"`
-	Coupon          string `json:"coupon,omitempty"`
+	UserSubscribeID compatFlexibleInt64 `json:"user_subscribe_id" form:"user_subscribe_id"`
+	Quantity        int64               `json:"quantity" form:"quantity"`
+	Payment         compatFlexibleInt64 `json:"payment" form:"payment"`
+	Coupon          string              `json:"coupon,omitempty"`
 }
 
 type compatResetTrafficOrderRequest struct {
-	UserSubscribeID int64 `json:"user_subscribe_id"`
-	Payment         int64 `json:"payment"`
+	UserSubscribeID compatFlexibleInt64 `json:"user_subscribe_id" form:"user_subscribe_id"`
+	Payment         compatFlexibleInt64 `json:"payment" form:"payment"`
 }
 
 type compatPortalPurchaseRequest struct {
@@ -383,43 +383,6 @@ func registerLegacyPublicOrderCompatRoutes(r *khttp.Router, dataLayer *data.Data
 				CouponDiscount: compatParseInt64String(data.CouponDiscount),
 				FeeAmount:      compatParseInt64String(data.FeeAmount),
 			}, nil
-		})
-		if err != nil {
-			return compatJSONError(ctx, err)
-		}
-		return compatJSON(ctx, out)
-	})
-
-	r.POST("/v1/public/order/purchase", func(ctx khttp.Context) error {
-		var req compatPurchaseOrderRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
-		if req.Quantity == 0 {
-			return compatJSONError(ctx, compatFieldValidationError("PurchaseOrderRequest", "Quantity", "required"))
-		}
-		if req.Quantity < 0 {
-			return compatJSONError(ctx, compatFieldValidationError("PurchaseOrderRequest", "Quantity", "gt"))
-		}
-		if req.Quantity > 1000 {
-			return compatJSONError(ctx, compatFieldValidationError("PurchaseOrderRequest", "Quantity", "lte"))
-		}
-
-		out, err := compatMiddleware(ctx, &req, func(inner context.Context, request interface{}) (interface{}, error) {
-			in := request.(*compatPurchaseOrderRequest)
-			reply, err := publicOrder.Purchase(inner, &publicorderv1.PurchaseRequest{
-				SubscribeId: strconv.FormatInt(int64(in.SubscribeID), 10),
-				Quantity:    int32(in.Quantity),
-				Coupon:      in.Coupon,
-				Payment:     strconv.FormatInt(int64(in.Payment), 10),
-			})
-			if err != nil {
-				return nil, err
-			}
-			orderNo := ""
-			if reply != nil && reply.Data != nil {
-				orderNo = reply.Data.OrderNo
-			}
-			return &compatOrderResultData{OrderNo: orderNo}, nil
 		})
 		if err != nil {
 			return compatJSONError(ctx, err)

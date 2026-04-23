@@ -71,6 +71,7 @@ type SubscribeRepo interface {
 	// User subscription query (for checking if subscribe is in use)
 	GetActiveUserSubscriptionCount(ctx context.Context, subscribeID int) (int64, error)
 	GetActiveUserSubscriptionCountByIDs(ctx context.Context, subscribeIDs []int64) (map[int64]int64, error)
+	ResetAllSubscribeToken(ctx context.Context) error
 }
 
 // ==================== Subscribe Operations ====================
@@ -455,6 +456,14 @@ func (uc *SubscribeUseCase) GetSubscribeGroupList(ctx context.Context) (*v1.GetS
 		List:  groups,
 		Total: total,
 	}, nil
+}
+
+func (uc *SubscribeUseCase) ResetAllSubscribeToken(ctx context.Context) error {
+	if err := uc.repo.ResetAllSubscribeToken(ctx); err != nil {
+		uc.log.WithContext(ctx).Errorw("msg", "ResetAllSubscribeToken failed", "error", err)
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
+	}
+	return nil
 }
 
 // ==================== Helper Functions ====================

@@ -47,36 +47,47 @@ type PortalRepo interface {
 // SubscribeInfo 订阅信息
 // ⚠️ 完全复刻原项目（server-master/internal/types/types.go:Subscribe）
 type SubscribeInfo struct {
-	ID             int64
-	Name           string
-	Language       string
-	Description    *string
-	UnitPrice      int64
-	UnitTime       string
-	Discount       []SubscribeDiscount
-	Replacement    int64
-	Inventory      int64
-	Traffic        int64
-	SpeedLimit     int64
-	DeviceLimit    int64
-	Quota          int64
-	Nodes          []int
-	NodeTags       []string
-	Show           bool
-	Sell           bool
-	Sort           int64
-	DeductionRatio int64
-	AllowDeduction bool
-	ResetCycle     int64
-	RenewalReset   bool
-	CreatedAt      int64
-	UpdatedAt      int64
+	ID                int64
+	Name              string
+	Language          string
+	Description       *string
+	UnitPrice         int64
+	UnitTime          string
+	Discount          []SubscribeDiscount
+	Replacement       int64
+	Inventory         int64
+	Traffic           int64
+	SpeedLimit        int64
+	DeviceLimit       int64
+	Quota             int64
+	Nodes             []int
+	NodeTags          []string
+	NodeGroupIds      []string
+	NodeGroupId       string
+	TrafficLimit      []TrafficLimit
+	Show              bool
+	Sell              bool
+	Sort              int64
+	DeductionRatio    int64
+	AllowDeduction    bool
+	ResetCycle        int64
+	RenewalReset      bool
+	ShowOriginalPrice bool
+	CreatedAt         int64
+	UpdatedAt         int64
 }
 
 // SubscribeDiscount 订阅折扣配置
 type SubscribeDiscount struct {
 	Quantity int `json:"quantity"` // 购买数量
 	Discount int `json:"discount"` // 折扣值（百分比 0-100）
+}
+
+type TrafficLimit struct {
+	StatType     string `json:"stat_type"`
+	StatValue    int64  `json:"stat_value"`
+	TrafficUsage int64  `json:"traffic_usage"`
+	SpeedLimit   int64  `json:"speed_limit"`
 }
 
 // PriceInfo 价格信息（预览）

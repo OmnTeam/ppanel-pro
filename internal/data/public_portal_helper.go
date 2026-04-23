@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
+	portalBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/portal"
 )
 
 // SubscribeDiscount 订阅折扣配置
@@ -22,6 +23,15 @@ func parseSubscribeDiscounts(discountJSON string) []SubscribeDiscount {
 	var discounts []SubscribeDiscount
 	_ = json.Unmarshal([]byte(discountJSON), &discounts)
 	return discounts
+}
+
+func parsePortalTrafficLimits(trafficLimitJSON string) []portalBiz.TrafficLimit {
+	if trafficLimitJSON == "" {
+		return []portalBiz.TrafficLimit{}
+	}
+	var limits []portalBiz.TrafficLimit
+	_ = json.Unmarshal([]byte(trafficLimitJSON), &limits)
+	return limits
 }
 
 // stringToInt64Slice 将逗号分隔的字符串转换为int64切片

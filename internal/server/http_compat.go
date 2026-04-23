@@ -6,10 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	admingroupservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/group"
-	adminpaymentservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/payment"
-	adminsystemservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/system"
-	adminticketservice "github.com/OmnTeam/ppanel-pro/internal/service/admin/ticket"
 	authservice "github.com/OmnTeam/ppanel-pro/internal/service/auth"
 	authoauthservice "github.com/OmnTeam/ppanel-pro/internal/service/auth/oauth"
 	publicpaymentservice "github.com/OmnTeam/ppanel-pro/internal/service/public/payment"
@@ -55,13 +51,7 @@ func registerLegacyCompatRoutes(
 	oauthSvc *authoauthservice.OAuthService,
 	dataLayer *data.Data,
 	appConf *conf.Application,
-	adminGroup *admingroupservice.GroupService,
-	adminPayment *adminpaymentservice.PaymentService,
-	adminSystem *adminsystemservice.SystemService,
-	adminTicket *adminticketservice.TicketService,
-	publicOrder legacyPublicOrderCompat,
 	publicPayment *publicpaymentservice.PaymentService,
-	publicPortal legacyPublicPortalCompat,
 	publicTicket legacyPublicTicketCompat,
 	publicUser legacyPublicUserCompat,
 	logger log.Logger,
@@ -74,8 +64,7 @@ func registerLegacyCompatRoutes(
 
 	registerLegacyAuthCompatRoutes(r, authCompat, authSvc, oauthSvc)
 	registerLegacyCommonCompatRoutes(r, dataLayer, appConf, logger)
-	registerLegacyAdminCompatRoutes(r, dataLayer, adminGroup, adminPayment, adminSystem, adminTicket)
-	registerLegacyPublicCompatRoutes(r, dataLayer, appConf, publicOrder, publicPayment, publicPortal, publicTicket, publicUser)
+	registerLegacyPublicCompatRoutes(r, dataLayer, appConf, publicTicket, publicUser)
 	registerLegacyCallbackCompatRoutes(r, dataLayer, appConf, publicPayment, logger)
 	registerLegacyServerCompatRoutes(r, dataLayer)
 }

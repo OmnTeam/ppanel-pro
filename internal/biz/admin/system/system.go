@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"reflect"
+	"strings"
 
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/log"
@@ -113,6 +114,12 @@ type VerifyConfig struct {
 	EnableUserResetPasswordCaptcha bool   `json:"EnableUserResetPasswordCaptcha"`
 }
 
+type SystemModule struct {
+	ServiceName    string
+	ServiceVersion string
+	Secret         string
+}
+
 // TimePeriod 时间段倍率
 type TimePeriod struct {
 	StartTime  string  `json:"StartTime"`
@@ -154,6 +161,32 @@ func (uc *SystemUsecase) GetCurrencyConfig(ctx context.Context) (*CurrencyConfig
 	tool.SystemConfigSliceReflectToStruct(configs, result)
 
 	return result, nil
+}
+
+func (uc *SystemUsecase) GetSystemModule(ctx context.Context) (*SystemModule, error) {
+	configs, err := uc.repo.GetConfigByCategory(ctx, "system")
+	if err != nil {
+		return nil, err
+	}
+
+	version := "unknown version"
+	for _, item := range configs {
+		if item == nil {
+			continue
+		}
+		if item.Key == "Version" || item.Key == "version" {
+			if item.Value != "" {
+				version = item.Value
+			}
+			break
+		}
+	}
+
+	return &SystemModule{
+		ServiceName:    "ApiService",
+		ServiceVersion: strings.ReplaceAll(version, "v", ""),
+		Secret:         "",
+	}, nil
 }
 
 // UpdateCurrencyConfig 更新货币配置

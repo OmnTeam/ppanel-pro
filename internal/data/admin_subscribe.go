@@ -2,8 +2,11 @@ package data
 
 import (
 	"context"
+	"fmt"
+	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/google/uuid"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribe"
@@ -11,6 +14,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/subscribe"
 	"github.com/OmnTeam/ppanel-pro/internal/model"
+	"github.com/OmnTeam/ppanel-pro/pkg/uuidx"
 )
 
 const subscribeModule = "data/admin_subscribe"
@@ -309,6 +313,57 @@ func (r *subscribeRepo) GetActiveUserSubscriptionCountByIDs(ctx context.Context,
 		result[id] = int64(count)
 	}
 	return result, nil
+}
+
+func (r *subscribeRepo) ResetAllSubscribeToken(ctx context.Context) error {
+	tx, err := r.data.db.Tx(ctx)
+	if err != nil {
+		return err
+	}
+
+	userSubs, err := tx.ProxyUserSubscribe.Query().
+		Where(proxyusersubscribe.StatusIn(1, 2)).
+		All(ctx)
+	if err != nil {
+		return rollback(tx, err)
+	}
+
+	nowMillis := time.Now().UnixMilli()
+	oldTokens := make(map[int64]string, len(userSubs))
+	for _, userSub := range userSubs {
+		if userSub.Token != nil {
+			oldTokens[userSub.ID] = *userSub.Token
+		}
+		token := uuidx.SubscribeToken(fmt.Sprintf("%d%d", nowMillis, userSub.ID))
+		subscribeUUID := uuid.NewString()
+		if _, err := tx.ProxyUserSubscribe.UpdateOneID(userSub.ID).
+			SetToken(token).
+			SetUUID(subscribeUUID).
+			Save(ctx); err != nil {
+			return rollback(tx, err)
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	if r.data.Redis() != nil {
+		for _, userSub := range userSubs {
+			keys := []string{
+				fmt.Sprintf("cache:user:subscribe:user:%d", userSub.UserID),
+				fmt.Sprintf("cache:user:subscribe:id:%d", userSub.ID),
+				fmt.Sprintf("cache:subscribe:id:%d", userSub.SubscribeID),
+				fmt.Sprintf("cache:subscribe:servers:%d", userSub.SubscribeID),
+			}
+			if token := oldTokens[userSub.ID]; token != "" {
+				keys = append(keys, fmt.Sprintf("cache:user:subscribe:token:%s", token))
+			}
+			_ = r.data.Redis().Del(ctx, keys...).Err()
+		}
+	}
+
+	return nil
 }
 
 // rollback helper function to rollback transaction

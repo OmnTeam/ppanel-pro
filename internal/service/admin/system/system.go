@@ -25,6 +25,24 @@ func NewSystemService(uc *systembiz.SystemUsecase, logger log.Logger) *SystemSer
 	}
 }
 
+func (s *SystemService) GetSystemModule(ctx context.Context, req *pb.GetSystemModuleRequest) (*pb.GetSystemModuleReply, error) {
+	module, err := s.uc.GetSystemModule(ctx)
+	if err != nil {
+		s.log.Errorf("Failed to get system module: %v", err)
+		return nil, err
+	}
+
+	return &pb.GetSystemModuleReply{
+		Code:    200,
+		Message: "success",
+		Data: &pb.SystemModule{
+			ServiceName:    module.ServiceName,
+			ServiceVersion: module.ServiceVersion,
+			Secret:         module.Secret,
+		},
+	}, nil
+}
+
 // GetCurrencyConfig 获取货币配置
 func (s *SystemService) GetCurrencyConfig(ctx context.Context, req *pb.GetCurrencyConfigRequest) (*pb.GetCurrencyConfigReply, error) {
 

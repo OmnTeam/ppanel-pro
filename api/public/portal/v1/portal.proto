@@ -93,21 +93,32 @@ message SubscribeInfo {
   string quota = 13;
   repeated string nodes = 14;
   repeated string node_tags = 15;
-  bool show = 16;
-  bool sell = 17;
-  string sort = 18;
-  string deduction_ratio = 19;
-  bool allow_deduction = 20;
-  string reset_cycle = 21;
-  bool renewal_reset = 22;
-  string created_at = 23;
-  string updated_at = 24;
+  repeated string node_group_ids = 16;
+  string node_group_id = 17;
+  repeated TrafficLimit traffic_limit = 18;
+  bool show = 19;
+  bool sell = 20;
+  string sort = 21;
+  string deduction_ratio = 22;
+  bool allow_deduction = 23;
+  string reset_cycle = 24;
+  bool renewal_reset = 25;
+  bool show_original_price = 26;
+  string created_at = 27;
+  string updated_at = 28;
 }
 
 // SubscribeDiscount 订阅折扣配置
 message SubscribeDiscount {
   string quantity = 1;  // 购买数量
   string discount = 2;  // 折扣值（百分比 0-100）
+}
+
+message TrafficLimit {
+  string stat_type = 1;
+  string stat_value = 2;
+  string traffic_usage = 3;
+  string speed_limit = 4;
 }
 
 // PrePurchaseOrderRequest 预购买订单请求
@@ -162,7 +173,7 @@ message PurchaseReply {
 
 // GetAvailablePaymentMethodsData 获取可用支付方式数据
 message GetAvailablePaymentMethodsData {
-  repeated PaymentMethod methods = 1;
+  repeated PaymentMethod list = 1;
 }
 
 // GetAvailablePaymentMethodsReply 获取可用支付方式响应

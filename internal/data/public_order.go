@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
@@ -68,6 +69,36 @@ func NewPublicOrderRepo(data *Data, config *conf.Application, logger log.Logger)
 		logger: log.NewHelper(logger),
 		config: config,
 	}
+}
+
+func (r *publicOrderRepo) isUserEligibleForNewOrder(ctx context.Context, userID int64) (bool, error) {
+	count, err := r.data.db.ProxyOrder.Query().
+		Where(
+			proxyorder.UserIDEQ(userID),
+			proxyorder.StatusIn(2, 5),
+		).
+		Count(ctx)
+	if err != nil {
+		return false, err
+	}
+	return count == 0, nil
+}
+
+func (r *publicOrderRepo) listLegacyValidUserSubscriptions(ctx context.Context, userID int64) ([]*ent.ProxyUserSubscribe, error) {
+	items, err := r.data.db.ProxyUserSubscribe.Query().
+		Where(proxyusersubscribe.UserIDEQ(userID)).
+		All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	now := time.Now()
+	result := make([]*ent.ProxyUserSubscribe, 0, len(items))
+	for _, item := range items {
+		if shouldKeepLegacyUserSubscribe(item, now) {
+			result = append(result, item)
+		}
+	}
+	return result, nil
 }
 
 // CloseOrder 关闭订单，包含完整的业务逻辑（含赠金退回）
@@ -336,18 +367,7 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 	}
 
 	if sub.Quota > 0 {
-		now := time.Now()
-		sevenDaysAgo := now.Add(-7 * 24 * time.Hour)
-		userSubs, err := r.data.db.ProxyUserSubscribe.Query().
-			Where(
-				proxyusersubscribe.UserIDEQ(req.UserID),
-				proxyusersubscribe.Or(
-					proxyusersubscribe.ExpireTimeGT(now),
-					proxyusersubscribe.FinishedAtGTE(sevenDaysAgo),
-					proxyusersubscribe.ExpireTimeEQ(time.UnixMilli(0)),
-				),
-			).
-			All(ctx)
+		userSubs, err := r.listLegacyValidUserSubscriptions(ctx, req.UserID)
 		if err != nil {
 			r.logger.Errorf("[PreCreateOrder] 查询用户订阅失败, userID: %d, error: %v", req.UserID, err)
 			return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
@@ -515,24 +535,13 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 		singleModelEnabled = systemConfigBool(subscribeValues, singleModelEnabled, "SingleModel", "single_model")
 	}
 	if singleModelEnabled {
-		now := time.Now()
-		sevenDaysAgo := now.Add(-7 * 24 * time.Hour)
-		existingSubscriptions, err := r.data.db.ProxyUserSubscribe.Query().
-			Where(
-				proxyusersubscribe.UserIDEQ(req.UserID),
-				proxyusersubscribe.Or(
-					proxyusersubscribe.ExpireTimeGT(now),
-					proxyusersubscribe.FinishedAtGTE(sevenDaysAgo),
-					proxyusersubscribe.ExpireTimeEQ(time.UnixMilli(0)),
-				),
-			).
-			Count(ctx)
+		existingSubscriptions, err := r.listLegacyValidUserSubscriptions(ctx, req.UserID)
 		if err != nil {
 			r.logger.Errorf("[Purchase] Check existing subscriptions failed: %v", err)
 			return nil, errors.InternalServer("CHECK_SUBSCRIPTION_FAILED", "检查现有订阅失败")
 		}
-		if existingSubscriptions > 0 {
-			r.logger.Warnf("[Purchase] Single model restriction: user %d already has %d subscription(s)", req.UserID, existingSubscriptions)
+		if len(existingSubscriptions) > 0 {
+			r.logger.Warnf("[Purchase] Single model restriction: user %d already has %d subscription(s)", req.UserID, len(existingSubscriptions))
 			return nil, errors.BadRequest("USER_SUBSCRIPTION_EXISTS", "用户已有活动订阅。每个用户只允许一个订阅。")
 		}
 	}
@@ -558,25 +567,18 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 	}
 
 	// 检查订阅计划配额（每个计划的用户购买限制）
-	// 完全按照老项目QueryUserSubscribe逻辑：不传入status参数，只应用时间过滤
+	// 与老项目 QueryUserSubscribe 及当前项目用户侧有效订阅口径保持一致
 	if sub.Quota > 0 {
-		now := time.Now()
-		sevenDaysAgo := now.Add(-7 * 24 * time.Hour)
-
-		existingCount, err := r.data.db.ProxyUserSubscribe.Query().
-			Where(
-				proxyusersubscribe.UserIDEQ(req.UserID),
-				proxyusersubscribe.SubscribeIDEQ(req.SubscribeID),
-				proxyusersubscribe.Or(
-					proxyusersubscribe.ExpireTimeGT(now),
-					proxyusersubscribe.FinishedAtGTE(sevenDaysAgo),
-					proxyusersubscribe.ExpireTimeEQ(time.UnixMilli(0)),
-				),
-			).
-			Count(ctx)
+		existingSubscriptions, err := r.listLegacyValidUserSubscriptions(ctx, req.UserID)
 		if err != nil {
 			r.logger.Errorf("[Purchase] Check quota failed: %v", err)
 			return nil, errors.InternalServer("QUOTA_CHECK_FAILED", "检查配额失败")
+		}
+		var existingCount int64
+		for _, item := range existingSubscriptions {
+			if item.SubscribeID == req.SubscribeID {
+				existingCount++
+			}
 		}
 		if int64(existingCount) >= sub.Quota {
 			r.logger.Warnf("[Purchase] Quota exceeded: user %d, subscribe %d, count %d, quota %d", req.UserID, req.SubscribeID, existingCount, sub.Quota)
@@ -682,16 +684,11 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	// 检查用户是新购还是续费
-	isNew := true
-	count, err := r.data.db.ProxyOrder.Query().
-		Where(
-			proxyorder.UserIDEQ(req.UserID),
-			proxyorder.StatusEQ(2), // 已支付状态
-		).
-		Count(ctx)
-	if err == nil && count > 0 {
-		isNew = false
+	// 与老项目一致：只要用户存在已完成/已激活订单(status in 2,5)，则不再属于新购
+	isNew, err := r.isUserEligibleForNewOrder(ctx, req.UserID)
+	if err != nil {
+		r.logger.Errorf("[Purchase] 查询用户新购资格失败: %v, userID: %d", err, req.UserID)
+		return nil, errors.InternalServer("DATABASE_QUERY_ERROR", "数据库查询失败")
 	}
 
 	// 生成订单号
@@ -722,21 +719,21 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 	var createdOrder *ent.ProxyOrder
 	err = r.data.db.TX(ctx, func(tx *ent.Tx) error {
 		if sub.Quota > 0 {
-			now := time.Now()
-			sevenDaysAgo := now.Add(-7 * 24 * time.Hour)
-			currentCount, err := tx.ProxyUserSubscribe.Query().
-				Where(
-					proxyusersubscribe.UserIDEQ(req.UserID),
-					proxyusersubscribe.SubscribeIDEQ(req.SubscribeID),
-					proxyusersubscribe.Or(
-						proxyusersubscribe.ExpireTimeGT(now),
-						proxyusersubscribe.FinishedAtGTE(sevenDaysAgo),
-						proxyusersubscribe.ExpireTimeEQ(time.UnixMilli(0)),
-					),
-				).
-				Count(ctx)
+			currentSubscriptions, err := tx.ProxyUserSubscribe.Query().
+				Where(proxyusersubscribe.UserIDEQ(req.UserID)).
+				All(ctx)
 			if err != nil {
 				return errors.InternalServer("QUOTA_CHECK_FAILED", "检查配额失败")
+			}
+			var currentCount int64
+			now := time.Now()
+			for _, item := range currentSubscriptions {
+				if !shouldKeepLegacyUserSubscribe(item, now) {
+					continue
+				}
+				if item.SubscribeID == req.SubscribeID {
+					currentCount++
+				}
 			}
 			if int64(currentCount) >= sub.Quota {
 				return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
@@ -860,16 +857,11 @@ func (r *publicOrderRepo) Recharge(ctx context.Context, req *publicBiz.RechargeP
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	// 检查用户是否为新用户
-	isNew := true
-	count, err := r.data.db.ProxyOrder.Query().
-		Where(
-			proxyorder.UserIDEQ(req.UserID),
-			proxyorder.StatusEQ(2), // 已支付状态
-		).
-		Count(ctx)
-	if err == nil && count > 0 {
-		isNew = false
+	// 与老项目一致：只要用户存在已完成/已激活订单(status in 2,5)，则不再属于新购
+	isNew, err := r.isUserEligibleForNewOrder(ctx, req.UserID)
+	if err != nil {
+		r.logger.Errorf("[Recharge] 查询用户新购资格失败: %v, userID: %d", err, req.UserID)
+		return nil, errors.InternalServer("DATABASE_QUERY_ERROR", "数据库查询失败")
 	}
 
 	// 生成订单号
@@ -925,8 +917,8 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 		).
 		Only(ctx)
 	if err != nil {
-		r.logger.Errorf("[Renewal] User subscribe not found: %d", req.UserSubscribeID)
-		return nil, responsecode.NewKratosError(responsecode.ErrSubscribeNotFound)
+		r.logger.Errorf("[Renewal] Query user subscribe failed: %v, userSubscribeID: %d", err, req.UserSubscribeID)
+		return nil, responsecode.NewDatabaseQueryError()
 	}
 
 	// 查找订阅（已修复：使用ProxySubscribe而非ProxySubscribeGroup）
@@ -936,8 +928,8 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 		).
 		Only(ctx)
 	if err != nil {
-		r.logger.Errorf("[Renewal] Subscribe not found: %d", userSubscribe.SubscribeID)
-		return nil, responsecode.NewKratosError(responsecode.ErrSubscribeNotFound)
+		r.logger.Errorf("[Renewal] Query subscribe failed: %v, subscribeID: %d", err, userSubscribe.SubscribeID)
+		return nil, responsecode.NewDatabaseQueryError()
 	}
 
 	// 检查订阅计划状态（售卖标志）
@@ -1478,27 +1470,44 @@ func (r *publicOrderRepo) convertToSubscribe(subscribe *ent.ProxySubscribe) *pub
 		deductionRatio = int64(*subscribe.DeductionRatio)
 	}
 
+	nodeGroupID := ""
+	if subscribe.NodeGroupID != nil {
+		nodeGroupID = strconv.FormatInt(*subscribe.NodeGroupID, 10)
+	}
+
+	resetCycle := int64(0)
+	if subscribe.ResetCycle != nil {
+		resetCycle = int64(*subscribe.ResetCycle)
+	}
+
 	return &publicBiz.Subscribe{
-		ID:             int64(subscribe.ID),
-		Name:           subscribe.Name,
-		Language:       subscribe.Language,
-		Description:    description,
-		UnitPrice:      subscribe.UnitPrice,
-		UnitTime:       subscribe.UnitTime,
-		Discount:       discounts,
-		Replacement:    int64(subscribe.Replacement),
-		Inventory:      int64(subscribe.Inventory),
-		Traffic:        subscribe.Traffic,
-		SpeedLimit:     int64(subscribe.SpeedLimit),
-		DeviceLimit:    int64(subscribe.DeviceLimit),
-		Quota:          int64(subscribe.Quota),
-		Nodes:          nodes,
-		NodeTags:       nodeTags,
-		Show:           subscribe.Show,
-		Sell:           subscribe.Sell,
-		Sort:           int64(subscribe.Sort),
-		DeductionRatio: deductionRatio,
-		AllowDeduction: subscribe.AllowDeduction,
+		ID:                int64(subscribe.ID),
+		Name:              subscribe.Name,
+		Language:          subscribe.Language,
+		Description:       description,
+		UnitPrice:         subscribe.UnitPrice,
+		UnitTime:          subscribe.UnitTime,
+		Discount:          discounts,
+		Replacement:       int64(subscribe.Replacement),
+		Inventory:         int64(subscribe.Inventory),
+		Traffic:           subscribe.Traffic,
+		SpeedLimit:        int64(subscribe.SpeedLimit),
+		DeviceLimit:       int64(subscribe.DeviceLimit),
+		Quota:             int64(subscribe.Quota),
+		Nodes:             nodes,
+		NodeTags:          nodeTags,
+		Show:              subscribe.Show,
+		Sell:              subscribe.Sell,
+		Sort:              int64(subscribe.Sort),
+		DeductionRatio:    deductionRatio,
+		AllowDeduction:    subscribe.AllowDeduction,
+		NodeGroupIds:      tool.Int64SliceToStringSlice(subscribe.NodeGroupIds),
+		NodeGroupId:       nodeGroupID,
+		ResetCycle:        resetCycle,
+		RenewalReset:      subscribe.RenewalReset,
+		ShowOriginalPrice: subscribe.ShowOriginalPrice,
+		CreatedAt:         subscribe.CreatedAt.UnixMilli(),
+		UpdatedAt:         subscribe.UpdatedAt.UnixMilli(),
 	}
 }
 

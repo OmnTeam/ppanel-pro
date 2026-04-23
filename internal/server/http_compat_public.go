@@ -109,7 +109,7 @@ type compatDocumentListData struct {
 	List  []*compatDocument `json:"list"`
 }
 
-func registerLegacyPublicCompatRoutes(r *khttp.Router, dataLayer *data.Data, appConf *conf.Application, publicOrder legacyPublicOrderCompat, publicPayment legacyPublicPaymentCompat, publicPortal legacyPublicPortalCompat, publicTicket legacyPublicTicketCompat, publicUser legacyPublicUserCompat) {
+func registerLegacyPublicCompatRoutes(r *khttp.Router, dataLayer *data.Data, appConf *conf.Application, publicTicket legacyPublicTicketCompat, publicUser legacyPublicUserCompat) {
 	if r == nil {
 		return
 	}
@@ -117,9 +117,6 @@ func registerLegacyPublicCompatRoutes(r *khttp.Router, dataLayer *data.Data, app
 	registerLegacyPublicSubscribeCompatRoutes(r, dataLayer)
 	registerLegacyPublicTicketCompatRoutes(r, publicTicket)
 	registerLegacyPublicUserCompatRoutes(r, dataLayer, publicUser)
-	registerLegacyPublicOrderCompatRoutes(r, dataLayer, publicOrder)
-	registerLegacyPublicPaymentCompatRoutes(r, publicPayment)
-	registerLegacyPublicPortalCompatRoutes(r, dataLayer, publicPortal)
 
 	r.GET("/v1/public/announcement/list", func(ctx khttp.Context) error {
 		req := compatAnnouncementRequest{}

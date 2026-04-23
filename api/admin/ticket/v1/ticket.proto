@@ -12,7 +12,7 @@ service Ticket {
   // UpdateTicketStatus 更新工单状态
   rpc UpdateTicketStatus (UpdateTicketStatusRequest) returns (UpdateTicketStatusReply) {
     option (google.api.http) = {
-      put: "/v1/admin/ticket/"
+      put: "/v1/admin/ticket"
       body: "*"
     };
   }

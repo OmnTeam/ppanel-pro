@@ -136,32 +136,44 @@ func (r *publicPortalRepo) GetSubscribeList(ctx context.Context, language string
 		if sub.ResetCycle != nil {
 			resetCycle = int64(*sub.ResetCycle)
 		}
+		nodeGroupID := "0"
+		if sub.NodeGroupID != nil {
+			nodeGroupID = strconv.FormatInt(*sub.NodeGroupID, 10)
+		}
+		var trafficLimit []portalBiz.TrafficLimit
+		if sub.TrafficLimit != nil {
+			trafficLimit = parsePortalTrafficLimits(*sub.TrafficLimit)
+		}
 
 		result = append(result, &portalBiz.SubscribeInfo{
-			ID:             int64(sub.ID),
-			Name:           sub.Name,
-			Language:       sub.Language,
-			Description:    sub.Description,
-			UnitPrice:      sub.UnitPrice,
-			UnitTime:       sub.UnitTime,
-			Discount:       discounts,
-			Replacement:    sub.Replacement,
-			Inventory:      sub.Inventory,
-			Traffic:        sub.Traffic,
-			SpeedLimit:     sub.SpeedLimit,
-			DeviceLimit:    sub.DeviceLimit,
-			Quota:          sub.Quota,
-			Nodes:          nodes,
-			NodeTags:       nodeTags,
-			Show:           sub.Show,
-			Sell:           sub.Sell,
-			Sort:           sub.Sort,
-			DeductionRatio: deductionRatio,
-			AllowDeduction: sub.AllowDeduction,
-			ResetCycle:     resetCycle,
-			RenewalReset:   sub.RenewalReset,
-			CreatedAt:      sub.CreatedAt.Unix(),
-			UpdatedAt:      sub.UpdatedAt.Unix(),
+			ID:                int64(sub.ID),
+			Name:              sub.Name,
+			Language:          sub.Language,
+			Description:       sub.Description,
+			UnitPrice:         sub.UnitPrice,
+			UnitTime:          sub.UnitTime,
+			Discount:          discounts,
+			Replacement:       sub.Replacement,
+			Inventory:         sub.Inventory,
+			Traffic:           sub.Traffic,
+			SpeedLimit:        sub.SpeedLimit,
+			DeviceLimit:       sub.DeviceLimit,
+			Quota:             sub.Quota,
+			Nodes:             nodes,
+			NodeTags:          nodeTags,
+			NodeGroupIds:      tool.Int64SliceToStringSlice(sub.NodeGroupIds),
+			NodeGroupId:       nodeGroupID,
+			TrafficLimit:      trafficLimit,
+			Show:              sub.Show,
+			Sell:              sub.Sell,
+			Sort:              sub.Sort,
+			DeductionRatio:    deductionRatio,
+			AllowDeduction:    sub.AllowDeduction,
+			ResetCycle:        resetCycle,
+			RenewalReset:      sub.RenewalReset,
+			ShowOriginalPrice: sub.ShowOriginalPrice,
+			CreatedAt:         sub.CreatedAt.Unix(),
+			UpdatedAt:         sub.UpdatedAt.Unix(),
 		})
 	}
 
@@ -778,32 +790,44 @@ func (r *publicPortalRepo) CheckOrderStatus(ctx context.Context, orderNo, authTy
 		if subscribeEntity.ResetCycle != nil {
 			resetCycle = int64(*subscribeEntity.ResetCycle)
 		}
+		nodeGroupID := "0"
+		if subscribeEntity.NodeGroupID != nil {
+			nodeGroupID = strconv.FormatInt(*subscribeEntity.NodeGroupID, 10)
+		}
+		var trafficLimit []portalBiz.TrafficLimit
+		if subscribeEntity.TrafficLimit != nil {
+			trafficLimit = parsePortalTrafficLimits(*subscribeEntity.TrafficLimit)
+		}
 
 		subscribe = &portalBiz.SubscribeInfo{
-			ID:             int64(subscribeEntity.ID),
-			Name:           subscribeEntity.Name,
-			Language:       subscribeEntity.Language,
-			Description:    subscribeEntity.Description,
-			UnitPrice:      subscribeEntity.UnitPrice,
-			UnitTime:       subscribeEntity.UnitTime,
-			Discount:       discounts,
-			Replacement:    subscribeEntity.Replacement,
-			Inventory:      subscribeEntity.Inventory,
-			Traffic:        subscribeEntity.Traffic,
-			SpeedLimit:     subscribeEntity.SpeedLimit,
-			DeviceLimit:    subscribeEntity.DeviceLimit,
-			Quota:          subscribeEntity.Quota,
-			Nodes:          nodes,
-			NodeTags:       nodeTags,
-			Show:           subscribeEntity.Show,
-			Sell:           subscribeEntity.Sell,
-			Sort:           subscribeEntity.Sort,
-			DeductionRatio: deductionRatio,
-			AllowDeduction: subscribeEntity.AllowDeduction,
-			ResetCycle:     resetCycle,
-			RenewalReset:   subscribeEntity.RenewalReset,
-			CreatedAt:      subscribeEntity.CreatedAt.Unix(),
-			UpdatedAt:      subscribeEntity.UpdatedAt.Unix(),
+			ID:                int64(subscribeEntity.ID),
+			Name:              subscribeEntity.Name,
+			Language:          subscribeEntity.Language,
+			Description:       subscribeEntity.Description,
+			UnitPrice:         subscribeEntity.UnitPrice,
+			UnitTime:          subscribeEntity.UnitTime,
+			Discount:          discounts,
+			Replacement:       subscribeEntity.Replacement,
+			Inventory:         subscribeEntity.Inventory,
+			Traffic:           subscribeEntity.Traffic,
+			SpeedLimit:        subscribeEntity.SpeedLimit,
+			DeviceLimit:       subscribeEntity.DeviceLimit,
+			Quota:             subscribeEntity.Quota,
+			Nodes:             nodes,
+			NodeTags:          nodeTags,
+			NodeGroupIds:      tool.Int64SliceToStringSlice(subscribeEntity.NodeGroupIds),
+			NodeGroupId:       nodeGroupID,
+			TrafficLimit:      trafficLimit,
+			Show:              subscribeEntity.Show,
+			Sell:              subscribeEntity.Sell,
+			Sort:              subscribeEntity.Sort,
+			DeductionRatio:    deductionRatio,
+			AllowDeduction:    subscribeEntity.AllowDeduction,
+			ResetCycle:        resetCycle,
+			RenewalReset:      subscribeEntity.RenewalReset,
+			ShowOriginalPrice: subscribeEntity.ShowOriginalPrice,
+			CreatedAt:         subscribeEntity.CreatedAt.Unix(),
+			UpdatedAt:         subscribeEntity.UpdatedAt.Unix(),
 		}
 	}
 
