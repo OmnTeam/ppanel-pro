@@ -3,8 +3,6 @@ package payment
 import (
 	"context"
 	"encoding/json"
-	"strconv"
-	"strings"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -14,24 +12,6 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 )
-
-func requireString(value string) error {
-	if strings.TrimSpace(value) == "" {
-		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	return nil
-}
-
-func parseRequiredInt64(value string) (int64, error) {
-	if err := requireString(value); err != nil {
-		return 0, err
-	}
-	parsed, err := strconv.ParseInt(strings.TrimSpace(value), 10, 64)
-	if err != nil {
-		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	return parsed, nil
-}
 
 // PaymentService 支付方式服务
 type PaymentService struct {
@@ -74,7 +54,7 @@ func (s *PaymentService) CreatePaymentMethod(ctx context.Context, req *v1.Create
 		req.Icon,
 		req.Domain,
 		configJSON,
-		req.FeeMode,
+		int32(req.FeeMode),
 		req.FeePercent,
 		req.FeeAmount,
 		enable,
@@ -93,14 +73,14 @@ func (s *PaymentService) CreatePaymentMethod(ctx context.Context, req *v1.Create
 		Code:    int32(responsecode.AdminCreatePaymentMethodSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminCreatePaymentMethodSuccess],
 		Data: &v1.PaymentMethod{
-			Id:          strconv.FormatInt(method.ID, 10),
+			Id:          method.ID,
 			Name:        method.Name,
 			Platform:    method.Platform,
 			Description: method.Description,
 			Icon:        method.Icon,
 			Domain:      method.Domain,
 			Config:      configStruct,
-			FeeMode:     int32(method.FeeMode),
+			FeeMode:     uint32(method.FeeMode),
 			FeePercent:  method.FeePercent,
 			FeeAmount:   method.FeeAmount,
 			Enable:      method.Enable,
@@ -115,10 +95,10 @@ func (s *PaymentService) UpdatePaymentMethod(ctx context.Context, req *v1.Update
 	if req.Config == nil || req.Enable == nil {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
-	id, err := parseRequiredInt64(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
+	id := req.Id
 	// 转换config为JSON字符串
 	configJSON, err := tool.StructToJSON(req.Config)
 	if err != nil {
@@ -140,7 +120,7 @@ func (s *PaymentService) UpdatePaymentMethod(ctx context.Context, req *v1.Update
 		req.Icon,
 		req.Domain,
 		configJSON,
-		req.FeeMode,
+		int32(req.FeeMode),
 		req.FeePercent,
 		req.FeeAmount,
 		enable,
@@ -159,14 +139,14 @@ func (s *PaymentService) UpdatePaymentMethod(ctx context.Context, req *v1.Update
 		Code:    int32(responsecode.AdminUpdatePaymentMethodSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminUpdatePaymentMethodSuccess],
 		Data: &v1.PaymentMethod{
-			Id:          strconv.FormatInt(method.ID, 10),
+			Id:          method.ID,
 			Name:        method.Name,
 			Platform:    method.Platform,
 			Description: method.Description,
 			Icon:        method.Icon,
 			Domain:      method.Domain,
 			Config:      configStruct,
-			FeeMode:     int32(method.FeeMode),
+			FeeMode:     uint32(method.FeeMode),
 			FeePercent:  method.FeePercent,
 			FeeAmount:   method.FeeAmount,
 			Enable:      method.Enable,
@@ -178,12 +158,12 @@ func (s *PaymentService) UpdatePaymentMethod(ctx context.Context, req *v1.Update
 
 // DeletePaymentMethod 删除支付方式
 func (s *PaymentService) DeletePaymentMethod(ctx context.Context, req *v1.DeletePaymentMethodRequest) (*v1.DeletePaymentMethodReply, error) {
-	id, err := parseRequiredInt64(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
+	id := req.Id
 
-	err = s.uc.DeletePaymentMethod(ctx, int(id))
+	err := s.uc.DeletePaymentMethod(ctx, int(id))
 	if err != nil {
 		return nil, err
 	}
@@ -223,14 +203,14 @@ func (s *PaymentService) GetPaymentMethodList(ctx context.Context, req *v1.GetPa
 		}
 
 		methods = append(methods, &v1.PaymentMethod{
-			Id:          strconv.FormatInt(method.ID, 10),
+			Id:          method.ID,
 			Name:        method.Name,
 			Platform:    method.Platform,
 			Description: method.Description,
 			Icon:        method.Icon,
 			Domain:      method.Domain,
 			Config:      configStruct,
-			FeeMode:     int32(method.FeeMode),
+			FeeMode:     uint32(method.FeeMode),
 			FeePercent:  method.FeePercent,
 			FeeAmount:   method.FeeAmount,
 			Enable:      method.Enable,

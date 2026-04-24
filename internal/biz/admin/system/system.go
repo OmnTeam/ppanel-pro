@@ -68,6 +68,7 @@ type RegisterConfig struct {
 	EnableIpRegisterLimit   bool   `json:"EnableIpRegisterLimit"`
 	IpRegisterLimit         int    `json:"IpRegisterLimit"`
 	IpRegisterLimitDuration int    `json:"IpRegisterLimitDuration"`
+	DeviceLimit             int    `json:"DeviceLimit"`
 }
 
 // SiteConfig 站点配置

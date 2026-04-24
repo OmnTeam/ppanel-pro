@@ -2,7 +2,6 @@ package order
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -10,14 +9,6 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/order"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
-
-func parseOrderStringInt(s string) (int, error) {
-	val, err := strconv.Atoi(s)
-	if err != nil {
-		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	return val, nil
-}
 
 type OrderService struct {
 	v1.UnimplementedOrderServiceServer
@@ -36,32 +27,16 @@ func NewOrderService(uc *order.OrderUseCase, logger log.Logger) *OrderService {
 // CreateOrder 创建订单
 func (s *OrderService) CreateOrder(ctx context.Context, req *v1.CreateOrderRequest) (*v1.CreateOrderReply, error) {
 	// 验证用户ID
-	if req.UserId == "" {
+	if req.UserId <= 0 {
 		return nil, responsecode.ErrUserIDRequired()
 	}
 
-	// 转换参数类型
-	userId, err := parseOrderStringInt(req.UserId)
-	if err != nil {
-		return nil, err
-	}
-	subscribeId := 0
-	if req.SubscribeId != "" {
-		subscribeId, err = parseOrderStringInt(req.SubscribeId)
-		if err != nil {
-			return nil, err
-		}
-	}
-	paymentId := 0
-	if req.PaymentId != "" {
-		paymentId, err = parseOrderStringInt(req.PaymentId)
-		if err != nil {
-			return nil, err
-		}
-	}
+	userId := int(req.UserId)
+	subscribeId := int(req.SubscribeId)
+	paymentId := int(req.PaymentId)
 
 	// 创建订单
-	err = s.uc.CreateOrder(ctx,
+	err := s.uc.CreateOrder(ctx,
 		userId,
 		req.Type,
 		int(req.Quantity),
@@ -91,25 +66,15 @@ func (s *OrderService) CreateOrder(ctx context.Context, req *v1.CreateOrderReque
 // UpdateOrderStatus 更新订单状态
 func (s *OrderService) UpdateOrderStatus(ctx context.Context, req *v1.UpdateOrderStatusRequest) (*v1.UpdateOrderStatusReply, error) {
 	// 验证订单ID
-	if req.Id == "" {
+	if req.Id <= 0 {
 		return nil, responsecode.ErrOrderIDRequired()
 	}
 
-	// 转换参数类型
-	id, err := parseOrderStringInt(req.Id)
-	if err != nil {
-		return nil, err
-	}
-	paymentId := 0
-	if req.PaymentId != "" {
-		paymentId, err = parseOrderStringInt(req.PaymentId)
-		if err != nil {
-			return nil, err
-		}
-	}
+	id := int(req.Id)
+	paymentId := int(req.PaymentId)
 
 	// 更新订单状态
-	err = s.uc.UpdateOrderStatus(ctx, id, req.Status, paymentId, req.TradeNo)
+	err := s.uc.UpdateOrderStatus(ctx, id, req.Status, paymentId, req.TradeNo)
 	if err != nil {
 		s.log.Errorw("msg", "update order status failed", "error", err)
 		return nil, responsecode.ErrOrderUpdateFailed()
@@ -131,22 +96,8 @@ func (s *OrderService) GetOrderList(ctx context.Context, req *v1.GetOrderListReq
 		req.Size = 10
 	}
 
-	// 转换参数类型
-	var err error
-	userId := 0
-	if req.UserId != "" {
-		userId, err = parseOrderStringInt(req.UserId)
-		if err != nil {
-			return nil, err
-		}
-	}
-	subscribeId := 0
-	if req.SubscribeId != "" {
-		subscribeId, err = parseOrderStringInt(req.SubscribeId)
-		if err != nil {
-			return nil, err
-		}
-	}
+	userId := int(req.UserId)
+	subscribeId := int(req.SubscribeId)
 
 	// 获取订单列表
 	list, total, err := s.uc.GetOrderList(ctx, int(req.Page), int(req.Size), userId, req.Status, subscribeId, req.Search)
@@ -159,27 +110,27 @@ func (s *OrderService) GetOrderList(ctx context.Context, req *v1.GetOrderListReq
 	var items []*v1.OrderItem
 	for _, o := range list {
 		item := &v1.OrderItem{
-			Id:             strconv.Itoa(int(o.ID)),
-			ParentId:       strconv.Itoa(int(o.ParentID)),
-			UserId:         strconv.Itoa(int(o.UserID)),
+			Id:             int64(o.ID),
+			ParentId:       int64(o.ParentID),
+			UserId:         int64(o.UserID),
 			OrderNo:        o.OrderNo,
 			Type:           int32(o.Type),
 			Quantity:       int64(o.Quantity),
 			Price:          int64(o.Price),
 			Amount:         int64(o.Amount),
-			GiftAmount:     0, // Field doesn't exist in schema
+			GiftAmount:     int64(o.GiftAmount),
 			Discount:       int64(o.Discount),
 			Coupon:         o.Coupon,
 			CouponDiscount: int64(o.CouponDiscount),
 			Commission:     int64(o.Commission),
-			PaymentId:      strconv.FormatInt(int64(o.PaymentID), 10),
+			PaymentId:      int64(o.PaymentID),
 			Method:         o.Method,
 			FeeAmount:      int64(o.FeeAmount),
 			TradeNo:        o.TradeNo,
 			Status:         int32(o.Status),
-			SubscribeId:    strconv.Itoa(int(o.SubscribeID)),
-			SubscribeToken: "",    // Field doesn't exist in schema
-			IsNew:          false, // Field doesn't exist in schema
+			SubscribeId:    int64(o.SubscribeID),
+			SubscribeToken: o.SubscribeToken,
+			IsNew:          o.IsNew,
 			CreatedAt:      o.CreatedAt.UnixMilli(),
 			UpdatedAt:      o.UpdatedAt.UnixMilli(),
 		}

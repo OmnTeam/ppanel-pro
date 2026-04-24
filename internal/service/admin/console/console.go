@@ -2,7 +2,6 @@ package console
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/OmnTeam/ppanel-pro/api/admin/console/v1"
 	consolebiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/console"
@@ -108,7 +107,7 @@ func (s *ConsoleService) QueryServerTotalData(ctx context.Context, req *v1.Query
 		data.ServerTrafficRankingToday = make([]*v1.ServerTrafficData, 0, len(resp.ServerTrafficRankingToday))
 		for _, item := range resp.ServerTrafficRankingToday {
 			data.ServerTrafficRankingToday = append(data.ServerTrafficRankingToday, &v1.ServerTrafficData{
-				ServerId: strconv.FormatInt(int64(item.ServerID), 10),
+				ServerId: int64(item.ServerID),
 				Name:     item.Name,
 				Upload:   int64(item.Upload),
 				Download: int64(item.Download),
@@ -120,7 +119,7 @@ func (s *ConsoleService) QueryServerTotalData(ctx context.Context, req *v1.Query
 		data.ServerTrafficRankingYesterday = make([]*v1.ServerTrafficData, 0, len(resp.ServerTrafficRankingYesterday))
 		for _, item := range resp.ServerTrafficRankingYesterday {
 			data.ServerTrafficRankingYesterday = append(data.ServerTrafficRankingYesterday, &v1.ServerTrafficData{
-				ServerId: strconv.FormatInt(int64(item.ServerID), 10),
+				ServerId: int64(item.ServerID),
 				Name:     item.Name,
 				Upload:   int64(item.Upload),
 				Download: int64(item.Download),
@@ -133,7 +132,7 @@ func (s *ConsoleService) QueryServerTotalData(ctx context.Context, req *v1.Query
 		data.UserTrafficRankingToday = make([]*v1.UserTrafficData, 0, len(resp.UserTrafficRankingToday))
 		for _, item := range resp.UserTrafficRankingToday {
 			data.UserTrafficRankingToday = append(data.UserTrafficRankingToday, &v1.UserTrafficData{
-				Sid:      strconv.FormatInt(int64(item.SID), 10),
+				Sid:      int64(item.SID),
 				Upload:   int64(item.Upload),
 				Download: int64(item.Download),
 			})
@@ -144,7 +143,7 @@ func (s *ConsoleService) QueryServerTotalData(ctx context.Context, req *v1.Query
 		data.UserTrafficRankingYesterday = make([]*v1.UserTrafficData, 0, len(resp.UserTrafficRankingYesterday))
 		for _, item := range resp.UserTrafficRankingYesterday {
 			data.UserTrafficRankingYesterday = append(data.UserTrafficRankingYesterday, &v1.UserTrafficData{
-				Sid:      strconv.FormatInt(int64(item.SID), 10),
+				Sid:      int64(item.SID),
 				Upload:   int64(item.Upload),
 				Download: int64(item.Download),
 			})

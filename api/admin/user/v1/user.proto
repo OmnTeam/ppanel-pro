@@ -86,7 +86,7 @@ message CreateUserRequest {
   string password = 4;
   int64 product_id = 5;
   int64 duration = 6;
-  int32 referral_percentage = 7;
+  uint32 referral_percentage = 7;
   bool only_first_purchase = 8;
   string referer_user = 9;   // 推荐人邮箱
   string refer_code = 10;
@@ -97,7 +97,7 @@ message CreateUserRequest {
 }
 
 message CreateUserData {
-  string user_id = 1;
+  int64 user_id = 1;
 }
 
 message CreateUserReply {
@@ -109,7 +109,7 @@ message CreateUserReply {
 // ===== DeleteUser =====
 
 message DeleteUserRequest {
-  string id = 1;  // 用户ID
+  int64 id = 1;   // 用户ID
 }
 
 message DeleteUserData {
@@ -125,7 +125,7 @@ message DeleteUserReply {
 // ===== BatchDeleteUser =====
 
 message BatchDeleteUserRequest {
-  repeated string ids = 1;  // 用户ID列表
+  repeated int64 ids = 1;  // 用户ID列表
 }
 
 message BatchDeleteUserData {
@@ -155,7 +155,7 @@ message CurrentUserReply {
 // ===== GetUserDetail =====
 
 message GetUserDetailRequest {
-  string id = 1;  // 用户ID
+  int64 id = 1;   // 用户ID
 }
 
 message GetUserDetailReply {
@@ -170,10 +170,10 @@ message GetUserListRequest {
   int32 page = 1;
   int32 size = 2;
   string search = 3;               // 搜索关键字
-  optional string user_id = 4;      // 过滤特定用户ID
+  optional int64 user_id = 4;      // 过滤特定用户ID
   bool unscoped = 5;               // 包含已删除
-  optional string subscribe_id = 6; // 过滤订阅套餐ID
-  optional string user_subscribe_id = 7; // 过滤用户订阅ID
+  optional int64 subscribe_id = 6; // 过滤订阅套餐ID
+  optional int64 user_subscribe_id = 7; // 过滤用户订阅ID
   string short_code = 8;           // 短码
 }
 
@@ -191,17 +191,17 @@ message GetUserListReply {
 // ===== UpdateUserBasicInfo =====
 
 message UpdateUserBasicInfoRequest {
-  string user_id = 1;              // 用户ID
+  int64 user_id = 1;              // 用户ID
   string password = 2;            // 新密码（可选）
   string avatar = 3;              // 头像
   int64 balance = 4;              // 余额（分）
   int64 commission = 5;           // 佣金（分）
-  int32 referral_percentage = 6;  // 推荐返利比例
+  uint32 referral_percentage = 6;  // 推荐返利比例
   bool only_first_purchase = 7;   // 仅首次购买返利
   int64 gift_amount = 8;          // 赠送金额（分）
   int64 telegram = 9;             // Telegram ID
   string refer_code = 10;         // 推荐码
-  string referer_id = 11;          // 推荐人ID
+  int64 referer_id = 11;           // 推荐人ID
   bool enable = 12;               // 是否启用
   bool is_admin = 13;             // 是否管理员
 }
@@ -214,7 +214,7 @@ message UpdateUserBasicInfoReply {
 // ===== UpdateUserNotifySettings =====
 
 message UpdateUserNotifySettingsRequest {
-  string user_id = 1;
+  int64 user_id = 1;
   bool enable_balance_notify = 2;
   bool enable_login_notify = 3;
   bool enable_subscribe_notify = 4;
@@ -231,7 +231,7 @@ message UpdateUserNotifySettingsReply {
 message GetUserLoginLogsRequest {
   int32 page = 1;
   int32 size = 2;
-  string user_id = 3;  // 可选：过滤特定用户
+  int64 user_id = 3;   // 可选：过滤特定用户
 }
 
 message GetUserLoginLogsData {
@@ -249,16 +249,13 @@ message GetUserLoginLogsReply {
 
 // User 用户信息
 message User {
-  string id = 1;
-  string email = 2;
-  string telephone = 3;
-  string telephone_area_code = 4;
+  int64 id = 1;
   string avatar = 5;
   int64 balance = 6;               // 余额（分）
   string refer_code = 7;
   int64 referer_id = 8;
   int64 commission = 9;            // 佣金（分）
-  int32 referral_percentage = 10;
+  uint32 referral_percentage = 10;
   bool only_first_purchase = 11;
   int64 gift_amount = 12;          // 赠送金额（分）
   bool enable = 13;
@@ -267,22 +264,22 @@ message User {
   bool enable_login_notify = 16;
   bool enable_subscribe_notify = 17;
   bool enable_trade_notify = 18;
-  int64 created_at = 19;           // Unix timestamp in seconds
-  int64 updated_at = 20;           // Unix timestamp in seconds
-  int64 telegram = 21;             // Telegram ID
   repeated UserAuthMethod auth_methods = 22;  // 用户认证方法列表
   repeated UserDevice user_devices = 23;       // 用户设备列表
   repeated string rules = 24;                  // 权限规则
+  int64 created_at = 19;           // Unix timestamp in seconds
+  int64 updated_at = 20;           // Unix timestamp in seconds
+  int64 telegram = 21;             // Telegram ID
   int64 deleted_at = 25;           // Unix timestamp in seconds
   bool is_del = 26;                // 是否已删除
 }
 
 // LoginLog 登录日志
 message LoginLog {
-  string user_id = 1;
-  string method = 2;       // 登录方法
-  string login_ip = 3;     // 登录IP
-  string user_agent = 4;   // 用户代理
-  bool success = 5;        // 是否成功
-  int64 timestamp = 6;     // Unix timestamp in seconds
+  int64 id = 1;
+  int64 user_id = 2;
+  string login_ip = 3;
+  string user_agent = 4;
+  bool success = 5;
+  int64 timestamp = 6;
 }

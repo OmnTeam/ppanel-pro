@@ -2,7 +2,6 @@ package ticket
 
 import (
 	"context"
-	"strconv"
 
 	pb "github.com/OmnTeam/ppanel-pro/api/admin/ticket/v1"
 	ticketbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/ticket"
@@ -18,26 +17,13 @@ func NewTicketService(uc *ticketbiz.TicketUseCase) *TicketService {
 	return &TicketService{uc: uc}
 }
 
-func parseStringID(s string) (int64, error) {
-	id, err := strconv.ParseInt(s, 10, 64)
-	if err != nil {
-		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	return id, nil
-}
-
-func formatInt64(i int64) string {
-	return strconv.FormatInt(i, 10)
-}
-
 // UpdateTicketStatus 更新工单状态
 func (s *TicketService) UpdateTicketStatus(ctx context.Context, req *pb.UpdateTicketStatusRequest) (*pb.UpdateTicketStatusReply, error) {
-	id, err := parseStringID(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	err = s.uc.UpdateTicketStatus(ctx, int(id), int8(req.Status))
+	err := s.uc.UpdateTicketStatus(ctx, int(req.Id), int8(req.Status))
 	if err != nil {
 		return nil, err
 	}
@@ -50,12 +36,11 @@ func (s *TicketService) UpdateTicketStatus(ctx context.Context, req *pb.UpdateTi
 
 // GetTicket 获取工单详情
 func (s *TicketService) GetTicket(ctx context.Context, req *pb.GetTicketRequest) (*pb.GetTicketReply, error) {
-	id, err := parseStringID(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	ticket, err := s.uc.GetTicket(ctx, int(id))
+	ticket, err := s.uc.GetTicket(ctx, int(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -69,19 +54,18 @@ func (s *TicketService) GetTicket(ctx context.Context, req *pb.GetTicketRequest)
 
 // CreateTicketFollow 创建工单跟进
 func (s *TicketService) CreateTicketFollow(ctx context.Context, req *pb.CreateTicketFollowRequest) (*pb.CreateTicketFollowReply, error) {
-	ticketID, err := parseStringID(req.TicketId)
-	if err != nil {
-		return nil, err
+	if req.TicketId <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	follow := &ticketbiz.Follow{
-		TicketId: ticketID,
+		TicketId: req.TicketId,
 		From:     req.From,
 		Type:     int8(req.Type),
 		Content:  req.Content,
 	}
 
-	err = s.uc.CreateTicketFollow(ctx, follow)
+	err := s.uc.CreateTicketFollow(ctx, follow)
 	if err != nil {
 		return nil, err
 	}
@@ -109,14 +93,7 @@ func (s *TicketService) GetTicketList(ctx context.Context, req *pb.GetTicketList
 		size = 10
 	}
 
-	var userID int64
-	var err error
-	if req.UserId != "" {
-		userID, err = parseStringID(req.UserId)
-		if err != nil {
-			return nil, err
-		}
-	}
+	userID := req.UserId
 
 	total, list, err := s.uc.GetTicketList(ctx, page, size, userID, status, req.Search)
 	if err != nil {
@@ -143,8 +120,8 @@ func (s *TicketService) convertTicketToProto(ticket *ticketbiz.Ticket) *pb.Ticke
 	follows := make([]*pb.TicketFollow, 0, len(ticket.Follow))
 	for _, f := range ticket.Follow {
 		follows = append(follows, &pb.TicketFollow{
-			Id:        formatInt64(f.Id),
-			TicketId:  formatInt64(f.TicketId),
+			Id:        f.Id,
+			TicketId:  f.TicketId,
 			From:      f.From,
 			Type:      int32(f.Type),
 			Content:   f.Content,
@@ -153,10 +130,10 @@ func (s *TicketService) convertTicketToProto(ticket *ticketbiz.Ticket) *pb.Ticke
 	}
 
 	return &pb.TicketInfo{
-		Id:          formatInt64(ticket.Id),
+		Id:          ticket.Id,
 		Title:       ticket.Title,
 		Description: ticket.Description,
-		UserId:      formatInt64(ticket.UserId),
+		UserId:      ticket.UserId,
 		Follow:      follows,
 		Status:      int32(ticket.Status),
 		CreatedAt:   int64(ticket.CreatedAt),

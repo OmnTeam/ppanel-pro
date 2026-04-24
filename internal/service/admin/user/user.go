@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -14,6 +15,7 @@ import (
 	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
 	"github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/OmnTeam/ppanel-pro/pkg/phone"
 )
 
 func parseStringInt64(s string) (int64, error) {
@@ -58,19 +60,18 @@ func (s *UserService) CreateUser(ctx context.Context, req *v1.CreateUserRequest)
 		Code:    responsecode.AdminCreateUserSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminCreateUserSuccess],
 		Data: &v1.CreateUserData{
-			UserId: strconv.FormatInt(userID, 10),
+			UserId: userID,
 		},
 	}, nil
 }
 
 // DeleteUser 删除用户
 func (s *UserService) DeleteUser(ctx context.Context, req *v1.DeleteUserRequest) (*v1.DeleteUserReply, error) {
-	userID, err := parseStringInt64(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	err = s.uc.DeleteUser(ctx, int(userID))
+	err := s.uc.DeleteUser(ctx, int(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -87,10 +88,9 @@ func (s *UserService) DeleteUser(ctx context.Context, req *v1.DeleteUserRequest)
 // BatchDeleteUser 批量删除用户
 func (s *UserService) BatchDeleteUser(ctx context.Context, req *v1.BatchDeleteUserRequest) (*v1.BatchDeleteUserReply, error) {
 	idsInt := make([]int, len(req.Ids))
-	for i, v := range req.Ids {
-		id, err := parseStringInt64(v)
-		if err != nil {
-			return nil, err
+	for i, id := range req.Ids {
+		if id <= 0 {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 		}
 		idsInt[i] = int(id)
 	}
@@ -136,12 +136,11 @@ func (s *UserService) CurrentUser(ctx context.Context, req *v1.CurrentUserReques
 
 // GetUserDetail 获取用户详情
 func (s *UserService) GetUserDetail(ctx context.Context, req *v1.GetUserDetailRequest) (*v1.GetUserDetailReply, error) {
-	userID, err := parseStringInt64(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	user, err := s.uc.GetUserDetail(ctx, int(userID))
+	user, err := s.uc.GetUserDetail(ctx, int(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -163,29 +162,17 @@ func (s *UserService) GetUserDetail(ctx context.Context, req *v1.GetUserDetailRe
 func (s *UserService) GetUserList(ctx context.Context, req *v1.GetUserListRequest) (*v1.GetUserListReply, error) {
 
 	var userID, subscribeID, userSubscribeID *int64
-	if req.UserId != nil && *req.UserId != "" {
-		parsedID, err := parseStringInt64(*req.UserId)
-		if err != nil {
-			return nil, err
-		}
-		userID = &parsedID
+	if req.UserId != nil {
+		userID = req.UserId
 	}
-	if req.SubscribeId != nil && *req.SubscribeId != "" {
-		parsedID, err := parseStringInt64(*req.SubscribeId)
-		if err != nil {
-			return nil, err
-		}
-		subscribeID = &parsedID
+	if req.SubscribeId != nil {
+		subscribeID = req.SubscribeId
 	}
-	if req.UserSubscribeId != nil && *req.UserSubscribeId != "" {
-		parsedID, err := parseStringInt64(*req.UserSubscribeId)
-		if err != nil {
-			return nil, err
-		}
-		userSubscribeID = &parsedID
+	if req.UserSubscribeId != nil {
+		userSubscribeID = req.UserSubscribeId
 	}
 
-	users, total, err := s.uc.GetUserList(ctx, req.Page, req.Size, req.Search, userID, subscribeID, userSubscribeID)
+	users, total, err := s.uc.GetUserList(ctx, req.Page, req.Size, req.Search, userID, subscribeID, userSubscribeID, req.Unscoped, req.ShortCode)
 	if err != nil {
 		return nil, err
 	}
@@ -240,12 +227,8 @@ func (s *UserService) UpdateUserNotifySettings(ctx context.Context, req *v1.Upda
 func (s *UserService) GetUserLoginLogs(ctx context.Context, req *v1.GetUserLoginLogsRequest) (*v1.GetUserLoginLogsReply, error) {
 
 	var userID *int64
-	if req.UserId != "" {
-		parsedID, err := parseStringInt64(req.UserId)
-		if err != nil {
-			return nil, err
-		}
-		userID = &parsedID
+	if req.UserId > 0 {
+		userID = &req.UserId
 	}
 
 	logs, total, err := s.uc.GetUserLoginLogs(ctx, req.Page, req.Size, userID, "")
@@ -264,12 +247,12 @@ func (s *UserService) GetUserLoginLogs(ctx context.Context, req *v1.GetUserLogin
 		}
 
 		protoLog := &v1.LoginLog{
-			UserId:    strconv.FormatInt(int64(logEntry.ObjectID), 10),
-			Method:    loginLog.Method,
+			Id:        int64(logEntry.ID),
+			UserId:    int64(logEntry.ObjectID),
 			LoginIp:   loginLog.LoginIP,
 			UserAgent: loginLog.UserAgent,
 			Success:   loginLog.Success,
-			Timestamp: loginLog.Timestamp,
+			Timestamp: logEntry.CreatedAt.UnixMilli(),
 		}
 
 		protoLogs = append(protoLogs, protoLog)
@@ -307,17 +290,10 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 		s.logger.Errorf("Failed to query user devices for user %d: %v", user.ID, err)
 	}
 
-	// 提取邮箱、手机号和 Telegram
-	var email, telephone, telephoneAreaCode string
+	// 提取 Telegram
 	var telegram int64
 	for _, am := range authMethods {
-		if am.AuthType == "email" {
-			email = am.AuthIdentifier
-		} else if am.AuthType == "mobile" {
-			// 解析手机号格式: {area_code}-{phone}
-			telephone = am.AuthIdentifier
-			// 手机号格式化处理，与原项目保持一致
-		} else if am.AuthType == "telegram" {
+		if am.AuthType == "telegram" {
 			telegram, _ = strconv.ParseInt(am.AuthIdentifier, 10, 64)
 		}
 	}
@@ -328,11 +304,15 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 	// 转换认证方法为 proto
 	protoAuthMethods := make([]*v1.UserAuthMethod, 0, len(authMethods))
 	for _, am := range authMethods {
-		protoAuthMethods = append(protoAuthMethods, &v1.UserAuthMethod{
+		protoAuthMethod := &v1.UserAuthMethod{
 			AuthType:       am.AuthType,
 			AuthIdentifier: am.AuthIdentifier,
 			Verified:       am.Verified,
-		})
+		}
+		if am.AuthType == "mobile" {
+			protoAuthMethod.AuthIdentifier = phone.FormatToInternational(am.AuthIdentifier)
+		}
+		protoAuthMethods = append(protoAuthMethods, protoAuthMethod)
 	}
 
 	// 转换用户设备为 proto
@@ -353,14 +333,14 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 		}
 
 		protoUserDevices = append(protoUserDevices, &v1.UserDevice{
-			Id:         strconv.FormatInt(int64(ud.ID), 10),
+			Id:         int64(ud.ID),
 			Ip:         ip,
 			Identifier: identifier,
 			UserAgent:  userAgent,
 			Online:     ud.Online,
 			Enabled:    ud.Enabled,
-			CreatedAt:  ud.CreatedAt.UnixMilli(),
-			UpdatedAt:  ud.UpdatedAt.UnixMilli(),
+			CreatedAt:  ud.CreatedAt.Unix(),
+			UpdatedAt:  ud.UpdatedAt.Unix(),
 		})
 	}
 
@@ -389,17 +369,23 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 	if user.Avatar != nil {
 		avatar = *user.Avatar
 	}
+	rules := parseUserRules(user.Rules)
+	var deletedAt int64
+	if user.DeletedAt != nil {
+		deletedAt = user.DeletedAt.Unix()
+	}
+	isDel := false
+	if user.IsDel != nil {
+		isDel = *user.IsDel == 0
+	}
 
 	protoUser := &v1.User{
-		Id:                    strconv.FormatInt(int64(user.ID), 10),
-		Email:                 email,
-		Telephone:             telephone,
-		TelephoneAreaCode:     telephoneAreaCode,
+		Id:                    int64(user.ID),
 		Balance:               balance,
 		ReferCode:             referCode,
 		RefererId:             refererID,
 		Commission:            commission,
-		ReferralPercentage:    int32(user.ReferralPercentage),
+		ReferralPercentage:    uint32(user.ReferralPercentage),
 		OnlyFirstPurchase:     user.OnlyFirstPurchase,
 		GiftAmount:            giftAmount,
 		Enable:                user.Enable,
@@ -409,12 +395,26 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 		EnableSubscribeNotify: user.EnableSubscribeNotify,
 		EnableTradeNotify:     user.EnableTradeNotify,
 		Avatar:                avatar,
-		CreatedAt:             user.CreatedAt.UnixMilli(),
-		UpdatedAt:             user.UpdatedAt.UnixMilli(),
+		CreatedAt:             user.CreatedAt.Unix(),
+		UpdatedAt:             user.UpdatedAt.Unix(),
 		Telegram:              telegram,
 		AuthMethods:           protoAuthMethods,
 		UserDevices:           protoUserDevices,
+		Rules:                 rules,
+		DeletedAt:             deletedAt,
+		IsDel:                 isDel,
 	}
 
 	return protoUser, nil
+}
+
+func parseUserRules(raw *string) []string {
+	if raw == nil || *raw == "" {
+		return nil
+	}
+	var rules []string
+	if err := json.Unmarshal([]byte(*raw), &rules); err == nil {
+		return rules
+	}
+	return []string{*raw}
 }

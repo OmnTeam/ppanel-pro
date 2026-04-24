@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxysystemlog"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdevice"
 	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
 	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
 	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
@@ -251,12 +251,14 @@ func (r *adminUserRepo) GetUserByID(ctx context.Context, userID int) (*ent.Proxy
 }
 
 // GetUserList 获取用户列表
-func (r *adminUserRepo) GetUserList(ctx context.Context, page, size int32, search string, userID, subscribeID, userSubscribeID *int64) ([]*ent.ProxyUser, int64, error) {
-	query := r.data.db.ProxyUser.Query().
-		Where(
+func (r *adminUserRepo) GetUserList(ctx context.Context, page, size int32, search string, userID, subscribeID, userSubscribeID *int64, unscoped bool, shortCode string) ([]*ent.ProxyUser, int64, error) {
+	query := r.data.db.ProxyUser.Query()
+	if !unscoped {
+		query = query.Where(
 			proxyuser.DeletedAtIsNil(),
 			proxyuser.Or(proxyuser.IsDelIsNil(), proxyuser.IsDelEQ(1)),
 		)
+	}
 
 	// 按用户ID过滤
 	if userID != nil && *userID > 0 {
@@ -280,12 +282,18 @@ func (r *adminUserRepo) GetUserList(ctx context.Context, page, size int32, searc
 			matchedIDs[am.UserID] = struct{}{}
 		}
 
-		referUsers, err := r.data.db.ProxyUser.Query().
+		referQuery := r.data.db.ProxyUser.Query().
 			Where(
 				proxyuser.ReferCodeContains(search),
+			)
+		if !unscoped {
+			referQuery = referQuery.Where(
 				proxyuser.DeletedAtIsNil(),
 				proxyuser.Or(proxyuser.IsDelIsNil(), proxyuser.IsDelEQ(1)),
-			).
+			)
+		}
+
+		referUsers, err := referQuery.
 			All(ctx)
 		if err != nil {
 			return nil, 0, err
@@ -355,6 +363,28 @@ func (r *adminUserRepo) GetUserList(ctx context.Context, page, size int32, searc
 		query = query.Where(proxyuser.IDIn(filterUserIDs...))
 	}
 
+	if shortCode != "" {
+		devices, err := r.data.db.ProxyUserDevice.Query().
+			Where(proxyuserdevice.ShortCodeContains(shortCode)).
+			All(ctx)
+		if err != nil {
+			return nil, 0, err
+		}
+		if len(devices) == 0 {
+			return []*ent.ProxyUser{}, 0, nil
+		}
+		filterUserIDs := make([]int64, 0, len(devices))
+		seen := make(map[int64]struct{}, len(devices))
+		for _, device := range devices {
+			if _, ok := seen[device.UserID]; ok {
+				continue
+			}
+			seen[device.UserID] = struct{}{}
+			filterUserIDs = append(filterUserIDs, device.UserID)
+		}
+		query = query.Where(proxyuser.IDIn(filterUserIDs...))
+	}
+
 	// 获取总数
 	total, err := query.Count(ctx)
 	if err != nil {
@@ -364,7 +394,7 @@ func (r *adminUserRepo) GetUserList(ctx context.Context, page, size int32, searc
 	// 分页查询
 	users, err := query.
 		Order(func(s *sql.Selector) {
-			s.OrderBy(sql.Desc(proxyuser.FieldCreatedAt))
+			s.OrderBy(sql.Desc(proxyuser.FieldID))
 		}).
 		Offset(int((page - 1) * size)).
 		Limit(int(size)).
@@ -378,9 +408,8 @@ func (r *adminUserRepo) GetUserList(ctx context.Context, page, size int32, searc
 
 // UpdateUserBasicInfo 更新用户基本信息
 func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateUserBasicInfoRequest) error {
-	// Parse user ID
-	userID, err := strconv.ParseInt(req.UserId, 10, 64)
-	if err != nil {
+	userID := req.UserId
+	if userID <= 0 {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
@@ -404,105 +433,89 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	// Balance field is int64 in proto
-	var balance int64
-	if req.Balance != 0 {
-		balance = req.Balance
-
-		// 余额变更日志
-		currentBalance := int64(0)
-		if userInfo.Balance != nil {
-			currentBalance = int64(*userInfo.Balance)
+	currentBalance := int64(0)
+	if userInfo.Balance != nil {
+		currentBalance = int64(*userInfo.Balance)
+	}
+	balance := req.Balance
+	if currentBalance != balance {
+		change := balance - currentBalance
+		balanceLog := logmodel.Balance{
+			Type:      logmodel.BalanceTypeAdjust,
+			Amount:    change,
+			OrderNo:   "",
+			Balance:   balance,
+			Timestamp: time.Now().UnixMilli(),
 		}
-		if currentBalance != balance {
-			change := balance - currentBalance
-			balanceLog := logmodel.Balance{
-				Type:      logmodel.BalanceTypeAdjust,
+		content, _ := balanceLog.Marshal()
+
+		err = r.data.db.ProxySystemLog.Create().
+			SetType(int8(logmodel.TypeBalance)).
+			SetDate(time.Now().Format(time.DateOnly)).
+			SetObjectID(userID).
+			SetContent(string(content)).
+			Exec(ctx)
+		if err != nil {
+			r.logger.Errorf("Failed to insert balance log: %v", err)
+		}
+	}
+
+	currentGiftAmount := int64(0)
+	if userInfo.GiftAmount != nil {
+		currentGiftAmount = int64(*userInfo.GiftAmount)
+	}
+	giftAmount := req.GiftAmount
+	if currentGiftAmount != giftAmount {
+		change := giftAmount - currentGiftAmount
+		if change != 0 {
+			var changeType uint16
+			if currentGiftAmount < giftAmount {
+				changeType = logmodel.GiftTypeIncrease
+			} else {
+				changeType = logmodel.GiftTypeReduce
+			}
+			giftLog := logmodel.Gift{
+				Type:      changeType,
 				Amount:    change,
-				OrderNo:   "",
-				Balance:   balance,
+				Balance:   giftAmount,
+				Remark:    "Admin adjustment",
 				Timestamp: time.Now().UnixMilli(),
 			}
-			content, _ := balanceLog.Marshal()
+			content, _ := giftLog.Marshal()
 
 			err = r.data.db.ProxySystemLog.Create().
-				SetType(int8(logmodel.TypeBalance)).
+				SetType(int8(logmodel.TypeGift)).
 				SetDate(time.Now().Format(time.DateOnly)).
 				SetObjectID(userID).
 				SetContent(string(content)).
 				Exec(ctx)
 			if err != nil {
-				r.logger.Errorf("Failed to insert balance log: %v", err)
+				r.logger.Errorf("Failed to insert gift log: %v", err)
 			}
 		}
 	}
 
-	// 赠送金额变更日志
-	var giftAmount int64
-	if req.GiftAmount != 0 {
-		giftAmount = req.GiftAmount
-
-		currentGiftAmount := int64(0)
-		if userInfo.GiftAmount != nil {
-			currentGiftAmount = int64(*userInfo.GiftAmount)
-		}
-		if currentGiftAmount != giftAmount {
-			change := giftAmount - currentGiftAmount
-			if change != 0 {
-				var changeType uint16
-				if currentGiftAmount < giftAmount {
-					changeType = logmodel.GiftTypeIncrease
-				} else {
-					changeType = logmodel.GiftTypeReduce
-				}
-				giftLog := logmodel.Gift{
-					Type:      changeType,
-					Amount:    change,
-					Balance:   giftAmount,
-					Remark:    "Admin adjustment",
-					Timestamp: time.Now().UnixMilli(),
-				}
-				content, _ := giftLog.Marshal()
-
-				err = r.data.db.ProxySystemLog.Create().
-					SetType(int8(logmodel.TypeGift)).
-					SetDate(time.Now().Format(time.DateOnly)).
-					SetObjectID(userID).
-					SetContent(string(content)).
-					Exec(ctx)
-				if err != nil {
-					r.logger.Errorf("Failed to insert gift log: %v", err)
-				}
-			}
-		}
+	currentCommission := int64(0)
+	if userInfo.Commission != nil {
+		currentCommission = int64(*userInfo.Commission)
 	}
-
-	// 佣金变更日志
-	var commission int64
-	if req.Commission != 0 {
-		commission = req.Commission
-
-		currentCommission := int64(0)
-		if userInfo.Commission != nil {
-			currentCommission = int64(*userInfo.Commission)
+	commission := req.Commission
+	if commission != currentCommission {
+		commissionLog := logmodel.Commission{
+			Type:      logmodel.CommissionTypeAdjust,
+			Amount:    commission - currentCommission,
+			Timestamp: time.Now().UnixMilli(),
 		}
-		if commission != currentCommission {
-			commissionLog := logmodel.Commission{
-				Type:      logmodel.CommissionTypeAdjust,
-				Amount:    commission - currentCommission,
-				Timestamp: time.Now().UnixMilli(),
-			}
-			content, _ := commissionLog.Marshal()
+		content, _ := commissionLog.Marshal()
 
-			err = r.data.db.ProxySystemLog.Create().
-				SetType(int8(logmodel.TypeCommission)).
-				SetDate(time.Now().Format(time.DateOnly)).
-				SetObjectID(userID).
-				SetContent(string(content)).
-				Exec(ctx)
-			if err != nil {
-				r.logger.Errorf("Failed to insert commission log: %v", err)
-			}
+		err = r.data.db.ProxySystemLog.Create().
+			SetType(int8(logmodel.TypeCommission)).
+			SetDate(time.Now().Format(time.DateOnly)).
+			SetObjectID(userID).
+			SetContent(string(content)).
+			Exec(ctx)
+		if err != nil {
+			r.logger.Errorf("Failed to insert commission log: %v", err)
 		}
 	}
 
@@ -526,21 +539,11 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 	}
 
 	// 无条件更新所有数值字段（允许设置为0）
-	if req.Balance != 0 {
-		builder.SetBalance(balance)
-	}
-	if req.Commission != 0 {
-		builder.SetCommission(commission)
-	}
-	if req.GiftAmount != 0 {
-		builder.SetGiftAmount(giftAmount)
-	}
-	if req.RefererId != "" {
-		refererID, err := strconv.ParseInt(req.RefererId, 10, 64)
-		if err != nil {
-			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
-		builder.SetRefererID(refererID)
+	builder.SetBalance(balance)
+	builder.SetCommission(commission)
+	builder.SetGiftAmount(giftAmount)
+	if req.RefererId > 0 {
+		builder.SetRefererID(req.RefererId)
 	}
 	builder.SetReferralPercentage(int8(req.ReferralPercentage))
 	builder.SetOnlyFirstPurchase(req.OnlyFirstPurchase)
@@ -572,12 +575,12 @@ func (r *adminUserRepo) UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateU
 
 // UpdateUserNotifySettings 更新用户通知设置
 func (r *adminUserRepo) UpdateUserNotifySettings(ctx context.Context, req *v1.UpdateUserNotifySettingsRequest) error {
-	userID, err := strconv.ParseInt(req.UserId, 10, 64)
-	if err != nil {
+	userID := req.UserId
+	if userID <= 0 {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	err = r.data.db.ProxyUser.UpdateOneID(userID).
+	err := r.data.db.ProxyUser.UpdateOneID(userID).
 		SetEnableBalanceNotify(req.EnableBalanceNotify).
 		SetEnableLoginNotify(req.EnableLoginNotify).
 		SetEnableSubscribeNotify(req.EnableSubscribeNotify).

@@ -2,6 +2,7 @@ package data
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -22,8 +23,21 @@ import (
 	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
 	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/OmnTeam/ppanel-pro/pkg/phone"
 	"github.com/OmnTeam/ppanel-pro/pkg/uuidx"
 )
+
+type adminUserSubscribeDiscount struct {
+	Quantity int64 `json:"quantity"`
+	Discount int64 `json:"discount"`
+}
+
+type adminUserTrafficLimit struct {
+	StatType     string `json:"stat_type"`
+	StatValue    int64  `json:"stat_value"`
+	TrafficUsage int64  `json:"traffic_usage"`
+	SpeedLimit   int64  `json:"speed_limit"`
+}
 
 type adminUserSubscribeRepo struct {
 	data   *Data
@@ -54,21 +68,20 @@ func (r *adminUserSubscribeRepo) GetUserSubscribe(ctx context.Context, req *v1.G
 	query := r.data.db.ProxyUserSubscribe.Query()
 
 	// 用户ID过滤（可选）
-	if req.UserId != "" {
-		userID, _ := strconv.ParseInt(req.UserId, 10, 64)
-		query = query.Where(proxyusersubscribe.UserIDEQ(userID))
+	if req.UserId > 0 {
+		query = query.Where(proxyusersubscribe.UserIDEQ(req.UserId))
 	}
 
-	// 订阅套餐ID过滤（可选）
-	if req.SubscribeId != "" {
-		subscribeID, _ := strconv.ParseInt(req.SubscribeId, 10, 64)
-		query = query.Where(proxyusersubscribe.SubscribeIDEQ(subscribeID))
-	}
-
-	// 状态过滤（可选，0表示所有状态）
-	if req.Status > 0 {
-		query = query.Where(proxyusersubscribe.StatusEQ(int8(req.Status)))
-	}
+	now := time.Now()
+	sevenDaysAgo := now.Add(-7 * 24 * time.Hour)
+	query = query.Where(
+		proxyusersubscribe.StatusIn(0, 1, 2, 3, 4),
+		proxyusersubscribe.Or(
+			proxyusersubscribe.ExpireTimeGT(now),
+			proxyusersubscribe.FinishedAtGTE(sevenDaysAgo),
+			proxyusersubscribe.ExpireTimeEQ(time.UnixMilli(0)),
+		),
+	)
 
 	// 查询总数
 	total, err := query.Count(ctx)
@@ -94,9 +107,8 @@ func (r *adminUserSubscribeRepo) GetUserSubscribe(ctx context.Context, req *v1.G
 
 // CreateUserSubscribe 创建用户订阅
 func (r *adminUserSubscribeRepo) CreateUserSubscribe(ctx context.Context, req *v1.CreateUserSubscribeRequest) (int64, error) {
-	// Parse user ID
-	userID, err := strconv.ParseInt(req.UserId, 10, 64)
-	if err != nil {
+	userID := req.UserId
+	if userID <= 0 {
 		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
@@ -129,9 +141,8 @@ func (r *adminUserSubscribeRepo) CreateUserSubscribe(ctx context.Context, req *v
 		}
 	}
 
-	// Parse subscribe ID
-	subscribeID, err := strconv.ParseInt(req.SubscribeId, 10, 64)
-	if err != nil {
+	subscribeID := req.SubscribeId
+	if subscribeID <= 0 {
 		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
@@ -195,8 +206,8 @@ func (r *adminUserSubscribeRepo) CreateUserSubscribe(ctx context.Context, req *v
 
 // UpdateUserSubscribe 更新用户订阅
 func (r *adminUserSubscribeRepo) UpdateUserSubscribe(ctx context.Context, req *v1.UpdateUserSubscribeRequest) error {
-	id, err := strconv.ParseInt(req.UserSubscribeId, 10, 64)
-	if err != nil {
+	id := req.UserSubscribeId
+	if id <= 0 {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
@@ -236,12 +247,8 @@ func (r *adminUserSubscribeRepo) UpdateUserSubscribe(ctx context.Context, req *v
 	} else {
 		update.ClearExpireTime()
 	}
-	if req.SubscribeId != "" {
-		subscribeID, err := strconv.ParseInt(req.SubscribeId, 10, 64)
-		if err != nil {
-			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
-		update.SetSubscribeID(subscribeID)
+	if req.SubscribeId > 0 {
+		update.SetSubscribeID(req.SubscribeId)
 	}
 
 	err = update.Exec(ctx)
@@ -309,6 +316,22 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeById(ctx context.Context, id in
 		return nil, err
 	}
 
+	authMethods, err := r.data.db.ProxyUserAuthMethod.Query().
+		Where(proxyuserauthmethod.UserIDEQ(userSub.UserID)).
+		All(ctx)
+	if err != nil {
+		r.logger.Errorf("Failed to query user auth methods: %v", err)
+		return nil, err
+	}
+
+	userDevices, err := r.data.db.ProxyUserDevice.Query().
+		Where(proxyuserdevice.UserIDEQ(userSub.UserID)).
+		All(ctx)
+	if err != nil {
+		r.logger.Errorf("Failed to query user devices: %v", err)
+		return nil, err
+	}
+
 	subscribePlan, err := r.data.db.ProxySubscribe.Query().
 		Where(proxysubscribe.IDEQ(userSub.SubscribeID)).
 		Only(ctx)
@@ -320,64 +343,62 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeById(ctx context.Context, id in
 		return nil, err
 	}
 
-	authMethods, err := r.data.db.ProxyUserAuthMethod.Query().
-		Where(proxyuserauthmethod.UserIDEQ(userSub.UserID)).
-		All(ctx)
-	if err != nil {
-		r.logger.Errorf("Failed to query user auth methods: %v", err)
-		return nil, err
-	}
-
-	email := ""
-	telephone := ""
-	telephoneAreaCode := ""
-	for _, method := range authMethods {
-		switch strings.ToLower(strings.TrimSpace(method.AuthType)) {
-		case "email":
-			if email == "" {
-				email = method.AuthIdentifier
-			}
-		case "mobile":
-			if telephone == "" {
-				parts := strings.SplitN(method.AuthIdentifier, "-", 2)
-				if len(parts) == 2 {
-					telephoneAreaCode = parts[0]
-					telephone = parts[1]
-				} else {
-					telephone = method.AuthIdentifier
-				}
+	protoAuthMethods := make([]*v1.UserAuthMethod, 0, len(authMethods))
+	telegram := getInt64ValueFromPointer(userInfo.Telegram)
+	for _, item := range authMethods {
+		authIdentifier := item.AuthIdentifier
+		if item.AuthType == "mobile" {
+			authIdentifier = phone.FormatToInternational(authIdentifier)
+		}
+		if item.AuthType == "telegram" && telegram == 0 {
+			if parsed, parseErr := strconv.ParseInt(item.AuthIdentifier, 10, 64); parseErr == nil {
+				telegram = parsed
 			}
 		}
+		protoAuthMethods = append(protoAuthMethods, &v1.UserAuthMethod{
+			AuthType:       item.AuthType,
+			AuthIdentifier: authIdentifier,
+			Verified:       item.Verified,
+		})
+	}
+
+	protoUserDevices := make([]*v1.UserDevice, 0, len(userDevices))
+	for _, item := range userDevices {
+		protoUserDevices = append(protoUserDevices, &v1.UserDevice{
+			Id:         item.ID,
+			Ip:         getStringValue(item.IP),
+			Identifier: getStringValue(item.Identifier),
+			UserAgent:  getStringValue(item.UserAgent),
+			Online:     item.Online,
+			Enabled:    item.Enabled,
+			CreatedAt:  item.CreatedAt.Unix(),
+			UpdatedAt:  item.UpdatedAt.Unix(),
+		})
 	}
 
 	detail := &v1.UserSubscribeDetail{
-		Id:          strconv.FormatInt(int64(userSub.ID), 10),
-		UserId:      strconv.FormatInt(int64(userSub.UserID), 10),
-		OrderId:     strconv.FormatInt(int64(userSub.OrderID), 10),
-		SubscribeId: strconv.FormatInt(int64(userSub.SubscribeID), 10),
-		NodeGroupId: strconv.FormatInt(int64(userSub.NodeGroupID), 10),
+		Id:          int64(userSub.ID),
+		UserId:      int64(userSub.UserID),
+		OrderId:     int64(userSub.OrderID),
+		SubscribeId: int64(userSub.SubscribeID),
+		NodeGroupId: int64(userSub.NodeGroupID),
 		GroupLocked: userSub.GroupLocked,
-		StartTime:   userSub.StartTime.UnixMilli(),
+		StartTime:   userSub.StartTime.Unix(),
 		Traffic:     getInt64ValueFromPointer(userSub.Traffic),
 		Download:    getInt64ValueFromPointer(userSub.Download),
 		Upload:      getInt64ValueFromPointer(userSub.Upload),
 		Token:       getStringValue(userSub.Token),
-		Status:      int32(getInt8Value(userSub.Status)),
-		CreatedAt:   userSub.CreatedAt.UnixMilli(),
-		UpdatedAt:   userSub.UpdatedAt.UnixMilli(),
-		FinishedAt:  timePointerToUnixMilli(userSub.FinishedAt),
-		Uuid:        getStringValue(userSub.UUID),
+		Status:      uint32(getInt8Value(userSub.Status)),
+		CreatedAt:   userSub.CreatedAt.Unix(),
+		UpdatedAt:   userSub.UpdatedAt.Unix(),
 		User: &v1.User{
-			Id:                    strconv.FormatInt(userInfo.ID, 10),
-			Email:                 email,
-			Telephone:             telephone,
-			TelephoneAreaCode:     telephoneAreaCode,
+			Id:                    userInfo.ID,
 			Avatar:                getStringValue(userInfo.Avatar),
 			Balance:               getInt64ValueFromPointer(userInfo.Balance),
 			ReferCode:             getStringValue(userInfo.ReferCode),
 			RefererId:             getInt64ValueFromPointer(userInfo.RefererID),
 			Commission:            getInt64ValueFromPointer(userInfo.Commission),
-			ReferralPercentage:    int32(userInfo.ReferralPercentage),
+			ReferralPercentage:    uint32(userInfo.ReferralPercentage),
 			OnlyFirstPurchase:     userInfo.OnlyFirstPurchase,
 			GiftAmount:            getInt64ValueFromPointer(userInfo.GiftAmount),
 			Enable:                userInfo.Enable,
@@ -386,28 +407,48 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeById(ctx context.Context, id in
 			EnableLoginNotify:     userInfo.EnableLoginNotify,
 			EnableSubscribeNotify: userInfo.EnableSubscribeNotify,
 			EnableTradeNotify:     userInfo.EnableTradeNotify,
-			CreatedAt:             userInfo.CreatedAt.UnixMilli(),
-			UpdatedAt:             userInfo.UpdatedAt.UnixMilli(),
-			Telegram:              getInt64ValueFromPointer(userInfo.Telegram),
-			DeletedAt:             timePointerToUnixMilli(userInfo.DeletedAt),
-			IsDel:                 userInfo.IsDel != nil && *userInfo.IsDel == 1,
+			AuthMethods:           protoAuthMethods,
+			UserDevices:           protoUserDevices,
+			Rules:                 parseUserRulesValue(userInfo.Rules),
+			CreatedAt:             userInfo.CreatedAt.Unix(),
+			UpdatedAt:             userInfo.UpdatedAt.Unix(),
+			Telegram:              telegram,
+			DeletedAt:             timePointerToUnix(userInfo.DeletedAt),
+			IsDel:                 userInfo.IsDel != nil && *userInfo.IsDel == 0,
 		},
 		Subscribe: &v1.Subscribe{
-			Id:          strconv.FormatInt(subscribePlan.ID, 10),
-			Name:        subscribePlan.Name,
-			Description: getStringValue(subscribePlan.Description),
-			UnitPrice:   subscribePlan.UnitPrice,
-			UnitTime:    subscribePlan.UnitTime,
-			Traffic:     subscribePlan.Traffic,
-			SpeedLimit:  subscribePlan.SpeedLimit,
-			DeviceLimit: subscribePlan.DeviceLimit,
-			ResetCycle:  getInt64ValueFromPointer(subscribePlan.ResetCycle),
-			CreatedAt:   subscribePlan.CreatedAt.UnixMilli(),
-			UpdatedAt:   subscribePlan.UpdatedAt.UnixMilli(),
+			Id:                subscribePlan.ID,
+			Name:              subscribePlan.Name,
+			Language:          subscribePlan.Language,
+			Description:       getStringValue(subscribePlan.Description),
+			UnitPrice:         subscribePlan.UnitPrice,
+			UnitTime:          subscribePlan.UnitTime,
+			Discount:          parseAdminUserSubscribeDiscounts(subscribePlan.Discount),
+			Replacement:       subscribePlan.Replacement,
+			Inventory:         subscribePlan.Inventory,
+			Traffic:           subscribePlan.Traffic,
+			SpeedLimit:        subscribePlan.SpeedLimit,
+			DeviceLimit:       subscribePlan.DeviceLimit,
+			Quota:             subscribePlan.Quota,
+			Nodes:             parseInt64CSV(subscribePlan.Nodes),
+			NodeTags:          parseStringCSV(subscribePlan.NodeTags),
+			NodeGroupIds:      subscribePlan.NodeGroupIds,
+			NodeGroupId:       getInt64ValueFromPointer(subscribePlan.NodeGroupID),
+			TrafficLimit:      parseAdminUserTrafficLimits(subscribePlan.TrafficLimit),
+			Show:              subscribePlan.Show,
+			Sell:              subscribePlan.Sell,
+			Sort:              subscribePlan.Sort,
+			DeductionRatio:    getInt64ValueFromPointer(subscribePlan.DeductionRatio),
+			AllowDeduction:    subscribePlan.AllowDeduction,
+			ResetCycle:        getInt64ValueFromPointer(subscribePlan.ResetCycle),
+			RenewalReset:      subscribePlan.RenewalReset,
+			ShowOriginalPrice: subscribePlan.ShowOriginalPrice,
+			CreatedAt:         subscribePlan.CreatedAt.Unix(),
+			UpdatedAt:         subscribePlan.UpdatedAt.Unix(),
 		},
 	}
 	if userSub.ExpireTime != nil {
-		detail.ExpireTime = userSub.ExpireTime.UnixMilli()
+		detail.ExpireTime = userSub.ExpireTime.Unix()
 	}
 	return detail, nil
 }
@@ -415,19 +456,11 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeById(ctx context.Context, id in
 // GetUserSubscribeDevices 获取用户订阅设备列表
 func (r *adminUserSubscribeRepo) GetUserSubscribeDevices(ctx context.Context, req *v1.GetUserSubscribeDevicesRequest) ([]*ent.ProxyUserDevice, int64, error) {
 	query := r.data.db.ProxyUserDevice.Query()
-	if req.UserId != "" {
-		userID, err := strconv.ParseInt(req.UserId, 10, 64)
-		if err != nil {
-			return nil, 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
-		query = query.Where(proxyuserdevice.UserIDEQ(userID))
+	if req.UserId > 0 {
+		query = query.Where(proxyuserdevice.UserIDEQ(req.UserId))
 	}
-	if req.SubscribeId != "" {
-		subscribeID, err := strconv.ParseInt(req.SubscribeId, 10, 64)
-		if err != nil {
-			return nil, 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
-		query = query.Where(proxyuserdevice.SubscribeIDEQ(subscribeID))
+	if req.SubscribeId > 0 {
+		query = query.Where(proxyuserdevice.SubscribeIDEQ(req.SubscribeId))
 	}
 
 	// 查询总数
@@ -458,18 +491,36 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeLogs(ctx context.Context, req *
 			proxysystemlog.TypeEQ(int8(logmodel.TypeSubscribe)), // Type = 20
 		)
 
-	userSubID := int64(0)
-	if req.UserSubscribeId != "" {
-		userSubID, _ = strconv.ParseInt(req.UserSubscribeId, 10, 64)
-	}
-	if userSubID == 0 && req.SubscribeId != "" {
-		userSubID, _ = strconv.ParseInt(req.SubscribeId, 10, 64)
-	}
-	if userSubID > 0 {
-		query = query.Where(proxysystemlog.ObjectIDEQ(userSubID))
+	if req.Date != "" {
+		query = query.Where(proxysystemlog.DateEQ(req.Date))
 	}
 
-	// 注意：user_id 在系统日志中没有直接字段，需要通过 object_id 关联查询，这里暂不实现该过滤
+	userSubscribeIDs := make([]int64, 0)
+	if req.UserSubscribeId > 0 {
+		userSubscribeIDs = append(userSubscribeIDs, req.UserSubscribeId)
+	}
+
+	if req.UserId > 0 || req.SubscribeId > 0 {
+		userSubQuery := r.data.db.ProxyUserSubscribe.Query()
+		if req.UserId > 0 {
+			userSubQuery = userSubQuery.Where(proxyusersubscribe.UserIDEQ(req.UserId))
+		}
+		if req.SubscribeId > 0 {
+			userSubQuery = userSubQuery.Where(proxyusersubscribe.SubscribeIDEQ(req.SubscribeId))
+		}
+		userSubs, err := userSubQuery.All(ctx)
+		if err != nil {
+			r.logger.Errorf("Failed to query user subscribes for subscribe logs: %v", err)
+			return nil, 0, err
+		}
+		for _, item := range userSubs {
+			userSubscribeIDs = append(userSubscribeIDs, item.ID)
+		}
+	}
+
+	if len(userSubscribeIDs) > 0 {
+		query = query.Where(proxysystemlog.ObjectIDIn(userSubscribeIDs...))
+	}
 
 	// 查询总数
 	total, err := query.Count(ctx)
@@ -500,9 +551,11 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeResetTrafficLogs(ctx context.Co
 			proxysystemlog.TypeEQ(int8(logmodel.TypeResetSubscribe)), // Type = 23
 		)
 
-	if req.UserSubscribeId != "" {
-		userSubID, _ := strconv.ParseInt(req.UserSubscribeId, 10, 64)
-		query = query.Where(proxysystemlog.ObjectIDEQ(userSubID))
+	if req.UserSubscribeId > 0 {
+		query = query.Where(proxysystemlog.ObjectIDEQ(req.UserSubscribeId))
+	}
+	if req.Date != "" {
+		query = query.Where(proxysystemlog.DateEQ(req.Date))
 	}
 
 	// 查询总数
@@ -531,33 +584,46 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeResetTrafficLogs(ctx context.Co
 func (r *adminUserSubscribeRepo) GetUserSubscribeTrafficLogs(ctx context.Context, req *v1.GetUserSubscribeTrafficLogsRequest) ([]*ent.ProxyTrafficLog, int64, error) {
 	query := r.data.db.ProxyTrafficLog.Query()
 
-	// 可选：过滤特定用户
-	if req.UserId != "" {
-		userID, _ := strconv.ParseInt(req.UserId, 10, 64)
-		query = query.Where(proxytrafficlog.UserIDEQ(userID))
+	if req.UserSubscribeId > 0 {
+		userSub, err := r.data.db.ProxyUserSubscribe.Query().
+			Where(proxyusersubscribe.IDEQ(req.UserSubscribeId)).
+			Only(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return []*ent.ProxyTrafficLog{}, 0, nil
+			}
+			r.logger.Errorf("Failed to query user subscribe for traffic logs: %v", err)
+			return nil, 0, err
+		}
+		query = query.Where(
+			proxytrafficlog.UserIDEQ(userSub.UserID),
+			proxytrafficlog.SubscribeIDEQ(userSub.SubscribeID),
+		)
 	}
 
-	if req.SubscribeId != "" {
-		subscribeID, _ := strconv.ParseInt(req.SubscribeId, 10, 64)
-		query = query.Where(proxytrafficlog.SubscribeIDEQ(subscribeID))
+	// 可选：过滤特定用户
+	if req.UserId > 0 {
+		query = query.Where(proxytrafficlog.UserIDEQ(req.UserId))
 	}
-	if req.UserSubscribeId != "" {
-		userSubID, _ := strconv.ParseInt(req.UserSubscribeId, 10, 64)
-		userSub, err := r.data.db.ProxyUserSubscribe.Query().
-			Where(
-				proxyusersubscribe.IDEQ(userSubID),
-			).
-			Only(ctx)
-		if err == nil {
-			subscribeId := userSub.SubscribeID
-			query = query.Where(proxytrafficlog.SubscribeIDEQ(subscribeId))
-		}
+
+	if req.SubscribeId > 0 {
+		query = query.Where(proxytrafficlog.SubscribeIDEQ(req.SubscribeId))
 	}
 	if req.StartTime > 0 {
 		query = query.Where(proxytrafficlog.TimestampGTE(time.UnixMilli(req.StartTime)))
 	}
 	if req.EndTime > 0 {
 		query = query.Where(proxytrafficlog.TimestampLTE(time.UnixMilli(req.EndTime)))
+	}
+	if req.Date != "" {
+		startTime, endTime, err := parseDateRange(req.Date)
+		if err != nil {
+			return nil, 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+		query = query.Where(
+			proxytrafficlog.TimestampGTE(startTime),
+			proxytrafficlog.TimestampLTE(endTime),
+		)
 	}
 
 	// 查询总数
@@ -689,11 +755,22 @@ func getStringValue(p *string) string {
 	return *p
 }
 
-func timePointerToUnixMilli(t *time.Time) int64 {
+func parseUserRulesValue(raw *string) []string {
+	if raw == nil || *raw == "" {
+		return nil
+	}
+	var rules []string
+	if err := json.Unmarshal([]byte(*raw), &rules); err == nil {
+		return rules
+	}
+	return []string{*raw}
+}
+
+func timePointerToUnix(t *time.Time) int64 {
 	if t == nil {
 		return 0
 	}
-	return t.UnixMilli()
+	return t.Unix()
 }
 
 // 辅助函数：获取int8指针的值，nil返回0
@@ -710,4 +787,75 @@ func getUint8Value(p *uint8) uint8 {
 		return 0
 	}
 	return *p
+}
+
+func parseAdminUserSubscribeDiscounts(raw *string) []*v1.SubscribeDiscount {
+	if raw == nil || strings.TrimSpace(*raw) == "" {
+		return nil
+	}
+	var items []adminUserSubscribeDiscount
+	if err := json.Unmarshal([]byte(*raw), &items); err != nil {
+		return nil
+	}
+	result := make([]*v1.SubscribeDiscount, 0, len(items))
+	for _, item := range items {
+		result = append(result, &v1.SubscribeDiscount{
+			Quantity: item.Quantity,
+			Discount: item.Discount,
+		})
+	}
+	return result
+}
+
+func parseAdminUserTrafficLimits(raw *string) []*v1.TrafficLimit {
+	if raw == nil || strings.TrimSpace(*raw) == "" {
+		return nil
+	}
+	var items []adminUserTrafficLimit
+	if err := json.Unmarshal([]byte(*raw), &items); err != nil {
+		return nil
+	}
+	result := make([]*v1.TrafficLimit, 0, len(items))
+	for _, item := range items {
+		result = append(result, &v1.TrafficLimit{
+			StatType:     item.StatType,
+			StatValue:    item.StatValue,
+			TrafficUsage: item.TrafficUsage,
+			SpeedLimit:   item.SpeedLimit,
+		})
+	}
+	return result
+}
+
+func parseInt64CSV(raw string) []int64 {
+	if strings.TrimSpace(raw) == "" {
+		return nil
+	}
+	parts := strings.Split(raw, ",")
+	result := make([]int64, 0, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+		if value, err := strconv.ParseInt(part, 10, 64); err == nil {
+			result = append(result, value)
+		}
+	}
+	return result
+}
+
+func parseStringCSV(raw string) []string {
+	if strings.TrimSpace(raw) == "" {
+		return nil
+	}
+	parts := strings.Split(raw, ",")
+	result := make([]string, 0, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part != "" {
+			result = append(result, part)
+		}
+	}
+	return result
 }

@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
-	"strconv"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -71,11 +70,11 @@ func (r *adminGroupRepo) CreateNodeGroup(ctx context.Context, req *v1.CreateNode
 
 // UpdateNodeGroup updates node group
 func (r *adminGroupRepo) UpdateNodeGroup(ctx context.Context, req *v1.UpdateNodeGroupRequest) error {
-	groupID, err := strconv.ParseInt(req.Id, 10, 64)
-	if err != nil {
+	groupID := req.Id
+	if groupID <= 0 {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
-	_, err = r.data.db.ProxyServerGroup.Query().
+	_, err := r.data.db.ProxyServerGroup.Query().
 		Where(proxyservergroup.IDEQ(groupID)).
 		Only(ctx)
 

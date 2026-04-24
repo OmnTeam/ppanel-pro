@@ -23,7 +23,7 @@ type UserRepo interface {
 	GetUserByID(ctx context.Context, userID int) (*ent.ProxyUser, error)
 
 	// GetUserList 获取用户列表
-	GetUserList(ctx context.Context, page, size int32, search string, userID, subscribeID, userSubscribeID *int64) ([]*ent.ProxyUser, int64, error)
+	GetUserList(ctx context.Context, page, size int32, search string, userID, subscribeID, userSubscribeID *int64, unscoped bool, shortCode string) ([]*ent.ProxyUser, int64, error)
 
 	// UpdateUserBasicInfo 更新用户基本信息
 	UpdateUserBasicInfo(ctx context.Context, req *v1.UpdateUserBasicInfoRequest) error
@@ -75,8 +75,8 @@ func (uc *UserUsecase) GetUserDetail(ctx context.Context, userID int) (*ent.Prox
 }
 
 // GetUserList 获取用户列表
-func (uc *UserUsecase) GetUserList(ctx context.Context, page, size int32, search string, userID, subscribeID, userSubscribeID *int64) ([]*ent.ProxyUser, int64, error) {
-	return uc.repo.GetUserList(ctx, page, size, search, userID, subscribeID, userSubscribeID)
+func (uc *UserUsecase) GetUserList(ctx context.Context, page, size int32, search string, userID, subscribeID, userSubscribeID *int64, unscoped bool, shortCode string) ([]*ent.ProxyUser, int64, error) {
+	return uc.repo.GetUserList(ctx, page, size, search, userID, subscribeID, userSubscribeID, unscoped, shortCode)
 }
 
 // UpdateUserBasicInfo 更新用户基本信息

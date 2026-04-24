@@ -575,6 +575,7 @@ func (c *AuthCompat) registerDeviceUser(ctx context.Context, repo *authRepo, par
 		SetUserID(userInfo.ID).
 		SetIP(params.Meta.IP).
 		SetIdentifier(params.Identifier).
+		SetShortCode(params.ShortCode).
 		SetUserAgent(trimUserAgent(params.Meta.UserAgent)).
 		SetEnabled(true).
 		SetOnline(false).

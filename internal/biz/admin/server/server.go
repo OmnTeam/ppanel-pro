@@ -62,6 +62,8 @@ type Node struct {
 	ServerID  int64
 	Protocol  string
 	Enabled   *bool
+	NodeType  string
+	IsHidden  *bool
 	Sort      uint32 // 匹配数据库 INT UNSIGNED 类型
 	CreatedAt int64
 	UpdatedAt int64
@@ -111,7 +113,7 @@ type NodeRepo interface {
 	CreateNode(ctx context.Context, node *Node) (*Node, error)
 	UpdateNode(ctx context.Context, node *Node) (*Node, error)
 	DeleteNode(ctx context.Context, id int) error
-	FilterNodeList(ctx context.Context, page, size int32, search string) (int64, []*Node, error)
+	FilterNodeList(ctx context.Context, page, size int32, search string, nodeGroupID *int64) (int64, []*Node, error)
 	ToggleNodeStatus(ctx context.Context, id int, enable *bool) (*Node, error)
 	QueryNodeTags(ctx context.Context) ([]string, error)
 	ResetNodeSort(ctx context.Context, sortItems []*SortItem) error

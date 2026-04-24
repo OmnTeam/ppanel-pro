@@ -92,11 +92,7 @@ func (uc *SubscribeUseCase) CreateSubscribe(ctx context.Context, req *v1.CreateS
 	// Convert nodes to comma-separated string
 	nodesInt := make([]int, len(req.Nodes))
 	for i, v := range req.Nodes {
-		parsed, err := strconv.Atoi(v)
-		if err != nil {
-			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
-		nodesInt[i] = parsed
+		nodesInt[i] = int(v)
 	}
 	nodesStr := int64SliceToString(nodesInt)
 	nodeTagsStr := stringSliceToString(req.NodeTags)
@@ -135,12 +131,12 @@ func (uc *SubscribeUseCase) CreateSubscribe(ctx context.Context, req *v1.CreateS
 // UpdateSubscribe update subscribe
 func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateSubscribeRequest) error {
 	// Check if subscribe exists
-	id, err := parseStringID(req.Id)
-	if err != nil {
-		return err
+	id := int(req.Id)
+	if id <= 0 {
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	_, err = uc.repo.GetSubscribeByID(ctx, id)
+	_, err := uc.repo.GetSubscribeByID(ctx, id)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			uc.log.WithContext(ctx).Errorw("msg", "UpdateSubscribe subscribe not found", "error", err, "id", req.Id)
@@ -164,11 +160,7 @@ func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateS
 	// Convert nodes to comma-separated string
 	nodesInt := make([]int, len(req.Nodes))
 	for i, v := range req.Nodes {
-		parsed, err := strconv.Atoi(v)
-		if err != nil {
-			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
-		nodesInt[i] = parsed
+		nodesInt[i] = int(v)
 	}
 	nodesStr := int64SliceToString(nodesInt)
 	nodeTagsStr := stringSliceToString(req.NodeTags)
@@ -323,10 +315,10 @@ func (uc *SubscribeUseCase) SubscribeSort(ctx context.Context, req *v1.Subscribe
 	ids := make([]int, 0, len(req.Sort))
 	sortMap := make(map[int64]int64)
 	for i, item := range req.Sort {
-		id, err := parseStringID(item.Id)
-		if err != nil {
-			return err
+		if item.Id <= 0 {
+			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 		}
+		id := int(item.Id)
 		ids = append(ids, id)
 		sortMap[int64(id)] = int64(i)
 	}
@@ -389,9 +381,9 @@ func (uc *SubscribeUseCase) CreateSubscribeGroup(ctx context.Context, req *v1.Cr
 
 // UpdateSubscribeGroup update subscribe group
 func (uc *SubscribeUseCase) UpdateSubscribeGroup(ctx context.Context, req *v1.UpdateSubscribeGroupRequest) error {
-	id, err := parseStringID64(req.Id)
-	if err != nil {
-		return err
+	id := req.Id
+	if id <= 0 {
+		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	group := &model.SubscribeGroup{
@@ -444,7 +436,7 @@ func (uc *SubscribeUseCase) GetSubscribeGroupList(ctx context.Context) (*v1.GetS
 			desc = *group.Description
 		}
 		groups = append(groups, &v1.SubscribeGroupInfo{
-			Id:          strconv.FormatInt(int64(group.ID), 10),
+			Id:          int64(group.ID),
 			Name:        group.Name,
 			Description: desc,
 			CreatedAt:   group.CreatedAt.Unix(),
@@ -575,7 +567,7 @@ func convertSubscribeToProto(sub *ent.ProxySubscribe) *v1.SubscribeInfo {
 	renewalReset := sub.RenewalReset
 
 	return &v1.SubscribeInfo{
-		Id:             strconv.FormatInt(int64(sub.ID), 10),
+		Id:             int64(sub.ID),
 		Name:           sub.Name,
 		Language:       sub.Language,
 		Description:    desc,
@@ -588,7 +580,7 @@ func convertSubscribeToProto(sub *ent.ProxySubscribe) *v1.SubscribeInfo {
 		SpeedLimit:     int64(sub.SpeedLimit),
 		DeviceLimit:    int64(sub.DeviceLimit),
 		Quota:          int64(sub.Quota),
-		Nodes:          intSliceToStringSlice(stringToInt64Slice(sub.Nodes)),
+		Nodes:          convertIntSliceToInt64Slice(stringToInt64Slice(sub.Nodes)),
 		NodeTags:       stringToStringSlice(sub.NodeTags),
 		Show:           sub.Show,
 		Sell:           sub.Sell,
@@ -624,7 +616,7 @@ func convertSubscribeToProtoItem(sub *ent.ProxySubscribe) *v1.SubscribeItem {
 	renewalReset := sub.RenewalReset
 
 	return &v1.SubscribeItem{
-		Id:             strconv.FormatInt(int64(sub.ID), 10),
+		Id:             int64(sub.ID),
 		Name:           sub.Name,
 		Language:       sub.Language,
 		Description:    desc,

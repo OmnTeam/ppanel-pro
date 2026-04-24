@@ -24,7 +24,7 @@ func NewToolService(uc *tool.ToolUseCase) *ToolService {
 
 // GetSystemLog 获取系统日志
 func (s *ToolService) GetSystemLog(ctx context.Context, req *v1.GetSystemLogRequest) (*v1.GetSystemLogReply, error) {
-	logs, total, err := s.uc.GetSystemLog(ctx, req)
+	logs, err := s.uc.GetSystemLog(ctx, req)
 	if err != nil {
 		return nil, err
 	}
@@ -32,10 +32,7 @@ func (s *ToolService) GetSystemLog(ctx context.Context, req *v1.GetSystemLogRequ
 	return &v1.GetSystemLogReply{
 		Code:    int32(responsecode.AdminGetSystemLogSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetSystemLogSuccess],
-		Data: &v1.GetSystemLogData{
-			Logs:  logs,
-			Total: total,
-		},
+		Data:    &v1.LogResponse{List: logs},
 	}, nil
 }
 
@@ -48,10 +45,6 @@ func (s *ToolService) RestartSystem(ctx context.Context, req *v1.RestartSystemRe
 	return &v1.RestartSystemReply{
 		Code:    int32(responsecode.AdminRestartSystemSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminRestartSystemSuccess],
-		Data: &v1.RestartSystemData{
-			Success: true,
-			Message: "System restart initiated",
-		},
 	}, nil
 }
 
@@ -65,9 +58,7 @@ func (s *ToolService) GetVersion(ctx context.Context, req *v1.GetVersionRequest)
 	return &v1.GetVersionReply{
 		Code:    int32(responsecode.AdminGetVersionSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminGetVersionSuccess],
-		Data: &v1.GetVersionData{
-			Version: version,
-		},
+		Data:    version,
 	}, nil
 }
 
@@ -81,8 +72,6 @@ func (s *ToolService) QueryIPLocation(ctx context.Context, req *v1.QueryIPLocati
 	return &v1.QueryIPLocationReply{
 		Code:    int32(responsecode.AdminQueryIPLocationSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminQueryIPLocationSuccess],
-		Data: &v1.QueryIPLocationData{
-			Location: location,
-		},
+		Data:    location,
 	}, nil
 }

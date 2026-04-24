@@ -105,9 +105,7 @@ service UserSubscribeService {
 message GetUserSubscribeRequest {
   int32 page = 1;
   int32 size = 2;
-  string user_id = 3;  // 用户ID
-  string subscribe_id = 4; // 订阅套餐ID
-  int32 status = 5; // 状态过滤
+  int64 user_id = 3;
 }
 
 message GetUserSubscribeData {
@@ -124,10 +122,10 @@ message GetUserSubscribeReply {
 // ===== CreateUserSubscribe =====
 
 message CreateUserSubscribeRequest {
-  string user_id = 1;
-  int64 expired_at = 2;   // 过期时间（Unix时间戳，秒）
-  int64 traffic = 3;      // 总流量（字节）
-  string subscribe_id = 4; // 订阅套餐ID
+  int64 user_id = 1;
+  int64 expired_at = 2;
+  int64 traffic = 3;
+  int64 subscribe_id = 4;
 }
 
 message CreateUserSubscribeReply {
@@ -138,12 +136,12 @@ message CreateUserSubscribeReply {
 // ===== UpdateUserSubscribe =====
 
 message UpdateUserSubscribeRequest {
-  string user_subscribe_id = 1; // 用户订阅ID
-  string subscribe_id = 2;      // 订阅套餐ID
-  int64 traffic = 3;           // 总流量（字节）
-  int64 expired_at = 4;        // 过期时间（Unix时间戳，秒）
-  int64 upload = 5;            // 上传流量（字节）
-  int64 download = 6;          // 下载流量（字节）
+  int64 user_subscribe_id = 1;
+  int64 subscribe_id = 2;
+  int64 traffic = 3;
+  int64 expired_at = 4;
+  int64 upload = 5;
+  int64 download = 6;
 }
 
 message UpdateUserSubscribeReply {
@@ -154,7 +152,7 @@ message UpdateUserSubscribeReply {
 // ===== DeleteUserSubscribe =====
 
 message DeleteUserSubscribeRequest {
-  string user_subscribe_id = 1;  // 用户订阅ID
+  int64 user_subscribe_id = 1;
 }
 
 message DeleteUserSubscribeReply {
@@ -165,7 +163,7 @@ message DeleteUserSubscribeReply {
 // ===== GetUserSubscribeById =====
 
 message GetUserSubscribeByIdRequest {
-  string id = 1;  // 用户订阅ID
+  int64 id = 1;
 }
 
 message GetUserSubscribeByIdReply {
@@ -179,8 +177,8 @@ message GetUserSubscribeByIdReply {
 message GetUserSubscribeDevicesRequest {
   int32 page = 1;
   int32 size = 2;
-  string user_id = 3;           // 用户ID
-  string subscribe_id = 4;      // 用户订阅ID
+  int64 user_id = 3;
+  int64 subscribe_id = 4;
 }
 
 message GetUserSubscribeDevicesData {
@@ -199,10 +197,10 @@ message GetUserSubscribeDevicesReply {
 message GetUserSubscribeLogsRequest {
   int32 page = 1;
   int32 size = 2;
-  string user_id = 3;           // 用户ID
-  string subscribe_id = 4;      // 订阅套餐ID（可选）
-  string user_subscribe_id = 5; // 用户订阅ID（可选）
-  string date = 6;              // 日期（可选）
+  int64 user_id = 3;
+  int64 subscribe_id = 4;
+  int64 user_subscribe_id = 5;
+  string date = 6;
 }
 
 message GetUserSubscribeLogsData {
@@ -221,8 +219,8 @@ message GetUserSubscribeLogsReply {
 message GetUserSubscribeResetTrafficLogsRequest {
   int32 page = 1;
   int32 size = 2;
-  string user_subscribe_id = 3;  // 用户订阅ID
-  string date = 4;               // 日期（可选）
+  int64 user_subscribe_id = 3;
+  string date = 4;
 }
 
 message GetUserSubscribeResetTrafficLogsData {
@@ -241,12 +239,12 @@ message GetUserSubscribeResetTrafficLogsReply {
 message GetUserSubscribeTrafficLogsRequest {
   int32 page = 1;
   int32 size = 2;
-  string user_id = 3;       // 用户ID
-  string subscribe_id = 4;  // 订阅套餐ID
-  int64 start_time = 5;    // 开始时间（Unix时间戳，秒）
-  int64 end_time = 6;      // 结束时间（Unix时间戳，秒）
-  string user_subscribe_id = 7; // 用户订阅ID（可选）
-  string date = 8;              // 日期（可选）
+  int64 user_id = 3;
+  int64 subscribe_id = 4;
+  int64 start_time = 5;
+  int64 end_time = 6;
+  int64 user_subscribe_id = 7;
+  string date = 8;
 }
 
 message GetUserSubscribeTrafficLogsData {
@@ -263,7 +261,7 @@ message GetUserSubscribeTrafficLogsReply {
 // ===== ResetUserSubscribeToken =====
 
 message ResetUserSubscribeTokenRequest {
-  string user_subscribe_id = 1;  // 用户订阅ID
+  int64 user_subscribe_id = 1;
 }
 
 message ResetUserSubscribeTokenReply {
@@ -274,7 +272,7 @@ message ResetUserSubscribeTokenReply {
 // ===== ToggleUserSubscribeStatus =====
 
 message ToggleUserSubscribeStatusRequest {
-  string user_subscribe_id = 1;  // 用户订阅ID
+  int64 user_subscribe_id = 1;
 }
 
 message ToggleUserSubscribeStatusReply {
@@ -285,7 +283,7 @@ message ToggleUserSubscribeStatusReply {
 // ===== ResetUserSubscribeTraffic =====
 
 message ResetUserSubscribeTrafficRequest {
-  string user_subscribe_id = 1;  // 用户订阅ID
+  int64 user_subscribe_id = 1;
 }
 
 message ResetUserSubscribeTrafficReply {
@@ -297,54 +295,52 @@ message ResetUserSubscribeTrafficReply {
 
 // UserSubscribe 用户订阅
 message UserSubscribe {
-  string id = 1;
-  string user_id = 2;
-  string order_id = 3;
-  string subscribe_id = 4;  // 订阅套餐ID
-  string node_group_id = 5;
-  bool group_locked = 6;
-  int64 start_time = 7;    // Unix timestamp in seconds
-  int64 expire_time = 8;   // Unix timestamp in seconds
-  int64 reset_time = 9;    // Unix timestamp in seconds
-  int64 traffic = 10;      // 总流量（字节）
-  int64 download = 11;     // 下载流量（字节）
-  int64 upload = 12;       // 上传流量（字节）
-  string token = 13;       // 订阅令牌
-  int32 status = 14;       // 状态：0:待激活 1:激活 2:完成 3:过期 4:已扣除
-  string short = 15;       // 短码
-  int64 created_at = 16;   // Unix timestamp in seconds
-  int64 updated_at = 17;   // Unix timestamp in seconds
-  int64 finished_at = 18;  // Unix timestamp in seconds
-  string uuid = 19;        // 订阅UUID
-  Subscribe subscribe = 20;
+  int64 id = 1;
+  string id_str = 2;
+  int64 user_id = 3;
+  int64 order_id = 4;
+  int64 subscribe_id = 5;
+  Subscribe subscribe = 6;
+  int64 node_group_id = 7;
+  bool group_locked = 8;
+  int64 start_time = 9;
+  int64 expire_time = 10;
+  int64 finished_at = 11;
+  int64 reset_time = 12;
+  int64 traffic = 13;
+  int64 download = 14;
+  int64 upload = 15;
+  string token = 16;
+  uint32 status = 17;
+  string short = 18;
+  int64 created_at = 19;
+  int64 updated_at = 20;
 }
 
 // UserSubscribeDetail 用户订阅详情（含关联对象）
 message UserSubscribeDetail {
-  string id = 1;
-  string user_id = 2;
-  string order_id = 3;
-  string subscribe_id = 4;
-  string node_group_id = 5;
-  bool group_locked = 6;
-  int64 start_time = 7;
-  int64 expire_time = 8;
-  int64 reset_time = 9;
-  int64 traffic = 10;
-  int64 download = 11;
-  int64 upload = 12;
-  string token = 13;
-  int32 status = 14;
-  int64 created_at = 15;
-  int64 updated_at = 16;
-  User user = 17;
-  Subscribe subscribe = 18;
-  int64 finished_at = 19;
-  string uuid = 20;
+  int64 id = 1;
+  int64 user_id = 2;
+  User user = 3;
+  int64 order_id = 4;
+  int64 subscribe_id = 5;
+  Subscribe subscribe = 6;
+  int64 node_group_id = 7;
+  bool group_locked = 8;
+  int64 start_time = 9;
+  int64 expire_time = 10;
+  int64 reset_time = 11;
+  int64 traffic = 12;
+  int64 download = 13;
+  int64 upload = 14;
+  string token = 15;
+  uint32 status = 16;
+  int64 created_at = 17;
+  int64 updated_at = 18;
 }
 
 message Subscribe {
-  string id = 1;
+  int64 id = 1;
   string name = 2;
   string description = 3;
   int64 unit_price = 4;
@@ -355,35 +351,64 @@ message Subscribe {
   int64 reset_cycle = 9;
   int64 created_at = 10;
   int64 updated_at = 11;
+  string language = 12;
+  repeated SubscribeDiscount discount = 13;
+  int64 replacement = 14;
+  int64 inventory = 15;
+  int64 quota = 16;
+  repeated int64 nodes = 17;
+  repeated string node_tags = 18;
+  repeated int64 node_group_ids = 19;
+  int64 node_group_id = 20;
+  bool show = 21;
+  bool sell = 22;
+  int64 sort = 23;
+  int64 deduction_ratio = 24;
+  bool allow_deduction = 25;
+  bool renewal_reset = 26;
+  bool show_original_price = 27;
+  repeated TrafficLimit traffic_limit = 28;
+}
+
+message SubscribeDiscount {
+  int64 quantity = 1;
+  int64 discount = 2;
+}
+
+message TrafficLimit {
+  string stat_type = 1;
+  int64 stat_value = 2;
+  int64 traffic_usage = 3;
+  int64 speed_limit = 4;
 }
 
 // UserSubscribeLog 用户订阅日志
 message UserSubscribeLog {
-  string id = 1;
-  string user_id = 2;
-  string user_subscribe_id = 3;
+  int64 id = 1;
+  int64 user_id = 2;
+  int64 user_subscribe_id = 3;
   string token = 4;
   string ip = 5;
   string user_agent = 6;
-  int64 timestamp = 7;  // Unix timestamp in seconds
+  int64 timestamp = 7;
 }
 
 // ResetSubscribeTrafficLog 重置流量日志
 message ResetSubscribeTrafficLog {
-  string id = 1;
-  int32 type = 2;              // 类型
-  string user_subscribe_id = 3;
-  string order_no = 4;         // 订单号（可选）
-  int64 timestamp = 5;         // Unix timestamp in seconds
+  int64 id = 1;
+  int32 type = 2;
+  int64 user_subscribe_id = 3;
+  string order_no = 4;
+  int64 timestamp = 5;
 }
 
 // TrafficLog 流量日志
 message TrafficLog {
-  string id = 1;
-  string server_id = 2;
-  string user_id = 3;
-  string subscribe_id = 4;
+  int64 id = 1;
+  int64 server_id = 2;
+  int64 user_id = 3;
+  int64 subscribe_id = 4;
   int64 download = 5;
   int64 upload = 6;
-  int64 timestamp = 7;  // Unix timestamp in seconds
+  int64 timestamp = 7;
 }

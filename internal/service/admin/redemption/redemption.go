@@ -2,7 +2,6 @@ package redemption
 
 import (
 	"context"
-	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/redemption/v1"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/redemption"
@@ -71,12 +70,11 @@ func (s *RedemptionService) ToggleRedemptionCodeStatus(ctx context.Context, req 
 
 // DeleteRedemptionCode 删除兑换码
 func (s *RedemptionService) DeleteRedemptionCode(ctx context.Context, req *v1.DeleteRedemptionCodeRequest) (*v1.DeleteRedemptionCodeReply, error) {
-	id, err := strconv.ParseInt(req.Id, 10, 64)
-	if err != nil || id <= 0 {
+	if req.Id <= 0 {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	if err := s.uc.DeleteRedemptionCode(ctx, id); err != nil {
+	if err := s.uc.DeleteRedemptionCode(ctx, req.Id); err != nil {
 		return nil, err
 	}
 
@@ -92,9 +90,8 @@ func (s *RedemptionService) DeleteRedemptionCode(ctx context.Context, req *v1.De
 // BatchDeleteRedemptionCode 批量删除兑换码
 func (s *RedemptionService) BatchDeleteRedemptionCode(ctx context.Context, req *v1.BatchDeleteRedemptionCodeRequest) (*v1.BatchDeleteRedemptionCodeReply, error) {
 	ids := make([]int64, 0, len(req.Ids))
-	for _, item := range req.Ids {
-		id, err := strconv.ParseInt(item, 10, 64)
-		if err != nil || id <= 0 {
+	for _, id := range req.Ids {
+		if id <= 0 {
 			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 		}
 		ids = append(ids, id)
@@ -124,14 +121,14 @@ func (s *RedemptionService) GetRedemptionCodeList(ctx context.Context, req *v1.G
 	redemptionCodes := make([]*v1.RedemptionCode, 0, len(list))
 	for _, item := range list {
 		redemptionCodes = append(redemptionCodes, &v1.RedemptionCode{
-			Id:            strconv.FormatInt(item.ID, 10),
+			Id:            item.ID,
 			Code:          item.Code,
 			TotalCount:    item.TotalCount,
 			UsedCount:     item.UsedCount,
-			SubscribePlan: strconv.FormatInt(item.SubscribePlan, 10),
+			SubscribePlan: item.SubscribePlan,
 			UnitTime:      item.UnitTime,
 			Quantity:      item.Quantity,
-			Status:        int64(item.Status),
+			Status:        int32(item.Status),
 			CreatedAt:     item.CreatedAt.Unix(),
 			UpdatedAt:     item.UpdatedAt.Unix(),
 		})
@@ -158,10 +155,10 @@ func (s *RedemptionService) GetRedemptionRecordList(ctx context.Context, req *v1
 	redemptionRecords := make([]*v1.RedemptionRecord, 0, len(list))
 	for _, item := range list {
 		redemptionRecords = append(redemptionRecords, &v1.RedemptionRecord{
-			Id:               strconv.FormatInt(item.ID, 10),
-			RedemptionCodeId: strconv.FormatInt(item.RedemptionCodeID, 10),
-			UserId:           strconv.FormatInt(item.UserID, 10),
-			SubscribeId:      strconv.FormatInt(item.SubscribeID, 10),
+			Id:               item.ID,
+			RedemptionCodeId: item.RedemptionCodeID,
+			UserId:           item.UserID,
+			SubscribeId:      item.SubscribeID,
 			UnitTime:         item.UnitTime,
 			Quantity:         item.Quantity,
 			RedeemedAt:       item.RedeemedAt.Unix(),

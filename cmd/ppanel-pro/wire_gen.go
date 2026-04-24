@@ -150,7 +150,7 @@ func wireApp(confServer *conf.Server, confData *conf.Data, confApplication *conf
 	redemptionRepo := data.NewAdminRedemptionRepo(dataData, logger)
 	redemptionUseCase := redemption.NewRedemptionUseCase(redemptionRepo, logger)
 	redemptionService := redemption2.NewRedemptionService(redemptionUseCase)
-	toolUseCase := tool.NewToolUseCase(logger)
+	toolUseCase := tool.NewToolUseCase(logger, systemUsecase)
 	toolService := tool2.NewToolService(toolUseCase)
 	groupRepo := data.NewAdminGroupRepo(dataData, logger)
 	groupUseCase := group.NewGroupUseCase(groupRepo, logger)

@@ -92,17 +92,17 @@ message GetAdsRequest {
 
 // Ads message
 message Ads {
-  string id = 1;
+  int64 id = 1;
   string title = 2;
   string type = 3;
   string content = 4;
   string description = 5;
   string target_url = 6;
-  string start_time = 7;
-  int32 end_time = 8;
+  int64 start_time = 7;
+  int64 end_time = 8;
   int32 status = 9;
-  string created_at = 10;
-  string updated_at = 11;
+  int64 created_at = 10;
+  int64 updated_at = 11;
 }
 
 // GetAdsData 广告列表数据
@@ -132,7 +132,7 @@ message DownloadLink {
 
 // SubscribeClient message
 message SubscribeClient {
-  string id = 1;
+  int64 id = 1;
   string name = 2;
   string description = 3;
   string icon = 4;
@@ -143,7 +143,7 @@ message SubscribeClient {
 
 // GetClientData 客户端列表数据
 message GetClientData {
-  int32 total = 1;
+  int64 total = 1;
   repeated SubscribeClient list = 2;
 }
 
@@ -200,10 +200,12 @@ message SiteConfig {
 
 // Verify configuration
 message VerifyConfig {
-  string turnstile_site_key = 1;
-  bool enable_login_verify = 2;
-  bool enable_register_verify = 3;
-  bool enable_reset_password_verify = 4;
+  string captcha_type = 1;
+  string turnstile_site_key = 2;
+  bool enable_user_login_captcha = 3;
+  bool enable_user_register_captcha = 4;
+  bool enable_admin_login_captcha = 5;
+  bool enable_user_reset_password_captcha = 6;
 }
 
 // Mobile auth configuration
@@ -225,21 +227,30 @@ message EmailAuthConfig {
 message RegisterConfig {
   bool stop_register = 1;
   bool enable_ip_register_limit = 2;
-  int32 ip_register_limit = 3;
-  int32 ip_register_limit_duration = 4;
+  int64 ip_register_limit = 3;
+  int64 ip_register_limit_duration = 4;
+}
+
+// Device auth configuration
+message DeviceAuthConfig {
+  bool enable = 1;
+  bool show_ads = 2;
+  bool enable_security = 3;
+  bool only_real_device = 4;
 }
 
 // Auth configuration
 message AuthConfig {
   MobileAuthConfig mobile = 1;
   EmailAuthConfig email = 2;
-  RegisterConfig register = 3;
+  DeviceAuthConfig device = 3;
+  RegisterConfig register = 4;
 }
 
 // Invite configuration
 message InviteConfig {
   bool forced_invite = 1;
-  int32 referral_percentage = 2;
+  int64 referral_percentage = 2;
   bool only_first_purchase = 3;
 }
 
@@ -261,7 +272,7 @@ message SubscribeConfig {
 
 // Public verify code configuration
 message PublicVerifyCodeConfig {
-  int32 verify_code_interval = 1;
+  int64 verify_code_interval = 1;
 }
 
 // GetGlobalConfigData 全局配置数据
@@ -294,7 +305,7 @@ message HeartbeatRequest {}
 message HeartbeatData {
   bool status = 1;
   string message = 2;
-  string timestamp = 3;
+  int64 timestamp = 3;
 }
 
 // Heartbeat Reply
@@ -306,9 +317,9 @@ message HeartbeatReply {
 
 // GetStatData 统计数据
 message GetStatData {
-  int32 user = 1;
-  int32 node = 2;
-  int32 country = 3;
+  int64 user = 1;
+  int64 node = 2;
+  int64 country = 3;
   repeated string protocol = 4;
 }
 

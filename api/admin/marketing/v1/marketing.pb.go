@@ -323,7 +323,7 @@ type BatchSendEmailTask struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id                string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                                           // 任务ID
+	Id                int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                                          // 任务ID
 	Subject           string `protobuf:"bytes,2,opt,name=subject,proto3" json:"subject,omitempty"`                                                 // 邮件主题
 	Content           string `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`                                                 // 邮件内容
 	Recipients        string `protobuf:"bytes,4,opt,name=recipients,proto3" json:"recipients,omitempty"`                                           // 收件人列表(换行分隔)
@@ -374,11 +374,11 @@ func (*BatchSendEmailTask) Descriptor() ([]byte, []int) {
 	return file_admin_marketing_v1_marketing_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *BatchSendEmailTask) GetId() string {
+func (x *BatchSendEmailTask) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 func (x *BatchSendEmailTask) GetSubject() string {
@@ -619,7 +619,7 @@ type StopBatchSendEmailTaskRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // 任务ID
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 任务ID
 }
 
 func (x *StopBatchSendEmailTaskRequest) Reset() {
@@ -654,11 +654,11 @@ func (*StopBatchSendEmailTaskRequest) Descriptor() ([]byte, []int) {
 	return file_admin_marketing_v1_marketing_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *StopBatchSendEmailTaskRequest) GetId() string {
+func (x *StopBatchSendEmailTaskRequest) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 // StopBatchSendEmailTaskData 停止批量发送邮件任务数据
@@ -955,7 +955,7 @@ type GetBatchSendEmailTaskStatusRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // 任务ID
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 任务ID
 }
 
 func (x *GetBatchSendEmailTaskStatusRequest) Reset() {
@@ -990,11 +990,11 @@ func (*GetBatchSendEmailTaskStatusRequest) Descriptor() ([]byte, []int) {
 	return file_admin_marketing_v1_marketing_proto_rawDescGZIP(), []int{13}
 }
 
-func (x *GetBatchSendEmailTaskStatusRequest) GetId() string {
+func (x *GetBatchSendEmailTaskStatusRequest) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 // GetBatchSendEmailTaskStatusData 获取批量发送邮件任务状态数据
@@ -1139,14 +1139,14 @@ type CreateQuotaTaskRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Subscribers  []string `protobuf:"bytes,1,rep,name=subscribers,proto3" json:"subscribers,omitempty"`                        // 订阅ID列表
-	IsActive     *bool    `protobuf:"varint,2,opt,name=is_active,json=isActive,proto3,oneof" json:"is_active,omitempty"`       // 是否仅活跃订阅
-	StartTime    int64    `protobuf:"varint,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`          // 开始时间过滤(Unix时间戳)
-	EndTime      int64    `protobuf:"varint,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`                // 结束时间过滤(Unix时间戳)
-	ResetTraffic bool     `protobuf:"varint,5,opt,name=reset_traffic,json=resetTraffic,proto3" json:"reset_traffic,omitempty"` // 是否重置流量
-	Days         int64    `protobuf:"varint,6,opt,name=days,proto3" json:"days,omitempty"`                                     // 增加天数
-	GiftType     int32    `protobuf:"varint,7,opt,name=gift_type,json=giftType,proto3" json:"gift_type,omitempty"`             // 赠送类型: 1:Fixed, 2:Ratio
-	GiftValue    int64    `protobuf:"varint,8,opt,name=gift_value,json=giftValue,proto3" json:"gift_value,omitempty"`          // 赠送值
+	Subscribers  []int64 `protobuf:"varint,1,rep,packed,name=subscribers,proto3" json:"subscribers,omitempty"`                // 订阅ID列表
+	IsActive     *bool   `protobuf:"varint,2,opt,name=is_active,json=isActive,proto3,oneof" json:"is_active,omitempty"`       // 是否仅活跃订阅
+	StartTime    int64   `protobuf:"varint,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`          // 开始时间过滤(Unix时间戳)
+	EndTime      int64   `protobuf:"varint,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`                // 结束时间过滤(Unix时间戳)
+	ResetTraffic bool    `protobuf:"varint,5,opt,name=reset_traffic,json=resetTraffic,proto3" json:"reset_traffic,omitempty"` // 是否重置流量
+	Days         int64   `protobuf:"varint,6,opt,name=days,proto3" json:"days,omitempty"`                                     // 增加天数
+	GiftType     int32   `protobuf:"varint,7,opt,name=gift_type,json=giftType,proto3" json:"gift_type,omitempty"`             // 赠送类型: 1:Fixed, 2:Ratio
+	GiftValue    int64   `protobuf:"varint,8,opt,name=gift_value,json=giftValue,proto3" json:"gift_value,omitempty"`          // 赠送值
 }
 
 func (x *CreateQuotaTaskRequest) Reset() {
@@ -1181,7 +1181,7 @@ func (*CreateQuotaTaskRequest) Descriptor() ([]byte, []int) {
 	return file_admin_marketing_v1_marketing_proto_rawDescGZIP(), []int{16}
 }
 
-func (x *CreateQuotaTaskRequest) GetSubscribers() []string {
+func (x *CreateQuotaTaskRequest) GetSubscribers() []int64 {
 	if x != nil {
 		return x.Subscribers
 	}
@@ -1355,10 +1355,10 @@ type QueryQuotaTaskPreCountRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Subscribers []string `protobuf:"bytes,1,rep,name=subscribers,proto3" json:"subscribers,omitempty"`                  // 订阅ID列表
-	IsActive    *bool    `protobuf:"varint,2,opt,name=is_active,json=isActive,proto3,oneof" json:"is_active,omitempty"` // 是否仅活跃订阅
-	StartTime   int64    `protobuf:"varint,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`    // 开始时间过滤(Unix时间戳)
-	EndTime     int64    `protobuf:"varint,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`          // 结束时间过滤(Unix时间戳)
+	Subscribers []int64 `protobuf:"varint,1,rep,packed,name=subscribers,proto3" json:"subscribers,omitempty"`          // 订阅ID列表
+	IsActive    *bool   `protobuf:"varint,2,opt,name=is_active,json=isActive,proto3,oneof" json:"is_active,omitempty"` // 是否仅活跃订阅
+	StartTime   int64   `protobuf:"varint,3,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`    // 开始时间过滤(Unix时间戳)
+	EndTime     int64   `protobuf:"varint,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`          // 结束时间过滤(Unix时间戳)
 }
 
 func (x *QueryQuotaTaskPreCountRequest) Reset() {
@@ -1393,7 +1393,7 @@ func (*QueryQuotaTaskPreCountRequest) Descriptor() ([]byte, []int) {
 	return file_admin_marketing_v1_marketing_proto_rawDescGZIP(), []int{19}
 }
 
-func (x *QueryQuotaTaskPreCountRequest) GetSubscribers() []string {
+func (x *QueryQuotaTaskPreCountRequest) GetSubscribers() []int64 {
 	if x != nil {
 		return x.Subscribers
 	}
@@ -1539,22 +1539,22 @@ type QuotaTask struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id           string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                          // 任务ID
-	Subscribers  []string `protobuf:"bytes,2,rep,name=subscribers,proto3" json:"subscribers,omitempty"`                        // 订阅ID列表
-	IsActive     *bool    `protobuf:"varint,3,opt,name=is_active,json=isActive,proto3,oneof" json:"is_active,omitempty"`       // 是否仅活跃订阅
-	StartTime    int64    `protobuf:"varint,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`          // 开始时间过滤(Unix时间戳)
-	EndTime      int64    `protobuf:"varint,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`                // 结束时间过滤(Unix时间戳)
-	ResetTraffic bool     `protobuf:"varint,6,opt,name=reset_traffic,json=resetTraffic,proto3" json:"reset_traffic,omitempty"` // 是否重置流量
-	Days         int64    `protobuf:"varint,7,opt,name=days,proto3" json:"days,omitempty"`                                     // 增加天数
-	GiftType     int32    `protobuf:"varint,8,opt,name=gift_type,json=giftType,proto3" json:"gift_type,omitempty"`             // 赠送类型: 1:Fixed, 2:Ratio
-	GiftValue    int64    `protobuf:"varint,9,opt,name=gift_value,json=giftValue,proto3" json:"gift_value,omitempty"`          // 赠送值
-	Objects      []string `protobuf:"bytes,10,rep,name=objects,proto3" json:"objects,omitempty"`                               // 用户订阅ID列表(实际影响的对象)
-	Status       int32    `protobuf:"varint,11,opt,name=status,proto3" json:"status,omitempty"`                                // 任务状态: 0:Pending, 1:In Progress, 2:Completed, 3:Failed
-	Total        int64    `protobuf:"varint,12,opt,name=total,proto3" json:"total,omitempty"`                                  // 总数
-	Current      int64    `protobuf:"varint,13,opt,name=current,proto3" json:"current,omitempty"`                              // 当前处理数
-	Errors       string   `protobuf:"bytes,14,opt,name=errors,proto3" json:"errors,omitempty"`                                 // 错误信息
-	CreatedAt    int64    `protobuf:"varint,15,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`         // 创建时间(Unix时间戳)
-	UpdatedAt    int64    `protobuf:"varint,16,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`         // 更新时间(Unix时间戳)
+	Id           int64   `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                         // 任务ID
+	Subscribers  []int64 `protobuf:"varint,2,rep,packed,name=subscribers,proto3" json:"subscribers,omitempty"`                // 订阅ID列表
+	IsActive     *bool   `protobuf:"varint,3,opt,name=is_active,json=isActive,proto3,oneof" json:"is_active,omitempty"`       // 是否仅活跃订阅
+	StartTime    int64   `protobuf:"varint,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`          // 开始时间过滤(Unix时间戳)
+	EndTime      int64   `protobuf:"varint,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`                // 结束时间过滤(Unix时间戳)
+	ResetTraffic bool    `protobuf:"varint,6,opt,name=reset_traffic,json=resetTraffic,proto3" json:"reset_traffic,omitempty"` // 是否重置流量
+	Days         int64   `protobuf:"varint,7,opt,name=days,proto3" json:"days,omitempty"`                                     // 增加天数
+	GiftType     int32   `protobuf:"varint,8,opt,name=gift_type,json=giftType,proto3" json:"gift_type,omitempty"`             // 赠送类型: 1:Fixed, 2:Ratio
+	GiftValue    int64   `protobuf:"varint,9,opt,name=gift_value,json=giftValue,proto3" json:"gift_value,omitempty"`          // 赠送值
+	Objects      []int64 `protobuf:"varint,10,rep,packed,name=objects,proto3" json:"objects,omitempty"`                       // 用户订阅ID列表(实际影响的对象)
+	Status       int32   `protobuf:"varint,11,opt,name=status,proto3" json:"status,omitempty"`                                // 任务状态: 0:Pending, 1:In Progress, 2:Completed, 3:Failed
+	Total        int64   `protobuf:"varint,12,opt,name=total,proto3" json:"total,omitempty"`                                  // 总数
+	Current      int64   `protobuf:"varint,13,opt,name=current,proto3" json:"current,omitempty"`                              // 当前处理数
+	Errors       string  `protobuf:"bytes,14,opt,name=errors,proto3" json:"errors,omitempty"`                                 // 错误信息
+	CreatedAt    int64   `protobuf:"varint,15,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`         // 创建时间(Unix时间戳)
+	UpdatedAt    int64   `protobuf:"varint,16,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`         // 更新时间(Unix时间戳)
 }
 
 func (x *QuotaTask) Reset() {
@@ -1589,14 +1589,14 @@ func (*QuotaTask) Descriptor() ([]byte, []int) {
 	return file_admin_marketing_v1_marketing_proto_rawDescGZIP(), []int{22}
 }
 
-func (x *QuotaTask) GetId() string {
+func (x *QuotaTask) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
-func (x *QuotaTask) GetSubscribers() []string {
+func (x *QuotaTask) GetSubscribers() []int64 {
 	if x != nil {
 		return x.Subscribers
 	}
@@ -1652,7 +1652,7 @@ func (x *QuotaTask) GetGiftValue() int64 {
 	return 0
 }
 
-func (x *QuotaTask) GetObjects() []string {
+func (x *QuotaTask) GetObjects() []int64 {
 	if x != nil {
 		return x.Objects
 	}
@@ -1938,7 +1938,7 @@ var file_admin_marketing_v1_marketing_proto_rawDesc = []byte{
 	0x06, 0x5f, 0x73, 0x63, 0x6f, 0x70, 0x65, 0x42, 0x09, 0x0a, 0x07, 0x5f, 0x73, 0x74, 0x61, 0x74,
 	0x75, 0x73, 0x22, 0xf8, 0x03, 0x0a, 0x12, 0x42, 0x61, 0x74, 0x63, 0x68, 0x53, 0x65, 0x6e, 0x64,
 	0x45, 0x6d, 0x61, 0x69, 0x6c, 0x54, 0x61, 0x73, 0x6b, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x73, 0x75, 0x62,
+	0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x73, 0x75, 0x62,
 	0x6a, 0x65, 0x63, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x73, 0x75, 0x62, 0x6a,
 	0x65, 0x63, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x03,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x12, 0x1e, 0x0a,
@@ -1987,7 +1987,7 @@ var file_admin_marketing_v1_marketing_proto_rawDesc = []byte{
 	0x73, 0x6b, 0x4c, 0x69, 0x73, 0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61,
 	0x22, 0x2f, 0x0a, 0x1d, 0x53, 0x74, 0x6f, 0x70, 0x42, 0x61, 0x74, 0x63, 0x68, 0x53, 0x65, 0x6e,
 	0x64, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x54, 0x61, 0x73, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
+	0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69,
 	0x64, 0x22, 0x36, 0x0a, 0x1a, 0x53, 0x74, 0x6f, 0x70, 0x42, 0x61, 0x74, 0x63, 0x68, 0x53, 0x65,
 	0x6e, 0x64, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x54, 0x61, 0x73, 0x6b, 0x44, 0x61, 0x74, 0x61, 0x12,
 	0x18, 0x0a, 0x07, 0x73, 0x75, 0x63, 0x63, 0x65, 0x73, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08,
@@ -2025,7 +2025,7 @@ var file_admin_marketing_v1_marketing_proto_rawDesc = []byte{
 	0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0x34, 0x0a, 0x22, 0x47, 0x65, 0x74, 0x42, 0x61, 0x74, 0x63,
 	0x68, 0x53, 0x65, 0x6e, 0x64, 0x45, 0x6d, 0x61, 0x69, 0x6c, 0x54, 0x61, 0x73, 0x6b, 0x53, 0x74,
 	0x61, 0x74, 0x75, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69,
-	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x81, 0x01, 0x0a, 0x1f,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x22, 0x81, 0x01, 0x0a, 0x1f,
 	0x47, 0x65, 0x74, 0x42, 0x61, 0x74, 0x63, 0x68, 0x53, 0x65, 0x6e, 0x64, 0x45, 0x6d, 0x61, 0x69,
 	0x6c, 0x54, 0x61, 0x73, 0x6b, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x44, 0x61, 0x74, 0x61, 0x12,
 	0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52,
@@ -2046,7 +2046,7 @@ var file_admin_marketing_v1_marketing_proto_rawDesc = []byte{
 	0x74, 0x61, 0x74, 0x75, 0x73, 0x44, 0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22,
 	0x99, 0x02, 0x0a, 0x16, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x51, 0x75, 0x6f, 0x74, 0x61, 0x54,
 	0x61, 0x73, 0x6b, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x20, 0x0a, 0x0b, 0x73, 0x75,
-	0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x72, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52,
+	0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x72, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x03, 0x52,
 	0x0b, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x72, 0x73, 0x12, 0x20, 0x0a, 0x09,
 	0x69, 0x73, 0x5f, 0x61, 0x63, 0x74, 0x69, 0x76, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x48,
 	0x00, 0x52, 0x08, 0x69, 0x73, 0x41, 0x63, 0x74, 0x69, 0x76, 0x65, 0x88, 0x01, 0x01, 0x12, 0x1d,
@@ -2076,7 +2076,7 @@ var file_admin_marketing_v1_marketing_proto_rawDesc = []byte{
 	0x64, 0x61, 0x74, 0x61, 0x22, 0xab, 0x01, 0x0a, 0x1d, 0x51, 0x75, 0x65, 0x72, 0x79, 0x51, 0x75,
 	0x6f, 0x74, 0x61, 0x54, 0x61, 0x73, 0x6b, 0x50, 0x72, 0x65, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x52,
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x20, 0x0a, 0x0b, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72,
-	0x69, 0x62, 0x65, 0x72, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0b, 0x73, 0x75, 0x62,
+	0x69, 0x62, 0x65, 0x72, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x03, 0x52, 0x0b, 0x73, 0x75, 0x62,
 	0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x72, 0x73, 0x12, 0x20, 0x0a, 0x09, 0x69, 0x73, 0x5f, 0x61,
 	0x63, 0x74, 0x69, 0x76, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x48, 0x00, 0x52, 0x08, 0x69,
 	0x73, 0x41, 0x63, 0x74, 0x69, 0x76, 0x65, 0x88, 0x01, 0x01, 0x12, 0x1d, 0x0a, 0x0a, 0x73, 0x74,
@@ -2098,8 +2098,8 @@ var file_admin_marketing_v1_marketing_proto_rawDesc = []byte{
 	0x79, 0x51, 0x75, 0x6f, 0x74, 0x61, 0x54, 0x61, 0x73, 0x6b, 0x50, 0x72, 0x65, 0x43, 0x6f, 0x75,
 	0x6e, 0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0xd4, 0x03, 0x0a,
 	0x09, 0x51, 0x75, 0x6f, 0x74, 0x61, 0x54, 0x61, 0x73, 0x6b, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x20, 0x0a, 0x0b, 0x73, 0x75,
-	0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x72, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x09, 0x52,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x20, 0x0a, 0x0b, 0x73, 0x75,
+	0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x72, 0x73, 0x18, 0x02, 0x20, 0x03, 0x28, 0x03, 0x52,
 	0x0b, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x72, 0x73, 0x12, 0x20, 0x0a, 0x09,
 	0x69, 0x73, 0x5f, 0x61, 0x63, 0x74, 0x69, 0x76, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x08, 0x48,
 	0x00, 0x52, 0x08, 0x69, 0x73, 0x41, 0x63, 0x74, 0x69, 0x76, 0x65, 0x88, 0x01, 0x01, 0x12, 0x1d,
@@ -2114,7 +2114,7 @@ var file_admin_marketing_v1_marketing_proto_rawDesc = []byte{
 	0x20, 0x01, 0x28, 0x05, 0x52, 0x08, 0x67, 0x69, 0x66, 0x74, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1d,
 	0x0a, 0x0a, 0x67, 0x69, 0x66, 0x74, 0x5f, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x09, 0x20, 0x01,
 	0x28, 0x03, 0x52, 0x09, 0x67, 0x69, 0x66, 0x74, 0x56, 0x61, 0x6c, 0x75, 0x65, 0x12, 0x18, 0x0a,
-	0x07, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x73, 0x18, 0x0a, 0x20, 0x03, 0x28, 0x09, 0x52, 0x07,
+	0x07, 0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x73, 0x18, 0x0a, 0x20, 0x03, 0x28, 0x03, 0x52, 0x07,
 	0x6f, 0x62, 0x6a, 0x65, 0x63, 0x74, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75,
 	0x73, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12,
 	0x14, 0x0a, 0x05, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x18, 0x0c, 0x20, 0x01, 0x28, 0x03, 0x52, 0x05,

@@ -166,8 +166,8 @@ message Protocol {
 }
 
 message SortItem {
-  string id = 1;
-  int64 sort = 2;
+  int64 id = 1;
+  int32 sort = 2;
 }
 
 message ServerOnlineIP {
@@ -177,9 +177,9 @@ message ServerOnlineIP {
 
 message ServerOnlineUser {
   repeated ServerOnlineIP ip = 1;
-  string user_id = 2;
+  int64 user_id = 2;
   string subscribe = 3;
-  string subscribe_id = 4;
+  int64 subscribe_id = 4;
   int64 traffic = 5;
   int64 expired_at = 6;
 }
@@ -194,12 +194,12 @@ message ServerStatus {
 }
 
 message Server {
-  string id = 1;
+  int64 id = 1;
   string name = 3;
   string country = 4;
   string city = 5;
   string address = 6;
-  int64 sort = 7;
+  int32 sort = 7;
   repeated Protocol protocols = 8;
   int64 last_reported_at = 9;
   ServerStatus status = 10;
@@ -208,19 +208,21 @@ message Server {
 }
 
 message Node {
-  string id = 1;
+  int64 id = 1;
   string name = 3;
   repeated string tags = 4;
   uint32 port = 5;  // Proto3 不支持 uint16，使用 uint32（值范围 0-65535，对应数据库 smallint32unsigned）
   string address = 6;
-  string server_id = 7;
+  int64 server_id = 7;
   string protocol = 8;
   optional bool enabled = 9;  // 使用 optional 支持 null 和布尔值，与老项目兼容
-  int64 sort = 10;
-  string node_group_id = 11;
-  repeated string node_group_ids = 12;
-  int64 created_at = 13;
-  int64 updated_at = 14;
+  int32 sort = 10;
+  int64 node_group_id = 11;
+  repeated int64 node_group_ids = 12;
+  string node_type = 13;
+  optional bool is_hidden = 14;
+  int64 created_at = 15;
+  int64 updated_at = 16;
 }
 
 // Server Requests/Replies
@@ -244,7 +246,7 @@ message CreateServerReply {
 }
 
 message UpdateServerRequest {
-  string id = 1;
+  int64 id = 1;
   string name = 2;
   string country = 3;
   string city = 4;
@@ -264,7 +266,7 @@ message UpdateServerReply {
 }
 
 message DeleteServerRequest {
-  string id = 1;
+  int64 id = 1;
 }
 
 message DeleteServerData {
@@ -295,7 +297,7 @@ message FilterServerListReply {
 }
 
 message GetServerProtocolsRequest {
-  string id = 1;
+  int64 id = 1;
 }
 
 message GetServerProtocolsData {
@@ -314,10 +316,12 @@ message CreateNodeRequest {
   repeated string tags = 2;
   uint32 port = 3;  // Proto3 不支持 uint16，使用 uint32（值范围 0-65535）
   string address = 4;
-  string server_id = 5;
+  int64 server_id = 5;
   string protocol = 6;
   optional bool enabled = 7;  // 使用 optional 支持 null 和布尔值，与老项目兼容
-  repeated string node_group_ids = 8;
+  string node_type = 8;
+  optional bool is_hidden = 9;
+  repeated int64 node_group_ids = 10;
 }
 
 message CreateNodeData {
@@ -331,15 +335,17 @@ message CreateNodeReply {
 }
 
 message UpdateNodeRequest {
-  string id = 1;
+  int64 id = 1;
   string name = 2;
   repeated string tags = 3;
   uint32 port = 4;  // Proto3 不支持 uint16，使用 uint32（值范围 0-65535）
   string address = 5;
-  string server_id = 6;
+  int64 server_id = 6;
   string protocol = 7;
   optional bool enabled = 8;  // 使用 optional 支持 null 和布尔值，与老项目兼容
-  repeated string node_group_ids = 9;
+  string node_type = 9;
+  optional bool is_hidden = 10;
+  repeated int64 node_group_ids = 11;
 }
 
 message UpdateNodeData {
@@ -353,7 +359,7 @@ message UpdateNodeReply {
 }
 
 message DeleteNodeRequest {
-  string id = 1;
+  int64 id = 1;
 }
 
 message DeleteNodeData {
@@ -370,6 +376,7 @@ message FilterNodeListRequest {
   int32 page = 1;
   int32 size = 2;
   string search = 3;
+  optional int64 node_group_id = 4;
 }
 
 message FilterNodeListData {
@@ -384,7 +391,7 @@ message FilterNodeListReply {
 }
 
 message ToggleNodeStatusRequest {
-  string id = 1;
+  int64 id = 1;
   optional bool enable = 2;  // 使用 optional 支持 null 和布尔值，与老项目兼容
 }
 

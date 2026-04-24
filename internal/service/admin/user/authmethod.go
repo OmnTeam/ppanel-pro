@@ -2,22 +2,14 @@ package user
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/user/v1"
 	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/OmnTeam/ppanel-pro/pkg/phone"
 )
-
-func parseAuthMethodUserID(s string) (int64, error) {
-	val, err := strconv.ParseInt(s, 10, 64)
-	if err != nil {
-		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	return val, nil
-}
 
 // UserAuthMethodService 用户认证方法服务
 type UserAuthMethodService struct {
@@ -41,17 +33,20 @@ func (s *UserAuthMethodService) CreateUserAuthMethod(ctx context.Context, req *v
 		return nil, err
 	}
 
-	return &v1.CreateUserAuthMethodReply{}, nil
+	return &v1.CreateUserAuthMethodReply{
+		Code:    200,
+		Message: responsecode.CodeMessages[200],
+		Data:    &v1.CreateUserAuthMethodData{Success: true},
+	}, nil
 }
 
 // GetUserAuthMethod 获取用户认证方法
 func (s *UserAuthMethodService) GetUserAuthMethod(ctx context.Context, req *v1.GetUserAuthMethodRequest) (*v1.GetUserAuthMethodReply, error) {
-	userID, err := parseAuthMethodUserID(req.UserId)
-	if err != nil {
-		return nil, err
+	if req.UserId <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	methods, err := s.uc.GetUserAuthMethod(ctx, userID)
+	methods, err := s.uc.GetUserAuthMethod(ctx, req.UserId)
 	if err != nil {
 		return nil, err
 	}
@@ -64,11 +59,18 @@ func (s *UserAuthMethodService) GetUserAuthMethod(ctx context.Context, req *v1.G
 			AuthIdentifier: method.AuthIdentifier,
 			Verified:       method.Verified,
 		}
+		if method.AuthType == "mobile" {
+			protoMethod.AuthIdentifier = phone.FormatToInternational(method.AuthIdentifier)
+		}
 		protoMethods = append(protoMethods, protoMethod)
 	}
 
 	return &v1.GetUserAuthMethodReply{
-		AuthMethods: protoMethods,
+		Code:    200,
+		Message: responsecode.CodeMessages[200],
+		Data: &v1.GetUserAuthMethodData{
+			AuthMethods: protoMethods,
+		},
 	}, nil
 }
 
@@ -79,20 +81,27 @@ func (s *UserAuthMethodService) UpdateUserAuthMethod(ctx context.Context, req *v
 		return nil, err
 	}
 
-	return &v1.UpdateUserAuthMethodReply{}, nil
+	return &v1.UpdateUserAuthMethodReply{
+		Code:    200,
+		Message: responsecode.CodeMessages[200],
+		Data:    &v1.UpdateUserAuthMethodData{Success: true},
+	}, nil
 }
 
 // DeleteUserAuthMethod 删除用户认证方法
 func (s *UserAuthMethodService) DeleteUserAuthMethod(ctx context.Context, req *v1.DeleteUserAuthMethodRequest) (*v1.DeleteUserAuthMethodReply, error) {
-	userID, err := parseAuthMethodUserID(req.UserId)
+	if req.UserId <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	err := s.uc.DeleteUserAuthMethod(ctx, req.UserId, req.AuthType)
 	if err != nil {
 		return nil, err
 	}
 
-	err = s.uc.DeleteUserAuthMethod(ctx, userID, req.AuthType)
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.DeleteUserAuthMethodReply{}, nil
+	return &v1.DeleteUserAuthMethodReply{
+		Code:    200,
+		Message: responsecode.CodeMessages[200],
+		Data:    &v1.DeleteUserAuthMethodData{Success: true},
+	}, nil
 }

@@ -3,6 +3,7 @@ syntax = "proto3";
 package api.admin.tool.v1;
 
 import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
 
 option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/tool/v1;v1";
 option java_multiple_files = true;
@@ -40,96 +41,56 @@ service Tool {
 
 // ==================== Messages ====================
 
-// LogEntry 日志条目
-message LogEntry {
-  int64 timestamp = 1; // 时间戳
-  string level = 2;     // 日志级别
-  string message = 3;   // 日志消息
-  string source = 4;    // 日志来源
-}
-
 // GetSystemLogRequest 获取系统日志请求
-message GetSystemLogRequest {
-  int64 page = 1;       // 页码
-  int64 size = 2;       // 每页数量
-  string level = 3;     // 日志级别过滤（可选）
-}
+message GetSystemLogRequest {}
 
-// GetSystemLogData 获取系统日志数据
-message GetSystemLogData {
-  repeated LogEntry logs = 1; // 日志列表
-  int64 total = 2;             // 总数
+message LogResponse {
+  repeated google.protobuf.Struct list = 1;
 }
 
 // GetSystemLogReply 获取系统日志响应
 message GetSystemLogReply {
-  int32 code = 1;                // 状态码
-  string message = 2;            // 消息内容
-  GetSystemLogData data = 3;     // 响应数据
+  int32 code = 1;
+  string message = 2;
+  LogResponse data = 3;
 }
 
 // RestartSystemRequest 重启系统请求
-message RestartSystemRequest {
-  bool confirm = 1; // 确认重启
-}
-
-// RestartSystemData 重启系统数据
-message RestartSystemData {
-  bool success = 1;  // 是否成功
-  string message = 2; // 提示消息
-}
+message RestartSystemRequest {}
 
 // RestartSystemReply 重启系统响应
 message RestartSystemReply {
-  int32 code = 1;                  // 状态码
-  string message = 2;              // 消息内容
-  RestartSystemData data = 3;      // 响应数据
+  int32 code = 1;
+  string message = 2;
 }
 
 // GetVersionRequest 获取版本信息请求
 message GetVersionRequest {}
 
-// VersionInfo 版本信息
-message VersionInfo {
-  string version = 1;     // 版本号
-  string build_time = 2;  // 构建时间
-  string git_commit = 3;  // Git提交哈希
-  string go_version = 4;  // Go版本
-}
-
-// GetVersionData 获取版本数据
-message GetVersionData {
-  VersionInfo version = 1; // 版本信息
+message VersionResponse {
+  string version = 1;
 }
 
 // GetVersionReply 获取版本信息响应
 message GetVersionReply {
-  int32 code = 1;              // 状态码
-  string message = 2;          // 消息内容
-  GetVersionData data = 3;     // 响应数据
+  int32 code = 1;
+  string message = 2;
+  VersionResponse data = 3;
 }
 
 // QueryIPLocationRequest 查询IP地理位置请求
 message QueryIPLocationRequest {
-  string ip = 1; // IP地址
+  string ip = 1;
 }
 
-// IPLocation IP地理位置信息
-message IPLocation {
-  string country = 1;  // 国家
-  string region = 2;   // 地区
-  string city = 3;     // 城市
-  string isp = 4;      // 运营商
+message QueryIPLocationResponse {
+  string country = 1;
+  string region = 2;
+  string city = 3;
 }
 
-// QueryIPLocationData 查询IP地理位置数据
-message QueryIPLocationData {
-  IPLocation location = 1; // 位置信息
-}
-
-// QueryIPLocationReply 查询IP地理位置响应
 message QueryIPLocationReply {
-  int32 code = 1;                    // 状态码
-  string message = 2;                // 消息内容
-  QueryIPLocationData data = 3;      // 响应数据
+  int32 code = 1;
+  string message = 2;
+  QueryIPLocationResponse data = 3;
 }

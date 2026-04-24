@@ -3,7 +3,6 @@ package group
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/group/v1"
 	"github.com/OmnTeam/ppanel-pro/ent"
@@ -48,14 +47,6 @@ func NewGroupUseCase(repo GroupRepo, logger log.Logger) *GroupUseCase {
 	}
 }
 
-func parseStringID(id string) (int64, error) {
-	v, err := strconv.ParseInt(id, 10, 64)
-	if err != nil {
-		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	return v, nil
-}
-
 // CreateNodeGroup creates node group
 func (uc *GroupUseCase) CreateNodeGroup(ctx context.Context, req *v1.CreateNodeGroupRequest) (int64, error) {
 	if req.Name == "" {
@@ -73,12 +64,11 @@ func (uc *GroupUseCase) CreateNodeGroup(ctx context.Context, req *v1.CreateNodeG
 
 // UpdateNodeGroup updates node group
 func (uc *GroupUseCase) UpdateNodeGroup(ctx context.Context, req *v1.UpdateNodeGroupRequest) error {
-	id, err := parseStringID(req.Id)
-	if err != nil || id <= 0 {
+	if req.Id <= 0 {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	err = uc.repo.UpdateNodeGroup(ctx, req)
+	err := uc.repo.UpdateNodeGroup(ctx, req)
 	if err != nil {
 		uc.log.Errorf("Failed to update node group: %v", err)
 		return err
@@ -189,12 +179,11 @@ func (uc *GroupUseCase) GetGroupHistory(ctx context.Context, req *v1.GetGroupHis
 
 // PreviewUserNodes previews user nodes
 func (uc *GroupUseCase) PreviewUserNodes(ctx context.Context, req *v1.PreviewUserNodesRequest) ([]*ent.ProxyNode, int64, error) {
-	userID, err := parseStringID(req.UserId)
-	if err != nil || userID <= 0 {
+	if req.UserId <= 0 {
 		return nil, 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	nodes, nodeGroupId, err := uc.repo.PreviewUserNodes(ctx, userID)
+	nodes, nodeGroupId, err := uc.repo.PreviewUserNodes(ctx, req.UserId)
 	if err != nil {
 		uc.log.Errorf("Failed to preview user nodes: %v", err)
 		return nil, 0, err
@@ -249,12 +238,8 @@ func (uc *GroupUseCase) GetSubscribeGroupMapping(ctx context.Context) ([]*v1.Sub
 // ExportGroupResult exports group result as CSV
 func (uc *GroupUseCase) ExportGroupResult(ctx context.Context, req *v1.ExportGroupResultRequest) ([]byte, string, error) {
 	var historyID *int64
-	if req.HistoryId != "" {
-		parsed, err := parseStringID(req.HistoryId)
-		if err != nil {
-			return nil, "", err
-		}
-		historyID = &parsed
+	if req.HistoryId > 0 {
+		historyID = &req.HistoryId
 	}
 
 	data, filename, err := uc.repo.ExportGroupResult(ctx, historyID)

@@ -370,12 +370,13 @@ message UpdatePrivacyPolicyConfigReply {
 message RegisterConfig {
   bool stop_register = 1;                    // 是否停止注册
   bool enable_trial = 2;                     // 是否启用试用
-  int32 trial_subscribe = 3;                 // 试用订阅
-  int32 trial_time = 4;                      // 试用时间
+  int64 trial_subscribe = 3;                 // 试用订阅
+  int64 trial_time = 4;                      // 试用时间
   string trial_time_unit = 5;                // 试用时间单位
   bool enable_ip_register_limit = 6;         // 是否启用IP注册限制
-  int32 ip_register_limit = 7;               // IP注册限制
-  int32 ip_register_limit_duration = 8;      // IP注册限制时长
+  int64 ip_register_limit = 7;               // IP注册限制
+  int64 ip_register_limit_duration = 8;      // IP注册限制时长
+  int64 device_limit = 9;                    // 设备限制
 }
 
 // SiteConfig 站点配置
@@ -402,12 +403,13 @@ message GetRegisterConfigReply {
 message UpdateRegisterConfigRequest {
   bool stop_register = 1;
   bool enable_trial = 2;
-  int32 trial_subscribe = 3;
-  int32 trial_time = 4;
+  int64 trial_subscribe = 3;
+  int64 trial_time = 4;
   string trial_time_unit = 5;
   bool enable_ip_register_limit = 6;
-  int32 ip_register_limit = 7;
-  int32 ip_register_limit_duration = 8;
+  int64 ip_register_limit = 7;
+  int64 ip_register_limit_duration = 8;
+  int64 device_limit = 9;
 }
 
 message UpdateRegisterConfigData {
@@ -560,9 +562,6 @@ message VerifyConfig {
   bool enable_user_reset_password_captcha = 5;  // 是否启用用户重置密码验证码
   string captcha_type = 6;                       // 验证码类型: local/slider/turnstile
   bool enable_admin_login_captcha = 7;          // 是否启用管理员登录验证码
-  bool enable_login_verify = 8;                  // 兼容旧字段
-  bool enable_register_verify = 9;               // 兼容旧字段
-  bool enable_reset_password_verify = 10;        // 兼容旧字段
 }
 
 // GetVerifyConfig
@@ -583,9 +582,6 @@ message UpdateVerifyConfigRequest {
   bool enable_user_reset_password_captcha = 5;
   string captcha_type = 6;
   bool enable_admin_login_captcha = 7;
-  bool enable_login_verify = 8;
-  bool enable_register_verify = 9;
-  bool enable_reset_password_verify = 10;
 }
 
 message UpdateVerifyConfigData {

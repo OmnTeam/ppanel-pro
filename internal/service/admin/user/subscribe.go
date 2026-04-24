@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"strconv"
+	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -10,6 +11,7 @@ import (
 	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
 	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 )
 
 // UserSubscribeService 用户订阅服务
@@ -47,22 +49,24 @@ func (s *UserSubscribeService) GetUserSubscribe(ctx context.Context, req *v1.Get
 	protoList := make([]*v1.UserSubscribe, 0, len(list))
 	for _, item := range list {
 		protoItem := &v1.UserSubscribe{
-			Id:          strconv.FormatInt(int64(item.ID), 10),
-			UserId:      strconv.FormatInt(int64(item.UserID), 10),
-			OrderId:     strconv.FormatInt(int64(item.OrderID), 10),
-			SubscribeId: strconv.FormatInt(int64(item.SubscribeID), 10),
-			NodeGroupId: strconv.FormatInt(int64(item.NodeGroupID), 10),
-			StartTime:   item.StartTime.UnixMilli(),
-			CreatedAt:   item.CreatedAt.UnixMilli(),
-			UpdatedAt:   item.UpdatedAt.UnixMilli(),
+			Id:          int64(item.ID),
+			IdStr:       strconv.FormatInt(int64(item.ID), 10),
+			UserId:      int64(item.UserID),
+			OrderId:     int64(item.OrderID),
+			SubscribeId: int64(item.SubscribeID),
+			NodeGroupId: int64(item.NodeGroupID),
+			GroupLocked: item.GroupLocked,
+			StartTime:   item.StartTime.Unix(),
+			CreatedAt:   item.CreatedAt.Unix(),
+			UpdatedAt:   item.UpdatedAt.Unix(),
 		}
 
 		// 处理指针字段
 		if item.ExpireTime != nil {
-			protoItem.ExpireTime = item.ExpireTime.UnixMilli()
+			protoItem.ExpireTime = item.ExpireTime.Unix()
 		}
 		if item.FinishedAt != nil {
-			protoItem.FinishedAt = item.FinishedAt.UnixMilli()
+			protoItem.FinishedAt = item.FinishedAt.Unix()
 		}
 		if item.Traffic != nil {
 			protoItem.Traffic = int64(*item.Traffic)
@@ -76,14 +80,17 @@ func (s *UserSubscribeService) GetUserSubscribe(ctx context.Context, req *v1.Get
 		if item.Token != nil {
 			protoItem.Token = *item.Token
 		}
-		if item.UUID != nil {
-			protoItem.Uuid = *item.UUID
-		}
 		if item.Status != nil {
-			protoItem.Status = int32(*item.Status)
+			protoItem.Status = uint32(*item.Status)
+		}
+		if item.Token != nil {
+			if short, shortErr := tool.FixedUniqueString(*item.Token, 8, ""); shortErr == nil {
+				protoItem.Short = short
+			}
 		}
 		if detail, detailErr := s.uc.GetUserSubscribeById(ctx, item.ID); detailErr == nil && detail != nil {
 			protoItem.Subscribe = detail.Subscribe
+			protoItem.ResetTime = calculateNextResetTime(protoItem)
 		}
 
 		protoList = append(protoList, protoItem)
@@ -97,6 +104,35 @@ func (s *UserSubscribeService) GetUserSubscribe(ctx context.Context, req *v1.Get
 			List:  protoList,
 		},
 	}, nil
+}
+
+func calculateNextResetTime(sub *v1.UserSubscribe) int64 {
+	if sub == nil || sub.Subscribe == nil {
+		return 0
+	}
+
+	resetTime := time.Unix(sub.ExpireTime, 0)
+	now := time.Now()
+
+	switch sub.Subscribe.ResetCycle {
+	case 0:
+		return 0
+	case 1:
+		return time.Date(now.Year(), now.Month()+1, 1, 0, 0, 0, 0, now.Location()).UnixMilli()
+	case 2:
+		if resetTime.Day() > now.Day() {
+			return time.Date(now.Year(), now.Month(), resetTime.Day(), 0, 0, 0, 0, now.Location()).UnixMilli()
+		}
+		return time.Date(now.Year(), now.Month()+1, resetTime.Day(), 0, 0, 0, 0, now.Location()).UnixMilli()
+	case 3:
+		targetTime := time.Date(now.Year(), resetTime.Month(), resetTime.Day(), 0, 0, 0, 0, now.Location())
+		if targetTime.Before(now) {
+			targetTime = time.Date(now.Year()+1, resetTime.Month(), resetTime.Day(), 0, 0, 0, 0, now.Location())
+		}
+		return targetTime.UnixMilli()
+	default:
+		return 0
+	}
 }
 
 // CreateUserSubscribe 创建用户订阅
@@ -126,12 +162,11 @@ func (s *UserSubscribeService) UpdateUserSubscribe(ctx context.Context, req *v1.
 
 // DeleteUserSubscribe 删除用户订阅
 func (s *UserSubscribeService) DeleteUserSubscribe(ctx context.Context, req *v1.DeleteUserSubscribeRequest) (*v1.DeleteUserSubscribeReply, error) {
-	id, err := parseStringInt64Helper(req.UserSubscribeId)
-	if err != nil {
-		return nil, err
+	if req.UserSubscribeId <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	err = s.uc.DeleteUserSubscribe(ctx, id)
+	err := s.uc.DeleteUserSubscribe(ctx, req.UserSubscribeId)
 	if err != nil {
 		return nil, err
 	}
@@ -144,12 +179,11 @@ func (s *UserSubscribeService) DeleteUserSubscribe(ctx context.Context, req *v1.
 
 // GetUserSubscribeById 根据ID获取用户订阅详情
 func (s *UserSubscribeService) GetUserSubscribeById(ctx context.Context, req *v1.GetUserSubscribeByIdRequest) (*v1.GetUserSubscribeByIdReply, error) {
-	id, err := parseStringInt64Helper(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	subscribe, err := s.uc.GetUserSubscribeById(ctx, id)
+	subscribe, err := s.uc.GetUserSubscribeById(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -172,11 +206,11 @@ func (s *UserSubscribeService) GetUserSubscribeDevices(ctx context.Context, req 
 	protoList := make([]*v1.UserDevice, 0, len(list))
 	for _, item := range list {
 		protoItem := &v1.UserDevice{
-			Id:        strconv.FormatInt(int64(item.ID), 10),
+			Id:        int64(item.ID),
 			Online:    item.Online,
 			Enabled:   item.Enabled,
-			CreatedAt: item.CreatedAt.UnixMilli(),
-			UpdatedAt: item.UpdatedAt.UnixMilli(),
+			CreatedAt: item.CreatedAt.Unix(),
+			UpdatedAt: item.UpdatedAt.Unix(),
 		}
 
 		// 处理指针字段
@@ -217,13 +251,13 @@ func (s *UserSubscribeService) GetUserSubscribeLogs(ctx context.Context, req *v1
 		_ = content.Unmarshal([]byte(item.Content))
 
 		protoItem := &v1.UserSubscribeLog{
-			Id:              strconv.FormatInt(int64(item.ID), 10),
-			UserId:          "",
-			UserSubscribeId: strconv.FormatInt(int64(item.ObjectID), 10),
+			Id:              int64(item.ID),
+			UserId:          0,
+			UserSubscribeId: int64(item.ObjectID),
 			Token:           content.Token,
 			Ip:              content.ClientIP,
 			UserAgent:       content.UserAgent,
-			Timestamp:       item.CreatedAt.UnixMilli(),
+			Timestamp:       item.CreatedAt.Unix(),
 		}
 
 		protoList = append(protoList, protoItem)
@@ -253,9 +287,9 @@ func (s *UserSubscribeService) GetUserSubscribeResetTrafficLogs(ctx context.Cont
 		_ = content.Unmarshal([]byte(item.Content))
 
 		protoItem := &v1.ResetSubscribeTrafficLog{
-			Id:              strconv.FormatInt(int64(item.ID), 10),
+			Id:              int64(item.ID),
 			Type:            int32(content.Type),
-			UserSubscribeId: strconv.FormatInt(int64(item.ObjectID), 10),
+			UserSubscribeId: int64(item.ObjectID),
 			OrderNo:         content.OrderNo,
 			Timestamp:       content.Timestamp,
 		}
@@ -283,13 +317,13 @@ func (s *UserSubscribeService) GetUserSubscribeTrafficLogs(ctx context.Context, 
 	protoList := make([]*v1.TrafficLog, 0, len(list))
 	for _, item := range list {
 		protoItem := &v1.TrafficLog{
-			Id:          strconv.FormatInt(int64(item.ID), 10),
-			ServerId:    strconv.FormatInt(int64(item.ServerID), 10),
-			UserId:      strconv.FormatInt(int64(item.UserID), 10),
-			SubscribeId: strconv.FormatInt(int64(item.SubscribeID), 10),
+			Id:          int64(item.ID),
+			ServerId:    int64(item.ServerID),
+			UserId:      int64(item.UserID),
+			SubscribeId: int64(item.SubscribeID),
 			Download:    item.Download,
 			Upload:      item.Upload,
-			Timestamp:   item.Timestamp.UnixMilli(),
+			Timestamp:   item.Timestamp.Unix(),
 		}
 
 		protoList = append(protoList, protoItem)
@@ -307,12 +341,11 @@ func (s *UserSubscribeService) GetUserSubscribeTrafficLogs(ctx context.Context, 
 
 // ResetUserSubscribeToken 重置用户订阅令牌
 func (s *UserSubscribeService) ResetUserSubscribeToken(ctx context.Context, req *v1.ResetUserSubscribeTokenRequest) (*v1.ResetUserSubscribeTokenReply, error) {
-	userSubscribeID, err := parseStringInt64Helper(req.UserSubscribeId)
-	if err != nil {
-		return nil, err
+	if req.UserSubscribeId <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	if err := s.uc.ResetUserSubscribeToken(ctx, userSubscribeID); err != nil {
+	if err := s.uc.ResetUserSubscribeToken(ctx, req.UserSubscribeId); err != nil {
 		return nil, err
 	}
 
@@ -324,12 +357,11 @@ func (s *UserSubscribeService) ResetUserSubscribeToken(ctx context.Context, req 
 
 // ToggleUserSubscribeStatus 切换用户订阅状态
 func (s *UserSubscribeService) ToggleUserSubscribeStatus(ctx context.Context, req *v1.ToggleUserSubscribeStatusRequest) (*v1.ToggleUserSubscribeStatusReply, error) {
-	userSubscribeID, err := parseStringInt64Helper(req.UserSubscribeId)
-	if err != nil {
-		return nil, err
+	if req.UserSubscribeId <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	if err := s.uc.ToggleUserSubscribeStatus(ctx, userSubscribeID); err != nil {
+	if err := s.uc.ToggleUserSubscribeStatus(ctx, req.UserSubscribeId); err != nil {
 		return nil, err
 	}
 
@@ -341,12 +373,11 @@ func (s *UserSubscribeService) ToggleUserSubscribeStatus(ctx context.Context, re
 
 // ResetUserSubscribeTraffic 重置用户订阅流量
 func (s *UserSubscribeService) ResetUserSubscribeTraffic(ctx context.Context, req *v1.ResetUserSubscribeTrafficRequest) (*v1.ResetUserSubscribeTrafficReply, error) {
-	userSubscribeID, err := parseStringInt64Helper(req.UserSubscribeId)
-	if err != nil {
-		return nil, err
+	if req.UserSubscribeId <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	if err := s.uc.ResetUserSubscribeTraffic(ctx, userSubscribeID); err != nil {
+	if err := s.uc.ResetUserSubscribeTraffic(ctx, req.UserSubscribeId); err != nil {
 		return nil, err
 	}
 

@@ -50,14 +50,14 @@ service PaymentService {
 
 // 支付方式信息
 message PaymentMethod {
-  string id = 1;
+  int64 id = 1;
   string name = 2;
   string platform = 3;
   string description = 4;
   string icon = 5;
   string domain = 6;
   google.protobuf.Struct config = 7;
-  int32 fee_mode = 8;          // 手续费模式
+  uint32 fee_mode = 8;          // 手续费模式
   int64 fee_percent = 9;       // 手续费百分比
   int64 fee_amount = 10;       // 手续费固定金额（分）
   bool enable = 11;
@@ -80,7 +80,7 @@ message CreatePaymentMethodRequest {
   string icon = 4;
   string domain = 5;
   google.protobuf.Struct config = 6;
-  int32 fee_mode = 7;       // 手续费模式
+  uint32 fee_mode = 7;       // 手续费模式
   int64 fee_percent = 8;    // 手续费百分比
   int64 fee_amount = 9;     // 手续费固定金额（分）
   optional bool enable = 10;
@@ -95,14 +95,14 @@ message CreatePaymentMethodReply {
 
 // 更新支付方式请求
 message UpdatePaymentMethodRequest {
-  string id = 1 [(validate.rules).int64.gt = 0];
+  int64 id = 1 [(validate.rules).int64.gt = 0];
   string name = 2 [(validate.rules).string.min_len = 1];
   string platform = 3 [(validate.rules).string.min_len = 1];
   string description = 4;
   string icon = 5;
   string domain = 6;
   google.protobuf.Struct config = 7;
-  int32 fee_mode = 8;
+  uint32 fee_mode = 8;
   int64 fee_percent = 9;
   int64 fee_amount = 10;
   optional bool enable = 11;
@@ -117,7 +117,7 @@ message UpdatePaymentMethodReply {
 
 // 删除支付方式请求
 message DeletePaymentMethodRequest {
-  string id = 1;
+  int64 id = 1;
 }
 
 // 删除支付方式响应

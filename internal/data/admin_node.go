@@ -37,10 +37,14 @@ func (r *adminNodeRepo) CreateNode(ctx context.Context, node *serverbiz.Node) (*
 		SetAddress(node.Address).
 		SetServerID(node.ServerID).
 		SetProtocol(node.Protocol).
+		SetNodeType(node.NodeType).
 		SetSort(int(node.Sort)) // uint32 to int
 
 	if node.Enabled != nil {
 		builder = builder.SetEnabled(*node.Enabled)
+	}
+	if node.IsHidden != nil {
+		builder = builder.SetIsHidden(*node.IsHidden)
 	}
 
 	created, err := builder.Save(ctx)
@@ -63,6 +67,8 @@ func (r *adminNodeRepo) CreateNode(ctx context.Context, node *serverbiz.Node) (*
 		ServerID:  created.ServerID,
 		Protocol:  created.Protocol,
 		Enabled:   &enabled,
+		NodeType:  created.NodeType,
+		IsHidden:  &created.IsHidden,
 		Sort:      uint32(created.Sort),          // int to uint32
 		CreatedAt: created.CreatedAt.UnixMilli(), // 返回毫秒时间戳
 		UpdatedAt: created.UpdatedAt.UnixMilli(), // 返回毫秒时间戳
@@ -81,10 +87,14 @@ func (r *adminNodeRepo) UpdateNode(ctx context.Context, node *serverbiz.Node) (*
 		SetAddress(node.Address).
 		SetServerID(node.ServerID).
 		SetProtocol(node.Protocol).
+		SetNodeType(node.NodeType).
 		SetSort(int(node.Sort))
 
 	if node.Enabled != nil {
 		builder = builder.SetEnabled(*node.Enabled)
+	}
+	if node.IsHidden != nil {
+		builder = builder.SetIsHidden(*node.IsHidden)
 	}
 
 	updated, err := builder.Save(ctx)
@@ -107,6 +117,8 @@ func (r *adminNodeRepo) UpdateNode(ctx context.Context, node *serverbiz.Node) (*
 		ServerID:  updated.ServerID,
 		Protocol:  updated.Protocol,
 		Enabled:   &enabled,
+		NodeType:  updated.NodeType,
+		IsHidden:  &updated.IsHidden,
 		Sort:      uint32(updated.Sort),          // int to uint32
 		CreatedAt: updated.CreatedAt.UnixMilli(), // 返回毫秒时间戳
 		UpdatedAt: updated.UpdatedAt.UnixMilli(), // 返回毫秒时间戳
@@ -139,8 +151,19 @@ func (r *adminNodeRepo) DeleteNode(ctx context.Context, id int) error {
 }
 
 // FilterNodeList filters node list
-func (r *adminNodeRepo) FilterNodeList(ctx context.Context, page, size int32, search string) (int64, []*serverbiz.Node, error) {
+func (r *adminNodeRepo) FilterNodeList(ctx context.Context, page, size int32, search string, nodeGroupID *int64) (int64, []*serverbiz.Node, error) {
 	query := r.data.db.ProxyNode.Query()
+	if nodeGroupID != nil && *nodeGroupID > 0 {
+		query = query.Where(func(s *sql.Selector) {
+			s.Where(sql.P(func(b *sql.Builder) {
+				b.WriteString("JSON_CONTAINS(")
+				b.Ident(proxynode.FieldNodeGroupIds)
+				b.WriteString(", ")
+				b.Arg(fmt.Sprintf("[%d]", *nodeGroupID))
+				b.WriteString(")")
+			}))
+		})
+	}
 	if search != "" {
 		searchPattern := "%" + search + "%"
 		// 支持按名称、地址、标签、端口号搜索（与老项目保持一致）
@@ -191,6 +214,8 @@ func (r *adminNodeRepo) FilterNodeList(ctx context.Context, page, size int32, se
 			ServerID:  item.ServerID,
 			Protocol:  item.Protocol,
 			Enabled:   &enabled,
+			NodeType:  item.NodeType,
+			IsHidden:  &item.IsHidden,
 			Sort:      uint32(item.Sort),          // int to uint32
 			CreatedAt: item.CreatedAt.UnixMilli(), // 返回毫秒时间戳，与老项目保持一致
 			UpdatedAt: item.UpdatedAt.UnixMilli(), // 返回毫秒时间戳，与老项目保持一致
@@ -226,6 +251,8 @@ func (r *adminNodeRepo) ToggleNodeStatus(ctx context.Context, id int, enable *bo
 		ServerID:  updated.ServerID,
 		Protocol:  updated.Protocol,
 		Enabled:   &enabled,
+		NodeType:  updated.NodeType,
+		IsHidden:  &updated.IsHidden,
 		Sort:      uint32(updated.Sort),          // int to uint32
 		CreatedAt: updated.CreatedAt.UnixMilli(), // 返回毫秒时间戳
 		UpdatedAt: updated.UpdatedAt.UnixMilli(), // 返回毫秒时间戳

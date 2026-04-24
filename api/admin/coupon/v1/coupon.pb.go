@@ -27,17 +27,17 @@ type CreateCouponRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Name       string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                                // 优惠券名称
-	Code       string   `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`                                // 优惠券代码（可选，为空则自动生成）
-	Count      int64    `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`                             // 数量限制
-	Type       int32    `protobuf:"varint,4,opt,name=type,proto3" json:"type,omitempty"`                               // 类型：1：百分比 2：固定金额
-	Discount   int64    `protobuf:"varint,5,opt,name=discount,proto3" json:"discount,omitempty"`                       // 折扣（分）
-	StartTime  int64    `protobuf:"varint,6,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`    // 开始时间（Unix时间戳，秒）
-	ExpireTime int64    `protobuf:"varint,7,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"` // 过期时间（Unix时间戳，秒）
-	UserLimit  int64    `protobuf:"varint,8,opt,name=user_limit,json=userLimit,proto3" json:"user_limit,omitempty"`    // 用户限制
-	Subscribe  []string `protobuf:"bytes,9,rep,name=subscribe,proto3" json:"subscribe,omitempty"`                      // 订阅限制（订阅ID列表）
-	UsedCount  int64    `protobuf:"varint,10,opt,name=used_count,json=usedCount,proto3" json:"used_count,omitempty"`   // 已使用数量
-	Enable     *bool    `protobuf:"varint,11,opt,name=enable,proto3,oneof" json:"enable,omitempty"`                    // 启用
+	Name       string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`                                // 优惠券名称
+	Code       string `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`                                // 优惠券代码（可选，为空则自动生成）
+	Count      int64  `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`                             // 数量限制
+	Type       int32  `protobuf:"varint,4,opt,name=type,proto3" json:"type,omitempty"`                               // 类型：1：百分比 2：固定金额
+	Discount   int64  `protobuf:"varint,5,opt,name=discount,proto3" json:"discount,omitempty"`                       // 折扣（分）
+	StartTime  int64  `protobuf:"varint,6,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`    // 开始时间（Unix时间戳，秒）
+	ExpireTime int64  `protobuf:"varint,7,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"` // 过期时间（Unix时间戳，秒）
+	UserLimit  int64  `protobuf:"varint,8,opt,name=user_limit,json=userLimit,proto3" json:"user_limit,omitempty"`    // 用户限制
+	Subscribe  string `protobuf:"bytes,9,opt,name=subscribe,proto3" json:"subscribe,omitempty"`                      // 订阅限制
+	UsedCount  int64  `protobuf:"varint,10,opt,name=used_count,json=usedCount,proto3" json:"used_count,omitempty"`   // 已使用数量
+	Enable     *bool  `protobuf:"varint,11,opt,name=enable,proto3,oneof" json:"enable,omitempty"`                    // 启用
 }
 
 func (x *CreateCouponRequest) Reset() {
@@ -128,11 +128,11 @@ func (x *CreateCouponRequest) GetUserLimit() int64 {
 	return 0
 }
 
-func (x *CreateCouponRequest) GetSubscribe() []string {
+func (x *CreateCouponRequest) GetSubscribe() string {
 	if x != nil {
 		return x.Subscribe
 	}
-	return nil
+	return ""
 }
 
 func (x *CreateCouponRequest) GetUsedCount() int64 {
@@ -211,18 +211,18 @@ type UpdateCouponRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id         string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                    // 优惠券ID
-	Name       string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                                // 优惠券名称
-	Code       string   `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`                                // 优惠券代码
-	Count      int64    `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`                             // 数量限制
-	Type       int32    `protobuf:"varint,5,opt,name=type,proto3" json:"type,omitempty"`                               // 类型
-	Discount   int64    `protobuf:"varint,6,opt,name=discount,proto3" json:"discount,omitempty"`                       // 折扣（分）
-	StartTime  int64    `protobuf:"varint,7,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`    // 开始时间
-	ExpireTime int64    `protobuf:"varint,8,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"` // 过期时间
-	UserLimit  int64    `protobuf:"varint,9,opt,name=user_limit,json=userLimit,proto3" json:"user_limit,omitempty"`    // 用户限制
-	Subscribe  []string `protobuf:"bytes,10,rep,name=subscribe,proto3" json:"subscribe,omitempty"`                     // 订阅限制
-	UsedCount  int64    `protobuf:"varint,11,opt,name=used_count,json=usedCount,proto3" json:"used_count,omitempty"`   // 已使用数量
-	Enable     *bool    `protobuf:"varint,12,opt,name=enable,proto3,oneof" json:"enable,omitempty"`                    // 启用
+	Id         int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                   // 优惠券ID
+	Name       string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                                // 优惠券名称
+	Code       string `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`                                // 优惠券代码
+	Count      int64  `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`                             // 数量限制
+	Type       int32  `protobuf:"varint,5,opt,name=type,proto3" json:"type,omitempty"`                               // 类型
+	Discount   int64  `protobuf:"varint,6,opt,name=discount,proto3" json:"discount,omitempty"`                       // 折扣（分）
+	StartTime  int64  `protobuf:"varint,7,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`    // 开始时间
+	ExpireTime int64  `protobuf:"varint,8,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"` // 过期时间
+	UserLimit  int64  `protobuf:"varint,9,opt,name=user_limit,json=userLimit,proto3" json:"user_limit,omitempty"`    // 用户限制
+	Subscribe  string `protobuf:"bytes,10,opt,name=subscribe,proto3" json:"subscribe,omitempty"`                     // 订阅限制
+	UsedCount  int64  `protobuf:"varint,11,opt,name=used_count,json=usedCount,proto3" json:"used_count,omitempty"`   // 已使用数量
+	Enable     *bool  `protobuf:"varint,12,opt,name=enable,proto3,oneof" json:"enable,omitempty"`                    // 启用
 }
 
 func (x *UpdateCouponRequest) Reset() {
@@ -257,11 +257,11 @@ func (*UpdateCouponRequest) Descriptor() ([]byte, []int) {
 	return file_admin_coupon_v1_coupon_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *UpdateCouponRequest) GetId() string {
+func (x *UpdateCouponRequest) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 func (x *UpdateCouponRequest) GetName() string {
@@ -320,11 +320,11 @@ func (x *UpdateCouponRequest) GetUserLimit() int64 {
 	return 0
 }
 
-func (x *UpdateCouponRequest) GetSubscribe() []string {
+func (x *UpdateCouponRequest) GetSubscribe() string {
 	if x != nil {
 		return x.Subscribe
 	}
-	return nil
+	return ""
 }
 
 func (x *UpdateCouponRequest) GetUsedCount() int64 {
@@ -403,7 +403,7 @@ type DeleteCouponRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // 优惠券ID
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` // 优惠券ID
 }
 
 func (x *DeleteCouponRequest) Reset() {
@@ -438,11 +438,11 @@ func (*DeleteCouponRequest) Descriptor() ([]byte, []int) {
 	return file_admin_coupon_v1_coupon_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *DeleteCouponRequest) GetId() string {
+func (x *DeleteCouponRequest) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 // DeleteCouponReply 删除优惠券响应
@@ -507,7 +507,7 @@ type BatchDeleteCouponRequest struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Ids []string `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"` // 优惠券ID列表
+	Ids []int64 `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"` // 优惠券ID列表
 }
 
 func (x *BatchDeleteCouponRequest) Reset() {
@@ -542,7 +542,7 @@ func (*BatchDeleteCouponRequest) Descriptor() ([]byte, []int) {
 	return file_admin_coupon_v1_coupon_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *BatchDeleteCouponRequest) GetIds() []string {
+func (x *BatchDeleteCouponRequest) GetIds() []int64 {
 	if x != nil {
 		return x.Ids
 	}
@@ -803,20 +803,20 @@ type CouponItem struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id         string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`                                    // 优惠券ID
-	Name       string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                                // 优惠券名称
-	Code       string   `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`                                // 优惠券代码
-	Count      int64    `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`                             // 数量限制
-	Type       int32    `protobuf:"varint,5,opt,name=type,proto3" json:"type,omitempty"`                               // 类型
-	Discount   int64    `protobuf:"varint,6,opt,name=discount,proto3" json:"discount,omitempty"`                       // 折扣（分）
-	StartTime  int64    `protobuf:"varint,7,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`    // 开始时间（Unix时间戳，秒）
-	ExpireTime int64    `protobuf:"varint,8,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"` // 过期时间（Unix时间戳，秒）
-	UserLimit  int64    `protobuf:"varint,9,opt,name=user_limit,json=userLimit,proto3" json:"user_limit,omitempty"`    // 用户限制
-	Subscribe  []string `protobuf:"bytes,10,rep,name=subscribe,proto3" json:"subscribe,omitempty"`                     // 订阅限制
-	UsedCount  int64    `protobuf:"varint,11,opt,name=used_count,json=usedCount,proto3" json:"used_count,omitempty"`   // 已使用数量
-	Enable     bool     `protobuf:"varint,12,opt,name=enable,proto3" json:"enable,omitempty"`                          // 启用
-	CreatedAt  int64    `protobuf:"varint,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`   // 创建时间（Unix时间戳，秒）
-	UpdatedAt  int64    `protobuf:"varint,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`   // 更新时间（Unix时间戳，秒）
+	Id         int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                   // 优惠券ID
+	Name       string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`                                // 优惠券名称
+	Code       string `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`                                // 优惠券代码
+	Count      int64  `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`                             // 数量限制
+	Type       int32  `protobuf:"varint,5,opt,name=type,proto3" json:"type,omitempty"`                               // 类型
+	Discount   int64  `protobuf:"varint,6,opt,name=discount,proto3" json:"discount,omitempty"`                       // 折扣（分）
+	StartTime  int64  `protobuf:"varint,7,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`    // 开始时间（Unix时间戳，秒）
+	ExpireTime int64  `protobuf:"varint,8,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"` // 过期时间（Unix时间戳，秒）
+	UserLimit  int64  `protobuf:"varint,9,opt,name=user_limit,json=userLimit,proto3" json:"user_limit,omitempty"`    // 用户限制
+	Subscribe  string `protobuf:"bytes,10,opt,name=subscribe,proto3" json:"subscribe,omitempty"`                     // 订阅限制
+	UsedCount  int64  `protobuf:"varint,11,opt,name=used_count,json=usedCount,proto3" json:"used_count,omitempty"`   // 已使用数量
+	Enable     bool   `protobuf:"varint,12,opt,name=enable,proto3" json:"enable,omitempty"`                          // 启用
+	CreatedAt  int64  `protobuf:"varint,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`   // 创建时间（Unix时间戳，秒）
+	UpdatedAt  int64  `protobuf:"varint,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`   // 更新时间（Unix时间戳，秒）
 }
 
 func (x *CouponItem) Reset() {
@@ -851,11 +851,11 @@ func (*CouponItem) Descriptor() ([]byte, []int) {
 	return file_admin_coupon_v1_coupon_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *CouponItem) GetId() string {
+func (x *CouponItem) GetId() int64 {
 	if x != nil {
 		return x.Id
 	}
-	return ""
+	return 0
 }
 
 func (x *CouponItem) GetName() string {
@@ -914,11 +914,11 @@ func (x *CouponItem) GetUserLimit() int64 {
 	return 0
 }
 
-func (x *CouponItem) GetSubscribe() []string {
+func (x *CouponItem) GetSubscribe() string {
 	if x != nil {
 		return x.Subscribe
 	}
-	return nil
+	return ""
 }
 
 func (x *CouponItem) GetUsedCount() int64 {
@@ -972,7 +972,7 @@ var file_admin_coupon_v1_coupon_proto_rawDesc = []byte{
 	0x69, 0x72, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x75, 0x73, 0x65, 0x72, 0x5f,
 	0x6c, 0x69, 0x6d, 0x69, 0x74, 0x18, 0x08, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x75, 0x73, 0x65,
 	0x72, 0x4c, 0x69, 0x6d, 0x69, 0x74, 0x12, 0x1c, 0x0a, 0x09, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72,
-	0x69, 0x62, 0x65, 0x18, 0x09, 0x20, 0x03, 0x28, 0x09, 0x52, 0x09, 0x73, 0x75, 0x62, 0x73, 0x63,
+	0x69, 0x62, 0x65, 0x18, 0x09, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x73, 0x75, 0x62, 0x73, 0x63,
 	0x72, 0x69, 0x62, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x75, 0x73, 0x65, 0x64, 0x5f, 0x63, 0x6f, 0x75,
 	0x6e, 0x74, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x75, 0x73, 0x65, 0x64, 0x43, 0x6f,
 	0x75, 0x6e, 0x74, 0x12, 0x1b, 0x0a, 0x06, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x18, 0x0b, 0x20,
@@ -984,7 +984,7 @@ var file_admin_coupon_v1_coupon_proto_rawDesc = []byte{
 	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0xd7,
 	0x02, 0x0a, 0x13, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x43, 0x6f, 0x75, 0x70, 0x6f, 0x6e, 0x52,
 	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02,
+	0x28, 0x03, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02,
 	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f,
 	0x64, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x14,
 	0x0a, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x03, 0x52, 0x05, 0x63,
@@ -998,7 +998,7 @@ var file_admin_coupon_v1_coupon_proto_rawDesc = []byte{
 	0x54, 0x69, 0x6d, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x6c, 0x69, 0x6d,
 	0x69, 0x74, 0x18, 0x09, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x75, 0x73, 0x65, 0x72, 0x4c, 0x69,
 	0x6d, 0x69, 0x74, 0x12, 0x1c, 0x0a, 0x09, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65,
-	0x18, 0x0a, 0x20, 0x03, 0x28, 0x09, 0x52, 0x09, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62,
+	0x18, 0x0a, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62,
 	0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x75, 0x73, 0x65, 0x64, 0x5f, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18,
 	0x0b, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x75, 0x73, 0x65, 0x64, 0x43, 0x6f, 0x75, 0x6e, 0x74,
 	0x12, 0x1b, 0x0a, 0x06, 0x65, 0x6e, 0x61, 0x62, 0x6c, 0x65, 0x18, 0x0c, 0x20, 0x01, 0x28, 0x08,
@@ -1009,14 +1009,14 @@ var file_admin_coupon_v1_coupon_proto_rawDesc = []byte{
 	0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x25, 0x0a, 0x13, 0x44,
 	0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x75, 0x70, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02,
+	0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02,
 	0x69, 0x64, 0x22, 0x41, 0x0a, 0x11, 0x44, 0x65, 0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x75, 0x70,
 	0x6f, 0x6e, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18,
 	0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d,
 	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65,
 	0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x2c, 0x0a, 0x18, 0x42, 0x61, 0x74, 0x63, 0x68, 0x44, 0x65,
 	0x6c, 0x65, 0x74, 0x65, 0x43, 0x6f, 0x75, 0x70, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x10, 0x0a, 0x03, 0x69, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x03,
+	0x74, 0x12, 0x10, 0x0a, 0x03, 0x69, 0x64, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x03, 0x52, 0x03,
 	0x69, 0x64, 0x73, 0x22, 0x46, 0x0a, 0x16, 0x42, 0x61, 0x74, 0x63, 0x68, 0x44, 0x65, 0x6c, 0x65,
 	0x74, 0x65, 0x43, 0x6f, 0x75, 0x70, 0x6f, 0x6e, 0x52, 0x65, 0x70, 0x6c, 0x79, 0x12, 0x12, 0x0a,
 	0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x63, 0x6f, 0x64,
@@ -1044,7 +1044,7 @@ var file_admin_coupon_v1_coupon_proto_rawDesc = []byte{
 	0x63, 0x6f, 0x75, 0x70, 0x6f, 0x6e, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x75,
 	0x70, 0x6f, 0x6e, 0x4c, 0x69, 0x73, 0x74, 0x44, 0x61, 0x74, 0x61, 0x52, 0x04, 0x64, 0x61, 0x74,
 	0x61, 0x22, 0xfc, 0x02, 0x0a, 0x0a, 0x43, 0x6f, 0x75, 0x70, 0x6f, 0x6e, 0x49, 0x74, 0x65, 0x6d,
-	0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64,
+	0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x02, 0x69, 0x64,
 	0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
 	0x6e, 0x61, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x03, 0x20, 0x01,
 	0x28, 0x09, 0x52, 0x04, 0x63, 0x6f, 0x64, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x63, 0x6f, 0x75, 0x6e,
@@ -1058,7 +1058,7 @@ var file_admin_coupon_v1_coupon_proto_rawDesc = []byte{
 	0x28, 0x03, 0x52, 0x0a, 0x65, 0x78, 0x70, 0x69, 0x72, 0x65, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x1d,
 	0x0a, 0x0a, 0x75, 0x73, 0x65, 0x72, 0x5f, 0x6c, 0x69, 0x6d, 0x69, 0x74, 0x18, 0x09, 0x20, 0x01,
 	0x28, 0x03, 0x52, 0x09, 0x75, 0x73, 0x65, 0x72, 0x4c, 0x69, 0x6d, 0x69, 0x74, 0x12, 0x1c, 0x0a,
-	0x09, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x18, 0x0a, 0x20, 0x03, 0x28, 0x09,
+	0x09, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x09,
 	0x52, 0x09, 0x73, 0x75, 0x62, 0x73, 0x63, 0x72, 0x69, 0x62, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x75,
 	0x73, 0x65, 0x64, 0x5f, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x0b, 0x20, 0x01, 0x28, 0x03, 0x52,
 	0x09, 0x75, 0x73, 0x65, 0x64, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x65, 0x6e,

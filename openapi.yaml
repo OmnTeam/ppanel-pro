@@ -2112,6 +2112,10 @@ paths:
                   in: query
                   schema:
                     type: string
+                - name: nodeGroupId
+                  in: query
+                  schema:
+                    type: string
             responses:
                 "200":
                     description: OK
@@ -2992,19 +2996,6 @@ paths:
                 - Tool
             description: GetSystemLog 获取系统日志
             operationId: Tool_GetSystemLog
-            parameters:
-                - name: page
-                  in: query
-                  schema:
-                    type: string
-                - name: size
-                  in: query
-                  schema:
-                    type: string
-                - name: level
-                  in: query
-                  schema:
-                    type: string
             responses:
                 "200":
                     description: OK
@@ -3018,11 +3009,6 @@ paths:
                 - Tool
             description: RestartSystem 重启系统
             operationId: Tool_RestartSystem
-            parameters:
-                - name: confirm
-                  in: query
-                  schema:
-                    type: boolean
             responses:
                 "200":
                     description: OK
@@ -3395,15 +3381,6 @@ paths:
                   in: query
                   schema:
                     type: string
-                - name: subscribeId
-                  in: query
-                  schema:
-                    type: string
-                - name: status
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
             responses:
                 "200":
                     description: OK
@@ -6193,9 +6170,7 @@ components:
                 userLimit:
                     type: string
                 subscribe:
-                    type: array
-                    items:
-                        type: string
+                    type: string
                 usedCount:
                     type: string
                 enable:
@@ -6235,9 +6210,7 @@ components:
                 userLimit:
                     type: string
                 subscribe:
-                    type: array
-                    items:
-                        type: string
+                    type: string
                 usedCount:
                     type: string
                 enable:
@@ -6305,9 +6278,7 @@ components:
                 userLimit:
                     type: string
                 subscribe:
-                    type: array
-                    items:
-                        type: string
+                    type: string
                 usedCount:
                     type: string
                 enable:
@@ -6809,7 +6780,8 @@ components:
                 maxTrafficGb:
                     type: string
                 nodeCount:
-                    type: string
+                    type: integer
+                    format: int32
                 createdAt:
                     type: string
                 updatedAt:
@@ -7973,7 +7945,7 @@ components:
                     type: object
                 feeMode:
                     type: integer
-                    format: int32
+                    format: uint32
                 feePercent:
                     type: string
                 feeAmount:
@@ -8049,7 +8021,7 @@ components:
                     type: object
                 feeMode:
                     type: integer
-                    format: int32
+                    format: uint32
                 feePercent:
                     type: string
                 feeAmount:
@@ -8103,7 +8075,7 @@ components:
                     type: object
                 feeMode:
                     type: integer
-                    format: int32
+                    format: uint32
                 feePercent:
                     type: string
                 feeAmount:
@@ -8250,7 +8222,8 @@ components:
                 quantity:
                     type: string
                 status:
-                    type: string
+                    type: integer
+                    format: int32
                 createdAt:
                     type: string
                 updatedAt:
@@ -8299,7 +8272,8 @@ components:
                 id:
                     type: string
                 status:
-                    type: string
+                    type: integer
+                    format: int32
             description: ToggleRedemptionCodeStatusRequest 切换兑换码状态请求
         api.admin.redemption.v1.UpdateRedemptionCodeData:
             type: object
@@ -8332,7 +8306,8 @@ components:
                 quantity:
                     type: string
                 status:
-                    type: string
+                    type: integer
+                    format: int32
             description: UpdateRedemptionCodeRequest 更新兑换码请求
         api.admin.server.v1.CreateNodeData:
             type: object
@@ -8368,6 +8343,10 @@ components:
                 protocol:
                     type: string
                 enabled:
+                    type: boolean
+                nodeType:
+                    type: string
+                isHidden:
                     type: boolean
                 nodeGroupIds:
                     type: array
@@ -8561,13 +8540,18 @@ components:
                 enabled:
                     type: boolean
                 sort:
-                    type: string
+                    type: integer
+                    format: int32
                 nodeGroupId:
                     type: string
                 nodeGroupIds:
                     type: array
                     items:
                         type: string
+                nodeType:
+                    type: string
+                isHidden:
+                    type: boolean
                 createdAt:
                     type: string
                 updatedAt:
@@ -8730,7 +8714,8 @@ components:
                 address:
                     type: string
                 sort:
-                    type: string
+                    type: integer
+                    format: int32
                 protocols:
                     type: array
                     items:
@@ -8793,7 +8778,8 @@ components:
                 id:
                     type: string
                 sort:
-                    type: string
+                    type: integer
+                    format: int32
         api.admin.server.v1.ToggleNodeStatusData:
             type: object
             properties:
@@ -8852,6 +8838,10 @@ components:
                 protocol:
                     type: string
                 enabled:
+                    type: boolean
+                nodeType:
+                    type: string
+                isHidden:
                     type: boolean
                 nodeGroupIds:
                     type: array
@@ -8998,7 +8988,9 @@ components:
                 unitTime:
                     type: string
                 discount:
-                    type: string
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.subscribe.v1.SubscribeDiscount'
                 replacement:
                     type: string
                 inventory:
@@ -9012,9 +9004,13 @@ components:
                 quota:
                     type: string
                 nodes:
-                    type: string
+                    type: array
+                    items:
+                        type: string
                 nodeTags:
-                    type: string
+                    type: array
+                    items:
+                        type: string
                 nodeGroupIds:
                     type: array
                     items:
@@ -9022,7 +9018,9 @@ components:
                 nodeGroupId:
                     type: string
                 trafficLimit:
-                    type: string
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.subscribe.v1.TrafficLimit'
                 show:
                     type: boolean
                 sell:
@@ -9176,6 +9174,14 @@ components:
                 sort:
                     type: string
             description: SortItem 排序项
+        api.admin.subscribe.v1.SubscribeDiscount:
+            type: object
+            properties:
+                quantity:
+                    type: string
+                discount:
+                    type: string
+            description: SubscribeDiscount 折扣配置
         api.admin.subscribe.v1.SubscribeGroupInfo:
             type: object
             properties:
@@ -9206,7 +9212,9 @@ components:
                 unitTime:
                     type: string
                 discount:
-                    type: string
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.subscribe.v1.SubscribeDiscount'
                 replacement:
                     type: string
                 inventory:
@@ -9220,9 +9228,13 @@ components:
                 quota:
                     type: string
                 nodes:
-                    type: string
+                    type: array
+                    items:
+                        type: string
                 nodeTags:
-                    type: string
+                    type: array
+                    items:
+                        type: string
                 nodeGroupIds:
                     type: array
                     items:
@@ -9230,7 +9242,9 @@ components:
                 nodeGroupId:
                     type: string
                 trafficLimit:
-                    type: string
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.subscribe.v1.TrafficLimit'
                 show:
                     type: boolean
                 sell:
@@ -9268,7 +9282,9 @@ components:
                 unitTime:
                     type: string
                 discount:
-                    type: string
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.subscribe.v1.SubscribeDiscount'
                 replacement:
                     type: string
                 inventory:
@@ -9282,9 +9298,13 @@ components:
                 quota:
                     type: string
                 nodes:
-                    type: string
+                    type: array
+                    items:
+                        type: string
                 nodeTags:
-                    type: string
+                    type: array
+                    items:
+                        type: string
                 nodeGroupIds:
                     type: array
                     items:
@@ -9292,7 +9312,9 @@ components:
                 nodeGroupId:
                     type: string
                 trafficLimit:
-                    type: string
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.subscribe.v1.TrafficLimit'
                 show:
                     type: boolean
                 sell:
@@ -9341,6 +9363,18 @@ components:
                     items:
                         $ref: '#/components/schemas/api.admin.subscribe.v1.SortItem'
             description: SubscribeSortRequest 订阅套餐排序请求
+        api.admin.subscribe.v1.TrafficLimit:
+            type: object
+            properties:
+                statType:
+                    type: string
+                statValue:
+                    type: string
+                trafficUsage:
+                    type: string
+                speedLimit:
+                    type: string
+            description: TrafficLimit 流量限制配置
         api.admin.subscribe.v1.UpdateSubscribeData:
             type: object
             properties:
@@ -9401,7 +9435,9 @@ components:
                 unitTime:
                     type: string
                 discount:
-                    type: string
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.subscribe.v1.SubscribeDiscount'
                 replacement:
                     type: string
                 inventory:
@@ -9415,9 +9451,13 @@ components:
                 quota:
                     type: string
                 nodes:
-                    type: string
+                    type: array
+                    items:
+                        type: string
                 nodeTags:
-                    type: string
+                    type: array
+                    items:
+                        type: string
                 nodeGroupIds:
                     type: array
                     items:
@@ -9425,7 +9465,9 @@ components:
                 nodeGroupId:
                     type: string
                 trafficLimit:
-                    type: string
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.subscribe.v1.TrafficLimit'
                 show:
                     type: boolean
                 sell:
@@ -9678,21 +9720,19 @@ components:
                 enableTrial:
                     type: boolean
                 trialSubscribe:
-                    type: integer
-                    format: int32
+                    type: string
                 trialTime:
-                    type: integer
-                    format: int32
+                    type: string
                 trialTimeUnit:
                     type: string
                 enableIpRegisterLimit:
                     type: boolean
                 ipRegisterLimit:
-                    type: integer
-                    format: int32
+                    type: string
                 ipRegisterLimitDuration:
-                    type: integer
-                    format: int32
+                    type: string
+                deviceLimit:
+                    type: string
             description: RegisterConfig 注册配置
         api.admin.system.v1.SetNodeMultiplierData:
             type: object
@@ -9931,21 +9971,19 @@ components:
                 enableTrial:
                     type: boolean
                 trialSubscribe:
-                    type: integer
-                    format: int32
+                    type: string
                 trialTime:
-                    type: integer
-                    format: int32
+                    type: string
                 trialTimeUnit:
                     type: string
                 enableIpRegisterLimit:
                     type: boolean
                 ipRegisterLimit:
-                    type: integer
-                    format: int32
+                    type: string
                 ipRegisterLimitDuration:
-                    type: integer
-                    format: int32
+                    type: string
+                deviceLimit:
+                    type: string
             description: UpdateRegisterConfig
         api.admin.system.v1.UpdateSiteConfigData:
             type: object
@@ -10089,12 +10127,6 @@ components:
                     type: string
                 enableAdminLoginCaptcha:
                     type: boolean
-                enableLoginVerify:
-                    type: boolean
-                enableRegisterVerify:
-                    type: boolean
-                enableResetPasswordVerify:
-                    type: boolean
             description: UpdateVerifyConfig
         api.admin.system.v1.VerifyCodeConfig:
             type: object
@@ -10122,12 +10154,6 @@ components:
                 captchaType:
                     type: string
                 enableAdminLoginCaptcha:
-                    type: boolean
-                enableLoginVerify:
-                    type: boolean
-                enableRegisterVerify:
-                    type: boolean
-                enableResetPasswordVerify:
                     type: boolean
             description: VerifyConfig 验证配置
         api.admin.ticket.v1.CreateTicketFollowReply:
@@ -10242,16 +10268,6 @@ components:
                     type: integer
                     format: int32
             description: UpdateTicketStatusRequest 更新工单状态请求
-        api.admin.tool.v1.GetSystemLogData:
-            type: object
-            properties:
-                logs:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/api.admin.tool.v1.LogEntry'
-                total:
-                    type: string
-            description: GetSystemLogData 获取系统日志数据
         api.admin.tool.v1.GetSystemLogReply:
             type: object
             properties:
@@ -10261,14 +10277,8 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/api.admin.tool.v1.GetSystemLogData'
+                    $ref: '#/components/schemas/api.admin.tool.v1.LogResponse'
             description: GetSystemLogReply 获取系统日志响应
-        api.admin.tool.v1.GetVersionData:
-            type: object
-            properties:
-                version:
-                    $ref: '#/components/schemas/api.admin.tool.v1.VersionInfo'
-            description: GetVersionData 获取版本数据
         api.admin.tool.v1.GetVersionReply:
             type: object
             properties:
@@ -10278,38 +10288,15 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/api.admin.tool.v1.GetVersionData'
+                    $ref: '#/components/schemas/api.admin.tool.v1.VersionResponse'
             description: GetVersionReply 获取版本信息响应
-        api.admin.tool.v1.IPLocation:
+        api.admin.tool.v1.LogResponse:
             type: object
             properties:
-                country:
-                    type: string
-                region:
-                    type: string
-                city:
-                    type: string
-                isp:
-                    type: string
-            description: IPLocation IP地理位置信息
-        api.admin.tool.v1.LogEntry:
-            type: object
-            properties:
-                timestamp:
-                    type: string
-                level:
-                    type: string
-                message:
-                    type: string
-                source:
-                    type: string
-            description: LogEntry 日志条目
-        api.admin.tool.v1.QueryIPLocationData:
-            type: object
-            properties:
-                location:
-                    $ref: '#/components/schemas/api.admin.tool.v1.IPLocation'
-            description: QueryIPLocationData 查询IP地理位置数据
+                list:
+                    type: array
+                    items:
+                        type: object
         api.admin.tool.v1.QueryIPLocationReply:
             type: object
             properties:
@@ -10319,16 +10306,16 @@ components:
                 message:
                     type: string
                 data:
-                    $ref: '#/components/schemas/api.admin.tool.v1.QueryIPLocationData'
-            description: QueryIPLocationReply 查询IP地理位置响应
-        api.admin.tool.v1.RestartSystemData:
+                    $ref: '#/components/schemas/api.admin.tool.v1.QueryIPLocationResponse'
+        api.admin.tool.v1.QueryIPLocationResponse:
             type: object
             properties:
-                success:
-                    type: boolean
-                message:
+                country:
                     type: string
-            description: RestartSystemData 重启系统数据
+                region:
+                    type: string
+                city:
+                    type: string
         api.admin.tool.v1.RestartSystemReply:
             type: object
             properties:
@@ -10337,21 +10324,12 @@ components:
                     format: int32
                 message:
                     type: string
-                data:
-                    $ref: '#/components/schemas/api.admin.tool.v1.RestartSystemData'
             description: RestartSystemReply 重启系统响应
-        api.admin.tool.v1.VersionInfo:
+        api.admin.tool.v1.VersionResponse:
             type: object
             properties:
                 version:
                     type: string
-                buildTime:
-                    type: string
-                gitCommit:
-                    type: string
-                goVersion:
-                    type: string
-            description: VersionInfo 版本信息
         api.admin.user.v1.BatchDeleteUserData:
             type: object
             properties:
@@ -10367,9 +10345,21 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.user.v1.BatchDeleteUserData'
+        api.admin.user.v1.CreateUserAuthMethodData:
+            type: object
+            properties:
+                success:
+                    type: boolean
         api.admin.user.v1.CreateUserAuthMethodReply:
             type: object
-            properties: {}
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.user.v1.CreateUserAuthMethodData'
         api.admin.user.v1.CreateUserAuthMethodRequest:
             type: object
             properties:
@@ -10411,7 +10401,7 @@ components:
                     type: string
                 referralPercentage:
                     type: integer
-                    format: int32
+                    format: uint32
                 onlyFirstPurchase:
                     type: boolean
                 refererUser:
@@ -10460,17 +10450,41 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.user.v1.CurrentUserData'
+        api.admin.user.v1.DeleteUserAuthMethodData:
+            type: object
+            properties:
+                success:
+                    type: boolean
         api.admin.user.v1.DeleteUserAuthMethodReply:
             type: object
-            properties: {}
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.user.v1.DeleteUserAuthMethodData'
         api.admin.user.v1.DeleteUserData:
+            type: object
+            properties:
+                success:
+                    type: boolean
+        api.admin.user.v1.DeleteUserDeviceData:
             type: object
             properties:
                 success:
                     type: boolean
         api.admin.user.v1.DeleteUserDeviceReply:
             type: object
-            properties: {}
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.user.v1.DeleteUserDeviceData'
         api.admin.user.v1.DeleteUserReply:
             type: object
             properties:
@@ -10489,13 +10503,23 @@ components:
                     format: int32
                 message:
                     type: string
-        api.admin.user.v1.GetUserAuthMethodReply:
+        api.admin.user.v1.GetUserAuthMethodData:
             type: object
             properties:
                 authMethods:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.admin.user.v1.UserAuthMethod'
+        api.admin.user.v1.GetUserAuthMethodReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.user.v1.GetUserAuthMethodData'
         api.admin.user.v1.GetUserDetailReply:
             type: object
             properties:
@@ -10649,9 +10673,21 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.user.v1.GetUserSubscribeTrafficLogsData'
+        api.admin.user.v1.KickOfflineByUserDeviceData:
+            type: object
+            properties:
+                success:
+                    type: boolean
         api.admin.user.v1.KickOfflineByUserDeviceReply:
             type: object
-            properties: {}
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.user.v1.KickOfflineByUserDeviceData'
         api.admin.user.v1.KickOfflineByUserDeviceRequest:
             type: object
             properties:
@@ -10660,9 +10696,9 @@ components:
         api.admin.user.v1.LoginLog:
             type: object
             properties:
-                userId:
+                id:
                     type: string
-                method:
+                userId:
                     type: string
                 loginIp:
                     type: string
@@ -10739,6 +10775,57 @@ components:
                     type: string
                 updatedAt:
                     type: string
+                language:
+                    type: string
+                discount:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.user.v1.SubscribeDiscount'
+                replacement:
+                    type: string
+                inventory:
+                    type: string
+                quota:
+                    type: string
+                nodes:
+                    type: array
+                    items:
+                        type: string
+                nodeTags:
+                    type: array
+                    items:
+                        type: string
+                nodeGroupIds:
+                    type: array
+                    items:
+                        type: string
+                nodeGroupId:
+                    type: string
+                show:
+                    type: boolean
+                sell:
+                    type: boolean
+                sort:
+                    type: string
+                deductionRatio:
+                    type: string
+                allowDeduction:
+                    type: boolean
+                renewalReset:
+                    type: boolean
+                showOriginalPrice:
+                    type: boolean
+                trafficLimit:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/api.admin.user.v1.TrafficLimit'
+        api.admin.user.v1.SubscribeDiscount:
+            type: object
+            properties:
+                quantity:
+                    type: string
+                discount:
+                    type: string
         api.admin.user.v1.ToggleUserSubscribeStatusReply:
             type: object
             properties:
@@ -10751,6 +10838,17 @@ components:
             type: object
             properties:
                 userSubscribeId:
+                    type: string
+        api.admin.user.v1.TrafficLimit:
+            type: object
+            properties:
+                statType:
+                    type: string
+                statValue:
+                    type: string
+                trafficUsage:
+                    type: string
+                speedLimit:
                     type: string
         api.admin.user.v1.TrafficLog:
             type: object
@@ -10770,9 +10868,21 @@ components:
                 timestamp:
                     type: string
             description: TrafficLog 流量日志
+        api.admin.user.v1.UpdateUserAuthMethodData:
+            type: object
+            properties:
+                success:
+                    type: boolean
         api.admin.user.v1.UpdateUserAuthMethodReply:
             type: object
-            properties: {}
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.user.v1.UpdateUserAuthMethodData'
         api.admin.user.v1.UpdateUserAuthMethodRequest:
             type: object
             properties:
@@ -10805,7 +10915,7 @@ components:
                     type: string
                 referralPercentage:
                     type: integer
-                    format: int32
+                    format: uint32
                 onlyFirstPurchase:
                     type: boolean
                 giftAmount:
@@ -10820,15 +10930,25 @@ components:
                     type: boolean
                 isAdmin:
                     type: boolean
+        api.admin.user.v1.UpdateUserDeviceData:
+            type: object
+            properties:
+                success:
+                    type: boolean
         api.admin.user.v1.UpdateUserDeviceReply:
             type: object
-            properties: {}
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                message:
+                    type: string
+                data:
+                    $ref: '#/components/schemas/api.admin.user.v1.UpdateUserDeviceData'
         api.admin.user.v1.UpdateUserDeviceRequest:
             type: object
             properties:
                 id:
-                    type: string
-                subscribeId:
                     type: string
                 ip:
                     type: string
@@ -10840,6 +10960,10 @@ components:
                     type: boolean
                 enabled:
                     type: boolean
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
         api.admin.user.v1.UpdateUserNotifySettingsReply:
             type: object
             properties:
@@ -10889,12 +11013,6 @@ components:
             properties:
                 id:
                     type: string
-                email:
-                    type: string
-                telephone:
-                    type: string
-                telephoneAreaCode:
-                    type: string
                 avatar:
                     type: string
                 balance:
@@ -10907,7 +11025,7 @@ components:
                     type: string
                 referralPercentage:
                     type: integer
-                    format: int32
+                    format: uint32
                 onlyFirstPurchase:
                     type: boolean
                 giftAmount:
@@ -10924,12 +11042,6 @@ components:
                     type: boolean
                 enableTradeNotify:
                     type: boolean
-                createdAt:
-                    type: string
-                updatedAt:
-                    type: string
-                telegram:
-                    type: string
                 authMethods:
                     type: array
                     items:
@@ -10942,6 +11054,12 @@ components:
                     type: array
                     items:
                         type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                telegram:
+                    type: string
                 deletedAt:
                     type: string
                 isDel:
@@ -10982,12 +11100,16 @@ components:
             properties:
                 id:
                     type: string
+                idStr:
+                    type: string
                 userId:
                     type: string
                 orderId:
                     type: string
                 subscribeId:
                     type: string
+                subscribe:
+                    $ref: '#/components/schemas/api.admin.user.v1.Subscribe'
                 nodeGroupId:
                     type: string
                 groupLocked:
@@ -10995,6 +11117,8 @@ components:
                 startTime:
                     type: string
                 expireTime:
+                    type: string
+                finishedAt:
                     type: string
                 resetTime:
                     type: string
@@ -11008,19 +11132,13 @@ components:
                     type: string
                 status:
                     type: integer
-                    format: int32
+                    format: uint32
                 short:
                     type: string
                 createdAt:
                     type: string
                 updatedAt:
                     type: string
-                finishedAt:
-                    type: string
-                uuid:
-                    type: string
-                subscribe:
-                    $ref: '#/components/schemas/api.admin.user.v1.Subscribe'
             description: UserSubscribe 用户订阅
         api.admin.user.v1.UserSubscribeDetail:
             type: object
@@ -11029,10 +11147,14 @@ components:
                     type: string
                 userId:
                     type: string
+                user:
+                    $ref: '#/components/schemas/api.admin.user.v1.User'
                 orderId:
                     type: string
                 subscribeId:
                     type: string
+                subscribe:
+                    $ref: '#/components/schemas/api.admin.user.v1.Subscribe'
                 nodeGroupId:
                     type: string
                 groupLocked:
@@ -11053,18 +11175,10 @@ components:
                     type: string
                 status:
                     type: integer
-                    format: int32
+                    format: uint32
                 createdAt:
                     type: string
                 updatedAt:
-                    type: string
-                user:
-                    $ref: '#/components/schemas/api.admin.user.v1.User'
-                subscribe:
-                    $ref: '#/components/schemas/api.admin.user.v1.Subscribe'
-                finishedAt:
-                    type: string
-                uuid:
                     type: string
             description: UserSubscribeDetail 用户订阅详情（含关联对象）
         api.admin.user.v1.UserSubscribeLog:
@@ -11467,8 +11581,7 @@ components:
                     items:
                         $ref: '#/components/schemas/api.public.announcement.v1.AnnouncementItem'
                 total:
-                    type: integer
-                    format: int32
+                    type: string
             description: AnnouncementListData 公告列表数据
         api.public.announcement.v1.AnnouncementListReply:
             type: object
@@ -13097,7 +13210,8 @@ components:
                 nodes:
                     type: array
                     items:
-                        type: string
+                        type: integer
+                        format: int32
                 nodeTags:
                     type: array
                     items:
@@ -13113,7 +13227,8 @@ components:
                 allowDeduction:
                     type: boolean
                 resetCycle:
-                    type: string
+                    type: integer
+                    format: int32
                 createdAt:
                     type: string
                 updatedAt:

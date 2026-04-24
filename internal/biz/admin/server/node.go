@@ -21,7 +21,7 @@ func NewNodeUsecase(repo NodeRepo, logger log.Logger) *NodeUsecase {
 }
 
 // CreateNode creates a new node
-func (uc *NodeUsecase) CreateNode(ctx context.Context, name string, tags []string, port uint16, address string, serverID int64, protocol string, enabled *bool) (*Node, error) {
+func (uc *NodeUsecase) CreateNode(ctx context.Context, name string, tags []string, port uint16, address string, serverID int64, protocol string, enabled *bool, nodeType string, isHidden *bool) (*Node, error) {
 	node := &Node{
 		Name:     name,
 		Tags:     tags,
@@ -30,12 +30,14 @@ func (uc *NodeUsecase) CreateNode(ctx context.Context, name string, tags []strin
 		ServerID: serverID,
 		Protocol: protocol,
 		Enabled:  enabled,
+		NodeType: nodeType,
+		IsHidden: isHidden,
 	}
 	return uc.repo.CreateNode(ctx, node)
 }
 
 // UpdateNode updates an existing node
-func (uc *NodeUsecase) UpdateNode(ctx context.Context, id int, name string, tags []string, port uint16, address string, serverID int64, protocol string, enabled *bool) (*Node, error) {
+func (uc *NodeUsecase) UpdateNode(ctx context.Context, id int, name string, tags []string, port uint16, address string, serverID int64, protocol string, enabled *bool, nodeType string, isHidden *bool) (*Node, error) {
 	node := &Node{
 		ID:       int64(id),
 		Name:     name,
@@ -45,6 +47,8 @@ func (uc *NodeUsecase) UpdateNode(ctx context.Context, id int, name string, tags
 		ServerID: serverID,
 		Protocol: protocol,
 		Enabled:  enabled,
+		NodeType: nodeType,
+		IsHidden: isHidden,
 	}
 
 	updatedNode, err := uc.repo.UpdateNode(ctx, node)
@@ -67,8 +71,8 @@ func (uc *NodeUsecase) DeleteNode(ctx context.Context, id int) error {
 }
 
 // FilterNodeList filters node list
-func (uc *NodeUsecase) FilterNodeList(ctx context.Context, page, size int32, search string) (int64, []*Node, error) {
-	return uc.repo.FilterNodeList(ctx, page, size, search)
+func (uc *NodeUsecase) FilterNodeList(ctx context.Context, page, size int32, search string, nodeGroupID *int64) (int64, []*Node, error) {
+	return uc.repo.FilterNodeList(ctx, page, size, search, nodeGroupID)
 }
 
 // ToggleNodeStatus toggles node status

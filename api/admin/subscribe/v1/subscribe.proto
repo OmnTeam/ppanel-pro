@@ -129,7 +129,7 @@ message TrafficLimit {
 
 // SubscribeInfo 订阅套餐信息
 message SubscribeInfo {
-  string id = 1;                             // 订阅套餐ID
+  int64 id = 1;                              // 订阅套餐ID
   string name = 2;                          // 订阅套餐名称
   string language = 3;                      // 语言
   string description = 4;                   // 订阅套餐描述
@@ -142,10 +142,10 @@ message SubscribeInfo {
   int64 speed_limit = 11;                   // 速度限制
   int64 device_limit = 12;                  // 设备数限制
   int64 quota = 13;                         // 配额
-  repeated string nodes = 14;                // 节点IDs
+  repeated int64 nodes = 14;                 // 节点IDs
   repeated string node_tags = 15;           // 节点标签
-  repeated string node_group_ids = 16;       // 节点组IDs
-  string node_group_id = 17;                 // 节点组ID
+  repeated int64 node_group_ids = 16;       // 节点组IDs
+  int64 node_group_id = 17;                 // 节点组ID
   repeated TrafficLimit traffic_limit = 18; // 流量限制配置
   bool show = 19;                           // 是否在门户页面显示
   bool sell = 20;                           // 是否售卖
@@ -161,7 +161,7 @@ message SubscribeInfo {
 
 // SubscribeItem 订阅套餐列表项（包含销量）
 message SubscribeItem {
-  string id = 1;
+  int64 id = 1;
   string name = 2;
   string language = 3;
   string description = 4;
@@ -177,7 +177,7 @@ message SubscribeItem {
   repeated int64 nodes = 14;
   repeated string node_tags = 15;
   repeated int64 node_group_ids = 16;
-  string node_group_id = 17;
+  int64 node_group_id = 17;
   repeated TrafficLimit traffic_limit = 18;
   bool show = 19;
   bool sell = 20;
@@ -206,10 +206,10 @@ message CreateSubscribeRequest {
   int64 speed_limit = 10;                   // 速度限制
   int64 device_limit = 11;                  // 设备数限制
   int64 quota = 12;                         // 配额
-  repeated string nodes = 13;                // 节点IDs
+  repeated int64 nodes = 13;                 // 节点IDs
   repeated string node_tags = 14;           // 节点标签
-  repeated string node_group_ids = 15;       // 节点组IDs
-  string node_group_id = 16;                 // 节点组ID
+  repeated int64 node_group_ids = 15;       // 节点组IDs
+  int64 node_group_id = 16;                 // 节点组ID
   repeated TrafficLimit traffic_limit = 17; // 流量限制配置
   optional bool show = 18;                  // 是否在门户页面显示
   optional bool sell = 19;                  // 是否售卖
@@ -236,7 +236,7 @@ message CreateSubscribeReply {
 
 // UpdateSubscribeRequest 更新订阅套餐请求
 message UpdateSubscribeRequest {
-  string id = 1;                             // 订阅套餐ID
+  int64 id = 1;                              // 订阅套餐ID
   string name = 2;                          // 订阅套餐名称
   string language = 3;                      // 语言
   string description = 4;                   // 订阅套餐描述
@@ -249,10 +249,10 @@ message UpdateSubscribeRequest {
   int64 speed_limit = 11;                   // 速度限制
   int64 device_limit = 12;                  // 设备数限制
   int64 quota = 13;                         // 配额
-  repeated string nodes = 14;                // 节点IDs
+  repeated int64 nodes = 14;                 // 节点IDs
   repeated string node_tags = 15;           // 节点标签
-  repeated string node_group_ids = 16;       // 节点组IDs
-  string node_group_id = 17;                 // 节点组ID
+  repeated int64 node_group_ids = 16;       // 节点组IDs
+  int64 node_group_id = 17;                 // 节点组ID
   repeated TrafficLimit traffic_limit = 18; // 流量限制配置
   optional bool show = 19;                  // 是否在门户页面显示
   optional bool sell = 20;                  // 是否售卖
@@ -278,7 +278,7 @@ message UpdateSubscribeReply {
 
 // DeleteSubscribeRequest 删除订阅套餐请求
 message DeleteSubscribeRequest {
-string id = 1;  // 订阅套餐ID
+  int64 id = 1;  // 订阅套餐ID
 }
 
 // DeleteSubscribeData 删除订阅套餐数据
@@ -295,7 +295,7 @@ message DeleteSubscribeReply {
 
 // BatchDeleteSubscribeRequest 批量删除订阅套餐请求
 message BatchDeleteSubscribeRequest {
-  repeated string ids = 1;  // 订阅套餐ID列表
+  repeated int64 ids = 1;  // 订阅套餐ID列表
 }
 
 // BatchDeleteSubscribeData 批量删除订阅套餐数据
@@ -312,7 +312,7 @@ message BatchDeleteSubscribeReply {
 
 // GetSubscribeDetailsRequest 获取订阅套餐详情请求
 message GetSubscribeDetailsRequest {
-string id = 1;  // 订阅套餐ID
+  int64 id = 1;  // 订阅套餐ID
 }
 
 // GetSubscribeDetailsData 获取订阅套餐详情数据
@@ -333,7 +333,7 @@ message GetSubscribeListRequest {
   int64 size = 2;          // 每页数量
   string language = 3;     // 语言筛选
   string search = 4;       // 搜索关键词
-  string node_group_id = 5; // 节点组ID筛选
+  int64 node_group_id = 5; // 节点组ID筛选
 }
 
 // GetSubscribeListData 获取订阅套餐列表数据
@@ -351,7 +351,7 @@ message GetSubscribeListReply {
 
 // SortItem 排序项
 message SortItem {
-  string id = 1;    // 订阅套餐ID
+  int64 id = 1;     // 订阅套餐ID
   int64 sort = 2;  // 排序值
 }
 
@@ -376,7 +376,7 @@ message SubscribeSortReply {
 
 // SubscribeGroupInfo 订阅组信息
 message SubscribeGroupInfo {
-  string id = 1;            // 订阅组ID
+  int64 id = 1;             // 订阅组ID
   string name = 2;         // 订阅组名称
   string description = 3;  // 订阅组描述
   int64 created_at = 4;    // 创建时间
@@ -403,7 +403,7 @@ message CreateSubscribeGroupReply {
 
 // UpdateSubscribeGroupRequest 更新订阅组请求
 message UpdateSubscribeGroupRequest {
-string id = 1;           // 订阅组ID
+  int64 id = 1;           // 订阅组ID
   string name = 2;        // 订阅组名称
   string description = 3; // 订阅组描述
 }
@@ -422,7 +422,7 @@ message UpdateSubscribeGroupReply {
 
 // DeleteSubscribeGroupRequest 删除订阅组请求
 message DeleteSubscribeGroupRequest {
-string id = 1;  // 订阅组ID
+  int64 id = 1;  // 订阅组ID
 }
 
 // DeleteSubscribeGroupData 删除订阅组数据
@@ -439,7 +439,7 @@ message DeleteSubscribeGroupReply {
 
 // BatchDeleteSubscribeGroupRequest 批量删除订阅组请求
 message BatchDeleteSubscribeGroupRequest {
-  repeated string ids = 1;  // 订阅组ID列表
+  repeated int64 ids = 1;  // 订阅组ID列表
 }
 
 // BatchDeleteSubscribeGroupData 批量删除订阅组数据

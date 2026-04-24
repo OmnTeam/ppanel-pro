@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -28,9 +27,8 @@ func NewAdminUserAuthMethodRepo(d *Data, logger log.Logger) userbiz.AuthMethodRe
 
 // CreateUserAuthMethod 创建用户认证方法（或更新已存在的）
 func (r *adminUserAuthMethodRepo) CreateUserAuthMethod(ctx context.Context, req *v1.CreateUserAuthMethodRequest) (int64, error) {
-	// Parse user ID
-	userID, err := strconv.ParseInt(req.UserId, 10, 64)
-	if err != nil {
+	userID := req.UserId
+	if userID <= 0 {
 		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
@@ -88,9 +86,8 @@ func (r *adminUserAuthMethodRepo) GetUserAuthMethod(ctx context.Context, userID 
 
 // UpdateUserAuthMethod 更新用户认证方法
 func (r *adminUserAuthMethodRepo) UpdateUserAuthMethod(ctx context.Context, req *v1.UpdateUserAuthMethodRequest) error {
-	// Parse user ID
-	userID, err := strconv.ParseInt(req.UserId, 10, 64)
-	if err != nil {
+	userID := req.UserId
+	if userID <= 0 {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
@@ -138,7 +135,7 @@ func (r *adminUserAuthMethodRepo) DeleteUserAuthMethod(ctx context.Context, user
 	}
 
 	if deletedCount == 0 {
-		return responsecode.NewKratosError(responsecode.ErrAuthMethodNotFound)
+		return nil
 	}
 
 	return nil

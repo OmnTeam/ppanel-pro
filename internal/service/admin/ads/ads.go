@@ -2,7 +2,6 @@ package ads
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/ads/v1"
@@ -61,12 +60,11 @@ func (s *AdsService) GetAdsList(ctx context.Context, req *v1.GetAdsListRequest) 
 
 // GetAds 获取广告详情
 func (s *AdsService) GetAds(ctx context.Context, req *v1.GetAdsRequest) (*v1.GetAdsReply, error) {
-	id, err := strconv.ParseInt(req.Id, 10, 64)
-	if err != nil {
+	if req.Id <= 0 {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	ads, err := s.uc.GetAdsByID(ctx, id)
+	ads, err := s.uc.GetAdsByID(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -114,13 +112,12 @@ func (s *AdsService) CreateAds(ctx context.Context, req *v1.CreateAdsRequest) (*
 
 // UpdateAds 更新广告
 func (s *AdsService) UpdateAds(ctx context.Context, req *v1.UpdateAdsRequest) (*v1.UpdateAdsReply, error) {
-	id, err := strconv.ParseInt(req.Id, 10, 64)
-	if err != nil {
+	if req.Id <= 0 {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	ads := &adsbiz.Ads{
-		ID:          id,
+		ID:          req.Id,
 		Title:       req.Title,
 		Type:        req.Type,
 		Content:     req.Content,
@@ -152,12 +149,11 @@ func (s *AdsService) UpdateAds(ctx context.Context, req *v1.UpdateAdsRequest) (*
 
 // DeleteAds 删除广告
 func (s *AdsService) DeleteAds(ctx context.Context, req *v1.DeleteAdsRequest) (*v1.DeleteAdsReply, error) {
-	id, err := strconv.ParseInt(req.Id, 10, 64)
-	if err != nil {
+	if req.Id <= 0 {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	err = s.uc.DeleteAds(ctx, id)
+	err := s.uc.DeleteAds(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +174,7 @@ func (s *AdsService) bizAdsToProto(ads *adsbiz.Ads) *v1.Ads {
 	}
 
 	pbAds := &v1.Ads{
-		Id:          strconv.FormatInt(ads.ID, 10),
+		Id:          ads.ID,
 		Title:       ads.Title,
 		Type:        ads.Type,
 		Content:     ads.Content,

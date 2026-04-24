@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/server/v1"
 	serverbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/server"
@@ -10,23 +9,6 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
-
-// Helper functions for type conversion
-func parseInt64(s string) (int64, error) {
-	val, err := strconv.ParseInt(s, 10, 64)
-	if err != nil {
-		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	return val, nil
-}
-
-func parseInt(s string) (int, error) {
-	val, err := parseInt64(s)
-	if err != nil {
-		return 0, err
-	}
-	return int(val), nil
-}
 
 // ServerService is the server service
 type ServerService struct {
@@ -70,12 +52,11 @@ func (s *ServerService) CreateServer(ctx context.Context, req *v1.CreateServerRe
 func (s *ServerService) UpdateServer(ctx context.Context, req *v1.UpdateServerRequest) (*v1.UpdateServerReply, error) {
 	protocols := protosToModelProtocols(req.Protocols)
 
-	id, err := parseInt(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	server, err := s.serverUc.UpdateServer(ctx, id, req.Name, req.Country, req.City, req.Address, int64(req.Sort), protocols)
+	server, err := s.serverUc.UpdateServer(ctx, int(req.Id), req.Name, req.Country, req.City, req.Address, int64(req.Sort), protocols)
 	if err != nil {
 		return nil, err
 	}
@@ -91,12 +72,11 @@ func (s *ServerService) UpdateServer(ctx context.Context, req *v1.UpdateServerRe
 
 // DeleteServer deletes a server
 func (s *ServerService) DeleteServer(ctx context.Context, req *v1.DeleteServerRequest) (*v1.DeleteServerReply, error) {
-	id, err := parseInt(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	err = s.serverUc.DeleteServer(ctx, id)
+	err := s.serverUc.DeleteServer(ctx, int(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -134,12 +114,11 @@ func (s *ServerService) FilterServerList(ctx context.Context, req *v1.FilterServ
 
 // GetServerProtocols gets server protocols
 func (s *ServerService) GetServerProtocols(ctx context.Context, req *v1.GetServerProtocolsRequest) (*v1.GetServerProtocolsReply, error) {
-	id, err := parseInt(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	protocols, err := s.serverUc.GetServerProtocols(ctx, id)
+	protocols, err := s.serverUc.GetServerProtocols(ctx, int(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -157,12 +136,12 @@ func (s *ServerService) GetServerProtocols(ctx context.Context, req *v1.GetServe
 
 // CreateNode creates a new node
 func (s *ServerService) CreateNode(ctx context.Context, req *v1.CreateNodeRequest) (*v1.CreateNodeReply, error) {
-	serverID, err := parseInt64(req.ServerId)
-	if err != nil {
-		return nil, err
+	serverID := req.ServerId
+	if serverID <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	node, err := s.nodeUc.CreateNode(ctx, req.Name, req.Tags, uint16(req.Port), req.Address, serverID, req.Protocol, req.Enabled)
+	node, err := s.nodeUc.CreateNode(ctx, req.Name, req.Tags, uint16(req.Port), req.Address, serverID, req.Protocol, req.Enabled, req.NodeType, req.IsHidden)
 	if err != nil {
 		return nil, err
 	}
@@ -178,16 +157,11 @@ func (s *ServerService) CreateNode(ctx context.Context, req *v1.CreateNodeReques
 
 // UpdateNode updates an existing node
 func (s *ServerService) UpdateNode(ctx context.Context, req *v1.UpdateNodeRequest) (*v1.UpdateNodeReply, error) {
-	id, err := parseInt(req.Id)
-	if err != nil {
-		return nil, err
-	}
-	serverID, err := parseInt64(req.ServerId)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 || req.ServerId <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	node, err := s.nodeUc.UpdateNode(ctx, id, req.Name, req.Tags, uint16(req.Port), req.Address, serverID, req.Protocol, req.Enabled)
+	node, err := s.nodeUc.UpdateNode(ctx, int(req.Id), req.Name, req.Tags, uint16(req.Port), req.Address, req.ServerId, req.Protocol, req.Enabled, req.NodeType, req.IsHidden)
 	if err != nil {
 		return nil, err
 	}
@@ -203,12 +177,11 @@ func (s *ServerService) UpdateNode(ctx context.Context, req *v1.UpdateNodeReques
 
 // DeleteNode deletes a node
 func (s *ServerService) DeleteNode(ctx context.Context, req *v1.DeleteNodeRequest) (*v1.DeleteNodeReply, error) {
-	id, err := parseInt(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	err = s.nodeUc.DeleteNode(ctx, id)
+	err := s.nodeUc.DeleteNode(ctx, int(req.Id))
 	if err != nil {
 		return nil, err
 	}
@@ -224,7 +197,7 @@ func (s *ServerService) DeleteNode(ctx context.Context, req *v1.DeleteNodeReques
 
 // FilterNodeList filters node list
 func (s *ServerService) FilterNodeList(ctx context.Context, req *v1.FilterNodeListRequest) (*v1.FilterNodeListReply, error) {
-	total, nodes, err := s.nodeUc.FilterNodeList(ctx, int32(req.Page), int32(req.Size), req.Search)
+	total, nodes, err := s.nodeUc.FilterNodeList(ctx, int32(req.Page), int32(req.Size), req.Search, req.NodeGroupId)
 	if err != nil {
 		return nil, err
 	}
@@ -246,12 +219,11 @@ func (s *ServerService) FilterNodeList(ctx context.Context, req *v1.FilterNodeLi
 
 // ToggleNodeStatus toggles node status
 func (s *ServerService) ToggleNodeStatus(ctx context.Context, req *v1.ToggleNodeStatusRequest) (*v1.ToggleNodeStatusReply, error) {
-	id, err := parseInt(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	node, err := s.nodeUc.ToggleNodeStatus(ctx, id, req.Enable)
+	node, err := s.nodeUc.ToggleNodeStatus(ctx, int(req.Id), req.Enable)
 	if err != nil {
 		return nil, err
 	}
@@ -318,13 +290,12 @@ func (s *ServerService) MigrateServerNode(ctx context.Context, req *v1.MigrateSe
 func (s *ServerService) ResetSortWithServer(ctx context.Context, req *v1.ResetSortRequest) (*v1.ResetSortReply, error) {
 	sortItems := make([]*serverbiz.SortItem, 0, len(req.Sort))
 	for _, item := range req.Sort {
-		id, err := parseInt64(item.Id)
-		if err != nil {
-			return nil, err
+		if item.Id <= 0 {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 		}
 
 		sortItems = append(sortItems, &serverbiz.SortItem{
-			ID:   id,
+			ID:   item.Id,
 			Sort: int(item.Sort),
 		})
 	}
@@ -347,13 +318,12 @@ func (s *ServerService) ResetSortWithServer(ctx context.Context, req *v1.ResetSo
 func (s *ServerService) ResetSortWithNode(ctx context.Context, req *v1.ResetSortRequest) (*v1.ResetSortReply, error) {
 	sortItems := make([]*serverbiz.SortItem, 0, len(req.Sort))
 	for _, item := range req.Sort {
-		id, err := parseInt64(item.Id)
-		if err != nil {
-			return nil, err
+		if item.Id <= 0 {
+			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 		}
 
 		sortItems = append(sortItems, &serverbiz.SortItem{
-			ID:   id,
+			ID:   item.Id,
 			Sort: int(item.Sort),
 		})
 	}
@@ -392,9 +362,9 @@ func serverToProto(s *serverbiz.Server) *v1.Server {
 			}
 			onlineUsers = append(onlineUsers, &v1.ServerOnlineUser{
 				Ip:          ips,
-				UserId:      strconv.FormatInt(user.UserID, 10),
+				UserId:      user.UserID,
 				Subscribe:   user.Subscribe,
-				SubscribeId: strconv.FormatInt(user.SubscribeID, 10),
+				SubscribeId: user.SubscribeID,
 				Traffic:     user.Traffic,
 				ExpiredAt:   user.ExpiredAt,
 			})
@@ -410,12 +380,12 @@ func serverToProto(s *serverbiz.Server) *v1.Server {
 	}
 
 	return &v1.Server{
-		Id:             strconv.FormatInt(s.ID, 10),
+		Id:             s.ID,
 		Name:           s.Name,
 		Country:        s.Country,
 		City:           s.City,
 		Address:        s.Address,
-		Sort:           int64(s.Sort),
+		Sort:           int32(s.Sort),
 		Protocols:      modelProtocolsToProtos(s.Protocols),
 		LastReportedAt: s.LastReportedAt,
 		Status:         status,
@@ -430,15 +400,17 @@ func nodeToProto(n *serverbiz.Node) *v1.Node {
 	}
 
 	return &v1.Node{
-		Id:        strconv.FormatInt(n.ID, 10),
+		Id:        n.ID,
 		Name:      n.Name,
 		Tags:      n.Tags,
 		Port:      uint32(n.Port), // Convert uint16 to uint32 for Proto
 		Address:   n.Address,
-		ServerId:  strconv.FormatInt(n.ServerID, 10),
+		ServerId:  n.ServerID,
 		Protocol:  n.Protocol,
-		Enabled:   n.Enabled, // 直接使用 *bool，与老项目一致
-		Sort:      int64(n.Sort),
+		Enabled:   n.Enabled,
+		NodeType:  n.NodeType,
+		IsHidden:  n.IsHidden, // 直接使用 *bool，与老项目一致
+		Sort:      int32(n.Sort),
 		CreatedAt: n.CreatedAt,
 		UpdatedAt: n.UpdatedAt,
 	}

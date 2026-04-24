@@ -2,7 +2,6 @@ package data
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -28,9 +27,8 @@ func NewAdminUserDeviceRepo(d *Data, logger log.Logger) userbiz.DeviceRepo {
 
 // UpdateUserDevice 更新用户设备
 func (r *adminUserDeviceRepo) UpdateUserDevice(ctx context.Context, req *v1.UpdateUserDeviceRequest) error {
-	// Parse device ID
-	deviceID, err := strconv.ParseInt(req.Id, 10, 64)
-	if err != nil {
+	deviceID := req.Id
+	if deviceID <= 0 {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
@@ -76,7 +74,7 @@ func (r *adminUserDeviceRepo) DeleteUserDevice(ctx context.Context, deviceID int
 	}
 
 	if deletedCount == 0 {
-		return responsecode.NewKratosError(responsecode.ErrDeviceNotFound)
+		return nil
 	}
 
 	return nil
@@ -99,8 +97,9 @@ func (r *adminUserDeviceRepo) KickOfflineByUserDevice(ctx context.Context, devic
 		return err
 	}
 
-	// TODO: 调用DeviceManager.KickDevice(device.UserID, device.Identifier)
-	// 原项目通过DeviceManager进行设备踢下线，这里需要后续实现
+	if r.data.DeviceManager() != nil {
+		r.data.DeviceManager().KickDevice(device.UserID, getStringValue(device.Identifier))
+	}
 
 	// 设置设备为离线状态
 	err = device.Update().

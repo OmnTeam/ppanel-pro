@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
-	"strconv"
 	"time"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/redemption/v1"
@@ -67,19 +66,19 @@ func (r *adminRedemptionRepo) generateUniqueCode(ctx context.Context) (string, e
 
 // CreateRedemptionCode creates redemption codes in batch
 func (r *adminRedemptionRepo) CreateRedemptionCode(ctx context.Context, req *v1.CreateRedemptionCodeRequest) (int64, error) {
-	subscribePlan, err := strconv.ParseInt(req.SubscribePlan, 10, 64)
-	if err != nil || subscribePlan <= 0 {
+	subscribePlan := req.SubscribePlan
+	if subscribePlan <= 0 {
 		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
 	// Verify subscribe plan exists
-	_, err = r.data.db.ProxySubscribe.Query().
+	_, err := r.data.db.ProxySubscribe.Query().
 		Where(proxysubscribe.IDEQ(subscribePlan)).
 		Only(ctx)
 
 	if err != nil {
 		if ent.IsNotFound(err) {
-			r.logger.Errorf("Subscribe plan not found: %s", req.SubscribePlan)
+			r.logger.Errorf("Subscribe plan not found: %d", req.SubscribePlan)
 			return 0, responsecode.NewKratosError(responsecode.ErrSubscribeNotFound)
 		}
 		r.logger.Errorf("Failed to query subscribe plan: %v", err)
@@ -127,8 +126,8 @@ func (r *adminRedemptionRepo) CreateRedemptionCode(ctx context.Context, req *v1.
 
 // UpdateRedemptionCode updates redemption code
 func (r *adminRedemptionRepo) UpdateRedemptionCode(ctx context.Context, req *v1.UpdateRedemptionCodeRequest) error {
-	id, err := strconv.ParseInt(req.Id, 10, 64)
-	if err != nil || id <= 0 {
+	id := req.Id
+	if id <= 0 {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
@@ -154,11 +153,8 @@ func (r *adminRedemptionRepo) UpdateRedemptionCode(ctx context.Context, req *v1.
 		}
 		update.SetTotalCount(req.TotalCount)
 	}
-	if req.SubscribePlan != "" {
-		subscribePlan, err := strconv.ParseInt(req.SubscribePlan, 10, 64)
-		if err != nil || subscribePlan <= 0 {
-			return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
+	if req.SubscribePlan > 0 {
+		subscribePlan := req.SubscribePlan
 		// Verify subscribe plan exists
 		_, err = r.data.db.ProxySubscribe.Query().
 			Where(proxysubscribe.IDEQ(subscribePlan)).
@@ -191,8 +187,8 @@ func (r *adminRedemptionRepo) UpdateRedemptionCode(ctx context.Context, req *v1.
 
 // ToggleRedemptionCodeStatus toggles redemption code status
 func (r *adminRedemptionRepo) ToggleRedemptionCodeStatus(ctx context.Context, req *v1.ToggleRedemptionCodeStatusRequest) error {
-	id, err := strconv.ParseInt(req.Id, 10, 64)
-	if err != nil || id <= 0 {
+	id := req.Id
+	if id <= 0 {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
@@ -256,12 +252,8 @@ func (r *adminRedemptionRepo) GetRedemptionCodeList(ctx context.Context, req *v1
 	query := r.data.db.ProxyRedemptionCode.Query()
 
 	// Optional filters
-	if req.SubscribePlan != "" {
-		subscribePlan, err := strconv.ParseInt(req.SubscribePlan, 10, 64)
-		if err != nil {
-			return nil, 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
-		query = query.Where(proxyredemptioncode.SubscribePlanEQ(subscribePlan))
+	if req.SubscribePlan > 0 {
+		query = query.Where(proxyredemptioncode.SubscribePlanEQ(req.SubscribePlan))
 	}
 	if req.UnitTime != "" {
 		query = query.Where(proxyredemptioncode.UnitTimeEQ(req.UnitTime))
@@ -298,19 +290,11 @@ func (r *adminRedemptionRepo) GetRedemptionRecordList(ctx context.Context, req *
 	query := r.data.db.ProxyRedemptionRecord.Query()
 
 	// Optional filters
-	if req.UserId != "" {
-		userID, err := strconv.ParseInt(req.UserId, 10, 64)
-		if err != nil {
-			return nil, 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
-		query = query.Where(proxyredemptionrecord.UserIDEQ(userID))
+	if req.UserId > 0 {
+		query = query.Where(proxyredemptionrecord.UserIDEQ(req.UserId))
 	}
-	if req.CodeId != "" {
-		codeID, err := strconv.ParseInt(req.CodeId, 10, 64)
-		if err != nil {
-			return nil, 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-		}
-		query = query.Where(proxyredemptionrecord.RedemptionCodeIDEQ(codeID))
+	if req.CodeId > 0 {
+		query = query.Where(proxyredemptionrecord.RedemptionCodeIDEQ(req.CodeId))
 	}
 
 	// Get total count

@@ -314,12 +314,13 @@ func (s *SystemService) GetRegisterConfig(ctx context.Context, req *pb.GetRegist
 		Data: &pb.RegisterConfig{
 			StopRegister:            config.StopRegister,
 			EnableTrial:             config.EnableTrial,
-			TrialSubscribe:          int32(config.TrialSubscribe),
-			TrialTime:               int32(config.TrialTime),
+			TrialSubscribe:          int64(config.TrialSubscribe),
+			TrialTime:               int64(config.TrialTime),
 			TrialTimeUnit:           config.TrialTimeUnit,
 			EnableIpRegisterLimit:   config.EnableIpRegisterLimit,
-			IpRegisterLimit:         int32(config.IpRegisterLimit),
-			IpRegisterLimitDuration: int32(config.IpRegisterLimitDuration),
+			IpRegisterLimit:         int64(config.IpRegisterLimit),
+			IpRegisterLimitDuration: int64(config.IpRegisterLimitDuration),
+			DeviceLimit:             int64(config.DeviceLimit),
 		},
 	}, nil
 }
@@ -336,6 +337,7 @@ func (s *SystemService) UpdateRegisterConfig(ctx context.Context, req *pb.Update
 		EnableIpRegisterLimit:   req.EnableIpRegisterLimit,
 		IpRegisterLimit:         int(req.IpRegisterLimit),
 		IpRegisterLimitDuration: int(req.IpRegisterLimitDuration),
+		DeviceLimit:             int(req.DeviceLimit),
 	}
 
 	if err := s.uc.UpdateRegisterConfig(ctx, config); err != nil {
@@ -544,9 +546,6 @@ func (s *SystemService) GetVerifyConfig(ctx context.Context, req *pb.GetVerifyCo
 			EnableUserRegisterCaptcha:      config.EnableUserRegisterCaptcha,
 			EnableAdminLoginCaptcha:        config.EnableAdminLoginCaptcha,
 			EnableUserResetPasswordCaptcha: config.EnableUserResetPasswordCaptcha,
-			EnableLoginVerify:              config.EnableUserLoginCaptcha,
-			EnableRegisterVerify:           config.EnableUserRegisterCaptcha,
-			EnableResetPasswordVerify:      config.EnableUserResetPasswordCaptcha,
 		},
 	}, nil
 }
@@ -558,10 +557,10 @@ func (s *SystemService) UpdateVerifyConfig(ctx context.Context, req *pb.UpdateVe
 		CaptchaType:                    req.CaptchaType,
 		TurnstileSiteKey:               req.TurnstileSiteKey,
 		TurnstileSecret:                req.TurnstileSecret,
-		EnableUserLoginCaptcha:         req.EnableUserLoginCaptcha || req.EnableLoginVerify,
-		EnableUserRegisterCaptcha:      req.EnableUserRegisterCaptcha || req.EnableRegisterVerify,
+		EnableUserLoginCaptcha:         req.EnableUserLoginCaptcha,
+		EnableUserRegisterCaptcha:      req.EnableUserRegisterCaptcha,
 		EnableAdminLoginCaptcha:        req.EnableAdminLoginCaptcha,
-		EnableUserResetPasswordCaptcha: req.EnableUserResetPasswordCaptcha || req.EnableResetPasswordVerify,
+		EnableUserResetPasswordCaptcha: req.EnableUserResetPasswordCaptcha,
 	}
 
 	if err := s.uc.UpdateVerifyConfig(ctx, config); err != nil {

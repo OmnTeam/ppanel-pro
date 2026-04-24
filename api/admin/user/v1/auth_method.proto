@@ -42,40 +42,70 @@ service UserAuthMethodService {
 // ===== CreateUserAuthMethod =====
 
 message CreateUserAuthMethodRequest {
-  string user_id = 1;
+  int64 user_id = 1;
   string auth_type = 2;        // apple, google, github, facebook, telegram, email, mobile
   string auth_identifier = 3;  // 认证标识（邮箱、手机号、OpenID等）
 }
 
-message CreateUserAuthMethodReply {}
+message CreateUserAuthMethodData {
+  bool success = 1;
+}
+
+message CreateUserAuthMethodReply {
+  int32 code = 1;
+  string message = 2;
+  CreateUserAuthMethodData data = 3;
+}
 
 // ===== UpdateUserAuthMethod =====
 
 message UpdateUserAuthMethodRequest {
-  string user_id = 1;           // 用户ID
+  int64 user_id = 1;           // 用户ID
   string auth_type = 2;        // 认证类型
   string auth_identifier = 3;  // 认证标识
 }
 
-message UpdateUserAuthMethodReply {}
+message UpdateUserAuthMethodData {
+  bool success = 1;
+}
+
+message UpdateUserAuthMethodReply {
+  int32 code = 1;
+  string message = 2;
+  UpdateUserAuthMethodData data = 3;
+}
 
 // ===== DeleteUserAuthMethod =====
 
 message DeleteUserAuthMethodRequest {
-  string user_id = 1;   // 用户ID
+  int64 user_id = 1;   // 用户ID
   string auth_type = 2; // 认证类型
 }
 
-message DeleteUserAuthMethodReply {}
+message DeleteUserAuthMethodData {
+  bool success = 1;
+}
+
+message DeleteUserAuthMethodReply {
+  int32 code = 1;
+  string message = 2;
+  DeleteUserAuthMethodData data = 3;
+}
 
 // ===== GetUserAuthMethod =====
 
 message GetUserAuthMethodRequest {
-  string user_id = 1;  // 用户ID
+  int64 user_id = 1;  // 用户ID
+}
+
+message GetUserAuthMethodData {
+  repeated UserAuthMethod auth_methods = 1;
 }
 
 message GetUserAuthMethodReply {
-  repeated UserAuthMethod auth_methods = 1;
+  int32 code = 1;
+  string message = 2;
+  GetUserAuthMethodData data = 3;
 }
 
 // ===== Common Messages =====

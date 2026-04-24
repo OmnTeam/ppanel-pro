@@ -3,7 +3,6 @@ package authmethod
 import (
 	"context"
 	"encoding/json"
-	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -42,7 +41,7 @@ func (s *AuthMethodService) GetAuthMethodConfig(ctx context.Context, req *v1.Get
 		Message: responsecode.CodeMessages[responsecode.AdminGetAuthMethodConfigSuccess],
 		Data: &v1.AuthMethodConfigData{
 			Config: &v1.AuthMethodConfig{
-				Id:      strconv.FormatInt(auth.ID, 10),
+				Id:      auth.ID,
 				Method:  auth.Method,
 				Config:  config,
 				Enabled: auth.Enabled,
@@ -77,7 +76,7 @@ func (s *AuthMethodService) UpdateAuthMethodConfig(ctx context.Context, req *v1.
 		Message: responsecode.CodeMessages[responsecode.AdminUpdateAuthMethodConfigSuccess],
 		Data: &v1.AuthMethodConfigData{
 			Config: &v1.AuthMethodConfig{
-				Id:      strconv.FormatInt(result.ID, 10),
+				Id:      result.ID,
 				Method:  result.Method,
 				Config:  config,
 				Enabled: result.Enabled,
@@ -137,7 +136,7 @@ func (s *AuthMethodService) GetAuthMethodList(ctx context.Context, req *v1.GetAu
 	for _, auth := range list {
 		config, _ := s.parseConfig(auth.Config)
 		result = append(result, &v1.AuthMethodConfig{
-			Id:      strconv.FormatInt(auth.ID, 10),
+			Id:      auth.ID,
 			Method:  auth.Method,
 			Config:  config,
 			Enabled: auth.Enabled,

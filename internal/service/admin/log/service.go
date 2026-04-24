@@ -3,8 +3,6 @@ package log
 import (
 	"context"
 	"encoding/json"
-	"strconv"
-
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/log/v1"
 	logbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/log"
 	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
@@ -12,19 +10,11 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 )
 
-func parseOptionalInt64(s string) (*int64, error) {
-	if s == "" {
+func parseOptionalInt64(v int64) (*int64, error) {
+	if v <= 0 {
 		return nil, nil
 	}
-	val, err := strconv.ParseInt(s, 10, 64)
-	if err != nil {
-		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	return &val, nil
-}
-
-func formatInt64(i int64) string {
-	return strconv.FormatInt(i, 10)
+	return &v, nil
 }
 
 // LogService 日志服务（统一所有日志相关 API）
@@ -74,7 +64,7 @@ func (s *LogService) FilterBalanceLog(ctx context.Context, req *v1.FilterBalance
 
 		list = append(list, &v1.BalanceLog{
 			Type:      int32(content.Type),
-			UserId:    formatInt64(int64(l.ObjectID)),
+			UserId:    int64(l.ObjectID),
 			Amount:    content.Amount,
 			OrderNo:   content.OrderNo,
 			Balance:   content.Balance,
@@ -108,7 +98,7 @@ func (s *LogService) FilterCommissionLog(ctx context.Context, req *v1.FilterComm
 
 		list = append(list, &v1.CommissionLog{
 			Type:      int32(content.Type),
-			UserId:    formatInt64(int64(l.ObjectID)),
+			UserId:    int64(l.ObjectID),
 			Amount:    content.Amount,
 			OrderNo:   content.OrderNo,
 			Timestamp: content.Timestamp,
@@ -134,7 +124,7 @@ func (s *LogService) FilterEmailLog(ctx context.Context, req *v1.FilterEmailLogR
 			continue
 		}
 		contentJSON, _ := json.Marshal(content.Content)
-		list = append(list, &v1.EmailLog{Id: formatInt64(int64(l.ID)), Type: int32(l.Type), Platform: content.Platform, To: content.To, Subject: content.Subject, Content: string(contentJSON), Status: int32(content.Status), CreatedAt: l.CreatedAt.UnixMilli()})
+		list = append(list, &v1.EmailLog{Id: int64(l.ID), Type: int32(l.Type), Platform: content.Platform, To: content.To, Subject: content.Subject, Content: string(contentJSON), Status: int32(content.Status), CreatedAt: l.CreatedAt.UnixMilli()})
 	}
 
 	return &v1.FilterEmailLogReply{Code: int32(responsecode.FilterEmailLogSuccess), Message: responsecode.CodeMessages[responsecode.FilterEmailLogSuccess], Data: &v1.FilterEmailLogData{Total: total, List: list}}, nil
@@ -161,7 +151,7 @@ func (s *LogService) FilterGiftLog(ctx context.Context, req *v1.FilterGiftLogReq
 			continue
 		}
 
-		list = append(list, &v1.GiftLog{Type: int32(content.Type), UserId: formatInt64(int64(l.ObjectID)), OrderNo: content.OrderNo, SubscribeId: formatInt64(content.SubscribeId), Amount: content.Amount, Balance: content.Balance, Remark: content.Remark, Timestamp: content.Timestamp})
+		list = append(list, &v1.GiftLog{Type: int32(content.Type), UserId: int64(l.ObjectID), OrderNo: content.OrderNo, SubscribeId: content.SubscribeId, Amount: content.Amount, Balance: content.Balance, Remark: content.Remark, Timestamp: content.Timestamp})
 	}
 
 	return &v1.FilterGiftLogReply{Code: int32(responsecode.FilterGiftLogSuccess), Message: responsecode.CodeMessages[responsecode.FilterGiftLogSuccess], Data: &v1.FilterGiftLogData{Total: total, List: list}}, nil
@@ -188,7 +178,7 @@ func (s *LogService) FilterLoginLog(ctx context.Context, req *v1.FilterLoginLogR
 			continue
 		}
 
-		list = append(list, &v1.LoginLog{UserId: formatInt64(int64(l.ObjectID)), Method: content.Method, LoginIp: content.LoginIP, UserAgent: content.UserAgent, Success: content.Success, Timestamp: l.CreatedAt.UnixMilli()})
+		list = append(list, &v1.LoginLog{UserId: int64(l.ObjectID), Method: content.Method, LoginIp: content.LoginIP, UserAgent: content.UserAgent, Success: content.Success, Timestamp: l.CreatedAt.UnixMilli()})
 	}
 
 	return &v1.FilterLoginLogReply{Code: int32(responsecode.FilterLoginLogSuccess), Message: responsecode.CodeMessages[responsecode.FilterLoginLogSuccess], Data: &v1.FilterLoginLogData{Total: total, List: list}}, nil
@@ -210,7 +200,7 @@ func (s *LogService) GetMessageLogList(ctx context.Context, req *v1.GetMessageLo
 			continue
 		}
 		contentJSON, _ := json.Marshal(content.Content)
-		list = append(list, &v1.MessageLog{Id: formatInt64(int64(l.ID)), Type: int32(l.Type), Platform: content.Platform, To: content.To, Subject: content.Subject, Content: string(contentJSON), Status: int32(content.Status), CreatedAt: l.CreatedAt.UnixMilli()})
+		list = append(list, &v1.MessageLog{Id: int64(l.ID), Type: int32(l.Type), Platform: content.Platform, To: content.To, Subject: content.Subject, Content: string(contentJSON), Status: int32(content.Status), CreatedAt: l.CreatedAt.UnixMilli()})
 	}
 
 	return &v1.GetMessageLogListReply{Code: int32(responsecode.GetMessageLogListSuccess), Message: responsecode.CodeMessages[responsecode.GetMessageLogListSuccess], Data: &v1.GetMessageLogListData{Total: total, List: list}}, nil
@@ -232,7 +222,7 @@ func (s *LogService) FilterMobileLog(ctx context.Context, req *v1.FilterMobileLo
 			continue
 		}
 		contentJSON, _ := json.Marshal(content.Content)
-		list = append(list, &v1.MobileLog{Id: formatInt64(int64(l.ID)), Type: int32(l.Type), Platform: content.Platform, To: content.To, Subject: content.Subject, Content: string(contentJSON), Status: int32(content.Status), CreatedAt: l.CreatedAt.UnixMilli()})
+		list = append(list, &v1.MobileLog{Id: int64(l.ID), Type: int32(l.Type), Platform: content.Platform, To: content.To, Subject: content.Subject, Content: string(contentJSON), Status: int32(content.Status), CreatedAt: l.CreatedAt.UnixMilli()})
 	}
 
 	return &v1.FilterMobileLogReply{Code: int32(responsecode.FilterMobileLogSuccess), Message: responsecode.CodeMessages[responsecode.FilterMobileLogSuccess], Data: &v1.FilterMobileLogData{Total: total, List: list}}, nil
@@ -259,7 +249,7 @@ func (s *LogService) FilterRegisterLog(ctx context.Context, req *v1.FilterRegist
 			continue
 		}
 
-		list = append(list, &v1.RegisterLog{UserId: formatInt64(int64(l.ObjectID)), AuthMethod: content.AuthMethod, Identifier: content.Identifier, RegisterIp: content.RegisterIP, UserAgent: content.UserAgent, Timestamp: content.Timestamp})
+		list = append(list, &v1.RegisterLog{UserId: int64(l.ObjectID), AuthMethod: content.AuthMethod, Identifier: content.Identifier, RegisterIp: content.RegisterIP, UserAgent: content.UserAgent, Timestamp: content.Timestamp})
 	}
 
 	return &v1.FilterRegisterLogReply{Code: int32(responsecode.FilterRegisterLogSuccess), Message: responsecode.CodeMessages[responsecode.FilterRegisterLogSuccess], Data: &v1.FilterRegisterLogData{Total: total, List: list}}, nil
@@ -286,7 +276,7 @@ func (s *LogService) FilterServerTrafficLog(ctx context.Context, req *v1.FilterS
 			continue
 		}
 
-		list = append(list, &v1.ServerTrafficLog{ServerId: formatInt64(int64(l.ObjectID)), Upload: content.Upload, Download: content.Download, Total: content.Upload + content.Download, Date: req.Date})
+		list = append(list, &v1.ServerTrafficLog{ServerId: int64(l.ObjectID), Upload: content.Upload, Download: content.Download, Total: content.Upload + content.Download, Date: req.Date})
 	}
 
 	return &v1.FilterServerTrafficLogReply{Code: int32(responsecode.FilterServerTrafficLogSuccess), Message: responsecode.CodeMessages[responsecode.FilterServerTrafficLogSuccess], Data: &v1.FilterServerTrafficLogData{Total: total, List: list}}, nil
@@ -313,7 +303,7 @@ func (s *LogService) FilterSubscribeLog(ctx context.Context, req *v1.FilterSubsc
 			continue
 		}
 
-		list = append(list, &v1.SubscribeLog{UserId: formatInt64(int64(l.ObjectID)), Token: content.Token, UserAgent: content.UserAgent, ClientIp: content.ClientIP, UserSubscribeId: formatInt64(content.UserSubscribeId), Timestamp: l.CreatedAt.UnixMilli()})
+		list = append(list, &v1.SubscribeLog{UserId: int64(l.ObjectID), Token: content.Token, UserAgent: content.UserAgent, ClientIp: content.ClientIP, UserSubscribeId: content.UserSubscribeId, Timestamp: l.CreatedAt.UnixMilli()})
 	}
 
 	return &v1.FilterSubscribeLogReply{Code: int32(responsecode.FilterSubscribeLogSuccess), Message: responsecode.CodeMessages[responsecode.FilterSubscribeLogSuccess], Data: &v1.FilterSubscribeLogData{Total: total, List: list}}, nil
@@ -340,7 +330,7 @@ func (s *LogService) FilterResetSubscribeLog(ctx context.Context, req *v1.Filter
 			continue
 		}
 
-		list = append(list, &v1.ResetSubscribeLog{Type: int32(content.Type), UserId: formatInt64(content.UserId), UserSubscribeId: formatInt64(content.UserSubscribeId), OrderNo: content.OrderNo, Timestamp: content.Timestamp})
+		list = append(list, &v1.ResetSubscribeLog{Type: int32(content.Type), UserId: content.UserId, UserSubscribeId: content.UserSubscribeId, OrderNo: content.OrderNo, Timestamp: content.Timestamp})
 	}
 
 	return &v1.FilterResetSubscribeLogReply{Code: int32(responsecode.FilterResetSubscribeLogSuccess), Message: responsecode.CodeMessages[responsecode.FilterResetSubscribeLogSuccess], Data: &v1.FilterResetSubscribeLogData{Total: total, List: list}}, nil
@@ -371,11 +361,11 @@ func (s *LogService) FilterUserSubscribeTrafficLog(ctx context.Context, req *v1.
 			continue
 		}
 
-		subscribeIDStr := ""
+		var subscribeIDValue int64
 		if subscribeID != nil {
-			subscribeIDStr = formatInt64(*subscribeID)
+			subscribeIDValue = *subscribeID
 		}
-		list = append(list, &v1.UserSubscribeTrafficLog{UserId: formatInt64(int64(l.ObjectID)), SubscribeId: subscribeIDStr, Upload: content.Upload, Download: content.Download, Total: content.Upload + content.Download, Date: req.Date})
+		list = append(list, &v1.UserSubscribeTrafficLog{UserId: int64(l.ObjectID), SubscribeId: subscribeIDValue, Upload: content.Upload, Download: content.Download, Total: content.Upload + content.Download, Date: req.Date})
 	}
 
 	return &v1.FilterUserSubscribeTrafficLogReply{Code: int32(responsecode.FilterUserSubscribeTrafficLogSuccess), Message: responsecode.CodeMessages[responsecode.FilterUserSubscribeTrafficLogSuccess], Data: &v1.FilterUserSubscribeTrafficLogData{Total: total, List: list}}, nil
@@ -404,7 +394,7 @@ func (s *LogService) FilterTrafficLogDetails(ctx context.Context, req *v1.Filter
 
 	list := make([]*v1.TrafficLogDetail, 0, len(logs))
 	for _, l := range logs {
-		list = append(list, &v1.TrafficLogDetail{Id: formatInt64(int64(l.ID)), ServerId: formatInt64(int64(l.ServerID)), UserId: formatInt64(int64(l.UserID)), SubscribeId: formatInt64(int64(l.SubscribeID)), Download: l.Download, Upload: l.Upload, Timestamp: l.Timestamp.UnixMilli()})
+		list = append(list, &v1.TrafficLogDetail{Id: int64(l.ID), ServerId: int64(l.ServerID), UserId: int64(l.UserID), SubscribeId: int64(l.SubscribeID), Download: l.Download, Upload: l.Upload, Timestamp: l.Timestamp.UnixMilli()})
 	}
 
 	return &v1.FilterTrafficLogDetailsReply{Code: int32(responsecode.FilterTrafficLogDetailsSuccess), Message: responsecode.CodeMessages[responsecode.FilterTrafficLogDetailsSuccess], Data: &v1.FilterTrafficLogDetailsData{Total: total, List: list}}, nil

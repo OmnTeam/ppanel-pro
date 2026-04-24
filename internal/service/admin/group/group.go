@@ -2,7 +2,6 @@ package group
 
 import (
 	"context"
-	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/group/v1"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/group"
@@ -140,15 +139,20 @@ func (s *GroupService) GetNodeGroupList(ctx context.Context, req *v1.GetNodeGrou
 		}
 
 		nodeGroups = append(nodeGroups, &v1.NodeGroup{
-			Id:             strconv.FormatInt(item.ID, 10),
-			Name:           item.Name,
-			Description:    item.Description,
-			Sort:           int32(item.Sort),
-			ForCalculation: item.ForCalculation,
-			MinTrafficGb:   minTrafficGB,
-			MaxTrafficGb:   maxTrafficGB,
-			CreatedAt:      item.CreatedAt.Unix(),
-			UpdatedAt:      item.UpdatedAt.Unix(),
+			Id:                  item.ID,
+			Name:                item.Name,
+			Description:         item.Description,
+			Sort:                int32(item.Sort),
+			ForCalculation:      item.ForCalculation,
+			IsExpiredGroup:      item.IsExpiredGroup,
+			ExpiredDaysLimit:    int32(item.ExpiredDaysLimit),
+			NodeCount:           0,
+			MinTrafficGb:        minTrafficGB,
+			MaxTrafficGb:        maxTrafficGB,
+			MaxTrafficGbExpired: valueOrZero(item.MaxTrafficGBExpired),
+			SpeedLimit:          int32(item.SpeedLimit),
+			CreatedAt:           item.CreatedAt.Unix(),
+			UpdatedAt:           item.UpdatedAt.Unix(),
 		})
 	}
 
@@ -173,7 +177,7 @@ func (s *GroupService) CreateNodeGroup(ctx context.Context, req *v1.CreateNodeGr
 		Code:    int32(responsecode.AdminCreateNodeGroupSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminCreateNodeGroupSuccess],
 		Data: &v1.CreateNodeGroupData{
-			Id: strconv.FormatInt(id, 10),
+			Id: id,
 		},
 	}, nil
 }
@@ -195,12 +199,11 @@ func (s *GroupService) UpdateNodeGroup(ctx context.Context, req *v1.UpdateNodeGr
 
 // DeleteNodeGroup 删除节点组
 func (s *GroupService) DeleteNodeGroup(ctx context.Context, req *v1.DeleteNodeGroupRequest) (*v1.DeleteNodeGroupReply, error) {
-	id, err := strconv.ParseInt(req.Id, 10, 64)
-	if err != nil {
+	if req.Id <= 0 {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	if err := s.uc.DeleteNodeGroup(ctx, id); err != nil {
+	if err := s.uc.DeleteNodeGroup(ctx, req.Id); err != nil {
 		return nil, err
 	}
 
@@ -262,7 +265,7 @@ func (s *GroupService) RecalculateGroup(ctx context.Context, req *v1.Recalculate
 		Code:    int32(responsecode.AdminRecalculateGroupSuccess),
 		Message: responsecode.CodeMessages[responsecode.AdminRecalculateGroupSuccess],
 		Data: &v1.RecalculateGroupData{
-			HistoryId: strconv.FormatInt(historyId, 10),
+			HistoryId: historyId,
 		},
 	}, nil
 }
@@ -292,7 +295,7 @@ func (s *GroupService) GetGroupHistory(ctx context.Context, req *v1.GetGroupHist
 	histories := make([]*v1.GroupHistory, 0, len(list))
 	for _, item := range list {
 		histories = append(histories, &v1.GroupHistory{
-			Id:           strconv.FormatInt(item.ID, 10),
+			Id:           item.ID,
 			GroupMode:    item.GroupMode,
 			TriggerType:  item.TriggerType,
 			TotalUsers:   int32(item.TotalUsers),
@@ -315,19 +318,18 @@ func (s *GroupService) GetGroupHistory(ctx context.Context, req *v1.GetGroupHist
 
 // GetGroupHistoryDetail 获取分组历史详情
 func (s *GroupService) GetGroupHistoryDetail(ctx context.Context, req *v1.GetGroupHistoryDetailRequest) (*v1.GetGroupHistoryDetailReply, error) {
-	historyID, err := strconv.ParseInt(req.Id, 10, 64)
-	if err != nil {
+	if req.Id <= 0 {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	history, err := s.uc.GetGroupHistoryDetail(ctx, historyID)
+	history, err := s.uc.GetGroupHistoryDetail(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
 
 	// Convert ent entity to proto message
 	historyMsg := &v1.GroupHistory{
-		Id:           strconv.FormatInt(history.ID, 10),
+		Id:           history.ID,
 		GroupMode:    history.GroupMode,
 		TriggerType:  history.TriggerType,
 		TotalUsers:   int32(history.TotalUsers),
@@ -378,16 +380,11 @@ func (s *GroupService) ExportGroupResult(ctx context.Context, req *v1.ExportGrou
 
 // MigrateUsers 迁移用户
 func (s *GroupService) MigrateUsers(ctx context.Context, req *v1.MigrateUsersRequest) (*v1.MigrateUsersReply, error) {
-	fromUserGroupID, err := strconv.ParseInt(req.FromUserGroupId, 10, 64)
-	if err != nil {
-		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	toUserGroupID, err := strconv.ParseInt(req.ToUserGroupId, 10, 64)
-	if err != nil {
+	if req.FromUserGroupId <= 0 || req.ToUserGroupId <= 0 {
 		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
-	successCount, failedCount, err := s.uc.MigrateUsers(ctx, fromUserGroupID, toUserGroupID, req.IncludeLocked)
+	successCount, failedCount, err := s.uc.MigrateUsers(ctx, req.FromUserGroupId, req.ToUserGroupId, req.IncludeLocked)
 	if err != nil {
 		return nil, err
 	}
@@ -413,7 +410,7 @@ func (s *GroupService) PreviewUserNodes(ctx context.Context, req *v1.PreviewUser
 	nodeList := make([]*v1.Node, 0, len(nodes))
 	for _, item := range nodes {
 		nodeList = append(nodeList, &v1.Node{
-			Id:      strconv.FormatInt(item.ID, 10),
+			Id:      item.ID,
 			Name:    item.Name,
 			Address: item.Address,
 			Port:    int32(item.Port),
@@ -424,7 +421,7 @@ func (s *GroupService) PreviewUserNodes(ctx context.Context, req *v1.PreviewUser
 
 	nodeGroups := []*v1.NodeGroupItem{
 		{
-			Id:    strconv.FormatInt(userGroupId, 10),
+			Id:    userGroupId,
 			Name:  "",
 			Nodes: nodeList,
 		},
@@ -438,6 +435,13 @@ func (s *GroupService) PreviewUserNodes(ctx context.Context, req *v1.PreviewUser
 			NodeGroups: nodeGroups,
 		},
 	}, nil
+}
+
+func valueOrZero(v *int64) int64 {
+	if v == nil {
+		return 0
+	}
+	return *v
 }
 
 // ResetGroups 重置所有分组

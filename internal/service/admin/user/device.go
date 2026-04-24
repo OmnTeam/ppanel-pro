@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"strconv"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -27,14 +26,6 @@ func NewUserDeviceService(uc *userbiz.DeviceUsecase, logger log.Logger) *UserDev
 	}
 }
 
-func parseDeviceID(s string) (int64, error) {
-	val, err := strconv.ParseInt(s, 10, 64)
-	if err != nil {
-		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	return val, nil
-}
-
 // UpdateUserDevice 更新用户设备
 func (s *UserDeviceService) UpdateUserDevice(ctx context.Context, req *v1.UpdateUserDeviceRequest) (*v1.UpdateUserDeviceReply, error) {
 	err := s.uc.UpdateUserDevice(ctx, req)
@@ -42,33 +33,43 @@ func (s *UserDeviceService) UpdateUserDevice(ctx context.Context, req *v1.Update
 		return nil, err
 	}
 
-	return &v1.UpdateUserDeviceReply{}, nil
+	return &v1.UpdateUserDeviceReply{
+		Code:    200,
+		Message: responsecode.CodeMessages[200],
+		Data:    &v1.UpdateUserDeviceData{Success: true},
+	}, nil
 }
 
 // DeleteUserDevice 删除用户设备
 func (s *UserDeviceService) DeleteUserDevice(ctx context.Context, req *v1.DeleteUserDeviceRequest) (*v1.DeleteUserDeviceReply, error) {
-	val, err := parseDeviceID(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
-	err = s.uc.DeleteUserDevice(ctx, val)
+	err := s.uc.DeleteUserDevice(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &v1.DeleteUserDeviceReply{}, nil
+	return &v1.DeleteUserDeviceReply{
+		Code:    200,
+		Message: responsecode.CodeMessages[200],
+		Data:    &v1.DeleteUserDeviceData{Success: true},
+	}, nil
 }
 
 // KickOfflineByUserDevice 踢下线用户设备
 func (s *UserDeviceService) KickOfflineByUserDevice(ctx context.Context, req *v1.KickOfflineByUserDeviceRequest) (*v1.KickOfflineByUserDeviceReply, error) {
-	val, err := parseDeviceID(req.Id)
-	if err != nil {
-		return nil, err
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
-	err = s.uc.KickOfflineByUserDevice(ctx, val)
+	err := s.uc.KickOfflineByUserDevice(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &v1.KickOfflineByUserDeviceReply{}, nil
+	return &v1.KickOfflineByUserDeviceReply{
+		Code:    200,
+		Message: responsecode.CodeMessages[200],
+		Data:    &v1.KickOfflineByUserDeviceData{Success: true},
+	}, nil
 }

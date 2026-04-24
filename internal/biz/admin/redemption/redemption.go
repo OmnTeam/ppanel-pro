@@ -2,7 +2,6 @@ package redemption
 
 import (
 	"context"
-	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/redemption/v1"
 	"github.com/OmnTeam/ppanel-pro/ent"
@@ -44,10 +43,7 @@ func NewRedemptionUseCase(repo RedemptionRepo, logger log.Logger) *RedemptionUse
 
 // CreateRedemptionCode creates redemption codes in batch
 func (uc *RedemptionUseCase) CreateRedemptionCode(ctx context.Context, req *v1.CreateRedemptionCodeRequest) (int64, error) {
-	subscribePlan, err := strconv.ParseInt(req.SubscribePlan, 10, 64)
-	if err != nil {
-		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParams)
-	}
+	subscribePlan := req.SubscribePlan
 
 	// Validate request parameters
 	if req.TotalCount <= 0 {
@@ -91,8 +87,8 @@ func (uc *RedemptionUseCase) CreateRedemptionCode(ctx context.Context, req *v1.C
 // UpdateRedemptionCode updates redemption code
 func (uc *RedemptionUseCase) UpdateRedemptionCode(ctx context.Context, req *v1.UpdateRedemptionCodeRequest) error {
 	// Validate request parameters
-	id, err := strconv.ParseInt(req.Id, 10, 64)
-	if err != nil || id <= 0 {
+	id := req.Id
+	if id <= 0 {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
@@ -116,7 +112,7 @@ func (uc *RedemptionUseCase) UpdateRedemptionCode(ctx context.Context, req *v1.U
 	}
 
 	// Call repository to update redemption code
-	err = uc.repo.UpdateRedemptionCode(ctx, req)
+	err := uc.repo.UpdateRedemptionCode(ctx, req)
 	if err != nil {
 		uc.log.Errorf("Failed to update redemption code: %v", err)
 		return err
@@ -128,8 +124,8 @@ func (uc *RedemptionUseCase) UpdateRedemptionCode(ctx context.Context, req *v1.U
 // ToggleRedemptionCodeStatus toggles redemption code status
 func (uc *RedemptionUseCase) ToggleRedemptionCodeStatus(ctx context.Context, req *v1.ToggleRedemptionCodeStatusRequest) error {
 	// Validate request parameters
-	id, err := strconv.ParseInt(req.Id, 10, 64)
-	if err != nil || id <= 0 {
+	id := req.Id
+	if id <= 0 {
 		return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 	}
 
@@ -138,7 +134,7 @@ func (uc *RedemptionUseCase) ToggleRedemptionCodeStatus(ctx context.Context, req
 	}
 
 	// Call repository to toggle status
-	err = uc.repo.ToggleRedemptionCodeStatus(ctx, req)
+	err := uc.repo.ToggleRedemptionCodeStatus(ctx, req)
 	if err != nil {
 		uc.log.Errorf("Failed to toggle redemption code status: %v", err)
 		return err
