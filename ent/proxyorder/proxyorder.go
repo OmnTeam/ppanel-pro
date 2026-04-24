@@ -106,7 +106,7 @@ var (
 	// DefaultType holds the default value on creation for the "type" field.
 	DefaultType int8
 	// DefaultQuantity holds the default value on creation for the "quantity" field.
-	DefaultQuantity int64
+	DefaultQuantity int32
 	// DefaultPrice holds the default value on creation for the "price" field.
 	DefaultPrice int64
 	// DefaultAmount holds the default value on creation for the "amount" field.

@@ -121,8 +121,8 @@ func parseUserSubscribeDiscounts(raw *string) []*userBiz.SubscribeDiscount {
 		return nil
 	}
 	var items []struct {
-		Quantity   int32 `json:"quantity"`
-		Percentage int32 `json:"percentage"`
+		Quantity int64   `json:"quantity"`
+		Discount float64 `json:"discount"`
 	}
 	if err := json.Unmarshal([]byte(*raw), &items); err != nil {
 		return nil
@@ -130,33 +130,40 @@ func parseUserSubscribeDiscounts(raw *string) []*userBiz.SubscribeDiscount {
 	result := make([]*userBiz.SubscribeDiscount, 0, len(items))
 	for _, item := range items {
 		result = append(result, &userBiz.SubscribeDiscount{
-			Quantity:   item.Quantity,
-			Percentage: item.Percentage,
+			Quantity: item.Quantity,
+			Discount: item.Discount,
 		})
 	}
 	return result
 }
 
-func parseLegacyUnitTime(unitTime string) int32 {
-	switch strings.ToLower(strings.TrimSpace(unitTime)) {
-	case "", "nolimit":
-		return 0
-	case "day":
-		return 1
-	case "month":
-		return 2
-	case "year":
-		return 3
-	case "hour":
-		return 4
-	case "minute":
-		return 5
-	default:
-		if value, err := strconv.Atoi(unitTime); err == nil {
-			return int32(value)
-		}
+func parseUserSubscribeNodes(raw string) []int64 {
+	return tool.StringToInt64Slice(raw)
+}
+
+func parseUserSubscribeTrafficLimit(raw *string) []*userBiz.TrafficLimit {
+	if raw == nil || strings.TrimSpace(*raw) == "" {
+		return nil
+	}
+	var items []*userBiz.TrafficLimit
+	if err := json.Unmarshal([]byte(*raw), &items); err != nil {
+		return nil
+	}
+	return items
+}
+
+func uint64Value(value *uint64) uint64 {
+	if value == nil {
 		return 0
 	}
+	return *value
+}
+
+func int64ValueFromInt32(value *int32) int64 {
+	if value == nil {
+		return 0
+	}
+	return int64(*value)
 }
 
 func calculateNextResetTimeLegacy(expireTime int64, resetCycle int64) int64 {
@@ -358,6 +365,36 @@ func (r *publicUserRepo) QueryUserInfo(ctx context.Context, userID int) (*userBi
 		return getAuthTypePriority(authMethods[i].AuthType) < getAuthTypePriority(authMethods[j].AuthType)
 	})
 
+	devices, err := r.data.db.ProxyUserDevice.Query().
+		Where(proxyuserdevice.UserIDEQ(int64(userID))).
+		All(ctx)
+	if err != nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	userDevices := make([]*userBiz.UserDevice, 0, len(devices))
+	for _, item := range devices {
+		userDevices = append(userDevices, &userBiz.UserDevice{
+			ID:         item.ID,
+			IP:         stringPointerValue(item.IP),
+			Identifier: stringPointerValue(item.Identifier),
+			UserAgent:  stringPointerValue(item.UserAgent),
+			Online:     item.Online,
+			Enabled:    item.Enabled,
+			CreatedAt:  item.CreatedAt.UnixMilli(),
+			UpdatedAt:  item.UpdatedAt.UnixMilli(),
+		})
+	}
+
+	var rules []string
+	if rawRules := stringPointerValue(userInfo.Rules); strings.TrimSpace(rawRules) != "" {
+		_ = json.Unmarshal([]byte(rawRules), &rules)
+	}
+
+	var deletedAt int64
+	if userInfo.DeletedAt != nil {
+		deletedAt = userInfo.DeletedAt.UnixMilli()
+	}
+
 	return &userBiz.UserInfo{
 		ID:                    userInfo.ID,
 		Avatar:                stringPointerValue(userInfo.Avatar),
@@ -376,12 +413,16 @@ func (r *publicUserRepo) QueryUserInfo(ctx context.Context, userID int) (*userBi
 		EnableSubscribeNotify: userInfo.EnableSubscribeNotify,
 		EnableTradeNotify:     userInfo.EnableTradeNotify,
 		AuthMethods:           authMethods,
+		UserDevices:           userDevices,
+		Rules:                 rules,
 		CreatedAt:             userInfo.CreatedAt.UnixMilli(),
 		UpdatedAt:             userInfo.UpdatedAt.UnixMilli(),
+		DeletedAt:             deletedAt,
+		IsDel:                 uint64Value(userInfo.IsDel) == 0,
 	}, nil
 }
 
-func (r *publicUserRepo) GetLoginLog(ctx context.Context, userID int, page, size int) ([]*userBiz.LoginLog, int64, error) {
+func (r *publicUserRepo) GetLoginLog(ctx context.Context, userID int, page, size int) ([]*userBiz.LoginLog, int32, error) {
 	query := r.data.db.ProxySystemLog.Query().
 		Where(
 			proxysystemlog.TypeEQ(int8(systemlog.TypeLogin)),
@@ -418,10 +459,10 @@ func (r *publicUserRepo) GetLoginLog(ctx context.Context, userID int, page, size
 		})
 	}
 
-	return list, int64(total), nil
+	return list, int32(total), nil
 }
 
-func (r *publicUserRepo) QueryUserBalanceLog(ctx context.Context, userID int) ([]*userBiz.BalanceLog, int64, error) {
+func (r *publicUserRepo) QueryUserBalanceLog(ctx context.Context, userID int) ([]*userBiz.BalanceLog, int32, error) {
 	logs, err := r.data.db.ProxySystemLog.Query().
 		Where(
 			proxysystemlog.TypeEQ(int8(systemlog.TypeBalance)),
@@ -449,10 +490,10 @@ func (r *publicUserRepo) QueryUserBalanceLog(ctx context.Context, userID int) ([
 		})
 	}
 
-	return list, int64(len(logs)), nil
+	return list, int32(len(logs)), nil
 }
 
-func (r *publicUserRepo) QueryUserCommissionLog(ctx context.Context, userID int, page, size int) ([]*userBiz.CommissionLog, int64, error) {
+func (r *publicUserRepo) QueryUserCommissionLog(ctx context.Context, userID int, page, size int) ([]*userBiz.CommissionLog, int32, error) {
 	query := r.data.db.ProxySystemLog.Query().
 		Where(
 			proxysystemlog.TypeEQ(int8(systemlog.TypeCommission)),
@@ -488,7 +529,7 @@ func (r *publicUserRepo) QueryUserCommissionLog(ctx context.Context, userID int,
 		})
 	}
 
-	return list, int64(total), nil
+	return list, int32(total), nil
 }
 
 func (r *publicUserRepo) QueryUserAffiliate(ctx context.Context, userID int) (int64, int64, error) {
@@ -521,7 +562,7 @@ func (r *publicUserRepo) QueryUserAffiliate(ctx context.Context, userID int) (in
 	return int64(registers), totalCommission, nil
 }
 
-func (r *publicUserRepo) QueryUserAffiliateList(ctx context.Context, userID int, page, size int) ([]*userBiz.UserAffiliate, int64, error) {
+func (r *publicUserRepo) QueryUserAffiliateList(ctx context.Context, userID int, page, size int) ([]*userBiz.UserAffiliate, int32, error) {
 	query := r.data.db.ProxyUser.Query().
 		Where(proxyuser.RefererIDEQ(int64(userID)))
 
@@ -556,7 +597,7 @@ func (r *publicUserRepo) QueryUserAffiliateList(ctx context.Context, userID int,
 		})
 	}
 
-	return list, int64(total), nil
+	return list, int32(total), nil
 }
 
 func (r *publicUserRepo) GetOAuthMethods(ctx context.Context, userID int) ([]*userBiz.AuthMethod, error) {
@@ -578,7 +619,7 @@ func (r *publicUserRepo) GetOAuthMethods(ctx context.Context, userID int) ([]*us
 	return list, nil
 }
 
-func (r *publicUserRepo) QueryUserSubscribe(ctx context.Context, userID int) ([]*userBiz.UserSubscribe, int64, error) {
+func (r *publicUserRepo) QueryUserSubscribe(ctx context.Context, userID int) ([]*userBiz.UserSubscribe, int32, error) {
 	subscriptions, err := r.data.db.ProxyUserSubscribe.Query().
 		Where(
 			proxyusersubscribe.UserIDEQ(int64(userID)),
@@ -603,22 +644,34 @@ func (r *publicUserRepo) QueryUserSubscribe(ctx context.Context, userID int) ([]
 		}
 
 		subscribeInfo := &userBiz.Subscribe{
-			ID:             subscribePlan.ID,
-			Name:           subscribePlan.Name,
-			Description:    stringPointerValue(subscribePlan.Description),
-			Price:          subscribePlan.UnitPrice,
-			Traffic:        subscribePlan.Traffic,
-			DeviceLimit:    int32(subscribePlan.DeviceLimit),
-			SpeedLimit:     int32(subscribePlan.SpeedLimit),
-			UnitTime:       parseLegacyUnitTime(subscribePlan.UnitTime),
-			UnitPrice:      subscribePlan.UnitPrice,
-			ResetCycle:     int32(int64Value(subscribePlan.ResetCycle)),
-			DeductionRatio: int32(int64Value(subscribePlan.DeductionRatio)),
-			AllowDeduction: subscribePlan.AllowDeduction,
-			Discount:       parseUserSubscribeDiscounts(subscribePlan.Discount),
-			Enable:         subscribePlan.Sell,
-			CreatedAt:      subscribePlan.CreatedAt.UnixMilli(),
-			UpdatedAt:      subscribePlan.UpdatedAt.UnixMilli(),
+			ID:                subscribePlan.ID,
+			Name:              subscribePlan.Name,
+			Language:          subscribePlan.Language,
+			Description:       stringPointerValue(subscribePlan.Description),
+			UnitPrice:         subscribePlan.UnitPrice,
+			UnitTime:          subscribePlan.UnitTime,
+			Replacement:       subscribePlan.Replacement,
+			Inventory:         int64(subscribePlan.Inventory),
+			Traffic:           subscribePlan.Traffic,
+			SpeedLimit:        int64(subscribePlan.SpeedLimit),
+			DeviceLimit:       int64(subscribePlan.DeviceLimit),
+			Quota:             int64(subscribePlan.Quota),
+			Nodes:             parseUserSubscribeNodes(subscribePlan.Nodes),
+			NodeTags:          tool.RemoveStringElement(strings.Split(subscribePlan.NodeTags, ","), ""),
+			NodeGroupIDs:      subscribePlan.NodeGroupIds,
+			NodeGroupID:       int64Value(subscribePlan.NodeGroupID),
+			TrafficLimit:      parseUserSubscribeTrafficLimit(subscribePlan.TrafficLimit),
+			Show:              subscribePlan.Show,
+			Sell:              subscribePlan.Sell,
+			Sort:              int64(subscribePlan.Sort),
+			DeductionRatio:    int64ValueFromInt32(subscribePlan.DeductionRatio),
+			AllowDeduction:    subscribePlan.AllowDeduction,
+			ResetCycle:        int64ValueFromInt32(subscribePlan.ResetCycle),
+			RenewalReset:      subscribePlan.RenewalReset,
+			ShowOriginalPrice: subscribePlan.ShowOriginalPrice,
+			Discount:          parseUserSubscribeDiscounts(subscribePlan.Discount),
+			CreatedAt:         subscribePlan.CreatedAt.UnixMilli(),
+			UpdatedAt:         subscribePlan.UpdatedAt.UnixMilli(),
 		}
 
 		expireAt := legacyUnixMillis(item.ExpireTime)
@@ -628,10 +681,12 @@ func (r *publicUserRepo) QueryUserSubscribe(ctx context.Context, userID int) ([]
 			OrderID:     item.OrderID,
 			SubscribeID: item.SubscribeID,
 			Subscribe:   subscribeInfo,
+			NodeGroupID: item.NodeGroupID,
+			GroupLocked: item.GroupLocked,
 			StartTime:   item.StartTime.UnixMilli(),
 			ExpireTime:  expireAt,
 			FinishedAt:  legacyUnixMillis(item.FinishedAt),
-			ResetTime:   calculateNextResetTimeLegacy(expireAt, int64Value(subscribePlan.ResetCycle)),
+			ResetTime:   calculateNextResetTimeLegacy(expireAt, int64ValueFromInt32(subscribePlan.ResetCycle)),
 			Traffic:     int64Value(item.Traffic),
 			Download:    int64Value(item.Download),
 			Upload:      int64Value(item.Upload),
@@ -649,14 +704,19 @@ func (r *publicUserRepo) QueryUserSubscribe(ctx context.Context, userID int) ([]
 		if item.Status != nil {
 			userSubscribe.Status = int32(*item.Status)
 		}
+		if token := stringPointerValue(item.Token); token != "" {
+			if short, err := tool.FixedUniqueString(token, 8, ""); err == nil {
+				userSubscribe.Short = short
+			}
+		}
 
 		list = append(list, userSubscribe)
 	}
 
-	return list, int64(len(list)), nil
+	return list, int32(len(list)), nil
 }
 
-func (r *publicUserRepo) GetSubscribeLog(ctx context.Context, userID int, page, size int) ([]*userBiz.UserSubscribeLog, int64, error) {
+func (r *publicUserRepo) GetSubscribeLog(ctx context.Context, userID int, page, size int) ([]*userBiz.UserSubscribeLog, int32, error) {
 	query := r.data.db.ProxySystemLog.Query().
 		Where(
 			proxysystemlog.TypeEQ(int8(systemlog.TypeSubscribe)),
@@ -694,7 +754,7 @@ func (r *publicUserRepo) GetSubscribeLog(ctx context.Context, userID int, page, 
 		})
 	}
 
-	return list, int64(total), nil
+	return list, int32(total), nil
 }
 
 func (r *publicUserRepo) ResetUserSubscribeToken(ctx context.Context, userID, userSubscribeID int) error {
@@ -802,12 +862,12 @@ func (r *publicUserRepo) calculateRemainingAmount(ctx context.Context, userID, u
 			Upload:         int64Value(userSub.Upload),
 			UnitTime:       subscribePlan.UnitTime,
 			UnitPrice:      subscribePlan.UnitPrice,
-			ResetCycle:     int64Value(subscribePlan.ResetCycle),
-			DeductionRatio: int64Value(subscribePlan.DeductionRatio),
+			ResetCycle:     int64ValueFromInt32(subscribePlan.ResetCycle),
+			DeductionRatio: int64ValueFromInt32(subscribePlan.DeductionRatio),
 		},
 		deduction.Order{
 			Amount:   orderAmount,
-			Quantity: orderQuantity,
+			Quantity: int64(orderQuantity),
 		},
 	)
 	if err != nil {
@@ -936,13 +996,21 @@ func (r *publicUserRepo) Unsubscribe(ctx context.Context, userID, id int) error 
 	return nil
 }
 
-func (r *publicUserRepo) UpdateUserNotify(ctx context.Context, userID int, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify bool) error {
-	if err := r.data.db.ProxyUser.UpdateOneID(int64(userID)).
-		SetEnableLoginNotify(enableLoginNotify).
-		SetEnableBalanceNotify(enableBalanceNotify).
-		SetEnableSubscribeNotify(enableSubscribeNotify).
-		SetEnableTradeNotify(enableTradeNotify).
-		Exec(ctx); err != nil {
+func (r *publicUserRepo) UpdateUserNotify(ctx context.Context, userID int, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify *bool) error {
+	update := r.data.db.ProxyUser.UpdateOneID(int64(userID))
+	if enableLoginNotify != nil {
+		update.SetEnableLoginNotify(*enableLoginNotify)
+	}
+	if enableBalanceNotify != nil {
+		update.SetEnableBalanceNotify(*enableBalanceNotify)
+	}
+	if enableSubscribeNotify != nil {
+		update.SetEnableSubscribeNotify(*enableSubscribeNotify)
+	}
+	if enableTradeNotify != nil {
+		update.SetEnableTradeNotify(*enableTradeNotify)
+	}
+	if err := update.Exec(ctx); err != nil {
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
 	}
 	return nil
@@ -1359,7 +1427,7 @@ func (r *publicUserRepo) DeviceWSConnect(ctx context.Context) error {
 	return nil
 }
 
-func (r *publicUserRepo) GetDeviceList(ctx context.Context, userID int) ([]*userBiz.UserDevice, int64, error) {
+func (r *publicUserRepo) GetDeviceList(ctx context.Context, userID int) ([]*userBiz.UserDevice, int32, error) {
 	devices, err := r.data.db.ProxyUserDevice.Query().
 		Where(proxyuserdevice.UserIDEQ(int64(userID))).
 		All(ctx)
@@ -1380,7 +1448,7 @@ func (r *publicUserRepo) GetDeviceList(ctx context.Context, userID int) ([]*user
 			UpdatedAt:  item.UpdatedAt.UnixMilli(),
 		})
 	}
-	return list, int64(len(list)), nil
+	return list, int32(len(list)), nil
 }
 
 func (r *publicUserRepo) UnbindDevice(ctx context.Context, userID, deviceID int) error {

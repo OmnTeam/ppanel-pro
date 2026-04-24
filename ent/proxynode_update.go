@@ -170,14 +170,14 @@ func (_u *ProxyNodeUpdate) SetNillableIsHidden(v *bool) *ProxyNodeUpdate {
 }
 
 // SetSort sets the "sort" field.
-func (_u *ProxyNodeUpdate) SetSort(v int) *ProxyNodeUpdate {
+func (_u *ProxyNodeUpdate) SetSort(v int32) *ProxyNodeUpdate {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *ProxyNodeUpdate) SetNillableSort(v *int) *ProxyNodeUpdate {
+func (_u *ProxyNodeUpdate) SetNillableSort(v *int32) *ProxyNodeUpdate {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -185,7 +185,7 @@ func (_u *ProxyNodeUpdate) SetNillableSort(v *int) *ProxyNodeUpdate {
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *ProxyNodeUpdate) AddSort(v int) *ProxyNodeUpdate {
+func (_u *ProxyNodeUpdate) AddSort(v int32) *ProxyNodeUpdate {
 	_u.mutation.AddSort(v)
 	return _u
 }
@@ -345,10 +345,10 @@ func (_u *ProxyNodeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		_spec.SetField(proxynode.FieldIsHidden, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(proxynode.FieldSort, field.TypeInt, value)
+		_spec.SetField(proxynode.FieldSort, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(proxynode.FieldSort, field.TypeInt, value)
+		_spec.AddField(proxynode.FieldSort, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.NodeGroupIds(); ok {
 		_spec.SetField(proxynode.FieldNodeGroupIds, field.TypeJSON, value)
@@ -528,14 +528,14 @@ func (_u *ProxyNodeUpdateOne) SetNillableIsHidden(v *bool) *ProxyNodeUpdateOne {
 }
 
 // SetSort sets the "sort" field.
-func (_u *ProxyNodeUpdateOne) SetSort(v int) *ProxyNodeUpdateOne {
+func (_u *ProxyNodeUpdateOne) SetSort(v int32) *ProxyNodeUpdateOne {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *ProxyNodeUpdateOne) SetNillableSort(v *int) *ProxyNodeUpdateOne {
+func (_u *ProxyNodeUpdateOne) SetNillableSort(v *int32) *ProxyNodeUpdateOne {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -543,7 +543,7 @@ func (_u *ProxyNodeUpdateOne) SetNillableSort(v *int) *ProxyNodeUpdateOne {
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *ProxyNodeUpdateOne) AddSort(v int) *ProxyNodeUpdateOne {
+func (_u *ProxyNodeUpdateOne) AddSort(v int32) *ProxyNodeUpdateOne {
 	_u.mutation.AddSort(v)
 	return _u
 }
@@ -733,10 +733,10 @@ func (_u *ProxyNodeUpdateOne) sqlSave(ctx context.Context) (_node *ProxyNode, er
 		_spec.SetField(proxynode.FieldIsHidden, field.TypeBool, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(proxynode.FieldSort, field.TypeInt, value)
+		_spec.SetField(proxynode.FieldSort, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(proxynode.FieldSort, field.TypeInt, value)
+		_spec.AddField(proxynode.FieldSort, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.NodeGroupIds(); ok {
 		_spec.SetField(proxynode.FieldNodeGroupIds, field.TypeJSON, value)

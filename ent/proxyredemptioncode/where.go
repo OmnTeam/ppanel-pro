@@ -61,12 +61,12 @@ func Code(v string) predicate.ProxyRedemptionCode {
 }
 
 // TotalCount applies equality check predicate on the "total_count" field. It's identical to TotalCountEQ.
-func TotalCount(v int64) predicate.ProxyRedemptionCode {
+func TotalCount(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldEQ(FieldTotalCount, v))
 }
 
 // UsedCount applies equality check predicate on the "used_count" field. It's identical to UsedCountEQ.
-func UsedCount(v int64) predicate.ProxyRedemptionCode {
+func UsedCount(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldEQ(FieldUsedCount, v))
 }
 
@@ -81,7 +81,7 @@ func UnitTime(v string) predicate.ProxyRedemptionCode {
 }
 
 // Quantity applies equality check predicate on the "quantity" field. It's identical to QuantityEQ.
-func Quantity(v int64) predicate.ProxyRedemptionCode {
+func Quantity(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldEQ(FieldQuantity, v))
 }
 
@@ -171,82 +171,82 @@ func CodeContainsFold(v string) predicate.ProxyRedemptionCode {
 }
 
 // TotalCountEQ applies the EQ predicate on the "total_count" field.
-func TotalCountEQ(v int64) predicate.ProxyRedemptionCode {
+func TotalCountEQ(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldEQ(FieldTotalCount, v))
 }
 
 // TotalCountNEQ applies the NEQ predicate on the "total_count" field.
-func TotalCountNEQ(v int64) predicate.ProxyRedemptionCode {
+func TotalCountNEQ(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldNEQ(FieldTotalCount, v))
 }
 
 // TotalCountIn applies the In predicate on the "total_count" field.
-func TotalCountIn(vs ...int64) predicate.ProxyRedemptionCode {
+func TotalCountIn(vs ...int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldIn(FieldTotalCount, vs...))
 }
 
 // TotalCountNotIn applies the NotIn predicate on the "total_count" field.
-func TotalCountNotIn(vs ...int64) predicate.ProxyRedemptionCode {
+func TotalCountNotIn(vs ...int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldNotIn(FieldTotalCount, vs...))
 }
 
 // TotalCountGT applies the GT predicate on the "total_count" field.
-func TotalCountGT(v int64) predicate.ProxyRedemptionCode {
+func TotalCountGT(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldGT(FieldTotalCount, v))
 }
 
 // TotalCountGTE applies the GTE predicate on the "total_count" field.
-func TotalCountGTE(v int64) predicate.ProxyRedemptionCode {
+func TotalCountGTE(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldGTE(FieldTotalCount, v))
 }
 
 // TotalCountLT applies the LT predicate on the "total_count" field.
-func TotalCountLT(v int64) predicate.ProxyRedemptionCode {
+func TotalCountLT(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldLT(FieldTotalCount, v))
 }
 
 // TotalCountLTE applies the LTE predicate on the "total_count" field.
-func TotalCountLTE(v int64) predicate.ProxyRedemptionCode {
+func TotalCountLTE(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldLTE(FieldTotalCount, v))
 }
 
 // UsedCountEQ applies the EQ predicate on the "used_count" field.
-func UsedCountEQ(v int64) predicate.ProxyRedemptionCode {
+func UsedCountEQ(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldEQ(FieldUsedCount, v))
 }
 
 // UsedCountNEQ applies the NEQ predicate on the "used_count" field.
-func UsedCountNEQ(v int64) predicate.ProxyRedemptionCode {
+func UsedCountNEQ(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldNEQ(FieldUsedCount, v))
 }
 
 // UsedCountIn applies the In predicate on the "used_count" field.
-func UsedCountIn(vs ...int64) predicate.ProxyRedemptionCode {
+func UsedCountIn(vs ...int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldIn(FieldUsedCount, vs...))
 }
 
 // UsedCountNotIn applies the NotIn predicate on the "used_count" field.
-func UsedCountNotIn(vs ...int64) predicate.ProxyRedemptionCode {
+func UsedCountNotIn(vs ...int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldNotIn(FieldUsedCount, vs...))
 }
 
 // UsedCountGT applies the GT predicate on the "used_count" field.
-func UsedCountGT(v int64) predicate.ProxyRedemptionCode {
+func UsedCountGT(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldGT(FieldUsedCount, v))
 }
 
 // UsedCountGTE applies the GTE predicate on the "used_count" field.
-func UsedCountGTE(v int64) predicate.ProxyRedemptionCode {
+func UsedCountGTE(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldGTE(FieldUsedCount, v))
 }
 
 // UsedCountLT applies the LT predicate on the "used_count" field.
-func UsedCountLT(v int64) predicate.ProxyRedemptionCode {
+func UsedCountLT(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldLT(FieldUsedCount, v))
 }
 
 // UsedCountLTE applies the LTE predicate on the "used_count" field.
-func UsedCountLTE(v int64) predicate.ProxyRedemptionCode {
+func UsedCountLTE(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldLTE(FieldUsedCount, v))
 }
 
@@ -356,42 +356,42 @@ func UnitTimeContainsFold(v string) predicate.ProxyRedemptionCode {
 }
 
 // QuantityEQ applies the EQ predicate on the "quantity" field.
-func QuantityEQ(v int64) predicate.ProxyRedemptionCode {
+func QuantityEQ(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldEQ(FieldQuantity, v))
 }
 
 // QuantityNEQ applies the NEQ predicate on the "quantity" field.
-func QuantityNEQ(v int64) predicate.ProxyRedemptionCode {
+func QuantityNEQ(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldNEQ(FieldQuantity, v))
 }
 
 // QuantityIn applies the In predicate on the "quantity" field.
-func QuantityIn(vs ...int64) predicate.ProxyRedemptionCode {
+func QuantityIn(vs ...int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldIn(FieldQuantity, vs...))
 }
 
 // QuantityNotIn applies the NotIn predicate on the "quantity" field.
-func QuantityNotIn(vs ...int64) predicate.ProxyRedemptionCode {
+func QuantityNotIn(vs ...int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldNotIn(FieldQuantity, vs...))
 }
 
 // QuantityGT applies the GT predicate on the "quantity" field.
-func QuantityGT(v int64) predicate.ProxyRedemptionCode {
+func QuantityGT(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldGT(FieldQuantity, v))
 }
 
 // QuantityGTE applies the GTE predicate on the "quantity" field.
-func QuantityGTE(v int64) predicate.ProxyRedemptionCode {
+func QuantityGTE(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldGTE(FieldQuantity, v))
 }
 
 // QuantityLT applies the LT predicate on the "quantity" field.
-func QuantityLT(v int64) predicate.ProxyRedemptionCode {
+func QuantityLT(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldLT(FieldQuantity, v))
 }
 
 // QuantityLTE applies the LTE predicate on the "quantity" field.
-func QuantityLTE(v int64) predicate.ProxyRedemptionCode {
+func QuantityLTE(v int32) predicate.ProxyRedemptionCode {
 	return predicate.ProxyRedemptionCode(sql.FieldLTE(FieldQuantity, v))
 }
 

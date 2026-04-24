@@ -112,14 +112,14 @@ func (_u *ProxyOrderUpdate) AddType(v int8) *ProxyOrderUpdate {
 }
 
 // SetQuantity sets the "quantity" field.
-func (_u *ProxyOrderUpdate) SetQuantity(v int64) *ProxyOrderUpdate {
+func (_u *ProxyOrderUpdate) SetQuantity(v int32) *ProxyOrderUpdate {
 	_u.mutation.ResetQuantity()
 	_u.mutation.SetQuantity(v)
 	return _u
 }
 
 // SetNillableQuantity sets the "quantity" field if the given value is not nil.
-func (_u *ProxyOrderUpdate) SetNillableQuantity(v *int64) *ProxyOrderUpdate {
+func (_u *ProxyOrderUpdate) SetNillableQuantity(v *int32) *ProxyOrderUpdate {
 	if v != nil {
 		_u.SetQuantity(*v)
 	}
@@ -127,7 +127,7 @@ func (_u *ProxyOrderUpdate) SetNillableQuantity(v *int64) *ProxyOrderUpdate {
 }
 
 // AddQuantity adds value to the "quantity" field.
-func (_u *ProxyOrderUpdate) AddQuantity(v int64) *ProxyOrderUpdate {
+func (_u *ProxyOrderUpdate) AddQuantity(v int32) *ProxyOrderUpdate {
 	_u.mutation.AddQuantity(v)
 	return _u
 }
@@ -544,10 +544,10 @@ func (_u *ProxyOrderUpdate) sqlSave(ctx context.Context) (_node int, err error) 
 		_spec.AddField(proxyorder.FieldType, field.TypeInt8, value)
 	}
 	if value, ok := _u.mutation.Quantity(); ok {
-		_spec.SetField(proxyorder.FieldQuantity, field.TypeInt64, value)
+		_spec.SetField(proxyorder.FieldQuantity, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedQuantity(); ok {
-		_spec.AddField(proxyorder.FieldQuantity, field.TypeInt64, value)
+		_spec.AddField(proxyorder.FieldQuantity, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.Price(); ok {
 		_spec.SetField(proxyorder.FieldPrice, field.TypeInt64, value)
@@ -740,14 +740,14 @@ func (_u *ProxyOrderUpdateOne) AddType(v int8) *ProxyOrderUpdateOne {
 }
 
 // SetQuantity sets the "quantity" field.
-func (_u *ProxyOrderUpdateOne) SetQuantity(v int64) *ProxyOrderUpdateOne {
+func (_u *ProxyOrderUpdateOne) SetQuantity(v int32) *ProxyOrderUpdateOne {
 	_u.mutation.ResetQuantity()
 	_u.mutation.SetQuantity(v)
 	return _u
 }
 
 // SetNillableQuantity sets the "quantity" field if the given value is not nil.
-func (_u *ProxyOrderUpdateOne) SetNillableQuantity(v *int64) *ProxyOrderUpdateOne {
+func (_u *ProxyOrderUpdateOne) SetNillableQuantity(v *int32) *ProxyOrderUpdateOne {
 	if v != nil {
 		_u.SetQuantity(*v)
 	}
@@ -755,7 +755,7 @@ func (_u *ProxyOrderUpdateOne) SetNillableQuantity(v *int64) *ProxyOrderUpdateOn
 }
 
 // AddQuantity adds value to the "quantity" field.
-func (_u *ProxyOrderUpdateOne) AddQuantity(v int64) *ProxyOrderUpdateOne {
+func (_u *ProxyOrderUpdateOne) AddQuantity(v int32) *ProxyOrderUpdateOne {
 	_u.mutation.AddQuantity(v)
 	return _u
 }
@@ -1202,10 +1202,10 @@ func (_u *ProxyOrderUpdateOne) sqlSave(ctx context.Context) (_node *ProxyOrder, 
 		_spec.AddField(proxyorder.FieldType, field.TypeInt8, value)
 	}
 	if value, ok := _u.mutation.Quantity(); ok {
-		_spec.SetField(proxyorder.FieldQuantity, field.TypeInt64, value)
+		_spec.SetField(proxyorder.FieldQuantity, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedQuantity(); ok {
-		_spec.AddField(proxyorder.FieldQuantity, field.TypeInt64, value)
+		_spec.AddField(proxyorder.FieldQuantity, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.Price(); ok {
 		_spec.SetField(proxyorder.FieldPrice, field.TypeInt64, value)

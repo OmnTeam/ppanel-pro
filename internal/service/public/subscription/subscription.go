@@ -35,16 +35,24 @@ func (s *PublicSubscriptionService) ValidateLegacyRequest(ctx context.Context, t
 
 // GetSubscribeConfig 获取订阅配置
 func (s *PublicSubscriptionService) GetSubscribeConfig(ctx context.Context, req *pb.GetSubscribeConfigRequest) (*pb.GetSubscribeConfigReply, error) {
-	// 获取User-Agent和客户端IP（用于日志记录）
 	userAgent := middleware.GetUserAgent(ctx)
+	if userAgent == "" {
+		userAgent = req.GetUa()
+	}
 	clientIP := middleware.GetClientIP(ctx)
 
-	// 获取请求URI和Host（用于生成订阅URL）
 	requestURI := middleware.GetRequestURI(ctx)
 	requestHost := middleware.GetRequestHost(ctx)
 	gatewayMode := middleware.GetGatewayMode(ctx)
 	queryParams := middleware.GetQueryParams(ctx)
 
-	// 调用业务层处理
 	return s.uc.GetSubscribeConfig(ctx, req, userAgent, clientIP, requestURI, requestHost, gatewayMode, queryParams)
+}
+
+func (s *PublicSubscriptionService) ResolveDownloadMeta(ctx context.Context, req *pb.GetSubscribeConfigRequest) (string, string, error) {
+	userAgent := middleware.GetUserAgent(ctx)
+	if userAgent == "" {
+		userAgent = req.GetUa()
+	}
+	return s.uc.ResolveDownloadMeta(ctx, req, userAgent)
 }

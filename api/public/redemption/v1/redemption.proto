@@ -26,13 +26,5 @@ message RedeemCodeRequest {
 
 // RedeemCodeReply 兑换码响应
 message RedeemCodeReply {
-  int32 code = 1;
-  string message = 2;
-  RedeemCodeData data = 3;
-}
-
-// RedeemCodeData 兑换码数据
-message RedeemCodeData {
-  string order_no = 1; // 订单号
-  string message = 2;  // 提示信息
+  string message = 1;
 }

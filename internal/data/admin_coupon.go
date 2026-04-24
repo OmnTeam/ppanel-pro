@@ -27,17 +27,18 @@ func NewCouponRepo(data *Data, logger log.Logger) coupon.CouponRepo {
 }
 
 // CreateCoupon 创建优惠券
-func (r *couponRepo) CreateCoupon(ctx context.Context, name, code string, count int, typ int32, discount, startTime, expireTime, userLimit int64, subscribe string, enable bool) error {
+func (r *couponRepo) CreateCoupon(ctx context.Context, name, code string, count int, typ int32, discount, startTime, expireTime, userLimit int64, subscribe string, usedCount int64, enable bool) error {
 	_, err := r.data.db.ProxyCoupon.Create().
 		SetName(name).
 		SetCode(code).
-		SetCount(int64(count)).
+		SetCount(int32(count)).
 		SetType(int8(typ)).
 		SetDiscount(discount).
 		SetStartTime(startTime).
 		SetExpireTime(expireTime).
 		SetUserLimit(userLimit).
 		SetSubscribe(subscribe).
+		SetUsedCount(int8(usedCount)).
 		SetEnable(enable).
 		Save(ctx)
 
@@ -45,20 +46,21 @@ func (r *couponRepo) CreateCoupon(ctx context.Context, name, code string, count 
 }
 
 // UpdateCoupon 更新优惠券
-func (r *couponRepo) UpdateCoupon(ctx context.Context, id int, name, code string, count int, typ int32, discount, startTime, expireTime, userLimit int64, subscribe string, enable bool) error {
+func (r *couponRepo) UpdateCoupon(ctx context.Context, id int, name, code string, count int, typ int32, discount, startTime, expireTime, userLimit int64, subscribe string, usedCount int64, enable bool) error {
 	return r.data.db.ProxyCoupon.Update().
 		Where(
 			proxycoupon.ID(int64(id)),
 		).
 		SetName(name).
 		SetCode(code).
-		SetCount(int64(count)).
+		SetCount(int32(count)).
 		SetType(int8(typ)).
 		SetDiscount(discount).
 		SetStartTime(startTime).
 		SetExpireTime(expireTime).
 		SetUserLimit(userLimit).
 		SetSubscribe(subscribe).
+		SetUsedCount(int8(usedCount)).
 		SetEnable(enable).
 		Exec(ctx)
 }
@@ -89,7 +91,7 @@ func (r *couponRepo) BatchDeleteCoupon(ctx context.Context, ids []int) error {
 }
 
 // GetCouponList 获取优惠券列表
-func (r *couponRepo) GetCouponList(ctx context.Context, page, size, subscribe int64, search string) ([]*ent.ProxyCoupon, int64, error) {
+func (r *couponRepo) GetCouponList(ctx context.Context, page, size, subscribe int64, search string) ([]*ent.ProxyCoupon, int32, error) {
 	query := r.data.db.ProxyCoupon.Query()
 
 	if subscribe != 0 {
@@ -121,7 +123,7 @@ func (r *couponRepo) GetCouponList(ctx context.Context, page, size, subscribe in
 		Order(ent.Desc(proxycoupon.FieldID)).
 		All(ctx)
 
-	return list, int64(total), err
+	return list, int32(total), err
 }
 
 // FindCouponByCode 根据代码查找优惠券

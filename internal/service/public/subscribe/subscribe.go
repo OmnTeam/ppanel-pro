@@ -2,90 +2,90 @@ package subscribe
 
 import (
 	"context"
-	"strconv"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/public/subscribe/v1"
 	subscribeBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscribe"
 	appmiddleware "github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
 
-// SubscribeService Public Subscribe服务实现
 type SubscribeService struct {
-	v1.UnimplementedSubscribeServer
+	v1.UnimplementedPublicSubscribeServer
 	uc *subscribeBiz.SubscribeUseCase
 }
 
-// NewSubscribeService 创建Public Subscribe服务
 func NewSubscribeService(uc *subscribeBiz.SubscribeUseCase) *SubscribeService {
 	return &SubscribeService{uc: uc}
 }
 
-// QuerySubscribeList 查询订阅列表
-func (s *SubscribeService) QuerySubscribeList(ctx context.Context, req *v1.QuerySubscribeListRequest) (*v1.SubscribeListReply, error) {
-
-	// 调用业务层
+func (s *SubscribeService) QuerySubscribeList(ctx context.Context, req *v1.QuerySubscribeListRequest) (*v1.QuerySubscribeListReply, error) {
 	subscribes, total, err := s.uc.QuerySubscribeList(ctx, req.Language)
 	if err != nil {
 		return nil, err
 	}
 
-	// 转换结果
-	list := make([]*v1.SubscribeItem, 0, len(subscribes))
+	list := make([]*v1.Subscribe, 0, len(subscribes))
 	for _, sub := range subscribes {
-		item := &v1.SubscribeItem{
-			Id:             strconv.FormatInt(sub.ID, 10),
-			Name:           sub.Name,
-			Language:       sub.Language,
-			Description:    sub.Description,
-			UnitPrice:      strconv.FormatInt(sub.UnitPrice, 10),
-			UnitTime:       sub.UnitTime,
-			Replacement:    strconv.FormatInt(sub.Replacement, 10),
-			Inventory:      strconv.FormatInt(sub.Inventory, 10),
-			Traffic:        strconv.FormatInt(sub.Traffic, 10),
-			SpeedLimit:     strconv.FormatInt(sub.SpeedLimit, 10),
-			DeviceLimit:    strconv.FormatInt(sub.DeviceLimit, 10),
-			Quota:          strconv.FormatInt(sub.Quota, 10),
-			Nodes:          convertIntSliceToInt32Slice(sub.Nodes),
-			NodeTags:       sub.NodeTags,
-			Show:           sub.Show,
-			Sell:           sub.Sell,
-			Sort:           strconv.FormatInt(sub.Sort, 10),
-			DeductionRatio: strconv.FormatInt(sub.DeductionRatio, 10),
-			AllowDeduction: sub.AllowDeduction,
-			ResetCycle:     sub.ResetCycle,
-			CreatedAt:      strconv.FormatInt(sub.CreatedAt, 10),
-			UpdatedAt:      strconv.FormatInt(sub.UpdatedAt, 10),
-		}
-
-		// 转换折扣信息
-		if len(sub.Discount) > 0 {
-			discounts := make([]*v1.SubscribeDiscount, 0, len(sub.Discount))
-			for _, d := range sub.Discount {
-				discounts = append(discounts, &v1.SubscribeDiscount{
-					Quantity:   d.Quantity,
-					Percentage: d.Percentage,
-				})
+		discounts := make([]*v1.SubscribeDiscount, 0, len(sub.Discount))
+		for _, discount := range sub.Discount {
+			if discount == nil {
+				continue
 			}
-			item.Discount = discounts
+			discounts = append(discounts, &v1.SubscribeDiscount{
+				Quantity: discount.Quantity,
+				Discount: discount.Discount,
+			})
 		}
 
-		list = append(list, item)
+		trafficLimits := make([]*v1.TrafficLimit, 0, len(sub.TrafficLimit))
+		for _, limit := range sub.TrafficLimit {
+			if limit == nil {
+				continue
+			}
+			trafficLimits = append(trafficLimits, &v1.TrafficLimit{
+				StatType:     limit.StatType,
+				StatValue:    limit.StatValue,
+				TrafficUsage: limit.TrafficUsage,
+				SpeedLimit:   int32(limit.SpeedLimit),
+			})
+		}
+
+		list = append(list, &v1.Subscribe{
+			Id:                sub.ID,
+			Name:              sub.Name,
+			Language:          sub.Language,
+			Description:       sub.Description,
+			UnitPrice:         sub.UnitPrice,
+			UnitTime:          sub.UnitTime,
+			Discount:          discounts,
+			Replacement:       sub.Replacement,
+			Inventory:         int32(sub.Inventory),
+			Traffic:           sub.Traffic,
+			SpeedLimit:        int32(sub.SpeedLimit),
+			DeviceLimit:       int32(sub.DeviceLimit),
+			Quota:             int32(sub.Quota),
+			Nodes:             convertIntSliceToInt64Slice(sub.Nodes),
+			NodeTags:          sub.NodeTags,
+			NodeGroupIds:      sub.NodeGroupIds,
+			NodeGroupId:       sub.NodeGroupId,
+			TrafficLimit:      trafficLimits,
+			Show:              sub.Show,
+			Sell:              sub.Sell,
+			Sort:              int32(sub.Sort),
+			DeductionRatio:    int32(sub.DeductionRatio),
+			AllowDeduction:    sub.AllowDeduction,
+			ResetCycle:        int32(sub.ResetCycle),
+			RenewalReset:      sub.RenewalReset,
+			ShowOriginalPrice: sub.ShowOriginalPrice,
+			CreatedAt:         sub.CreatedAt,
+			UpdatedAt:         sub.UpdatedAt,
+		})
 	}
 
-	return &v1.SubscribeListReply{
-		Code:    int32(responsecode.SubscribeQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.SubscribeQuerySuccess],
-		Data: &v1.SubscribeListData{
-			List:  list,
-			Total: int32(total),
-		},
-	}, nil
+	return &v1.QuerySubscribeListReply{List: list, Total: total}, nil
 }
 
 func (s *SubscribeService) QueryUserSubscribeNodeList(ctx context.Context, req *v1.QueryUserSubscribeNodeListRequest) (*v1.QueryUserSubscribeNodeListReply, error) {
 	userID := appmiddleware.GetUserID(ctx)
-
 	list, err := s.uc.QueryUserSubscribeNodeList(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -95,8 +95,11 @@ func (s *SubscribeService) QueryUserSubscribeNodeList(ctx context.Context, req *
 	for _, item := range list {
 		nodes := make([]*v1.UserSubscribeNodeInfo, 0, len(item.Nodes))
 		for _, node := range item.Nodes {
+			if node == nil {
+				continue
+			}
 			nodes = append(nodes, &v1.UserSubscribeNodeInfo{
-				Id:              strconv.FormatInt(node.ID, 10),
+				Id:              node.ID,
 				Name:            node.Name,
 				Uuid:            node.Uuid,
 				Protocol:        node.Protocol,
@@ -115,10 +118,10 @@ func (s *SubscribeService) QueryUserSubscribeNodeList(ctx context.Context, req *
 		}
 
 		items = append(items, &v1.UserSubscribeInfo{
-			Id:          strconv.FormatInt(item.ID, 10),
-			UserId:      strconv.FormatInt(item.UserID, 10),
-			OrderId:     strconv.FormatInt(item.OrderID, 10),
-			SubscribeId: strconv.FormatInt(item.SubscribeID, 10),
+			Id:          item.ID,
+			UserId:      item.UserID,
+			OrderId:     item.OrderID,
+			SubscribeId: item.SubscribeID,
 			StartTime:   item.StartTime,
 			ExpireTime:  item.ExpireTime,
 			FinishedAt:  item.FinishedAt,
@@ -127,7 +130,7 @@ func (s *SubscribeService) QueryUserSubscribeNodeList(ctx context.Context, req *
 			Download:    item.Download,
 			Upload:      item.Upload,
 			Token:       item.Token,
-			Status:      item.Status,
+			Status:      uint32(item.Status),
 			CreatedAt:   item.CreatedAt,
 			UpdatedAt:   item.UpdatedAt,
 			IsTryOut:    item.IsTryOut,
@@ -135,23 +138,16 @@ func (s *SubscribeService) QueryUserSubscribeNodeList(ctx context.Context, req *
 		})
 	}
 
-	return &v1.QueryUserSubscribeNodeListReply{
-		Code:    200,
-		Message: "success",
-		Data: &v1.QueryUserSubscribeNodeListData{
-			List: items,
-		},
-	}, nil
+	return &v1.QueryUserSubscribeNodeListReply{List: items}, nil
 }
 
-// convertIntSliceToInt32Slice converts []int to []int32
-func convertIntSliceToInt32Slice(input []int) []int32 {
-	if input == nil {
-		return nil
+func convertIntSliceToInt64Slice(input []int) []int64 {
+	if len(input) == 0 {
+		return []int64{}
 	}
-	result := make([]int32, len(input))
-	for i, v := range input {
-		result[i] = int32(v)
+	result := make([]int64, 0, len(input))
+	for _, item := range input {
+		result = append(result, int64(item))
 	}
 	return result
 }

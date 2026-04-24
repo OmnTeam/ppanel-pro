@@ -2,9 +2,11 @@ package user
 
 import (
 	"context"
+	"encoding/json"
 	"strconv"
 
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/public/user/v1"
 	userBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/user"
@@ -15,7 +17,7 @@ import (
 
 // UserService Public User服务实现
 type UserService struct {
-	v1.UnimplementedUserServer
+	v1.UnimplementedPublicUserServer
 	uc           *userBiz.UserUseCase
 	withdrawalUc *withdrawalBiz.WithdrawalUsecase
 }
@@ -28,20 +30,27 @@ func NewUserService(uc *userBiz.UserUseCase, withdrawalUc *withdrawalBiz.Withdra
 	}
 }
 
-func formatInt64(i int64) string {
-	return strconv.FormatInt(i, 10)
-}
-
 func parseStringID(id string) (int64, error) {
 	v, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
-		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		return 0, err
 	}
 	return v, nil
 }
 
+func encodeProtoValue(value *structpb.Value) (string, error) {
+	if value == nil {
+		return "null", nil
+	}
+	payload, err := json.Marshal(value.AsInterface())
+	if err != nil {
+		return "", err
+	}
+	return string(payload), nil
+}
+
 // QueryUserInfo 查询用户信息
-func (s *UserService) QueryUserInfo(ctx context.Context, req *emptypb.Empty) (*v1.UserInfoReply, error) {
+func (s *UserService) QueryUserInfo(ctx context.Context, req *emptypb.Empty) (*v1.User, error) {
 	userID := middleware.GetUserID(ctx)
 
 	userInfo, err := s.uc.QueryUserInfo(ctx, int(userID))
@@ -58,35 +67,49 @@ func (s *UserService) QueryUserInfo(ctx context.Context, req *emptypb.Empty) (*v
 		})
 	}
 
-	return &v1.UserInfoReply{
-		Code:    int32(responsecode.UserInfoQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.UserInfoQuerySuccess],
-		Data: &v1.UserInfoData{
-			Id:                    formatInt64(userInfo.ID),
-			Avatar:                userInfo.Avatar,
-			Balance:               userInfo.Balance,
-			Commission:            userInfo.Commission,
-			ReferralPercentage:    userInfo.ReferralPercentage,
-			OnlyFirstPurchase:     userInfo.OnlyFirstPurchase,
-			GiftAmount:            userInfo.GiftAmount,
-			Telegram:              userInfo.Telegram,
-			ReferCode:             userInfo.ReferCode,
-			RefererId:             formatInt64(userInfo.RefererID),
-			Enable:                userInfo.Enable,
-			IsAdmin:               userInfo.IsAdmin,
-			EnableBalanceNotify:   userInfo.EnableBalanceNotify,
-			EnableLoginNotify:     userInfo.EnableLoginNotify,
-			EnableSubscribeNotify: userInfo.EnableSubscribeNotify,
-			EnableTradeNotify:     userInfo.EnableTradeNotify,
-			AuthMethods:           authMethods,
-			CreatedAt:             userInfo.CreatedAt,
-			UpdatedAt:             userInfo.UpdatedAt,
-		},
+	userDevices := make([]*v1.UserDevice, 0, len(userInfo.UserDevices))
+	for _, item := range userInfo.UserDevices {
+		userDevices = append(userDevices, &v1.UserDevice{
+			Id:         item.ID,
+			Ip:         item.IP,
+			Identifier: item.Identifier,
+			UserAgent:  item.UserAgent,
+			Online:     item.Online,
+			Enabled:    item.Enabled,
+			CreatedAt:  item.CreatedAt,
+			UpdatedAt:  item.UpdatedAt,
+		})
+	}
+
+	return &v1.User{
+		Id:                    userInfo.ID,
+		Avatar:                userInfo.Avatar,
+		Balance:               userInfo.Balance,
+		Commission:            userInfo.Commission,
+		ReferralPercentage:    userInfo.ReferralPercentage,
+		OnlyFirstPurchase:     userInfo.OnlyFirstPurchase,
+		GiftAmount:            userInfo.GiftAmount,
+		Telegram:              userInfo.Telegram,
+		ReferCode:             userInfo.ReferCode,
+		RefererId:             userInfo.RefererID,
+		Enable:                userInfo.Enable,
+		IsAdmin:               userInfo.IsAdmin,
+		EnableBalanceNotify:   userInfo.EnableBalanceNotify,
+		EnableLoginNotify:     userInfo.EnableLoginNotify,
+		EnableSubscribeNotify: userInfo.EnableSubscribeNotify,
+		EnableTradeNotify:     userInfo.EnableTradeNotify,
+		AuthMethods:           authMethods,
+		UserDevices:           userDevices,
+		Rules:                 userInfo.Rules,
+		CreatedAt:             userInfo.CreatedAt,
+		UpdatedAt:             userInfo.UpdatedAt,
+		DeletedAt:             userInfo.DeletedAt,
+		IsDel:                 userInfo.IsDel,
 	}, nil
 }
 
 // GetLoginLog 获取登录日志
-func (s *UserService) GetLoginLog(ctx context.Context, req *v1.GetLoginLogRequest) (*v1.LoginLogReply, error) {
+func (s *UserService) GetLoginLog(ctx context.Context, req *v1.GetLoginLogRequest) (*v1.GetLoginLogReply, error) {
 	userID := middleware.GetUserID(ctx)
 
 	logs, total, err := s.uc.GetLoginLog(ctx, int(userID), int(req.Page), int(req.Size))
@@ -97,8 +120,8 @@ func (s *UserService) GetLoginLog(ctx context.Context, req *v1.GetLoginLogReques
 	list := make([]*v1.UserLoginLog, 0, len(logs))
 	for _, log := range logs {
 		list = append(list, &v1.UserLoginLog{
-			Id:        formatInt64(log.ID),
-			UserId:    formatInt64(log.UserID),
+			Id:        log.ID,
+			UserId:    log.UserID,
 			LoginIp:   log.LoginIP,
 			UserAgent: log.UserAgent,
 			Success:   log.Success,
@@ -106,18 +129,11 @@ func (s *UserService) GetLoginLog(ctx context.Context, req *v1.GetLoginLogReques
 		})
 	}
 
-	return &v1.LoginLogReply{
-		Code:    int32(responsecode.LoginLogQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.LoginLogQuerySuccess],
-		Data: &v1.LoginLogData{
-			List:  list,
-			Total: total,
-		},
-	}, nil
+	return &v1.GetLoginLogReply{List: list, Total: total}, nil
 }
 
 // QueryUserBalanceLog 查询用户余额日志
-func (s *UserService) QueryUserBalanceLog(ctx context.Context, req *emptypb.Empty) (*v1.BalanceLogReply, error) {
+func (s *UserService) QueryUserBalanceLog(ctx context.Context, req *emptypb.Empty) (*v1.QueryUserBalanceLogReply, error) {
 	userID := middleware.GetUserID(ctx)
 
 	logs, total, err := s.uc.QueryUserBalanceLog(ctx, int(userID))
@@ -129,7 +145,7 @@ func (s *UserService) QueryUserBalanceLog(ctx context.Context, req *emptypb.Empt
 	for _, log := range logs {
 		list = append(list, &v1.BalanceLog{
 			Type:      log.Type,
-			UserId:    formatInt64(log.UserID),
+			UserId:    log.UserID,
 			Amount:    log.Amount,
 			OrderNo:   log.OrderNo,
 			Balance:   log.Balance,
@@ -137,18 +153,11 @@ func (s *UserService) QueryUserBalanceLog(ctx context.Context, req *emptypb.Empt
 		})
 	}
 
-	return &v1.BalanceLogReply{
-		Code:    int32(responsecode.BalanceLogQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.BalanceLogQuerySuccess],
-		Data: &v1.BalanceLogData{
-			List:  list,
-			Total: total,
-		},
-	}, nil
+	return &v1.QueryUserBalanceLogReply{List: list, Total: total}, nil
 }
 
 // QueryUserCommissionLog 查询用户佣金日志
-func (s *UserService) QueryUserCommissionLog(ctx context.Context, req *v1.QueryUserCommissionLogRequest) (*v1.CommissionLogReply, error) {
+func (s *UserService) QueryUserCommissionLog(ctx context.Context, req *v1.QueryUserCommissionLogRequest) (*v1.QueryUserCommissionLogReply, error) {
 	userID := middleware.GetUserID(ctx)
 
 	logs, total, err := s.uc.QueryUserCommissionLog(ctx, int(userID), int(req.Page), int(req.Size))
@@ -160,25 +169,18 @@ func (s *UserService) QueryUserCommissionLog(ctx context.Context, req *v1.QueryU
 	for _, log := range logs {
 		list = append(list, &v1.CommissionLog{
 			Type:      log.Type,
-			UserId:    formatInt64(log.UserID),
+			UserId:    log.UserID,
 			Amount:    log.Amount,
 			OrderNo:   log.OrderNo,
 			Timestamp: log.Timestamp,
 		})
 	}
 
-	return &v1.CommissionLogReply{
-		Code:    int32(responsecode.CommissionLogQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.CommissionLogQuerySuccess],
-		Data: &v1.CommissionLogData{
-			List:  list,
-			Total: total,
-		},
-	}, nil
+	return &v1.QueryUserCommissionLogReply{List: list, Total: total}, nil
 }
 
 // QueryUserAffiliate 查询用户推荐数量
-func (s *UserService) QueryUserAffiliate(ctx context.Context, req *emptypb.Empty) (*v1.UserAffiliateReply, error) {
+func (s *UserService) QueryUserAffiliate(ctx context.Context, req *emptypb.Empty) (*v1.QueryUserAffiliateCountReply, error) {
 	userID := middleware.GetUserID(ctx)
 
 	registers, totalCommission, err := s.uc.QueryUserAffiliate(ctx, int(userID))
@@ -186,18 +188,11 @@ func (s *UserService) QueryUserAffiliate(ctx context.Context, req *emptypb.Empty
 		return nil, err
 	}
 
-	return &v1.UserAffiliateReply{
-		Code:    int32(responsecode.AffiliateQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.AffiliateQuerySuccess],
-		Data: &v1.UserAffiliateData{
-			Registers:       registers,
-			TotalCommission: totalCommission,
-		},
-	}, nil
+	return &v1.QueryUserAffiliateCountReply{Registers: registers, TotalCommission: totalCommission}, nil
 }
 
 // QueryUserAffiliateList 查询用户推荐列表
-func (s *UserService) QueryUserAffiliateList(ctx context.Context, req *v1.QueryUserAffiliateListRequest) (*v1.UserAffiliateListReply, error) {
+func (s *UserService) QueryUserAffiliateList(ctx context.Context, req *v1.QueryUserAffiliateListRequest) (*v1.QueryUserAffiliateListReply, error) {
 	userID := middleware.GetUserID(ctx)
 
 	affiliates, total, err := s.uc.QueryUserAffiliateList(ctx, int(userID), int(req.Page), int(req.Size))
@@ -215,18 +210,11 @@ func (s *UserService) QueryUserAffiliateList(ctx context.Context, req *v1.QueryU
 		})
 	}
 
-	return &v1.UserAffiliateListReply{
-		Code:    int32(responsecode.AffiliateListQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.AffiliateListQuerySuccess],
-		Data: &v1.UserAffiliateListData{
-			List:  list,
-			Total: total,
-		},
-	}, nil
+	return &v1.QueryUserAffiliateListReply{List: list, Total: total}, nil
 }
 
 // GetOAuthMethods 获取OAuth方法
-func (s *UserService) GetOAuthMethods(ctx context.Context, req *emptypb.Empty) (*v1.OAuthMethodsReply, error) {
+func (s *UserService) GetOAuthMethods(ctx context.Context, req *emptypb.Empty) (*v1.GetOAuthMethodsReply, error) {
 	userID := middleware.GetUserID(ctx)
 
 	methods, err := s.uc.GetOAuthMethods(ctx, int(userID))
@@ -243,17 +231,11 @@ func (s *UserService) GetOAuthMethods(ctx context.Context, req *emptypb.Empty) (
 		})
 	}
 
-	return &v1.OAuthMethodsReply{
-		Code:    int32(responsecode.OAuthMethodsQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.OAuthMethodsQuerySuccess],
-		Data: &v1.OAuthMethodsData{
-			Methods: list,
-		},
-	}, nil
+	return &v1.GetOAuthMethodsReply{Methods: list}, nil
 }
 
 // QueryUserSubscribe 查询用户订阅
-func (s *UserService) QueryUserSubscribe(ctx context.Context, req *emptypb.Empty) (*v1.UserSubscribeReply, error) {
+func (s *UserService) QueryUserSubscribe(ctx context.Context, req *emptypb.Empty) (*v1.QueryUserSubscribeReply, error) {
 	userID := middleware.GetUserID(ctx)
 
 	list, total, err := s.uc.QueryUserSubscribe(ctx, int(userID))
@@ -264,10 +246,10 @@ func (s *UserService) QueryUserSubscribe(ctx context.Context, req *emptypb.Empty
 	subscribeList := make([]*v1.UserSubscribe, 0, len(list))
 	for _, item := range list {
 		sub := &v1.UserSubscribe{
-			Id:          formatInt64(item.ID),
-			UserId:      formatInt64(item.UserID),
-			OrderId:     formatInt64(item.OrderID),
-			SubscribeId: formatInt64(item.SubscribeID),
+			Id:          item.ID,
+			UserId:      item.UserID,
+			OrderId:     item.OrderID,
+			SubscribeId: item.SubscribeID,
 			StartTime:   item.StartTime,
 			ExpireTime:  item.ExpireTime,
 			FinishedAt:  item.FinishedAt,
@@ -277,33 +259,55 @@ func (s *UserService) QueryUserSubscribe(ctx context.Context, req *emptypb.Empty
 			Upload:      item.Upload,
 			Token:       item.Token,
 			Status:      item.Status,
+			Short:       item.Short,
+			NodeGroupId: item.NodeGroupID,
+			GroupLocked: item.GroupLocked,
 			CreatedAt:   item.CreatedAt,
 			UpdatedAt:   item.UpdatedAt,
 		}
 
 		if item.Subscribe != nil {
 			sub.Subscribe = &v1.Subscribe{
-				Id:             formatInt64(item.Subscribe.ID),
-				Name:           item.Subscribe.Name,
-				Description:    item.Subscribe.Description,
-				Price:          item.Subscribe.Price,
-				Traffic:        item.Subscribe.Traffic,
-				DeviceLimit:    item.Subscribe.DeviceLimit,
-				SpeedLimit:     item.Subscribe.SpeedLimit,
-				UnitTime:       item.Subscribe.UnitTime,
-				UnitPrice:      item.Subscribe.UnitPrice,
-				ResetCycle:     item.Subscribe.ResetCycle,
-				DeductionRatio: item.Subscribe.DeductionRatio,
-				AllowDeduction: item.Subscribe.AllowDeduction,
-				Enable:         item.Subscribe.Enable,
-				CreatedAt:      item.Subscribe.CreatedAt,
-				UpdatedAt:      item.Subscribe.UpdatedAt,
+				Id:                item.Subscribe.ID,
+				Name:              item.Subscribe.Name,
+				Language:          item.Subscribe.Language,
+				Description:       item.Subscribe.Description,
+				UnitPrice:         item.Subscribe.UnitPrice,
+				UnitTime:          item.Subscribe.UnitTime,
+				Replacement:       item.Subscribe.Replacement,
+				Inventory:         int32(item.Subscribe.Inventory),
+				Traffic:           item.Subscribe.Traffic,
+				SpeedLimit:        int32(item.Subscribe.SpeedLimit),
+				DeviceLimit:       int32(item.Subscribe.DeviceLimit),
+				Quota:             int32(item.Subscribe.Quota),
+				Nodes:             item.Subscribe.Nodes,
+				NodeTags:          item.Subscribe.NodeTags,
+				NodeGroupIds:      item.Subscribe.NodeGroupIDs,
+				NodeGroupId:       item.Subscribe.NodeGroupID,
+				Show:              item.Subscribe.Show,
+				Sell:              item.Subscribe.Sell,
+				Sort:              int32(item.Subscribe.Sort),
+				DeductionRatio:    int32(item.Subscribe.DeductionRatio),
+				AllowDeduction:    item.Subscribe.AllowDeduction,
+				ResetCycle:        int32(item.Subscribe.ResetCycle),
+				RenewalReset:      item.Subscribe.RenewalReset,
+				ShowOriginalPrice: item.Subscribe.ShowOriginalPrice,
+				CreatedAt:         item.Subscribe.CreatedAt,
+				UpdatedAt:         item.Subscribe.UpdatedAt,
 			}
 
+			for _, limit := range item.Subscribe.TrafficLimit {
+				sub.Subscribe.TrafficLimit = append(sub.Subscribe.TrafficLimit, &v1.TrafficLimit{
+					StatType:     limit.StatType,
+					StatValue:    limit.StatValue,
+					TrafficUsage: limit.TrafficUsage,
+					SpeedLimit:   int32(limit.SpeedLimit),
+				})
+			}
 			for _, discount := range item.Subscribe.Discount {
 				sub.Subscribe.Discount = append(sub.Subscribe.Discount, &v1.SubscribeDiscount{
-					Quantity:   discount.Quantity,
-					Percentage: discount.Percentage,
+					Quantity: discount.Quantity,
+					Discount: discount.Discount,
 				})
 			}
 		}
@@ -311,18 +315,11 @@ func (s *UserService) QueryUserSubscribe(ctx context.Context, req *emptypb.Empty
 		subscribeList = append(subscribeList, sub)
 	}
 
-	return &v1.UserSubscribeReply{
-		Code:    int32(responsecode.UserSubscribeQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.UserSubscribeQuerySuccess],
-		Data: &v1.UserSubscribeData{
-			List:  subscribeList,
-			Total: total,
-		},
-	}, nil
+	return &v1.QueryUserSubscribeReply{List: subscribeList, Total: total}, nil
 }
 
 // GetSubscribeLog 获取订阅日志
-func (s *UserService) GetSubscribeLog(ctx context.Context, req *v1.GetSubscribeLogRequest) (*v1.SubscribeLogReply, error) {
+func (s *UserService) GetSubscribeLog(ctx context.Context, req *v1.GetSubscribeLogRequest) (*v1.GetSubscribeLogReply, error) {
 	userID := middleware.GetUserID(ctx)
 
 	logs, total, err := s.uc.GetSubscribeLog(ctx, int(userID), int(req.Page), int(req.Size))
@@ -333,9 +330,9 @@ func (s *UserService) GetSubscribeLog(ctx context.Context, req *v1.GetSubscribeL
 	list := make([]*v1.UserSubscribeLog, 0, len(logs))
 	for _, log := range logs {
 		list = append(list, &v1.UserSubscribeLog{
-			Id:              formatInt64(log.ID),
-			UserId:          formatInt64(log.UserID),
-			UserSubscribeId: formatInt64(log.UserSubscribeID),
+			Id:              log.ID,
+			UserId:          log.UserID,
+			UserSubscribeId: log.UserSubscribeID,
 			Token:           log.Token,
 			Ip:              log.IP,
 			UserAgent:       log.UserAgent,
@@ -343,96 +340,54 @@ func (s *UserService) GetSubscribeLog(ctx context.Context, req *v1.GetSubscribeL
 		})
 	}
 
-	return &v1.SubscribeLogReply{
-		Code:    int32(responsecode.SubscribeLogQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.SubscribeLogQuerySuccess],
-		Data: &v1.SubscribeLogData{
-			List:  list,
-			Total: total,
-		},
-	}, nil
+	return &v1.GetSubscribeLogReply{List: list, Total: total}, nil
 }
 
 // ResetUserSubscribeToken 重置订阅令牌
-func (s *UserService) ResetUserSubscribeToken(ctx context.Context, req *v1.ResetUserSubscribeTokenRequest) (*v1.CommonReply, error) {
+func (s *UserService) ResetUserSubscribeToken(ctx context.Context, req *v1.ResetUserSubscribeTokenRequest) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
 
-	userSubscribeID, err := parseStringID(req.UserSubscribeId)
+	err := s.uc.ResetUserSubscribeToken(ctx, int(userID), int(req.UserSubscribeId))
 	if err != nil {
 		return nil, err
 	}
-
-	err = s.uc.ResetUserSubscribeToken(ctx, int(userID), int(userSubscribeID))
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.CommonReply{
-		Code:    int32(responsecode.SubscribeTokenResetSuccess),
-		Message: responsecode.CodeMessages[responsecode.SubscribeTokenResetSuccess],
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // PreUnsubscribe 预退订
-func (s *UserService) PreUnsubscribe(ctx context.Context, req *v1.PreUnsubscribeRequest) (*v1.UnsubscribeInfoReply, error) {
+func (s *UserService) PreUnsubscribe(ctx context.Context, req *v1.PreUnsubscribeRequest) (*v1.PreUnsubscribeReply, error) {
 	userID := middleware.GetUserID(ctx)
 
-	id, err := parseStringID(req.Id)
+	deductionAmount, err := s.uc.PreUnsubscribe(ctx, int(userID), int(req.Id))
 	if err != nil {
 		return nil, err
 	}
-
-	deductionAmount, err := s.uc.PreUnsubscribe(ctx, int(userID), int(id))
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.UnsubscribeInfoReply{
-		Code:    int32(responsecode.PreUnsubscribeSuccess),
-		Message: responsecode.CodeMessages[responsecode.PreUnsubscribeSuccess],
-		Data: &v1.UnsubscribeInfoData{
-			DeductionAmount: deductionAmount,
-		},
-	}, nil
+	return &v1.PreUnsubscribeReply{DeductionAmount: deductionAmount}, nil
 }
 
 // Unsubscribe 退订
-func (s *UserService) Unsubscribe(ctx context.Context, req *v1.UnsubscribeRequest) (*v1.CommonReply, error) {
+func (s *UserService) Unsubscribe(ctx context.Context, req *v1.UnsubscribeRequest) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
-
-	id, err := parseStringID(req.Id)
+	err := s.uc.Unsubscribe(ctx, int(userID), int(req.Id))
 	if err != nil {
 		return nil, err
 	}
-
-	err = s.uc.Unsubscribe(ctx, int(userID), int(id))
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.CommonReply{
-		Code:    int32(responsecode.UnsubscribeSuccess),
-		Message: responsecode.CodeMessages[responsecode.UnsubscribeSuccess],
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // UpdateUserNotify 更新通知设置
-func (s *UserService) UpdateUserNotify(ctx context.Context, req *v1.UpdateUserNotifyRequest) (*v1.CommonReply, error) {
+func (s *UserService) UpdateUserNotify(ctx context.Context, req *v1.UpdateUserNotifyRequest) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
 
 	err := s.uc.UpdateUserNotify(ctx, int(userID), req.EnableLoginNotify, req.EnableBalanceNotify, req.EnableSubscribeNotify, req.EnableTradeNotify)
 	if err != nil {
 		return nil, err
 	}
-
-	return &v1.CommonReply{
-		Code:    int32(responsecode.NotifyUpdateSuccess),
-		Message: responsecode.CodeMessages[responsecode.NotifyUpdateSuccess],
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // UpdateUserPassword 更新密码
-func (s *UserService) UpdateUserPassword(ctx context.Context, req *v1.UpdateUserPasswordRequest) (*v1.CommonReply, error) {
+func (s *UserService) UpdateUserPassword(ctx context.Context, req *v1.UpdateUserPasswordRequest) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
 
 	err := s.uc.UpdateUserPassword(ctx, int(userID), req.Password)
@@ -440,14 +395,11 @@ func (s *UserService) UpdateUserPassword(ctx context.Context, req *v1.UpdateUser
 		return nil, err
 	}
 
-	return &v1.CommonReply{
-		Code:    int32(responsecode.PasswordUpdateSuccess),
-		Message: responsecode.CodeMessages[responsecode.PasswordUpdateSuccess],
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // BindTelegram 绑定Telegram
-func (s *UserService) BindTelegram(ctx context.Context, req *emptypb.Empty) (*v1.TelegramBindReply, error) {
+func (s *UserService) BindTelegram(ctx context.Context, req *emptypb.Empty) (*v1.BindTelegramReply, error) {
 	session := middleware.GetSessionID(ctx)
 	botName := ""
 
@@ -456,18 +408,11 @@ func (s *UserService) BindTelegram(ctx context.Context, req *emptypb.Empty) (*v1
 		return nil, err
 	}
 
-	return &v1.TelegramBindReply{
-		Code:    int32(responsecode.TelegramBindSuccess),
-		Message: responsecode.CodeMessages[responsecode.TelegramBindSuccess],
-		Data: &v1.TelegramBindData{
-			Url:       url,
-			ExpiredAt: expiredAt,
-		},
-	}, nil
+	return &v1.BindTelegramReply{Url: url, ExpiredAt: expiredAt}, nil
 }
 
 // UnbindTelegram 解绑Telegram
-func (s *UserService) UnbindTelegram(ctx context.Context, req *emptypb.Empty) (*v1.CommonReply, error) {
+func (s *UserService) UnbindTelegram(ctx context.Context, req *emptypb.Empty) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
 
 	err := s.uc.UnbindTelegram(ctx, int(userID))
@@ -475,45 +420,35 @@ func (s *UserService) UnbindTelegram(ctx context.Context, req *emptypb.Empty) (*
 		return nil, err
 	}
 
-	return &v1.CommonReply{
-		Code:    int32(responsecode.TelegramUnbindSuccess),
-		Message: responsecode.CodeMessages[responsecode.TelegramUnbindSuccess],
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // BindOAuth 绑定OAuth
-func (s *UserService) BindOAuth(ctx context.Context, req *v1.BindOAuthRequest) (*v1.OAuthBindReply, error) {
+func (s *UserService) BindOAuth(ctx context.Context, req *v1.BindOAuthRequest) (*v1.BindOAuthReply, error) {
 	redirect, err := s.uc.BindOAuth(ctx, req.Method, req.Redirect)
 	if err != nil {
 		return nil, err
 	}
 
-	return &v1.OAuthBindReply{
-		Code:    int32(responsecode.OAuthBindSuccess),
-		Message: responsecode.CodeMessages[responsecode.OAuthBindSuccess],
-		Data: &v1.OAuthBindData{
-			Redirect: redirect,
-		},
-	}, nil
+	return &v1.BindOAuthReply{Redirect: redirect}, nil
 }
 
 // BindOAuthCallback OAuth回调
-func (s *UserService) BindOAuthCallback(ctx context.Context, req *v1.BindOAuthCallbackRequest) (*v1.CommonReply, error) {
+func (s *UserService) BindOAuthCallback(ctx context.Context, req *v1.BindOAuthCallbackRequest) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
-
-	err := s.uc.BindOAuthCallback(ctx, int(userID), req.Method, req.Callback)
+	callback, err := encodeProtoValue(req.Callback)
 	if err != nil {
 		return nil, err
 	}
-
-	return &v1.CommonReply{
-		Code:    int32(responsecode.OAuthCallbackSuccess),
-		Message: responsecode.CodeMessages[responsecode.OAuthCallbackSuccess],
-	}, nil
+	err = s.uc.BindOAuthCallback(ctx, int(userID), req.Method, callback)
+	if err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
 }
 
 // UnbindOAuth 解绑OAuth
-func (s *UserService) UnbindOAuth(ctx context.Context, req *v1.UnbindOAuthRequest) (*v1.CommonReply, error) {
+func (s *UserService) UnbindOAuth(ctx context.Context, req *v1.UnbindOAuthRequest) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
 
 	err := s.uc.UnbindOAuth(ctx, int(userID), req.Method)
@@ -521,14 +456,11 @@ func (s *UserService) UnbindOAuth(ctx context.Context, req *v1.UnbindOAuthReques
 		return nil, err
 	}
 
-	return &v1.CommonReply{
-		Code:    int32(responsecode.OAuthUnbindSuccess),
-		Message: responsecode.CodeMessages[responsecode.OAuthUnbindSuccess],
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // VerifyEmail 验证邮箱
-func (s *UserService) VerifyEmail(ctx context.Context, req *v1.VerifyEmailRequest) (*v1.CommonReply, error) {
+func (s *UserService) VerifyEmail(ctx context.Context, req *v1.VerifyEmailRequest) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
 
 	err := s.uc.VerifyEmail(ctx, int(userID), req.Email, req.Code)
@@ -536,14 +468,11 @@ func (s *UserService) VerifyEmail(ctx context.Context, req *v1.VerifyEmailReques
 		return nil, err
 	}
 
-	return &v1.CommonReply{
-		Code:    int32(responsecode.EmailVerifySuccess),
-		Message: responsecode.CodeMessages[responsecode.EmailVerifySuccess],
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // UpdateBindMobile 更新绑定手机
-func (s *UserService) UpdateBindMobile(ctx context.Context, req *v1.UpdateBindMobileRequest) (*v1.CommonReply, error) {
+func (s *UserService) UpdateBindMobile(ctx context.Context, req *v1.UpdateBindMobileRequest) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
 
 	err := s.uc.UpdateBindMobile(ctx, int(userID), req.AreaCode, req.Mobile, req.Code)
@@ -551,14 +480,11 @@ func (s *UserService) UpdateBindMobile(ctx context.Context, req *v1.UpdateBindMo
 		return nil, err
 	}
 
-	return &v1.CommonReply{
-		Code:    int32(responsecode.MobileBindSuccess),
-		Message: responsecode.CodeMessages[responsecode.MobileBindSuccess],
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // UpdateBindEmail 更新绑定邮箱
-func (s *UserService) UpdateBindEmail(ctx context.Context, req *v1.UpdateBindEmailRequest) (*v1.CommonReply, error) {
+func (s *UserService) UpdateBindEmail(ctx context.Context, req *v1.UpdateBindEmailRequest) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
 
 	err := s.uc.UpdateBindEmail(ctx, int(userID), req.Email)
@@ -566,23 +492,17 @@ func (s *UserService) UpdateBindEmail(ctx context.Context, req *v1.UpdateBindEma
 		return nil, err
 	}
 
-	return &v1.CommonReply{
-		Code:    int32(responsecode.EmailBindSuccess),
-		Message: responsecode.CodeMessages[responsecode.EmailBindSuccess],
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // DeviceWSConnect 设备WebSocket连接
-func (s *UserService) DeviceWSConnect(ctx context.Context, req *emptypb.Empty) (*v1.CommonReply, error) {
+func (s *UserService) DeviceWSConnect(ctx context.Context, req *emptypb.Empty) (*emptypb.Empty, error) {
 	err := s.uc.DeviceWSConnect(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &v1.CommonReply{
-		Code:    int32(responsecode.UserCreated),
-		Message: "设备连接成功",
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // GetDeviceList 获取设备列表
@@ -597,7 +517,7 @@ func (s *UserService) GetDeviceList(ctx context.Context, req *emptypb.Empty) (*v
 	deviceList := make([]*v1.UserDevice, 0, len(list))
 	for _, device := range list {
 		deviceList = append(deviceList, &v1.UserDevice{
-			Id:         formatInt64(device.ID),
+			Id:         device.ID,
 			Ip:         device.IP,
 			Identifier: device.Identifier,
 			UserAgent:  device.UserAgent,
@@ -608,34 +528,17 @@ func (s *UserService) GetDeviceList(ctx context.Context, req *emptypb.Empty) (*v
 		})
 	}
 
-	return &v1.GetDeviceListReply{
-		Code:    int32(responsecode.UserDeviceListQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.UserDeviceListQuerySuccess],
-		Data: &v1.GetDeviceListData{
-			List:  deviceList,
-			Total: total,
-		},
-	}, nil
+	return &v1.GetDeviceListReply{List: deviceList, Total: total}, nil
 }
 
 // UnbindDevice 解绑设备
-func (s *UserService) UnbindDevice(ctx context.Context, req *v1.UnbindDeviceRequest) (*v1.CommonReply, error) {
+func (s *UserService) UnbindDevice(ctx context.Context, req *v1.UnbindDeviceRequest) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
-
-	deviceID, err := parseStringID(req.Id)
+	err := s.uc.UnbindDevice(ctx, int(userID), int(req.Id))
 	if err != nil {
 		return nil, err
 	}
-
-	err = s.uc.UnbindDevice(ctx, int(userID), int(deviceID))
-	if err != nil {
-		return nil, err
-	}
-
-	return &v1.CommonReply{
-		Code:    int32(responsecode.UserDeviceUnbindSuccess),
-		Message: responsecode.CodeMessages[responsecode.UserDeviceUnbindSuccess],
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // GetDeviceOnlineStatistics 获取设备在线统计
@@ -663,50 +566,36 @@ func (s *UserService) GetDeviceOnlineStatistics(ctx context.Context, req *emptyp
 	}
 
 	return &v1.GetDeviceOnlineStatisticsReply{
-		Code:    int32(responsecode.UserDeviceStatisticsQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.UserDeviceStatisticsQuerySuccess],
-		Data: &v1.GetDeviceOnlineStatisticsData{
-			WeeklyStats:       weeklyStats,
-			ConnectionRecords: connectionRecords,
-		},
+		WeeklyStats:       weeklyStats,
+		ConnectionRecords: connectionRecords,
 	}, nil
 }
 
 // CommissionWithdraw 佣金提现
-func (s *UserService) CommissionWithdraw(ctx context.Context, req *v1.CommissionWithdrawRequest) (*v1.WithdrawalLogReply, error) {
+func (s *UserService) CommissionWithdraw(ctx context.Context, req *v1.CommissionWithdrawRequest) (*v1.WithdrawalLog, error) {
 	userID := middleware.GetUserID(ctx)
-
-	amount, err := strconv.ParseInt(req.Amount, 10, 64)
-	if err != nil {
-		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-
 	withdrawal, err := s.withdrawalUc.CommissionWithdraw(ctx, int64(userID), &withdrawalBiz.CommissionWithdrawRequest{
-		Amount:  amount,
+		Amount:  req.Amount,
 		Content: req.Content,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	return &v1.WithdrawalLogReply{
-		Code:    int32(responsecode.UserInfoQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.UserInfoQuerySuccess],
-		Data: &v1.WithdrawalLogData{
-			Id:        formatInt64(withdrawal.ID),
-			UserId:    formatInt64(withdrawal.UserID),
-			Amount:    formatInt64(withdrawal.Amount),
-			Content:   withdrawal.Content,
-			Status:    int32(withdrawal.Status),
-			Reason:    withdrawal.Reason,
-			CreatedAt: formatInt64(withdrawal.CreatedAt.UnixMilli()),
-			UpdatedAt: formatInt64(withdrawal.UpdatedAt.UnixMilli()),
-		},
+	return &v1.WithdrawalLog{
+		Id:        withdrawal.ID,
+		UserId:    withdrawal.UserID,
+		Amount:    withdrawal.Amount,
+		Content:   withdrawal.Content,
+		Status:    int32(withdrawal.Status),
+		Reason:    withdrawal.Reason,
+		CreatedAt: withdrawal.CreatedAt.UnixMilli(),
+		UpdatedAt: withdrawal.UpdatedAt.UnixMilli(),
 	}, nil
 }
 
 // QueryWithdrawalLog 查询提现日志
-func (s *UserService) QueryWithdrawalLog(ctx context.Context, req *v1.QueryWithdrawalLogRequest) (*v1.WithdrawalLogListReply, error) {
+func (s *UserService) QueryWithdrawalLog(ctx context.Context, req *v1.QueryWithdrawalLogRequest) (*v1.QueryWithdrawalLogReply, error) {
 	userID := middleware.GetUserID(ctx)
 
 	withdrawals, total, err := s.withdrawalUc.QueryWithdrawalLog(ctx, int64(userID), int32(req.Page), int32(req.Size))
@@ -714,54 +603,37 @@ func (s *UserService) QueryWithdrawalLog(ctx context.Context, req *v1.QueryWithd
 		return nil, err
 	}
 
-	list := make([]*v1.WithdrawalLogData, 0, len(withdrawals))
+	list := make([]*v1.WithdrawalLog, 0, len(withdrawals))
 	for _, w := range withdrawals {
-		list = append(list, &v1.WithdrawalLogData{
-			Id:        formatInt64(w.ID),
-			UserId:    formatInt64(w.UserID),
-			Amount:    formatInt64(w.Amount),
+		list = append(list, &v1.WithdrawalLog{
+			Id:        w.ID,
+			UserId:    w.UserID,
+			Amount:    w.Amount,
 			Content:   w.Content,
 			Status:    int32(w.Status),
 			Reason:    w.Reason,
-			CreatedAt: formatInt64(w.CreatedAt.UnixMilli()),
-			UpdatedAt: formatInt64(w.UpdatedAt.UnixMilli()),
+			CreatedAt: w.CreatedAt.UnixMilli(),
+			UpdatedAt: w.UpdatedAt.UnixMilli(),
 		})
 	}
-
-	return &v1.WithdrawalLogListReply{
-		Code:    int32(responsecode.UserInfoQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.UserInfoQuerySuccess],
-		Data: &v1.WithdrawalLogListData{
-			List:  list,
-			Total: formatInt64(int64(total)),
-		},
-	}, nil
+	return &v1.QueryWithdrawalLogReply{List: list, Total: total}, nil
 }
 
 // UpdateUserSubscribeNote 更新用户订阅备注
-func (s *UserService) UpdateUserSubscribeNote(ctx context.Context, req *v1.UpdateUserSubscribeNoteRequest) (*v1.CommonReply, error) {
+func (s *UserService) UpdateUserSubscribeNote(ctx context.Context, req *v1.UpdateUserSubscribeNoteRequest) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
-
-	userSubscribeID, err := parseStringID(req.UserSubscribeId)
-	if err != nil {
-		return nil, err
-	}
 	if len(req.Note) > 500 {
-		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		return nil, strconv.ErrSyntax
 	}
 
-	if err := s.uc.UpdateUserSubscribeNote(ctx, int(userID), userSubscribeID, req.Note); err != nil {
+	if err := s.uc.UpdateUserSubscribeNote(ctx, int(userID), req.UserSubscribeId, req.Note); err != nil {
 		return nil, err
 	}
-
-	return &v1.CommonReply{
-		Code:    int32(responsecode.UserUpdated),
-		Message: responsecode.CodeMessages[responsecode.UserUpdated],
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // UpdateUserRules 更新用户规则
-func (s *UserService) UpdateUserRules(ctx context.Context, req *v1.UpdateUserRulesRequest) (*v1.CommonReply, error) {
+func (s *UserService) UpdateUserRules(ctx context.Context, req *v1.UpdateUserRulesRequest) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
 
 	if len(req.Rules) == 0 {
@@ -771,15 +643,11 @@ func (s *UserService) UpdateUserRules(ctx context.Context, req *v1.UpdateUserRul
 	if err := s.uc.UpdateUserRules(ctx, int(userID), req.Rules); err != nil {
 		return nil, err
 	}
-
-	return &v1.CommonReply{
-		Code:    int32(responsecode.UserUpdated),
-		Message: responsecode.CodeMessages[responsecode.UserUpdated],
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // DeleteCurrentUserAccount 删除当前用户账号
-func (s *UserService) DeleteCurrentUserAccount(ctx context.Context, req *emptypb.Empty) (*v1.CommonReply, error) {
+func (s *UserService) DeleteCurrentUserAccount(ctx context.Context, req *emptypb.Empty) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
 	sessionID := middleware.GetSessionID(ctx)
 
@@ -787,10 +655,7 @@ func (s *UserService) DeleteCurrentUserAccount(ctx context.Context, req *emptypb
 		return nil, err
 	}
 
-	return &v1.CommonReply{
-		Code:    int32(responsecode.UserDeleted),
-		Message: responsecode.CodeMessages[responsecode.UserDeleted],
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
 // GetUserTrafficStats 获取用户流量统计
@@ -817,18 +682,14 @@ func (s *UserService) GetUserTrafficStats(ctx context.Context, req *v1.GetUserTr
 			Date:     item.Date,
 			Upload:   item.Upload,
 			Download: item.Download,
-			Total:    item.Total,
+			Total:    int32(item.Total),
 		})
 	}
 
 	return &v1.GetUserTrafficStatsReply{
-		Code:    int32(responsecode.UserInfoQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.UserInfoQuerySuccess],
-		Data: &v1.GetUserTrafficStatsData{
-			List:          list,
-			TotalUpload:   stats.TotalUpload,
-			TotalDownload: stats.TotalDownload,
-			TotalTraffic:  stats.TotalTraffic,
-		},
+		List:          list,
+		TotalUpload:   stats.TotalUpload,
+		TotalDownload: stats.TotalDownload,
+		TotalTraffic:  stats.TotalTraffic,
 	}, nil
 }

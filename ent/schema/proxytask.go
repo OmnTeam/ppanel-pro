@@ -29,8 +29,8 @@ func (ProxyTask) Fields() []ent.Field {
 		field.Text("content").Optional().Comment("任务内容"),
 		field.Int8("status").Default(0).Comment("任务状态"),
 		field.Text("errors").Optional().Comment("任务错误信息"),
-		field.Uint64("total").Default(0).Comment("总数"),
-		field.Uint64("current").Default(0).Comment("当前数量"),
+		field.Uint32("total").Default(0).Comment("总数"),
+		field.Uint32("current").Default(0).Comment("当前数量"),
 		field.Time("created_at").Default(time.Now).Comment("创建时间"),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now).Comment("更新时间"),
 	}

@@ -130,13 +130,13 @@ func (_c *ProxyPaymentCreate) SetNillableFeeAmount(v *int64) *ProxyPaymentCreate
 }
 
 // SetSort sets the "sort" field.
-func (_c *ProxyPaymentCreate) SetSort(v int64) *ProxyPaymentCreate {
+func (_c *ProxyPaymentCreate) SetSort(v int32) *ProxyPaymentCreate {
 	_c.mutation.SetSort(v)
 	return _c
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_c *ProxyPaymentCreate) SetNillableSort(v *int64) *ProxyPaymentCreate {
+func (_c *ProxyPaymentCreate) SetNillableSort(v *int32) *ProxyPaymentCreate {
 	if v != nil {
 		_c.SetSort(*v)
 	}
@@ -372,7 +372,7 @@ func (_c *ProxyPaymentCreate) createSpec() (*ProxyPayment, *sqlgraph.CreateSpec)
 		_node.FeeAmount = value
 	}
 	if value, ok := _c.mutation.Sort(); ok {
-		_spec.SetField(proxypayment.FieldSort, field.TypeInt64, value)
+		_spec.SetField(proxypayment.FieldSort, field.TypeInt32, value)
 		_node.Sort = value
 	}
 	if value, ok := _c.mutation.Enable(); ok {

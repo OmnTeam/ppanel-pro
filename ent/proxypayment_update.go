@@ -181,14 +181,14 @@ func (_u *ProxyPaymentUpdate) AddFeeAmount(v int64) *ProxyPaymentUpdate {
 }
 
 // SetSort sets the "sort" field.
-func (_u *ProxyPaymentUpdate) SetSort(v int64) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) SetSort(v int32) *ProxyPaymentUpdate {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *ProxyPaymentUpdate) SetNillableSort(v *int64) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) SetNillableSort(v *int32) *ProxyPaymentUpdate {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -196,7 +196,7 @@ func (_u *ProxyPaymentUpdate) SetNillableSort(v *int64) *ProxyPaymentUpdate {
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *ProxyPaymentUpdate) AddSort(v int64) *ProxyPaymentUpdate {
+func (_u *ProxyPaymentUpdate) AddSort(v int32) *ProxyPaymentUpdate {
 	_u.mutation.AddSort(v)
 	return _u
 }
@@ -348,10 +348,10 @@ func (_u *ProxyPaymentUpdate) sqlSave(ctx context.Context) (_node int, err error
 		_spec.AddField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(proxypayment.FieldSort, field.TypeInt64, value)
+		_spec.SetField(proxypayment.FieldSort, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(proxypayment.FieldSort, field.TypeInt64, value)
+		_spec.AddField(proxypayment.FieldSort, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.Enable(); ok {
 		_spec.SetField(proxypayment.FieldEnable, field.TypeBool, value)
@@ -533,14 +533,14 @@ func (_u *ProxyPaymentUpdateOne) AddFeeAmount(v int64) *ProxyPaymentUpdateOne {
 }
 
 // SetSort sets the "sort" field.
-func (_u *ProxyPaymentUpdateOne) SetSort(v int64) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) SetSort(v int32) *ProxyPaymentUpdateOne {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *ProxyPaymentUpdateOne) SetNillableSort(v *int64) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) SetNillableSort(v *int32) *ProxyPaymentUpdateOne {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -548,7 +548,7 @@ func (_u *ProxyPaymentUpdateOne) SetNillableSort(v *int64) *ProxyPaymentUpdateOn
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *ProxyPaymentUpdateOne) AddSort(v int64) *ProxyPaymentUpdateOne {
+func (_u *ProxyPaymentUpdateOne) AddSort(v int32) *ProxyPaymentUpdateOne {
 	_u.mutation.AddSort(v)
 	return _u
 }
@@ -730,10 +730,10 @@ func (_u *ProxyPaymentUpdateOne) sqlSave(ctx context.Context) (_node *ProxyPayme
 		_spec.AddField(proxypayment.FieldFeeAmount, field.TypeInt64, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(proxypayment.FieldSort, field.TypeInt64, value)
+		_spec.SetField(proxypayment.FieldSort, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(proxypayment.FieldSort, field.TypeInt64, value)
+		_spec.AddField(proxypayment.FieldSort, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.Enable(); ok {
 		_spec.SetField(proxypayment.FieldEnable, field.TypeBool, value)

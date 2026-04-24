@@ -118,7 +118,7 @@ func (l *CloseOrderLogic) CloseOrder(req *CloseOrderRequest) error {
 				OrderNo:     orderInfo.OrderNo,
 				SubscribeId: 0,
 				Amount:      int64(orderInfo.GiftAmount),
-				Balance:     newGiftAmount,
+				Balance:     int64(newGiftAmount),
 				Remark:      "Order cancellation refund",
 				Timestamp:   time.Now().UnixMilli(),
 			}

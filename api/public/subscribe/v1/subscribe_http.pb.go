@@ -19,29 +19,27 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationSubscribeQuerySubscribeList = "/api.public.subscribe.v1.Subscribe/QuerySubscribeList"
-const OperationSubscribeQueryUserSubscribeNodeList = "/api.public.subscribe.v1.Subscribe/QueryUserSubscribeNodeList"
+const OperationPublicSubscribeQuerySubscribeList = "/api.public.subscribe.v1.PublicSubscribe/QuerySubscribeList"
+const OperationPublicSubscribeQueryUserSubscribeNodeList = "/api.public.subscribe.v1.PublicSubscribe/QueryUserSubscribeNodeList"
 
-type SubscribeHTTPServer interface {
-	// QuerySubscribeList QuerySubscribeList 查询订阅列表
-	QuerySubscribeList(context.Context, *QuerySubscribeListRequest) (*SubscribeListReply, error)
-	// QueryUserSubscribeNodeList QueryUserSubscribeNodeList 查询当前用户订阅节点列表
+type PublicSubscribeHTTPServer interface {
+	QuerySubscribeList(context.Context, *QuerySubscribeListRequest) (*QuerySubscribeListReply, error)
 	QueryUserSubscribeNodeList(context.Context, *QueryUserSubscribeNodeListRequest) (*QueryUserSubscribeNodeListReply, error)
 }
 
-func RegisterSubscribeHTTPServer(s *http.Server, srv SubscribeHTTPServer) {
+func RegisterPublicSubscribeHTTPServer(s *http.Server, srv PublicSubscribeHTTPServer) {
 	r := s.Route("/")
-	r.GET("/v1/public/subscribe/list", _Subscribe_QuerySubscribeList0_HTTP_Handler(srv))
-	r.GET("/v1/public/subscribe/node/list", _Subscribe_QueryUserSubscribeNodeList0_HTTP_Handler(srv))
+	r.GET("/v1/public/subscribe/list", _PublicSubscribe_QuerySubscribeList0_HTTP_Handler(srv))
+	r.GET("/v1/public/subscribe/node/list", _PublicSubscribe_QueryUserSubscribeNodeList0_HTTP_Handler(srv))
 }
 
-func _Subscribe_QuerySubscribeList0_HTTP_Handler(srv SubscribeHTTPServer) func(ctx http.Context) error {
+func _PublicSubscribe_QuerySubscribeList0_HTTP_Handler(srv PublicSubscribeHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in QuerySubscribeListRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationSubscribeQuerySubscribeList)
+		http.SetOperation(ctx, OperationPublicSubscribeQuerySubscribeList)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.QuerySubscribeList(ctx, req.(*QuerySubscribeListRequest))
 		})
@@ -49,18 +47,18 @@ func _Subscribe_QuerySubscribeList0_HTTP_Handler(srv SubscribeHTTPServer) func(c
 		if err != nil {
 			return err
 		}
-		reply := out.(*SubscribeListReply)
+		reply := out.(*QuerySubscribeListReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _Subscribe_QueryUserSubscribeNodeList0_HTTP_Handler(srv SubscribeHTTPServer) func(ctx http.Context) error {
+func _PublicSubscribe_QueryUserSubscribeNodeList0_HTTP_Handler(srv PublicSubscribeHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in QueryUserSubscribeNodeListRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationSubscribeQueryUserSubscribeNodeList)
+		http.SetOperation(ctx, OperationPublicSubscribeQueryUserSubscribeNodeList)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.QueryUserSubscribeNodeList(ctx, req.(*QueryUserSubscribeNodeListRequest))
 		})
@@ -73,24 +71,24 @@ func _Subscribe_QueryUserSubscribeNodeList0_HTTP_Handler(srv SubscribeHTTPServer
 	}
 }
 
-type SubscribeHTTPClient interface {
-	QuerySubscribeList(ctx context.Context, req *QuerySubscribeListRequest, opts ...http.CallOption) (rsp *SubscribeListReply, err error)
+type PublicSubscribeHTTPClient interface {
+	QuerySubscribeList(ctx context.Context, req *QuerySubscribeListRequest, opts ...http.CallOption) (rsp *QuerySubscribeListReply, err error)
 	QueryUserSubscribeNodeList(ctx context.Context, req *QueryUserSubscribeNodeListRequest, opts ...http.CallOption) (rsp *QueryUserSubscribeNodeListReply, err error)
 }
 
-type SubscribeHTTPClientImpl struct {
+type PublicSubscribeHTTPClientImpl struct {
 	cc *http.Client
 }
 
-func NewSubscribeHTTPClient(client *http.Client) SubscribeHTTPClient {
-	return &SubscribeHTTPClientImpl{client}
+func NewPublicSubscribeHTTPClient(client *http.Client) PublicSubscribeHTTPClient {
+	return &PublicSubscribeHTTPClientImpl{client}
 }
 
-func (c *SubscribeHTTPClientImpl) QuerySubscribeList(ctx context.Context, in *QuerySubscribeListRequest, opts ...http.CallOption) (*SubscribeListReply, error) {
-	var out SubscribeListReply
+func (c *PublicSubscribeHTTPClientImpl) QuerySubscribeList(ctx context.Context, in *QuerySubscribeListRequest, opts ...http.CallOption) (*QuerySubscribeListReply, error) {
+	var out QuerySubscribeListReply
 	pattern := "/v1/public/subscribe/list"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationSubscribeQuerySubscribeList))
+	opts = append(opts, http.Operation(OperationPublicSubscribeQuerySubscribeList))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -99,11 +97,11 @@ func (c *SubscribeHTTPClientImpl) QuerySubscribeList(ctx context.Context, in *Qu
 	return &out, nil
 }
 
-func (c *SubscribeHTTPClientImpl) QueryUserSubscribeNodeList(ctx context.Context, in *QueryUserSubscribeNodeListRequest, opts ...http.CallOption) (*QueryUserSubscribeNodeListReply, error) {
+func (c *PublicSubscribeHTTPClientImpl) QueryUserSubscribeNodeList(ctx context.Context, in *QueryUserSubscribeNodeListRequest, opts ...http.CallOption) (*QueryUserSubscribeNodeListReply, error) {
 	var out QueryUserSubscribeNodeListReply
 	pattern := "/v1/public/subscribe/node/list"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationSubscribeQueryUserSubscribeNodeList))
+	opts = append(opts, http.Operation(OperationPublicSubscribeQueryUserSubscribeNodeList))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

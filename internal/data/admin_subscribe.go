@@ -44,19 +44,24 @@ func (r *subscribeRepo) CreateSubscribe(ctx context.Context, sub *model.Subscrib
 		SetUnitTime(sub.UnitTime).
 		SetDiscount(sub.Discount).
 		SetReplacement(sub.Replacement).
-		SetInventory(sub.Inventory).
+		SetInventory(int32(sub.Inventory)).
 		SetTraffic(sub.Traffic).
-		SetSpeedLimit(sub.SpeedLimit).
-		SetDeviceLimit(sub.DeviceLimit).
-		SetQuota(sub.Quota).
+		SetSpeedLimit(int32(sub.SpeedLimit)).
+		SetDeviceLimit(int32(sub.DeviceLimit)).
+		SetQuota(int32(sub.Quota)).
 		SetNodes(sub.Nodes).
 		SetNodeTags(sub.NodeTags).
+		SetNodeGroupIds(sub.NodeGroupIDs).
+		SetNodeGroupID(sub.NodeGroupID).
+		SetTrafficLimit(sub.TrafficLimit).
 		SetShow(sub.Show).
 		SetSell(sub.Sell).
-		SetDeductionRatio(sub.DeductionRatio).
+		SetSort(int32(sub.Sort)).
+		SetDeductionRatio(int32(sub.DeductionRatio)).
 		SetAllowDeduction(sub.AllowDeduction).
-		SetResetCycle(sub.ResetCycle).
+		SetResetCycle(int32(sub.ResetCycle)).
 		SetRenewalReset(sub.RenewalReset).
+		SetShowOriginalPrice(sub.ShowOriginalPrice).
 		Save(ctx)
 
 	return err
@@ -80,20 +85,24 @@ func (r *subscribeRepo) UpdateSubscribe(ctx context.Context, sub *model.Subscrib
 		SetUnitTime(sub.UnitTime).
 		SetDiscount(sub.Discount).
 		SetReplacement(sub.Replacement).
-		SetInventory(sub.Inventory).
+		SetInventory(int32(sub.Inventory)).
 		SetTraffic(sub.Traffic).
-		SetSpeedLimit(sub.SpeedLimit).
-		SetDeviceLimit(sub.DeviceLimit).
-		SetQuota(sub.Quota).
+		SetSpeedLimit(int32(sub.SpeedLimit)).
+		SetDeviceLimit(int32(sub.DeviceLimit)).
+		SetQuota(int32(sub.Quota)).
 		SetNodes(sub.Nodes).
 		SetNodeTags(sub.NodeTags).
+		SetNodeGroupIds(sub.NodeGroupIDs).
+		SetNodeGroupID(sub.NodeGroupID).
+		SetTrafficLimit(sub.TrafficLimit).
 		SetShow(sub.Show).
 		SetSell(sub.Sell).
-		SetSort(sub.Sort).
-		SetDeductionRatio(sub.DeductionRatio).
+		SetSort(int32(sub.Sort)).
+		SetDeductionRatio(int32(sub.DeductionRatio)).
 		SetAllowDeduction(sub.AllowDeduction).
-		SetResetCycle(sub.ResetCycle).
+		SetResetCycle(int32(sub.ResetCycle)).
 		SetRenewalReset(sub.RenewalReset).
+		SetShowOriginalPrice(sub.ShowOriginalPrice).
 		Exec(ctx)
 }
 
@@ -106,7 +115,7 @@ func (r *subscribeRepo) DeleteSubscribe(ctx context.Context, id int) error {
 }
 
 // GetSubscribeList get subscribe list with pagination and filters
-func (r *subscribeRepo) GetSubscribeList(ctx context.Context, req *model.SubscribeListParams) ([]*ent.ProxySubscribe, int64, error) {
+func (r *subscribeRepo) GetSubscribeList(ctx context.Context, req *model.SubscribeListParams) ([]*ent.ProxySubscribe, int32, error) {
 	query := r.data.db.ProxySubscribe.Query()
 
 	// Apply filters
@@ -116,6 +125,10 @@ func (r *subscribeRepo) GetSubscribeList(ctx context.Context, req *model.Subscri
 
 	if req.Search != "" {
 		query = query.Where(proxysubscribe.NameContains(req.Search))
+	}
+
+	if req.NodeGroupID > 0 {
+		query = query.Where(proxysubscribe.NodeGroupIDEQ(req.NodeGroupID))
 	}
 
 	if len(req.IDs) > 0 {
@@ -140,7 +153,7 @@ func (r *subscribeRepo) GetSubscribeList(ctx context.Context, req *model.Subscri
 		return nil, 0, err
 	}
 
-	return list, int64(total), nil
+	return list, int32(total), nil
 }
 
 // CheckSubscribeInUse check if subscribe is being used by active user subscriptions
@@ -202,7 +215,7 @@ func (r *subscribeRepo) BatchUpdateSubscribeSort(ctx context.Context, subscribes
 
 	for _, sub := range subscribes {
 		err = tx.ProxySubscribe.UpdateOneID(sub.ID).
-			SetSort(sub.Sort).
+			SetSort(int32(sub.Sort)).
 			Exec(ctx)
 		if err != nil {
 			return rollback(tx, err)
@@ -219,6 +232,10 @@ func (r *subscribeRepo) CreateSubscribeGroup(ctx context.Context, group *model.S
 	_, err := r.data.db.ProxySubscribeGroup.Create().
 		SetName(group.Name).
 		SetDescription(group.Description).
+		SetIsExpiredGroup(group.IsExpiredGroup).
+		SetExpiredDaysLimit(int32(group.ExpiredDaysLimit)).
+		SetMaxTrafficGBExpired(int32(group.MaxTrafficGBExpired)).
+		SetSpeedLimit(group.SpeedLimit).
 		Save(ctx)
 
 	return err
@@ -237,6 +254,10 @@ func (r *subscribeRepo) UpdateSubscribeGroup(ctx context.Context, group *model.S
 		Where(proxysubscribegroup.ID(group.ID)).
 		SetName(group.Name).
 		SetDescription(group.Description).
+		SetIsExpiredGroup(group.IsExpiredGroup).
+		SetExpiredDaysLimit(int32(group.ExpiredDaysLimit)).
+		SetMaxTrafficGBExpired(int32(group.MaxTrafficGBExpired)).
+		SetSpeedLimit(group.SpeedLimit).
 		Exec(ctx)
 }
 
@@ -249,7 +270,7 @@ func (r *subscribeRepo) DeleteSubscribeGroup(ctx context.Context, id int) error 
 }
 
 // GetSubscribeGroupList get all subscribe groups (no pagination)
-func (r *subscribeRepo) GetSubscribeGroupList(ctx context.Context) ([]*ent.ProxySubscribeGroup, int64, error) {
+func (r *subscribeRepo) GetSubscribeGroupList(ctx context.Context) ([]*ent.ProxySubscribeGroup, int32, error) {
 	list, err := r.data.db.ProxySubscribeGroup.Query().
 		All(ctx)
 
@@ -257,7 +278,7 @@ func (r *subscribeRepo) GetSubscribeGroupList(ctx context.Context) ([]*ent.Proxy
 		return nil, 0, err
 	}
 
-	return list, int64(len(list)), nil
+	return list, int32(len(list)), nil
 }
 
 // BatchDeleteSubscribeGroup batch delete subscribe groups

@@ -30,7 +30,7 @@ const (
 // 公共公告服务（需要认证）
 type AnnouncementClient interface {
 	// QueryAnnouncement 查询公告列表
-	QueryAnnouncement(ctx context.Context, in *QueryAnnouncementRequest, opts ...grpc.CallOption) (*AnnouncementListReply, error)
+	QueryAnnouncement(ctx context.Context, in *QueryAnnouncementRequest, opts ...grpc.CallOption) (*QueryAnnouncementReply, error)
 }
 
 type announcementClient struct {
@@ -41,9 +41,9 @@ func NewAnnouncementClient(cc grpc.ClientConnInterface) AnnouncementClient {
 	return &announcementClient{cc}
 }
 
-func (c *announcementClient) QueryAnnouncement(ctx context.Context, in *QueryAnnouncementRequest, opts ...grpc.CallOption) (*AnnouncementListReply, error) {
+func (c *announcementClient) QueryAnnouncement(ctx context.Context, in *QueryAnnouncementRequest, opts ...grpc.CallOption) (*QueryAnnouncementReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AnnouncementListReply)
+	out := new(QueryAnnouncementReply)
 	err := c.cc.Invoke(ctx, Announcement_QueryAnnouncement_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (c *announcementClient) QueryAnnouncement(ctx context.Context, in *QueryAnn
 // 公共公告服务（需要认证）
 type AnnouncementServer interface {
 	// QueryAnnouncement 查询公告列表
-	QueryAnnouncement(context.Context, *QueryAnnouncementRequest) (*AnnouncementListReply, error)
+	QueryAnnouncement(context.Context, *QueryAnnouncementRequest) (*QueryAnnouncementReply, error)
 	mustEmbedUnimplementedAnnouncementServer()
 }
 
@@ -70,7 +70,7 @@ type AnnouncementServer interface {
 // pointer dereference when methods are called.
 type UnimplementedAnnouncementServer struct{}
 
-func (UnimplementedAnnouncementServer) QueryAnnouncement(context.Context, *QueryAnnouncementRequest) (*AnnouncementListReply, error) {
+func (UnimplementedAnnouncementServer) QueryAnnouncement(context.Context, *QueryAnnouncementRequest) (*QueryAnnouncementReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryAnnouncement not implemented")
 }
 func (UnimplementedAnnouncementServer) mustEmbedUnimplementedAnnouncementServer() {}

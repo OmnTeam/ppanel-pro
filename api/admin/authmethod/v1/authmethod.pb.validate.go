@@ -1023,9 +1023,20 @@ func (m *TestSmsSendRequest) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetMobile()) < 1 {
+	if utf8.RuneCountInString(m.GetAreaCode()) < 1 {
 		err := TestSmsSendRequestValidationError{
-			field:  "Mobile",
+			field:  "AreaCode",
+			reason: "value length must be at least 1 runes",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if utf8.RuneCountInString(m.GetTelephone()) < 1 {
+		err := TestSmsSendRequestValidationError{
+			field:  "Telephone",
 			reason: "value length must be at least 1 runes",
 		}
 		if !all {

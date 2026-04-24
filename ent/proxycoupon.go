@@ -23,7 +23,7 @@ type ProxyCoupon struct {
 	// 优惠券代码
 	Code string `json:"code,omitempty"`
 	// 数量限制
-	Count int64 `json:"count,omitempty"`
+	Count int32 `json:"count,omitempty"`
 	// 优惠券类型：1：百分比 2：固定金额
 	Type int8 `json:"type,omitempty"`
 	// 优惠券折扣
@@ -37,7 +37,7 @@ type ProxyCoupon struct {
 	// 订阅限制
 	Subscribe string `json:"subscribe,omitempty"`
 	// 已使用次数
-	UsedCount int64 `json:"used_count,omitempty"`
+	UsedCount int8 `json:"used_count,omitempty"`
 	// 是否启用
 	Enable bool `json:"enable,omitempty"`
 	// 创建时间
@@ -97,7 +97,7 @@ func (_m *ProxyCoupon) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field count", values[i])
 			} else if value.Valid {
-				_m.Count = value.Int64
+				_m.Count = int32(value.Int64)
 			}
 		case proxycoupon.FieldType:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -139,7 +139,7 @@ func (_m *ProxyCoupon) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field used_count", values[i])
 			} else if value.Valid {
-				_m.UsedCount = value.Int64
+				_m.UsedCount = int8(value.Int64)
 			}
 		case proxycoupon.FieldEnable:
 			if value, ok := values[i].(*sql.NullBool); !ok {

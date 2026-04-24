@@ -77,13 +77,13 @@ func (_c *ProxyServerCreate) SetNillableServerAddr(v *string) *ProxyServerCreate
 }
 
 // SetSort sets the "sort" field.
-func (_c *ProxyServerCreate) SetSort(v int) *ProxyServerCreate {
+func (_c *ProxyServerCreate) SetSort(v int32) *ProxyServerCreate {
 	_c.mutation.SetSort(v)
 	return _c
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_c *ProxyServerCreate) SetNillableSort(v *int) *ProxyServerCreate {
+func (_c *ProxyServerCreate) SetNillableSort(v *int32) *ProxyServerCreate {
 	if v != nil {
 		_c.SetSort(*v)
 	}
@@ -413,7 +413,7 @@ func (_c *ProxyServerCreate) createSpec() (*ProxyServer, *sqlgraph.CreateSpec) {
 		_node.ServerAddr = value
 	}
 	if value, ok := _c.mutation.Sort(); ok {
-		_spec.SetField(proxyserver.FieldSort, field.TypeInt, value)
+		_spec.SetField(proxyserver.FieldSort, field.TypeInt32, value)
 		_node.Sort = value
 	}
 	if value, ok := _c.mutation.Protocol(); ok {

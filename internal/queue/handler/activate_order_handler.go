@@ -1364,7 +1364,7 @@ func (h *ActivateOrderHandler) RedemptionActivate(ctx context.Context, orderInfo
 			SetUserID(int64(userInfo.ID)).
 			SetSubscribeID(orderInfo.SubscribeID).
 			SetUnitTime(redemptionData.UnitTime).
-			SetQuantity(redemptionData.Quantity).
+			SetQuantity(int32(redemptionData.Quantity)).
 			SetRedeemedAt(now).
 			Save(ctx)
 

@@ -2,6 +2,8 @@ package console
 
 import (
 	"context"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -97,6 +99,9 @@ func NewConsoleUsecase(repo ConsoleRepo, logger log.Logger) *ConsoleUsecase {
 
 // QueryRevenueStatistics queries revenue statistics
 func (uc *ConsoleUsecase) QueryRevenueStatistics(ctx context.Context) (*RevenueStatisticsResponse, error) {
+	if strings.ToLower(os.Getenv("PPANEL_MODE")) == "demo" {
+		return uc.mockRevenueStatistics(), nil
+	}
 	now := time.Now()
 
 	// Get today's revenue statistics
@@ -147,6 +152,9 @@ func (uc *ConsoleUsecase) QueryRevenueStatistics(ctx context.Context) (*RevenueS
 
 // QueryUserStatistics queries user statistics
 func (uc *ConsoleUsecase) QueryUserStatistics(ctx context.Context) (*UserStatisticsResponse, error) {
+	if strings.ToLower(os.Getenv("PPANEL_MODE")) == "demo" {
+		return uc.mockUserStatistics(), nil
+	}
 	now := time.Now()
 	resp := &UserStatisticsResponse{
 		Today:   &UserStatistics{},
@@ -240,8 +248,11 @@ func (uc *ConsoleUsecase) QueryTicketWaitReply(ctx context.Context) (*TicketWait
 // QueryServerTotalData queries server total data
 func (uc *ConsoleUsecase) QueryServerTotalData(ctx context.Context) (*ServerTotalDataResponse, error) {
 	now := time.Now()
+	if strings.ToLower(os.Getenv("PPANEL_MODE")) == "demo" {
+		return uc.mockServerTotalData(now), nil
+	}
 	resp := &ServerTotalDataResponse{
-		UpdatedAt: now.Format(time.RFC3339),
+		UpdatedAt: now.Unix(),
 	}
 
 	// Query online servers
@@ -347,9 +358,121 @@ type ServerTotalDataResponse struct {
 	TodayDownload                 int                  `json:"today_download"`
 	MonthlyUpload                 int                  `json:"monthly_upload"`
 	MonthlyDownload               int                  `json:"monthly_download"`
-	UpdatedAt                     string               `json:"updated_at"`
+	UpdatedAt                     int64                `json:"updated_at"`
 	ServerTrafficRankingToday     []*ServerTrafficData `json:"server_traffic_ranking_today,omitempty"`
 	ServerTrafficRankingYesterday []*ServerTrafficData `json:"server_traffic_ranking_yesterday,omitempty"`
 	UserTrafficRankingToday       []*UserTrafficData   `json:"user_traffic_ranking_today,omitempty"`
 	UserTrafficRankingYesterday   []*UserTrafficData   `json:"user_traffic_ranking_yesterday,omitempty"`
+}
+
+func (uc *ConsoleUsecase) mockRevenueStatistics() *RevenueStatisticsResponse {
+	now := time.Now()
+	monthlyList := make([]*OrdersTotalWithDate, 7)
+	for i := 0; i < 7; i++ {
+		dayDate := now.AddDate(0, 0, -(6 - i))
+		baseAmount := 25000 + ((6 - i) * 3000) + ((6-i)%3)*8000
+		monthlyList[i] = &OrdersTotalWithDate{
+			Date:               dayDate.Format("2006-01-02"),
+			AmountTotal:        baseAmount,
+			NewOrderAmount:     int(float64(baseAmount) * 0.68),
+			RenewalOrderAmount: int(float64(baseAmount) * 0.32),
+		}
+	}
+	allList := make([]*OrdersTotalWithDate, 6)
+	for i := 0; i < 6; i++ {
+		monthDate := now.AddDate(0, -(5 - i), 0)
+		baseAmount := 1800000 + ((5 - i) * 200000) + ((5-i)%2)*500000
+		allList[i] = &OrdersTotalWithDate{
+			Date:               monthDate.Format("2006-01"),
+			AmountTotal:        baseAmount,
+			NewOrderAmount:     int(float64(baseAmount) * 0.68),
+			RenewalOrderAmount: int(float64(baseAmount) * 0.32),
+		}
+	}
+	return &RevenueStatisticsResponse{
+		Today: &OrdersTotal{AmountTotal: 35888, NewOrderAmount: 22888, RenewalOrderAmount: 13000},
+		Monthly: &OrdersTotal{
+			AmountTotal:        888888,
+			NewOrderAmount:     588888,
+			RenewalOrderAmount: 300000,
+			List:               monthlyList,
+		},
+		All: &OrdersTotal{
+			AmountTotal:        12888888,
+			NewOrderAmount:     8588888,
+			RenewalOrderAmount: 4300000,
+			List:               allList,
+		},
+	}
+}
+
+func (uc *ConsoleUsecase) mockUserStatistics() *UserStatisticsResponse {
+	now := time.Now()
+	monthlyList := make([]*UserStatistics, 7)
+	for i := 0; i < 7; i++ {
+		dayDate := now.AddDate(0, 0, -(6 - i))
+		baseRegister := 18 + ((6 - i) * 3) + ((6-i)%3)*8
+		monthlyList[i] = &UserStatistics{
+			Date:              dayDate.Format("2006-01-02"),
+			Register:          baseRegister,
+			NewOrderUsers:     int(float64(baseRegister) * 0.65),
+			RenewalOrderUsers: int(float64(baseRegister) * 0.35),
+		}
+	}
+	allList := make([]*UserStatistics, 6)
+	for i := 0; i < 6; i++ {
+		monthDate := now.AddDate(0, -(5 - i), 0)
+		baseRegister := 1800 + ((5 - i) * 200) + ((5-i)%2)*500
+		allList[i] = &UserStatistics{
+			Date:              monthDate.Format("2006-01"),
+			Register:          baseRegister,
+			NewOrderUsers:     int(float64(baseRegister) * 0.65),
+			RenewalOrderUsers: int(float64(baseRegister) * 0.35),
+		}
+	}
+	return &UserStatisticsResponse{
+		Today: &UserStatistics{Register: 28, NewOrderUsers: 18, RenewalOrderUsers: 10},
+		Monthly: &UserStatistics{
+			Register:          888,
+			NewOrderUsers:     588,
+			RenewalOrderUsers: 300,
+			List:              monthlyList,
+		},
+		All: &UserStatistics{
+			Register: 18888,
+			List:     allList,
+		},
+	}
+}
+
+func (uc *ConsoleUsecase) mockServerTotalData(now time.Time) *ServerTotalDataResponse {
+	serverNames := []string{"香港-01", "美国-洛杉矶", "日本-东京", "新加坡-01", "韩国-首尔", "台湾-01", "德国-法兰克福", "英国-伦敦", "加拿大-多伦多", "澳洲-悉尼"}
+	serverTrafficToday := make([]*ServerTrafficData, 10)
+	serverTrafficYesterday := make([]*ServerTrafficData, 10)
+	for i := 0; i < 10; i++ {
+		serverTrafficToday[i] = &ServerTrafficData{
+			ServerID: i + 1,
+			Name:     serverNames[i],
+			Upload:   500000000 + (i * 100000000) + (i%3)*200000000,
+			Download: 2000000000 + (i * 300000000) + (i%4)*500000000,
+		}
+		serverTrafficYesterday[i] = &ServerTrafficData{
+			ServerID: i + 1,
+			Name:     serverNames[i],
+			Upload:   480000000 + (i * 95000000) + (i%3)*180000000,
+			Download: 1900000000 + (i * 280000000) + (i%4)*450000000,
+		}
+	}
+	return &ServerTotalDataResponse{
+		OnlineUsers:                   1688,
+		OnlineServers:                 8,
+		OfflineServers:                2,
+		TodayUpload:                   8888888888,
+		TodayDownload:                 28888888888,
+		MonthlyUpload:                 288888888888,
+		MonthlyDownload:               888888888888,
+		UpdatedAt:                     now.Unix(),
+		ServerTrafficRankingToday:     serverTrafficToday,
+		ServerTrafficRankingYesterday: serverTrafficYesterday,
+	}
 }

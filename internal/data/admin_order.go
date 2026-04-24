@@ -9,6 +9,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
 	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/order"
 	"github.com/OmnTeam/ppanel-pro/internal/queue/types"
+	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 
 	"github.com/go-kratos/kratos/v2/log"
@@ -33,9 +34,9 @@ func NewOrderRepo(data *Data, logger log.Logger) order.OrderRepo {
 }
 
 // CreateOrder 创建订单
-func (r *orderRepo) CreateOrder(ctx context.Context, userID int, orderType int32, quantity, price, amount, discount int,
+func (r *orderRepo) CreateOrder(ctx context.Context, userID int, orderType uint32, quantity, price, amount, discount int,
 	coupon string, couponDiscount, commission, feeAmount, paymentID int, tradeNo string,
-	status int32, subscribeID int) error {
+	status uint32, subscribeID int) error {
 
 	// 如果paymentID > 0，验证支付方式是否存在并获取token作为method
 	var method string
@@ -47,6 +48,9 @@ func (r *orderRepo) CreateOrder(ctx context.Context, userID int, orderType int32
 			Only(ctx)
 		if err != nil {
 			r.log.Errorw("msg", "payment method not found", "error", err, "paymentID", paymentID)
+			if ent.IsNotFound(err) {
+				return responsecode.NewPaymentNotFoundError()
+			}
 			return err
 		}
 		method = payment.Token
@@ -60,7 +64,7 @@ func (r *orderRepo) CreateOrder(ctx context.Context, userID int, orderType int32
 		SetUserID(int64(userID)).
 		SetOrderNo(orderNo).
 		SetType(int8(orderType)).
-		SetQuantity(int64(quantity)).
+		SetQuantity(int32(quantity)).
 		SetPrice(int64(price)).
 		SetAmount(int64(amount)).
 		SetDiscount(int64(discount)).
@@ -79,7 +83,7 @@ func (r *orderRepo) CreateOrder(ctx context.Context, userID int, orderType int32
 }
 
 // UpdateOrderStatus 更新订单状态
-func (r *orderRepo) UpdateOrderStatus(ctx context.Context, id int, status int32, paymentID int, tradeNo string) error {
+func (r *orderRepo) UpdateOrderStatus(ctx context.Context, id int, status uint32, paymentID int, tradeNo string) error {
 	// 查询订单
 	orderInfo, err := r.data.db.ProxyOrder.Query().
 		Where(
@@ -111,9 +115,12 @@ func (r *orderRepo) UpdateOrderStatus(ctx context.Context, id int, status int32,
 			Only(ctx)
 		if err != nil {
 			r.log.Errorw("msg", "payment method not found", "error", err, "paymentID", paymentID)
+			if ent.IsNotFound(err) {
+				return rollback(tx, responsecode.NewPaymentNotFoundError())
+			}
 			return rollback(tx, err)
 		}
-		updater = updater.SetPaymentID(int64(paymentID)).SetMethod(payment.Token)
+		updater = updater.SetPaymentID(int64(paymentID)).SetMethod(payment.Platform)
 	}
 
 	// 如果提供了tradeNo，更新交易号
@@ -158,7 +165,7 @@ func (r *orderRepo) UpdateOrderStatus(ctx context.Context, id int, status int32,
 }
 
 // GetOrderList 获取订单列表
-func (r *orderRepo) GetOrderList(ctx context.Context, page, size, userID int, status int32, subscribeID int, search string) ([]*ent.ProxyOrder, int64, error) {
+func (r *orderRepo) GetOrderList(ctx context.Context, page, size, userID int, status uint32, subscribeID int, search string) ([]*ent.ProxyOrder, int32, error) {
 	query := r.data.db.ProxyOrder.Query()
 
 	// 用户ID筛选
@@ -200,5 +207,5 @@ func (r *orderRepo) GetOrderList(ctx context.Context, page, size, userID int, st
 		Order(ent.Desc(proxyorder.FieldID)).
 		All(ctx)
 
-	return list, int64(total), err
+	return list, int32(total), err
 }

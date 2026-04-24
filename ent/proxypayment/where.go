@@ -98,7 +98,7 @@ func FeeAmount(v int64) predicate.ProxyPayment {
 }
 
 // Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
-func Sort(v int64) predicate.ProxyPayment {
+func Sort(v int32) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldSort, v))
 }
 
@@ -633,42 +633,42 @@ func FeeAmountLTE(v int64) predicate.ProxyPayment {
 }
 
 // SortEQ applies the EQ predicate on the "sort" field.
-func SortEQ(v int64) predicate.ProxyPayment {
+func SortEQ(v int32) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldEQ(FieldSort, v))
 }
 
 // SortNEQ applies the NEQ predicate on the "sort" field.
-func SortNEQ(v int64) predicate.ProxyPayment {
+func SortNEQ(v int32) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldNEQ(FieldSort, v))
 }
 
 // SortIn applies the In predicate on the "sort" field.
-func SortIn(vs ...int64) predicate.ProxyPayment {
+func SortIn(vs ...int32) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldIn(FieldSort, vs...))
 }
 
 // SortNotIn applies the NotIn predicate on the "sort" field.
-func SortNotIn(vs ...int64) predicate.ProxyPayment {
+func SortNotIn(vs ...int32) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldNotIn(FieldSort, vs...))
 }
 
 // SortGT applies the GT predicate on the "sort" field.
-func SortGT(v int64) predicate.ProxyPayment {
+func SortGT(v int32) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldGT(FieldSort, v))
 }
 
 // SortGTE applies the GTE predicate on the "sort" field.
-func SortGTE(v int64) predicate.ProxyPayment {
+func SortGTE(v int32) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldGTE(FieldSort, v))
 }
 
 // SortLT applies the LT predicate on the "sort" field.
-func SortLT(v int64) predicate.ProxyPayment {
+func SortLT(v int32) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldLT(FieldSort, v))
 }
 
 // SortLTE applies the LTE predicate on the "sort" field.
-func SortLTE(v int64) predicate.ProxyPayment {
+func SortLTE(v int32) predicate.ProxyPayment {
 	return predicate.ProxyPayment(sql.FieldLTE(FieldSort, v))
 }
 

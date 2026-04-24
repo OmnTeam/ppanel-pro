@@ -73,7 +73,8 @@ func (r *adminUserAuthMethodRepo) GetUserAuthMethod(ctx context.Context, userID 
 	query := r.data.db.ProxyUserAuthMethod.Query().
 		Where(
 			proxyuserauthmethod.UserIDEQ(userID),
-		)
+		).
+		Order(ent.Desc(proxyuserauthmethod.FieldAuthType))
 
 	methods, err := query.All(ctx)
 	if err != nil {

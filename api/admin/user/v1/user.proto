@@ -178,7 +178,7 @@ message GetUserListRequest {
 }
 
 message GetUserListData {
-  int64 total = 1;
+  int32 total = 1;
   repeated User list = 2;
 }
 
@@ -235,7 +235,7 @@ message GetUserLoginLogsRequest {
 }
 
 message GetUserLoginLogsData {
-  int64 total = 1;
+  int32 total = 1;
   repeated LoginLog list = 2;
 }
 

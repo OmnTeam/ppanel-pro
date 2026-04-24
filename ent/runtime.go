@@ -230,7 +230,7 @@ func init() {
 	// proxycouponDescCount is the schema descriptor for count field.
 	proxycouponDescCount := proxycouponFields[3].Descriptor()
 	// proxycoupon.DefaultCount holds the default value on creation for the count field.
-	proxycoupon.DefaultCount = proxycouponDescCount.Default.(int64)
+	proxycoupon.DefaultCount = proxycouponDescCount.Default.(int32)
 	// proxycouponDescType is the schema descriptor for type field.
 	proxycouponDescType := proxycouponFields[4].Descriptor()
 	// proxycoupon.DefaultType holds the default value on creation for the type field.
@@ -260,7 +260,7 @@ func init() {
 	// proxycouponDescUsedCount is the schema descriptor for used_count field.
 	proxycouponDescUsedCount := proxycouponFields[10].Descriptor()
 	// proxycoupon.DefaultUsedCount holds the default value on creation for the used_count field.
-	proxycoupon.DefaultUsedCount = proxycouponDescUsedCount.Default.(int64)
+	proxycoupon.DefaultUsedCount = proxycouponDescUsedCount.Default.(int8)
 	// proxycouponDescEnable is the schema descriptor for enable field.
 	proxycouponDescEnable := proxycouponFields[11].Descriptor()
 	// proxycoupon.DefaultEnable holds the default value on creation for the enable field.
@@ -444,7 +444,7 @@ func init() {
 	// proxynodeDescSort is the schema descriptor for sort field.
 	proxynodeDescSort := proxynodeFields[10].Descriptor()
 	// proxynode.DefaultSort holds the default value on creation for the sort field.
-	proxynode.DefaultSort = proxynodeDescSort.Default.(int)
+	proxynode.DefaultSort = proxynodeDescSort.Default.(int32)
 	// proxynodeDescCreatedAt is the schema descriptor for created_at field.
 	proxynodeDescCreatedAt := proxynodeFields[12].Descriptor()
 	// proxynode.DefaultCreatedAt holds the default value on creation for the created_at field.
@@ -486,7 +486,7 @@ func init() {
 	// proxyorderDescQuantity is the schema descriptor for quantity field.
 	proxyorderDescQuantity := proxyorderFields[5].Descriptor()
 	// proxyorder.DefaultQuantity holds the default value on creation for the quantity field.
-	proxyorder.DefaultQuantity = proxyorderDescQuantity.Default.(int64)
+	proxyorder.DefaultQuantity = proxyorderDescQuantity.Default.(int32)
 	// proxyorderDescPrice is the schema descriptor for price field.
 	proxyorderDescPrice := proxyorderFields[6].Descriptor()
 	// proxyorder.DefaultPrice holds the default value on creation for the price field.
@@ -630,7 +630,7 @@ func init() {
 	// proxypaymentDescSort is the schema descriptor for sort field.
 	proxypaymentDescSort := proxypaymentFields[10].Descriptor()
 	// proxypayment.DefaultSort holds the default value on creation for the sort field.
-	proxypayment.DefaultSort = proxypaymentDescSort.Default.(int64)
+	proxypayment.DefaultSort = proxypaymentDescSort.Default.(int32)
 	// proxypaymentDescEnable is the schema descriptor for enable field.
 	proxypaymentDescEnable := proxypaymentFields[11].Descriptor()
 	// proxypayment.DefaultEnable holds the default value on creation for the enable field.
@@ -676,11 +676,11 @@ func init() {
 	// proxyredemptioncodeDescTotalCount is the schema descriptor for total_count field.
 	proxyredemptioncodeDescTotalCount := proxyredemptioncodeFields[2].Descriptor()
 	// proxyredemptioncode.DefaultTotalCount holds the default value on creation for the total_count field.
-	proxyredemptioncode.DefaultTotalCount = proxyredemptioncodeDescTotalCount.Default.(int64)
+	proxyredemptioncode.DefaultTotalCount = proxyredemptioncodeDescTotalCount.Default.(int32)
 	// proxyredemptioncodeDescUsedCount is the schema descriptor for used_count field.
 	proxyredemptioncodeDescUsedCount := proxyredemptioncodeFields[3].Descriptor()
 	// proxyredemptioncode.DefaultUsedCount holds the default value on creation for the used_count field.
-	proxyredemptioncode.DefaultUsedCount = proxyredemptioncodeDescUsedCount.Default.(int64)
+	proxyredemptioncode.DefaultUsedCount = proxyredemptioncodeDescUsedCount.Default.(int32)
 	// proxyredemptioncodeDescSubscribePlan is the schema descriptor for subscribe_plan field.
 	proxyredemptioncodeDescSubscribePlan := proxyredemptioncodeFields[4].Descriptor()
 	// proxyredemptioncode.DefaultSubscribePlan holds the default value on creation for the subscribe_plan field.
@@ -694,7 +694,7 @@ func init() {
 	// proxyredemptioncodeDescQuantity is the schema descriptor for quantity field.
 	proxyredemptioncodeDescQuantity := proxyredemptioncodeFields[6].Descriptor()
 	// proxyredemptioncode.DefaultQuantity holds the default value on creation for the quantity field.
-	proxyredemptioncode.DefaultQuantity = proxyredemptioncodeDescQuantity.Default.(int64)
+	proxyredemptioncode.DefaultQuantity = proxyredemptioncodeDescQuantity.Default.(int32)
 	// proxyredemptioncodeDescStatus is the schema descriptor for status field.
 	proxyredemptioncodeDescStatus := proxyredemptioncodeFields[7].Descriptor()
 	// proxyredemptioncode.DefaultStatus holds the default value on creation for the status field.
@@ -724,7 +724,7 @@ func init() {
 	// proxyredemptionrecordDescQuantity is the schema descriptor for quantity field.
 	proxyredemptionrecordDescQuantity := proxyredemptionrecordFields[5].Descriptor()
 	// proxyredemptionrecord.DefaultQuantity holds the default value on creation for the quantity field.
-	proxyredemptionrecord.DefaultQuantity = proxyredemptionrecordDescQuantity.Default.(int64)
+	proxyredemptionrecord.DefaultQuantity = proxyredemptionrecordDescQuantity.Default.(int32)
 	// proxyredemptionrecordDescRedeemedAt is the schema descriptor for redeemed_at field.
 	proxyredemptionrecordDescRedeemedAt := proxyredemptionrecordFields[6].Descriptor()
 	// proxyredemptionrecord.DefaultRedeemedAt holds the default value on creation for the redeemed_at field.
@@ -766,7 +766,7 @@ func init() {
 	// proxyserverDescSort is the schema descriptor for sort field.
 	proxyserverDescSort := proxyserverFields[5].Descriptor()
 	// proxyserver.DefaultSort holds the default value on creation for the sort field.
-	proxyserver.DefaultSort = proxyserverDescSort.Default.(int)
+	proxyserver.DefaultSort = proxyserverDescSort.Default.(int32)
 	// proxyserverDescLongitude is the schema descriptor for longitude field.
 	proxyserverDescLongitude := proxyserverFields[8].Descriptor()
 	// proxyserver.DefaultLongitude holds the default value on creation for the longitude field.
@@ -896,7 +896,7 @@ func init() {
 	// proxysubscribeDescInventory is the schema descriptor for inventory field.
 	proxysubscribeDescInventory := proxysubscribeFields[8].Descriptor()
 	// proxysubscribe.DefaultInventory holds the default value on creation for the inventory field.
-	proxysubscribe.DefaultInventory = proxysubscribeDescInventory.Default.(int64)
+	proxysubscribe.DefaultInventory = proxysubscribeDescInventory.Default.(int32)
 	// proxysubscribeDescTraffic is the schema descriptor for traffic field.
 	proxysubscribeDescTraffic := proxysubscribeFields[9].Descriptor()
 	// proxysubscribe.DefaultTraffic holds the default value on creation for the traffic field.
@@ -904,15 +904,15 @@ func init() {
 	// proxysubscribeDescSpeedLimit is the schema descriptor for speed_limit field.
 	proxysubscribeDescSpeedLimit := proxysubscribeFields[10].Descriptor()
 	// proxysubscribe.DefaultSpeedLimit holds the default value on creation for the speed_limit field.
-	proxysubscribe.DefaultSpeedLimit = proxysubscribeDescSpeedLimit.Default.(int64)
+	proxysubscribe.DefaultSpeedLimit = proxysubscribeDescSpeedLimit.Default.(int32)
 	// proxysubscribeDescDeviceLimit is the schema descriptor for device_limit field.
 	proxysubscribeDescDeviceLimit := proxysubscribeFields[11].Descriptor()
 	// proxysubscribe.DefaultDeviceLimit holds the default value on creation for the device_limit field.
-	proxysubscribe.DefaultDeviceLimit = proxysubscribeDescDeviceLimit.Default.(int64)
+	proxysubscribe.DefaultDeviceLimit = proxysubscribeDescDeviceLimit.Default.(int32)
 	// proxysubscribeDescQuota is the schema descriptor for quota field.
 	proxysubscribeDescQuota := proxysubscribeFields[12].Descriptor()
 	// proxysubscribe.DefaultQuota holds the default value on creation for the quota field.
-	proxysubscribe.DefaultQuota = proxysubscribeDescQuota.Default.(int64)
+	proxysubscribe.DefaultQuota = proxysubscribeDescQuota.Default.(int32)
 	// proxysubscribeDescNodes is the schema descriptor for nodes field.
 	proxysubscribeDescNodes := proxysubscribeFields[13].Descriptor()
 	// proxysubscribe.DefaultNodes holds the default value on creation for the nodes field.
@@ -940,11 +940,11 @@ func init() {
 	// proxysubscribeDescSort is the schema descriptor for sort field.
 	proxysubscribeDescSort := proxysubscribeFields[20].Descriptor()
 	// proxysubscribe.DefaultSort holds the default value on creation for the sort field.
-	proxysubscribe.DefaultSort = proxysubscribeDescSort.Default.(int64)
+	proxysubscribe.DefaultSort = proxysubscribeDescSort.Default.(int32)
 	// proxysubscribeDescDeductionRatio is the schema descriptor for deduction_ratio field.
 	proxysubscribeDescDeductionRatio := proxysubscribeFields[21].Descriptor()
 	// proxysubscribe.DefaultDeductionRatio holds the default value on creation for the deduction_ratio field.
-	proxysubscribe.DefaultDeductionRatio = proxysubscribeDescDeductionRatio.Default.(int64)
+	proxysubscribe.DefaultDeductionRatio = proxysubscribeDescDeductionRatio.Default.(int32)
 	// proxysubscribeDescAllowDeduction is the schema descriptor for allow_deduction field.
 	proxysubscribeDescAllowDeduction := proxysubscribeFields[22].Descriptor()
 	// proxysubscribe.DefaultAllowDeduction holds the default value on creation for the allow_deduction field.
@@ -952,7 +952,7 @@ func init() {
 	// proxysubscribeDescResetCycle is the schema descriptor for reset_cycle field.
 	proxysubscribeDescResetCycle := proxysubscribeFields[23].Descriptor()
 	// proxysubscribe.DefaultResetCycle holds the default value on creation for the reset_cycle field.
-	proxysubscribe.DefaultResetCycle = proxysubscribeDescResetCycle.Default.(int64)
+	proxysubscribe.DefaultResetCycle = proxysubscribeDescResetCycle.Default.(int32)
 	// proxysubscribeDescRenewalReset is the schema descriptor for renewal_reset field.
 	proxysubscribeDescRenewalReset := proxysubscribeFields[24].Descriptor()
 	// proxysubscribe.DefaultRenewalReset holds the default value on creation for the renewal_reset field.
@@ -1080,11 +1080,11 @@ func init() {
 	// proxysubscribegroupDescExpiredDaysLimit is the schema descriptor for expired_days_limit field.
 	proxysubscribegroupDescExpiredDaysLimit := proxysubscribegroupFields[4].Descriptor()
 	// proxysubscribegroup.DefaultExpiredDaysLimit holds the default value on creation for the expired_days_limit field.
-	proxysubscribegroup.DefaultExpiredDaysLimit = proxysubscribegroupDescExpiredDaysLimit.Default.(int64)
+	proxysubscribegroup.DefaultExpiredDaysLimit = proxysubscribegroupDescExpiredDaysLimit.Default.(int32)
 	// proxysubscribegroupDescMaxTrafficGBExpired is the schema descriptor for max_traffic_gb_expired field.
 	proxysubscribegroupDescMaxTrafficGBExpired := proxysubscribegroupFields[5].Descriptor()
 	// proxysubscribegroup.DefaultMaxTrafficGBExpired holds the default value on creation for the max_traffic_gb_expired field.
-	proxysubscribegroup.DefaultMaxTrafficGBExpired = proxysubscribegroupDescMaxTrafficGBExpired.Default.(int64)
+	proxysubscribegroup.DefaultMaxTrafficGBExpired = proxysubscribegroupDescMaxTrafficGBExpired.Default.(int32)
 	// proxysubscribegroupDescSpeedLimit is the schema descriptor for speed_limit field.
 	proxysubscribegroupDescSpeedLimit := proxysubscribegroupFields[6].Descriptor()
 	// proxysubscribegroup.DefaultSpeedLimit holds the default value on creation for the speed_limit field.
@@ -1170,11 +1170,11 @@ func init() {
 	// proxytaskDescTotal is the schema descriptor for total field.
 	proxytaskDescTotal := proxytaskFields[6].Descriptor()
 	// proxytask.DefaultTotal holds the default value on creation for the total field.
-	proxytask.DefaultTotal = proxytaskDescTotal.Default.(uint64)
+	proxytask.DefaultTotal = proxytaskDescTotal.Default.(uint32)
 	// proxytaskDescCurrent is the schema descriptor for current field.
 	proxytaskDescCurrent := proxytaskFields[7].Descriptor()
 	// proxytask.DefaultCurrent holds the default value on creation for the current field.
-	proxytask.DefaultCurrent = proxytaskDescCurrent.Default.(uint64)
+	proxytask.DefaultCurrent = proxytaskDescCurrent.Default.(uint32)
 	// proxytaskDescCreatedAt is the schema descriptor for created_at field.
 	proxytaskDescCreatedAt := proxytaskFields[8].Descriptor()
 	// proxytask.DefaultCreatedAt holds the default value on creation for the created_at field.

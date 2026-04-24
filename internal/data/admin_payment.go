@@ -2,7 +2,9 @@ package data
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/go-kratos/kratos/v2/log"
 
@@ -10,6 +12,8 @@ import (
 	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
 	paymentbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/payment"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	paymentpkg "github.com/OmnTeam/ppanel-pro/pkg/payment"
+	stripepkg "github.com/OmnTeam/ppanel-pro/pkg/payment/stripe"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 )
 
@@ -18,7 +22,6 @@ type adminPaymentRepo struct {
 	log  *log.Helper
 }
 
-// NewAdminPaymentRepo 创建支付方式仓储
 func NewAdminPaymentRepo(data *Data, logger log.Logger) paymentbiz.PaymentRepo {
 	return &adminPaymentRepo{
 		data: data,
@@ -26,13 +29,27 @@ func NewAdminPaymentRepo(data *Data, logger log.Logger) paymentbiz.PaymentRepo {
 	}
 }
 
-// Create 创建支付方式
 func (r *adminPaymentRepo) Create(ctx context.Context, method *paymentbiz.PaymentMethod) (*paymentbiz.PaymentMethod, error) {
-	// 生成8位随机token
 	token := tool.GenerateRandomString(8)
+	config, err := r.normalizePaymentConfig(method.Platform, method.Config)
+	if err != nil {
+		return nil, err
+	}
 
-	// 生成通知URL
-	notifyURL := fmt.Sprintf("%s/v1/notify/%s/%s", method.Domain, method.Platform, token)
+	sort := method.Sort
+	if sort == 0 {
+		sort, err = r.nextSort(ctx)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if paymentpkg.ParsePlatform(method.Platform) == paymentpkg.Stripe {
+		config, err = r.attachStripeWebhook(config, strings.TrimSpace(method.Domain), token)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	created, err := r.data.db.ProxyPayment.
 		Create().
@@ -41,45 +58,26 @@ func (r *adminPaymentRepo) Create(ctx context.Context, method *paymentbiz.Paymen
 		SetDescription(method.Description).
 		SetIcon(method.Icon).
 		SetDomain(method.Domain).
-		SetConfig(method.Config).
+		SetConfig(config).
 		SetFeeMode(uint(method.FeeMode)).
 		SetFeePercent(method.FeePercent).
 		SetFeeAmount(method.FeeAmount).
+		SetSort(int32(sort)).
 		SetEnable(method.Enable).
 		SetToken(token).
 		Save(ctx)
-
 	if err != nil {
 		return nil, err
 	}
 
-	return &paymentbiz.PaymentMethod{
-		ID:          int64(created.ID),
-		Name:        created.Name,
-		Platform:    created.Platform,
-		Description: created.Description,
-		Icon:        created.Icon,
-		Domain:      created.Domain,
-		Config:      created.Config,
-		FeeMode:     int32(created.FeeMode),
-		FeePercent:  created.FeePercent,
-		FeeAmount:   created.FeeAmount,
-		Enable:      created.Enable,
-		Token:       created.Token,
-		NotifyURL:   notifyURL,
-	}, nil
+	return r.toBiz(created), nil
 }
 
-// Update 更新支付方式
 func (r *adminPaymentRepo) Update(ctx context.Context, method *paymentbiz.PaymentMethod) (*paymentbiz.PaymentMethod, error) {
-	// 获取原有支付方式
 	original, err := r.data.db.ProxyPayment.
 		Query().
-		Where(
-			proxypayment.ID(method.ID),
-		).
+		Where(proxypayment.ID(method.ID)).
 		Only(ctx)
-
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, responsecode.NewPaymentNotFoundError()
@@ -87,8 +85,15 @@ func (r *adminPaymentRepo) Update(ctx context.Context, method *paymentbiz.Paymen
 		return nil, err
 	}
 
-	// 生成通知URL (使用原有token)
-	notifyURL := fmt.Sprintf("%s/v1/notify/%s/%s", method.Domain, method.Platform, original.Token)
+	config, err := r.normalizePaymentConfig(method.Platform, method.Config)
+	if err != nil {
+		return nil, err
+	}
+
+	sort := method.Sort
+	if sort == 0 {
+		sort = int64(original.Sort)
+	}
 
 	updated, err := original.
 		Update().
@@ -97,153 +102,185 @@ func (r *adminPaymentRepo) Update(ctx context.Context, method *paymentbiz.Paymen
 		SetDescription(method.Description).
 		SetIcon(method.Icon).
 		SetDomain(method.Domain).
-		SetConfig(method.Config).
+		SetConfig(config).
 		SetFeeMode(uint(method.FeeMode)).
 		SetFeePercent(method.FeePercent).
 		SetFeeAmount(method.FeeAmount).
+		SetSort(int32(sort)).
 		SetEnable(method.Enable).
 		Save(ctx)
-
 	if err != nil {
 		return nil, err
 	}
 
-	return &paymentbiz.PaymentMethod{
-		ID:          int64(updated.ID),
-		Name:        updated.Name,
-		Platform:    updated.Platform,
-		Description: updated.Description,
-		Icon:        updated.Icon,
-		Domain:      updated.Domain,
-		Config:      updated.Config,
-		FeeMode:     int32(updated.FeeMode),
-		FeePercent:  updated.FeePercent,
-		FeeAmount:   updated.FeeAmount,
-		Enable:      updated.Enable,
-		Token:       updated.Token,
-		NotifyURL:   notifyURL,
-	}, nil
+	return r.toBiz(updated), nil
 }
 
-// Delete 删除支付方式
 func (r *adminPaymentRepo) Delete(ctx context.Context, id int) error {
-	result, err := r.data.db.ProxyPayment.
+	_, err := r.data.db.ProxyPayment.
 		Delete().
-		Where(
-			proxypayment.ID(int64(id)),
-		).
+		Where(proxypayment.ID(int64(id))).
 		Exec(ctx)
-
-	if err != nil {
-		return err
-	}
-
-	if result == 0 {
-		return responsecode.NewPaymentNotFoundError()
-	}
-
-	return nil
+	return err
 }
 
-// Get 获取支付方式详情
 func (r *adminPaymentRepo) Get(ctx context.Context, id int) (*paymentbiz.PaymentMethod, error) {
 	payment, err := r.data.db.ProxyPayment.
 		Query().
-		Where(
-			proxypayment.ID(int64(id)),
-		).
+		Where(proxypayment.ID(int64(id))).
 		Only(ctx)
-
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, responsecode.NewPaymentNotFoundError()
 		}
 		return nil, err
 	}
-
-	// 生成通知URL
-	notifyURL := fmt.Sprintf("%s/v1/notify/%s/%s", payment.Domain, payment.Platform, payment.Token)
-
-	return &paymentbiz.PaymentMethod{
-		ID:          int64(payment.ID),
-		Name:        payment.Name,
-		Platform:    payment.Platform,
-		Description: payment.Description,
-		Icon:        payment.Icon,
-		Domain:      payment.Domain,
-		Config:      payment.Config,
-		FeeMode:     int32(payment.FeeMode),
-		FeePercent:  payment.FeePercent,
-		FeeAmount:   payment.FeeAmount,
-		Enable:      payment.Enable,
-		Token:       payment.Token,
-		NotifyURL:   notifyURL,
-	}, nil
+	return r.toBiz(payment), nil
 }
 
-// List 获取支付方式列表
-func (r *adminPaymentRepo) List(ctx context.Context, page, size int, platform, search string, enable *bool) (int64, []*paymentbiz.PaymentMethod, error) {
-	query := r.data.db.ProxyPayment.
-		Query()
-
-	// 平台筛选
+func (r *adminPaymentRepo) List(ctx context.Context, page, size int, platform, search string, enable *bool) (int32, []*paymentbiz.PaymentMethod, error) {
+	query := r.data.db.ProxyPayment.Query()
 	if platform != "" {
 		query = query.Where(proxypayment.Platform(platform))
 	}
-
-	// 启用状态筛选
 	if enable != nil {
 		query = query.Where(proxypayment.Enable(*enable))
 	}
-
-	// 搜索条件
 	if search != "" {
-		query = query.Where(
-			proxypayment.Or(
-				proxypayment.NameContains(search),
-				proxypayment.DescriptionContains(search),
-			),
-		)
+		query = query.Where(proxypayment.NameContains(search))
 	}
 
-	// 获取总数
 	total, err := query.Count(ctx)
 	if err != nil {
 		return 0, nil, err
 	}
 
-	// 分页查询
 	payments, err := query.
-		Offset(int((page - 1) * size)).
-		Limit(int(size)).
-		Order(ent.Desc(proxypayment.FieldID)).
+		Offset((page-1)*size).
+		Limit(size).
+		Order(ent.Asc(proxypayment.FieldSort), ent.Asc(proxypayment.FieldID)).
 		All(ctx)
-
 	if err != nil {
 		return 0, nil, err
 	}
 
 	result := make([]*paymentbiz.PaymentMethod, 0, len(payments))
-	for _, p := range payments {
-		// 生成通知URL
-		notifyURL := fmt.Sprintf("%s/v1/notify/%s/%s", p.Domain, p.Platform, p.Token)
+	for _, item := range payments {
+		result = append(result, r.toBiz(item))
+	}
+	return int32(total), result, nil
+}
 
-		result = append(result, &paymentbiz.PaymentMethod{
-			ID:          int64(p.ID),
-			Name:        p.Name,
-			Platform:    p.Platform,
-			Description: p.Description,
-			Icon:        p.Icon,
-			Domain:      p.Domain,
-			Config:      p.Config,
-			FeeMode:     int32(p.FeeMode),
-			FeePercent:  p.FeePercent,
-			FeeAmount:   p.FeeAmount,
-			Enable:      p.Enable,
-			Token:       p.Token,
-			NotifyURL:   notifyURL,
-		})
+func (r *adminPaymentRepo) toBiz(item *ent.ProxyPayment) *paymentbiz.PaymentMethod {
+	if item == nil {
+		return nil
+	}
+	return &paymentbiz.PaymentMethod{
+		ID:          item.ID,
+		Name:        item.Name,
+		Platform:    item.Platform,
+		Description: item.Description,
+		Icon:        item.Icon,
+		Domain:      item.Domain,
+		Config:      item.Config,
+		FeeMode:     int32(item.FeeMode),
+		FeePercent:  item.FeePercent,
+		FeeAmount:   item.FeeAmount,
+		Sort:        int64(item.Sort),
+		Enable:      item.Enable,
+		Token:       item.Token,
+		SiteHost:    r.siteHost(),
+	}
+}
+
+func (r *adminPaymentRepo) nextSort(ctx context.Context) (int64, error) {
+	last, err := r.data.db.ProxyPayment.Query().Order(ent.Desc(proxypayment.FieldSort)).First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return 1, nil
+		}
+		return 0, err
+	}
+	return int64(last.Sort) + 1, nil
+}
+
+func (r *adminPaymentRepo) normalizePaymentConfig(platform, raw string) (string, error) {
+	data := []byte(raw)
+	switch paymentpkg.ParsePlatform(platform) {
+	case paymentpkg.Stripe:
+		var cfg StripeConfig
+		if err := cfg.Unmarshal(data); err != nil {
+			return "", err
+		}
+		content, err := json.Marshal(&cfg)
+		if err != nil {
+			return "", err
+		}
+		return string(content), nil
+	case paymentpkg.AlipayF2F:
+		var cfg AlipayF2FConfig
+		if err := cfg.Unmarshal(data); err != nil {
+			return "", err
+		}
+		content, err := json.Marshal(&cfg)
+		if err != nil {
+			return "", err
+		}
+		return string(content), nil
+	case paymentpkg.EPay:
+		var cfg EPayConfig
+		if err := cfg.Unmarshal(data); err != nil {
+			return "", err
+		}
+		content, err := json.Marshal(&cfg)
+		if err != nil {
+			return "", err
+		}
+		return string(content), nil
+	case paymentpkg.CryptoSaaS:
+		var cfg CryptoSaaSConfig
+		if err := cfg.Unmarshal(data); err != nil {
+			return "", err
+		}
+		content, err := json.Marshal(&cfg)
+		if err != nil {
+			return "", err
+		}
+		return string(content), nil
+	default:
+		return raw, nil
+	}
+}
+
+func (r *adminPaymentRepo) attachStripeWebhook(configJSON, domain, token string) (string, error) {
+	var cfg StripeConfig
+	if err := cfg.Unmarshal([]byte(configJSON)); err != nil {
+		return "", err
+	}
+	if strings.TrimSpace(cfg.SecretKey) == "" {
+		return "", fmt.Errorf("stripe secret key is empty")
 	}
 
-	return int64(total), result, nil
+	client := stripepkg.NewClient(stripepkg.Config{
+		SecretKey: cfg.SecretKey,
+		PublicKey: cfg.PublicKey,
+	})
+	endpoint, err := client.CreateWebhookEndpoint(fmt.Sprintf("%s/v1/notify/Stripe/%s", domain, token))
+	if err != nil {
+		return "", err
+	}
+	cfg.WebhookSecret = endpoint.Secret
+
+	content, err := json.Marshal(&cfg)
+	if err != nil {
+		return "", err
+	}
+	return string(content), nil
+}
+
+func (r *adminPaymentRepo) siteHost() string {
+	if r.data != nil && r.data.AppConf() != nil && r.data.AppConf().Site != nil {
+		return strings.TrimSpace(r.data.AppConf().Site.Host)
+	}
+	return ""
 }

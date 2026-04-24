@@ -21,15 +21,15 @@ type ProxyRedemptionCode struct {
 	// 兑换码
 	Code string `json:"code,omitempty"`
 	// 总兑换次数
-	TotalCount int64 `json:"total_count,omitempty"`
+	TotalCount int32 `json:"total_count,omitempty"`
 	// 已使用次数
-	UsedCount int64 `json:"used_count,omitempty"`
+	UsedCount int32 `json:"used_count,omitempty"`
 	// 订阅套餐ID
 	SubscribePlan int64 `json:"subscribe_plan,omitempty"`
 	// 时间单位
 	UnitTime string `json:"unit_time,omitempty"`
 	// 数量
-	Quantity int64 `json:"quantity,omitempty"`
+	Quantity int32 `json:"quantity,omitempty"`
 	// 状态
 	Status int8 `json:"status,omitempty"`
 	// 创建时间
@@ -104,13 +104,13 @@ func (_m *ProxyRedemptionCode) assignValues(columns []string, values []any) erro
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field total_count", values[i])
 			} else if value.Valid {
-				_m.TotalCount = value.Int64
+				_m.TotalCount = int32(value.Int64)
 			}
 		case proxyredemptioncode.FieldUsedCount:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field used_count", values[i])
 			} else if value.Valid {
-				_m.UsedCount = value.Int64
+				_m.UsedCount = int32(value.Int64)
 			}
 		case proxyredemptioncode.FieldSubscribePlan:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -128,7 +128,7 @@ func (_m *ProxyRedemptionCode) assignValues(columns []string, values []any) erro
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field quantity", values[i])
 			} else if value.Valid {
-				_m.Quantity = value.Int64
+				_m.Quantity = int32(value.Int64)
 			}
 		case proxyredemptioncode.FieldStatus:
 			if value, ok := values[i].(*sql.NullInt64); !ok {

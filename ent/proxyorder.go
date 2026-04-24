@@ -27,7 +27,7 @@ type ProxyOrder struct {
 	// 订单类型
 	Type int8 `json:"type,omitempty"`
 	// 数量
-	Quantity int64 `json:"quantity,omitempty"`
+	Quantity int32 `json:"quantity,omitempty"`
 	// 原价
 	Price int64 `json:"price,omitempty"`
 	// 实付金额
@@ -127,7 +127,7 @@ func (_m *ProxyOrder) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field quantity", values[i])
 			} else if value.Valid {
-				_m.Quantity = value.Int64
+				_m.Quantity = int32(value.Int64)
 			}
 		case proxyorder.FieldPrice:
 			if value, ok := values[i].(*sql.NullInt64); !ok {

@@ -44,14 +44,14 @@ func (_u *ProxyRedemptionCodeUpdate) SetNillableCode(v *string) *ProxyRedemption
 }
 
 // SetTotalCount sets the "total_count" field.
-func (_u *ProxyRedemptionCodeUpdate) SetTotalCount(v int64) *ProxyRedemptionCodeUpdate {
+func (_u *ProxyRedemptionCodeUpdate) SetTotalCount(v int32) *ProxyRedemptionCodeUpdate {
 	_u.mutation.ResetTotalCount()
 	_u.mutation.SetTotalCount(v)
 	return _u
 }
 
 // SetNillableTotalCount sets the "total_count" field if the given value is not nil.
-func (_u *ProxyRedemptionCodeUpdate) SetNillableTotalCount(v *int64) *ProxyRedemptionCodeUpdate {
+func (_u *ProxyRedemptionCodeUpdate) SetNillableTotalCount(v *int32) *ProxyRedemptionCodeUpdate {
 	if v != nil {
 		_u.SetTotalCount(*v)
 	}
@@ -59,20 +59,20 @@ func (_u *ProxyRedemptionCodeUpdate) SetNillableTotalCount(v *int64) *ProxyRedem
 }
 
 // AddTotalCount adds value to the "total_count" field.
-func (_u *ProxyRedemptionCodeUpdate) AddTotalCount(v int64) *ProxyRedemptionCodeUpdate {
+func (_u *ProxyRedemptionCodeUpdate) AddTotalCount(v int32) *ProxyRedemptionCodeUpdate {
 	_u.mutation.AddTotalCount(v)
 	return _u
 }
 
 // SetUsedCount sets the "used_count" field.
-func (_u *ProxyRedemptionCodeUpdate) SetUsedCount(v int64) *ProxyRedemptionCodeUpdate {
+func (_u *ProxyRedemptionCodeUpdate) SetUsedCount(v int32) *ProxyRedemptionCodeUpdate {
 	_u.mutation.ResetUsedCount()
 	_u.mutation.SetUsedCount(v)
 	return _u
 }
 
 // SetNillableUsedCount sets the "used_count" field if the given value is not nil.
-func (_u *ProxyRedemptionCodeUpdate) SetNillableUsedCount(v *int64) *ProxyRedemptionCodeUpdate {
+func (_u *ProxyRedemptionCodeUpdate) SetNillableUsedCount(v *int32) *ProxyRedemptionCodeUpdate {
 	if v != nil {
 		_u.SetUsedCount(*v)
 	}
@@ -80,7 +80,7 @@ func (_u *ProxyRedemptionCodeUpdate) SetNillableUsedCount(v *int64) *ProxyRedemp
 }
 
 // AddUsedCount adds value to the "used_count" field.
-func (_u *ProxyRedemptionCodeUpdate) AddUsedCount(v int64) *ProxyRedemptionCodeUpdate {
+func (_u *ProxyRedemptionCodeUpdate) AddUsedCount(v int32) *ProxyRedemptionCodeUpdate {
 	_u.mutation.AddUsedCount(v)
 	return _u
 }
@@ -121,14 +121,14 @@ func (_u *ProxyRedemptionCodeUpdate) SetNillableUnitTime(v *string) *ProxyRedemp
 }
 
 // SetQuantity sets the "quantity" field.
-func (_u *ProxyRedemptionCodeUpdate) SetQuantity(v int64) *ProxyRedemptionCodeUpdate {
+func (_u *ProxyRedemptionCodeUpdate) SetQuantity(v int32) *ProxyRedemptionCodeUpdate {
 	_u.mutation.ResetQuantity()
 	_u.mutation.SetQuantity(v)
 	return _u
 }
 
 // SetNillableQuantity sets the "quantity" field if the given value is not nil.
-func (_u *ProxyRedemptionCodeUpdate) SetNillableQuantity(v *int64) *ProxyRedemptionCodeUpdate {
+func (_u *ProxyRedemptionCodeUpdate) SetNillableQuantity(v *int32) *ProxyRedemptionCodeUpdate {
 	if v != nil {
 		_u.SetQuantity(*v)
 	}
@@ -136,7 +136,7 @@ func (_u *ProxyRedemptionCodeUpdate) SetNillableQuantity(v *int64) *ProxyRedempt
 }
 
 // AddQuantity adds value to the "quantity" field.
-func (_u *ProxyRedemptionCodeUpdate) AddQuantity(v int64) *ProxyRedemptionCodeUpdate {
+func (_u *ProxyRedemptionCodeUpdate) AddQuantity(v int32) *ProxyRedemptionCodeUpdate {
 	_u.mutation.AddQuantity(v)
 	return _u
 }
@@ -296,16 +296,16 @@ func (_u *ProxyRedemptionCodeUpdate) sqlSave(ctx context.Context) (_node int, er
 		_spec.SetField(proxyredemptioncode.FieldCode, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.TotalCount(); ok {
-		_spec.SetField(proxyredemptioncode.FieldTotalCount, field.TypeInt64, value)
+		_spec.SetField(proxyredemptioncode.FieldTotalCount, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedTotalCount(); ok {
-		_spec.AddField(proxyredemptioncode.FieldTotalCount, field.TypeInt64, value)
+		_spec.AddField(proxyredemptioncode.FieldTotalCount, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.UsedCount(); ok {
-		_spec.SetField(proxyredemptioncode.FieldUsedCount, field.TypeInt64, value)
+		_spec.SetField(proxyredemptioncode.FieldUsedCount, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedUsedCount(); ok {
-		_spec.AddField(proxyredemptioncode.FieldUsedCount, field.TypeInt64, value)
+		_spec.AddField(proxyredemptioncode.FieldUsedCount, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.SubscribePlan(); ok {
 		_spec.SetField(proxyredemptioncode.FieldSubscribePlan, field.TypeInt64, value)
@@ -317,10 +317,10 @@ func (_u *ProxyRedemptionCodeUpdate) sqlSave(ctx context.Context) (_node int, er
 		_spec.SetField(proxyredemptioncode.FieldUnitTime, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Quantity(); ok {
-		_spec.SetField(proxyredemptioncode.FieldQuantity, field.TypeInt64, value)
+		_spec.SetField(proxyredemptioncode.FieldQuantity, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedQuantity(); ok {
-		_spec.AddField(proxyredemptioncode.FieldQuantity, field.TypeInt64, value)
+		_spec.AddField(proxyredemptioncode.FieldQuantity, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(proxyredemptioncode.FieldStatus, field.TypeInt8, value)
@@ -417,14 +417,14 @@ func (_u *ProxyRedemptionCodeUpdateOne) SetNillableCode(v *string) *ProxyRedempt
 }
 
 // SetTotalCount sets the "total_count" field.
-func (_u *ProxyRedemptionCodeUpdateOne) SetTotalCount(v int64) *ProxyRedemptionCodeUpdateOne {
+func (_u *ProxyRedemptionCodeUpdateOne) SetTotalCount(v int32) *ProxyRedemptionCodeUpdateOne {
 	_u.mutation.ResetTotalCount()
 	_u.mutation.SetTotalCount(v)
 	return _u
 }
 
 // SetNillableTotalCount sets the "total_count" field if the given value is not nil.
-func (_u *ProxyRedemptionCodeUpdateOne) SetNillableTotalCount(v *int64) *ProxyRedemptionCodeUpdateOne {
+func (_u *ProxyRedemptionCodeUpdateOne) SetNillableTotalCount(v *int32) *ProxyRedemptionCodeUpdateOne {
 	if v != nil {
 		_u.SetTotalCount(*v)
 	}
@@ -432,20 +432,20 @@ func (_u *ProxyRedemptionCodeUpdateOne) SetNillableTotalCount(v *int64) *ProxyRe
 }
 
 // AddTotalCount adds value to the "total_count" field.
-func (_u *ProxyRedemptionCodeUpdateOne) AddTotalCount(v int64) *ProxyRedemptionCodeUpdateOne {
+func (_u *ProxyRedemptionCodeUpdateOne) AddTotalCount(v int32) *ProxyRedemptionCodeUpdateOne {
 	_u.mutation.AddTotalCount(v)
 	return _u
 }
 
 // SetUsedCount sets the "used_count" field.
-func (_u *ProxyRedemptionCodeUpdateOne) SetUsedCount(v int64) *ProxyRedemptionCodeUpdateOne {
+func (_u *ProxyRedemptionCodeUpdateOne) SetUsedCount(v int32) *ProxyRedemptionCodeUpdateOne {
 	_u.mutation.ResetUsedCount()
 	_u.mutation.SetUsedCount(v)
 	return _u
 }
 
 // SetNillableUsedCount sets the "used_count" field if the given value is not nil.
-func (_u *ProxyRedemptionCodeUpdateOne) SetNillableUsedCount(v *int64) *ProxyRedemptionCodeUpdateOne {
+func (_u *ProxyRedemptionCodeUpdateOne) SetNillableUsedCount(v *int32) *ProxyRedemptionCodeUpdateOne {
 	if v != nil {
 		_u.SetUsedCount(*v)
 	}
@@ -453,7 +453,7 @@ func (_u *ProxyRedemptionCodeUpdateOne) SetNillableUsedCount(v *int64) *ProxyRed
 }
 
 // AddUsedCount adds value to the "used_count" field.
-func (_u *ProxyRedemptionCodeUpdateOne) AddUsedCount(v int64) *ProxyRedemptionCodeUpdateOne {
+func (_u *ProxyRedemptionCodeUpdateOne) AddUsedCount(v int32) *ProxyRedemptionCodeUpdateOne {
 	_u.mutation.AddUsedCount(v)
 	return _u
 }
@@ -494,14 +494,14 @@ func (_u *ProxyRedemptionCodeUpdateOne) SetNillableUnitTime(v *string) *ProxyRed
 }
 
 // SetQuantity sets the "quantity" field.
-func (_u *ProxyRedemptionCodeUpdateOne) SetQuantity(v int64) *ProxyRedemptionCodeUpdateOne {
+func (_u *ProxyRedemptionCodeUpdateOne) SetQuantity(v int32) *ProxyRedemptionCodeUpdateOne {
 	_u.mutation.ResetQuantity()
 	_u.mutation.SetQuantity(v)
 	return _u
 }
 
 // SetNillableQuantity sets the "quantity" field if the given value is not nil.
-func (_u *ProxyRedemptionCodeUpdateOne) SetNillableQuantity(v *int64) *ProxyRedemptionCodeUpdateOne {
+func (_u *ProxyRedemptionCodeUpdateOne) SetNillableQuantity(v *int32) *ProxyRedemptionCodeUpdateOne {
 	if v != nil {
 		_u.SetQuantity(*v)
 	}
@@ -509,7 +509,7 @@ func (_u *ProxyRedemptionCodeUpdateOne) SetNillableQuantity(v *int64) *ProxyRede
 }
 
 // AddQuantity adds value to the "quantity" field.
-func (_u *ProxyRedemptionCodeUpdateOne) AddQuantity(v int64) *ProxyRedemptionCodeUpdateOne {
+func (_u *ProxyRedemptionCodeUpdateOne) AddQuantity(v int32) *ProxyRedemptionCodeUpdateOne {
 	_u.mutation.AddQuantity(v)
 	return _u
 }
@@ -699,16 +699,16 @@ func (_u *ProxyRedemptionCodeUpdateOne) sqlSave(ctx context.Context) (_node *Pro
 		_spec.SetField(proxyredemptioncode.FieldCode, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.TotalCount(); ok {
-		_spec.SetField(proxyredemptioncode.FieldTotalCount, field.TypeInt64, value)
+		_spec.SetField(proxyredemptioncode.FieldTotalCount, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedTotalCount(); ok {
-		_spec.AddField(proxyredemptioncode.FieldTotalCount, field.TypeInt64, value)
+		_spec.AddField(proxyredemptioncode.FieldTotalCount, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.UsedCount(); ok {
-		_spec.SetField(proxyredemptioncode.FieldUsedCount, field.TypeInt64, value)
+		_spec.SetField(proxyredemptioncode.FieldUsedCount, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedUsedCount(); ok {
-		_spec.AddField(proxyredemptioncode.FieldUsedCount, field.TypeInt64, value)
+		_spec.AddField(proxyredemptioncode.FieldUsedCount, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.SubscribePlan(); ok {
 		_spec.SetField(proxyredemptioncode.FieldSubscribePlan, field.TypeInt64, value)
@@ -720,10 +720,10 @@ func (_u *ProxyRedemptionCodeUpdateOne) sqlSave(ctx context.Context) (_node *Pro
 		_spec.SetField(proxyredemptioncode.FieldUnitTime, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Quantity(); ok {
-		_spec.SetField(proxyredemptioncode.FieldQuantity, field.TypeInt64, value)
+		_spec.SetField(proxyredemptioncode.FieldQuantity, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedQuantity(); ok {
-		_spec.AddField(proxyredemptioncode.FieldQuantity, field.TypeInt64, value)
+		_spec.AddField(proxyredemptioncode.FieldQuantity, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(proxyredemptioncode.FieldStatus, field.TypeInt8, value)

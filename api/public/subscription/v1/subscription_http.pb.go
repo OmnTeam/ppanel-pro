@@ -23,13 +23,14 @@ const OperationSubscriptionGetSubscribeConfig = "/api.public.subscription.v1.Sub
 
 type SubscriptionHTTPServer interface {
 	// GetSubscribeConfig GetSubscribeConfig 获取订阅配置
-	// 根据token获取用户订阅配置文件，支持多种客户端格式
+	// 根据老项目请求参数生成订阅配置
 	GetSubscribeConfig(context.Context, *GetSubscribeConfigRequest) (*GetSubscribeConfigReply, error)
 }
 
 func RegisterSubscriptionHTTPServer(s *http.Server, srv SubscriptionHTTPServer) {
 	r := s.Route("/")
 	r.GET("/v1/subscribe/{token}", _Subscription_GetSubscribeConfig1_HTTP_Handler(srv))
+	r.GET("/v1/subscribe/config", _Subscription_GetSubscribeConfig2_HTTP_Handler(srv))
 }
 
 func _Subscription_GetSubscribeConfig1_HTTP_Handler(srv SubscriptionHTTPServer) func(ctx http.Context) error {
@@ -39,6 +40,25 @@ func _Subscription_GetSubscribeConfig1_HTTP_Handler(srv SubscriptionHTTPServer) 
 			return err
 		}
 		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationSubscriptionGetSubscribeConfig)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetSubscribeConfig(ctx, req.(*GetSubscribeConfigRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetSubscribeConfigReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Subscription_GetSubscribeConfig2_HTTP_Handler(srv SubscriptionHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetSubscribeConfigRequest
+		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationSubscriptionGetSubscribeConfig)
@@ -68,7 +88,7 @@ func NewSubscriptionHTTPClient(client *http.Client) SubscriptionHTTPClient {
 
 func (c *SubscriptionHTTPClientImpl) GetSubscribeConfig(ctx context.Context, in *GetSubscribeConfigRequest, opts ...http.CallOption) (*GetSubscribeConfigReply, error) {
 	var out GetSubscribeConfigReply
-	pattern := "/v1/subscribe/{token}"
+	pattern := "/v1/subscribe/config"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationSubscriptionGetSubscribeConfig))
 	opts = append(opts, http.PathTemplate(pattern))

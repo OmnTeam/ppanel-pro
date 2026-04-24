@@ -94,6 +94,7 @@ func NewHTTPServer(c *conf.Server, appConf *conf.Application, authMiddleware *ap
 		http.Filter(
 			middleware.TraceMiddleware(logger),
 			middleware.CORSFilter(c.Cors),                                 // CORS Filter 必须最外层
+			middleware.SubscribePathCompatFilter(appConf),                 // 兼容管理端自定义订阅路径
 			middleware.LegacyPathCompatFilter(),                           // 兼容旧项目尾斜杠路由
 			middleware.LegacyRouteGuardFilter(),                           // 屏蔽新项目多出的非兼容路由
 			middleware.DeviceMiddleware(getDeviceConfig(appConf), logger), // 设备加解密需保留在 HTTP Filter 链中
@@ -105,8 +106,8 @@ func NewHTTPServer(c *conf.Server, appConf *conf.Application, authMiddleware *ap
 		),
 		http.ErrorEncoder(CustomErrorEncoder), // 使用自定义错误编码器，所有错误返回HTTP 200
 		//http.RequestDecoder(CustomRequestDecoder),   // 使用自定义请求解码器，处理前端空对象问题
-		//http.ResponseEncoder(CustomResponseEncoder), // 使用自定义响应编码器，解决 int64 序列化问题
-		http.StrictSlash(false), // 禁用尾部斜杠自动重定向，通过手动注册两个路由来支持
+		http.ResponseEncoder(CustomResponseEncoder), // 使用自定义响应编码器，解决 int64 序列化问题
+		http.StrictSlash(false),                     // 禁用尾部斜杠自动重定向，通过手动注册两个路由来支持
 		http.NotFoundHandler(newCORSAwareFallbackHandler(c.Cors, nethttp.StatusNotFound)),
 		http.MethodNotAllowedHandler(newCORSAwareFallbackHandler(c.Cors, nethttp.StatusMethodNotAllowed)),
 	}
@@ -156,7 +157,7 @@ func NewHTTPServer(c *conf.Server, appConf *conf.Application, authMiddleware *ap
 	// Public Announcement模块服务注册
 	publicannouncementv1.RegisterAnnouncementHTTPServer(srv, publicAnnouncement)
 	// Public Document模块服务注册
-	publicdocumentv1.RegisterDocumentHTTPServer(srv, publicDocument)
+	publicdocumentv1.RegisterPublicDocumentHTTPServer(srv, publicDocument)
 	// Public Payment模块服务注册
 	publicpaymentv1.RegisterPaymentHTTPServer(srv, publicPayment)
 	// Public Portal模块服务注册
@@ -164,16 +165,20 @@ func NewHTTPServer(c *conf.Server, appConf *conf.Application, authMiddleware *ap
 	// Public Redemption模块服务注册
 	publicredemptionv1.RegisterRedemptionServiceHTTPServer(srv, publicRedemption)
 	// Public Subscribe模块服务注册
-	publicsubscribev1.RegisterSubscribeHTTPServer(srv, publicSubscribe)
+	publicsubscribev1.RegisterPublicSubscribeHTTPServer(srv, publicSubscribe)
 	// Public Subscription模块服务注册（订阅配置生成）
 	subscriptionv1.RegisterSubscriptionHTTPServer(srv, publicSubscription)
 	// Public Ticket模块服务注册
 	publicticketv1.RegisterTicketHTTPServer(srv, publicTicket)
 	// Public User模块服务注册
-	publicuserv1.RegisterUserHTTPServer(srv, publicUser)
+	publicuserv1.RegisterPublicUserHTTPServer(srv, publicUser)
 	// 注册兼容的订阅配置端点（与原项目格式完全一致）
 	for _, subscribePath := range subscribeCompatPaths(appConf) {
-		srv.HandleFunc(subscribePath, handleSubscribeConfig(publicSubscription))
+		srv.HandleFunc(subscribePath, handleSubscribeConfig(publicSubscription, subscribePath))
+		if subscribePath != "/v1/subscribe/config" {
+			prefixPath := strings.TrimRight(subscribePath, "/") + "/"
+			srv.HandleFunc(prefixPath, handleSubscribeConfig(publicSubscription, subscribePath))
+		}
 	}
 
 	return srv
@@ -187,11 +192,14 @@ func getDeviceConfig(appConf *conf.Application) *conf.Device {
 }
 
 // handleSubscribeConfig 处理订阅配置请求（与原项目完全兼容）
-func handleSubscribeConfig(subscriptionSvc *publicsubscription.PublicSubscriptionService) nethttp.HandlerFunc {
+func handleSubscribeConfig(subscriptionSvc *publicsubscription.PublicSubscriptionService, basePath string) nethttp.HandlerFunc {
 	return func(w nethttp.ResponseWriter, r *nethttp.Request) {
 		token := r.Header.Get("token")
 		if token == "" {
 			token = r.URL.Query().Get("token")
+		}
+		if token == "" {
+			token = subscribeTokenFromPath(r.URL.Path, basePath)
 		}
 
 		userAgent := r.UserAgent()
@@ -202,41 +210,15 @@ func handleSubscribeConfig(subscriptionSvc *publicsubscription.PublicSubscriptio
 		gatewayMode := legacyGatewayModeEnabled()
 
 		req := &subscriptionv1.GetSubscribeConfigRequest{
-			Token: token,
-		}
-
-		if target := r.URL.Query().Get("target"); target != "" {
-			req.Target = target
-		}
-		if r.URL.Query().Get("list") == "true" {
-			req.List = true
-		}
-		if r.URL.Query().Get("emoji") == "true" {
-			req.Emoji = true
-		}
-		if r.URL.Query().Get("udp") == "true" {
-			req.Udp = true
-		}
-		if r.URL.Query().Get("tfo") == "true" {
-			req.Tfo = true
-		}
-		if r.URL.Query().Get("scv") == "true" {
-			req.Scv = true
-		}
-		if filter := r.URL.Query().Get("filter"); filter != "" {
-			req.Filter = filter
-		}
-		if sortValue := strings.TrimSpace(r.URL.Query().Get("sort")); sortValue != "" {
-			if parsed, err := strconv.ParseInt(sortValue, 10, 32); err == nil {
-				req.Sort = int32(parsed)
-			}
-		}
-		if r.URL.Query().Get("expand") == "true" {
-			req.Expand = true
+			Token:  token,
+			Ua:     userAgent,
+			Flag:   r.URL.Query().Get("flag"),
+			Type:   r.URL.Query().Get("type"),
+			Params: getQueryMap(r),
 		}
 
 		ctx := r.Context()
-		queryParams := getQueryMap(r)
+		queryParams := req.Params
 		ctx = middleware.WithUserAgent(ctx, userAgent)
 		ctx = middleware.WithClientIP(ctx, clientIP)
 		ctx = middleware.WithRequestURI(ctx, requestURI)
@@ -254,24 +236,53 @@ func handleSubscribeConfig(subscriptionSvc *publicsubscription.PublicSubscriptio
 		}
 
 		resp, err := subscriptionSvc.GetSubscribeConfig(ctx, req)
-		if err != nil || resp == nil || resp.Code != 0 || resp.Data == nil {
+		if err != nil || resp == nil {
 			nethttp.Error(w, "Internal Server Error", nethttp.StatusInternalServerError)
 			return
 		}
 
-		if resp.Data.Header != "" {
-			w.Header().Set("subscription-userinfo", resp.Data.Header)
+		if resp.Header != "" {
+			w.Header().Set("subscription-userinfo", resp.Header)
 		}
-		if resp.Data.ContentType != "" {
-			w.Header().Set("Content-Type", resp.Data.ContentType)
+		contentType, filename, err := subscriptionSvc.ResolveDownloadMeta(ctx, req)
+		if err != nil {
+			nethttp.Error(w, "Internal Server Error", nethttp.StatusInternalServerError)
+			return
 		}
-		if resp.Data.Filename != "" {
-			w.Header().Set("content-disposition", fmt.Sprintf("attachment;filename*=UTF-8''%s", resp.Data.Filename))
+		if contentType != "" {
+			w.Header().Set("Content-Type", contentType)
+		}
+		if filename != "" {
+			w.Header().Set("content-disposition", fmt.Sprintf("attachment;filename*=UTF-8''%s", filename))
 		}
 
 		w.WriteHeader(nethttp.StatusOK)
-		w.Write([]byte(resp.Data.Config))
+		_, _ = w.Write(resp.Config)
 	}
+}
+
+func subscribeTokenFromPath(requestPath, basePath string) string {
+	basePath = strings.TrimSpace(basePath)
+	requestPath = strings.TrimSpace(requestPath)
+	if basePath == "" || requestPath == "" {
+		return ""
+	}
+
+	basePath = strings.TrimRight(basePath, "/")
+	if requestPath == basePath {
+		return ""
+	}
+
+	prefix := basePath + "/"
+	if !strings.HasPrefix(requestPath, prefix) {
+		return ""
+	}
+
+	remainder := strings.TrimSpace(strings.TrimPrefix(requestPath, prefix))
+	if remainder == "" || strings.Contains(remainder, "/") {
+		return ""
+	}
+	return remainder
 }
 
 // getClientIP 获取客户端真实IP（支持代理）
@@ -304,17 +315,20 @@ func getQueryMap(r *nethttp.Request) map[string]string {
 }
 
 func subscribeCompatPaths(appConf *conf.Application) []string {
-	paths := []string{
-		"/v1/subscribe/config",
-	}
-
+	basePath := "/api/subscribe"
 	if appConf != nil && appConf.Subscribe != nil {
 		if customPath := strings.TrimSpace(appConf.Subscribe.SubscribePath); customPath != "" {
 			if !strings.HasPrefix(customPath, "/") {
 				customPath = "/" + customPath
 			}
-			paths = append(paths, customPath)
+			basePath = strings.TrimRight(customPath, "/")
 		}
+	}
+
+	paths := []string{basePath}
+
+	if legacyGatewayModeEnabled() {
+		paths = append(paths, "/sub"+basePath)
 	}
 
 	seen := make(map[string]struct{}, len(paths))

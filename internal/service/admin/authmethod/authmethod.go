@@ -54,8 +54,11 @@ func (s *AuthMethodService) GetAuthMethodConfig(ctx context.Context, req *v1.Get
 func (s *AuthMethodService) UpdateAuthMethodConfig(ctx context.Context, req *v1.UpdateAuthMethodConfigRequest) (*v1.AuthMethodConfigReply, error) {
 	// 构造 biz 层请求（对应原项目的 types.UpdateAuthMethodConfigRequest）
 	bizReq := &authmethodbiz.UpdateAuthMethodRequest{
-		Method:  req.Method,
-		Enabled: req.Enabled,
+		ID:     req.Id,
+		Method: req.Method,
+	}
+	if req.Enabled != nil {
+		bizReq.Enabled = &req.Enabled.Value
 	}
 
 	// 将 protobuf Struct 转换为 interface{}（对应原项目的 req.Config）
@@ -92,8 +95,9 @@ func (s *AuthMethodService) GetEmailPlatform(ctx context.Context, req *v1.GetEma
 	result := make([]*v1.Platform, 0, len(platforms))
 	for _, p := range platforms {
 		result = append(result, &v1.Platform{
-			Name:  p.Platform,
-			Label: p.Platform, // 使用 Platform 作为 Label
+			Platform:                 p.Platform,
+			PlatformUrl:              p.PlatformUrl,
+			PlatformFieldDescription: p.PlatformFieldDescription,
 		})
 	}
 	return &v1.PlatformListReply{
@@ -112,8 +116,9 @@ func (s *AuthMethodService) GetSmsPlatform(ctx context.Context, req *v1.GetSmsPl
 	result := make([]*v1.Platform, 0, len(platforms))
 	for _, p := range platforms {
 		result = append(result, &v1.Platform{
-			Name:  p.Platform,
-			Label: p.Platform, // 使用 Platform 作为 Label
+			Platform:                 p.Platform,
+			PlatformUrl:              p.PlatformUrl,
+			PlatformFieldDescription: p.PlatformFieldDescription,
 		})
 	}
 	return &v1.PlatformListReply{
@@ -169,7 +174,7 @@ func (s *AuthMethodService) TestEmailSend(ctx context.Context, req *v1.TestEmail
 
 // TestSmsSend 测试短信发送
 func (s *AuthMethodService) TestSmsSend(ctx context.Context, req *v1.TestSmsSendRequest) (*v1.TestSendReply, error) {
-	success, message, err := s.uc.TestSmsSend(ctx, req.Mobile)
+	success, message, err := s.uc.TestSmsSendWithAreaCode(ctx, req.AreaCode, req.Telephone)
 	if err != nil {
 		return nil, err
 	}

@@ -41,13 +41,13 @@ func (_c *ProxyCouponCreate) SetCode(v string) *ProxyCouponCreate {
 }
 
 // SetCount sets the "count" field.
-func (_c *ProxyCouponCreate) SetCount(v int64) *ProxyCouponCreate {
+func (_c *ProxyCouponCreate) SetCount(v int32) *ProxyCouponCreate {
 	_c.mutation.SetCount(v)
 	return _c
 }
 
 // SetNillableCount sets the "count" field if the given value is not nil.
-func (_c *ProxyCouponCreate) SetNillableCount(v *int64) *ProxyCouponCreate {
+func (_c *ProxyCouponCreate) SetNillableCount(v *int32) *ProxyCouponCreate {
 	if v != nil {
 		_c.SetCount(*v)
 	}
@@ -139,13 +139,13 @@ func (_c *ProxyCouponCreate) SetNillableSubscribe(v *string) *ProxyCouponCreate 
 }
 
 // SetUsedCount sets the "used_count" field.
-func (_c *ProxyCouponCreate) SetUsedCount(v int64) *ProxyCouponCreate {
+func (_c *ProxyCouponCreate) SetUsedCount(v int8) *ProxyCouponCreate {
 	_c.mutation.SetUsedCount(v)
 	return _c
 }
 
 // SetNillableUsedCount sets the "used_count" field if the given value is not nil.
-func (_c *ProxyCouponCreate) SetNillableUsedCount(v *int64) *ProxyCouponCreate {
+func (_c *ProxyCouponCreate) SetNillableUsedCount(v *int8) *ProxyCouponCreate {
 	if v != nil {
 		_c.SetUsedCount(*v)
 	}
@@ -382,7 +382,7 @@ func (_c *ProxyCouponCreate) createSpec() (*ProxyCoupon, *sqlgraph.CreateSpec) {
 		_node.Code = value
 	}
 	if value, ok := _c.mutation.Count(); ok {
-		_spec.SetField(proxycoupon.FieldCount, field.TypeInt64, value)
+		_spec.SetField(proxycoupon.FieldCount, field.TypeInt32, value)
 		_node.Count = value
 	}
 	if value, ok := _c.mutation.GetType(); ok {
@@ -410,7 +410,7 @@ func (_c *ProxyCouponCreate) createSpec() (*ProxyCoupon, *sqlgraph.CreateSpec) {
 		_node.Subscribe = value
 	}
 	if value, ok := _c.mutation.UsedCount(); ok {
-		_spec.SetField(proxycoupon.FieldUsedCount, field.TypeInt64, value)
+		_spec.SetField(proxycoupon.FieldUsedCount, field.TypeInt8, value)
 		_node.UsedCount = value
 	}
 	if value, ok := _c.mutation.Enable(); ok {

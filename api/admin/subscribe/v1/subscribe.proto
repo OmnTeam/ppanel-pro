@@ -124,7 +124,7 @@ message TrafficLimit {
   string stat_type = 1;    // 统计类型
   int64 stat_value = 2;    // 统计值
   int64 traffic_usage = 3; // 流量用量
-  int64 speed_limit = 4;   // 速度限制
+  int32 speed_limit = 4;   // 速度限制
 }
 
 // SubscribeInfo 订阅套餐信息
@@ -137,11 +137,11 @@ message SubscribeInfo {
   string unit_time = 6;                     // 单位时间
   repeated SubscribeDiscount discount = 7;  // 折扣配置
   int64 replacement = 8;                    // 替换
-  int64 inventory = 9;                      // 库存
+  int32 inventory = 9;                      // 库存
   int64 traffic = 10;                       // 流量（字节）
-  int64 speed_limit = 11;                   // 速度限制
-  int64 device_limit = 12;                  // 设备数限制
-  int64 quota = 13;                         // 配额
+  int32 speed_limit = 11;                   // 速度限制
+  int32 device_limit = 12;                  // 设备数限制
+  int32 quota = 13;                         // 配额
   repeated int64 nodes = 14;                 // 节点IDs
   repeated string node_tags = 15;           // 节点标签
   repeated int64 node_group_ids = 16;       // 节点组IDs
@@ -149,10 +149,10 @@ message SubscribeInfo {
   repeated TrafficLimit traffic_limit = 18; // 流量限制配置
   bool show = 19;                           // 是否在门户页面显示
   bool sell = 20;                           // 是否售卖
-  int64 sort = 21;                          // 排序
-  int64 deduction_ratio = 22;               // 扣除比例
+  int32 sort = 21;                          // 排序
+  int32 deduction_ratio = 22;               // 扣除比例
   bool allow_deduction = 23;                // 允许扣除
-  int64 reset_cycle = 24;                   // 重置周期: 0-不重置 1-1号 2-每月 3-每年
+  int32 reset_cycle = 24;                   // 重置周期: 0-不重置 1-1号 2-每月 3-每年
   bool renewal_reset = 25;                  // 续费重置
   bool show_original_price = 26;            // 显示原价
   int64 created_at = 27;                    // 创建时间
@@ -169,11 +169,11 @@ message SubscribeItem {
   string unit_time = 6;
   repeated SubscribeDiscount discount = 7;
   int64 replacement = 8;
-  int64 inventory = 9;
+  int32 inventory = 9;
   int64 traffic = 10;
-  int64 speed_limit = 11;
-  int64 device_limit = 12;
-  int64 quota = 13;
+  int32 speed_limit = 11;
+  int32 device_limit = 12;
+  int32 quota = 13;
   repeated int64 nodes = 14;
   repeated string node_tags = 15;
   repeated int64 node_group_ids = 16;
@@ -181,10 +181,10 @@ message SubscribeItem {
   repeated TrafficLimit traffic_limit = 18;
   bool show = 19;
   bool sell = 20;
-  int64 sort = 21;
-  int64 deduction_ratio = 22;
+  int32 sort = 21;
+  int32 deduction_ratio = 22;
   bool allow_deduction = 23;
-  int64 reset_cycle = 24;
+  int32 reset_cycle = 24;
   bool renewal_reset = 25;
   bool show_original_price = 26;
   int64 created_at = 27;
@@ -201,11 +201,11 @@ message CreateSubscribeRequest {
   string unit_time = 5;                     // 单位时间
   repeated SubscribeDiscount discount = 6;  // 折扣配置
   int64 replacement = 7;                    // 替换
-  int64 inventory = 8;                      // 库存
+  int32 inventory = 8;                      // 库存
   int64 traffic = 9;                        // 流量（字节）
-  int64 speed_limit = 10;                   // 速度限制
-  int64 device_limit = 11;                  // 设备数限制
-  int64 quota = 12;                         // 配额
+  int32 speed_limit = 10;                   // 速度限制
+  int32 device_limit = 11;                  // 设备数限制
+  int32 quota = 12;                         // 配额
   repeated int64 nodes = 13;                 // 节点IDs
   repeated string node_tags = 14;           // 节点标签
   repeated int64 node_group_ids = 15;       // 节点组IDs
@@ -213,10 +213,10 @@ message CreateSubscribeRequest {
   repeated TrafficLimit traffic_limit = 17; // 流量限制配置
   optional bool show = 18;                  // 是否在门户页面显示
   optional bool sell = 19;                  // 是否售卖
-  int64 sort = 20;                          // 排序
-  int64 deduction_ratio = 21;               // 扣除比例
+  int32 sort = 20;                          // 排序
+  int32 deduction_ratio = 21;               // 扣除比例
   optional bool allow_deduction = 22;       // 允许扣除
-  int64 reset_cycle = 23;                   // 重置周期
+  int32 reset_cycle = 23;                   // 重置周期
   optional bool renewal_reset = 24;         // 续费重置
   bool show_original_price = 25;            // 显示原价
   bool auto_create_group = 26;              // 自动创建分组
@@ -244,11 +244,11 @@ message UpdateSubscribeRequest {
   string unit_time = 6;                     // 单位时间
   repeated SubscribeDiscount discount = 7;  // 折扣配置
   int64 replacement = 8;                    // 替换
-  int64 inventory = 9;                      // 库存
+  int32 inventory = 9;                      // 库存
   int64 traffic = 10;                       // 流量（字节）
-  int64 speed_limit = 11;                   // 速度限制
-  int64 device_limit = 12;                  // 设备数限制
-  int64 quota = 13;                         // 配额
+  int32 speed_limit = 11;                   // 速度限制
+  int32 device_limit = 12;                  // 设备数限制
+  int32 quota = 13;                         // 配额
   repeated int64 nodes = 14;                 // 节点IDs
   repeated string node_tags = 15;           // 节点标签
   repeated int64 node_group_ids = 16;       // 节点组IDs
@@ -256,10 +256,10 @@ message UpdateSubscribeRequest {
   repeated TrafficLimit traffic_limit = 18; // 流量限制配置
   optional bool show = 19;                  // 是否在门户页面显示
   optional bool sell = 20;                  // 是否售卖
-  int64 sort = 21;                          // 排序
-  int64 deduction_ratio = 22;               // 扣除比例
+  int32 sort = 21;                          // 排序
+  int32 deduction_ratio = 22;               // 扣除比例
   optional bool allow_deduction = 23;       // 允许扣除
-  int64 reset_cycle = 24;                   // 重置周期
+  int32 reset_cycle = 24;                   // 重置周期
   optional bool renewal_reset = 25;         // 续费重置
   bool show_original_price = 26;            // 显示原价
 }
@@ -339,7 +339,7 @@ message GetSubscribeListRequest {
 // GetSubscribeListData 获取订阅套餐列表数据
 message GetSubscribeListData {
   repeated SubscribeItem list = 1;  // 订阅套餐列表
-  int64 total = 2;                   // 总数
+  int32 total = 2;                   // 总数
 }
 
 // GetSubscribeListReply 获取订阅套餐列表响应
@@ -352,7 +352,7 @@ message GetSubscribeListReply {
 // SortItem 排序项
 message SortItem {
   int64 id = 1;     // 订阅套餐ID
-  int64 sort = 2;  // 排序值
+  int32 sort = 2;  // 排序值
 }
 
 // SubscribeSortRequest 订阅套餐排序请求
@@ -376,17 +376,25 @@ message SubscribeSortReply {
 
 // SubscribeGroupInfo 订阅组信息
 message SubscribeGroupInfo {
-  int64 id = 1;             // 订阅组ID
-  string name = 2;         // 订阅组名称
-  string description = 3;  // 订阅组描述
-  int64 created_at = 4;    // 创建时间
-  int64 updated_at = 5;    // 更新时间
+  int64 id = 1;                       // 订阅组ID
+  string name = 2;                    // 订阅组名称
+  string description = 3;             // 订阅组描述
+  bool is_expired_group = 4;          // 是否为过期组
+  int32 expired_days_limit = 5;       // 过期天数限制
+  int32 max_traffic_gb_expired = 6;   // 过期后最大流量GB
+  int32 speed_limit = 7;              // 速度限制
+  int64 created_at = 8;               // 创建时间
+  int64 updated_at = 9;               // 更新时间
 }
 
 // CreateSubscribeGroupRequest 创建订阅组请求
 message CreateSubscribeGroupRequest {
-  string name = 1;        // 订阅组名称
-  string description = 2; // 订阅组描述
+  string name = 1;                    // 订阅组名称
+  string description = 2;             // 订阅组描述
+  bool is_expired_group = 3;          // 是否为过期组
+  int64 expired_days_limit = 4;       // 过期天数限制
+  int64 max_traffic_gb_expired = 5;   // 过期后最大流量GB
+  int32 speed_limit = 6;              // 速度限制
 }
 
 // CreateSubscribeGroupData 创建订阅组数据
@@ -403,9 +411,13 @@ message CreateSubscribeGroupReply {
 
 // UpdateSubscribeGroupRequest 更新订阅组请求
 message UpdateSubscribeGroupRequest {
-  int64 id = 1;           // 订阅组ID
-  string name = 2;        // 订阅组名称
-  string description = 3; // 订阅组描述
+  int64 id = 1;                       // 订阅组ID
+  string name = 2;                    // 订阅组名称
+  string description = 3;             // 订阅组描述
+  bool is_expired_group = 4;          // 是否为过期组
+  int64 expired_days_limit = 5;       // 过期天数限制
+  int64 max_traffic_gb_expired = 6;   // 过期后最大流量GB
+  int32 speed_limit = 7;              // 速度限制
 }
 
 // UpdateSubscribeGroupData 更新订阅组数据
@@ -460,7 +472,7 @@ message GetSubscribeGroupListRequest {}
 // GetSubscribeGroupListData 获取订阅组列表数据
 message GetSubscribeGroupListData {
   repeated SubscribeGroupInfo list = 1;  // 订阅组列表
-  int64 total = 2;                        // 总数
+  int32 total = 2;                        // 总数
 }
 
 // GetSubscribeGroupListReply 获取订阅组列表响应
@@ -484,3 +496,5 @@ message ResetAllSubscribeTokenReply {
   string message = 2;                          // 消息内容
   ResetAllSubscribeTokenData data = 3;         // 响应数据
 }
+
+

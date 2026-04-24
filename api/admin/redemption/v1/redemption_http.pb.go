@@ -28,19 +28,12 @@ const OperationRedemptionToggleRedemptionCodeStatus = "/api.admin.redemption.v1.
 const OperationRedemptionUpdateRedemptionCode = "/api.admin.redemption.v1.Redemption/UpdateRedemptionCode"
 
 type RedemptionHTTPServer interface {
-	// BatchDeleteRedemptionCode BatchDeleteRedemptionCode 批量删除兑换码
 	BatchDeleteRedemptionCode(context.Context, *BatchDeleteRedemptionCodeRequest) (*BatchDeleteRedemptionCodeReply, error)
-	// CreateRedemptionCode CreateRedemptionCode 创建兑换码
 	CreateRedemptionCode(context.Context, *CreateRedemptionCodeRequest) (*CreateRedemptionCodeReply, error)
-	// DeleteRedemptionCode DeleteRedemptionCode 删除兑换码
 	DeleteRedemptionCode(context.Context, *DeleteRedemptionCodeRequest) (*DeleteRedemptionCodeReply, error)
-	// GetRedemptionCodeList GetRedemptionCodeList 获取兑换码列表
 	GetRedemptionCodeList(context.Context, *GetRedemptionCodeListRequest) (*GetRedemptionCodeListReply, error)
-	// GetRedemptionRecordList GetRedemptionRecordList 获取兑换记录列表
 	GetRedemptionRecordList(context.Context, *GetRedemptionRecordListRequest) (*GetRedemptionRecordListReply, error)
-	// ToggleRedemptionCodeStatus ToggleRedemptionCodeStatus 切换兑换码状态
 	ToggleRedemptionCodeStatus(context.Context, *ToggleRedemptionCodeStatusRequest) (*ToggleRedemptionCodeStatusReply, error)
-	// UpdateRedemptionCode UpdateRedemptionCode 更新兑换码
 	UpdateRedemptionCode(context.Context, *UpdateRedemptionCodeRequest) (*UpdateRedemptionCodeReply, error)
 }
 

@@ -164,7 +164,7 @@ func (h *QuotaTaskHandler) processSubscribes(ctx context.Context, taskInfo *ent.
 		}
 
 		if err := tx.ProxyTask.UpdateOneID(taskInfo.ID).
-			SetCurrent(uint64(len(subscribes))).
+			SetCurrent(uint32(len(subscribes))).
 			SetStatus(status).
 			SetErrors(errorJSON).
 			Exec(ctx); err != nil {

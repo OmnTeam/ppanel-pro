@@ -115,6 +115,8 @@ message PreviewSubscribeTemplateRequest {
 
 // 获取订阅应用配置列表请求
 message GetSubscribeApplicationListRequest {
+  int64 page = 1;
+  int64 size = 2;
 }
 
 // 订阅应用配置数据
@@ -132,7 +134,7 @@ message SubscribeApplicationReply {
 // 订阅应用配置列表数据
 message GetSubscribeApplicationListData {
   repeated SubscribeApplication list = 1;
-  int64 total = 2;
+  int32 total = 2;
 }
 
 // 订阅应用配置列表响应

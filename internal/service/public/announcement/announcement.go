@@ -5,7 +5,6 @@ import (
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/public/announcement/v1"
 	announcementBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/announcement"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
 
 // AnnouncementService Public Announcement服务实现
@@ -20,7 +19,12 @@ func NewAnnouncementService(uc *announcementBiz.AnnouncementUseCase) *Announceme
 }
 
 // QueryAnnouncement 查询公告列表
-func (s *AnnouncementService) QueryAnnouncement(ctx context.Context, req *v1.QueryAnnouncementRequest) (*v1.AnnouncementListReply, error) {
+func (s *AnnouncementService) QueryAnnouncement(ctx context.Context, req *v1.QueryAnnouncementRequest) (*v1.QueryAnnouncementReply, error) {
+	size := req.Size
+	if size == 0 {
+		size = 15
+	}
+
 	// 处理可选参数
 	var pinned, popup *bool
 	if req.Pinned != nil {
@@ -33,7 +37,7 @@ func (s *AnnouncementService) QueryAnnouncement(ctx context.Context, req *v1.Que
 	}
 
 	// 调用业务层
-	announcements, total, err := s.uc.QueryAnnouncement(ctx, req.Page, req.Size, pinned, popup)
+	announcements, total, err := s.uc.QueryAnnouncement(ctx, req.Page, size, pinned, popup)
 	if err != nil {
 		return nil, err
 	}
@@ -45,20 +49,16 @@ func (s *AnnouncementService) QueryAnnouncement(ctx context.Context, req *v1.Que
 			Id:        a.ID,
 			Title:     a.Title,
 			Content:   a.Content,
-			Show:      a.Show,
-			Pinned:    a.Pinned,
-			Popup:     a.Popup,
 			CreatedAt: a.CreatedAt,
 			UpdatedAt: a.UpdatedAt,
 		})
+		list[len(list)-1].Show = &a.Show
+		list[len(list)-1].Pinned = &a.Pinned
+		list[len(list)-1].Popup = &a.Popup
 	}
 
-	return &v1.AnnouncementListReply{
-		Code:    int32(responsecode.AnnouncementQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.AnnouncementQuerySuccess],
-		Data: &v1.AnnouncementListData{
-			List:  list,
-			Total: total,
-		},
+	return &v1.QueryAnnouncementReply{
+		Announcements: list,
+		Total:         total,
 	}, nil
 }

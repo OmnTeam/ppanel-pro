@@ -2,18 +2,34 @@ package data
 
 import (
 	"context"
+	"fmt"
+	"strconv"
+	"strings"
+	"sync"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	systembiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/system"
+	authmodel "github.com/OmnTeam/ppanel-pro/internal/model/auth"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/OmnTeam/ppanel-pro/pkg/constant"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/log"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type adminSystemRepo struct {
 	data *Data
 	log  *log.Helper
+}
+
+var adminTelegramPolling struct {
+	mu  sync.Mutex
+	bot *tgbotapi.BotAPI
 }
 
 func LoadNodeConfigForServer(ctx context.Context, data *Data, logger log.Logger) (*systembiz.NodeConfig, error) {
@@ -217,4 +233,261 @@ func (r *adminSystemRepo) UpdateNodeMultiplier(ctx context.Context, value string
 	}
 
 	return nil
+}
+
+func (r *adminSystemRepo) ApplyTelegramBot(ctx context.Context) error {
+	if r.data == nil || r.data.db == nil {
+		return nil
+	}
+
+	method, err := r.data.db.ProxyAuthMethod.Query().
+		Where(proxyauthmethod.MethodEQ("telegram")).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil
+		}
+		r.log.Errorf("[ApplyTelegramBot] query telegram auth method failed: %v", err)
+		return responsecode.NewDatabaseQueryError()
+	}
+	if strings.TrimSpace(method.Config) == "" {
+		return nil
+	}
+
+	var cfg authmodel.TelegramAuthConfig
+	if err := cfg.Unmarshal(method.Config); err != nil {
+		r.log.Errorf("[ApplyTelegramBot] unmarshal telegram config failed: %v", err)
+		return responsecode.NewKratosError(responsecode.ErrConfigurationError)
+	}
+	botToken := strings.TrimSpace(cfg.BotToken)
+	if botToken == "" {
+		return nil
+	}
+
+	bot, err := tgbotapi.NewBotAPI(botToken)
+	if err != nil {
+		r.log.Errorf("[ApplyTelegramBot] create telegram bot failed: %v", err)
+		return responsecode.NewKratosError(responsecode.ErrConfigurationError)
+	}
+
+	webhookDomain := strings.TrimSpace(cfg.WebHookDomain)
+	if webhookDomain != "" {
+		webhookURL := fmt.Sprintf("%s/v1/telegram/webhook?secret=%s", webhookDomain, tool.Md5Encode(botToken, false))
+		webhook, err := tgbotapi.NewWebhook(webhookURL)
+		if err != nil {
+			r.log.Errorf("[ApplyTelegramBot] create telegram webhook failed: %v", err)
+			return responsecode.NewKratosError(responsecode.ErrConfigurationError)
+		}
+		if _, err := bot.Request(webhook); err != nil {
+			r.log.Errorf("[ApplyTelegramBot] apply telegram webhook failed: %v", err)
+			return responsecode.NewKratosError(responsecode.ErrConfigurationError)
+		}
+		r.stopTelegramLongPolling()
+	} else {
+		r.startTelegramLongPolling(bot, botToken)
+	}
+
+	me, err := bot.GetMe()
+	if err != nil {
+		r.log.Errorf("[ApplyTelegramBot] get telegram bot info failed: %v", err)
+		return responsecode.NewKratosError(responsecode.ErrConfigurationError)
+	}
+
+	return r.UpdateConfigByCategory(ctx, "telegram", map[string]*tool.SystemConfig{
+		"bot_token": {
+			Key:   "bot_token",
+			Value: botToken,
+			Type:  "string",
+		},
+		"bot_name": {
+			Key:   "bot_name",
+			Value: strings.TrimPrefix(strings.TrimSpace(me.UserName), "@"),
+			Type:  "string",
+		},
+		"bot_id": {
+			Key:   "bot_id",
+			Value: strconv.FormatInt(int64(me.ID), 10),
+			Type:  "int64",
+		},
+		"enable_notify": {
+			Key:   "enable_notify",
+			Value: strconv.FormatBool(cfg.EnableNotify),
+			Type:  "bool",
+		},
+		"webhook_domain": {
+			Key:   "webhook_domain",
+			Value: webhookDomain,
+			Type:  "string",
+		},
+	})
+}
+
+func (r *adminSystemRepo) startTelegramLongPolling(bot *tgbotapi.BotAPI, botToken string) {
+	if bot == nil || strings.TrimSpace(botToken) == "" {
+		return
+	}
+
+	adminTelegramPolling.mu.Lock()
+	oldBot := adminTelegramPolling.bot
+	adminTelegramPolling.bot = bot
+	adminTelegramPolling.mu.Unlock()
+
+	if oldBot != nil && oldBot != bot {
+		oldBot.StopReceivingUpdates()
+	}
+
+	updateConfig := tgbotapi.NewUpdate(0)
+	updateConfig.Timeout = 60
+	updates := bot.GetUpdatesChan(updateConfig)
+
+	go func(currentBot *tgbotapi.BotAPI) {
+		for update := range updates {
+			r.handleTelegramUpdate(context.Background(), &update, botToken)
+		}
+
+		adminTelegramPolling.mu.Lock()
+		if adminTelegramPolling.bot == currentBot {
+			adminTelegramPolling.bot = nil
+		}
+		adminTelegramPolling.mu.Unlock()
+	}(bot)
+}
+
+func (r *adminSystemRepo) stopTelegramLongPolling() {
+	adminTelegramPolling.mu.Lock()
+	bot := adminTelegramPolling.bot
+	adminTelegramPolling.bot = nil
+	adminTelegramPolling.mu.Unlock()
+
+	if bot != nil {
+		bot.StopReceivingUpdates()
+	}
+}
+
+func (r *adminSystemRepo) handleTelegramUpdate(ctx context.Context, update *tgbotapi.Update, botToken string) {
+	if update == nil || update.Message == nil || strings.TrimSpace(update.Message.Text) == "" {
+		return
+	}
+	if update.Message.Command() != "start" {
+		return
+	}
+	if r.data == nil || r.data.db == nil || r.data.rdb == nil {
+		return
+	}
+
+	chatID := update.Message.Chat.ID
+	sessionID := strings.TrimSpace(update.Message.CommandArguments())
+	if sessionID == "" {
+		r.sendTelegramMessage(botToken, chatID, "Please bind account!")
+		return
+	}
+
+	sessionKey := fmt.Sprintf("%s:%s", constant.SessionIdKey, sessionID)
+	userIDText, err := r.data.rdb.Get(ctx, sessionKey).Result()
+	if err != nil || strings.TrimSpace(userIDText) == "" {
+		r.sendTelegramMessage(botToken, chatID, "Bind failed!")
+		return
+	}
+
+	userID, err := strconv.ParseInt(userIDText, 10, 64)
+	if err != nil {
+		r.sendTelegramMessage(botToken, chatID, "Bind failed!")
+		return
+	}
+
+	method, err := r.data.db.ProxyUserAuthMethod.Query().
+		Where(
+			proxyuserauthmethod.UserIDEQ(userID),
+			proxyuserauthmethod.AuthTypeEQ("telegram"),
+		).
+		Only(ctx)
+	if err != nil && !ent.IsNotFound(err) {
+		r.log.Errorf("[handleTelegramUpdate] query auth method failed: %v", err)
+		r.sendTelegramMessage(botToken, chatID, "Bind failed!")
+		return
+	}
+
+	identifier := strconv.FormatInt(chatID, 10)
+	if ent.IsNotFound(err) {
+		if _, err := r.data.db.ProxyUserAuthMethod.Create().
+			SetUserID(userID).
+			SetAuthType("telegram").
+			SetAuthIdentifier(identifier).
+			SetVerified(true).
+			Save(ctx); err != nil {
+			r.log.Errorf("[handleTelegramUpdate] create auth method failed: %v", err)
+			r.sendTelegramMessage(botToken, chatID, "Bind failed!")
+			return
+		}
+	} else {
+		if _, err := r.data.db.ProxyUserAuthMethod.UpdateOneID(method.ID).
+			SetAuthIdentifier(identifier).
+			SetVerified(true).
+			Save(ctx); err != nil {
+			r.log.Errorf("[handleTelegramUpdate] update auth method failed: %v", err)
+			r.sendTelegramMessage(botToken, chatID, "Bind failed!")
+			return
+		}
+	}
+
+	r.clearTelegramUserCache(ctx, userID)
+	text, renderErr := tool.RenderTemplateToString("Bind success!\nAccount ID: {{.Id}}\nTime: {{.Time}}", map[string]string{
+		"Id":   strconv.FormatInt(userID, 10),
+		"Time": time.Now().Format("2006-01-02 15:04:05"),
+	})
+	if renderErr != nil {
+		text = "Bind success!"
+	}
+	r.sendTelegramMessage(botToken, chatID, text)
+}
+
+func (r *adminSystemRepo) sendTelegramMessage(botToken string, chatID int64, text string) {
+	botToken = strings.TrimSpace(botToken)
+	if botToken == "" || chatID == 0 || strings.TrimSpace(text) == "" {
+		return
+	}
+	bot, err := tgbotapi.NewBotAPI(botToken)
+	if err != nil {
+		return
+	}
+	msg := tgbotapi.NewMessage(chatID, text)
+	_, _ = bot.Send(msg)
+}
+
+func (r *adminSystemRepo) clearTelegramUserCache(ctx context.Context, userID int64) {
+	if r.data == nil || r.data.rdb == nil {
+		return
+	}
+	keys := []string{fmt.Sprintf("cache:user:id:%d", userID)}
+
+	methods, err := r.data.db.ProxyUserAuthMethod.Query().
+		Where(
+			proxyuserauthmethod.UserIDEQ(userID),
+			proxyuserauthmethod.AuthTypeEQ("email"),
+		).
+		All(ctx)
+	if err == nil {
+		for _, item := range methods {
+			if email := strings.TrimSpace(item.AuthIdentifier); email != "" {
+				keys = append(keys, fmt.Sprintf("cache:user:email:%s", email))
+			}
+		}
+	}
+	r.deleteRedisKeys(ctx, keys...)
+}
+
+func (r *adminSystemRepo) deleteRedisKeys(ctx context.Context, keys ...string) {
+	if r.data == nil || r.data.rdb == nil || len(keys) == 0 {
+		return
+	}
+	filtered := make([]string, 0, len(keys))
+	for _, key := range keys {
+		if key = strings.TrimSpace(key); key != "" {
+			filtered = append(filtered, key)
+		}
+	}
+	if len(filtered) == 0 {
+		return
+	}
+	_ = r.data.rdb.Del(ctx, filtered...).Err()
 }

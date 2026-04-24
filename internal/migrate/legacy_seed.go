@@ -35,6 +35,7 @@ var legacySQLMigrations = []legacySQLMigration{
 	{version: 2135, path: "legacy_sql/02135_add_node_group_type.up.sql"},
 	{version: 2136, path: "legacy_sql/02136_add_node_type_is_hidden.up.sql"},
 	{version: 2137, path: "legacy_sql/02137_payment_sort.up.sql"},
+	{version: 2138, path: "legacy_sql/02138_add_simnet_subscribe_application.up.sql"},
 }
 
 func (m *Migrator) initLegacyDefaultData(ctx context.Context) error {

@@ -180,13 +180,6 @@ func (r *commonRepo) GetEnabledAuthMethods(ctx context.Context) ([]string, error
 
 // GetStatistics retrieves system statistics
 func (r *commonRepo) GetStatistics(ctx context.Context) (*v1.Statistics, error) {
-	if cached, err := r.data.rdb.Get(ctx, CommonStatCacheKey).Result(); err == nil && cached != "" {
-		var stat v1.Statistics
-		if err := json.Unmarshal([]byte(cached), &stat); err == nil {
-			return &stat, nil
-		}
-	}
-
 	userCount, err := r.data.db.ProxyUser.Query().
 		Where(proxyuser.EnableEQ(true)).
 		Count(ctx)
@@ -237,10 +230,6 @@ func (r *commonRepo) GetStatistics(ctx context.Context) (*v1.Statistics, error) 
 		Node:     int64(nodeCount),
 		Country:  countryCount,
 		Protocol: protocols,
-	}
-
-	if payload, err := json.Marshal(stat); err == nil {
-		_ = r.data.rdb.Set(ctx, CommonStatCacheKey, payload, time.Hour).Err()
 	}
 
 	return stat, nil

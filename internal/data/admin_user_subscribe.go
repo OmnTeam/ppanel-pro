@@ -44,6 +44,26 @@ type adminUserSubscribeRepo struct {
 	logger *log.Helper
 }
 
+func (r *adminUserSubscribeRepo) clearUserSubscribeCaches(ctx context.Context, userSub *ent.ProxyUserSubscribe) error {
+	if userSub == nil || r.data == nil || r.data.rdb == nil {
+		return nil
+	}
+
+	cacheKeys := []string{
+		fmt.Sprintf("cache:user:subscribe:user:%d", userSub.UserID),
+		fmt.Sprintf("cache:user:subscribe:id:%d", userSub.ID),
+		fmt.Sprintf("cache:subscribe:id:%d", userSub.SubscribeID),
+		fmt.Sprintf("cache:subscribe:servers:%d", userSub.SubscribeID),
+	}
+	if userSub.Token != nil && *userSub.Token != "" {
+		cacheKeys = append(cacheKeys, fmt.Sprintf("cache:user:subscribe:token:%s", *userSub.Token))
+	}
+	if err := r.data.rdb.Del(ctx, cacheKeys...).Err(); err != nil {
+		return err
+	}
+	return ClearLegacyServerAllCaches(ctx, r.data.rdb)
+}
+
 // NewAdminUserSubscribeRepo creates a new admin user subscribe repository
 func NewAdminUserSubscribeRepo(d *Data, logger log.Logger) userbiz.SubscribeRepo {
 	return &adminUserSubscribeRepo{
@@ -64,7 +84,7 @@ func (r *adminUserSubscribeRepo) isSingleSubscribeModeEnabled(ctx context.Contex
 }
 
 // GetUserSubscribe 获取用户订阅列表
-func (r *adminUserSubscribeRepo) GetUserSubscribe(ctx context.Context, req *v1.GetUserSubscribeRequest) ([]*ent.ProxyUserSubscribe, int64, error) {
+func (r *adminUserSubscribeRepo) GetUserSubscribe(ctx context.Context, req *v1.GetUserSubscribeRequest) ([]*ent.ProxyUserSubscribe, int32, error) {
 	query := r.data.db.ProxyUserSubscribe.Query()
 
 	// 用户ID过滤（可选）
@@ -102,7 +122,7 @@ func (r *adminUserSubscribeRepo) GetUserSubscribe(ctx context.Context, req *v1.G
 		return nil, 0, err
 	}
 
-	return list, int64(total), nil
+	return list, int32(total), nil
 }
 
 // CreateUserSubscribe 创建用户订阅
@@ -258,6 +278,11 @@ func (r *adminUserSubscribeRepo) UpdateUserSubscribe(ctx context.Context, req *v
 		return err
 	}
 
+	if err := r.clearUserSubscribeCaches(ctx, userSub); err != nil {
+		r.logger.Errorf("Failed to clear user subscribe caches: %v", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -282,6 +307,11 @@ func (r *adminUserSubscribeRepo) DeleteUserSubscribe(ctx context.Context, id int
 	err = r.data.db.ProxyUserSubscribe.DeleteOne(userSub).Exec(ctx)
 	if err != nil {
 		r.logger.Errorf("Failed to delete user subscribe: %v", err)
+		return err
+	}
+
+	if err := r.clearUserSubscribeCaches(ctx, userSub); err != nil {
+		r.logger.Errorf("Failed to clear user subscribe caches: %v", err)
 		return err
 	}
 
@@ -318,6 +348,7 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeById(ctx context.Context, id in
 
 	authMethods, err := r.data.db.ProxyUserAuthMethod.Query().
 		Where(proxyuserauthmethod.UserIDEQ(userSub.UserID)).
+		Order(ent.Desc(proxyuserauthmethod.FieldAuthType)).
 		All(ctx)
 	if err != nil {
 		r.logger.Errorf("Failed to query user auth methods: %v", err)
@@ -437,10 +468,10 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeById(ctx context.Context, id in
 			TrafficLimit:      parseAdminUserTrafficLimits(subscribePlan.TrafficLimit),
 			Show:              subscribePlan.Show,
 			Sell:              subscribePlan.Sell,
-			Sort:              subscribePlan.Sort,
-			DeductionRatio:    getInt64ValueFromPointer(subscribePlan.DeductionRatio),
+			Sort:              int32(subscribePlan.Sort),
+			DeductionRatio:    derefInt32(subscribePlan.DeductionRatio),
 			AllowDeduction:    subscribePlan.AllowDeduction,
-			ResetCycle:        getInt64ValueFromPointer(subscribePlan.ResetCycle),
+			ResetCycle:        derefInt32(subscribePlan.ResetCycle),
 			RenewalReset:      subscribePlan.RenewalReset,
 			ShowOriginalPrice: subscribePlan.ShowOriginalPrice,
 			CreatedAt:         subscribePlan.CreatedAt.Unix(),
@@ -454,7 +485,7 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeById(ctx context.Context, id in
 }
 
 // GetUserSubscribeDevices 获取用户订阅设备列表
-func (r *adminUserSubscribeRepo) GetUserSubscribeDevices(ctx context.Context, req *v1.GetUserSubscribeDevicesRequest) ([]*ent.ProxyUserDevice, int64, error) {
+func (r *adminUserSubscribeRepo) GetUserSubscribeDevices(ctx context.Context, req *v1.GetUserSubscribeDevicesRequest) ([]*ent.ProxyUserDevice, int32, error) {
 	query := r.data.db.ProxyUserDevice.Query()
 	if req.UserId > 0 {
 		query = query.Where(proxyuserdevice.UserIDEQ(req.UserId))
@@ -481,11 +512,11 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeDevices(ctx context.Context, re
 		return nil, 0, err
 	}
 
-	return list, int64(total), nil
+	return list, int32(total), nil
 }
 
 // GetUserSubscribeLogs 获取用户订阅日志
-func (r *adminUserSubscribeRepo) GetUserSubscribeLogs(ctx context.Context, req *v1.GetUserSubscribeLogsRequest) ([]*ent.ProxySystemLog, int64, error) {
+func (r *adminUserSubscribeRepo) GetUserSubscribeLogs(ctx context.Context, req *v1.GetUserSubscribeLogsRequest) ([]*ent.ProxySystemLog, int32, error) {
 	query := r.data.db.ProxySystemLog.Query().
 		Where(
 			proxysystemlog.TypeEQ(int8(logmodel.TypeSubscribe)), // Type = 20
@@ -541,11 +572,11 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeLogs(ctx context.Context, req *
 		return nil, 0, err
 	}
 
-	return list, int64(total), nil
+	return list, int32(total), nil
 }
 
 // GetUserSubscribeResetTrafficLogs 获取用户订阅重置流量日志
-func (r *adminUserSubscribeRepo) GetUserSubscribeResetTrafficLogs(ctx context.Context, req *v1.GetUserSubscribeResetTrafficLogsRequest) ([]*ent.ProxySystemLog, int64, error) {
+func (r *adminUserSubscribeRepo) GetUserSubscribeResetTrafficLogs(ctx context.Context, req *v1.GetUserSubscribeResetTrafficLogsRequest) ([]*ent.ProxySystemLog, int32, error) {
 	query := r.data.db.ProxySystemLog.Query().
 		Where(
 			proxysystemlog.TypeEQ(int8(logmodel.TypeResetSubscribe)), // Type = 23
@@ -577,11 +608,11 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeResetTrafficLogs(ctx context.Co
 		return nil, 0, err
 	}
 
-	return list, int64(total), nil
+	return list, int32(total), nil
 }
 
 // GetUserSubscribeTrafficLogs 获取用户订阅流量日志
-func (r *adminUserSubscribeRepo) GetUserSubscribeTrafficLogs(ctx context.Context, req *v1.GetUserSubscribeTrafficLogsRequest) ([]*ent.ProxyTrafficLog, int64, error) {
+func (r *adminUserSubscribeRepo) GetUserSubscribeTrafficLogs(ctx context.Context, req *v1.GetUserSubscribeTrafficLogsRequest) ([]*ent.ProxyTrafficLog, int32, error) {
 	query := r.data.db.ProxyTrafficLog.Query()
 
 	if req.UserSubscribeId > 0 {
@@ -645,7 +676,7 @@ func (r *adminUserSubscribeRepo) GetUserSubscribeTrafficLogs(ctx context.Context
 		return nil, 0, err
 	}
 
-	return list, int64(total), nil
+	return list, int32(total), nil
 }
 
 // ResetUserSubscribeToken 重置用户订阅令牌
@@ -739,6 +770,22 @@ func getInt64ValueFromPointer(p *int64) int64 {
 	return *p
 }
 
+// 辅助函数：获取int32指针的值并转为int64，nil返回0
+func getInt64ValueFromInt32Pointer(p *int32) int64 {
+	if p == nil {
+		return 0
+	}
+	return int64(*p)
+}
+
+// 辅助函数：获取int32指针的值，nil返回0
+func derefInt32(p *int32) int32 {
+	if p == nil {
+		return 0
+	}
+	return *p
+}
+
 // 辅助函数：获取int64指针的值并格式化为字符串，nil返回"0"
 func formatInt64Value(p *int64) string {
 	if p == nil {
@@ -821,7 +868,7 @@ func parseAdminUserTrafficLimits(raw *string) []*v1.TrafficLimit {
 			StatType:     item.StatType,
 			StatValue:    item.StatValue,
 			TrafficUsage: item.TrafficUsage,
-			SpeedLimit:   item.SpeedLimit,
+			SpeedLimit:   int32(item.SpeedLimit),
 		})
 	}
 	return result

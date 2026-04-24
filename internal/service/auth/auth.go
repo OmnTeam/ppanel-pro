@@ -56,11 +56,7 @@ func (s *AuthService) CheckUser(ctx context.Context, req *pb.CheckUserRequest) (
 	}
 
 	return &pb.CheckUserReply{
-		Code:    int32(responsecode.UserCheckSuccess),
-		Message: responsecode.CodeMessages[responsecode.UserCheckSuccess],
-		Data: &pb.CheckUserData{
-			Exist: exist,
-		},
+		Exist: exist,
 	}, nil
 }
 
@@ -71,11 +67,7 @@ func (s *AuthService) CheckUserTelephone(ctx context.Context, req *pb.CheckUserT
 	}
 
 	return &pb.CheckUserTelephoneReply{
-		Code:    int32(responsecode.UserCheckSuccess),
-		Message: responsecode.CodeMessages[responsecode.UserCheckSuccess],
-		Data: &pb.CheckUserTelephoneData{
-			Exist: exist,
-		},
+		Exist: exist,
 	}, nil
 }
 
@@ -178,14 +170,10 @@ func (s *AuthService) GenerateCaptcha(ctx context.Context, req *pb.GenerateCaptc
 	}
 
 	return &pb.GenerateCaptchaReply{
-		Code:    200,
-		Message: "success",
-		Data: &pb.GenerateCaptchaData{
-			Type:       result.Type,
-			Id:         result.ID,
-			Image:      result.Image,
-			BlockImage: result.BlockImage,
-		},
+		Type:       result.Type,
+		Id:         result.ID,
+		Image:      result.Image,
+		BlockImage: result.BlockImage,
 	}, nil
 }
 
@@ -200,11 +188,7 @@ func (s *AuthService) VerifySliderCaptcha(ctx context.Context, req *pb.VerifySli
 	}
 
 	return &pb.VerifySliderCaptchaReply{
-		Code:    200,
-		Message: "success",
-		Data: &pb.VerifySliderCaptchaData{
-			Token: result.Token,
-		},
+		Token: result.Token,
 	}, nil
 }
 
@@ -216,7 +200,7 @@ func (s *AuthService) DeviceLogin(ctx context.Context, req *pb.DeviceLoginReques
 	result, err := s.authCompat.DeviceLogin(ctx, &CompatDeviceLoginParams{
 		Identifier: req.Identifier,
 		ShortCode:  req.ShortCode,
-		Meta:       buildRequestMeta(ctx, req.Ip, req.UserAgent, req.LoginType, req.Identifier, req.CfToken, "", "", ""),
+		Meta:       buildRequestMeta(ctx, req.Ip, req.UserAgent, "", req.Identifier, req.CfToken, "", "", ""),
 	})
 	if err != nil {
 		return nil, err
@@ -227,11 +211,7 @@ func (s *AuthService) DeviceLogin(ctx context.Context, req *pb.DeviceLoginReques
 
 func loginReply(token string, code int) *pb.LoginReply {
 	return &pb.LoginReply{
-		Code:    int32(code),
-		Message: responsecode.CodeMessages[code],
-		Data: &pb.LoginData{
-			Token: token,
-		},
+		Token: token,
 	}
 }
 

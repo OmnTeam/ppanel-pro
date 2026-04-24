@@ -77,8 +77,64 @@ type PushOnlineUsersRequest struct {
 
 // Protocol 协议配置
 type Protocol struct {
-	Type   string
-	Config string
+	Type                     string
+	Port                     int32
+	Enable                   bool
+	Security                 string
+	SNI                      string
+	AllowInsecure            bool
+	Fingerprint              string
+	RealityServerAddr        string
+	RealityServerPort        int32
+	RealityPrivateKey        string
+	RealityPublicKey         string
+	RealityShortId           string
+	Transport                string
+	Host                     string
+	Path                     string
+	ServiceName              string
+	Cipher                   string
+	ServerKey                string
+	Flow                     string
+	HopPorts                 string
+	HopInterval              int32
+	ObfsPassword             string
+	DisableSNI               bool
+	ReduceRtt                bool
+	UDPRelayMode             string
+	CongestionController     string
+	Multiplex                string
+	PaddingScheme            string
+	UpMbps                   int32
+	DownMbps                 int32
+	Obfs                     string
+	ObfsHost                 string
+	ObfsPath                 string
+	XhttpMode                string
+	XhttpExtra               string
+	Encryption               string
+	EncryptionMode           string
+	EncryptionRtt            string
+	EncryptionTicket         string
+	EncryptionServerPadding  string
+	EncryptionPrivateKey     string
+	EncryptionClientPadding  string
+	EncryptionPassword       string
+	Ratio                    float64
+	CertMode                 string
+	CertDNSProvider          string
+	CertDNSEnv               string
+	SimnetPsk                string
+	SimnetKeyID              int32
+	SimnetTicketID           string
+	SimnetPath               string
+	SimnetCarrier            string
+	SimnetAfEnabled          bool
+	SimnetAfPathMode         string
+	SimnetAfPathPrefix       string
+	SimnetAfPathSuffix       string
+	SimnetAfMagicMode        string
+	SimnetAfResponseJitterMs int32
 }
 
 // ProtocolConfig 协议配置响应
@@ -89,7 +145,7 @@ type ProtocolConfig struct {
 	Block                  []string
 	Outbound               []*OutboundConfig
 	Protocols              []*Protocol
-	Total                  int64
+	Total                  int32
 }
 
 // DNSConfig DNS配置
@@ -222,7 +278,7 @@ func (uc *ServerNodeUsecase) QueryServerProtocolConfig(ctx context.Context, serv
 				}
 			}
 			config.Protocols = filtered
-			config.Total = int64(len(filtered))
+			config.Total = int32(len(filtered))
 		}
 	}
 

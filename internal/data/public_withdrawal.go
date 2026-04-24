@@ -88,7 +88,7 @@ func (r *withdrawalRepo) GetWithdrawalByID(ctx context.Context, id int64) (*with
 }
 
 // GetUserWithdrawals 获取用户提现记录列表
-func (r *withdrawalRepo) GetUserWithdrawals(ctx context.Context, userID int64, page, pageSize int32) ([]*withdrawal.Withdrawal, int, error) {
+func (r *withdrawalRepo) GetUserWithdrawals(ctx context.Context, userID int64, page, pageSize int32) ([]*withdrawal.Withdrawal, int32, error) {
 	query := r.data.db.ProxyUserWithdrawal.Query().
 		Where(proxyuserwithdrawal.UserID(userID)).
 		Order(ent.Desc(proxyuserwithdrawal.FieldCreatedAt))
@@ -111,7 +111,7 @@ func (r *withdrawalRepo) GetUserWithdrawals(ctx context.Context, userID int64, p
 		withdrawals[i] = r.convertToModel(entity)
 	}
 
-	return withdrawals, total, nil
+	return withdrawals, int32(total), nil
 }
 
 // UpdateUserCommission 更新用户佣金

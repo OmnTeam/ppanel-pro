@@ -26,15 +26,10 @@ const OperationPaymentServiceGetPaymentPlatform = "/api.admin.payment.v1.Payment
 const OperationPaymentServiceUpdatePaymentMethod = "/api.admin.payment.v1.PaymentService/UpdatePaymentMethod"
 
 type PaymentServiceHTTPServer interface {
-	// CreatePaymentMethod 创建支付方式
 	CreatePaymentMethod(context.Context, *CreatePaymentMethodRequest) (*CreatePaymentMethodReply, error)
-	// DeletePaymentMethod 删除支付方式
 	DeletePaymentMethod(context.Context, *DeletePaymentMethodRequest) (*DeletePaymentMethodReply, error)
-	// GetPaymentMethodList 获取支付方式列表
 	GetPaymentMethodList(context.Context, *GetPaymentMethodListRequest) (*GetPaymentMethodListReply, error)
-	// GetPaymentPlatform 获取支付平台列表
 	GetPaymentPlatform(context.Context, *GetPaymentPlatformRequest) (*GetPaymentPlatformReply, error)
-	// UpdatePaymentMethod 更新支付方式
 	UpdatePaymentMethod(context.Context, *UpdatePaymentMethodRequest) (*UpdatePaymentMethodReply, error)
 }
 

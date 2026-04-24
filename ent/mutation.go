@@ -2255,8 +2255,8 @@ type ProxyCouponMutation struct {
 	id             *int64
 	name           *string
 	code           *string
-	count          *int64
-	addcount       *int64
+	count          *int32
+	addcount       *int32
 	_type          *int8
 	add_type       *int8
 	discount       *int64
@@ -2268,8 +2268,8 @@ type ProxyCouponMutation struct {
 	user_limit     *int64
 	adduser_limit  *int64
 	subscribe      *string
-	used_count     *int64
-	addused_count  *int64
+	used_count     *int8
+	addused_count  *int8
 	enable         *bool
 	created_at     *time.Time
 	updated_at     *time.Time
@@ -2456,13 +2456,13 @@ func (m *ProxyCouponMutation) ResetCode() {
 }
 
 // SetCount sets the "count" field.
-func (m *ProxyCouponMutation) SetCount(i int64) {
+func (m *ProxyCouponMutation) SetCount(i int32) {
 	m.count = &i
 	m.addcount = nil
 }
 
 // Count returns the value of the "count" field in the mutation.
-func (m *ProxyCouponMutation) Count() (r int64, exists bool) {
+func (m *ProxyCouponMutation) Count() (r int32, exists bool) {
 	v := m.count
 	if v == nil {
 		return
@@ -2473,7 +2473,7 @@ func (m *ProxyCouponMutation) Count() (r int64, exists bool) {
 // OldCount returns the old "count" field's value of the ProxyCoupon entity.
 // If the ProxyCoupon object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxyCouponMutation) OldCount(ctx context.Context) (v int64, err error) {
+func (m *ProxyCouponMutation) OldCount(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCount is only allowed on UpdateOne operations")
 	}
@@ -2488,7 +2488,7 @@ func (m *ProxyCouponMutation) OldCount(ctx context.Context) (v int64, err error)
 }
 
 // AddCount adds i to the "count" field.
-func (m *ProxyCouponMutation) AddCount(i int64) {
+func (m *ProxyCouponMutation) AddCount(i int32) {
 	if m.addcount != nil {
 		*m.addcount += i
 	} else {
@@ -2497,7 +2497,7 @@ func (m *ProxyCouponMutation) AddCount(i int64) {
 }
 
 // AddedCount returns the value that was added to the "count" field in this mutation.
-func (m *ProxyCouponMutation) AddedCount() (r int64, exists bool) {
+func (m *ProxyCouponMutation) AddedCount() (r int32, exists bool) {
 	v := m.addcount
 	if v == nil {
 		return
@@ -2828,13 +2828,13 @@ func (m *ProxyCouponMutation) ResetSubscribe() {
 }
 
 // SetUsedCount sets the "used_count" field.
-func (m *ProxyCouponMutation) SetUsedCount(i int64) {
+func (m *ProxyCouponMutation) SetUsedCount(i int8) {
 	m.used_count = &i
 	m.addused_count = nil
 }
 
 // UsedCount returns the value of the "used_count" field in the mutation.
-func (m *ProxyCouponMutation) UsedCount() (r int64, exists bool) {
+func (m *ProxyCouponMutation) UsedCount() (r int8, exists bool) {
 	v := m.used_count
 	if v == nil {
 		return
@@ -2845,7 +2845,7 @@ func (m *ProxyCouponMutation) UsedCount() (r int64, exists bool) {
 // OldUsedCount returns the old "used_count" field's value of the ProxyCoupon entity.
 // If the ProxyCoupon object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxyCouponMutation) OldUsedCount(ctx context.Context) (v int64, err error) {
+func (m *ProxyCouponMutation) OldUsedCount(ctx context.Context) (v int8, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUsedCount is only allowed on UpdateOne operations")
 	}
@@ -2860,7 +2860,7 @@ func (m *ProxyCouponMutation) OldUsedCount(ctx context.Context) (v int64, err er
 }
 
 // AddUsedCount adds i to the "used_count" field.
-func (m *ProxyCouponMutation) AddUsedCount(i int64) {
+func (m *ProxyCouponMutation) AddUsedCount(i int8) {
 	if m.addused_count != nil {
 		*m.addused_count += i
 	} else {
@@ -2869,7 +2869,7 @@ func (m *ProxyCouponMutation) AddUsedCount(i int64) {
 }
 
 // AddedUsedCount returns the value that was added to the "used_count" field in this mutation.
-func (m *ProxyCouponMutation) AddedUsedCount() (r int64, exists bool) {
+func (m *ProxyCouponMutation) AddedUsedCount() (r int8, exists bool) {
 	v := m.addused_count
 	if v == nil {
 		return
@@ -3158,7 +3158,7 @@ func (m *ProxyCouponMutation) SetField(name string, value ent.Value) error {
 		m.SetCode(v)
 		return nil
 	case proxycoupon.FieldCount:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3207,7 +3207,7 @@ func (m *ProxyCouponMutation) SetField(name string, value ent.Value) error {
 		m.SetSubscribe(v)
 		return nil
 	case proxycoupon.FieldUsedCount:
-		v, ok := value.(int64)
+		v, ok := value.(int8)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3295,7 +3295,7 @@ func (m *ProxyCouponMutation) AddedField(name string) (ent.Value, bool) {
 func (m *ProxyCouponMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case proxycoupon.FieldCount:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3337,7 +3337,7 @@ func (m *ProxyCouponMutation) AddField(name string, value ent.Value) error {
 		m.AddUserLimit(v)
 		return nil
 	case proxycoupon.FieldUsedCount:
-		v, ok := value.(int64)
+		v, ok := value.(int8)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -5914,8 +5914,8 @@ type ProxyNodeMutation struct {
 	enabled              *bool
 	node_type            *string
 	is_hidden            *bool
-	sort                 *int
-	addsort              *int
+	sort                 *int32
+	addsort              *int32
 	node_group_ids       *[]int64
 	appendnode_group_ids []int64
 	created_at           *time.Time
@@ -6395,13 +6395,13 @@ func (m *ProxyNodeMutation) ResetIsHidden() {
 }
 
 // SetSort sets the "sort" field.
-func (m *ProxyNodeMutation) SetSort(i int) {
+func (m *ProxyNodeMutation) SetSort(i int32) {
 	m.sort = &i
 	m.addsort = nil
 }
 
 // Sort returns the value of the "sort" field in the mutation.
-func (m *ProxyNodeMutation) Sort() (r int, exists bool) {
+func (m *ProxyNodeMutation) Sort() (r int32, exists bool) {
 	v := m.sort
 	if v == nil {
 		return
@@ -6412,7 +6412,7 @@ func (m *ProxyNodeMutation) Sort() (r int, exists bool) {
 // OldSort returns the old "sort" field's value of the ProxyNode entity.
 // If the ProxyNode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxyNodeMutation) OldSort(ctx context.Context) (v int, err error) {
+func (m *ProxyNodeMutation) OldSort(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldSort is only allowed on UpdateOne operations")
 	}
@@ -6427,7 +6427,7 @@ func (m *ProxyNodeMutation) OldSort(ctx context.Context) (v int, err error) {
 }
 
 // AddSort adds i to the "sort" field.
-func (m *ProxyNodeMutation) AddSort(i int) {
+func (m *ProxyNodeMutation) AddSort(i int32) {
 	if m.addsort != nil {
 		*m.addsort += i
 	} else {
@@ -6436,7 +6436,7 @@ func (m *ProxyNodeMutation) AddSort(i int) {
 }
 
 // AddedSort returns the value that was added to the "sort" field in this mutation.
-func (m *ProxyNodeMutation) AddedSort() (r int, exists bool) {
+func (m *ProxyNodeMutation) AddedSort() (r int32, exists bool) {
 	v := m.addsort
 	if v == nil {
 		return
@@ -6803,7 +6803,7 @@ func (m *ProxyNodeMutation) SetField(name string, value ent.Value) error {
 		m.SetIsHidden(v)
 		return nil
 	case proxynode.FieldSort:
-		v, ok := value.(int)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -6885,7 +6885,7 @@ func (m *ProxyNodeMutation) AddField(name string, value ent.Value) error {
 		m.AddServerID(v)
 		return nil
 	case proxynode.FieldSort:
-		v, ok := value.(int)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -7031,8 +7031,8 @@ type ProxyOrderMutation struct {
 	order_no           *string
 	_type              *int8
 	add_type           *int8
-	quantity           *int64
-	addquantity        *int64
+	quantity           *int32
+	addquantity        *int32
 	price              *int64
 	addprice           *int64
 	amount             *int64
@@ -7389,13 +7389,13 @@ func (m *ProxyOrderMutation) ResetType() {
 }
 
 // SetQuantity sets the "quantity" field.
-func (m *ProxyOrderMutation) SetQuantity(i int64) {
+func (m *ProxyOrderMutation) SetQuantity(i int32) {
 	m.quantity = &i
 	m.addquantity = nil
 }
 
 // Quantity returns the value of the "quantity" field in the mutation.
-func (m *ProxyOrderMutation) Quantity() (r int64, exists bool) {
+func (m *ProxyOrderMutation) Quantity() (r int32, exists bool) {
 	v := m.quantity
 	if v == nil {
 		return
@@ -7406,7 +7406,7 @@ func (m *ProxyOrderMutation) Quantity() (r int64, exists bool) {
 // OldQuantity returns the old "quantity" field's value of the ProxyOrder entity.
 // If the ProxyOrder object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxyOrderMutation) OldQuantity(ctx context.Context) (v int64, err error) {
+func (m *ProxyOrderMutation) OldQuantity(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldQuantity is only allowed on UpdateOne operations")
 	}
@@ -7421,7 +7421,7 @@ func (m *ProxyOrderMutation) OldQuantity(ctx context.Context) (v int64, err erro
 }
 
 // AddQuantity adds i to the "quantity" field.
-func (m *ProxyOrderMutation) AddQuantity(i int64) {
+func (m *ProxyOrderMutation) AddQuantity(i int32) {
 	if m.addquantity != nil {
 		*m.addquantity += i
 	} else {
@@ -7430,7 +7430,7 @@ func (m *ProxyOrderMutation) AddQuantity(i int64) {
 }
 
 // AddedQuantity returns the value that was added to the "quantity" field in this mutation.
-func (m *ProxyOrderMutation) AddedQuantity() (r int64, exists bool) {
+func (m *ProxyOrderMutation) AddedQuantity() (r int32, exists bool) {
 	v := m.addquantity
 	if v == nil {
 		return
@@ -8539,7 +8539,7 @@ func (m *ProxyOrderMutation) SetField(name string, value ent.Value) error {
 		m.SetType(v)
 		return nil
 	case proxyorder.FieldQuantity:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -8781,7 +8781,7 @@ func (m *ProxyOrderMutation) AddField(name string, value ent.Value) error {
 		m.AddType(v)
 		return nil
 	case proxyorder.FieldQuantity:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -9047,8 +9047,8 @@ type ProxyPaymentMutation struct {
 	addfee_percent *int64
 	fee_amount     *int64
 	addfee_amount  *int64
-	sort           *int64
-	addsort        *int64
+	sort           *int32
+	addsort        *int32
 	enable         *bool
 	token          *string
 	clearedFields  map[string]struct{}
@@ -9559,13 +9559,13 @@ func (m *ProxyPaymentMutation) ResetFeeAmount() {
 }
 
 // SetSort sets the "sort" field.
-func (m *ProxyPaymentMutation) SetSort(i int64) {
+func (m *ProxyPaymentMutation) SetSort(i int32) {
 	m.sort = &i
 	m.addsort = nil
 }
 
 // Sort returns the value of the "sort" field in the mutation.
-func (m *ProxyPaymentMutation) Sort() (r int64, exists bool) {
+func (m *ProxyPaymentMutation) Sort() (r int32, exists bool) {
 	v := m.sort
 	if v == nil {
 		return
@@ -9576,7 +9576,7 @@ func (m *ProxyPaymentMutation) Sort() (r int64, exists bool) {
 // OldSort returns the old "sort" field's value of the ProxyPayment entity.
 // If the ProxyPayment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxyPaymentMutation) OldSort(ctx context.Context) (v int64, err error) {
+func (m *ProxyPaymentMutation) OldSort(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldSort is only allowed on UpdateOne operations")
 	}
@@ -9591,7 +9591,7 @@ func (m *ProxyPaymentMutation) OldSort(ctx context.Context) (v int64, err error)
 }
 
 // AddSort adds i to the "sort" field.
-func (m *ProxyPaymentMutation) AddSort(i int64) {
+func (m *ProxyPaymentMutation) AddSort(i int32) {
 	if m.addsort != nil {
 		*m.addsort += i
 	} else {
@@ -9600,7 +9600,7 @@ func (m *ProxyPaymentMutation) AddSort(i int64) {
 }
 
 // AddedSort returns the value that was added to the "sort" field in this mutation.
-func (m *ProxyPaymentMutation) AddedSort() (r int64, exists bool) {
+func (m *ProxyPaymentMutation) AddedSort() (r int32, exists bool) {
 	v := m.addsort
 	if v == nil {
 		return
@@ -9895,7 +9895,7 @@ func (m *ProxyPaymentMutation) SetField(name string, value ent.Value) error {
 		m.SetFeeAmount(v)
 		return nil
 	case proxypayment.FieldSort:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -9982,7 +9982,7 @@ func (m *ProxyPaymentMutation) AddField(name string, value ent.Value) error {
 		m.AddFeeAmount(v)
 		return nil
 	case proxypayment.FieldSort:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -10119,15 +10119,15 @@ type ProxyRedemptionCodeMutation struct {
 	typ               string
 	id                *int64
 	code              *string
-	total_count       *int64
-	addtotal_count    *int64
-	used_count        *int64
-	addused_count     *int64
+	total_count       *int32
+	addtotal_count    *int32
+	used_count        *int32
+	addused_count     *int32
 	subscribe_plan    *int64
 	addsubscribe_plan *int64
 	unit_time         *string
-	quantity          *int64
-	addquantity       *int64
+	quantity          *int32
+	addquantity       *int32
 	status            *int8
 	addstatus         *int8
 	created_at        *time.Time
@@ -10283,13 +10283,13 @@ func (m *ProxyRedemptionCodeMutation) ResetCode() {
 }
 
 // SetTotalCount sets the "total_count" field.
-func (m *ProxyRedemptionCodeMutation) SetTotalCount(i int64) {
+func (m *ProxyRedemptionCodeMutation) SetTotalCount(i int32) {
 	m.total_count = &i
 	m.addtotal_count = nil
 }
 
 // TotalCount returns the value of the "total_count" field in the mutation.
-func (m *ProxyRedemptionCodeMutation) TotalCount() (r int64, exists bool) {
+func (m *ProxyRedemptionCodeMutation) TotalCount() (r int32, exists bool) {
 	v := m.total_count
 	if v == nil {
 		return
@@ -10300,7 +10300,7 @@ func (m *ProxyRedemptionCodeMutation) TotalCount() (r int64, exists bool) {
 // OldTotalCount returns the old "total_count" field's value of the ProxyRedemptionCode entity.
 // If the ProxyRedemptionCode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxyRedemptionCodeMutation) OldTotalCount(ctx context.Context) (v int64, err error) {
+func (m *ProxyRedemptionCodeMutation) OldTotalCount(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTotalCount is only allowed on UpdateOne operations")
 	}
@@ -10315,7 +10315,7 @@ func (m *ProxyRedemptionCodeMutation) OldTotalCount(ctx context.Context) (v int6
 }
 
 // AddTotalCount adds i to the "total_count" field.
-func (m *ProxyRedemptionCodeMutation) AddTotalCount(i int64) {
+func (m *ProxyRedemptionCodeMutation) AddTotalCount(i int32) {
 	if m.addtotal_count != nil {
 		*m.addtotal_count += i
 	} else {
@@ -10324,7 +10324,7 @@ func (m *ProxyRedemptionCodeMutation) AddTotalCount(i int64) {
 }
 
 // AddedTotalCount returns the value that was added to the "total_count" field in this mutation.
-func (m *ProxyRedemptionCodeMutation) AddedTotalCount() (r int64, exists bool) {
+func (m *ProxyRedemptionCodeMutation) AddedTotalCount() (r int32, exists bool) {
 	v := m.addtotal_count
 	if v == nil {
 		return
@@ -10339,13 +10339,13 @@ func (m *ProxyRedemptionCodeMutation) ResetTotalCount() {
 }
 
 // SetUsedCount sets the "used_count" field.
-func (m *ProxyRedemptionCodeMutation) SetUsedCount(i int64) {
+func (m *ProxyRedemptionCodeMutation) SetUsedCount(i int32) {
 	m.used_count = &i
 	m.addused_count = nil
 }
 
 // UsedCount returns the value of the "used_count" field in the mutation.
-func (m *ProxyRedemptionCodeMutation) UsedCount() (r int64, exists bool) {
+func (m *ProxyRedemptionCodeMutation) UsedCount() (r int32, exists bool) {
 	v := m.used_count
 	if v == nil {
 		return
@@ -10356,7 +10356,7 @@ func (m *ProxyRedemptionCodeMutation) UsedCount() (r int64, exists bool) {
 // OldUsedCount returns the old "used_count" field's value of the ProxyRedemptionCode entity.
 // If the ProxyRedemptionCode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxyRedemptionCodeMutation) OldUsedCount(ctx context.Context) (v int64, err error) {
+func (m *ProxyRedemptionCodeMutation) OldUsedCount(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUsedCount is only allowed on UpdateOne operations")
 	}
@@ -10371,7 +10371,7 @@ func (m *ProxyRedemptionCodeMutation) OldUsedCount(ctx context.Context) (v int64
 }
 
 // AddUsedCount adds i to the "used_count" field.
-func (m *ProxyRedemptionCodeMutation) AddUsedCount(i int64) {
+func (m *ProxyRedemptionCodeMutation) AddUsedCount(i int32) {
 	if m.addused_count != nil {
 		*m.addused_count += i
 	} else {
@@ -10380,7 +10380,7 @@ func (m *ProxyRedemptionCodeMutation) AddUsedCount(i int64) {
 }
 
 // AddedUsedCount returns the value that was added to the "used_count" field in this mutation.
-func (m *ProxyRedemptionCodeMutation) AddedUsedCount() (r int64, exists bool) {
+func (m *ProxyRedemptionCodeMutation) AddedUsedCount() (r int32, exists bool) {
 	v := m.addused_count
 	if v == nil {
 		return
@@ -10487,13 +10487,13 @@ func (m *ProxyRedemptionCodeMutation) ResetUnitTime() {
 }
 
 // SetQuantity sets the "quantity" field.
-func (m *ProxyRedemptionCodeMutation) SetQuantity(i int64) {
+func (m *ProxyRedemptionCodeMutation) SetQuantity(i int32) {
 	m.quantity = &i
 	m.addquantity = nil
 }
 
 // Quantity returns the value of the "quantity" field in the mutation.
-func (m *ProxyRedemptionCodeMutation) Quantity() (r int64, exists bool) {
+func (m *ProxyRedemptionCodeMutation) Quantity() (r int32, exists bool) {
 	v := m.quantity
 	if v == nil {
 		return
@@ -10504,7 +10504,7 @@ func (m *ProxyRedemptionCodeMutation) Quantity() (r int64, exists bool) {
 // OldQuantity returns the old "quantity" field's value of the ProxyRedemptionCode entity.
 // If the ProxyRedemptionCode object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxyRedemptionCodeMutation) OldQuantity(ctx context.Context) (v int64, err error) {
+func (m *ProxyRedemptionCodeMutation) OldQuantity(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldQuantity is only allowed on UpdateOne operations")
 	}
@@ -10519,7 +10519,7 @@ func (m *ProxyRedemptionCodeMutation) OldQuantity(ctx context.Context) (v int64,
 }
 
 // AddQuantity adds i to the "quantity" field.
-func (m *ProxyRedemptionCodeMutation) AddQuantity(i int64) {
+func (m *ProxyRedemptionCodeMutation) AddQuantity(i int32) {
 	if m.addquantity != nil {
 		*m.addquantity += i
 	} else {
@@ -10528,7 +10528,7 @@ func (m *ProxyRedemptionCodeMutation) AddQuantity(i int64) {
 }
 
 // AddedQuantity returns the value that was added to the "quantity" field in this mutation.
-func (m *ProxyRedemptionCodeMutation) AddedQuantity() (r int64, exists bool) {
+func (m *ProxyRedemptionCodeMutation) AddedQuantity() (r int32, exists bool) {
 	v := m.addquantity
 	if v == nil {
 		return
@@ -10912,14 +10912,14 @@ func (m *ProxyRedemptionCodeMutation) SetField(name string, value ent.Value) err
 		m.SetCode(v)
 		return nil
 	case proxyredemptioncode.FieldTotalCount:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTotalCount(v)
 		return nil
 	case proxyredemptioncode.FieldUsedCount:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -10940,7 +10940,7 @@ func (m *ProxyRedemptionCodeMutation) SetField(name string, value ent.Value) err
 		m.SetUnitTime(v)
 		return nil
 	case proxyredemptioncode.FieldQuantity:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -11025,14 +11025,14 @@ func (m *ProxyRedemptionCodeMutation) AddedField(name string) (ent.Value, bool) 
 func (m *ProxyRedemptionCodeMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case proxyredemptioncode.FieldTotalCount:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTotalCount(v)
 		return nil
 	case proxyredemptioncode.FieldUsedCount:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -11046,7 +11046,7 @@ func (m *ProxyRedemptionCodeMutation) AddField(name string, value ent.Value) err
 		m.AddSubscribePlan(v)
 		return nil
 	case proxyredemptioncode.FieldQuantity:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -11222,8 +11222,8 @@ type ProxyRedemptionRecordMutation struct {
 	subscribe_id           *int64
 	addsubscribe_id        *int64
 	unit_time              *string
-	quantity               *int64
-	addquantity            *int64
+	quantity               *int32
+	addquantity            *int32
 	redeemed_at            *time.Time
 	created_at             *time.Time
 	clearedFields          map[string]struct{}
@@ -11505,13 +11505,13 @@ func (m *ProxyRedemptionRecordMutation) ResetUnitTime() {
 }
 
 // SetQuantity sets the "quantity" field.
-func (m *ProxyRedemptionRecordMutation) SetQuantity(i int64) {
+func (m *ProxyRedemptionRecordMutation) SetQuantity(i int32) {
 	m.quantity = &i
 	m.addquantity = nil
 }
 
 // Quantity returns the value of the "quantity" field in the mutation.
-func (m *ProxyRedemptionRecordMutation) Quantity() (r int64, exists bool) {
+func (m *ProxyRedemptionRecordMutation) Quantity() (r int32, exists bool) {
 	v := m.quantity
 	if v == nil {
 		return
@@ -11522,7 +11522,7 @@ func (m *ProxyRedemptionRecordMutation) Quantity() (r int64, exists bool) {
 // OldQuantity returns the old "quantity" field's value of the ProxyRedemptionRecord entity.
 // If the ProxyRedemptionRecord object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxyRedemptionRecordMutation) OldQuantity(ctx context.Context) (v int64, err error) {
+func (m *ProxyRedemptionRecordMutation) OldQuantity(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldQuantity is only allowed on UpdateOne operations")
 	}
@@ -11537,7 +11537,7 @@ func (m *ProxyRedemptionRecordMutation) OldQuantity(ctx context.Context) (v int6
 }
 
 // AddQuantity adds i to the "quantity" field.
-func (m *ProxyRedemptionRecordMutation) AddQuantity(i int64) {
+func (m *ProxyRedemptionRecordMutation) AddQuantity(i int32) {
 	if m.addquantity != nil {
 		*m.addquantity += i
 	} else {
@@ -11546,7 +11546,7 @@ func (m *ProxyRedemptionRecordMutation) AddQuantity(i int64) {
 }
 
 // AddedQuantity returns the value that was added to the "quantity" field in this mutation.
-func (m *ProxyRedemptionRecordMutation) AddedQuantity() (r int64, exists bool) {
+func (m *ProxyRedemptionRecordMutation) AddedQuantity() (r int32, exists bool) {
 	v := m.addquantity
 	if v == nil {
 		return
@@ -11825,7 +11825,7 @@ func (m *ProxyRedemptionRecordMutation) SetField(name string, value ent.Value) e
 		m.SetUnitTime(v)
 		return nil
 	case proxyredemptionrecord.FieldQuantity:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -11888,7 +11888,7 @@ func (m *ProxyRedemptionRecordMutation) AddField(name string, value ent.Value) e
 		m.AddSubscribeID(v)
 		return nil
 	case proxyredemptionrecord.FieldQuantity:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -12380,8 +12380,8 @@ type ProxyServerMutation struct {
 	country          *string
 	city             *string
 	server_addr      *string
-	sort             *int
-	addsort          *int
+	sort             *int32
+	addsort          *int32
 	protocol         *string
 	last_reported_at *time.Time
 	longitude        *string
@@ -12645,13 +12645,13 @@ func (m *ProxyServerMutation) ResetServerAddr() {
 }
 
 // SetSort sets the "sort" field.
-func (m *ProxyServerMutation) SetSort(i int) {
+func (m *ProxyServerMutation) SetSort(i int32) {
 	m.sort = &i
 	m.addsort = nil
 }
 
 // Sort returns the value of the "sort" field in the mutation.
-func (m *ProxyServerMutation) Sort() (r int, exists bool) {
+func (m *ProxyServerMutation) Sort() (r int32, exists bool) {
 	v := m.sort
 	if v == nil {
 		return
@@ -12662,7 +12662,7 @@ func (m *ProxyServerMutation) Sort() (r int, exists bool) {
 // OldSort returns the old "sort" field's value of the ProxyServer entity.
 // If the ProxyServer object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxyServerMutation) OldSort(ctx context.Context) (v int, err error) {
+func (m *ProxyServerMutation) OldSort(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldSort is only allowed on UpdateOne operations")
 	}
@@ -12677,7 +12677,7 @@ func (m *ProxyServerMutation) OldSort(ctx context.Context) (v int, err error) {
 }
 
 // AddSort adds i to the "sort" field.
-func (m *ProxyServerMutation) AddSort(i int) {
+func (m *ProxyServerMutation) AddSort(i int32) {
 	if m.addsort != nil {
 		*m.addsort += i
 	} else {
@@ -12686,7 +12686,7 @@ func (m *ProxyServerMutation) AddSort(i int) {
 }
 
 // AddedSort returns the value that was added to the "sort" field in this mutation.
-func (m *ProxyServerMutation) AddedSort() (r int, exists bool) {
+func (m *ProxyServerMutation) AddedSort() (r int32, exists bool) {
 	v := m.addsort
 	if v == nil {
 		return
@@ -13195,7 +13195,7 @@ func (m *ProxyServerMutation) SetField(name string, value ent.Value) error {
 		m.SetServerAddr(v)
 		return nil
 	case proxyserver.FieldSort:
-		v, ok := value.(int)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -13288,7 +13288,7 @@ func (m *ProxyServerMutation) AddedField(name string) (ent.Value, bool) {
 func (m *ProxyServerMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case proxyserver.FieldSort:
-		v, ok := value.(int)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -14705,16 +14705,16 @@ type ProxySubscribeMutation struct {
 	discount             *string
 	replacement          *int64
 	addreplacement       *int64
-	inventory            *int64
-	addinventory         *int64
+	inventory            *int32
+	addinventory         *int32
 	traffic              *int64
 	addtraffic           *int64
-	speed_limit          *int64
-	addspeed_limit       *int64
-	device_limit         *int64
-	adddevice_limit      *int64
-	quota                *int64
-	addquota             *int64
+	speed_limit          *int32
+	addspeed_limit       *int32
+	device_limit         *int32
+	adddevice_limit      *int32
+	quota                *int32
+	addquota             *int32
 	nodes                *string
 	node_tags            *string
 	node_group_ids       *[]int64
@@ -14724,13 +14724,13 @@ type ProxySubscribeMutation struct {
 	traffic_limit        *string
 	show                 *bool
 	sell                 *bool
-	sort                 *int64
-	addsort              *int64
-	deduction_ratio      *int64
-	adddeduction_ratio   *int64
+	sort                 *int32
+	addsort              *int32
+	deduction_ratio      *int32
+	adddeduction_ratio   *int32
 	allow_deduction      *bool
-	reset_cycle          *int64
-	addreset_cycle       *int64
+	reset_cycle          *int32
+	addreset_cycle       *int32
 	renewal_reset        *bool
 	show_original_price  *bool
 	created_at           *time.Time
@@ -15164,13 +15164,13 @@ func (m *ProxySubscribeMutation) ResetReplacement() {
 }
 
 // SetInventory sets the "inventory" field.
-func (m *ProxySubscribeMutation) SetInventory(i int64) {
+func (m *ProxySubscribeMutation) SetInventory(i int32) {
 	m.inventory = &i
 	m.addinventory = nil
 }
 
 // Inventory returns the value of the "inventory" field in the mutation.
-func (m *ProxySubscribeMutation) Inventory() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) Inventory() (r int32, exists bool) {
 	v := m.inventory
 	if v == nil {
 		return
@@ -15181,7 +15181,7 @@ func (m *ProxySubscribeMutation) Inventory() (r int64, exists bool) {
 // OldInventory returns the old "inventory" field's value of the ProxySubscribe entity.
 // If the ProxySubscribe object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxySubscribeMutation) OldInventory(ctx context.Context) (v int64, err error) {
+func (m *ProxySubscribeMutation) OldInventory(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldInventory is only allowed on UpdateOne operations")
 	}
@@ -15196,7 +15196,7 @@ func (m *ProxySubscribeMutation) OldInventory(ctx context.Context) (v int64, err
 }
 
 // AddInventory adds i to the "inventory" field.
-func (m *ProxySubscribeMutation) AddInventory(i int64) {
+func (m *ProxySubscribeMutation) AddInventory(i int32) {
 	if m.addinventory != nil {
 		*m.addinventory += i
 	} else {
@@ -15205,7 +15205,7 @@ func (m *ProxySubscribeMutation) AddInventory(i int64) {
 }
 
 // AddedInventory returns the value that was added to the "inventory" field in this mutation.
-func (m *ProxySubscribeMutation) AddedInventory() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) AddedInventory() (r int32, exists bool) {
 	v := m.addinventory
 	if v == nil {
 		return
@@ -15276,13 +15276,13 @@ func (m *ProxySubscribeMutation) ResetTraffic() {
 }
 
 // SetSpeedLimit sets the "speed_limit" field.
-func (m *ProxySubscribeMutation) SetSpeedLimit(i int64) {
+func (m *ProxySubscribeMutation) SetSpeedLimit(i int32) {
 	m.speed_limit = &i
 	m.addspeed_limit = nil
 }
 
 // SpeedLimit returns the value of the "speed_limit" field in the mutation.
-func (m *ProxySubscribeMutation) SpeedLimit() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) SpeedLimit() (r int32, exists bool) {
 	v := m.speed_limit
 	if v == nil {
 		return
@@ -15293,7 +15293,7 @@ func (m *ProxySubscribeMutation) SpeedLimit() (r int64, exists bool) {
 // OldSpeedLimit returns the old "speed_limit" field's value of the ProxySubscribe entity.
 // If the ProxySubscribe object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxySubscribeMutation) OldSpeedLimit(ctx context.Context) (v int64, err error) {
+func (m *ProxySubscribeMutation) OldSpeedLimit(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldSpeedLimit is only allowed on UpdateOne operations")
 	}
@@ -15308,7 +15308,7 @@ func (m *ProxySubscribeMutation) OldSpeedLimit(ctx context.Context) (v int64, er
 }
 
 // AddSpeedLimit adds i to the "speed_limit" field.
-func (m *ProxySubscribeMutation) AddSpeedLimit(i int64) {
+func (m *ProxySubscribeMutation) AddSpeedLimit(i int32) {
 	if m.addspeed_limit != nil {
 		*m.addspeed_limit += i
 	} else {
@@ -15317,7 +15317,7 @@ func (m *ProxySubscribeMutation) AddSpeedLimit(i int64) {
 }
 
 // AddedSpeedLimit returns the value that was added to the "speed_limit" field in this mutation.
-func (m *ProxySubscribeMutation) AddedSpeedLimit() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) AddedSpeedLimit() (r int32, exists bool) {
 	v := m.addspeed_limit
 	if v == nil {
 		return
@@ -15332,13 +15332,13 @@ func (m *ProxySubscribeMutation) ResetSpeedLimit() {
 }
 
 // SetDeviceLimit sets the "device_limit" field.
-func (m *ProxySubscribeMutation) SetDeviceLimit(i int64) {
+func (m *ProxySubscribeMutation) SetDeviceLimit(i int32) {
 	m.device_limit = &i
 	m.adddevice_limit = nil
 }
 
 // DeviceLimit returns the value of the "device_limit" field in the mutation.
-func (m *ProxySubscribeMutation) DeviceLimit() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) DeviceLimit() (r int32, exists bool) {
 	v := m.device_limit
 	if v == nil {
 		return
@@ -15349,7 +15349,7 @@ func (m *ProxySubscribeMutation) DeviceLimit() (r int64, exists bool) {
 // OldDeviceLimit returns the old "device_limit" field's value of the ProxySubscribe entity.
 // If the ProxySubscribe object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxySubscribeMutation) OldDeviceLimit(ctx context.Context) (v int64, err error) {
+func (m *ProxySubscribeMutation) OldDeviceLimit(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDeviceLimit is only allowed on UpdateOne operations")
 	}
@@ -15364,7 +15364,7 @@ func (m *ProxySubscribeMutation) OldDeviceLimit(ctx context.Context) (v int64, e
 }
 
 // AddDeviceLimit adds i to the "device_limit" field.
-func (m *ProxySubscribeMutation) AddDeviceLimit(i int64) {
+func (m *ProxySubscribeMutation) AddDeviceLimit(i int32) {
 	if m.adddevice_limit != nil {
 		*m.adddevice_limit += i
 	} else {
@@ -15373,7 +15373,7 @@ func (m *ProxySubscribeMutation) AddDeviceLimit(i int64) {
 }
 
 // AddedDeviceLimit returns the value that was added to the "device_limit" field in this mutation.
-func (m *ProxySubscribeMutation) AddedDeviceLimit() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) AddedDeviceLimit() (r int32, exists bool) {
 	v := m.adddevice_limit
 	if v == nil {
 		return
@@ -15388,13 +15388,13 @@ func (m *ProxySubscribeMutation) ResetDeviceLimit() {
 }
 
 // SetQuota sets the "quota" field.
-func (m *ProxySubscribeMutation) SetQuota(i int64) {
+func (m *ProxySubscribeMutation) SetQuota(i int32) {
 	m.quota = &i
 	m.addquota = nil
 }
 
 // Quota returns the value of the "quota" field in the mutation.
-func (m *ProxySubscribeMutation) Quota() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) Quota() (r int32, exists bool) {
 	v := m.quota
 	if v == nil {
 		return
@@ -15405,7 +15405,7 @@ func (m *ProxySubscribeMutation) Quota() (r int64, exists bool) {
 // OldQuota returns the old "quota" field's value of the ProxySubscribe entity.
 // If the ProxySubscribe object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxySubscribeMutation) OldQuota(ctx context.Context) (v int64, err error) {
+func (m *ProxySubscribeMutation) OldQuota(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldQuota is only allowed on UpdateOne operations")
 	}
@@ -15420,7 +15420,7 @@ func (m *ProxySubscribeMutation) OldQuota(ctx context.Context) (v int64, err err
 }
 
 // AddQuota adds i to the "quota" field.
-func (m *ProxySubscribeMutation) AddQuota(i int64) {
+func (m *ProxySubscribeMutation) AddQuota(i int32) {
 	if m.addquota != nil {
 		*m.addquota += i
 	} else {
@@ -15429,7 +15429,7 @@ func (m *ProxySubscribeMutation) AddQuota(i int64) {
 }
 
 // AddedQuota returns the value that was added to the "quota" field in this mutation.
-func (m *ProxySubscribeMutation) AddedQuota() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) AddedQuota() (r int32, exists bool) {
 	v := m.addquota
 	if v == nil {
 		return
@@ -15772,13 +15772,13 @@ func (m *ProxySubscribeMutation) ResetSell() {
 }
 
 // SetSort sets the "sort" field.
-func (m *ProxySubscribeMutation) SetSort(i int64) {
+func (m *ProxySubscribeMutation) SetSort(i int32) {
 	m.sort = &i
 	m.addsort = nil
 }
 
 // Sort returns the value of the "sort" field in the mutation.
-func (m *ProxySubscribeMutation) Sort() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) Sort() (r int32, exists bool) {
 	v := m.sort
 	if v == nil {
 		return
@@ -15789,7 +15789,7 @@ func (m *ProxySubscribeMutation) Sort() (r int64, exists bool) {
 // OldSort returns the old "sort" field's value of the ProxySubscribe entity.
 // If the ProxySubscribe object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxySubscribeMutation) OldSort(ctx context.Context) (v int64, err error) {
+func (m *ProxySubscribeMutation) OldSort(ctx context.Context) (v int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldSort is only allowed on UpdateOne operations")
 	}
@@ -15804,7 +15804,7 @@ func (m *ProxySubscribeMutation) OldSort(ctx context.Context) (v int64, err erro
 }
 
 // AddSort adds i to the "sort" field.
-func (m *ProxySubscribeMutation) AddSort(i int64) {
+func (m *ProxySubscribeMutation) AddSort(i int32) {
 	if m.addsort != nil {
 		*m.addsort += i
 	} else {
@@ -15813,7 +15813,7 @@ func (m *ProxySubscribeMutation) AddSort(i int64) {
 }
 
 // AddedSort returns the value that was added to the "sort" field in this mutation.
-func (m *ProxySubscribeMutation) AddedSort() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) AddedSort() (r int32, exists bool) {
 	v := m.addsort
 	if v == nil {
 		return
@@ -15828,13 +15828,13 @@ func (m *ProxySubscribeMutation) ResetSort() {
 }
 
 // SetDeductionRatio sets the "deduction_ratio" field.
-func (m *ProxySubscribeMutation) SetDeductionRatio(i int64) {
+func (m *ProxySubscribeMutation) SetDeductionRatio(i int32) {
 	m.deduction_ratio = &i
 	m.adddeduction_ratio = nil
 }
 
 // DeductionRatio returns the value of the "deduction_ratio" field in the mutation.
-func (m *ProxySubscribeMutation) DeductionRatio() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) DeductionRatio() (r int32, exists bool) {
 	v := m.deduction_ratio
 	if v == nil {
 		return
@@ -15845,7 +15845,7 @@ func (m *ProxySubscribeMutation) DeductionRatio() (r int64, exists bool) {
 // OldDeductionRatio returns the old "deduction_ratio" field's value of the ProxySubscribe entity.
 // If the ProxySubscribe object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxySubscribeMutation) OldDeductionRatio(ctx context.Context) (v *int64, err error) {
+func (m *ProxySubscribeMutation) OldDeductionRatio(ctx context.Context) (v *int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDeductionRatio is only allowed on UpdateOne operations")
 	}
@@ -15860,7 +15860,7 @@ func (m *ProxySubscribeMutation) OldDeductionRatio(ctx context.Context) (v *int6
 }
 
 // AddDeductionRatio adds i to the "deduction_ratio" field.
-func (m *ProxySubscribeMutation) AddDeductionRatio(i int64) {
+func (m *ProxySubscribeMutation) AddDeductionRatio(i int32) {
 	if m.adddeduction_ratio != nil {
 		*m.adddeduction_ratio += i
 	} else {
@@ -15869,7 +15869,7 @@ func (m *ProxySubscribeMutation) AddDeductionRatio(i int64) {
 }
 
 // AddedDeductionRatio returns the value that was added to the "deduction_ratio" field in this mutation.
-func (m *ProxySubscribeMutation) AddedDeductionRatio() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) AddedDeductionRatio() (r int32, exists bool) {
 	v := m.adddeduction_ratio
 	if v == nil {
 		return
@@ -15934,13 +15934,13 @@ func (m *ProxySubscribeMutation) ResetAllowDeduction() {
 }
 
 // SetResetCycle sets the "reset_cycle" field.
-func (m *ProxySubscribeMutation) SetResetCycle(i int64) {
+func (m *ProxySubscribeMutation) SetResetCycle(i int32) {
 	m.reset_cycle = &i
 	m.addreset_cycle = nil
 }
 
 // ResetCycle returns the value of the "reset_cycle" field in the mutation.
-func (m *ProxySubscribeMutation) ResetCycle() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) ResetCycle() (r int32, exists bool) {
 	v := m.reset_cycle
 	if v == nil {
 		return
@@ -15951,7 +15951,7 @@ func (m *ProxySubscribeMutation) ResetCycle() (r int64, exists bool) {
 // OldResetCycle returns the old "reset_cycle" field's value of the ProxySubscribe entity.
 // If the ProxySubscribe object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxySubscribeMutation) OldResetCycle(ctx context.Context) (v *int64, err error) {
+func (m *ProxySubscribeMutation) OldResetCycle(ctx context.Context) (v *int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldResetCycle is only allowed on UpdateOne operations")
 	}
@@ -15966,7 +15966,7 @@ func (m *ProxySubscribeMutation) OldResetCycle(ctx context.Context) (v *int64, e
 }
 
 // AddResetCycle adds i to the "reset_cycle" field.
-func (m *ProxySubscribeMutation) AddResetCycle(i int64) {
+func (m *ProxySubscribeMutation) AddResetCycle(i int32) {
 	if m.addreset_cycle != nil {
 		*m.addreset_cycle += i
 	} else {
@@ -15975,7 +15975,7 @@ func (m *ProxySubscribeMutation) AddResetCycle(i int64) {
 }
 
 // AddedResetCycle returns the value that was added to the "reset_cycle" field in this mutation.
-func (m *ProxySubscribeMutation) AddedResetCycle() (r int64, exists bool) {
+func (m *ProxySubscribeMutation) AddedResetCycle() (r int32, exists bool) {
 	v := m.addreset_cycle
 	if v == nil {
 		return
@@ -16447,7 +16447,7 @@ func (m *ProxySubscribeMutation) SetField(name string, value ent.Value) error {
 		m.SetReplacement(v)
 		return nil
 	case proxysubscribe.FieldInventory:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -16461,21 +16461,21 @@ func (m *ProxySubscribeMutation) SetField(name string, value ent.Value) error {
 		m.SetTraffic(v)
 		return nil
 	case proxysubscribe.FieldSpeedLimit:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSpeedLimit(v)
 		return nil
 	case proxysubscribe.FieldDeviceLimit:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeviceLimit(v)
 		return nil
 	case proxysubscribe.FieldQuota:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -16531,14 +16531,14 @@ func (m *ProxySubscribeMutation) SetField(name string, value ent.Value) error {
 		m.SetSell(v)
 		return nil
 	case proxysubscribe.FieldSort:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSort(v)
 		return nil
 	case proxysubscribe.FieldDeductionRatio:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -16552,7 +16552,7 @@ func (m *ProxySubscribeMutation) SetField(name string, value ent.Value) error {
 		m.SetAllowDeduction(v)
 		return nil
 	case proxysubscribe.FieldResetCycle:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -16681,7 +16681,7 @@ func (m *ProxySubscribeMutation) AddField(name string, value ent.Value) error {
 		m.AddReplacement(v)
 		return nil
 	case proxysubscribe.FieldInventory:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -16695,21 +16695,21 @@ func (m *ProxySubscribeMutation) AddField(name string, value ent.Value) error {
 		m.AddTraffic(v)
 		return nil
 	case proxysubscribe.FieldSpeedLimit:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddSpeedLimit(v)
 		return nil
 	case proxysubscribe.FieldDeviceLimit:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddDeviceLimit(v)
 		return nil
 	case proxysubscribe.FieldQuota:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -16723,21 +16723,21 @@ func (m *ProxySubscribeMutation) AddField(name string, value ent.Value) error {
 		m.AddNodeGroupID(v)
 		return nil
 	case proxysubscribe.FieldSort:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddSort(v)
 		return nil
 	case proxysubscribe.FieldDeductionRatio:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddDeductionRatio(v)
 		return nil
 	case proxysubscribe.FieldResetCycle:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -17927,10 +17927,10 @@ type ProxySubscribeGroupMutation struct {
 	name                      *string
 	description               *string
 	is_expired_group          *bool
-	expired_days_limit        *int64
-	addexpired_days_limit     *int64
-	max_traffic_gb_expired    *int64
-	addmax_traffic_gb_expired *int64
+	expired_days_limit        *int32
+	addexpired_days_limit     *int32
+	max_traffic_gb_expired    *int32
+	addmax_traffic_gb_expired *int32
 	speed_limit               *int64
 	addspeed_limit            *int64
 	created_at                *time.Time
@@ -18167,13 +18167,13 @@ func (m *ProxySubscribeGroupMutation) ResetIsExpiredGroup() {
 }
 
 // SetExpiredDaysLimit sets the "expired_days_limit" field.
-func (m *ProxySubscribeGroupMutation) SetExpiredDaysLimit(i int64) {
+func (m *ProxySubscribeGroupMutation) SetExpiredDaysLimit(i int32) {
 	m.expired_days_limit = &i
 	m.addexpired_days_limit = nil
 }
 
 // ExpiredDaysLimit returns the value of the "expired_days_limit" field in the mutation.
-func (m *ProxySubscribeGroupMutation) ExpiredDaysLimit() (r int64, exists bool) {
+func (m *ProxySubscribeGroupMutation) ExpiredDaysLimit() (r int32, exists bool) {
 	v := m.expired_days_limit
 	if v == nil {
 		return
@@ -18184,7 +18184,7 @@ func (m *ProxySubscribeGroupMutation) ExpiredDaysLimit() (r int64, exists bool) 
 // OldExpiredDaysLimit returns the old "expired_days_limit" field's value of the ProxySubscribeGroup entity.
 // If the ProxySubscribeGroup object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxySubscribeGroupMutation) OldExpiredDaysLimit(ctx context.Context) (v *int64, err error) {
+func (m *ProxySubscribeGroupMutation) OldExpiredDaysLimit(ctx context.Context) (v *int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldExpiredDaysLimit is only allowed on UpdateOne operations")
 	}
@@ -18199,7 +18199,7 @@ func (m *ProxySubscribeGroupMutation) OldExpiredDaysLimit(ctx context.Context) (
 }
 
 // AddExpiredDaysLimit adds i to the "expired_days_limit" field.
-func (m *ProxySubscribeGroupMutation) AddExpiredDaysLimit(i int64) {
+func (m *ProxySubscribeGroupMutation) AddExpiredDaysLimit(i int32) {
 	if m.addexpired_days_limit != nil {
 		*m.addexpired_days_limit += i
 	} else {
@@ -18208,7 +18208,7 @@ func (m *ProxySubscribeGroupMutation) AddExpiredDaysLimit(i int64) {
 }
 
 // AddedExpiredDaysLimit returns the value that was added to the "expired_days_limit" field in this mutation.
-func (m *ProxySubscribeGroupMutation) AddedExpiredDaysLimit() (r int64, exists bool) {
+func (m *ProxySubscribeGroupMutation) AddedExpiredDaysLimit() (r int32, exists bool) {
 	v := m.addexpired_days_limit
 	if v == nil {
 		return
@@ -18237,13 +18237,13 @@ func (m *ProxySubscribeGroupMutation) ResetExpiredDaysLimit() {
 }
 
 // SetMaxTrafficGBExpired sets the "max_traffic_gb_expired" field.
-func (m *ProxySubscribeGroupMutation) SetMaxTrafficGBExpired(i int64) {
+func (m *ProxySubscribeGroupMutation) SetMaxTrafficGBExpired(i int32) {
 	m.max_traffic_gb_expired = &i
 	m.addmax_traffic_gb_expired = nil
 }
 
 // MaxTrafficGBExpired returns the value of the "max_traffic_gb_expired" field in the mutation.
-func (m *ProxySubscribeGroupMutation) MaxTrafficGBExpired() (r int64, exists bool) {
+func (m *ProxySubscribeGroupMutation) MaxTrafficGBExpired() (r int32, exists bool) {
 	v := m.max_traffic_gb_expired
 	if v == nil {
 		return
@@ -18254,7 +18254,7 @@ func (m *ProxySubscribeGroupMutation) MaxTrafficGBExpired() (r int64, exists boo
 // OldMaxTrafficGBExpired returns the old "max_traffic_gb_expired" field's value of the ProxySubscribeGroup entity.
 // If the ProxySubscribeGroup object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxySubscribeGroupMutation) OldMaxTrafficGBExpired(ctx context.Context) (v *int64, err error) {
+func (m *ProxySubscribeGroupMutation) OldMaxTrafficGBExpired(ctx context.Context) (v *int32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldMaxTrafficGBExpired is only allowed on UpdateOne operations")
 	}
@@ -18269,7 +18269,7 @@ func (m *ProxySubscribeGroupMutation) OldMaxTrafficGBExpired(ctx context.Context
 }
 
 // AddMaxTrafficGBExpired adds i to the "max_traffic_gb_expired" field.
-func (m *ProxySubscribeGroupMutation) AddMaxTrafficGBExpired(i int64) {
+func (m *ProxySubscribeGroupMutation) AddMaxTrafficGBExpired(i int32) {
 	if m.addmax_traffic_gb_expired != nil {
 		*m.addmax_traffic_gb_expired += i
 	} else {
@@ -18278,7 +18278,7 @@ func (m *ProxySubscribeGroupMutation) AddMaxTrafficGBExpired(i int64) {
 }
 
 // AddedMaxTrafficGBExpired returns the value that was added to the "max_traffic_gb_expired" field in this mutation.
-func (m *ProxySubscribeGroupMutation) AddedMaxTrafficGBExpired() (r int64, exists bool) {
+func (m *ProxySubscribeGroupMutation) AddedMaxTrafficGBExpired() (r int32, exists bool) {
 	v := m.addmax_traffic_gb_expired
 	if v == nil {
 		return
@@ -18587,14 +18587,14 @@ func (m *ProxySubscribeGroupMutation) SetField(name string, value ent.Value) err
 		m.SetIsExpiredGroup(v)
 		return nil
 	case proxysubscribegroup.FieldExpiredDaysLimit:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetExpiredDaysLimit(v)
 		return nil
 	case proxysubscribegroup.FieldMaxTrafficGBExpired:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -18662,14 +18662,14 @@ func (m *ProxySubscribeGroupMutation) AddedField(name string) (ent.Value, bool) 
 func (m *ProxySubscribeGroupMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case proxysubscribegroup.FieldExpiredDaysLimit:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddExpiredDaysLimit(v)
 		return nil
 	case proxysubscribegroup.FieldMaxTrafficGBExpired:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -20161,10 +20161,10 @@ type ProxyTaskMutation struct {
 	status        *int8
 	addstatus     *int8
 	errors        *string
-	total         *uint64
-	addtotal      *int64
-	current       *uint64
-	addcurrent    *int64
+	total         *uint32
+	addtotal      *int32
+	current       *uint32
+	addcurrent    *int32
 	created_at    *time.Time
 	updated_at    *time.Time
 	clearedFields map[string]struct{}
@@ -20537,13 +20537,13 @@ func (m *ProxyTaskMutation) ResetErrors() {
 }
 
 // SetTotal sets the "total" field.
-func (m *ProxyTaskMutation) SetTotal(u uint64) {
+func (m *ProxyTaskMutation) SetTotal(u uint32) {
 	m.total = &u
 	m.addtotal = nil
 }
 
 // Total returns the value of the "total" field in the mutation.
-func (m *ProxyTaskMutation) Total() (r uint64, exists bool) {
+func (m *ProxyTaskMutation) Total() (r uint32, exists bool) {
 	v := m.total
 	if v == nil {
 		return
@@ -20554,7 +20554,7 @@ func (m *ProxyTaskMutation) Total() (r uint64, exists bool) {
 // OldTotal returns the old "total" field's value of the ProxyTask entity.
 // If the ProxyTask object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxyTaskMutation) OldTotal(ctx context.Context) (v uint64, err error) {
+func (m *ProxyTaskMutation) OldTotal(ctx context.Context) (v uint32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldTotal is only allowed on UpdateOne operations")
 	}
@@ -20569,7 +20569,7 @@ func (m *ProxyTaskMutation) OldTotal(ctx context.Context) (v uint64, err error) 
 }
 
 // AddTotal adds u to the "total" field.
-func (m *ProxyTaskMutation) AddTotal(u int64) {
+func (m *ProxyTaskMutation) AddTotal(u int32) {
 	if m.addtotal != nil {
 		*m.addtotal += u
 	} else {
@@ -20578,7 +20578,7 @@ func (m *ProxyTaskMutation) AddTotal(u int64) {
 }
 
 // AddedTotal returns the value that was added to the "total" field in this mutation.
-func (m *ProxyTaskMutation) AddedTotal() (r int64, exists bool) {
+func (m *ProxyTaskMutation) AddedTotal() (r int32, exists bool) {
 	v := m.addtotal
 	if v == nil {
 		return
@@ -20593,13 +20593,13 @@ func (m *ProxyTaskMutation) ResetTotal() {
 }
 
 // SetCurrent sets the "current" field.
-func (m *ProxyTaskMutation) SetCurrent(u uint64) {
+func (m *ProxyTaskMutation) SetCurrent(u uint32) {
 	m.current = &u
 	m.addcurrent = nil
 }
 
 // Current returns the value of the "current" field in the mutation.
-func (m *ProxyTaskMutation) Current() (r uint64, exists bool) {
+func (m *ProxyTaskMutation) Current() (r uint32, exists bool) {
 	v := m.current
 	if v == nil {
 		return
@@ -20610,7 +20610,7 @@ func (m *ProxyTaskMutation) Current() (r uint64, exists bool) {
 // OldCurrent returns the old "current" field's value of the ProxyTask entity.
 // If the ProxyTask object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProxyTaskMutation) OldCurrent(ctx context.Context) (v uint64, err error) {
+func (m *ProxyTaskMutation) OldCurrent(ctx context.Context) (v uint32, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCurrent is only allowed on UpdateOne operations")
 	}
@@ -20625,7 +20625,7 @@ func (m *ProxyTaskMutation) OldCurrent(ctx context.Context) (v uint64, err error
 }
 
 // AddCurrent adds u to the "current" field.
-func (m *ProxyTaskMutation) AddCurrent(u int64) {
+func (m *ProxyTaskMutation) AddCurrent(u int32) {
 	if m.addcurrent != nil {
 		*m.addcurrent += u
 	} else {
@@ -20634,7 +20634,7 @@ func (m *ProxyTaskMutation) AddCurrent(u int64) {
 }
 
 // AddedCurrent returns the value that was added to the "current" field in this mutation.
-func (m *ProxyTaskMutation) AddedCurrent() (r int64, exists bool) {
+func (m *ProxyTaskMutation) AddedCurrent() (r int32, exists bool) {
 	v := m.addcurrent
 	if v == nil {
 		return
@@ -20880,14 +20880,14 @@ func (m *ProxyTaskMutation) SetField(name string, value ent.Value) error {
 		m.SetErrors(v)
 		return nil
 	case proxytask.FieldTotal:
-		v, ok := value.(uint64)
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetTotal(v)
 		return nil
 	case proxytask.FieldCurrent:
-		v, ok := value.(uint64)
+		v, ok := value.(uint32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -20967,14 +20967,14 @@ func (m *ProxyTaskMutation) AddField(name string, value ent.Value) error {
 		m.AddStatus(v)
 		return nil
 	case proxytask.FieldTotal:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddTotal(v)
 		return nil
 	case proxytask.FieldCurrent:
-		v, ok := value.(int64)
+		v, ok := value.(int32)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

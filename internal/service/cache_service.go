@@ -129,14 +129,14 @@ func (cs *CacheService) GetUserFromCache(ctx context.Context, userID int64) (*Us
 func (cs *CacheService) SetUserCache(ctx context.Context, user *ent.ProxyUser) error {
 	var balance, giftAmount int64
 	if user.Balance != nil {
-		balance = int64(*user.Balance)
+		balance = *user.Balance
 	}
 	if user.GiftAmount != nil {
-		giftAmount = int64(*user.GiftAmount)
+		giftAmount = *user.GiftAmount
 	}
 
 	userModel := &UserCacheModel{
-		ID:         int64(user.ID),
+		ID:         user.ID,
 		Balance:    &balance,
 		GiftAmount: &giftAmount,
 	}
@@ -206,11 +206,11 @@ func (cs *CacheService) ClearUserCache(ctx context.Context, userID int64) error 
 		balance = int64(*user.Balance)
 	}
 	if user.GiftAmount != nil {
-		giftAmount = int64(*user.GiftAmount)
+		giftAmount = *user.GiftAmount
 	}
 
 	userModel := &UserCacheModel{
-		ID:         int64(user.ID),
+		ID:         user.ID,
 		Balance:    &balance,
 		GiftAmount: &giftAmount,
 	}
@@ -271,8 +271,8 @@ func (cs *CacheService) SetOrderCache(ctx context.Context, order *ent.ProxyOrder
 		OrderNo:    order.OrderNo,
 		UserID:     int64(order.UserID),
 		Status:     order.Status,
-		Amount:     int64(order.Amount),
-		GiftAmount: int64(order.GiftAmount),
+		Amount:     order.Amount,
+		GiftAmount: order.GiftAmount,
 	}
 
 	key := fmt.Sprintf(OrderNoKeyPrefix, order.OrderNo)

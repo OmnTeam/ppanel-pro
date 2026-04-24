@@ -902,7 +902,7 @@ type QueryServerTotalDataData struct {
 	TodayDownload                 int64                `protobuf:"varint,5,opt,name=today_download,json=todayDownload,proto3" json:"today_download,omitempty"`
 	MonthlyUpload                 int64                `protobuf:"varint,6,opt,name=monthly_upload,json=monthlyUpload,proto3" json:"monthly_upload,omitempty"`
 	MonthlyDownload               int64                `protobuf:"varint,7,opt,name=monthly_download,json=monthlyDownload,proto3" json:"monthly_download,omitempty"`
-	UpdatedAt                     string               `protobuf:"bytes,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	UpdatedAt                     int64                `protobuf:"varint,8,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	ServerTrafficRankingToday     []*ServerTrafficData `protobuf:"bytes,9,rep,name=server_traffic_ranking_today,json=serverTrafficRankingToday,proto3" json:"server_traffic_ranking_today,omitempty"`
 	ServerTrafficRankingYesterday []*ServerTrafficData `protobuf:"bytes,10,rep,name=server_traffic_ranking_yesterday,json=serverTrafficRankingYesterday,proto3" json:"server_traffic_ranking_yesterday,omitempty"`
 	UserTrafficRankingToday       []*UserTrafficData   `protobuf:"bytes,11,rep,name=user_traffic_ranking_today,json=userTrafficRankingToday,proto3" json:"user_traffic_ranking_today,omitempty"`
@@ -990,11 +990,11 @@ func (x *QueryServerTotalDataData) GetMonthlyDownload() int64 {
 	return 0
 }
 
-func (x *QueryServerTotalDataData) GetUpdatedAt() string {
+func (x *QueryServerTotalDataData) GetUpdatedAt() int64 {
 	if x != nil {
 		return x.UpdatedAt
 	}
-	return ""
+	return 0
 }
 
 func (x *QueryServerTotalDataData) GetServerTrafficRankingToday() []*ServerTrafficData {
@@ -1225,7 +1225,7 @@ var file_admin_console_v1_console_proto_rawDesc = []byte{
 	0x29, 0x0a, 0x10, 0x6d, 0x6f, 0x6e, 0x74, 0x68, 0x6c, 0x79, 0x5f, 0x64, 0x6f, 0x77, 0x6e, 0x6c,
 	0x6f, 0x61, 0x64, 0x18, 0x07, 0x20, 0x01, 0x28, 0x03, 0x52, 0x0f, 0x6d, 0x6f, 0x6e, 0x74, 0x68,
 	0x6c, 0x79, 0x44, 0x6f, 0x77, 0x6e, 0x6c, 0x6f, 0x61, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x75, 0x70,
-	0x64, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09,
+	0x64, 0x61, 0x74, 0x65, 0x64, 0x5f, 0x61, 0x74, 0x18, 0x08, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09,
 	0x75, 0x70, 0x64, 0x61, 0x74, 0x65, 0x64, 0x41, 0x74, 0x12, 0x60, 0x0a, 0x1c, 0x73, 0x65, 0x72,
 	0x76, 0x65, 0x72, 0x5f, 0x74, 0x72, 0x61, 0x66, 0x66, 0x69, 0x63, 0x5f, 0x72, 0x61, 0x6e, 0x6b,
 	0x69, 0x6e, 0x67, 0x5f, 0x74, 0x6f, 0x64, 0x61, 0x79, 0x18, 0x09, 0x20, 0x03, 0x28, 0x0b, 0x32,

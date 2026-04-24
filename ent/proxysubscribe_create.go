@@ -119,13 +119,13 @@ func (_c *ProxySubscribeCreate) SetNillableReplacement(v *int64) *ProxySubscribe
 }
 
 // SetInventory sets the "inventory" field.
-func (_c *ProxySubscribeCreate) SetInventory(v int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetInventory(v int32) *ProxySubscribeCreate {
 	_c.mutation.SetInventory(v)
 	return _c
 }
 
 // SetNillableInventory sets the "inventory" field if the given value is not nil.
-func (_c *ProxySubscribeCreate) SetNillableInventory(v *int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetNillableInventory(v *int32) *ProxySubscribeCreate {
 	if v != nil {
 		_c.SetInventory(*v)
 	}
@@ -147,13 +147,13 @@ func (_c *ProxySubscribeCreate) SetNillableTraffic(v *int64) *ProxySubscribeCrea
 }
 
 // SetSpeedLimit sets the "speed_limit" field.
-func (_c *ProxySubscribeCreate) SetSpeedLimit(v int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetSpeedLimit(v int32) *ProxySubscribeCreate {
 	_c.mutation.SetSpeedLimit(v)
 	return _c
 }
 
 // SetNillableSpeedLimit sets the "speed_limit" field if the given value is not nil.
-func (_c *ProxySubscribeCreate) SetNillableSpeedLimit(v *int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetNillableSpeedLimit(v *int32) *ProxySubscribeCreate {
 	if v != nil {
 		_c.SetSpeedLimit(*v)
 	}
@@ -161,13 +161,13 @@ func (_c *ProxySubscribeCreate) SetNillableSpeedLimit(v *int64) *ProxySubscribeC
 }
 
 // SetDeviceLimit sets the "device_limit" field.
-func (_c *ProxySubscribeCreate) SetDeviceLimit(v int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetDeviceLimit(v int32) *ProxySubscribeCreate {
 	_c.mutation.SetDeviceLimit(v)
 	return _c
 }
 
 // SetNillableDeviceLimit sets the "device_limit" field if the given value is not nil.
-func (_c *ProxySubscribeCreate) SetNillableDeviceLimit(v *int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetNillableDeviceLimit(v *int32) *ProxySubscribeCreate {
 	if v != nil {
 		_c.SetDeviceLimit(*v)
 	}
@@ -175,13 +175,13 @@ func (_c *ProxySubscribeCreate) SetNillableDeviceLimit(v *int64) *ProxySubscribe
 }
 
 // SetQuota sets the "quota" field.
-func (_c *ProxySubscribeCreate) SetQuota(v int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetQuota(v int32) *ProxySubscribeCreate {
 	_c.mutation.SetQuota(v)
 	return _c
 }
 
 // SetNillableQuota sets the "quota" field if the given value is not nil.
-func (_c *ProxySubscribeCreate) SetNillableQuota(v *int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetNillableQuota(v *int32) *ProxySubscribeCreate {
 	if v != nil {
 		_c.SetQuota(*v)
 	}
@@ -279,13 +279,13 @@ func (_c *ProxySubscribeCreate) SetNillableSell(v *bool) *ProxySubscribeCreate {
 }
 
 // SetSort sets the "sort" field.
-func (_c *ProxySubscribeCreate) SetSort(v int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetSort(v int32) *ProxySubscribeCreate {
 	_c.mutation.SetSort(v)
 	return _c
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_c *ProxySubscribeCreate) SetNillableSort(v *int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetNillableSort(v *int32) *ProxySubscribeCreate {
 	if v != nil {
 		_c.SetSort(*v)
 	}
@@ -293,13 +293,13 @@ func (_c *ProxySubscribeCreate) SetNillableSort(v *int64) *ProxySubscribeCreate 
 }
 
 // SetDeductionRatio sets the "deduction_ratio" field.
-func (_c *ProxySubscribeCreate) SetDeductionRatio(v int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetDeductionRatio(v int32) *ProxySubscribeCreate {
 	_c.mutation.SetDeductionRatio(v)
 	return _c
 }
 
 // SetNillableDeductionRatio sets the "deduction_ratio" field if the given value is not nil.
-func (_c *ProxySubscribeCreate) SetNillableDeductionRatio(v *int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetNillableDeductionRatio(v *int32) *ProxySubscribeCreate {
 	if v != nil {
 		_c.SetDeductionRatio(*v)
 	}
@@ -321,13 +321,13 @@ func (_c *ProxySubscribeCreate) SetNillableAllowDeduction(v *bool) *ProxySubscri
 }
 
 // SetResetCycle sets the "reset_cycle" field.
-func (_c *ProxySubscribeCreate) SetResetCycle(v int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetResetCycle(v int32) *ProxySubscribeCreate {
 	_c.mutation.SetResetCycle(v)
 	return _c
 }
 
 // SetNillableResetCycle sets the "reset_cycle" field if the given value is not nil.
-func (_c *ProxySubscribeCreate) SetNillableResetCycle(v *int64) *ProxySubscribeCreate {
+func (_c *ProxySubscribeCreate) SetNillableResetCycle(v *int32) *ProxySubscribeCreate {
 	if v != nil {
 		_c.SetResetCycle(*v)
 	}
@@ -678,7 +678,7 @@ func (_c *ProxySubscribeCreate) createSpec() (*ProxySubscribe, *sqlgraph.CreateS
 		_node.Replacement = value
 	}
 	if value, ok := _c.mutation.Inventory(); ok {
-		_spec.SetField(proxysubscribe.FieldInventory, field.TypeInt64, value)
+		_spec.SetField(proxysubscribe.FieldInventory, field.TypeInt32, value)
 		_node.Inventory = value
 	}
 	if value, ok := _c.mutation.Traffic(); ok {
@@ -686,15 +686,15 @@ func (_c *ProxySubscribeCreate) createSpec() (*ProxySubscribe, *sqlgraph.CreateS
 		_node.Traffic = value
 	}
 	if value, ok := _c.mutation.SpeedLimit(); ok {
-		_spec.SetField(proxysubscribe.FieldSpeedLimit, field.TypeInt64, value)
+		_spec.SetField(proxysubscribe.FieldSpeedLimit, field.TypeInt32, value)
 		_node.SpeedLimit = value
 	}
 	if value, ok := _c.mutation.DeviceLimit(); ok {
-		_spec.SetField(proxysubscribe.FieldDeviceLimit, field.TypeInt64, value)
+		_spec.SetField(proxysubscribe.FieldDeviceLimit, field.TypeInt32, value)
 		_node.DeviceLimit = value
 	}
 	if value, ok := _c.mutation.Quota(); ok {
-		_spec.SetField(proxysubscribe.FieldQuota, field.TypeInt64, value)
+		_spec.SetField(proxysubscribe.FieldQuota, field.TypeInt32, value)
 		_node.Quota = value
 	}
 	if value, ok := _c.mutation.Nodes(); ok {
@@ -726,11 +726,11 @@ func (_c *ProxySubscribeCreate) createSpec() (*ProxySubscribe, *sqlgraph.CreateS
 		_node.Sell = value
 	}
 	if value, ok := _c.mutation.Sort(); ok {
-		_spec.SetField(proxysubscribe.FieldSort, field.TypeInt64, value)
+		_spec.SetField(proxysubscribe.FieldSort, field.TypeInt32, value)
 		_node.Sort = value
 	}
 	if value, ok := _c.mutation.DeductionRatio(); ok {
-		_spec.SetField(proxysubscribe.FieldDeductionRatio, field.TypeInt64, value)
+		_spec.SetField(proxysubscribe.FieldDeductionRatio, field.TypeInt32, value)
 		_node.DeductionRatio = &value
 	}
 	if value, ok := _c.mutation.AllowDeduction(); ok {
@@ -738,7 +738,7 @@ func (_c *ProxySubscribeCreate) createSpec() (*ProxySubscribe, *sqlgraph.CreateS
 		_node.AllowDeduction = value
 	}
 	if value, ok := _c.mutation.ResetCycle(); ok {
-		_spec.SetField(proxysubscribe.FieldResetCycle, field.TypeInt64, value)
+		_spec.SetField(proxysubscribe.FieldResetCycle, field.TypeInt32, value)
 		_node.ResetCycle = &value
 	}
 	if value, ok := _c.mutation.RenewalReset(); ok {

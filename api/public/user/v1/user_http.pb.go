@@ -20,149 +20,149 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationUserBindOAuth = "/api.public.user.v1.User/BindOAuth"
-const OperationUserBindOAuthCallback = "/api.public.user.v1.User/BindOAuthCallback"
-const OperationUserBindTelegram = "/api.public.user.v1.User/BindTelegram"
-const OperationUserCommissionWithdraw = "/api.public.user.v1.User/CommissionWithdraw"
-const OperationUserDeleteCurrentUserAccount = "/api.public.user.v1.User/DeleteCurrentUserAccount"
-const OperationUserDeviceWSConnect = "/api.public.user.v1.User/DeviceWSConnect"
-const OperationUserGetDeviceList = "/api.public.user.v1.User/GetDeviceList"
-const OperationUserGetDeviceOnlineStatistics = "/api.public.user.v1.User/GetDeviceOnlineStatistics"
-const OperationUserGetLoginLog = "/api.public.user.v1.User/GetLoginLog"
-const OperationUserGetOAuthMethods = "/api.public.user.v1.User/GetOAuthMethods"
-const OperationUserGetSubscribeLog = "/api.public.user.v1.User/GetSubscribeLog"
-const OperationUserGetUserTrafficStats = "/api.public.user.v1.User/GetUserTrafficStats"
-const OperationUserPreUnsubscribe = "/api.public.user.v1.User/PreUnsubscribe"
-const OperationUserQueryUserAffiliate = "/api.public.user.v1.User/QueryUserAffiliate"
-const OperationUserQueryUserAffiliateList = "/api.public.user.v1.User/QueryUserAffiliateList"
-const OperationUserQueryUserBalanceLog = "/api.public.user.v1.User/QueryUserBalanceLog"
-const OperationUserQueryUserCommissionLog = "/api.public.user.v1.User/QueryUserCommissionLog"
-const OperationUserQueryUserInfo = "/api.public.user.v1.User/QueryUserInfo"
-const OperationUserQueryUserSubscribe = "/api.public.user.v1.User/QueryUserSubscribe"
-const OperationUserQueryWithdrawalLog = "/api.public.user.v1.User/QueryWithdrawalLog"
-const OperationUserResetUserSubscribeToken = "/api.public.user.v1.User/ResetUserSubscribeToken"
-const OperationUserUnbindDevice = "/api.public.user.v1.User/UnbindDevice"
-const OperationUserUnbindOAuth = "/api.public.user.v1.User/UnbindOAuth"
-const OperationUserUnbindTelegram = "/api.public.user.v1.User/UnbindTelegram"
-const OperationUserUnsubscribe = "/api.public.user.v1.User/Unsubscribe"
-const OperationUserUpdateBindEmail = "/api.public.user.v1.User/UpdateBindEmail"
-const OperationUserUpdateBindMobile = "/api.public.user.v1.User/UpdateBindMobile"
-const OperationUserUpdateUserNotify = "/api.public.user.v1.User/UpdateUserNotify"
-const OperationUserUpdateUserPassword = "/api.public.user.v1.User/UpdateUserPassword"
-const OperationUserUpdateUserRules = "/api.public.user.v1.User/UpdateUserRules"
-const OperationUserUpdateUserSubscribeNote = "/api.public.user.v1.User/UpdateUserSubscribeNote"
-const OperationUserVerifyEmail = "/api.public.user.v1.User/VerifyEmail"
+const OperationPublicUserBindOAuth = "/api.public.user.v1.PublicUser/BindOAuth"
+const OperationPublicUserBindOAuthCallback = "/api.public.user.v1.PublicUser/BindOAuthCallback"
+const OperationPublicUserBindTelegram = "/api.public.user.v1.PublicUser/BindTelegram"
+const OperationPublicUserCommissionWithdraw = "/api.public.user.v1.PublicUser/CommissionWithdraw"
+const OperationPublicUserDeleteCurrentUserAccount = "/api.public.user.v1.PublicUser/DeleteCurrentUserAccount"
+const OperationPublicUserDeviceWSConnect = "/api.public.user.v1.PublicUser/DeviceWSConnect"
+const OperationPublicUserGetDeviceList = "/api.public.user.v1.PublicUser/GetDeviceList"
+const OperationPublicUserGetDeviceOnlineStatistics = "/api.public.user.v1.PublicUser/GetDeviceOnlineStatistics"
+const OperationPublicUserGetLoginLog = "/api.public.user.v1.PublicUser/GetLoginLog"
+const OperationPublicUserGetOAuthMethods = "/api.public.user.v1.PublicUser/GetOAuthMethods"
+const OperationPublicUserGetSubscribeLog = "/api.public.user.v1.PublicUser/GetSubscribeLog"
+const OperationPublicUserGetUserTrafficStats = "/api.public.user.v1.PublicUser/GetUserTrafficStats"
+const OperationPublicUserPreUnsubscribe = "/api.public.user.v1.PublicUser/PreUnsubscribe"
+const OperationPublicUserQueryUserAffiliate = "/api.public.user.v1.PublicUser/QueryUserAffiliate"
+const OperationPublicUserQueryUserAffiliateList = "/api.public.user.v1.PublicUser/QueryUserAffiliateList"
+const OperationPublicUserQueryUserBalanceLog = "/api.public.user.v1.PublicUser/QueryUserBalanceLog"
+const OperationPublicUserQueryUserCommissionLog = "/api.public.user.v1.PublicUser/QueryUserCommissionLog"
+const OperationPublicUserQueryUserInfo = "/api.public.user.v1.PublicUser/QueryUserInfo"
+const OperationPublicUserQueryUserSubscribe = "/api.public.user.v1.PublicUser/QueryUserSubscribe"
+const OperationPublicUserQueryWithdrawalLog = "/api.public.user.v1.PublicUser/QueryWithdrawalLog"
+const OperationPublicUserResetUserSubscribeToken = "/api.public.user.v1.PublicUser/ResetUserSubscribeToken"
+const OperationPublicUserUnbindDevice = "/api.public.user.v1.PublicUser/UnbindDevice"
+const OperationPublicUserUnbindOAuth = "/api.public.user.v1.PublicUser/UnbindOAuth"
+const OperationPublicUserUnbindTelegram = "/api.public.user.v1.PublicUser/UnbindTelegram"
+const OperationPublicUserUnsubscribe = "/api.public.user.v1.PublicUser/Unsubscribe"
+const OperationPublicUserUpdateBindEmail = "/api.public.user.v1.PublicUser/UpdateBindEmail"
+const OperationPublicUserUpdateBindMobile = "/api.public.user.v1.PublicUser/UpdateBindMobile"
+const OperationPublicUserUpdateUserNotify = "/api.public.user.v1.PublicUser/UpdateUserNotify"
+const OperationPublicUserUpdateUserPassword = "/api.public.user.v1.PublicUser/UpdateUserPassword"
+const OperationPublicUserUpdateUserRules = "/api.public.user.v1.PublicUser/UpdateUserRules"
+const OperationPublicUserUpdateUserSubscribeNote = "/api.public.user.v1.PublicUser/UpdateUserSubscribeNote"
+const OperationPublicUserVerifyEmail = "/api.public.user.v1.PublicUser/VerifyEmail"
 
-type UserHTTPServer interface {
+type PublicUserHTTPServer interface {
 	// BindOAuth BindOAuth 绑定OAuth
-	BindOAuth(context.Context, *BindOAuthRequest) (*OAuthBindReply, error)
+	BindOAuth(context.Context, *BindOAuthRequest) (*BindOAuthReply, error)
 	// BindOAuthCallback BindOAuthCallback OAuth回调
-	BindOAuthCallback(context.Context, *BindOAuthCallbackRequest) (*CommonReply, error)
+	BindOAuthCallback(context.Context, *BindOAuthCallbackRequest) (*emptypb.Empty, error)
 	// BindTelegram BindTelegram 绑定Telegram
-	BindTelegram(context.Context, *emptypb.Empty) (*TelegramBindReply, error)
+	BindTelegram(context.Context, *emptypb.Empty) (*BindTelegramReply, error)
 	// CommissionWithdraw CommissionWithdraw 佣金提现
-	CommissionWithdraw(context.Context, *CommissionWithdrawRequest) (*WithdrawalLogReply, error)
+	CommissionWithdraw(context.Context, *CommissionWithdrawRequest) (*WithdrawalLog, error)
 	// DeleteCurrentUserAccount DeleteCurrentUserAccount 删除当前用户账号
-	DeleteCurrentUserAccount(context.Context, *emptypb.Empty) (*CommonReply, error)
+	DeleteCurrentUserAccount(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	// DeviceWSConnect DeviceWSConnect 设备WebSocket连接
-	DeviceWSConnect(context.Context, *emptypb.Empty) (*CommonReply, error)
+	DeviceWSConnect(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	// GetDeviceList GetDeviceList 获取设备列表
 	GetDeviceList(context.Context, *emptypb.Empty) (*GetDeviceListReply, error)
 	// GetDeviceOnlineStatistics GetDeviceOnlineStatistics 获取设备在线统计
 	GetDeviceOnlineStatistics(context.Context, *emptypb.Empty) (*GetDeviceOnlineStatisticsReply, error)
 	// GetLoginLog GetLoginLog 获取登录日志
-	GetLoginLog(context.Context, *GetLoginLogRequest) (*LoginLogReply, error)
+	GetLoginLog(context.Context, *GetLoginLogRequest) (*GetLoginLogReply, error)
 	// GetOAuthMethods GetOAuthMethods 获取OAuth方法
-	GetOAuthMethods(context.Context, *emptypb.Empty) (*OAuthMethodsReply, error)
+	GetOAuthMethods(context.Context, *emptypb.Empty) (*GetOAuthMethodsReply, error)
 	// GetSubscribeLog GetSubscribeLog 获取订阅日志
-	GetSubscribeLog(context.Context, *GetSubscribeLogRequest) (*SubscribeLogReply, error)
+	GetSubscribeLog(context.Context, *GetSubscribeLogRequest) (*GetSubscribeLogReply, error)
 	// GetUserTrafficStats GetUserTrafficStats 获取用户流量统计
 	GetUserTrafficStats(context.Context, *GetUserTrafficStatsRequest) (*GetUserTrafficStatsReply, error)
 	// PreUnsubscribe PreUnsubscribe 预退订
-	PreUnsubscribe(context.Context, *PreUnsubscribeRequest) (*UnsubscribeInfoReply, error)
+	PreUnsubscribe(context.Context, *PreUnsubscribeRequest) (*PreUnsubscribeReply, error)
 	// QueryUserAffiliate QueryUserAffiliate 查询用户推荐数量
-	QueryUserAffiliate(context.Context, *emptypb.Empty) (*UserAffiliateReply, error)
+	QueryUserAffiliate(context.Context, *emptypb.Empty) (*QueryUserAffiliateCountReply, error)
 	// QueryUserAffiliateList QueryUserAffiliateList 查询用户推荐列表
-	QueryUserAffiliateList(context.Context, *QueryUserAffiliateListRequest) (*UserAffiliateListReply, error)
+	QueryUserAffiliateList(context.Context, *QueryUserAffiliateListRequest) (*QueryUserAffiliateListReply, error)
 	// QueryUserBalanceLog QueryUserBalanceLog 查询用户余额日志
-	QueryUserBalanceLog(context.Context, *emptypb.Empty) (*BalanceLogReply, error)
+	QueryUserBalanceLog(context.Context, *emptypb.Empty) (*QueryUserBalanceLogReply, error)
 	// QueryUserCommissionLog QueryUserCommissionLog 查询用户佣金日志
-	QueryUserCommissionLog(context.Context, *QueryUserCommissionLogRequest) (*CommissionLogReply, error)
+	QueryUserCommissionLog(context.Context, *QueryUserCommissionLogRequest) (*QueryUserCommissionLogReply, error)
 	// QueryUserInfo QueryUserInfo 查询用户信息
-	QueryUserInfo(context.Context, *emptypb.Empty) (*UserInfoReply, error)
+	QueryUserInfo(context.Context, *emptypb.Empty) (*User, error)
 	// QueryUserSubscribe QueryUserSubscribe 查询用户订阅
-	QueryUserSubscribe(context.Context, *emptypb.Empty) (*UserSubscribeReply, error)
+	QueryUserSubscribe(context.Context, *emptypb.Empty) (*QueryUserSubscribeReply, error)
 	// QueryWithdrawalLog QueryWithdrawalLog 查询提现日志
-	QueryWithdrawalLog(context.Context, *QueryWithdrawalLogRequest) (*WithdrawalLogListReply, error)
+	QueryWithdrawalLog(context.Context, *QueryWithdrawalLogRequest) (*QueryWithdrawalLogReply, error)
 	// ResetUserSubscribeToken ResetUserSubscribeToken 重置订阅令牌
-	ResetUserSubscribeToken(context.Context, *ResetUserSubscribeTokenRequest) (*CommonReply, error)
+	ResetUserSubscribeToken(context.Context, *ResetUserSubscribeTokenRequest) (*emptypb.Empty, error)
 	// UnbindDevice UnbindDevice 解绑设备
-	UnbindDevice(context.Context, *UnbindDeviceRequest) (*CommonReply, error)
+	UnbindDevice(context.Context, *UnbindDeviceRequest) (*emptypb.Empty, error)
 	// UnbindOAuth UnbindOAuth 解绑OAuth
-	UnbindOAuth(context.Context, *UnbindOAuthRequest) (*CommonReply, error)
+	UnbindOAuth(context.Context, *UnbindOAuthRequest) (*emptypb.Empty, error)
 	// UnbindTelegram UnbindTelegram 解绑Telegram
-	UnbindTelegram(context.Context, *emptypb.Empty) (*CommonReply, error)
+	UnbindTelegram(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	// Unsubscribe Unsubscribe 退订
-	Unsubscribe(context.Context, *UnsubscribeRequest) (*CommonReply, error)
+	Unsubscribe(context.Context, *UnsubscribeRequest) (*emptypb.Empty, error)
 	// UpdateBindEmail UpdateBindEmail 更新绑定邮箱
-	UpdateBindEmail(context.Context, *UpdateBindEmailRequest) (*CommonReply, error)
+	UpdateBindEmail(context.Context, *UpdateBindEmailRequest) (*emptypb.Empty, error)
 	// UpdateBindMobile UpdateBindMobile 更新绑定手机
-	UpdateBindMobile(context.Context, *UpdateBindMobileRequest) (*CommonReply, error)
+	UpdateBindMobile(context.Context, *UpdateBindMobileRequest) (*emptypb.Empty, error)
 	// UpdateUserNotify UpdateUserNotify 更新通知设置
-	UpdateUserNotify(context.Context, *UpdateUserNotifyRequest) (*CommonReply, error)
+	UpdateUserNotify(context.Context, *UpdateUserNotifyRequest) (*emptypb.Empty, error)
 	// UpdateUserPassword UpdateUserPassword 更新密码
-	UpdateUserPassword(context.Context, *UpdateUserPasswordRequest) (*CommonReply, error)
+	UpdateUserPassword(context.Context, *UpdateUserPasswordRequest) (*emptypb.Empty, error)
 	// UpdateUserRules UpdateUserRules 更新用户规则
-	UpdateUserRules(context.Context, *UpdateUserRulesRequest) (*CommonReply, error)
+	UpdateUserRules(context.Context, *UpdateUserRulesRequest) (*emptypb.Empty, error)
 	// UpdateUserSubscribeNote UpdateUserSubscribeNote 更新用户订阅备注
-	UpdateUserSubscribeNote(context.Context, *UpdateUserSubscribeNoteRequest) (*CommonReply, error)
+	UpdateUserSubscribeNote(context.Context, *UpdateUserSubscribeNoteRequest) (*emptypb.Empty, error)
 	// VerifyEmail VerifyEmail 验证邮箱
-	VerifyEmail(context.Context, *VerifyEmailRequest) (*CommonReply, error)
+	VerifyEmail(context.Context, *VerifyEmailRequest) (*emptypb.Empty, error)
 }
 
-func RegisterUserHTTPServer(s *http.Server, srv UserHTTPServer) {
+func RegisterPublicUserHTTPServer(s *http.Server, srv PublicUserHTTPServer) {
 	r := s.Route("/")
-	r.GET("/v1/public/user/info", _User_QueryUserInfo0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/login_log", _User_GetLoginLog0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/balance_log", _User_QueryUserBalanceLog0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/commission_log", _User_QueryUserCommissionLog0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/affiliate/count", _User_QueryUserAffiliate0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/affiliate/list", _User_QueryUserAffiliateList0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/oauth_methods", _User_GetOAuthMethods0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/subscribe", _User_QueryUserSubscribe0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/subscribe_log", _User_GetSubscribeLog0_HTTP_Handler(srv))
-	r.PUT("/v1/public/user/subscribe_token", _User_ResetUserSubscribeToken1_HTTP_Handler(srv))
-	r.POST("/v1/public/user/unsubscribe/pre", _User_PreUnsubscribe0_HTTP_Handler(srv))
-	r.POST("/v1/public/user/unsubscribe", _User_Unsubscribe0_HTTP_Handler(srv))
-	r.PUT("/v1/public/user/notify", _User_UpdateUserNotify0_HTTP_Handler(srv))
-	r.PUT("/v1/public/user/password", _User_UpdateUserPassword0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/bind_telegram", _User_BindTelegram0_HTTP_Handler(srv))
-	r.POST("/v1/public/user/unbind_telegram", _User_UnbindTelegram0_HTTP_Handler(srv))
-	r.POST("/v1/public/user/bind_oauth", _User_BindOAuth0_HTTP_Handler(srv))
-	r.POST("/v1/public/user/bind_oauth/callback", _User_BindOAuthCallback0_HTTP_Handler(srv))
-	r.POST("/v1/public/user/unbind_oauth", _User_UnbindOAuth0_HTTP_Handler(srv))
-	r.POST("/v1/public/user/verify_email", _User_VerifyEmail0_HTTP_Handler(srv))
-	r.PUT("/v1/public/user/bind_mobile", _User_UpdateBindMobile0_HTTP_Handler(srv))
-	r.PUT("/v1/public/user/bind_email", _User_UpdateBindEmail0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/devices", _User_GetDeviceList0_HTTP_Handler(srv))
-	r.PUT("/v1/public/user/unbind_device", _User_UnbindDevice0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/device_online_statistics", _User_GetDeviceOnlineStatistics0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/device_ws_connect", _User_DeviceWSConnect0_HTTP_Handler(srv))
-	r.POST("/v1/public/user/commission_withdraw", _User_CommissionWithdraw0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/withdrawal_log", _User_QueryWithdrawalLog0_HTTP_Handler(srv))
-	r.PUT("/v1/public/user/subscribe_note", _User_UpdateUserSubscribeNote0_HTTP_Handler(srv))
-	r.PUT("/v1/public/user/rules", _User_UpdateUserRules0_HTTP_Handler(srv))
-	r.DELETE("/v1/public/user/current_user_account", _User_DeleteCurrentUserAccount0_HTTP_Handler(srv))
-	r.GET("/v1/public/user/traffic_stats", _User_GetUserTrafficStats0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/info", _PublicUser_QueryUserInfo0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/login_log", _PublicUser_GetLoginLog0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/balance_log", _PublicUser_QueryUserBalanceLog0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/commission_log", _PublicUser_QueryUserCommissionLog0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/affiliate/count", _PublicUser_QueryUserAffiliate0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/affiliate/list", _PublicUser_QueryUserAffiliateList0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/oauth_methods", _PublicUser_GetOAuthMethods0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/subscribe", _PublicUser_QueryUserSubscribe0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/subscribe_log", _PublicUser_GetSubscribeLog0_HTTP_Handler(srv))
+	r.PUT("/v1/public/user/subscribe_token", _PublicUser_ResetUserSubscribeToken1_HTTP_Handler(srv))
+	r.POST("/v1/public/user/unsubscribe/pre", _PublicUser_PreUnsubscribe0_HTTP_Handler(srv))
+	r.POST("/v1/public/user/unsubscribe", _PublicUser_Unsubscribe0_HTTP_Handler(srv))
+	r.PUT("/v1/public/user/notify", _PublicUser_UpdateUserNotify0_HTTP_Handler(srv))
+	r.PUT("/v1/public/user/password", _PublicUser_UpdateUserPassword0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/bind_telegram", _PublicUser_BindTelegram0_HTTP_Handler(srv))
+	r.POST("/v1/public/user/unbind_telegram", _PublicUser_UnbindTelegram0_HTTP_Handler(srv))
+	r.POST("/v1/public/user/bind_oauth", _PublicUser_BindOAuth0_HTTP_Handler(srv))
+	r.POST("/v1/public/user/bind_oauth/callback", _PublicUser_BindOAuthCallback0_HTTP_Handler(srv))
+	r.POST("/v1/public/user/unbind_oauth", _PublicUser_UnbindOAuth0_HTTP_Handler(srv))
+	r.POST("/v1/public/user/verify_email", _PublicUser_VerifyEmail0_HTTP_Handler(srv))
+	r.PUT("/v1/public/user/bind_mobile", _PublicUser_UpdateBindMobile0_HTTP_Handler(srv))
+	r.PUT("/v1/public/user/bind_email", _PublicUser_UpdateBindEmail0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/devices", _PublicUser_GetDeviceList0_HTTP_Handler(srv))
+	r.PUT("/v1/public/user/unbind_device", _PublicUser_UnbindDevice0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/device_online_statistics", _PublicUser_GetDeviceOnlineStatistics0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/device_ws_connect", _PublicUser_DeviceWSConnect0_HTTP_Handler(srv))
+	r.POST("/v1/public/user/commission_withdraw", _PublicUser_CommissionWithdraw0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/withdrawal_log", _PublicUser_QueryWithdrawalLog0_HTTP_Handler(srv))
+	r.PUT("/v1/public/user/subscribe_note", _PublicUser_UpdateUserSubscribeNote0_HTTP_Handler(srv))
+	r.PUT("/v1/public/user/rules", _PublicUser_UpdateUserRules0_HTTP_Handler(srv))
+	r.DELETE("/v1/public/user/current_user_account", _PublicUser_DeleteCurrentUserAccount0_HTTP_Handler(srv))
+	r.GET("/v1/public/user/traffic_stats", _PublicUser_GetUserTrafficStats0_HTTP_Handler(srv))
 }
 
-func _User_QueryUserInfo0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_QueryUserInfo0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserQueryUserInfo)
+		http.SetOperation(ctx, OperationPublicUserQueryUserInfo)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.QueryUserInfo(ctx, req.(*emptypb.Empty))
 		})
@@ -170,18 +170,18 @@ func _User_QueryUserInfo0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context
 		if err != nil {
 			return err
 		}
-		reply := out.(*UserInfoReply)
+		reply := out.(*User)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_GetLoginLog0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_GetLoginLog0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in GetLoginLogRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserGetLoginLog)
+		http.SetOperation(ctx, OperationPublicUserGetLoginLog)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.GetLoginLog(ctx, req.(*GetLoginLogRequest))
 		})
@@ -189,18 +189,18 @@ func _User_GetLoginLog0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) 
 		if err != nil {
 			return err
 		}
-		reply := out.(*LoginLogReply)
+		reply := out.(*GetLoginLogReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_QueryUserBalanceLog0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_QueryUserBalanceLog0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserQueryUserBalanceLog)
+		http.SetOperation(ctx, OperationPublicUserQueryUserBalanceLog)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.QueryUserBalanceLog(ctx, req.(*emptypb.Empty))
 		})
@@ -208,18 +208,18 @@ func _User_QueryUserBalanceLog0_HTTP_Handler(srv UserHTTPServer) func(ctx http.C
 		if err != nil {
 			return err
 		}
-		reply := out.(*BalanceLogReply)
+		reply := out.(*QueryUserBalanceLogReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_QueryUserCommissionLog0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_QueryUserCommissionLog0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in QueryUserCommissionLogRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserQueryUserCommissionLog)
+		http.SetOperation(ctx, OperationPublicUserQueryUserCommissionLog)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.QueryUserCommissionLog(ctx, req.(*QueryUserCommissionLogRequest))
 		})
@@ -227,18 +227,18 @@ func _User_QueryUserCommissionLog0_HTTP_Handler(srv UserHTTPServer) func(ctx htt
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommissionLogReply)
+		reply := out.(*QueryUserCommissionLogReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_QueryUserAffiliate0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_QueryUserAffiliate0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserQueryUserAffiliate)
+		http.SetOperation(ctx, OperationPublicUserQueryUserAffiliate)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.QueryUserAffiliate(ctx, req.(*emptypb.Empty))
 		})
@@ -246,18 +246,18 @@ func _User_QueryUserAffiliate0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Co
 		if err != nil {
 			return err
 		}
-		reply := out.(*UserAffiliateReply)
+		reply := out.(*QueryUserAffiliateCountReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_QueryUserAffiliateList0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_QueryUserAffiliateList0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in QueryUserAffiliateListRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserQueryUserAffiliateList)
+		http.SetOperation(ctx, OperationPublicUserQueryUserAffiliateList)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.QueryUserAffiliateList(ctx, req.(*QueryUserAffiliateListRequest))
 		})
@@ -265,18 +265,18 @@ func _User_QueryUserAffiliateList0_HTTP_Handler(srv UserHTTPServer) func(ctx htt
 		if err != nil {
 			return err
 		}
-		reply := out.(*UserAffiliateListReply)
+		reply := out.(*QueryUserAffiliateListReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_GetOAuthMethods0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_GetOAuthMethods0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserGetOAuthMethods)
+		http.SetOperation(ctx, OperationPublicUserGetOAuthMethods)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.GetOAuthMethods(ctx, req.(*emptypb.Empty))
 		})
@@ -284,18 +284,18 @@ func _User_GetOAuthMethods0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Conte
 		if err != nil {
 			return err
 		}
-		reply := out.(*OAuthMethodsReply)
+		reply := out.(*GetOAuthMethodsReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_QueryUserSubscribe0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_QueryUserSubscribe0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserQueryUserSubscribe)
+		http.SetOperation(ctx, OperationPublicUserQueryUserSubscribe)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.QueryUserSubscribe(ctx, req.(*emptypb.Empty))
 		})
@@ -303,18 +303,18 @@ func _User_QueryUserSubscribe0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Co
 		if err != nil {
 			return err
 		}
-		reply := out.(*UserSubscribeReply)
+		reply := out.(*QueryUserSubscribeReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_GetSubscribeLog0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_GetSubscribeLog0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in GetSubscribeLogRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserGetSubscribeLog)
+		http.SetOperation(ctx, OperationPublicUserGetSubscribeLog)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.GetSubscribeLog(ctx, req.(*GetSubscribeLogRequest))
 		})
@@ -322,12 +322,12 @@ func _User_GetSubscribeLog0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Conte
 		if err != nil {
 			return err
 		}
-		reply := out.(*SubscribeLogReply)
+		reply := out.(*GetSubscribeLogReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_ResetUserSubscribeToken1_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_ResetUserSubscribeToken1_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in ResetUserSubscribeTokenRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -336,7 +336,7 @@ func _User_ResetUserSubscribeToken1_HTTP_Handler(srv UserHTTPServer) func(ctx ht
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserResetUserSubscribeToken)
+		http.SetOperation(ctx, OperationPublicUserResetUserSubscribeToken)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.ResetUserSubscribeToken(ctx, req.(*ResetUserSubscribeTokenRequest))
 		})
@@ -344,12 +344,12 @@ func _User_ResetUserSubscribeToken1_HTTP_Handler(srv UserHTTPServer) func(ctx ht
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_PreUnsubscribe0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_PreUnsubscribe0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in PreUnsubscribeRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -358,7 +358,7 @@ func _User_PreUnsubscribe0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Contex
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserPreUnsubscribe)
+		http.SetOperation(ctx, OperationPublicUserPreUnsubscribe)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.PreUnsubscribe(ctx, req.(*PreUnsubscribeRequest))
 		})
@@ -366,12 +366,12 @@ func _User_PreUnsubscribe0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Contex
 		if err != nil {
 			return err
 		}
-		reply := out.(*UnsubscribeInfoReply)
+		reply := out.(*PreUnsubscribeReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_Unsubscribe0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_Unsubscribe0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in UnsubscribeRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -380,7 +380,7 @@ func _User_Unsubscribe0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) 
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserUnsubscribe)
+		http.SetOperation(ctx, OperationPublicUserUnsubscribe)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.Unsubscribe(ctx, req.(*UnsubscribeRequest))
 		})
@@ -388,18 +388,18 @@ func _User_Unsubscribe0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) 
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_UpdateUserNotify0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_UpdateUserNotify0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in UpdateUserNotifyRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserUpdateUserNotify)
+		http.SetOperation(ctx, OperationPublicUserUpdateUserNotify)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.UpdateUserNotify(ctx, req.(*UpdateUserNotifyRequest))
 		})
@@ -407,18 +407,18 @@ func _User_UpdateUserNotify0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Cont
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_UpdateUserPassword0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_UpdateUserPassword0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in UpdateUserPasswordRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserUpdateUserPassword)
+		http.SetOperation(ctx, OperationPublicUserUpdateUserPassword)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.UpdateUserPassword(ctx, req.(*UpdateUserPasswordRequest))
 		})
@@ -426,18 +426,18 @@ func _User_UpdateUserPassword0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Co
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_BindTelegram0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_BindTelegram0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserBindTelegram)
+		http.SetOperation(ctx, OperationPublicUserBindTelegram)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.BindTelegram(ctx, req.(*emptypb.Empty))
 		})
@@ -445,18 +445,18 @@ func _User_BindTelegram0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context)
 		if err != nil {
 			return err
 		}
-		reply := out.(*TelegramBindReply)
+		reply := out.(*BindTelegramReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_UnbindTelegram0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_UnbindTelegram0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserUnbindTelegram)
+		http.SetOperation(ctx, OperationPublicUserUnbindTelegram)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.UnbindTelegram(ctx, req.(*emptypb.Empty))
 		})
@@ -464,12 +464,12 @@ func _User_UnbindTelegram0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Contex
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_BindOAuth0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_BindOAuth0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in BindOAuthRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -478,7 +478,7 @@ func _User_BindOAuth0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) er
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserBindOAuth)
+		http.SetOperation(ctx, OperationPublicUserBindOAuth)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.BindOAuth(ctx, req.(*BindOAuthRequest))
 		})
@@ -486,12 +486,12 @@ func _User_BindOAuth0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) er
 		if err != nil {
 			return err
 		}
-		reply := out.(*OAuthBindReply)
+		reply := out.(*BindOAuthReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_BindOAuthCallback0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_BindOAuthCallback0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in BindOAuthCallbackRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -500,7 +500,7 @@ func _User_BindOAuthCallback0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Con
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserBindOAuthCallback)
+		http.SetOperation(ctx, OperationPublicUserBindOAuthCallback)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.BindOAuthCallback(ctx, req.(*BindOAuthCallbackRequest))
 		})
@@ -508,12 +508,12 @@ func _User_BindOAuthCallback0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Con
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_UnbindOAuth0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_UnbindOAuth0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in UnbindOAuthRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -522,7 +522,7 @@ func _User_UnbindOAuth0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) 
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserUnbindOAuth)
+		http.SetOperation(ctx, OperationPublicUserUnbindOAuth)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.UnbindOAuth(ctx, req.(*UnbindOAuthRequest))
 		})
@@ -530,12 +530,12 @@ func _User_UnbindOAuth0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) 
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_VerifyEmail0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_VerifyEmail0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in VerifyEmailRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -544,7 +544,7 @@ func _User_VerifyEmail0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) 
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserVerifyEmail)
+		http.SetOperation(ctx, OperationPublicUserVerifyEmail)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.VerifyEmail(ctx, req.(*VerifyEmailRequest))
 		})
@@ -552,12 +552,12 @@ func _User_VerifyEmail0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) 
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_UpdateBindMobile0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_UpdateBindMobile0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in UpdateBindMobileRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -566,7 +566,7 @@ func _User_UpdateBindMobile0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Cont
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserUpdateBindMobile)
+		http.SetOperation(ctx, OperationPublicUserUpdateBindMobile)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.UpdateBindMobile(ctx, req.(*UpdateBindMobileRequest))
 		})
@@ -574,12 +574,12 @@ func _User_UpdateBindMobile0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Cont
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_UpdateBindEmail0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_UpdateBindEmail0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in UpdateBindEmailRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -588,7 +588,7 @@ func _User_UpdateBindEmail0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Conte
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserUpdateBindEmail)
+		http.SetOperation(ctx, OperationPublicUserUpdateBindEmail)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.UpdateBindEmail(ctx, req.(*UpdateBindEmailRequest))
 		})
@@ -596,18 +596,18 @@ func _User_UpdateBindEmail0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Conte
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_GetDeviceList0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_GetDeviceList0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserGetDeviceList)
+		http.SetOperation(ctx, OperationPublicUserGetDeviceList)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.GetDeviceList(ctx, req.(*emptypb.Empty))
 		})
@@ -620,7 +620,7 @@ func _User_GetDeviceList0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context
 	}
 }
 
-func _User_UnbindDevice0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_UnbindDevice0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in UnbindDeviceRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -629,7 +629,7 @@ func _User_UnbindDevice0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context)
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserUnbindDevice)
+		http.SetOperation(ctx, OperationPublicUserUnbindDevice)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.UnbindDevice(ctx, req.(*UnbindDeviceRequest))
 		})
@@ -637,18 +637,18 @@ func _User_UnbindDevice0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context)
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_GetDeviceOnlineStatistics0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_GetDeviceOnlineStatistics0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserGetDeviceOnlineStatistics)
+		http.SetOperation(ctx, OperationPublicUserGetDeviceOnlineStatistics)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.GetDeviceOnlineStatistics(ctx, req.(*emptypb.Empty))
 		})
@@ -661,13 +661,13 @@ func _User_GetDeviceOnlineStatistics0_HTTP_Handler(srv UserHTTPServer) func(ctx 
 	}
 }
 
-func _User_DeviceWSConnect0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_DeviceWSConnect0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserDeviceWSConnect)
+		http.SetOperation(ctx, OperationPublicUserDeviceWSConnect)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.DeviceWSConnect(ctx, req.(*emptypb.Empty))
 		})
@@ -675,12 +675,12 @@ func _User_DeviceWSConnect0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Conte
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_CommissionWithdraw0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_CommissionWithdraw0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in CommissionWithdrawRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -689,7 +689,7 @@ func _User_CommissionWithdraw0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Co
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserCommissionWithdraw)
+		http.SetOperation(ctx, OperationPublicUserCommissionWithdraw)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.CommissionWithdraw(ctx, req.(*CommissionWithdrawRequest))
 		})
@@ -697,18 +697,18 @@ func _User_CommissionWithdraw0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Co
 		if err != nil {
 			return err
 		}
-		reply := out.(*WithdrawalLogReply)
+		reply := out.(*WithdrawalLog)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_QueryWithdrawalLog0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_QueryWithdrawalLog0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in QueryWithdrawalLogRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserQueryWithdrawalLog)
+		http.SetOperation(ctx, OperationPublicUserQueryWithdrawalLog)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.QueryWithdrawalLog(ctx, req.(*QueryWithdrawalLogRequest))
 		})
@@ -716,12 +716,12 @@ func _User_QueryWithdrawalLog0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Co
 		if err != nil {
 			return err
 		}
-		reply := out.(*WithdrawalLogListReply)
+		reply := out.(*QueryWithdrawalLogReply)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_UpdateUserSubscribeNote0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_UpdateUserSubscribeNote0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in UpdateUserSubscribeNoteRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -730,7 +730,7 @@ func _User_UpdateUserSubscribeNote0_HTTP_Handler(srv UserHTTPServer) func(ctx ht
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserUpdateUserSubscribeNote)
+		http.SetOperation(ctx, OperationPublicUserUpdateUserSubscribeNote)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.UpdateUserSubscribeNote(ctx, req.(*UpdateUserSubscribeNoteRequest))
 		})
@@ -738,12 +738,12 @@ func _User_UpdateUserSubscribeNote0_HTTP_Handler(srv UserHTTPServer) func(ctx ht
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_UpdateUserRules0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_UpdateUserRules0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in UpdateUserRulesRequest
 		if err := ctx.Bind(&in); err != nil {
@@ -752,7 +752,7 @@ func _User_UpdateUserRules0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Conte
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserUpdateUserRules)
+		http.SetOperation(ctx, OperationPublicUserUpdateUserRules)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.UpdateUserRules(ctx, req.(*UpdateUserRulesRequest))
 		})
@@ -760,18 +760,18 @@ func _User_UpdateUserRules0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Conte
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_DeleteCurrentUserAccount0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_DeleteCurrentUserAccount0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserDeleteCurrentUserAccount)
+		http.SetOperation(ctx, OperationPublicUserDeleteCurrentUserAccount)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.DeleteCurrentUserAccount(ctx, req.(*emptypb.Empty))
 		})
@@ -779,18 +779,18 @@ func _User_DeleteCurrentUserAccount0_HTTP_Handler(srv UserHTTPServer) func(ctx h
 		if err != nil {
 			return err
 		}
-		reply := out.(*CommonReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
-func _User_GetUserTrafficStats0_HTTP_Handler(srv UserHTTPServer) func(ctx http.Context) error {
+func _PublicUser_GetUserTrafficStats0_HTTP_Handler(srv PublicUserHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in GetUserTrafficStatsRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationUserGetUserTrafficStats)
+		http.SetOperation(ctx, OperationPublicUserGetUserTrafficStats)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.GetUserTrafficStats(ctx, req.(*GetUserTrafficStatsRequest))
 		})
@@ -803,54 +803,54 @@ func _User_GetUserTrafficStats0_HTTP_Handler(srv UserHTTPServer) func(ctx http.C
 	}
 }
 
-type UserHTTPClient interface {
-	BindOAuth(ctx context.Context, req *BindOAuthRequest, opts ...http.CallOption) (rsp *OAuthBindReply, err error)
-	BindOAuthCallback(ctx context.Context, req *BindOAuthCallbackRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
-	BindTelegram(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *TelegramBindReply, err error)
-	CommissionWithdraw(ctx context.Context, req *CommissionWithdrawRequest, opts ...http.CallOption) (rsp *WithdrawalLogReply, err error)
-	DeleteCurrentUserAccount(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *CommonReply, err error)
-	DeviceWSConnect(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *CommonReply, err error)
+type PublicUserHTTPClient interface {
+	BindOAuth(ctx context.Context, req *BindOAuthRequest, opts ...http.CallOption) (rsp *BindOAuthReply, err error)
+	BindOAuthCallback(ctx context.Context, req *BindOAuthCallbackRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	BindTelegram(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *BindTelegramReply, err error)
+	CommissionWithdraw(ctx context.Context, req *CommissionWithdrawRequest, opts ...http.CallOption) (rsp *WithdrawalLog, err error)
+	DeleteCurrentUserAccount(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	DeviceWSConnect(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 	GetDeviceList(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetDeviceListReply, err error)
 	GetDeviceOnlineStatistics(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetDeviceOnlineStatisticsReply, err error)
-	GetLoginLog(ctx context.Context, req *GetLoginLogRequest, opts ...http.CallOption) (rsp *LoginLogReply, err error)
-	GetOAuthMethods(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *OAuthMethodsReply, err error)
-	GetSubscribeLog(ctx context.Context, req *GetSubscribeLogRequest, opts ...http.CallOption) (rsp *SubscribeLogReply, err error)
+	GetLoginLog(ctx context.Context, req *GetLoginLogRequest, opts ...http.CallOption) (rsp *GetLoginLogReply, err error)
+	GetOAuthMethods(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetOAuthMethodsReply, err error)
+	GetSubscribeLog(ctx context.Context, req *GetSubscribeLogRequest, opts ...http.CallOption) (rsp *GetSubscribeLogReply, err error)
 	GetUserTrafficStats(ctx context.Context, req *GetUserTrafficStatsRequest, opts ...http.CallOption) (rsp *GetUserTrafficStatsReply, err error)
-	PreUnsubscribe(ctx context.Context, req *PreUnsubscribeRequest, opts ...http.CallOption) (rsp *UnsubscribeInfoReply, err error)
-	QueryUserAffiliate(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *UserAffiliateReply, err error)
-	QueryUserAffiliateList(ctx context.Context, req *QueryUserAffiliateListRequest, opts ...http.CallOption) (rsp *UserAffiliateListReply, err error)
-	QueryUserBalanceLog(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *BalanceLogReply, err error)
-	QueryUserCommissionLog(ctx context.Context, req *QueryUserCommissionLogRequest, opts ...http.CallOption) (rsp *CommissionLogReply, err error)
-	QueryUserInfo(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *UserInfoReply, err error)
-	QueryUserSubscribe(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *UserSubscribeReply, err error)
-	QueryWithdrawalLog(ctx context.Context, req *QueryWithdrawalLogRequest, opts ...http.CallOption) (rsp *WithdrawalLogListReply, err error)
-	ResetUserSubscribeToken(ctx context.Context, req *ResetUserSubscribeTokenRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
-	UnbindDevice(ctx context.Context, req *UnbindDeviceRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
-	UnbindOAuth(ctx context.Context, req *UnbindOAuthRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
-	UnbindTelegram(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *CommonReply, err error)
-	Unsubscribe(ctx context.Context, req *UnsubscribeRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
-	UpdateBindEmail(ctx context.Context, req *UpdateBindEmailRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
-	UpdateBindMobile(ctx context.Context, req *UpdateBindMobileRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
-	UpdateUserNotify(ctx context.Context, req *UpdateUserNotifyRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
-	UpdateUserPassword(ctx context.Context, req *UpdateUserPasswordRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
-	UpdateUserRules(ctx context.Context, req *UpdateUserRulesRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
-	UpdateUserSubscribeNote(ctx context.Context, req *UpdateUserSubscribeNoteRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
-	VerifyEmail(ctx context.Context, req *VerifyEmailRequest, opts ...http.CallOption) (rsp *CommonReply, err error)
+	PreUnsubscribe(ctx context.Context, req *PreUnsubscribeRequest, opts ...http.CallOption) (rsp *PreUnsubscribeReply, err error)
+	QueryUserAffiliate(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *QueryUserAffiliateCountReply, err error)
+	QueryUserAffiliateList(ctx context.Context, req *QueryUserAffiliateListRequest, opts ...http.CallOption) (rsp *QueryUserAffiliateListReply, err error)
+	QueryUserBalanceLog(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *QueryUserBalanceLogReply, err error)
+	QueryUserCommissionLog(ctx context.Context, req *QueryUserCommissionLogRequest, opts ...http.CallOption) (rsp *QueryUserCommissionLogReply, err error)
+	QueryUserInfo(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *User, err error)
+	QueryUserSubscribe(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *QueryUserSubscribeReply, err error)
+	QueryWithdrawalLog(ctx context.Context, req *QueryWithdrawalLogRequest, opts ...http.CallOption) (rsp *QueryWithdrawalLogReply, err error)
+	ResetUserSubscribeToken(ctx context.Context, req *ResetUserSubscribeTokenRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	UnbindDevice(ctx context.Context, req *UnbindDeviceRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	UnbindOAuth(ctx context.Context, req *UnbindOAuthRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	UnbindTelegram(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	Unsubscribe(ctx context.Context, req *UnsubscribeRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	UpdateBindEmail(ctx context.Context, req *UpdateBindEmailRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	UpdateBindMobile(ctx context.Context, req *UpdateBindMobileRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	UpdateUserNotify(ctx context.Context, req *UpdateUserNotifyRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	UpdateUserPassword(ctx context.Context, req *UpdateUserPasswordRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	UpdateUserRules(ctx context.Context, req *UpdateUserRulesRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	UpdateUserSubscribeNote(ctx context.Context, req *UpdateUserSubscribeNoteRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	VerifyEmail(ctx context.Context, req *VerifyEmailRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
-type UserHTTPClientImpl struct {
+type PublicUserHTTPClientImpl struct {
 	cc *http.Client
 }
 
-func NewUserHTTPClient(client *http.Client) UserHTTPClient {
-	return &UserHTTPClientImpl{client}
+func NewPublicUserHTTPClient(client *http.Client) PublicUserHTTPClient {
+	return &PublicUserHTTPClientImpl{client}
 }
 
-func (c *UserHTTPClientImpl) BindOAuth(ctx context.Context, in *BindOAuthRequest, opts ...http.CallOption) (*OAuthBindReply, error) {
-	var out OAuthBindReply
+func (c *PublicUserHTTPClientImpl) BindOAuth(ctx context.Context, in *BindOAuthRequest, opts ...http.CallOption) (*BindOAuthReply, error) {
+	var out BindOAuthReply
 	pattern := "/v1/public/user/bind_oauth"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserBindOAuth))
+	opts = append(opts, http.Operation(OperationPublicUserBindOAuth))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -859,11 +859,11 @@ func (c *UserHTTPClientImpl) BindOAuth(ctx context.Context, in *BindOAuthRequest
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) BindOAuthCallback(ctx context.Context, in *BindOAuthCallbackRequest, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) BindOAuthCallback(ctx context.Context, in *BindOAuthCallbackRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/bind_oauth/callback"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserBindOAuthCallback))
+	opts = append(opts, http.Operation(OperationPublicUserBindOAuthCallback))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -872,11 +872,11 @@ func (c *UserHTTPClientImpl) BindOAuthCallback(ctx context.Context, in *BindOAut
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) BindTelegram(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*TelegramBindReply, error) {
-	var out TelegramBindReply
+func (c *PublicUserHTTPClientImpl) BindTelegram(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*BindTelegramReply, error) {
+	var out BindTelegramReply
 	pattern := "/v1/public/user/bind_telegram"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserBindTelegram))
+	opts = append(opts, http.Operation(OperationPublicUserBindTelegram))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -885,11 +885,11 @@ func (c *UserHTTPClientImpl) BindTelegram(ctx context.Context, in *emptypb.Empty
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) CommissionWithdraw(ctx context.Context, in *CommissionWithdrawRequest, opts ...http.CallOption) (*WithdrawalLogReply, error) {
-	var out WithdrawalLogReply
+func (c *PublicUserHTTPClientImpl) CommissionWithdraw(ctx context.Context, in *CommissionWithdrawRequest, opts ...http.CallOption) (*WithdrawalLog, error) {
+	var out WithdrawalLog
 	pattern := "/v1/public/user/commission_withdraw"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserCommissionWithdraw))
+	opts = append(opts, http.Operation(OperationPublicUserCommissionWithdraw))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -898,11 +898,11 @@ func (c *UserHTTPClientImpl) CommissionWithdraw(ctx context.Context, in *Commiss
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) DeleteCurrentUserAccount(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) DeleteCurrentUserAccount(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/current_user_account"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserDeleteCurrentUserAccount))
+	opts = append(opts, http.Operation(OperationPublicUserDeleteCurrentUserAccount))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
 	if err != nil {
@@ -911,11 +911,11 @@ func (c *UserHTTPClientImpl) DeleteCurrentUserAccount(ctx context.Context, in *e
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) DeviceWSConnect(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) DeviceWSConnect(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/device_ws_connect"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserDeviceWSConnect))
+	opts = append(opts, http.Operation(OperationPublicUserDeviceWSConnect))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -924,11 +924,11 @@ func (c *UserHTTPClientImpl) DeviceWSConnect(ctx context.Context, in *emptypb.Em
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) GetDeviceList(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*GetDeviceListReply, error) {
+func (c *PublicUserHTTPClientImpl) GetDeviceList(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*GetDeviceListReply, error) {
 	var out GetDeviceListReply
 	pattern := "/v1/public/user/devices"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserGetDeviceList))
+	opts = append(opts, http.Operation(OperationPublicUserGetDeviceList))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -937,11 +937,11 @@ func (c *UserHTTPClientImpl) GetDeviceList(ctx context.Context, in *emptypb.Empt
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) GetDeviceOnlineStatistics(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*GetDeviceOnlineStatisticsReply, error) {
+func (c *PublicUserHTTPClientImpl) GetDeviceOnlineStatistics(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*GetDeviceOnlineStatisticsReply, error) {
 	var out GetDeviceOnlineStatisticsReply
 	pattern := "/v1/public/user/device_online_statistics"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserGetDeviceOnlineStatistics))
+	opts = append(opts, http.Operation(OperationPublicUserGetDeviceOnlineStatistics))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -950,11 +950,11 @@ func (c *UserHTTPClientImpl) GetDeviceOnlineStatistics(ctx context.Context, in *
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) GetLoginLog(ctx context.Context, in *GetLoginLogRequest, opts ...http.CallOption) (*LoginLogReply, error) {
-	var out LoginLogReply
+func (c *PublicUserHTTPClientImpl) GetLoginLog(ctx context.Context, in *GetLoginLogRequest, opts ...http.CallOption) (*GetLoginLogReply, error) {
+	var out GetLoginLogReply
 	pattern := "/v1/public/user/login_log"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserGetLoginLog))
+	opts = append(opts, http.Operation(OperationPublicUserGetLoginLog))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -963,11 +963,11 @@ func (c *UserHTTPClientImpl) GetLoginLog(ctx context.Context, in *GetLoginLogReq
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) GetOAuthMethods(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*OAuthMethodsReply, error) {
-	var out OAuthMethodsReply
+func (c *PublicUserHTTPClientImpl) GetOAuthMethods(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*GetOAuthMethodsReply, error) {
+	var out GetOAuthMethodsReply
 	pattern := "/v1/public/user/oauth_methods"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserGetOAuthMethods))
+	opts = append(opts, http.Operation(OperationPublicUserGetOAuthMethods))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -976,11 +976,11 @@ func (c *UserHTTPClientImpl) GetOAuthMethods(ctx context.Context, in *emptypb.Em
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) GetSubscribeLog(ctx context.Context, in *GetSubscribeLogRequest, opts ...http.CallOption) (*SubscribeLogReply, error) {
-	var out SubscribeLogReply
+func (c *PublicUserHTTPClientImpl) GetSubscribeLog(ctx context.Context, in *GetSubscribeLogRequest, opts ...http.CallOption) (*GetSubscribeLogReply, error) {
+	var out GetSubscribeLogReply
 	pattern := "/v1/public/user/subscribe_log"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserGetSubscribeLog))
+	opts = append(opts, http.Operation(OperationPublicUserGetSubscribeLog))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -989,11 +989,11 @@ func (c *UserHTTPClientImpl) GetSubscribeLog(ctx context.Context, in *GetSubscri
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) GetUserTrafficStats(ctx context.Context, in *GetUserTrafficStatsRequest, opts ...http.CallOption) (*GetUserTrafficStatsReply, error) {
+func (c *PublicUserHTTPClientImpl) GetUserTrafficStats(ctx context.Context, in *GetUserTrafficStatsRequest, opts ...http.CallOption) (*GetUserTrafficStatsReply, error) {
 	var out GetUserTrafficStatsReply
 	pattern := "/v1/public/user/traffic_stats"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserGetUserTrafficStats))
+	opts = append(opts, http.Operation(OperationPublicUserGetUserTrafficStats))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -1002,11 +1002,11 @@ func (c *UserHTTPClientImpl) GetUserTrafficStats(ctx context.Context, in *GetUse
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) PreUnsubscribe(ctx context.Context, in *PreUnsubscribeRequest, opts ...http.CallOption) (*UnsubscribeInfoReply, error) {
-	var out UnsubscribeInfoReply
+func (c *PublicUserHTTPClientImpl) PreUnsubscribe(ctx context.Context, in *PreUnsubscribeRequest, opts ...http.CallOption) (*PreUnsubscribeReply, error) {
+	var out PreUnsubscribeReply
 	pattern := "/v1/public/user/unsubscribe/pre"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserPreUnsubscribe))
+	opts = append(opts, http.Operation(OperationPublicUserPreUnsubscribe))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -1015,11 +1015,11 @@ func (c *UserHTTPClientImpl) PreUnsubscribe(ctx context.Context, in *PreUnsubscr
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) QueryUserAffiliate(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*UserAffiliateReply, error) {
-	var out UserAffiliateReply
+func (c *PublicUserHTTPClientImpl) QueryUserAffiliate(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*QueryUserAffiliateCountReply, error) {
+	var out QueryUserAffiliateCountReply
 	pattern := "/v1/public/user/affiliate/count"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserQueryUserAffiliate))
+	opts = append(opts, http.Operation(OperationPublicUserQueryUserAffiliate))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -1028,11 +1028,11 @@ func (c *UserHTTPClientImpl) QueryUserAffiliate(ctx context.Context, in *emptypb
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) QueryUserAffiliateList(ctx context.Context, in *QueryUserAffiliateListRequest, opts ...http.CallOption) (*UserAffiliateListReply, error) {
-	var out UserAffiliateListReply
+func (c *PublicUserHTTPClientImpl) QueryUserAffiliateList(ctx context.Context, in *QueryUserAffiliateListRequest, opts ...http.CallOption) (*QueryUserAffiliateListReply, error) {
+	var out QueryUserAffiliateListReply
 	pattern := "/v1/public/user/affiliate/list"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserQueryUserAffiliateList))
+	opts = append(opts, http.Operation(OperationPublicUserQueryUserAffiliateList))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -1041,11 +1041,11 @@ func (c *UserHTTPClientImpl) QueryUserAffiliateList(ctx context.Context, in *Que
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) QueryUserBalanceLog(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*BalanceLogReply, error) {
-	var out BalanceLogReply
+func (c *PublicUserHTTPClientImpl) QueryUserBalanceLog(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*QueryUserBalanceLogReply, error) {
+	var out QueryUserBalanceLogReply
 	pattern := "/v1/public/user/balance_log"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserQueryUserBalanceLog))
+	opts = append(opts, http.Operation(OperationPublicUserQueryUserBalanceLog))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -1054,11 +1054,11 @@ func (c *UserHTTPClientImpl) QueryUserBalanceLog(ctx context.Context, in *emptyp
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) QueryUserCommissionLog(ctx context.Context, in *QueryUserCommissionLogRequest, opts ...http.CallOption) (*CommissionLogReply, error) {
-	var out CommissionLogReply
+func (c *PublicUserHTTPClientImpl) QueryUserCommissionLog(ctx context.Context, in *QueryUserCommissionLogRequest, opts ...http.CallOption) (*QueryUserCommissionLogReply, error) {
+	var out QueryUserCommissionLogReply
 	pattern := "/v1/public/user/commission_log"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserQueryUserCommissionLog))
+	opts = append(opts, http.Operation(OperationPublicUserQueryUserCommissionLog))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -1067,11 +1067,11 @@ func (c *UserHTTPClientImpl) QueryUserCommissionLog(ctx context.Context, in *Que
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) QueryUserInfo(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*UserInfoReply, error) {
-	var out UserInfoReply
+func (c *PublicUserHTTPClientImpl) QueryUserInfo(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*User, error) {
+	var out User
 	pattern := "/v1/public/user/info"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserQueryUserInfo))
+	opts = append(opts, http.Operation(OperationPublicUserQueryUserInfo))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -1080,11 +1080,11 @@ func (c *UserHTTPClientImpl) QueryUserInfo(ctx context.Context, in *emptypb.Empt
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) QueryUserSubscribe(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*UserSubscribeReply, error) {
-	var out UserSubscribeReply
+func (c *PublicUserHTTPClientImpl) QueryUserSubscribe(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*QueryUserSubscribeReply, error) {
+	var out QueryUserSubscribeReply
 	pattern := "/v1/public/user/subscribe"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserQueryUserSubscribe))
+	opts = append(opts, http.Operation(OperationPublicUserQueryUserSubscribe))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -1093,11 +1093,11 @@ func (c *UserHTTPClientImpl) QueryUserSubscribe(ctx context.Context, in *emptypb
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) QueryWithdrawalLog(ctx context.Context, in *QueryWithdrawalLogRequest, opts ...http.CallOption) (*WithdrawalLogListReply, error) {
-	var out WithdrawalLogListReply
+func (c *PublicUserHTTPClientImpl) QueryWithdrawalLog(ctx context.Context, in *QueryWithdrawalLogRequest, opts ...http.CallOption) (*QueryWithdrawalLogReply, error) {
+	var out QueryWithdrawalLogReply
 	pattern := "/v1/public/user/withdrawal_log"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserQueryWithdrawalLog))
+	opts = append(opts, http.Operation(OperationPublicUserQueryWithdrawalLog))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -1106,11 +1106,11 @@ func (c *UserHTTPClientImpl) QueryWithdrawalLog(ctx context.Context, in *QueryWi
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) ResetUserSubscribeToken(ctx context.Context, in *ResetUserSubscribeTokenRequest, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) ResetUserSubscribeToken(ctx context.Context, in *ResetUserSubscribeTokenRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/subscribe_token"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserResetUserSubscribeToken))
+	opts = append(opts, http.Operation(OperationPublicUserResetUserSubscribeToken))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
@@ -1119,11 +1119,11 @@ func (c *UserHTTPClientImpl) ResetUserSubscribeToken(ctx context.Context, in *Re
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) UnbindDevice(ctx context.Context, in *UnbindDeviceRequest, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) UnbindDevice(ctx context.Context, in *UnbindDeviceRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/unbind_device"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserUnbindDevice))
+	opts = append(opts, http.Operation(OperationPublicUserUnbindDevice))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
@@ -1132,11 +1132,11 @@ func (c *UserHTTPClientImpl) UnbindDevice(ctx context.Context, in *UnbindDeviceR
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) UnbindOAuth(ctx context.Context, in *UnbindOAuthRequest, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) UnbindOAuth(ctx context.Context, in *UnbindOAuthRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/unbind_oauth"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserUnbindOAuth))
+	opts = append(opts, http.Operation(OperationPublicUserUnbindOAuth))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -1145,11 +1145,11 @@ func (c *UserHTTPClientImpl) UnbindOAuth(ctx context.Context, in *UnbindOAuthReq
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) UnbindTelegram(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) UnbindTelegram(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/unbind_telegram"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserUnbindTelegram))
+	opts = append(opts, http.Operation(OperationPublicUserUnbindTelegram))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, nil, &out, opts...)
 	if err != nil {
@@ -1158,11 +1158,11 @@ func (c *UserHTTPClientImpl) UnbindTelegram(ctx context.Context, in *emptypb.Emp
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) Unsubscribe(ctx context.Context, in *UnsubscribeRequest, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) Unsubscribe(ctx context.Context, in *UnsubscribeRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/unsubscribe"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserUnsubscribe))
+	opts = append(opts, http.Operation(OperationPublicUserUnsubscribe))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -1171,11 +1171,11 @@ func (c *UserHTTPClientImpl) Unsubscribe(ctx context.Context, in *UnsubscribeReq
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) UpdateBindEmail(ctx context.Context, in *UpdateBindEmailRequest, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) UpdateBindEmail(ctx context.Context, in *UpdateBindEmailRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/bind_email"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserUpdateBindEmail))
+	opts = append(opts, http.Operation(OperationPublicUserUpdateBindEmail))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
@@ -1184,11 +1184,11 @@ func (c *UserHTTPClientImpl) UpdateBindEmail(ctx context.Context, in *UpdateBind
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) UpdateBindMobile(ctx context.Context, in *UpdateBindMobileRequest, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) UpdateBindMobile(ctx context.Context, in *UpdateBindMobileRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/bind_mobile"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserUpdateBindMobile))
+	opts = append(opts, http.Operation(OperationPublicUserUpdateBindMobile))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
@@ -1197,11 +1197,11 @@ func (c *UserHTTPClientImpl) UpdateBindMobile(ctx context.Context, in *UpdateBin
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) UpdateUserNotify(ctx context.Context, in *UpdateUserNotifyRequest, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) UpdateUserNotify(ctx context.Context, in *UpdateUserNotifyRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/notify"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserUpdateUserNotify))
+	opts = append(opts, http.Operation(OperationPublicUserUpdateUserNotify))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, nil, &out, opts...)
 	if err != nil {
@@ -1210,11 +1210,11 @@ func (c *UserHTTPClientImpl) UpdateUserNotify(ctx context.Context, in *UpdateUse
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/password"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationUserUpdateUserPassword))
+	opts = append(opts, http.Operation(OperationPublicUserUpdateUserPassword))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, nil, &out, opts...)
 	if err != nil {
@@ -1223,11 +1223,11 @@ func (c *UserHTTPClientImpl) UpdateUserPassword(ctx context.Context, in *UpdateU
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) UpdateUserRules(ctx context.Context, in *UpdateUserRulesRequest, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) UpdateUserRules(ctx context.Context, in *UpdateUserRulesRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/rules"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserUpdateUserRules))
+	opts = append(opts, http.Operation(OperationPublicUserUpdateUserRules))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
@@ -1236,11 +1236,11 @@ func (c *UserHTTPClientImpl) UpdateUserRules(ctx context.Context, in *UpdateUser
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) UpdateUserSubscribeNote(ctx context.Context, in *UpdateUserSubscribeNoteRequest, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) UpdateUserSubscribeNote(ctx context.Context, in *UpdateUserSubscribeNoteRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/subscribe_note"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserUpdateUserSubscribeNote))
+	opts = append(opts, http.Operation(OperationPublicUserUpdateUserSubscribeNote))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
@@ -1249,11 +1249,11 @@ func (c *UserHTTPClientImpl) UpdateUserSubscribeNote(ctx context.Context, in *Up
 	return &out, nil
 }
 
-func (c *UserHTTPClientImpl) VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...http.CallOption) (*CommonReply, error) {
-	var out CommonReply
+func (c *PublicUserHTTPClientImpl) VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/user/verify_email"
 	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationUserVerifyEmail))
+	opts = append(opts, http.Operation(OperationPublicUserVerifyEmail))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

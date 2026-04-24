@@ -2,12 +2,11 @@ package public
 
 import (
 	"context"
-	"strconv"
 
 	pb "github.com/OmnTeam/ppanel-pro/api/public/order/v1"
 	publicBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public"
 	"github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type PublicOrderService struct {
@@ -17,382 +16,243 @@ type PublicOrderService struct {
 }
 
 func NewPublicOrderService(uc *publicBiz.OrderUsecase) *PublicOrderService {
-	return &PublicOrderService{
-		uc: uc,
-	}
+	return &PublicOrderService{uc: uc}
 }
 
-// Helper functions for type conversion
-func parseInt64Optional(fieldName, s string) (int64, error) {
-	if s == "" {
-		return 0, nil
-	}
-	val, err := strconv.ParseInt(s, 10, 64)
-	if err != nil {
-		_ = fieldName
-		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	return val, nil
-}
-
-func parseInt64Required(fieldName, s string) (int64, error) {
-	if s == "" {
-		_ = fieldName
-		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	val, err := strconv.ParseInt(s, 10, 64)
-	if err != nil {
-		return 0, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
-	}
-	return val, nil
-}
-
-// CloseOrder closes an order
-func (s *PublicOrderService) CloseOrder(ctx context.Context, req *pb.CloseOrderRequest) (*pb.OrderCloseReply, error) {
-	// Get user ID from context
+func (s *PublicOrderService) CloseOrder(ctx context.Context, req *pb.CloseOrderRequest) (*emptypb.Empty, error) {
 	userID := middleware.GetUserID(ctx)
-
-	err := s.uc.CloseOrder(ctx, int(userID), req.OrderNo)
-	if err != nil {
+	if err := s.uc.CloseOrder(ctx, int(userID), req.OrderNo); err != nil {
 		return nil, err
 	}
-
-	return &pb.OrderCloseReply{
-		Code:    int32(responsecode.OrderCloseSuccess),
-		Message: responsecode.CodeMessages[responsecode.OrderCloseSuccess],
-		Data: &pb.OrderCloseData{
-			Success: true,
-		},
-	}, nil
+	return &emptypb.Empty{}, nil
 }
 
-// QueryOrderDetail queries order detail
-func (s *PublicOrderService) QueryOrderDetail(ctx context.Context, req *pb.QueryOrderDetailRequest) (*pb.OrderDetailReply, error) {
-	// Get user ID from context
+func (s *PublicOrderService) QueryOrderDetail(ctx context.Context, req *pb.QueryOrderDetailRequest) (*pb.OrderDetail, error) {
 	userID := middleware.GetUserID(ctx)
-
 	order, err := s.uc.QueryOrderDetail(ctx, int(userID), req.OrderNo)
 	if err != nil {
 		return nil, err
 	}
+	return s.convertToProtoOrderDetail(order), nil
+}
 
-	return &pb.OrderDetailReply{
-		Code:    int32(responsecode.OrderDetailQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.OrderDetailQuerySuccess],
-		Data:    s.convertToProtoOrderDetail(order),
+func (s *PublicOrderService) QueryOrderList(ctx context.Context, req *pb.QueryOrderListRequest) (*pb.QueryOrderListReply, error) {
+	userID := middleware.GetUserID(ctx)
+	orders, total, err := s.uc.QueryOrderList(ctx, int(userID), int(req.Page), int(req.Size), 0, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	list := make([]*pb.OrderDetail, 0, len(orders))
+	for _, order := range orders {
+		list = append(list, s.convertToProtoOrderDetail(order))
+	}
+
+	return &pb.QueryOrderListReply{
+		Total: total,
+		List:  list,
 	}, nil
 }
 
-// QueryOrderList queries order list
-func (s *PublicOrderService) QueryOrderList(ctx context.Context, req *pb.QueryOrderListRequest) (*pb.OrderListReply, error) {
-	// Get user ID from context
+func (s *PublicOrderService) PreCreateOrder(ctx context.Context, req *pb.PreCreateOrderRequest) (*pb.PreCreateOrderReply, error) {
 	userID := middleware.GetUserID(ctx)
-
-	orders, total, err := s.uc.QueryOrderList(ctx, int(userID), int(req.Page), int(req.Size), req.Status, req.Type)
-	if err != nil {
-		return nil, err
-	}
-
-	protoOrders := make([]*pb.OrderDetail, len(orders))
-	for i, order := range orders {
-		protoOrders[i] = s.convertToProtoOrderDetail(order)
-	}
-
-	return &pb.OrderListReply{
-		Code:    int32(responsecode.OrderListQuerySuccess),
-		Message: responsecode.CodeMessages[responsecode.OrderListQuerySuccess],
-		Data: &pb.OrderListData{
-			List:  protoOrders,
-			Total: int32(total),
-		},
-	}, nil
-}
-
-// PreCreateOrder validates and calculates order price
-func (s *PublicOrderService) PreCreateOrder(ctx context.Context, req *pb.PreCreateOrderRequest) (*pb.OrderPreCreateReply, error) {
-	// Get user ID from context
-	userID := middleware.GetUserID(ctx)
-	subscribeID, err := parseInt64Optional("subscribe_id", req.SubscribeId)
-	if err != nil {
-		return nil, err
-	}
-	subscribeGroupID, err := parseInt64Optional("subscribe_group_id", req.SubscribeGroupId)
-	if err != nil {
-		return nil, err
-	}
-	paymentID, err := parseInt64Optional("payment", req.Payment)
-	if err != nil {
-		return nil, err
-	}
-
-	params := &publicBiz.PreCreateOrderParams{
-		UserID:           userID,
-		Type:             req.Type,
-		SubscribeID:      subscribeID,
-		SubscribeGroupID: subscribeGroupID,
-		Quantity:         int64(req.Quantity),
-		Coupon:           req.Coupon,
-		Payment:          paymentID,
-	}
-
-	result, err := s.uc.PreCreateOrder(ctx, params)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pb.OrderPreCreateReply{
-		Code:    int32(responsecode.OrderPreCreateSuccess),
-		Message: responsecode.CodeMessages[responsecode.OrderPreCreateSuccess],
-		Data: &pb.OrderPreCreateData{
-			Price:          strconv.FormatInt(result.Price, 10),
-			Amount:         strconv.FormatInt(result.Amount, 10),
-			Discount:       strconv.FormatInt(result.Discount, 10),
-			CouponDiscount: strconv.FormatInt(result.CouponDiscount, 10),
-			FeeAmount:      strconv.FormatInt(result.FeeAmount, 10),
-			Commission:     strconv.FormatInt(result.Commission, 10),
-			GiftAmount:     strconv.FormatInt(result.GiftAmount, 10),
-			Valid:          result.Valid,
-			ErrorMessage:   result.Message,
-		},
-	}, nil
-}
-
-// Purchase creates a purchase order
-func (s *PublicOrderService) Purchase(ctx context.Context, req *pb.PurchaseRequest) (*pb.PurchaseReply, error) {
-	// Get user ID from context
-	userID := middleware.GetUserID(ctx)
-	subscribeID, err := parseInt64Required("subscribe_id", req.SubscribeId)
-	if err != nil {
-		return nil, err
-	}
-	paymentID, err := parseInt64Required("payment", req.Payment)
-	if err != nil {
-		return nil, err
-	}
-
-	params := &publicBiz.PurchaseParams{
+	result, err := s.uc.PreCreateOrder(ctx, &publicBiz.PreCreateOrderParams{
 		UserID:      userID,
-		SubscribeID: subscribeID,
-		Quantity:    int64(req.Quantity),
+		Type:        1,
+		SubscribeID: req.SubscribeId,
+		Quantity:    req.Quantity,
 		Coupon:      req.Coupon,
-		Payment:     paymentID,
-	}
-
-	result, err := s.uc.Purchase(ctx, params)
+		Payment:     req.Payment,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	return &pb.PurchaseReply{
-		Code:    int32(responsecode.PurchaseSuccess),
-		Message: responsecode.CodeMessages[responsecode.PurchaseSuccess],
-		Data: &pb.PurchaseData{
-			OrderNo: result.OrderNo,
-		},
+	return &pb.PreCreateOrderReply{
+		Price:          result.Price,
+		Amount:         result.Amount,
+		Discount:       result.Discount,
+		GiftAmount:     result.GiftAmount,
+		Coupon:         req.Coupon,
+		CouponDiscount: result.CouponDiscount,
+		FeeAmount:      result.FeeAmount,
 	}, nil
 }
 
-// Recharge creates a recharge order
+func (s *PublicOrderService) Purchase(ctx context.Context, req *pb.PurchaseRequest) (*pb.PurchaseReply, error) {
+	userID := middleware.GetUserID(ctx)
+	result, err := s.uc.Purchase(ctx, &publicBiz.PurchaseParams{
+		UserID:      userID,
+		SubscribeID: req.SubscribeId,
+		Quantity:    req.Quantity,
+		Coupon:      req.Coupon,
+		Payment:     req.Payment,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &pb.PurchaseReply{OrderNo: result.OrderNo}, nil
+}
+
 func (s *PublicOrderService) Recharge(ctx context.Context, req *pb.RechargeRequest) (*pb.RechargeReply, error) {
-	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
-	amount, err := parseInt64Required("amount", req.Amount)
-	if err != nil {
-		return nil, err
-	}
-	paymentID, err := parseInt64Required("payment", req.Payment)
-	if err != nil {
-		return nil, err
-	}
-
-	params := &publicBiz.RechargeParams{
+	result, err := s.uc.Recharge(ctx, &publicBiz.RechargeParams{
 		UserID:  userID,
-		Amount:  amount,
-		Payment: paymentID,
-	}
-
-	result, err := s.uc.Recharge(ctx, params)
+		Amount:  req.Amount,
+		Payment: req.Payment,
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	return &pb.RechargeReply{
-		Code:    int32(responsecode.RechargeSuccess),
-		Message: responsecode.CodeMessages[responsecode.RechargeSuccess],
-		Data: &pb.RechargeData{
-			OrderNo: result.OrderNo,
-		},
-	}, nil
+	return &pb.RechargeReply{OrderNo: result.OrderNo}, nil
 }
 
-// Renewal creates a renewal order
 func (s *PublicOrderService) Renewal(ctx context.Context, req *pb.RenewalRequest) (*pb.RenewalReply, error) {
-	// Get user ID from context
 	userID := middleware.GetUserID(ctx)
-	userSubscribeID, err := parseInt64Required("user_subscribe_id", req.UserSubscribeId)
-	if err != nil {
-		return nil, err
-	}
-	paymentID, err := parseInt64Required("payment", req.Payment)
-	if err != nil {
-		return nil, err
-	}
-
-	params := &publicBiz.RenewalParams{
+	result, err := s.uc.Renewal(ctx, &publicBiz.RenewalParams{
 		UserID:          userID,
-		UserSubscribeID: userSubscribeID,
-		Quantity:        int64(req.Quantity),
+		UserSubscribeID: req.UserSubscribeId,
+		Quantity:        req.Quantity,
 		Coupon:          req.Coupon,
-		Payment:         paymentID,
-	}
-
-	result, err := s.uc.Renewal(ctx, params)
+		Payment:         req.Payment,
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	return &pb.RenewalReply{
-		Code:    int32(responsecode.RenewalSuccess),
-		Message: responsecode.CodeMessages[responsecode.RenewalSuccess],
-		Data: &pb.RenewalData{
-			OrderNo: result.OrderNo,
-		},
-	}, nil
+	return &pb.RenewalReply{OrderNo: result.OrderNo}, nil
 }
 
-// ResetTraffic creates a reset traffic order
-func (s *PublicOrderService) ResetTraffic(ctx context.Context, req *pb.ResetTrafficRequest) (*pb.TrafficResetReply, error) {
-	// Get user ID from context
+func (s *PublicOrderService) ResetTraffic(ctx context.Context, req *pb.ResetTrafficRequest) (*pb.ResetTrafficReply, error) {
 	userID := middleware.GetUserID(ctx)
-	userSubscribeID, err := parseInt64Required("user_subscribe_id", req.UserSubscribeId)
-	if err != nil {
-		return nil, err
-	}
-	paymentID, err := parseInt64Required("payment", req.Payment)
-	if err != nil {
-		return nil, err
-	}
-
-	params := &publicBiz.ResetTrafficParams{
+	result, err := s.uc.ResetTraffic(ctx, &publicBiz.ResetTrafficParams{
 		UserID:          userID,
-		UserSubscribeID: userSubscribeID,
-		Payment:         paymentID,
-	}
-
-	result, err := s.uc.ResetTraffic(ctx, params)
+		UserSubscribeID: req.UserSubscribeId,
+		Payment:         req.Payment,
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	return &pb.TrafficResetReply{
-		Code:    int32(responsecode.TrafficResetSuccess),
-		Message: responsecode.CodeMessages[responsecode.TrafficResetSuccess],
-		Data: &pb.TrafficResetData{
-			OrderNo: result.OrderNo,
-		},
-	}, nil
+	return &pb.ResetTrafficReply{OrderNo: result.OrderNo}, nil
 }
 
-// convertToProtoOrderDetail converts biz OrderDetail to proto OrderDetail
 func (s *PublicOrderService) convertToProtoOrderDetail(order *publicBiz.OrderDetail) *pb.OrderDetail {
-	// 转换 Payment 对象
+	if order == nil {
+		return &pb.OrderDetail{}
+	}
+
 	var payment *pb.PaymentMethod
 	if order.Payment != nil {
 		payment = &pb.PaymentMethod{
-			Id:          strconv.FormatInt(order.Payment.ID, 10),
+			Id:          order.Payment.ID,
 			Name:        order.Payment.Name,
 			Platform:    order.Payment.Platform,
 			Description: order.Payment.Description,
 			Icon:        order.Payment.Icon,
-			FeeMode:     order.Payment.FeeMode,
-			FeePercent:  strconv.FormatInt(order.Payment.FeePercent, 10),
-			FeeAmount:   strconv.FormatInt(order.Payment.FeeAmount, 10),
+			FeeMode:     uint32(order.Payment.FeeMode),
+			FeePercent:  order.Payment.FeePercent,
+			FeeAmount:   order.Payment.FeeAmount,
 		}
 	}
 
-	// 转换 Subscribe 对象
 	var subscribe *pb.Subscribe
 	if order.Subscribe != nil {
-		// 转换折扣列表
-		var discounts []*pb.SubscribeDiscount
-		for _, d := range order.Subscribe.Discount {
+		discounts := make([]*pb.SubscribeDiscount, 0, len(order.Subscribe.Discount))
+		for _, item := range order.Subscribe.Discount {
 			discounts = append(discounts, &pb.SubscribeDiscount{
-				Quantity: int32(d.Quantity),
-				Discount: strconv.FormatInt(d.Discount, 10),
+				Quantity: item.Quantity,
+				Discount: item.Discount,
 			})
 		}
 
 		subscribe = &pb.Subscribe{
-			Id:                strconv.FormatInt(order.Subscribe.ID, 10),
+			Id:                order.Subscribe.ID,
 			Name:              order.Subscribe.Name,
 			Language:          order.Subscribe.Language,
 			Description:       order.Subscribe.Description,
-			UnitPrice:         strconv.FormatInt(order.Subscribe.UnitPrice, 10),
+			UnitPrice:         order.Subscribe.UnitPrice,
 			UnitTime:          order.Subscribe.UnitTime,
 			Discount:          discounts,
-			Replacement:       strconv.FormatInt(order.Subscribe.Replacement, 10),
-			Inventory:         strconv.FormatInt(order.Subscribe.Inventory, 10),
-			Traffic:           strconv.FormatInt(order.Subscribe.Traffic, 10),
-			SpeedLimit:        strconv.FormatInt(order.Subscribe.SpeedLimit, 10),
-			DeviceLimit:       strconv.FormatInt(order.Subscribe.DeviceLimit, 10),
-			Quota:             strconv.FormatInt(order.Subscribe.Quota, 10),
-			Nodes:             convertIntSliceToInt32Slice(order.Subscribe.Nodes),
+			Replacement:       order.Subscribe.Replacement,
+			Inventory:         int32(order.Subscribe.Inventory),
+			Traffic:           order.Subscribe.Traffic,
+			SpeedLimit:        int32(order.Subscribe.SpeedLimit),
+			DeviceLimit:       int32(order.Subscribe.DeviceLimit),
+			Quota:             int32(order.Subscribe.Quota),
+			Nodes:             convertIntSliceToInt64Slice(order.Subscribe.Nodes),
 			NodeTags:          order.Subscribe.NodeTags,
+			NodeGroupIds:      convertStringSliceToInt64Slice(order.Subscribe.NodeGroupIds),
+			NodeGroupId:       parseStringInt64(order.Subscribe.NodeGroupId),
+			TrafficLimit:      []*pb.TrafficLimit{},
 			Show:              order.Subscribe.Show,
 			Sell:              order.Subscribe.Sell,
-			Sort:              strconv.FormatInt(order.Subscribe.Sort, 10),
-			DeductionRatio:    strconv.FormatInt(order.Subscribe.DeductionRatio, 10),
+			Sort:              int32(order.Subscribe.Sort),
+			DeductionRatio:    int32(order.Subscribe.DeductionRatio),
 			AllowDeduction:    order.Subscribe.AllowDeduction,
-			NodeGroupIds:      order.Subscribe.NodeGroupIds,
-			NodeGroupId:       order.Subscribe.NodeGroupId,
-			ResetCycle:        strconv.FormatInt(order.Subscribe.ResetCycle, 10),
+			ResetCycle:        int32(order.Subscribe.ResetCycle),
 			RenewalReset:      order.Subscribe.RenewalReset,
 			ShowOriginalPrice: order.Subscribe.ShowOriginalPrice,
-			CreatedAt:         strconv.FormatInt(order.Subscribe.CreatedAt, 10),
-			UpdatedAt:         strconv.FormatInt(order.Subscribe.UpdatedAt, 10),
+			CreatedAt:         order.Subscribe.CreatedAt,
+			UpdatedAt:         order.Subscribe.UpdatedAt,
 		}
 	}
 
 	return &pb.OrderDetail{
-		Id:             strconv.FormatInt(order.ID, 10),
-		ParentId:       strconv.FormatInt(order.ParentID, 10),
-		UserId:         strconv.FormatInt(order.UserID, 10),
+		Id:             order.ID,
+		UserId:         order.UserID,
 		OrderNo:        order.OrderNo,
 		Type:           order.Type,
-		Quantity:       int32(order.Quantity),
-		Price:          strconv.FormatInt(order.Price, 10),
-		Amount:         strconv.FormatInt(order.Amount, 10),
-		GiftAmount:     strconv.FormatInt(order.GiftAmount, 10),
-		Discount:       strconv.FormatInt(order.Discount, 10),
+		Quantity:       order.Quantity,
+		Price:          order.Price,
+		Amount:         order.Amount,
+		GiftAmount:     order.GiftAmount,
+		Discount:       order.Discount,
 		Coupon:         order.Coupon,
-		CouponDiscount: strconv.FormatInt(order.CouponDiscount, 10),
-		Commission:     "0", // Prevent commission amount leakage (set to 0 for public API)
+		CouponDiscount: order.CouponDiscount,
+		Commission:     0,
 		Payment:        payment,
 		Method:         order.Method,
-		FeeAmount:      strconv.FormatInt(order.FeeAmount, 10),
+		FeeAmount:      order.FeeAmount,
 		TradeNo:        order.TradeNo,
 		Status:         order.Status,
-		SubscribeId:    strconv.FormatInt(order.SubscribeID, 10),
-		SubscribeToken: order.SubscribeToken,
-		IsNew:          order.IsNew,
-		CreatedAt:      strconv.FormatInt(order.CreatedAt, 10),
-		UpdatedAt:      strconv.FormatInt(order.UpdatedAt, 10),
+		SubscribeId:    order.SubscribeID,
 		Subscribe:      subscribe,
-		SubscribeName:  order.SubscribeName,
-		PaymentName:    order.PaymentName,
-		StatusText:     order.StatusText,
-		TypeText:       order.TypeText,
+		CreatedAt:      order.CreatedAt,
+		UpdatedAt:      order.UpdatedAt,
 	}
 }
 
-// convertIntSliceToInt32Slice converts []int to []int32
-func convertIntSliceToInt32Slice(input []int) []int32 {
-	if input == nil {
-		return nil
+func convertIntSliceToInt64Slice(input []int) []int64 {
+	if len(input) == 0 {
+		return []int64{}
 	}
-	result := make([]int32, len(input))
-	for i, v := range input {
-		result[i] = int32(v)
+	result := make([]int64, 0, len(input))
+	for _, item := range input {
+		result = append(result, int64(item))
+	}
+	return result
+}
+
+func convertStringSliceToInt64Slice(input []string) []int64 {
+	if len(input) == 0 {
+		return []int64{}
+	}
+	result := make([]int64, 0, len(input))
+	for _, item := range input {
+		result = append(result, parseStringInt64(item))
+	}
+	return result
+}
+
+func parseStringInt64(value string) int64 {
+	if value == "" {
+		return 0
+	}
+	var result int64
+	for _, ch := range value {
+		if ch < '0' || ch > '9' {
+			return 0
+		}
+		result = result*10 + int64(ch-'0')
 	}
 	return result
 }

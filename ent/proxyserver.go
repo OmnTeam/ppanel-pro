@@ -27,7 +27,7 @@ type ProxyServer struct {
 	// 服务器地址
 	ServerAddr string `json:"server_addr,omitempty"`
 	// 排序
-	Sort int `json:"sort,omitempty"`
+	Sort int32 `json:"sort,omitempty"`
 	// 协议配置JSON
 	Protocol string `json:"protocol,omitempty"`
 	// 最后报告时间
@@ -107,7 +107,7 @@ func (_m *ProxyServer) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value.Valid {
-				_m.Sort = int(value.Int64)
+				_m.Sort = int32(value.Int64)
 			}
 		case proxyserver.FieldProtocol:
 			if value, ok := values[i].(*sql.NullString); !ok {

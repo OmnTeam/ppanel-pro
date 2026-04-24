@@ -24,6 +24,13 @@ type publicSubscribeRepo struct {
 	log  *log.Helper
 }
 
+type publicSubscribeTrafficLimit struct {
+	StatType     string `json:"stat_type"`
+	StatValue    int64  `json:"stat_value"`
+	TrafficUsage int64  `json:"traffic_usage"`
+	SpeedLimit   int64  `json:"speed_limit"`
+}
+
 // NewPublicSubscribeRepo 创建Public Subscribe仓库
 func NewPublicSubscribeRepo(data *Data, logger log.Logger) subscribeBiz.SubscribeRepo {
 	return &publicSubscribeRepo{
@@ -33,7 +40,7 @@ func NewPublicSubscribeRepo(data *Data, logger log.Logger) subscribeBiz.Subscrib
 }
 
 // QuerySubscribeList 查询订阅列表
-func (r *publicSubscribeRepo) QuerySubscribeList(ctx context.Context, language string) ([]*subscribeBiz.Subscribe, int64, error) {
+func (r *publicSubscribeRepo) QuerySubscribeList(ctx context.Context, language string) ([]*subscribeBiz.Subscribe, int32, error) {
 	// 查询条件: sell=true
 	query := r.data.db.ProxySubscribe.Query().
 		Where(
@@ -59,7 +66,7 @@ func (r *publicSubscribeRepo) QuerySubscribeList(ctx context.Context, language s
 		return nil, 0, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
 
-	total := int64(len(subscribes))
+	total := int32(len(subscribes))
 	result := make([]*subscribeBiz.Subscribe, 0, len(subscribes))
 
 	for _, s := range subscribes {
@@ -70,10 +77,10 @@ func (r *publicSubscribeRepo) QuerySubscribeList(ctx context.Context, language s
 		}
 
 		// 处理ResetCycle和DeductionRatio（指针类型）
-		resetCycle := int32(0)
+		resetCycle := int64(0)
 		deductionRatio := int64(0)
 		if s.ResetCycle != nil {
-			resetCycle = int32(*s.ResetCycle)
+			resetCycle = int64(*s.ResetCycle)
 		}
 		if s.DeductionRatio != nil {
 			deductionRatio = int64(*s.DeductionRatio)
@@ -96,29 +103,55 @@ func (r *publicSubscribeRepo) QuerySubscribeList(ctx context.Context, language s
 			}
 		}
 
+		nodeGroupID := int64(0)
+		if s.NodeGroupID != nil {
+			nodeGroupID = *s.NodeGroupID
+		}
+
+		var trafficLimit []*subscribeBiz.TrafficLimit
+		if s.TrafficLimit != nil && strings.TrimSpace(*s.TrafficLimit) != "" {
+			var limits []publicSubscribeTrafficLimit
+			if err := json.Unmarshal([]byte(*s.TrafficLimit), &limits); err == nil {
+				trafficLimit = make([]*subscribeBiz.TrafficLimit, 0, len(limits))
+				for _, limit := range limits {
+					trafficLimit = append(trafficLimit, &subscribeBiz.TrafficLimit{
+						StatType:     limit.StatType,
+						StatValue:    limit.StatValue,
+						TrafficUsage: limit.TrafficUsage,
+						SpeedLimit:   limit.SpeedLimit,
+					})
+				}
+			}
+		}
+
 		item := &subscribeBiz.Subscribe{
-			ID:             int64(s.ID),
-			Name:           s.Name,
-			Language:       s.Language,
-			Description:    desc,
-			UnitPrice:      s.UnitPrice,
-			UnitTime:       s.UnitTime,
-			Replacement:    int64(s.Replacement),
-			Inventory:      int64(s.Inventory),
-			Traffic:        s.Traffic,
-			SpeedLimit:     int64(s.SpeedLimit),
-			DeviceLimit:    int64(s.DeviceLimit),
-			Quota:          int64(s.Quota),
-			Nodes:          nodes,
-			NodeTags:       nodeTags,
-			Show:           s.Show,
-			Sell:           s.Sell,
-			Sort:           int64(s.Sort),
-			DeductionRatio: deductionRatio,
-			AllowDeduction: s.AllowDeduction,
-			ResetCycle:     resetCycle,
-			CreatedAt:      s.CreatedAt.UnixMilli(),
-			UpdatedAt:      s.UpdatedAt.UnixMilli(),
+			ID:                int64(s.ID),
+			Name:              s.Name,
+			Language:          s.Language,
+			Description:       desc,
+			UnitPrice:         s.UnitPrice,
+			UnitTime:          s.UnitTime,
+			Replacement:       int64(s.Replacement),
+			Inventory:         int64(s.Inventory),
+			Traffic:           s.Traffic,
+			SpeedLimit:        int64(s.SpeedLimit),
+			DeviceLimit:       int64(s.DeviceLimit),
+			Quota:             int64(s.Quota),
+			Nodes:             nodes,
+			NodeTags:          nodeTags,
+			NodeGroupIds:      append([]int64{}, s.NodeGroupIds...),
+			NodeGroupId:       nodeGroupID,
+			TrafficLimit:      trafficLimit,
+			Show:              s.Show,
+			Sell:              s.Sell,
+			Sort:              int64(s.Sort),
+			DeductionRatio:    deductionRatio,
+			AllowDeduction:    s.AllowDeduction,
+			ResetCycle:        resetCycle,
+			RenewalReset:      s.RenewalReset,
+			ShowOriginalPrice: s.ShowOriginalPrice,
+			CreatedAt:         s.CreatedAt.UnixMilli(),
+			UpdatedAt:         s.UpdatedAt.UnixMilli(),
 		}
 
 		// 解析Discount字段（指针类型）

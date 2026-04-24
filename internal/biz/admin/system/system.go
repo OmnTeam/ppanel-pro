@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"reflect"
+	"runtime/debug"
 	"strings"
+	"time"
 
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/log"
@@ -134,6 +136,7 @@ type SystemRepo interface {
 	UpdateConfigByCategory(ctx context.Context, category string, configs map[string]*tool.SystemConfig) error
 	GetNodeMultiplier(ctx context.Context) (string, error)
 	UpdateNodeMultiplier(ctx context.Context, value string) error
+	ApplyTelegramBot(ctx context.Context) error
 }
 
 // SystemUsecase is the system use case
@@ -165,21 +168,13 @@ func (uc *SystemUsecase) GetCurrencyConfig(ctx context.Context) (*CurrencyConfig
 }
 
 func (uc *SystemUsecase) GetSystemModule(ctx context.Context) (*SystemModule, error) {
-	configs, err := uc.repo.GetConfigByCategory(ctx, "system")
-	if err != nil {
-		return nil, err
-	}
+	_ = ctx
 
 	version := "unknown version"
-	for _, item := range configs {
-		if item == nil {
-			continue
-		}
-		if item.Key == "Version" || item.Key == "version" {
-			if item.Value != "" {
-				version = item.Value
-			}
-			break
+	if buildInfo, ok := debug.ReadBuildInfo(); ok {
+		candidate := strings.TrimSpace(buildInfo.Main.Version)
+		if candidate != "" && candidate != "(devel)" {
+			version = candidate
 		}
 	}
 
@@ -554,6 +549,42 @@ func (uc *SystemUsecase) SetNodeMultiplier(ctx context.Context, periods []TimePe
 	}
 
 	return uc.repo.UpdateNodeMultiplier(ctx, string(data))
+}
+
+func (uc *SystemUsecase) ApplyTelegramBot(ctx context.Context) error {
+	return uc.repo.ApplyTelegramBot(ctx)
+}
+
+func PreviewNodeMultiplier(now time.Time, periods []TimePeriod) float32 {
+	for _, period := range periods {
+		if timeWithinPeriod(now, period.StartTime, period.EndTime) {
+			if period.Multiplier > 0 {
+				return period.Multiplier
+			}
+			return 1.0
+		}
+	}
+	return 1.0
+}
+
+func timeWithinPeriod(current time.Time, start, end string) bool {
+	startTime, err := time.Parse("15:04.000", start)
+	if err != nil {
+		return false
+	}
+	endTime, err := time.Parse("15:04.000", end)
+	if err != nil {
+		return false
+	}
+
+	currentTime := time.Date(0, 1, 1, current.Hour(), current.Minute(), 0, 0, time.UTC)
+	startFormatted := time.Date(0, 1, 1, startTime.Hour(), startTime.Minute(), 0, 0, time.UTC)
+	endFormatted := time.Date(0, 1, 1, endTime.Hour(), endTime.Minute(), 0, 0, time.UTC)
+
+	if startFormatted.Before(endFormatted) {
+		return currentTime.After(startFormatted) && currentTime.Before(endFormatted)
+	}
+	return currentTime.After(startFormatted) || currentTime.Before(endFormatted)
 }
 
 // getFieldTypeString returns the type string for a reflect.Value

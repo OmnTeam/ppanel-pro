@@ -13,81 +13,28 @@ option java_package = "api.public.subscription.v1";
 // 订阅配置服务 - 生成客户端配置
 service Subscription {
   // GetSubscribeConfig 获取订阅配置
-  // 根据token获取用户订阅配置文件，支持多种客户端格式
+  // 根据老项目请求参数生成订阅配置
   rpc GetSubscribeConfig(GetSubscribeConfigRequest) returns (GetSubscribeConfigReply) {
     option (google.api.http) = {
-      get: "/v1/subscribe/{token}"
+      get: "/v1/subscribe/config"
+      additional_bindings {
+        get: "/v1/subscribe/{token}"
+      }
     };
   }
 }
 
 // GetSubscribeConfigRequest 获取订阅配置请求
 message GetSubscribeConfigRequest {
-  // token 订阅令牌（必填）
-  string token = 1 [
-    (google.api.field_behavior) = REQUIRED
-  ];
-
-  // target 目标客户端类型（可选，如: clash, surge, loon等）
-  // 如果不指定，则根据User-Agent自动识别
-  string target = 2;
-
-  // list 是否只返回节点列表（可选，默认false）
-  // 如果为true，只返回节点信息不生成完整配置
-  bool list = 3;
-
-  // emoji 是否添加国旗emoji到节点名称（可选，默认false）
-  bool emoji = 4;
-
-  // udp 是否启用UDP（可选，默认false）
-  bool udp = 5;
-
-  // tfo 是否启用TFO（可选，默认false）
-  bool tfo = 6;
-
-  // scv 是否跳过证书验证（可选，默认false）
-  bool scv = 7;
-
-  // sort 排序方式（可选，默认按sort字段排序）
-  // 0: 默认排序  1: 按名称排序
-  int32 sort = 8;
-
-  // filter 过滤标签（可选，多个标签用逗号分隔）
-  string filter = 9;
-
-  // expand 展开节点（可选，默认false）
-  bool expand = 10;
+  string flag = 1;
+  string token = 2 [(google.api.field_behavior) = REQUIRED];
+  string type = 3;
+  string ua = 4;
+  map<string, string> params = 5;
 }
 
 // GetSubscribeConfigReply 获取订阅配置响应
 message GetSubscribeConfigReply {
-  int32 code = 1;          // 状态码
-  string message = 2;      // 消息内容
-  GetSubscribeConfigData data = 3; // 响应数据
-}
-
-// GetSubscribeConfigData 订阅配置数据
-message GetSubscribeConfigData {
-  string config = 1;       // 配置内容（base64编码或原始格式）
-  string header = 2;       // 订阅信息头（upload/download/total/expire）
-  string content_type = 3; // 内容类型（application/octet-stream等）
-  string filename = 4;     // 文件名（用于下载）
-}
-
-// SubscribeInfo 订阅信息
-message SubscribeInfo {
-  int64 upload = 1;        // 已上传流量（字节）
-  int64 download = 2;       // 已下载流量（字节）
-  int64 total = 3;          // 总流量（字节）
-  int64 expire = 4;         // 过期时间（Unix时间戳）
-  string reset_day = 5;     // 重置日（每月几号重置）
-}
-
-// ProxyInfo 节点信息
-message ProxyInfo {
-  string name = 1;          // 节点名称
-  string server = 2;        // 服务器地址
-  int32 port = 3;           // 端口
-  string type = 4;          // 协议类型
-  repeated string tags = 5;  // 标签列表
+  bytes config = 1;
+  string header = 2;
 }

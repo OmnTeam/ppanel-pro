@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -33,15 +34,15 @@ const (
 // Ticket service for users
 type TicketClient interface {
 	// CreateUserTicket creates a new ticket
-	CreateUserTicket(ctx context.Context, in *CreateUserTicketRequest, opts ...grpc.CallOption) (*TicketCreateReply, error)
+	CreateUserTicket(ctx context.Context, in *CreateUserTicketRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// GetUserTicketList gets user's ticket list with pagination
-	GetUserTicketList(ctx context.Context, in *GetUserTicketListRequest, opts ...grpc.CallOption) (*TicketListReply, error)
+	GetUserTicketList(ctx context.Context, in *GetUserTicketListRequest, opts ...grpc.CallOption) (*GetUserTicketListReply, error)
 	// GetUserTicketDetails gets ticket details
-	GetUserTicketDetails(ctx context.Context, in *GetUserTicketDetailsRequest, opts ...grpc.CallOption) (*TicketDetailReply, error)
+	GetUserTicketDetails(ctx context.Context, in *GetUserTicketDetailsRequest, opts ...grpc.CallOption) (*TicketInfo, error)
 	// UpdateUserTicketStatus updates ticket status
-	UpdateUserTicketStatus(ctx context.Context, in *UpdateUserTicketStatusRequest, opts ...grpc.CallOption) (*TicketStatusReply, error)
+	UpdateUserTicketStatus(ctx context.Context, in *UpdateUserTicketStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// CreateUserTicketFollow creates a follow-up for ticket
-	CreateUserTicketFollow(ctx context.Context, in *CreateUserTicketFollowRequest, opts ...grpc.CallOption) (*TicketFollowReply, error)
+	CreateUserTicketFollow(ctx context.Context, in *CreateUserTicketFollowRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type ticketClient struct {
@@ -52,9 +53,9 @@ func NewTicketClient(cc grpc.ClientConnInterface) TicketClient {
 	return &ticketClient{cc}
 }
 
-func (c *ticketClient) CreateUserTicket(ctx context.Context, in *CreateUserTicketRequest, opts ...grpc.CallOption) (*TicketCreateReply, error) {
+func (c *ticketClient) CreateUserTicket(ctx context.Context, in *CreateUserTicketRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TicketCreateReply)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, Ticket_CreateUserTicket_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -62,9 +63,9 @@ func (c *ticketClient) CreateUserTicket(ctx context.Context, in *CreateUserTicke
 	return out, nil
 }
 
-func (c *ticketClient) GetUserTicketList(ctx context.Context, in *GetUserTicketListRequest, opts ...grpc.CallOption) (*TicketListReply, error) {
+func (c *ticketClient) GetUserTicketList(ctx context.Context, in *GetUserTicketListRequest, opts ...grpc.CallOption) (*GetUserTicketListReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TicketListReply)
+	out := new(GetUserTicketListReply)
 	err := c.cc.Invoke(ctx, Ticket_GetUserTicketList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -72,9 +73,9 @@ func (c *ticketClient) GetUserTicketList(ctx context.Context, in *GetUserTicketL
 	return out, nil
 }
 
-func (c *ticketClient) GetUserTicketDetails(ctx context.Context, in *GetUserTicketDetailsRequest, opts ...grpc.CallOption) (*TicketDetailReply, error) {
+func (c *ticketClient) GetUserTicketDetails(ctx context.Context, in *GetUserTicketDetailsRequest, opts ...grpc.CallOption) (*TicketInfo, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TicketDetailReply)
+	out := new(TicketInfo)
 	err := c.cc.Invoke(ctx, Ticket_GetUserTicketDetails_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -82,9 +83,9 @@ func (c *ticketClient) GetUserTicketDetails(ctx context.Context, in *GetUserTick
 	return out, nil
 }
 
-func (c *ticketClient) UpdateUserTicketStatus(ctx context.Context, in *UpdateUserTicketStatusRequest, opts ...grpc.CallOption) (*TicketStatusReply, error) {
+func (c *ticketClient) UpdateUserTicketStatus(ctx context.Context, in *UpdateUserTicketStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TicketStatusReply)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, Ticket_UpdateUserTicketStatus_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -92,9 +93,9 @@ func (c *ticketClient) UpdateUserTicketStatus(ctx context.Context, in *UpdateUse
 	return out, nil
 }
 
-func (c *ticketClient) CreateUserTicketFollow(ctx context.Context, in *CreateUserTicketFollowRequest, opts ...grpc.CallOption) (*TicketFollowReply, error) {
+func (c *ticketClient) CreateUserTicketFollow(ctx context.Context, in *CreateUserTicketFollowRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TicketFollowReply)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, Ticket_CreateUserTicketFollow_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -109,15 +110,15 @@ func (c *ticketClient) CreateUserTicketFollow(ctx context.Context, in *CreateUse
 // Ticket service for users
 type TicketServer interface {
 	// CreateUserTicket creates a new ticket
-	CreateUserTicket(context.Context, *CreateUserTicketRequest) (*TicketCreateReply, error)
+	CreateUserTicket(context.Context, *CreateUserTicketRequest) (*emptypb.Empty, error)
 	// GetUserTicketList gets user's ticket list with pagination
-	GetUserTicketList(context.Context, *GetUserTicketListRequest) (*TicketListReply, error)
+	GetUserTicketList(context.Context, *GetUserTicketListRequest) (*GetUserTicketListReply, error)
 	// GetUserTicketDetails gets ticket details
-	GetUserTicketDetails(context.Context, *GetUserTicketDetailsRequest) (*TicketDetailReply, error)
+	GetUserTicketDetails(context.Context, *GetUserTicketDetailsRequest) (*TicketInfo, error)
 	// UpdateUserTicketStatus updates ticket status
-	UpdateUserTicketStatus(context.Context, *UpdateUserTicketStatusRequest) (*TicketStatusReply, error)
+	UpdateUserTicketStatus(context.Context, *UpdateUserTicketStatusRequest) (*emptypb.Empty, error)
 	// CreateUserTicketFollow creates a follow-up for ticket
-	CreateUserTicketFollow(context.Context, *CreateUserTicketFollowRequest) (*TicketFollowReply, error)
+	CreateUserTicketFollow(context.Context, *CreateUserTicketFollowRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedTicketServer()
 }
 
@@ -128,19 +129,19 @@ type TicketServer interface {
 // pointer dereference when methods are called.
 type UnimplementedTicketServer struct{}
 
-func (UnimplementedTicketServer) CreateUserTicket(context.Context, *CreateUserTicketRequest) (*TicketCreateReply, error) {
+func (UnimplementedTicketServer) CreateUserTicket(context.Context, *CreateUserTicketRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateUserTicket not implemented")
 }
-func (UnimplementedTicketServer) GetUserTicketList(context.Context, *GetUserTicketListRequest) (*TicketListReply, error) {
+func (UnimplementedTicketServer) GetUserTicketList(context.Context, *GetUserTicketListRequest) (*GetUserTicketListReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetUserTicketList not implemented")
 }
-func (UnimplementedTicketServer) GetUserTicketDetails(context.Context, *GetUserTicketDetailsRequest) (*TicketDetailReply, error) {
+func (UnimplementedTicketServer) GetUserTicketDetails(context.Context, *GetUserTicketDetailsRequest) (*TicketInfo, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetUserTicketDetails not implemented")
 }
-func (UnimplementedTicketServer) UpdateUserTicketStatus(context.Context, *UpdateUserTicketStatusRequest) (*TicketStatusReply, error) {
+func (UnimplementedTicketServer) UpdateUserTicketStatus(context.Context, *UpdateUserTicketStatusRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateUserTicketStatus not implemented")
 }
-func (UnimplementedTicketServer) CreateUserTicketFollow(context.Context, *CreateUserTicketFollowRequest) (*TicketFollowReply, error) {
+func (UnimplementedTicketServer) CreateUserTicketFollow(context.Context, *CreateUserTicketFollowRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateUserTicketFollow not implemented")
 }
 func (UnimplementedTicketServer) mustEmbedUnimplementedTicketServer() {}

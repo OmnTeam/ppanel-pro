@@ -38,8 +38,8 @@ func NewAdminMarketingRepo(data *Data, logger log.Logger) marketingbiz.Marketing
 // ========== Email Task Methods ==========
 
 // CreateBatchSendEmailTask 创建批量发送邮件任务
-func (r *adminMarketingRepo) CreateBatchSendEmailTask(ctx context.Context, subject, content string, scope int32,
-	registerStartTime, registerEndTime int64, additional string, scheduled int, interval int32, limit int) error {
+func (r *adminMarketingRepo) CreateBatchSendEmailTask(ctx context.Context, subject, content string, scope uint32,
+	registerStartTime, registerEndTime int64, additional string, scheduled int64, interval uint32, limit uint64) error {
 
 	scopeType := taskmodel.ScopeType(scope)
 
@@ -206,7 +206,7 @@ func (r *adminMarketingRepo) CreateBatchSendEmailTask(ctx context.Context, subje
 		SetContent(contentJSON).
 		SetStatus(int8(taskmodel.StatusPending)).
 		SetErrors("").
-		SetTotal(total).
+		SetTotal(uint32(total)).
 		SetCurrent(0).
 		Save(ctx)
 
@@ -231,7 +231,7 @@ func (r *adminMarketingRepo) CreateBatchSendEmailTask(ctx context.Context, subje
 }
 
 // GetBatchSendEmailTaskList 获取批量发送邮件任务列表
-func (r *adminMarketingRepo) GetBatchSendEmailTaskList(ctx context.Context, page, size int32, scope, status *int32) ([]*ent.ProxyTask, int64, error) {
+func (r *adminMarketingRepo) GetBatchSendEmailTaskList(ctx context.Context, page, size int32, scope, status *uint32) ([]*ent.ProxyTask, int32, error) {
 	if page == 0 {
 		page = 1
 	}
@@ -247,7 +247,9 @@ func (r *adminMarketingRepo) GetBatchSendEmailTaskList(ctx context.Context, page
 			if status != nil {
 				s.Where(sql.EQ(s.C(proxytask.FieldStatus), int8(*status)))
 			}
-			// 注意：原始代码中有 scope 过滤，但这需要解析 JSON，暂不实现
+			if scope != nil {
+				s.Where(sql.Contains(s.C(proxytask.FieldScope), fmt.Sprintf(`"type":%d`, *scope)))
+			}
 		})
 
 	// 获取总数
@@ -266,7 +268,7 @@ func (r *adminMarketingRepo) GetBatchSendEmailTaskList(ctx context.Context, page
 		return nil, 0, err
 	}
 
-	return list, int64(total), nil
+	return list, int32(total), nil
 }
 
 // StopBatchSendEmailTask 停止批量发送邮件任务
@@ -295,7 +297,7 @@ func (r *adminMarketingRepo) StopBatchSendEmailTask(ctx context.Context, id int)
 }
 
 // GetPreSendEmailCount 获取预发送邮件数量
-func (r *adminMarketingRepo) GetPreSendEmailCount(ctx context.Context, scope int32, registerStartTime, registerEndTime int) (int64, error) {
+func (r *adminMarketingRepo) GetPreSendEmailCount(ctx context.Context, scope uint32, registerStartTime, registerEndTime int64) (int64, error) {
 	scopeType := taskmodel.ScopeType(scope)
 
 	// 基础查询：auth_type = 'email' 的用户认证方法
@@ -411,7 +413,7 @@ func (r *adminMarketingRepo) GetBatchSendEmailTaskStatus(ctx context.Context, id
 
 // CreateQuotaTask 创建配额任务
 func (r *adminMarketingRepo) CreateQuotaTask(ctx context.Context, subscribers []int, isActive *bool,
-	startTime, endTime int64, resetTraffic bool, days int64, giftType int32, giftValue int) error {
+	startTime, endTime int64, resetTraffic bool, days uint64, giftType uint32, giftValue uint64) error {
 
 	// 查询符合条件的用户订阅记录
 	// 将[]int转换为[]int64
@@ -481,9 +483,9 @@ func (r *adminMarketingRepo) CreateQuotaTask(ctx context.Context, subscribers []
 	// 构建QuotaContent
 	contentInfo := &taskmodel.QuotaContent{
 		ResetTraffic: resetTraffic,
-		Days:         uint64(days),
+		Days:         days,
 		GiftType:     uint8(giftType),
-		GiftValue:    uint64(giftValue),
+		GiftValue:    giftValue,
 	}
 	contentJSON, err := taskmodel.MarshalQuotaContent(contentInfo)
 	if err != nil {
@@ -498,7 +500,7 @@ func (r *adminMarketingRepo) CreateQuotaTask(ctx context.Context, subscribers []
 		SetContent(contentJSON).
 		SetStatus(int8(taskmodel.StatusPending)).
 		SetErrors("").
-		SetTotal(uint64(len(subIds))).
+		SetTotal(uint32(len(subIds))).
 		SetCurrent(0).
 		Save(ctx)
 
@@ -523,7 +525,7 @@ func (r *adminMarketingRepo) CreateQuotaTask(ctx context.Context, subscribers []
 }
 
 // QueryQuotaTaskPreCount 查询配额任务预计数量
-func (r *adminMarketingRepo) QueryQuotaTaskPreCount(ctx context.Context, subscribers []int, isActive *bool, startTime, endTime int) (int64, error) {
+func (r *adminMarketingRepo) QueryQuotaTaskPreCount(ctx context.Context, subscribers []int, isActive *bool, startTime, endTime int64) (int64, error) {
 	// 将[]int转换为[]int64
 	subscribersInt64 := make([]int64, len(subscribers))
 	for i, id := range subscribers {
@@ -566,7 +568,7 @@ func (r *adminMarketingRepo) QueryQuotaTaskPreCount(ctx context.Context, subscri
 }
 
 // QueryQuotaTaskList 查询配额任务列表
-func (r *adminMarketingRepo) QueryQuotaTaskList(ctx context.Context, page, size int32, status *int32) ([]*ent.ProxyTask, int64, error) {
+func (r *adminMarketingRepo) QueryQuotaTaskList(ctx context.Context, page, size int32, status *uint32) ([]*ent.ProxyTask, int32, error) {
 	if page == 0 {
 		page = 1
 	}
@@ -600,7 +602,7 @@ func (r *adminMarketingRepo) QueryQuotaTaskList(ctx context.Context, page, size 
 		return nil, 0, err
 	}
 
-	return list, int64(total), nil
+	return list, int32(total), nil
 }
 
 // ========== Helper Functions ==========

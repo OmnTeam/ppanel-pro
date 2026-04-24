@@ -89,7 +89,7 @@ var (
 	// ServerAddrValidator is a validator for the "server_addr" field. It is called by the builders before save.
 	ServerAddrValidator func(string) error
 	// DefaultSort holds the default value on creation for the "sort" field.
-	DefaultSort int
+	DefaultSort int32
 	// DefaultLongitude holds the default value on creation for the "longitude" field.
 	DefaultLongitude string
 	// LongitudeValidator is a validator for the "longitude" field. It is called by the builders before save.

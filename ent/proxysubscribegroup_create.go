@@ -63,13 +63,13 @@ func (_c *ProxySubscribeGroupCreate) SetNillableIsExpiredGroup(v *bool) *ProxySu
 }
 
 // SetExpiredDaysLimit sets the "expired_days_limit" field.
-func (_c *ProxySubscribeGroupCreate) SetExpiredDaysLimit(v int64) *ProxySubscribeGroupCreate {
+func (_c *ProxySubscribeGroupCreate) SetExpiredDaysLimit(v int32) *ProxySubscribeGroupCreate {
 	_c.mutation.SetExpiredDaysLimit(v)
 	return _c
 }
 
 // SetNillableExpiredDaysLimit sets the "expired_days_limit" field if the given value is not nil.
-func (_c *ProxySubscribeGroupCreate) SetNillableExpiredDaysLimit(v *int64) *ProxySubscribeGroupCreate {
+func (_c *ProxySubscribeGroupCreate) SetNillableExpiredDaysLimit(v *int32) *ProxySubscribeGroupCreate {
 	if v != nil {
 		_c.SetExpiredDaysLimit(*v)
 	}
@@ -77,13 +77,13 @@ func (_c *ProxySubscribeGroupCreate) SetNillableExpiredDaysLimit(v *int64) *Prox
 }
 
 // SetMaxTrafficGBExpired sets the "max_traffic_gb_expired" field.
-func (_c *ProxySubscribeGroupCreate) SetMaxTrafficGBExpired(v int64) *ProxySubscribeGroupCreate {
+func (_c *ProxySubscribeGroupCreate) SetMaxTrafficGBExpired(v int32) *ProxySubscribeGroupCreate {
 	_c.mutation.SetMaxTrafficGBExpired(v)
 	return _c
 }
 
 // SetNillableMaxTrafficGBExpired sets the "max_traffic_gb_expired" field if the given value is not nil.
-func (_c *ProxySubscribeGroupCreate) SetNillableMaxTrafficGBExpired(v *int64) *ProxySubscribeGroupCreate {
+func (_c *ProxySubscribeGroupCreate) SetNillableMaxTrafficGBExpired(v *int32) *ProxySubscribeGroupCreate {
 	if v != nil {
 		_c.SetMaxTrafficGBExpired(*v)
 	}
@@ -272,11 +272,11 @@ func (_c *ProxySubscribeGroupCreate) createSpec() (*ProxySubscribeGroup, *sqlgra
 		_node.IsExpiredGroup = value
 	}
 	if value, ok := _c.mutation.ExpiredDaysLimit(); ok {
-		_spec.SetField(proxysubscribegroup.FieldExpiredDaysLimit, field.TypeInt64, value)
+		_spec.SetField(proxysubscribegroup.FieldExpiredDaysLimit, field.TypeInt32, value)
 		_node.ExpiredDaysLimit = &value
 	}
 	if value, ok := _c.mutation.MaxTrafficGBExpired(); ok {
-		_spec.SetField(proxysubscribegroup.FieldMaxTrafficGBExpired, field.TypeInt64, value)
+		_spec.SetField(proxysubscribegroup.FieldMaxTrafficGBExpired, field.TypeInt32, value)
 		_node.MaxTrafficGBExpired = &value
 	}
 	if value, ok := _c.mutation.SpeedLimit(); ok {

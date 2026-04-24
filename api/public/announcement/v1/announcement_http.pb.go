@@ -23,7 +23,7 @@ const OperationAnnouncementQueryAnnouncement = "/api.public.announcement.v1.Anno
 
 type AnnouncementHTTPServer interface {
 	// QueryAnnouncement QueryAnnouncement 查询公告列表
-	QueryAnnouncement(context.Context, *QueryAnnouncementRequest) (*AnnouncementListReply, error)
+	QueryAnnouncement(context.Context, *QueryAnnouncementRequest) (*QueryAnnouncementReply, error)
 }
 
 func RegisterAnnouncementHTTPServer(s *http.Server, srv AnnouncementHTTPServer) {
@@ -45,13 +45,13 @@ func _Announcement_QueryAnnouncement0_HTTP_Handler(srv AnnouncementHTTPServer) f
 		if err != nil {
 			return err
 		}
-		reply := out.(*AnnouncementListReply)
+		reply := out.(*QueryAnnouncementReply)
 		return ctx.Result(200, reply)
 	}
 }
 
 type AnnouncementHTTPClient interface {
-	QueryAnnouncement(ctx context.Context, req *QueryAnnouncementRequest, opts ...http.CallOption) (rsp *AnnouncementListReply, err error)
+	QueryAnnouncement(ctx context.Context, req *QueryAnnouncementRequest, opts ...http.CallOption) (rsp *QueryAnnouncementReply, err error)
 }
 
 type AnnouncementHTTPClientImpl struct {
@@ -62,8 +62,8 @@ func NewAnnouncementHTTPClient(client *http.Client) AnnouncementHTTPClient {
 	return &AnnouncementHTTPClientImpl{client}
 }
 
-func (c *AnnouncementHTTPClientImpl) QueryAnnouncement(ctx context.Context, in *QueryAnnouncementRequest, opts ...http.CallOption) (*AnnouncementListReply, error) {
-	var out AnnouncementListReply
+func (c *AnnouncementHTTPClientImpl) QueryAnnouncement(ctx context.Context, in *QueryAnnouncementRequest, opts ...http.CallOption) (*QueryAnnouncementReply, error) {
+	var out QueryAnnouncementReply
 	pattern := "/v1/public/announcement/list"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationAnnouncementQueryAnnouncement))

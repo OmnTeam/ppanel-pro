@@ -57,14 +57,14 @@ func (_u *ProxyCouponUpdate) SetNillableCode(v *string) *ProxyCouponUpdate {
 }
 
 // SetCount sets the "count" field.
-func (_u *ProxyCouponUpdate) SetCount(v int64) *ProxyCouponUpdate {
+func (_u *ProxyCouponUpdate) SetCount(v int32) *ProxyCouponUpdate {
 	_u.mutation.ResetCount()
 	_u.mutation.SetCount(v)
 	return _u
 }
 
 // SetNillableCount sets the "count" field if the given value is not nil.
-func (_u *ProxyCouponUpdate) SetNillableCount(v *int64) *ProxyCouponUpdate {
+func (_u *ProxyCouponUpdate) SetNillableCount(v *int32) *ProxyCouponUpdate {
 	if v != nil {
 		_u.SetCount(*v)
 	}
@@ -72,7 +72,7 @@ func (_u *ProxyCouponUpdate) SetNillableCount(v *int64) *ProxyCouponUpdate {
 }
 
 // AddCount adds value to the "count" field.
-func (_u *ProxyCouponUpdate) AddCount(v int64) *ProxyCouponUpdate {
+func (_u *ProxyCouponUpdate) AddCount(v int32) *ProxyCouponUpdate {
 	_u.mutation.AddCount(v)
 	return _u
 }
@@ -197,14 +197,14 @@ func (_u *ProxyCouponUpdate) SetNillableSubscribe(v *string) *ProxyCouponUpdate 
 }
 
 // SetUsedCount sets the "used_count" field.
-func (_u *ProxyCouponUpdate) SetUsedCount(v int64) *ProxyCouponUpdate {
+func (_u *ProxyCouponUpdate) SetUsedCount(v int8) *ProxyCouponUpdate {
 	_u.mutation.ResetUsedCount()
 	_u.mutation.SetUsedCount(v)
 	return _u
 }
 
 // SetNillableUsedCount sets the "used_count" field if the given value is not nil.
-func (_u *ProxyCouponUpdate) SetNillableUsedCount(v *int64) *ProxyCouponUpdate {
+func (_u *ProxyCouponUpdate) SetNillableUsedCount(v *int8) *ProxyCouponUpdate {
 	if v != nil {
 		_u.SetUsedCount(*v)
 	}
@@ -212,7 +212,7 @@ func (_u *ProxyCouponUpdate) SetNillableUsedCount(v *int64) *ProxyCouponUpdate {
 }
 
 // AddUsedCount adds value to the "used_count" field.
-func (_u *ProxyCouponUpdate) AddUsedCount(v int64) *ProxyCouponUpdate {
+func (_u *ProxyCouponUpdate) AddUsedCount(v int8) *ProxyCouponUpdate {
 	_u.mutation.AddUsedCount(v)
 	return _u
 }
@@ -317,10 +317,10 @@ func (_u *ProxyCouponUpdate) sqlSave(ctx context.Context) (_node int, err error)
 		_spec.SetField(proxycoupon.FieldCode, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Count(); ok {
-		_spec.SetField(proxycoupon.FieldCount, field.TypeInt64, value)
+		_spec.SetField(proxycoupon.FieldCount, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedCount(); ok {
-		_spec.AddField(proxycoupon.FieldCount, field.TypeInt64, value)
+		_spec.AddField(proxycoupon.FieldCount, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.GetType(); ok {
 		_spec.SetField(proxycoupon.FieldType, field.TypeInt8, value)
@@ -356,10 +356,10 @@ func (_u *ProxyCouponUpdate) sqlSave(ctx context.Context) (_node int, err error)
 		_spec.SetField(proxycoupon.FieldSubscribe, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.UsedCount(); ok {
-		_spec.SetField(proxycoupon.FieldUsedCount, field.TypeInt64, value)
+		_spec.SetField(proxycoupon.FieldUsedCount, field.TypeInt8, value)
 	}
 	if value, ok := _u.mutation.AddedUsedCount(); ok {
-		_spec.AddField(proxycoupon.FieldUsedCount, field.TypeInt64, value)
+		_spec.AddField(proxycoupon.FieldUsedCount, field.TypeInt8, value)
 	}
 	if value, ok := _u.mutation.Enable(); ok {
 		_spec.SetField(proxycoupon.FieldEnable, field.TypeBool, value)
@@ -416,14 +416,14 @@ func (_u *ProxyCouponUpdateOne) SetNillableCode(v *string) *ProxyCouponUpdateOne
 }
 
 // SetCount sets the "count" field.
-func (_u *ProxyCouponUpdateOne) SetCount(v int64) *ProxyCouponUpdateOne {
+func (_u *ProxyCouponUpdateOne) SetCount(v int32) *ProxyCouponUpdateOne {
 	_u.mutation.ResetCount()
 	_u.mutation.SetCount(v)
 	return _u
 }
 
 // SetNillableCount sets the "count" field if the given value is not nil.
-func (_u *ProxyCouponUpdateOne) SetNillableCount(v *int64) *ProxyCouponUpdateOne {
+func (_u *ProxyCouponUpdateOne) SetNillableCount(v *int32) *ProxyCouponUpdateOne {
 	if v != nil {
 		_u.SetCount(*v)
 	}
@@ -431,7 +431,7 @@ func (_u *ProxyCouponUpdateOne) SetNillableCount(v *int64) *ProxyCouponUpdateOne
 }
 
 // AddCount adds value to the "count" field.
-func (_u *ProxyCouponUpdateOne) AddCount(v int64) *ProxyCouponUpdateOne {
+func (_u *ProxyCouponUpdateOne) AddCount(v int32) *ProxyCouponUpdateOne {
 	_u.mutation.AddCount(v)
 	return _u
 }
@@ -556,14 +556,14 @@ func (_u *ProxyCouponUpdateOne) SetNillableSubscribe(v *string) *ProxyCouponUpda
 }
 
 // SetUsedCount sets the "used_count" field.
-func (_u *ProxyCouponUpdateOne) SetUsedCount(v int64) *ProxyCouponUpdateOne {
+func (_u *ProxyCouponUpdateOne) SetUsedCount(v int8) *ProxyCouponUpdateOne {
 	_u.mutation.ResetUsedCount()
 	_u.mutation.SetUsedCount(v)
 	return _u
 }
 
 // SetNillableUsedCount sets the "used_count" field if the given value is not nil.
-func (_u *ProxyCouponUpdateOne) SetNillableUsedCount(v *int64) *ProxyCouponUpdateOne {
+func (_u *ProxyCouponUpdateOne) SetNillableUsedCount(v *int8) *ProxyCouponUpdateOne {
 	if v != nil {
 		_u.SetUsedCount(*v)
 	}
@@ -571,7 +571,7 @@ func (_u *ProxyCouponUpdateOne) SetNillableUsedCount(v *int64) *ProxyCouponUpdat
 }
 
 // AddUsedCount adds value to the "used_count" field.
-func (_u *ProxyCouponUpdateOne) AddUsedCount(v int64) *ProxyCouponUpdateOne {
+func (_u *ProxyCouponUpdateOne) AddUsedCount(v int8) *ProxyCouponUpdateOne {
 	_u.mutation.AddUsedCount(v)
 	return _u
 }
@@ -706,10 +706,10 @@ func (_u *ProxyCouponUpdateOne) sqlSave(ctx context.Context) (_node *ProxyCoupon
 		_spec.SetField(proxycoupon.FieldCode, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Count(); ok {
-		_spec.SetField(proxycoupon.FieldCount, field.TypeInt64, value)
+		_spec.SetField(proxycoupon.FieldCount, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedCount(); ok {
-		_spec.AddField(proxycoupon.FieldCount, field.TypeInt64, value)
+		_spec.AddField(proxycoupon.FieldCount, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.GetType(); ok {
 		_spec.SetField(proxycoupon.FieldType, field.TypeInt8, value)
@@ -745,10 +745,10 @@ func (_u *ProxyCouponUpdateOne) sqlSave(ctx context.Context) (_node *ProxyCoupon
 		_spec.SetField(proxycoupon.FieldSubscribe, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.UsedCount(); ok {
-		_spec.SetField(proxycoupon.FieldUsedCount, field.TypeInt64, value)
+		_spec.SetField(proxycoupon.FieldUsedCount, field.TypeInt8, value)
 	}
 	if value, ok := _u.mutation.AddedUsedCount(); ok {
-		_spec.AddField(proxycoupon.FieldUsedCount, field.TypeInt64, value)
+		_spec.AddField(proxycoupon.FieldUsedCount, field.TypeInt8, value)
 	}
 	if value, ok := _u.mutation.Enable(); ok {
 		_spec.SetField(proxycoupon.FieldEnable, field.TypeBool, value)

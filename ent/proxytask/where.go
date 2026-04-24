@@ -80,12 +80,12 @@ func Errors(v string) predicate.ProxyTask {
 }
 
 // Total applies equality check predicate on the "total" field. It's identical to TotalEQ.
-func Total(v uint64) predicate.ProxyTask {
+func Total(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldEQ(FieldTotal, v))
 }
 
 // Current applies equality check predicate on the "current" field. It's identical to CurrentEQ.
-func Current(v uint64) predicate.ProxyTask {
+func Current(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldEQ(FieldCurrent, v))
 }
 
@@ -405,82 +405,82 @@ func ErrorsContainsFold(v string) predicate.ProxyTask {
 }
 
 // TotalEQ applies the EQ predicate on the "total" field.
-func TotalEQ(v uint64) predicate.ProxyTask {
+func TotalEQ(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldEQ(FieldTotal, v))
 }
 
 // TotalNEQ applies the NEQ predicate on the "total" field.
-func TotalNEQ(v uint64) predicate.ProxyTask {
+func TotalNEQ(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldNEQ(FieldTotal, v))
 }
 
 // TotalIn applies the In predicate on the "total" field.
-func TotalIn(vs ...uint64) predicate.ProxyTask {
+func TotalIn(vs ...uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldIn(FieldTotal, vs...))
 }
 
 // TotalNotIn applies the NotIn predicate on the "total" field.
-func TotalNotIn(vs ...uint64) predicate.ProxyTask {
+func TotalNotIn(vs ...uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldNotIn(FieldTotal, vs...))
 }
 
 // TotalGT applies the GT predicate on the "total" field.
-func TotalGT(v uint64) predicate.ProxyTask {
+func TotalGT(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldGT(FieldTotal, v))
 }
 
 // TotalGTE applies the GTE predicate on the "total" field.
-func TotalGTE(v uint64) predicate.ProxyTask {
+func TotalGTE(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldGTE(FieldTotal, v))
 }
 
 // TotalLT applies the LT predicate on the "total" field.
-func TotalLT(v uint64) predicate.ProxyTask {
+func TotalLT(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldLT(FieldTotal, v))
 }
 
 // TotalLTE applies the LTE predicate on the "total" field.
-func TotalLTE(v uint64) predicate.ProxyTask {
+func TotalLTE(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldLTE(FieldTotal, v))
 }
 
 // CurrentEQ applies the EQ predicate on the "current" field.
-func CurrentEQ(v uint64) predicate.ProxyTask {
+func CurrentEQ(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldEQ(FieldCurrent, v))
 }
 
 // CurrentNEQ applies the NEQ predicate on the "current" field.
-func CurrentNEQ(v uint64) predicate.ProxyTask {
+func CurrentNEQ(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldNEQ(FieldCurrent, v))
 }
 
 // CurrentIn applies the In predicate on the "current" field.
-func CurrentIn(vs ...uint64) predicate.ProxyTask {
+func CurrentIn(vs ...uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldIn(FieldCurrent, vs...))
 }
 
 // CurrentNotIn applies the NotIn predicate on the "current" field.
-func CurrentNotIn(vs ...uint64) predicate.ProxyTask {
+func CurrentNotIn(vs ...uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldNotIn(FieldCurrent, vs...))
 }
 
 // CurrentGT applies the GT predicate on the "current" field.
-func CurrentGT(v uint64) predicate.ProxyTask {
+func CurrentGT(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldGT(FieldCurrent, v))
 }
 
 // CurrentGTE applies the GTE predicate on the "current" field.
-func CurrentGTE(v uint64) predicate.ProxyTask {
+func CurrentGTE(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldGTE(FieldCurrent, v))
 }
 
 // CurrentLT applies the LT predicate on the "current" field.
-func CurrentLT(v uint64) predicate.ProxyTask {
+func CurrentLT(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldLT(FieldCurrent, v))
 }
 
 // CurrentLTE applies the LTE predicate on the "current" field.
-func CurrentLTE(v uint64) predicate.ProxyTask {
+func CurrentLTE(v uint32) predicate.ProxyTask {
 	return predicate.ProxyTask(sql.FieldLTE(FieldCurrent, v))
 }
 

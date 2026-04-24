@@ -184,7 +184,7 @@ func (r *publicSubscriptionRepo) GetAvailableNodes(ctx context.Context, userSubs
 
 		nodeInfo := &subscriptionbiz.NodeInfo{
 			ID:          int64(node.ID),
-			Sort:        node.Sort,
+			Sort:        int(node.Sort),
 			Name:        node.Name,
 			Server:      node.Address,
 			Port:        node.Port,
@@ -192,47 +192,58 @@ func (r *publicSubscriptionRepo) GetAvailableNodes(ctx context.Context, userSubs
 			Tags:        tool.StringToStringSlice(node.Tags),
 			NodeGroupID: resolveNodeGroupID(node.NodeGroupIds, effectiveNodeGroupID),
 
-			Security:                matched.Security,
-			SNI:                     matched.SNI,
-			AllowInsecure:           matched.AllowInsecure,
-			Fingerprint:             matched.Fingerprint,
-			RealityServerAddr:       matched.RealityServerAddr,
-			RealityServerPort:       int(matched.RealityServerPort),
-			RealityPrivateKey:       matched.RealityPrivateKey,
-			RealityPublicKey:        matched.RealityPublicKey,
-			RealityShortId:          matched.RealityShortId,
-			Transport:               matched.Transport,
-			Host:                    matched.Host,
-			Path:                    matched.Path,
-			ServiceName:             matched.ServiceName,
-			Method:                  matched.Cipher,
-			ServerKey:               matched.ServerKey,
-			Flow:                    matched.Flow,
-			HopPorts:                matched.HopPorts,
-			HopInterval:             int(matched.HopInterval),
-			ObfsPassword:            matched.ObfsPassword,
-			UpMbps:                  int(matched.UpMbps),
-			DownMbps:                int(matched.DownMbps),
-			DisableSNI:              matched.DisableSNI,
-			ReduceRtt:               matched.ReduceRtt,
-			UDPRelayMode:            matched.UDPRelayMode,
-			CongestionController:    matched.CongestionController,
-			PaddingScheme:           matched.PaddingScheme,
-			Multiplex:               matched.Multiplex,
-			XhttpMode:               matched.XhttpMode,
-			XhttpExtra:              matched.XhttpExtra,
-			Encryption:              matched.Encryption,
-			EncryptionMode:          matched.EncryptionMode,
-			EncryptionRtt:           matched.EncryptionRtt,
-			EncryptionTicket:        matched.EncryptionTicket,
-			EncryptionServerPadding: matched.EncryptionServerPadding,
-			EncryptionPrivateKey:    matched.EncryptionPrivateKey,
-			EncryptionClientPadding: matched.EncryptionClientPadding,
-			EncryptionPassword:      matched.EncryptionPassword,
-			Ratio:                   matched.Ratio,
-			CertMode:                matched.CertMode,
-			CertDNSProvider:         matched.CertDNSProvider,
-			CertDNSEnv:              matched.CertDNSEnv,
+			Security:                 matched.Security,
+			SNI:                      matched.SNI,
+			AllowInsecure:            matched.AllowInsecure,
+			Fingerprint:              matched.Fingerprint,
+			RealityServerAddr:        matched.RealityServerAddr,
+			RealityServerPort:        int(matched.RealityServerPort),
+			RealityPrivateKey:        matched.RealityPrivateKey,
+			RealityPublicKey:         matched.RealityPublicKey,
+			RealityShortId:           matched.RealityShortId,
+			Transport:                matched.Transport,
+			Host:                     matched.Host,
+			Path:                     matched.Path,
+			ServiceName:              matched.ServiceName,
+			Method:                   matched.Cipher,
+			ServerKey:                matched.ServerKey,
+			Flow:                     matched.Flow,
+			HopPorts:                 matched.HopPorts,
+			HopInterval:              int(matched.HopInterval),
+			ObfsPassword:             matched.ObfsPassword,
+			UpMbps:                   int(matched.UpMbps),
+			DownMbps:                 int(matched.DownMbps),
+			DisableSNI:               matched.DisableSNI,
+			ReduceRtt:                matched.ReduceRtt,
+			UDPRelayMode:             matched.UDPRelayMode,
+			CongestionController:     matched.CongestionController,
+			PaddingScheme:            matched.PaddingScheme,
+			Multiplex:                matched.Multiplex,
+			XhttpMode:                matched.XhttpMode,
+			XhttpExtra:               matched.XhttpExtra,
+			Encryption:               matched.Encryption,
+			EncryptionMode:           matched.EncryptionMode,
+			EncryptionRtt:            matched.EncryptionRtt,
+			EncryptionTicket:         matched.EncryptionTicket,
+			EncryptionServerPadding:  matched.EncryptionServerPadding,
+			EncryptionPrivateKey:     matched.EncryptionPrivateKey,
+			EncryptionClientPadding:  matched.EncryptionClientPadding,
+			EncryptionPassword:       matched.EncryptionPassword,
+			Ratio:                    matched.Ratio,
+			CertMode:                 matched.CertMode,
+			CertDNSProvider:          matched.CertDNSProvider,
+			CertDNSEnv:               matched.CertDNSEnv,
+			SimnetPsk:                matched.SimnetPsk,
+			SimnetKeyID:              int(matched.SimnetKeyID),
+			SimnetTicketID:           matched.SimnetTicketID,
+			SimnetPath:               matched.SimnetPath,
+			SimnetCarrier:            matched.SimnetCarrier,
+			SimnetAfEnabled:          matched.SimnetAfEnabled,
+			SimnetAfPathMode:         matched.SimnetAfPathMode,
+			SimnetAfPathPrefix:       matched.SimnetAfPathPrefix,
+			SimnetAfPathSuffix:       matched.SimnetAfPathSuffix,
+			SimnetAfMagicMode:        matched.SimnetAfMagicMode,
+			SimnetAfResponseJitterMs: int(matched.SimnetAfResponseJitterMs),
 		}
 
 		nodeInfos = append(nodeInfos, nodeInfo)
@@ -349,6 +360,18 @@ func (r *publicSubscriptionRepo) GetSubscribeDomain(ctx context.Context) string 
 		return r.data.conf.Subscribe.SubscribeDomain
 	}
 	return ""
+}
+
+func (r *publicSubscriptionRepo) GetSubscribePath(ctx context.Context) string {
+	if subscribeValues, err := loadSystemConfigMap(ctx, r.data.db, "subscribe"); err == nil {
+		if value, ok := systemConfigLookup(subscribeValues, "SubscribePath", "subscribe_path"); ok {
+			return value
+		}
+	}
+	if r.data.conf != nil && r.data.conf.Subscribe != nil {
+		return r.data.conf.Subscribe.SubscribePath
+	}
+	return "/api/subscribe"
 }
 
 // GetSiteName 获取站点名称

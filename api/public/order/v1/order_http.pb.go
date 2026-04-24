@@ -10,6 +10,7 @@ import (
 	context "context"
 	http "github.com/go-kratos/kratos/v2/transport/http"
 	binding "github.com/go-kratos/kratos/v2/transport/http/binding"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -29,22 +30,14 @@ const OperationPublicOrderRenewal = "/api.public.order.v1.PublicOrder/Renewal"
 const OperationPublicOrderResetTraffic = "/api.public.order.v1.PublicOrder/ResetTraffic"
 
 type PublicOrderHTTPServer interface {
-	// CloseOrder Close order
-	CloseOrder(context.Context, *CloseOrderRequest) (*OrderCloseReply, error)
-	// PreCreateOrder Pre-create order (validate and calculate price)
-	PreCreateOrder(context.Context, *PreCreateOrderRequest) (*OrderPreCreateReply, error)
-	// Purchase Purchase subscription
+	CloseOrder(context.Context, *CloseOrderRequest) (*emptypb.Empty, error)
+	PreCreateOrder(context.Context, *PreCreateOrderRequest) (*PreCreateOrderReply, error)
 	Purchase(context.Context, *PurchaseRequest) (*PurchaseReply, error)
-	// QueryOrderDetail Query order detail
-	QueryOrderDetail(context.Context, *QueryOrderDetailRequest) (*OrderDetailReply, error)
-	// QueryOrderList Query order list
-	QueryOrderList(context.Context, *QueryOrderListRequest) (*OrderListReply, error)
-	// Recharge Recharge (add balance)
+	QueryOrderDetail(context.Context, *QueryOrderDetailRequest) (*OrderDetail, error)
+	QueryOrderList(context.Context, *QueryOrderListRequest) (*QueryOrderListReply, error)
 	Recharge(context.Context, *RechargeRequest) (*RechargeReply, error)
-	// Renewal Renewal subscription
 	Renewal(context.Context, *RenewalRequest) (*RenewalReply, error)
-	// ResetTraffic Reset traffic
-	ResetTraffic(context.Context, *ResetTrafficRequest) (*TrafficResetReply, error)
+	ResetTraffic(context.Context, *ResetTrafficRequest) (*ResetTrafficReply, error)
 }
 
 func RegisterPublicOrderHTTPServer(s *http.Server, srv PublicOrderHTTPServer) {
@@ -76,7 +69,7 @@ func _PublicOrder_CloseOrder0_HTTP_Handler(srv PublicOrderHTTPServer) func(ctx h
 		if err != nil {
 			return err
 		}
-		reply := out.(*OrderCloseReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
@@ -95,7 +88,7 @@ func _PublicOrder_QueryOrderDetail0_HTTP_Handler(srv PublicOrderHTTPServer) func
 		if err != nil {
 			return err
 		}
-		reply := out.(*OrderDetailReply)
+		reply := out.(*OrderDetail)
 		return ctx.Result(200, reply)
 	}
 }
@@ -114,7 +107,7 @@ func _PublicOrder_QueryOrderList0_HTTP_Handler(srv PublicOrderHTTPServer) func(c
 		if err != nil {
 			return err
 		}
-		reply := out.(*OrderListReply)
+		reply := out.(*QueryOrderListReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -136,7 +129,7 @@ func _PublicOrder_PreCreateOrder0_HTTP_Handler(srv PublicOrderHTTPServer) func(c
 		if err != nil {
 			return err
 		}
-		reply := out.(*OrderPreCreateReply)
+		reply := out.(*PreCreateOrderReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -224,20 +217,20 @@ func _PublicOrder_ResetTraffic0_HTTP_Handler(srv PublicOrderHTTPServer) func(ctx
 		if err != nil {
 			return err
 		}
-		reply := out.(*TrafficResetReply)
+		reply := out.(*ResetTrafficReply)
 		return ctx.Result(200, reply)
 	}
 }
 
 type PublicOrderHTTPClient interface {
-	CloseOrder(ctx context.Context, req *CloseOrderRequest, opts ...http.CallOption) (rsp *OrderCloseReply, err error)
-	PreCreateOrder(ctx context.Context, req *PreCreateOrderRequest, opts ...http.CallOption) (rsp *OrderPreCreateReply, err error)
+	CloseOrder(ctx context.Context, req *CloseOrderRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	PreCreateOrder(ctx context.Context, req *PreCreateOrderRequest, opts ...http.CallOption) (rsp *PreCreateOrderReply, err error)
 	Purchase(ctx context.Context, req *PurchaseRequest, opts ...http.CallOption) (rsp *PurchaseReply, err error)
-	QueryOrderDetail(ctx context.Context, req *QueryOrderDetailRequest, opts ...http.CallOption) (rsp *OrderDetailReply, err error)
-	QueryOrderList(ctx context.Context, req *QueryOrderListRequest, opts ...http.CallOption) (rsp *OrderListReply, err error)
+	QueryOrderDetail(ctx context.Context, req *QueryOrderDetailRequest, opts ...http.CallOption) (rsp *OrderDetail, err error)
+	QueryOrderList(ctx context.Context, req *QueryOrderListRequest, opts ...http.CallOption) (rsp *QueryOrderListReply, err error)
 	Recharge(ctx context.Context, req *RechargeRequest, opts ...http.CallOption) (rsp *RechargeReply, err error)
 	Renewal(ctx context.Context, req *RenewalRequest, opts ...http.CallOption) (rsp *RenewalReply, err error)
-	ResetTraffic(ctx context.Context, req *ResetTrafficRequest, opts ...http.CallOption) (rsp *TrafficResetReply, err error)
+	ResetTraffic(ctx context.Context, req *ResetTrafficRequest, opts ...http.CallOption) (rsp *ResetTrafficReply, err error)
 }
 
 type PublicOrderHTTPClientImpl struct {
@@ -248,8 +241,8 @@ func NewPublicOrderHTTPClient(client *http.Client) PublicOrderHTTPClient {
 	return &PublicOrderHTTPClientImpl{client}
 }
 
-func (c *PublicOrderHTTPClientImpl) CloseOrder(ctx context.Context, in *CloseOrderRequest, opts ...http.CallOption) (*OrderCloseReply, error) {
-	var out OrderCloseReply
+func (c *PublicOrderHTTPClientImpl) CloseOrder(ctx context.Context, in *CloseOrderRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/order/close"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPublicOrderCloseOrder))
@@ -261,8 +254,8 @@ func (c *PublicOrderHTTPClientImpl) CloseOrder(ctx context.Context, in *CloseOrd
 	return &out, nil
 }
 
-func (c *PublicOrderHTTPClientImpl) PreCreateOrder(ctx context.Context, in *PreCreateOrderRequest, opts ...http.CallOption) (*OrderPreCreateReply, error) {
-	var out OrderPreCreateReply
+func (c *PublicOrderHTTPClientImpl) PreCreateOrder(ctx context.Context, in *PreCreateOrderRequest, opts ...http.CallOption) (*PreCreateOrderReply, error) {
+	var out PreCreateOrderReply
 	pattern := "/v1/public/order/pre"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPublicOrderPreCreateOrder))
@@ -287,8 +280,8 @@ func (c *PublicOrderHTTPClientImpl) Purchase(ctx context.Context, in *PurchaseRe
 	return &out, nil
 }
 
-func (c *PublicOrderHTTPClientImpl) QueryOrderDetail(ctx context.Context, in *QueryOrderDetailRequest, opts ...http.CallOption) (*OrderDetailReply, error) {
-	var out OrderDetailReply
+func (c *PublicOrderHTTPClientImpl) QueryOrderDetail(ctx context.Context, in *QueryOrderDetailRequest, opts ...http.CallOption) (*OrderDetail, error) {
+	var out OrderDetail
 	pattern := "/v1/public/order/detail"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPublicOrderQueryOrderDetail))
@@ -300,8 +293,8 @@ func (c *PublicOrderHTTPClientImpl) QueryOrderDetail(ctx context.Context, in *Qu
 	return &out, nil
 }
 
-func (c *PublicOrderHTTPClientImpl) QueryOrderList(ctx context.Context, in *QueryOrderListRequest, opts ...http.CallOption) (*OrderListReply, error) {
-	var out OrderListReply
+func (c *PublicOrderHTTPClientImpl) QueryOrderList(ctx context.Context, in *QueryOrderListRequest, opts ...http.CallOption) (*QueryOrderListReply, error) {
+	var out QueryOrderListReply
 	pattern := "/v1/public/order/list"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationPublicOrderQueryOrderList))
@@ -339,8 +332,8 @@ func (c *PublicOrderHTTPClientImpl) Renewal(ctx context.Context, in *RenewalRequ
 	return &out, nil
 }
 
-func (c *PublicOrderHTTPClientImpl) ResetTraffic(ctx context.Context, in *ResetTrafficRequest, opts ...http.CallOption) (*TrafficResetReply, error) {
-	var out TrafficResetReply
+func (c *PublicOrderHTTPClientImpl) ResetTraffic(ctx context.Context, in *ResetTrafficRequest, opts ...http.CallOption) (*ResetTrafficReply, error) {
+	var out ResetTrafficReply
 	pattern := "/v1/public/order/reset"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationPublicOrderResetTraffic))

@@ -36,7 +36,7 @@ type ProxyPayment struct {
 	// 固定费用金额
 	FeeAmount int64 `json:"fee_amount,omitempty"`
 	// 排序
-	Sort int64 `json:"sort,omitempty"`
+	Sort int32 `json:"sort,omitempty"`
 	// 是否启用
 	Enable bool `json:"enable,omitempty"`
 	// 支付令牌
@@ -134,7 +134,7 @@ func (_m *ProxyPayment) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value.Valid {
-				_m.Sort = value.Int64
+				_m.Sort = int32(value.Int64)
 			}
 		case proxypayment.FieldEnable:
 			if value, ok := values[i].(*sql.NullBool); !ok {

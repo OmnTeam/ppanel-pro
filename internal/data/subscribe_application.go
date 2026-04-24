@@ -105,18 +105,21 @@ func (r *subscribeApplicationRepo) FindByID(ctx context.Context, id int64) (*app
 }
 
 // List 查询订阅应用配置列表
-func (r *subscribeApplicationRepo) List(ctx context.Context) ([]*applicationbiz.SubscribeApplication, error) {
+func (r *subscribeApplicationRepo) List(ctx context.Context, page, size int) ([]*applicationbiz.SubscribeApplication, int32, error) {
 	query := r.data.db.ProxySubscribeApplication.Query()
 
-	// 添加租户过滤
-	query = query
-
-	// 按创建时间倒序
-	query = query.Order(ent.Desc(proxysubscribeapplication.FieldCreatedAt))
-
-	pos, err := query.All(ctx)
+	total, err := query.Count(ctx)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
+	}
+
+	pos, err := query.
+		Order(ent.Desc(proxysubscribeapplication.FieldCreatedAt)).
+		Offset((page - 1) * size).
+		Limit(size).
+		All(ctx)
+	if err != nil {
+		return nil, 0, err
 	}
 
 	apps := make([]*applicationbiz.SubscribeApplication, 0, len(pos))
@@ -124,7 +127,7 @@ func (r *subscribeApplicationRepo) List(ctx context.Context) ([]*applicationbiz.
 		apps = append(apps, r.convertToModel(po))
 	}
 
-	return apps, nil
+	return apps, int32(total), nil
 }
 
 // GetPreviewNodes returns all enabled nodes converted for template preview rendering.
@@ -167,7 +170,7 @@ func (r *subscribeApplicationRepo) GetPreviewNodes(ctx context.Context) ([]*publ
 
 		result = append(result, &publicsubscriptionbiz.NodeInfo{
 			ID:          node.ID,
-			Sort:        node.Sort,
+			Sort:        int(node.Sort),
 			Name:        node.Name,
 			Server:      node.Address,
 			Port:        node.Port,
@@ -175,47 +178,58 @@ func (r *subscribeApplicationRepo) GetPreviewNodes(ctx context.Context) ([]*publ
 			Tags:        tool.StringToStringSlice(node.Tags),
 			NodeGroupID: 0,
 
-			Security:                matched.Security,
-			SNI:                     matched.SNI,
-			AllowInsecure:           matched.AllowInsecure,
-			Fingerprint:             matched.Fingerprint,
-			RealityServerAddr:       matched.RealityServerAddr,
-			RealityServerPort:       int(matched.RealityServerPort),
-			RealityPrivateKey:       matched.RealityPrivateKey,
-			RealityPublicKey:        matched.RealityPublicKey,
-			RealityShortId:          matched.RealityShortId,
-			Transport:               matched.Transport,
-			Host:                    matched.Host,
-			Path:                    matched.Path,
-			ServiceName:             matched.ServiceName,
-			Method:                  matched.Cipher,
-			ServerKey:               matched.ServerKey,
-			Flow:                    matched.Flow,
-			HopPorts:                matched.HopPorts,
-			HopInterval:             int(matched.HopInterval),
-			ObfsPassword:            matched.ObfsPassword,
-			UpMbps:                  int(matched.UpMbps),
-			DownMbps:                int(matched.DownMbps),
-			DisableSNI:              matched.DisableSNI,
-			ReduceRtt:               matched.ReduceRtt,
-			UDPRelayMode:            matched.UDPRelayMode,
-			CongestionController:    matched.CongestionController,
-			PaddingScheme:           matched.PaddingScheme,
-			Multiplex:               matched.Multiplex,
-			XhttpMode:               matched.XhttpMode,
-			XhttpExtra:              matched.XhttpExtra,
-			Encryption:              matched.Encryption,
-			EncryptionMode:          matched.EncryptionMode,
-			EncryptionRtt:           matched.EncryptionRtt,
-			EncryptionTicket:        matched.EncryptionTicket,
-			EncryptionServerPadding: matched.EncryptionServerPadding,
-			EncryptionPrivateKey:    matched.EncryptionPrivateKey,
-			EncryptionClientPadding: matched.EncryptionClientPadding,
-			EncryptionPassword:      matched.EncryptionPassword,
-			Ratio:                   matched.Ratio,
-			CertMode:                matched.CertMode,
-			CertDNSProvider:         matched.CertDNSProvider,
-			CertDNSEnv:              matched.CertDNSEnv,
+			Security:                 matched.Security,
+			SNI:                      matched.SNI,
+			AllowInsecure:            matched.AllowInsecure,
+			Fingerprint:              matched.Fingerprint,
+			RealityServerAddr:        matched.RealityServerAddr,
+			RealityServerPort:        int(matched.RealityServerPort),
+			RealityPrivateKey:        matched.RealityPrivateKey,
+			RealityPublicKey:         matched.RealityPublicKey,
+			RealityShortId:           matched.RealityShortId,
+			Transport:                matched.Transport,
+			Host:                     matched.Host,
+			Path:                     matched.Path,
+			ServiceName:              matched.ServiceName,
+			Method:                   matched.Cipher,
+			ServerKey:                matched.ServerKey,
+			Flow:                     matched.Flow,
+			HopPorts:                 matched.HopPorts,
+			HopInterval:              int(matched.HopInterval),
+			ObfsPassword:             matched.ObfsPassword,
+			UpMbps:                   int(matched.UpMbps),
+			DownMbps:                 int(matched.DownMbps),
+			DisableSNI:               matched.DisableSNI,
+			ReduceRtt:                matched.ReduceRtt,
+			UDPRelayMode:             matched.UDPRelayMode,
+			CongestionController:     matched.CongestionController,
+			PaddingScheme:            matched.PaddingScheme,
+			Multiplex:                matched.Multiplex,
+			XhttpMode:                matched.XhttpMode,
+			XhttpExtra:               matched.XhttpExtra,
+			Encryption:               matched.Encryption,
+			EncryptionMode:           matched.EncryptionMode,
+			EncryptionRtt:            matched.EncryptionRtt,
+			EncryptionTicket:         matched.EncryptionTicket,
+			EncryptionServerPadding:  matched.EncryptionServerPadding,
+			EncryptionPrivateKey:     matched.EncryptionPrivateKey,
+			EncryptionClientPadding:  matched.EncryptionClientPadding,
+			EncryptionPassword:       matched.EncryptionPassword,
+			Ratio:                    matched.Ratio,
+			CertMode:                 matched.CertMode,
+			CertDNSProvider:          matched.CertDNSProvider,
+			CertDNSEnv:               matched.CertDNSEnv,
+			SimnetPsk:                matched.SimnetPsk,
+			SimnetKeyID:              int(matched.SimnetKeyID),
+			SimnetTicketID:           matched.SimnetTicketID,
+			SimnetPath:               matched.SimnetPath,
+			SimnetCarrier:            matched.SimnetCarrier,
+			SimnetAfEnabled:          matched.SimnetAfEnabled,
+			SimnetAfPathMode:         matched.SimnetAfPathMode,
+			SimnetAfPathPrefix:       matched.SimnetAfPathPrefix,
+			SimnetAfPathSuffix:       matched.SimnetAfPathSuffix,
+			SimnetAfMagicMode:        matched.SimnetAfMagicMode,
+			SimnetAfResponseJitterMs: int(matched.SimnetAfResponseJitterMs),
 		})
 	}
 

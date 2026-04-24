@@ -3,229 +3,198 @@ syntax = "proto3";
 package api.admin.redemption.v1;
 
 import "google/api/annotations.proto";
+import "validate/validate.proto";
 
 option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/redemption/v1;v1";
 option java_multiple_files = true;
 option java_package = "api.admin.redemption.v1";
 
 service Redemption {
-  // CreateRedemptionCode 创建兑换码
-  rpc CreateRedemptionCode (CreateRedemptionCodeRequest) returns (CreateRedemptionCodeReply) {
+  rpc CreateRedemptionCode(CreateRedemptionCodeRequest) returns (CreateRedemptionCodeReply) {
     option (google.api.http) = {
       post: "/v1/admin/redemption/code"
       body: "*"
     };
   }
 
-  // UpdateRedemptionCode 更新兑换码
-  rpc UpdateRedemptionCode (UpdateRedemptionCodeRequest) returns (UpdateRedemptionCodeReply) {
+  rpc UpdateRedemptionCode(UpdateRedemptionCodeRequest) returns (UpdateRedemptionCodeReply) {
     option (google.api.http) = {
       put: "/v1/admin/redemption/code"
       body: "*"
     };
   }
 
-  // ToggleRedemptionCodeStatus 切换兑换码状态
-  rpc ToggleRedemptionCodeStatus (ToggleRedemptionCodeStatusRequest) returns (ToggleRedemptionCodeStatusReply) {
+  rpc ToggleRedemptionCodeStatus(ToggleRedemptionCodeStatusRequest) returns (ToggleRedemptionCodeStatusReply) {
     option (google.api.http) = {
       put: "/v1/admin/redemption/code/status"
       body: "*"
     };
   }
 
-  // DeleteRedemptionCode 删除兑换码
-  rpc DeleteRedemptionCode (DeleteRedemptionCodeRequest) returns (DeleteRedemptionCodeReply) {
+  rpc DeleteRedemptionCode(DeleteRedemptionCodeRequest) returns (DeleteRedemptionCodeReply) {
     option (google.api.http) = {
       delete: "/v1/admin/redemption/code"
       body: "*"
     };
   }
 
-  // BatchDeleteRedemptionCode 批量删除兑换码
-  rpc BatchDeleteRedemptionCode (BatchDeleteRedemptionCodeRequest) returns (BatchDeleteRedemptionCodeReply) {
+  rpc BatchDeleteRedemptionCode(BatchDeleteRedemptionCodeRequest) returns (BatchDeleteRedemptionCodeReply) {
     option (google.api.http) = {
       delete: "/v1/admin/redemption/code/batch"
       body: "*"
     };
   }
 
-  // GetRedemptionCodeList 获取兑换码列表
-  rpc GetRedemptionCodeList (GetRedemptionCodeListRequest) returns (GetRedemptionCodeListReply) {
+  rpc GetRedemptionCodeList(GetRedemptionCodeListRequest) returns (GetRedemptionCodeListReply) {
     option (google.api.http) = {
       get: "/v1/admin/redemption/code/list"
     };
   }
 
-  // GetRedemptionRecordList 获取兑换记录列表
-  rpc GetRedemptionRecordList (GetRedemptionRecordListRequest) returns (GetRedemptionRecordListReply) {
+  rpc GetRedemptionRecordList(GetRedemptionRecordListRequest) returns (GetRedemptionRecordListReply) {
     option (google.api.http) = {
       get: "/v1/admin/redemption/record/list"
     };
   }
 }
 
-// ==================== Messages ====================
-
-// RedemptionCode 兑换码信息
 message RedemptionCode {
-  int64 id = 1;              // 兑换码ID
-  string code = 2;          // 兑换码
-  int64 total_count = 3;    // 总兑换次数
-  int64 used_count = 4;     // 已使用次数
-  int64 subscribe_plan = 5;  // 订阅套餐ID
-  string unit_time = 6;     // 单位时间: day, month, quarter, half_year, year
-  int64 quantity = 7;       // 数量
-  int32 status = 8;         // 状态: 1=enabled, 0=disabled
-  int64 created_at = 9;     // 创建时间
-  int64 updated_at = 10;    // 更新时间
+  int64 id = 1;
+  string code = 2;
+  int32 total_count = 3;
+  int32 used_count = 4;
+  int64 subscribe_plan = 5;
+  string unit_time = 6;
+  int32 quantity = 7;
+  int32 status = 8;
+  int64 created_at = 9;
+  int64 updated_at = 10;
 }
 
-// RedemptionRecord 兑换记录
 message RedemptionRecord {
-  int64 id = 1;                // 记录ID
-  int64 redemption_code_id = 2; // 兑换码ID
-  int64 user_id = 3;          // 用户ID
-  int64 subscribe_id = 4;     // 订阅ID
-  string unit_time = 5;       // 单位时间
-  int64 quantity = 6;         // 数量
-  int64 redeemed_at = 7;      // 兑换时间
-  int64 created_at = 8;       // 创建时间
+  int64 id = 1;
+  int64 redemption_code_id = 2;
+  int64 user_id = 3;
+  int64 subscribe_id = 4;
+  string unit_time = 5;
+  int32 quantity = 6;
+  int64 redeemed_at = 7;
+  int64 created_at = 8;
 }
 
-// CreateRedemptionCodeRequest 创建兑换码请求
 message CreateRedemptionCodeRequest {
-  int64 total_count = 1;    // 总兑换次数
-  int64 subscribe_plan = 2;  // 订阅套餐ID
-  string unit_time = 3;     // 单位时间
-  int64 quantity = 4;       // 数量
-  int64 batch_count = 5;    // 批量生成数量
+  int64 total_count = 1 [(validate.rules).int64.gt = 0];
+  int64 subscribe_plan = 2 [(validate.rules).int64.gt = 0];
+  string unit_time = 3 [(validate.rules).string = {min_len: 1, in: ["day", "month", "quarter", "half_year", "year"]}];
+  int32 quantity = 4 [(validate.rules).int64.gt = 0];
+  int64 batch_count = 5 [(validate.rules).int64.gt = 0];
 }
 
-// CreateRedemptionCodeData 创建兑换码数据
 message CreateRedemptionCodeData {
-  int64 created_count = 1; // 成功创建的兑换码数量
+  int64 created_count = 1;
 }
 
-// CreateRedemptionCodeReply 创建兑换码响应
 message CreateRedemptionCodeReply {
-  int32 code = 1;                         // 状态码
-  string message = 2;                     // 消息内容
-  CreateRedemptionCodeData data = 3;      // 响应数据
+  int32 code = 1;
+  string message = 2;
+  CreateRedemptionCodeData data = 3;
 }
 
-// UpdateRedemptionCodeRequest 更新兑换码请求
 message UpdateRedemptionCodeRequest {
-  int64 id = 1;              // 兑换码ID
-  int64 total_count = 2;    // 总兑换次数
-  int64 subscribe_plan = 3;  // 订阅套餐ID
-  string unit_time = 4;     // 单位时间
-  int64 quantity = 5;       // 数量
-  int32 status = 6;         // 状态
+  int64 id = 1 [(validate.rules).int64.gt = 0];
+  int64 total_count = 2;
+  int64 subscribe_plan = 3;
+  string unit_time = 4 [(validate.rules).string = {ignore_empty: true, in: ["day", "month", "quarter", "half_year", "year"]}];
+  int32 quantity = 5;
+  optional int32 status = 6;
 }
 
-// UpdateRedemptionCodeData 更新兑换码数据
 message UpdateRedemptionCodeData {
-  bool success = 1; // 是否成功
+  bool success = 1;
 }
 
-// UpdateRedemptionCodeReply 更新兑换码响应
 message UpdateRedemptionCodeReply {
-  int32 code = 1;                         // 状态码
-  string message = 2;                     // 消息内容
-  UpdateRedemptionCodeData data = 3;      // 响应数据
+  int32 code = 1;
+  string message = 2;
+  UpdateRedemptionCodeData data = 3;
 }
 
-// ToggleRedemptionCodeStatusRequest 切换兑换码状态请求
 message ToggleRedemptionCodeStatusRequest {
-  int64 id = 1;      // 兑换码ID
-  int32 status = 2; // 状态: 1=enabled, 0=disabled
+  int64 id = 1 [(validate.rules).int64.gt = 0];
+  int32 status = 2 [(validate.rules).int32 = {in: [0, 1]}];
 }
 
-// ToggleRedemptionCodeStatusData 切换兑换码状态数据
 message ToggleRedemptionCodeStatusData {
-  bool success = 1; // 是否成功
+  bool success = 1;
 }
 
-// ToggleRedemptionCodeStatusReply 切换兑换码状态响应
 message ToggleRedemptionCodeStatusReply {
-  int32 code = 1;                                 // 状态码
-  string message = 2;                             // 消息内容
-  ToggleRedemptionCodeStatusData data = 3;        // 响应数据
+  int32 code = 1;
+  string message = 2;
+  ToggleRedemptionCodeStatusData data = 3;
 }
 
-// DeleteRedemptionCodeRequest 删除兑换码请求
 message DeleteRedemptionCodeRequest {
-  int64 id = 1;  // 兑换码ID
+  int64 id = 1 [(validate.rules).int64.gt = 0];
 }
 
-// DeleteRedemptionCodeData 删除兑换码数据
 message DeleteRedemptionCodeData {
-  bool success = 1; // 是否成功
+  bool success = 1;
 }
 
-// DeleteRedemptionCodeReply 删除兑换码响应
 message DeleteRedemptionCodeReply {
-  int32 code = 1;                         // 状态码
-  string message = 2;                     // 消息内容
-  DeleteRedemptionCodeData data = 3;      // 响应数据
+  int32 code = 1;
+  string message = 2;
+  DeleteRedemptionCodeData data = 3;
 }
 
-// BatchDeleteRedemptionCodeRequest 批量删除兑换码请求
 message BatchDeleteRedemptionCodeRequest {
-  repeated int64 ids = 1; // 兑换码ID列表
+  repeated int64 ids = 1;
 }
 
-// BatchDeleteRedemptionCodeData 批量删除兑换码数据
 message BatchDeleteRedemptionCodeData {
-  bool success = 1; // 是否成功
+  bool success = 1;
 }
 
-// BatchDeleteRedemptionCodeReply 批量删除兑换码响应
 message BatchDeleteRedemptionCodeReply {
-  int32 code = 1;                               // 状态码
-  string message = 2;                           // 消息内容
-  BatchDeleteRedemptionCodeData data = 3;        // 响应数据
+  int32 code = 1;
+  string message = 2;
+  BatchDeleteRedemptionCodeData data = 3;
 }
 
-// GetRedemptionCodeListRequest 获取兑换码列表请求
 message GetRedemptionCodeListRequest {
-  int64 page = 1;             // 页码
-  int64 size = 2;             // 每页数量
-  int64 subscribe_plan = 3;   // 订阅套餐ID过滤（可选）
-  string unit_time = 4;       // 单位时间过滤（可选）
-  string code = 5;            // 兑换码搜索（可选）
+  int64 page = 1 [(validate.rules).int64.gt = 0];
+  int64 size = 2 [(validate.rules).int64.gt = 0];
+  int64 subscribe_plan = 3;
+  string unit_time = 4;
+  string code = 5;
 }
 
-// GetRedemptionCodeListData 获取兑换码列表数据
 message GetRedemptionCodeListData {
-  int64 total = 1;                              // 总数
-  repeated RedemptionCode list = 2;            // 兑换码列表
+  int32 total = 1;
+  repeated RedemptionCode list = 2;
 }
 
-// GetRedemptionCodeListReply 获取兑换码列表响应
 message GetRedemptionCodeListReply {
-  int32 code = 1;                            // 状态码
-  string message = 2;                        // 消息内容
-  GetRedemptionCodeListData data = 3;         // 响应数据
+  int32 code = 1;
+  string message = 2;
+  GetRedemptionCodeListData data = 3;
 }
 
-// GetRedemptionRecordListRequest 获取兑换记录列表请求
 message GetRedemptionRecordListRequest {
-  int64 page = 1;     // 页码
-  int64 size = 2;     // 每页数量
-  int64 user_id = 3;  // 用户ID过滤（可选）
-  int64 code_id = 4;  // 兑换码ID过滤（可选）
+  int64 page = 1 [(validate.rules).int64.gt = 0];
+  int64 size = 2 [(validate.rules).int64.gt = 0];
+  int64 user_id = 3;
+  int64 code_id = 4;
 }
 
-// GetRedemptionRecordListData 获取兑换记录列表数据
 message GetRedemptionRecordListData {
-  int64 total = 1;                                // 总数
-  repeated RedemptionRecord list = 2;            // 兑换记录列表
+  int32 total = 1;
+  repeated RedemptionRecord list = 2;
 }
 
-// GetRedemptionRecordListReply 获取兑换记录列表响应
 message GetRedemptionRecordListReply {
-  int32 code = 1;                              // 状态码
-  string message = 2;                          // 消息内容
-  GetRedemptionRecordListData data = 3;         // 响应数据
+  int32 code = 1;
+  string message = 2;
+  GetRedemptionRecordListData data = 3;
 }

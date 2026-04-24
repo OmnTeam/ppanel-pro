@@ -32,19 +32,12 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type RedemptionClient interface {
-	// CreateRedemptionCode 创建兑换码
 	CreateRedemptionCode(ctx context.Context, in *CreateRedemptionCodeRequest, opts ...grpc.CallOption) (*CreateRedemptionCodeReply, error)
-	// UpdateRedemptionCode 更新兑换码
 	UpdateRedemptionCode(ctx context.Context, in *UpdateRedemptionCodeRequest, opts ...grpc.CallOption) (*UpdateRedemptionCodeReply, error)
-	// ToggleRedemptionCodeStatus 切换兑换码状态
 	ToggleRedemptionCodeStatus(ctx context.Context, in *ToggleRedemptionCodeStatusRequest, opts ...grpc.CallOption) (*ToggleRedemptionCodeStatusReply, error)
-	// DeleteRedemptionCode 删除兑换码
 	DeleteRedemptionCode(ctx context.Context, in *DeleteRedemptionCodeRequest, opts ...grpc.CallOption) (*DeleteRedemptionCodeReply, error)
-	// BatchDeleteRedemptionCode 批量删除兑换码
 	BatchDeleteRedemptionCode(ctx context.Context, in *BatchDeleteRedemptionCodeRequest, opts ...grpc.CallOption) (*BatchDeleteRedemptionCodeReply, error)
-	// GetRedemptionCodeList 获取兑换码列表
 	GetRedemptionCodeList(ctx context.Context, in *GetRedemptionCodeListRequest, opts ...grpc.CallOption) (*GetRedemptionCodeListReply, error)
-	// GetRedemptionRecordList 获取兑换记录列表
 	GetRedemptionRecordList(ctx context.Context, in *GetRedemptionRecordListRequest, opts ...grpc.CallOption) (*GetRedemptionRecordListReply, error)
 }
 
@@ -130,19 +123,12 @@ func (c *redemptionClient) GetRedemptionRecordList(ctx context.Context, in *GetR
 // All implementations must embed UnimplementedRedemptionServer
 // for forward compatibility.
 type RedemptionServer interface {
-	// CreateRedemptionCode 创建兑换码
 	CreateRedemptionCode(context.Context, *CreateRedemptionCodeRequest) (*CreateRedemptionCodeReply, error)
-	// UpdateRedemptionCode 更新兑换码
 	UpdateRedemptionCode(context.Context, *UpdateRedemptionCodeRequest) (*UpdateRedemptionCodeReply, error)
-	// ToggleRedemptionCodeStatus 切换兑换码状态
 	ToggleRedemptionCodeStatus(context.Context, *ToggleRedemptionCodeStatusRequest) (*ToggleRedemptionCodeStatusReply, error)
-	// DeleteRedemptionCode 删除兑换码
 	DeleteRedemptionCode(context.Context, *DeleteRedemptionCodeRequest) (*DeleteRedemptionCodeReply, error)
-	// BatchDeleteRedemptionCode 批量删除兑换码
 	BatchDeleteRedemptionCode(context.Context, *BatchDeleteRedemptionCodeRequest) (*BatchDeleteRedemptionCodeReply, error)
-	// GetRedemptionCodeList 获取兑换码列表
 	GetRedemptionCodeList(context.Context, *GetRedemptionCodeListRequest) (*GetRedemptionCodeListReply, error)
-	// GetRedemptionRecordList 获取兑换记录列表
 	GetRedemptionRecordList(context.Context, *GetRedemptionRecordListRequest) (*GetRedemptionRecordListReply, error)
 	mustEmbedUnimplementedRedemptionServer()
 }

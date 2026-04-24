@@ -612,16 +612,7 @@ func (s *SystemService) PreViewNodeMultiplier(ctx context.Context, req *pb.PreVi
 	// Calculate current time multiplier
 	now := time.Now()
 	currentTime := now.Format("2006-01-02 15:04:05")
-	ratio := float32(1.0) // Default ratio
-
-	// Find matching time period
-	currentTimeStr := now.Format("15:04:05")
-	for _, period := range periods {
-		if currentTimeStr >= period.StartTime && currentTimeStr <= period.EndTime {
-			ratio = period.Multiplier
-			break
-		}
-	}
+	ratio := systembiz.PreviewNodeMultiplier(now, periods)
 
 	return &pb.PreViewNodeMultiplierReply{
 		Code:    responsecode.AdminPreViewNodeMultiplierSuccess,
@@ -657,10 +648,10 @@ func (s *SystemService) SetNodeMultiplier(ctx context.Context, req *pb.SetNodeMu
 
 // SettingTelegramBot 设置Telegram机器人
 func (s *SystemService) SettingTelegramBot(ctx context.Context, req *pb.SettingTelegramBotRequest) (*pb.SettingTelegramBotReply, error) {
-	// This is just a placeholder for now
-	// In the original implementation, it triggers Telegram bot initialization
-	// We'll skip the actual implementation as it requires external dependencies
-	s.log.Info("SettingTelegramBot called")
+	if err := s.uc.ApplyTelegramBot(ctx); err != nil {
+		s.log.Errorf("Failed to apply telegram bot: %v", err)
+		return nil, err
+	}
 	return &pb.SettingTelegramBotReply{
 		Code:    responsecode.AdminSettingTelegramBotSuccess,
 		Message: responsecode.CodeMessages[responsecode.AdminSettingTelegramBotSuccess],

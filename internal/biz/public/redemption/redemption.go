@@ -125,7 +125,7 @@ func (uc *RedemptionUseCase) RedeemCode(ctx context.Context, userID int64, code 
 			return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 		}
 
-		if int64(count) >= subscribePlan.Quota {
+		if int32(count) >= subscribePlan.Quota {
 			return nil, responsecode.NewKratosError(responsecode.ErrSubscribeQuotaLimit)
 		}
 	}
@@ -148,7 +148,7 @@ func (uc *RedemptionUseCase) RedeemCode(ctx context.Context, userID int64, code 
 		SetUserID(userID).
 		SetOrderNo(orderNo).
 		SetType(5). // 兑换类型
-		SetQuantity(int64(redemptionCode.Quantity)).
+		SetQuantity(redemptionCode.Quantity).
 		SetPrice(0).
 		SetAmount(0).
 		SetDiscount(0).

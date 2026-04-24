@@ -65,7 +65,7 @@ func Code(v string) predicate.ProxyCoupon {
 }
 
 // Count applies equality check predicate on the "count" field. It's identical to CountEQ.
-func Count(v int64) predicate.ProxyCoupon {
+func Count(v int32) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldEQ(FieldCount, v))
 }
 
@@ -100,7 +100,7 @@ func Subscribe(v string) predicate.ProxyCoupon {
 }
 
 // UsedCount applies equality check predicate on the "used_count" field. It's identical to UsedCountEQ.
-func UsedCount(v int64) predicate.ProxyCoupon {
+func UsedCount(v int8) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldEQ(FieldUsedCount, v))
 }
 
@@ -250,42 +250,42 @@ func CodeContainsFold(v string) predicate.ProxyCoupon {
 }
 
 // CountEQ applies the EQ predicate on the "count" field.
-func CountEQ(v int64) predicate.ProxyCoupon {
+func CountEQ(v int32) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldEQ(FieldCount, v))
 }
 
 // CountNEQ applies the NEQ predicate on the "count" field.
-func CountNEQ(v int64) predicate.ProxyCoupon {
+func CountNEQ(v int32) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldNEQ(FieldCount, v))
 }
 
 // CountIn applies the In predicate on the "count" field.
-func CountIn(vs ...int64) predicate.ProxyCoupon {
+func CountIn(vs ...int32) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldIn(FieldCount, vs...))
 }
 
 // CountNotIn applies the NotIn predicate on the "count" field.
-func CountNotIn(vs ...int64) predicate.ProxyCoupon {
+func CountNotIn(vs ...int32) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldNotIn(FieldCount, vs...))
 }
 
 // CountGT applies the GT predicate on the "count" field.
-func CountGT(v int64) predicate.ProxyCoupon {
+func CountGT(v int32) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldGT(FieldCount, v))
 }
 
 // CountGTE applies the GTE predicate on the "count" field.
-func CountGTE(v int64) predicate.ProxyCoupon {
+func CountGTE(v int32) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldGTE(FieldCount, v))
 }
 
 // CountLT applies the LT predicate on the "count" field.
-func CountLT(v int64) predicate.ProxyCoupon {
+func CountLT(v int32) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldLT(FieldCount, v))
 }
 
 // CountLTE applies the LTE predicate on the "count" field.
-func CountLTE(v int64) predicate.ProxyCoupon {
+func CountLTE(v int32) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldLTE(FieldCount, v))
 }
 
@@ -555,42 +555,42 @@ func SubscribeContainsFold(v string) predicate.ProxyCoupon {
 }
 
 // UsedCountEQ applies the EQ predicate on the "used_count" field.
-func UsedCountEQ(v int64) predicate.ProxyCoupon {
+func UsedCountEQ(v int8) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldEQ(FieldUsedCount, v))
 }
 
 // UsedCountNEQ applies the NEQ predicate on the "used_count" field.
-func UsedCountNEQ(v int64) predicate.ProxyCoupon {
+func UsedCountNEQ(v int8) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldNEQ(FieldUsedCount, v))
 }
 
 // UsedCountIn applies the In predicate on the "used_count" field.
-func UsedCountIn(vs ...int64) predicate.ProxyCoupon {
+func UsedCountIn(vs ...int8) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldIn(FieldUsedCount, vs...))
 }
 
 // UsedCountNotIn applies the NotIn predicate on the "used_count" field.
-func UsedCountNotIn(vs ...int64) predicate.ProxyCoupon {
+func UsedCountNotIn(vs ...int8) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldNotIn(FieldUsedCount, vs...))
 }
 
 // UsedCountGT applies the GT predicate on the "used_count" field.
-func UsedCountGT(v int64) predicate.ProxyCoupon {
+func UsedCountGT(v int8) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldGT(FieldUsedCount, v))
 }
 
 // UsedCountGTE applies the GTE predicate on the "used_count" field.
-func UsedCountGTE(v int64) predicate.ProxyCoupon {
+func UsedCountGTE(v int8) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldGTE(FieldUsedCount, v))
 }
 
 // UsedCountLT applies the LT predicate on the "used_count" field.
-func UsedCountLT(v int64) predicate.ProxyCoupon {
+func UsedCountLT(v int8) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldLT(FieldUsedCount, v))
 }
 
 // UsedCountLTE applies the LTE predicate on the "used_count" field.
-func UsedCountLTE(v int64) predicate.ProxyCoupon {
+func UsedCountLTE(v int8) predicate.ProxyCoupon {
 	return predicate.ProxyCoupon(sql.FieldLTE(FieldUsedCount, v))
 }
 

@@ -251,7 +251,7 @@ func (r *publicOrderRepo) QueryOrderDetail(ctx context.Context, userID int, orde
 }
 
 // QueryOrderList 查询订单列表及订阅和支付信息
-func (r *publicOrderRepo) QueryOrderList(ctx context.Context, userID int, page, size int, status, orderType int32) ([]*publicBiz.OrderDetail, int64, error) {
+func (r *publicOrderRepo) QueryOrderList(ctx context.Context, userID int, page, size int, status, orderType int32) ([]*publicBiz.OrderDetail, int32, error) {
 	query := r.data.db.ProxyOrder.Query().
 		Where(
 			proxyorder.UserIDEQ(int64(userID)),
@@ -269,7 +269,7 @@ func (r *publicOrderRepo) QueryOrderList(ctx context.Context, userID int, page, 
 	total, err := query.Count(ctx)
 	if err != nil {
 		r.logger.Errorf("[PublicOrderRepo.QueryOrderList] count orders failed: %v", err)
-		return nil, int64(total), errors.InternalServer("ORDER_COUNT_FAILED", "统计订单失败")
+		return nil, int32(total), errors.InternalServer("ORDER_COUNT_FAILED", "统计订单失败")
 	}
 
 	// 应用分页
@@ -281,7 +281,7 @@ func (r *publicOrderRepo) QueryOrderList(ctx context.Context, userID int, page, 
 		All(ctx)
 	if err != nil {
 		r.logger.Errorf("[PublicOrderRepo.QueryOrderList] query orders failed: %v", err)
-		return nil, int64(total), errors.InternalServer("ORDER_QUERY_FAILED", "查询订单失败")
+		return nil, int32(total), errors.InternalServer("ORDER_QUERY_FAILED", "查询订单失败")
 	}
 
 	// 收集订阅ID和支付ID用于批量加载
@@ -341,7 +341,7 @@ func (r *publicOrderRepo) QueryOrderList(ctx context.Context, userID int, page, 
 		result[i].Commission = 0
 	}
 
-	return result, int64(total), nil
+	return result, int32(total), nil
 }
 
 // PreCreateOrder 验证并计算订单价格
@@ -378,7 +378,7 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 				count++
 			}
 		}
-		if count >= sub.Quota {
+		if count >= int64(sub.Quota) {
 			return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 		}
 	}
@@ -414,7 +414,7 @@ func (r *publicOrderRepo) PreCreateOrder(ctx context.Context, req *publicBiz.Pre
 			return nil, responsecode.NewKratosError(responsecode.ErrCouponNotFound)
 		}
 
-		if couponInfo.Count > 0 && couponInfo.Count <= couponInfo.UsedCount {
+		if couponInfo.Count > 0 && couponInfo.Count <= int32(couponInfo.UsedCount) {
 			return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
 		}
 
@@ -580,7 +580,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 				existingCount++
 			}
 		}
-		if int64(existingCount) >= sub.Quota {
+		if int64(existingCount) >= int64(sub.Quota) {
 			r.logger.Warnf("[Purchase] Quota exceeded: user %d, subscribe %d, count %d, quota %d", req.UserID, req.SubscribeID, existingCount, sub.Quota)
 			return nil, errors.BadRequest("QUOTA_EXCEEDED", "订阅配额限制已超过")
 		}
@@ -617,7 +617,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 			return nil, responsecode.NewKratosError(responsecode.ErrCouponNotFound)
 		}
 
-		if couponInfo.Count != 0 && couponInfo.Count <= couponInfo.UsedCount {
+		if couponInfo.Count != 0 && couponInfo.Count <= int32(couponInfo.UsedCount) {
 			return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
 		}
 		couponSub := tool.StringToInt64Slice(couponInfo.Subscribe)
@@ -700,7 +700,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 		UserID:         req.UserID,
 		OrderNo:        orderNo,
 		Type:           1, // 购买类型
-		Quantity:       quantity,
+		Quantity:       int32(quantity),
 		Price:          price,
 		Amount:         amount,
 		Discount:       discountAmount,
@@ -735,7 +735,7 @@ func (r *publicOrderRepo) Purchase(ctx context.Context, req *publicBiz.PurchaseP
 					currentCount++
 				}
 			}
-			if int64(currentCount) >= sub.Quota {
+			if int64(currentCount) >= int64(sub.Quota) {
 				return responsecode.NewKratosError(responsecode.ErrInvalidParameter)
 			}
 		}
@@ -968,7 +968,7 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 			return nil, responsecode.NewKratosError(responsecode.ErrCouponNotFound)
 		}
 
-		if couponInfo.Count != 0 && couponInfo.Count <= couponInfo.UsedCount {
+		if couponInfo.Count != 0 && couponInfo.Count <= int32(couponInfo.UsedCount) {
 			return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
 		}
 		couponSub := tool.StringToInt64Slice(couponInfo.Subscribe)
@@ -1093,7 +1093,7 @@ func (r *publicOrderRepo) Renewal(ctx context.Context, req *publicBiz.RenewalPar
 			SetParentID(userSubscribe.OrderID).
 			SetOrderNo(orderNo).
 			SetType(2). // 续费类型
-			SetQuantity(quantity).
+			SetQuantity(int32(quantity)).
 			SetPrice(price).
 			SetAmount(amount).
 			SetGiftAmount(deductionAmount).
@@ -1336,7 +1336,7 @@ func (r *publicOrderRepo) convertToOrderDetailWithNames(order *ent.ProxyOrder, s
 		UserID:         order.UserID,
 		OrderNo:        order.OrderNo,
 		Type:           int32(order.Type),
-		Quantity:       order.Quantity,
+		Quantity:       int64(order.Quantity),
 		Price:          order.Price,
 		Amount:         order.Amount,
 		GiftAmount:     order.GiftAmount,
@@ -1380,7 +1380,7 @@ func (r *publicOrderRepo) convertToOrderDetailFull(order *ent.ProxyOrder, subscr
 		UserID:         order.UserID,
 		OrderNo:        order.OrderNo,
 		Type:           int32(order.Type),
-		Quantity:       order.Quantity,
+		Quantity:       int64(order.Quantity),
 		Price:          order.Price,
 		Amount:         order.Amount,
 		GiftAmount:     order.GiftAmount,

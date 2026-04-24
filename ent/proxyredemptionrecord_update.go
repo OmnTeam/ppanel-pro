@@ -93,14 +93,14 @@ func (_u *ProxyRedemptionRecordUpdate) SetNillableUnitTime(v *string) *ProxyRede
 }
 
 // SetQuantity sets the "quantity" field.
-func (_u *ProxyRedemptionRecordUpdate) SetQuantity(v int64) *ProxyRedemptionRecordUpdate {
+func (_u *ProxyRedemptionRecordUpdate) SetQuantity(v int32) *ProxyRedemptionRecordUpdate {
 	_u.mutation.ResetQuantity()
 	_u.mutation.SetQuantity(v)
 	return _u
 }
 
 // SetNillableQuantity sets the "quantity" field if the given value is not nil.
-func (_u *ProxyRedemptionRecordUpdate) SetNillableQuantity(v *int64) *ProxyRedemptionRecordUpdate {
+func (_u *ProxyRedemptionRecordUpdate) SetNillableQuantity(v *int32) *ProxyRedemptionRecordUpdate {
 	if v != nil {
 		_u.SetQuantity(*v)
 	}
@@ -108,7 +108,7 @@ func (_u *ProxyRedemptionRecordUpdate) SetNillableQuantity(v *int64) *ProxyRedem
 }
 
 // AddQuantity adds value to the "quantity" field.
-func (_u *ProxyRedemptionRecordUpdate) AddQuantity(v int64) *ProxyRedemptionRecordUpdate {
+func (_u *ProxyRedemptionRecordUpdate) AddQuantity(v int32) *ProxyRedemptionRecordUpdate {
 	_u.mutation.AddQuantity(v)
 	return _u
 }
@@ -205,10 +205,10 @@ func (_u *ProxyRedemptionRecordUpdate) sqlSave(ctx context.Context) (_node int, 
 		_spec.SetField(proxyredemptionrecord.FieldUnitTime, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Quantity(); ok {
-		_spec.SetField(proxyredemptionrecord.FieldQuantity, field.TypeInt64, value)
+		_spec.SetField(proxyredemptionrecord.FieldQuantity, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedQuantity(); ok {
-		_spec.AddField(proxyredemptionrecord.FieldQuantity, field.TypeInt64, value)
+		_spec.AddField(proxyredemptionrecord.FieldQuantity, field.TypeInt32, value)
 	}
 	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -352,14 +352,14 @@ func (_u *ProxyRedemptionRecordUpdateOne) SetNillableUnitTime(v *string) *ProxyR
 }
 
 // SetQuantity sets the "quantity" field.
-func (_u *ProxyRedemptionRecordUpdateOne) SetQuantity(v int64) *ProxyRedemptionRecordUpdateOne {
+func (_u *ProxyRedemptionRecordUpdateOne) SetQuantity(v int32) *ProxyRedemptionRecordUpdateOne {
 	_u.mutation.ResetQuantity()
 	_u.mutation.SetQuantity(v)
 	return _u
 }
 
 // SetNillableQuantity sets the "quantity" field if the given value is not nil.
-func (_u *ProxyRedemptionRecordUpdateOne) SetNillableQuantity(v *int64) *ProxyRedemptionRecordUpdateOne {
+func (_u *ProxyRedemptionRecordUpdateOne) SetNillableQuantity(v *int32) *ProxyRedemptionRecordUpdateOne {
 	if v != nil {
 		_u.SetQuantity(*v)
 	}
@@ -367,7 +367,7 @@ func (_u *ProxyRedemptionRecordUpdateOne) SetNillableQuantity(v *int64) *ProxyRe
 }
 
 // AddQuantity adds value to the "quantity" field.
-func (_u *ProxyRedemptionRecordUpdateOne) AddQuantity(v int64) *ProxyRedemptionRecordUpdateOne {
+func (_u *ProxyRedemptionRecordUpdateOne) AddQuantity(v int32) *ProxyRedemptionRecordUpdateOne {
 	_u.mutation.AddQuantity(v)
 	return _u
 }
@@ -494,10 +494,10 @@ func (_u *ProxyRedemptionRecordUpdateOne) sqlSave(ctx context.Context) (_node *P
 		_spec.SetField(proxyredemptionrecord.FieldUnitTime, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Quantity(); ok {
-		_spec.SetField(proxyredemptionrecord.FieldQuantity, field.TypeInt64, value)
+		_spec.SetField(proxyredemptionrecord.FieldQuantity, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedQuantity(); ok {
-		_spec.AddField(proxyredemptionrecord.FieldQuantity, field.TypeInt64, value)
+		_spec.AddField(proxyredemptionrecord.FieldQuantity, field.TypeInt32, value)
 	}
 	if _u.mutation.UserCleared() {
 		edge := &sqlgraph.EdgeSpec{

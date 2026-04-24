@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 
@@ -37,6 +36,9 @@ type SubscriptionRepo interface {
 
 	// GetSubscribeDomain 获取订阅域名配置（用于生成订阅URL）
 	GetSubscribeDomain(ctx context.Context) string
+
+	// GetSubscribePath 获取订阅路径配置（用于生成订阅URL）
+	GetSubscribePath(ctx context.Context) string
 
 	// GetSiteName 获取站点名称
 	GetSiteName(ctx context.Context) string
@@ -81,14 +83,65 @@ func (uc *SubscriptionUseCase) GetSubscribeApplications(ctx context.Context) ([]
 	return uc.repo.GetSubscribeApplications(ctx)
 }
 
+func (uc *SubscriptionUseCase) matchSubscribeApplication(userAgent string, clients []*SubscribeApplication) (*SubscribeApplication, error) {
+	userAgentLower := strings.ToLower(userAgent)
+	var targetApp, defaultApp *SubscribeApplication
+
+	for _, item := range clients {
+		ua := strings.ToLower(item.UserAgent)
+		if item.IsDefault {
+			defaultApp = item
+		}
+
+		if strings.Contains(userAgentLower, ua) {
+			if strings.Contains(userAgentLower, "stash") && !strings.Contains(ua, "stash") {
+				continue
+			}
+			targetApp = item
+			break
+		}
+	}
+
+	if targetApp == nil {
+		if defaultApp == nil {
+			return nil, fmt.Errorf("no matching client found")
+		}
+		targetApp = defaultApp
+	}
+
+	return targetApp, nil
+}
+
 // getSubscribeV2URL 生成订阅URL - 按照原项目逻辑实现
 // requestURI: 请求的URI（例如：/v1/subscribe?token=xxx）
 // requestHost: 请求的Host（例如：example.com）
 // gatewayMode: 是否为网关模式（如果为true，添加/sub前缀）
-func (uc *SubscriptionUseCase) getSubscribeV2URL(ctx context.Context, requestURI, requestHost string, gatewayMode bool) string {
-	uri := requestURI
+func (uc *SubscriptionUseCase) getSubscribeV2URL(ctx context.Context, token, requestURI, requestHost string, gatewayMode bool) string {
+	uri := strings.TrimSpace(requestURI)
+	if subscribePath := strings.TrimSpace(uc.repo.GetSubscribePath(ctx)); subscribePath != "" {
+		if !strings.HasPrefix(subscribePath, "/") {
+			subscribePath = "/" + subscribePath
+		}
+		subscribePath = strings.TrimRight(subscribePath, "/")
+		if subscribePath == "" {
+			subscribePath = "/api/subscribe"
+		}
+		if token != "" {
+			uri = subscribePath + "/" + token
+		} else {
+			uri = subscribePath
+		}
+	}
+
+	if uri == "" {
+		uri = "/api/subscribe"
+		if token != "" {
+			uri += "/" + token
+		}
+	}
+
 	// 如果是网关模式，添加 /sub 前缀
-	if gatewayMode {
+	if gatewayMode && !strings.HasPrefix(uri, "/sub/") {
 		uri = "/sub" + uri
 	}
 
@@ -153,6 +206,26 @@ func (uc *SubscriptionUseCase) ValidateLegacyRequest(ctx context.Context, token,
 	return nil
 }
 
+func (uc *SubscriptionUseCase) ResolveDownloadMeta(ctx context.Context, _ *v1.GetSubscribeConfigRequest, userAgent string) (string, string, error) {
+	clients, err := uc.repo.GetSubscribeApplications(ctx)
+	if err != nil {
+		return "", "", err
+	}
+
+	targetApp, err := uc.matchSubscribeApplication(userAgent, clients)
+	if err != nil {
+		return "", "", err
+	}
+
+	siteName := uc.repo.GetSiteName(ctx)
+	switch strings.ToLower(targetApp.OutputFormat) {
+	case "json", "yaml", "conf":
+		return "application/octet-stream; charset=UTF-8", url.QueryEscape(siteName) + "." + strings.ToLower(targetApp.OutputFormat), nil
+	default:
+		return "", "", nil
+	}
+}
+
 // GetSubscribeConfig 获取订阅配置 - 按照原项目逻辑实现
 func (uc *SubscriptionUseCase) GetSubscribeConfig(ctx context.Context, req *v1.GetSubscribeConfigRequest, userAgent, clientIP, requestURI, requestHost string, gatewayMode bool, queryParams map[string]string) (*v1.GetSubscribeConfigReply, error) {
 	// 按照原项目逻辑，使用defer记录日志，并只在成功时记录
@@ -168,10 +241,7 @@ func (uc *SubscriptionUseCase) GetSubscribeConfig(ctx context.Context, req *v1.G
 	// 1. 查询客户端应用列表
 	clients, err := uc.repo.GetSubscribeApplications(ctx)
 	if err != nil {
-		return &v1.GetSubscribeConfigReply{
-			Code:    50000,
-			Message: "Failed to query client applications",
-		}, nil
+		return nil, err
 	}
 
 	if err := uc.ValidateLegacyRequest(ctx, req.Token, requestHost, userAgent, clients); err != nil {
@@ -179,97 +249,46 @@ func (uc *SubscriptionUseCase) GetSubscribeConfig(ctx context.Context, req *v1.G
 	}
 
 	// 2. 根据User-Agent匹配客户端
-	userAgentLower := strings.ToLower(userAgent)
-	var targetApp, defaultApp *SubscribeApplication
-
-	for _, item := range clients {
-		ua := strings.ToLower(item.UserAgent)
-		if item.IsDefault {
-			defaultApp = item
-		}
-
-		if strings.Contains(userAgentLower, ua) {
-			// 特殊处理Stash
-			if strings.Contains(userAgentLower, "stash") && !strings.Contains(ua, "stash") {
-				continue
-			}
-			targetApp = item
-			break
-		}
-	}
-
-	if targetApp == nil {
-		if defaultApp == nil {
-			return &v1.GetSubscribeConfigReply{
-				Code:    40004,
-				Message: "No matching client found",
-			}, nil
-		}
-		targetApp = defaultApp
+	targetApp, err := uc.matchSubscribeApplication(userAgent, clients)
+	if err != nil {
+		return nil, err
 	}
 
 	// 3. 验证token并获取用户订阅
 	userSubscribe, err = uc.repo.ValidateTokenAndGetSubscribe(ctx, req.Token)
 	if err != nil {
-		return &v1.GetSubscribeConfigReply{
-			Code:    40001,
-			Message: err.Error(),
-		}, nil
+		return nil, err
 	}
 
 	// 4. 获取用户信息
 	userInfo, err := uc.repo.GetUserInfo(ctx, userSubscribe.UserID)
 	if err != nil {
-		return &v1.GetSubscribeConfigReply{
-			Code:    50000,
-			Message: "Failed to get user info",
-		}, nil
+		return nil, err
 	}
 
 	// 5. 构建请求参数（URL参数）
-	params := make(map[string]string, len(queryParams))
+	params := make(map[string]string, len(req.Params)+len(queryParams)+2)
+	for key, value := range req.Params {
+		params[key] = value
+	}
 	for key, value := range queryParams {
 		params[key] = value
 	}
-	if req.Target != "" {
-		params["target"] = req.Target
+	if req.Flag != "" {
+		params["flag"] = req.Flag
 	}
-	if req.List {
-		params["list"] = "true"
-	}
-	if req.Emoji {
-		params["emoji"] = "true"
-	}
-	if req.Udp {
-		params["udp"] = "true"
-	}
-	if req.Tfo {
-		params["tfo"] = "true"
-	}
-	if req.Scv {
-		params["scv"] = "true"
-	}
-	if req.Sort > 0 {
-		params["sort"] = strconv.FormatInt(int64(req.Sort), 10)
-	}
-	if req.Filter != "" {
-		params["filter"] = req.Filter
-	}
-	if req.Expand {
-		params["expand"] = "true"
+	if req.Type != "" {
+		params["type"] = req.Type
 	}
 
 	// 6. 获取可用节点列表（包含分组过滤、过期检查等）
 	nodes, err := uc.repo.GetAvailableNodes(ctx, userSubscribe)
 	if err != nil {
-		return &v1.GetSubscribeConfigReply{
-			Code:    50000,
-			Message: err.Error(),
-		}, nil
+		return nil, err
 	}
 
 	// 7. 生成订阅URL（按照原项目逻辑）
-	subscribeURL := uc.getSubscribeV2URL(ctx, requestURI, requestHost, gatewayMode)
+	subscribeURL := uc.getSubscribeV2URL(ctx, req.Token, requestURI, requestHost, gatewayMode)
 
 	// 8. 更新用户信息中的订阅URL
 	userInfo.SubscribeURL = subscribeURL
@@ -296,36 +315,18 @@ func (uc *SubscriptionUseCase) GetSubscribeConfig(ctx context.Context, req *v1.G
 		params,
 	)
 	if err != nil {
-		return &v1.GetSubscribeConfigReply{
-			Code:    50000,
-			Message: "Failed to generate config: " + err.Error(),
-		}, nil
+		return nil, fmt.Errorf("failed to generate config: %w", err)
 	}
 
 	// 8. 获取订阅信息头
 	header := uc.repo.GetSubscribeInfo(ctx, userSubscribe)
 
-	// 9. 确定文件名和Content-Type
-	contentType := ""
-	filename := ""
-	switch strings.ToLower(targetApp.OutputFormat) {
-	case "json", "yaml", "conf":
-		contentType = "application/octet-stream; charset=UTF-8"
-		filename = url.QueryEscape(siteName) + "." + strings.ToLower(targetApp.OutputFormat)
-	}
-
 	// 10. 标记成功（defer会记录日志）
 	subscribeStatus = true
 
 	return &v1.GetSubscribeConfigReply{
-		Code:    0,
-		Message: "success",
-		Data: &v1.GetSubscribeConfigData{
-			Config:      string(configBytes),
-			Header:      header,
-			ContentType: contentType,
-			Filename:    filename,
-		},
+		Config: configBytes,
+		Header: header,
 	}, nil
 }
 
@@ -380,45 +381,56 @@ type NodeInfo struct {
 	Tags        []string
 	NodeGroupID int64
 
-	Security                string
-	SNI                     string
-	AllowInsecure           bool
-	Fingerprint             string
-	RealityServerAddr       string
-	RealityServerPort       int
-	RealityPrivateKey       string
-	RealityPublicKey        string
-	RealityShortId          string
-	Transport               string
-	Host                    string
-	Path                    string
-	ServiceName             string
-	Method                  string
-	ServerKey               string
-	Flow                    string
-	HopPorts                string
-	HopInterval             int
-	ObfsPassword            string
-	UpMbps                  int
-	DownMbps                int
-	DisableSNI              bool
-	ReduceRtt               bool
-	UDPRelayMode            string
-	CongestionController    string
-	PaddingScheme           string
-	Multiplex               string
-	XhttpMode               string
-	XhttpExtra              string
-	Encryption              string
-	EncryptionMode          string
-	EncryptionRtt           string
-	EncryptionTicket        string
-	EncryptionServerPadding string
-	EncryptionPrivateKey    string
-	EncryptionClientPadding string
-	EncryptionPassword      string
-	Ratio                   float64
-	CertMode                string
-	CertDNSProvider         string
-	CertDNSEnv              string
+	Security                 string
+	SNI                      string
+	AllowInsecure            bool
+	Fingerprint              string
+	RealityServerAddr        string
+	RealityServerPort        int
+	RealityPrivateKey        string
+	RealityPublicKey         string
+	RealityShortId           string
+	Transport                string
+	Host                     string
+	Path                     string
+	ServiceName              string
+	Method                   string
+	ServerKey                string
+	Flow                     string
+	HopPorts                 string
+	HopInterval              int
+	ObfsPassword             string
+	UpMbps                   int
+	DownMbps                 int
+	DisableSNI               bool
+	ReduceRtt                bool
+	UDPRelayMode             string
+	CongestionController     string
+	PaddingScheme            string
+	Multiplex                string
+	XhttpMode                string
+	XhttpExtra               string
+	Encryption               string
+	EncryptionMode           string
+	EncryptionRtt            string
+	EncryptionTicket         string
+	EncryptionServerPadding  string
+	EncryptionPrivateKey     string
+	EncryptionClientPadding  string
+	EncryptionPassword       string
+	Ratio                    float64
+	CertMode                 string
+	CertDNSProvider          string
+	CertDNSEnv               string
+	SimnetPsk                string
+	SimnetKeyID              int
+	SimnetTicketID           string
+	SimnetPath               string
+	SimnetCarrier            string
+	SimnetAfEnabled          bool
+	SimnetAfPathMode         string
+	SimnetAfPathPrefix       string
+	SimnetAfPathSuffix       string
+	SimnetAfMagicMode        string
+	SimnetAfResponseJitterMs int
 }

@@ -9,7 +9,7 @@ import "google/protobuf/empty.proto";
 
 // Public Document service
 // 公共文档服务（需要认证）
-service Document {
+service PublicDocument {
   // QueryDocumentList 查询文档列表
   rpc QueryDocumentList (google.protobuf.Empty) returns (DocumentListReply) {
     option (google.api.http) = {
@@ -27,43 +27,33 @@ service Document {
 
 // QueryDocumentDetailRequest 查询文档详情请求
 message QueryDocumentDetailRequest {
-  string id = 1;
-}
-
-// DocumentListData 文档列表数据
-message DocumentListData {
-  repeated DocumentItem list = 1;
-  int32 total = 2;
+  int64 id = 1;
 }
 
 // DocumentListReply 查询文档列表响应
 message DocumentListReply {
-  int32 code = 1;               // 状态码
-  string message = 2;           // 消息内容
-  DocumentListData data = 3;    // 响应数据
+  int32 total = 1;
+  repeated Document list = 2;
 }
 
-// DocumentItem 文档项（列表）
-message DocumentItem {
-  string id = 1;
-  string title = 2;
-  repeated string tags = 3;
-  string updated_at = 4;
-}
-
-// DocumentDetailData 文档详情数据
-message DocumentDetailData {
-  string id = 1;
+// Document 文档
+message Document {
+  int64 id = 1;
   string title = 2;
   string content = 3;
   repeated string tags = 4;
-  string created_at = 5;
-  string updated_at = 6;
+  bool show = 5;
+  int64 created_at = 6;
+  int64 updated_at = 7;
 }
 
 // DocumentDetailReply 查询文档详情响应
 message DocumentDetailReply {
-  int32 code = 1;                 // 状态码
-  string message = 2;             // 消息内容
-  DocumentDetailData data = 3;    // 响应数据
+  int64 id = 1;
+  string title = 2;
+  string content = 3;
+  repeated string tags = 4;
+  bool show = 5;
+  int64 created_at = 6;
+  int64 updated_at = 7;
 }

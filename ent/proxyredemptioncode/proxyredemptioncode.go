@@ -76,9 +76,9 @@ var (
 	// CodeValidator is a validator for the "code" field. It is called by the builders before save.
 	CodeValidator func(string) error
 	// DefaultTotalCount holds the default value on creation for the "total_count" field.
-	DefaultTotalCount int64
+	DefaultTotalCount int32
 	// DefaultUsedCount holds the default value on creation for the "used_count" field.
-	DefaultUsedCount int64
+	DefaultUsedCount int32
 	// DefaultSubscribePlan holds the default value on creation for the "subscribe_plan" field.
 	DefaultSubscribePlan int64
 	// DefaultUnitTime holds the default value on creation for the "unit_time" field.
@@ -86,7 +86,7 @@ var (
 	// UnitTimeValidator is a validator for the "unit_time" field. It is called by the builders before save.
 	UnitTimeValidator func(string) error
 	// DefaultQuantity holds the default value on creation for the "quantity" field.
-	DefaultQuantity int64
+	DefaultQuantity int32
 	// DefaultStatus holds the default value on creation for the "status" field.
 	DefaultStatus int8
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.

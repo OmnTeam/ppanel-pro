@@ -20,1349 +20,1349 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	User_QueryUserInfo_FullMethodName             = "/api.public.user.v1.User/QueryUserInfo"
-	User_GetLoginLog_FullMethodName               = "/api.public.user.v1.User/GetLoginLog"
-	User_QueryUserBalanceLog_FullMethodName       = "/api.public.user.v1.User/QueryUserBalanceLog"
-	User_QueryUserCommissionLog_FullMethodName    = "/api.public.user.v1.User/QueryUserCommissionLog"
-	User_QueryUserAffiliate_FullMethodName        = "/api.public.user.v1.User/QueryUserAffiliate"
-	User_QueryUserAffiliateList_FullMethodName    = "/api.public.user.v1.User/QueryUserAffiliateList"
-	User_GetOAuthMethods_FullMethodName           = "/api.public.user.v1.User/GetOAuthMethods"
-	User_QueryUserSubscribe_FullMethodName        = "/api.public.user.v1.User/QueryUserSubscribe"
-	User_GetSubscribeLog_FullMethodName           = "/api.public.user.v1.User/GetSubscribeLog"
-	User_ResetUserSubscribeToken_FullMethodName   = "/api.public.user.v1.User/ResetUserSubscribeToken"
-	User_PreUnsubscribe_FullMethodName            = "/api.public.user.v1.User/PreUnsubscribe"
-	User_Unsubscribe_FullMethodName               = "/api.public.user.v1.User/Unsubscribe"
-	User_UpdateUserNotify_FullMethodName          = "/api.public.user.v1.User/UpdateUserNotify"
-	User_UpdateUserPassword_FullMethodName        = "/api.public.user.v1.User/UpdateUserPassword"
-	User_BindTelegram_FullMethodName              = "/api.public.user.v1.User/BindTelegram"
-	User_UnbindTelegram_FullMethodName            = "/api.public.user.v1.User/UnbindTelegram"
-	User_BindOAuth_FullMethodName                 = "/api.public.user.v1.User/BindOAuth"
-	User_BindOAuthCallback_FullMethodName         = "/api.public.user.v1.User/BindOAuthCallback"
-	User_UnbindOAuth_FullMethodName               = "/api.public.user.v1.User/UnbindOAuth"
-	User_VerifyEmail_FullMethodName               = "/api.public.user.v1.User/VerifyEmail"
-	User_UpdateBindMobile_FullMethodName          = "/api.public.user.v1.User/UpdateBindMobile"
-	User_UpdateBindEmail_FullMethodName           = "/api.public.user.v1.User/UpdateBindEmail"
-	User_GetDeviceList_FullMethodName             = "/api.public.user.v1.User/GetDeviceList"
-	User_UnbindDevice_FullMethodName              = "/api.public.user.v1.User/UnbindDevice"
-	User_GetDeviceOnlineStatistics_FullMethodName = "/api.public.user.v1.User/GetDeviceOnlineStatistics"
-	User_DeviceWSConnect_FullMethodName           = "/api.public.user.v1.User/DeviceWSConnect"
-	User_CommissionWithdraw_FullMethodName        = "/api.public.user.v1.User/CommissionWithdraw"
-	User_QueryWithdrawalLog_FullMethodName        = "/api.public.user.v1.User/QueryWithdrawalLog"
-	User_UpdateUserSubscribeNote_FullMethodName   = "/api.public.user.v1.User/UpdateUserSubscribeNote"
-	User_UpdateUserRules_FullMethodName           = "/api.public.user.v1.User/UpdateUserRules"
-	User_DeleteCurrentUserAccount_FullMethodName  = "/api.public.user.v1.User/DeleteCurrentUserAccount"
-	User_GetUserTrafficStats_FullMethodName       = "/api.public.user.v1.User/GetUserTrafficStats"
+	PublicUser_QueryUserInfo_FullMethodName             = "/api.public.user.v1.PublicUser/QueryUserInfo"
+	PublicUser_GetLoginLog_FullMethodName               = "/api.public.user.v1.PublicUser/GetLoginLog"
+	PublicUser_QueryUserBalanceLog_FullMethodName       = "/api.public.user.v1.PublicUser/QueryUserBalanceLog"
+	PublicUser_QueryUserCommissionLog_FullMethodName    = "/api.public.user.v1.PublicUser/QueryUserCommissionLog"
+	PublicUser_QueryUserAffiliate_FullMethodName        = "/api.public.user.v1.PublicUser/QueryUserAffiliate"
+	PublicUser_QueryUserAffiliateList_FullMethodName    = "/api.public.user.v1.PublicUser/QueryUserAffiliateList"
+	PublicUser_GetOAuthMethods_FullMethodName           = "/api.public.user.v1.PublicUser/GetOAuthMethods"
+	PublicUser_QueryUserSubscribe_FullMethodName        = "/api.public.user.v1.PublicUser/QueryUserSubscribe"
+	PublicUser_GetSubscribeLog_FullMethodName           = "/api.public.user.v1.PublicUser/GetSubscribeLog"
+	PublicUser_ResetUserSubscribeToken_FullMethodName   = "/api.public.user.v1.PublicUser/ResetUserSubscribeToken"
+	PublicUser_PreUnsubscribe_FullMethodName            = "/api.public.user.v1.PublicUser/PreUnsubscribe"
+	PublicUser_Unsubscribe_FullMethodName               = "/api.public.user.v1.PublicUser/Unsubscribe"
+	PublicUser_UpdateUserNotify_FullMethodName          = "/api.public.user.v1.PublicUser/UpdateUserNotify"
+	PublicUser_UpdateUserPassword_FullMethodName        = "/api.public.user.v1.PublicUser/UpdateUserPassword"
+	PublicUser_BindTelegram_FullMethodName              = "/api.public.user.v1.PublicUser/BindTelegram"
+	PublicUser_UnbindTelegram_FullMethodName            = "/api.public.user.v1.PublicUser/UnbindTelegram"
+	PublicUser_BindOAuth_FullMethodName                 = "/api.public.user.v1.PublicUser/BindOAuth"
+	PublicUser_BindOAuthCallback_FullMethodName         = "/api.public.user.v1.PublicUser/BindOAuthCallback"
+	PublicUser_UnbindOAuth_FullMethodName               = "/api.public.user.v1.PublicUser/UnbindOAuth"
+	PublicUser_VerifyEmail_FullMethodName               = "/api.public.user.v1.PublicUser/VerifyEmail"
+	PublicUser_UpdateBindMobile_FullMethodName          = "/api.public.user.v1.PublicUser/UpdateBindMobile"
+	PublicUser_UpdateBindEmail_FullMethodName           = "/api.public.user.v1.PublicUser/UpdateBindEmail"
+	PublicUser_GetDeviceList_FullMethodName             = "/api.public.user.v1.PublicUser/GetDeviceList"
+	PublicUser_UnbindDevice_FullMethodName              = "/api.public.user.v1.PublicUser/UnbindDevice"
+	PublicUser_GetDeviceOnlineStatistics_FullMethodName = "/api.public.user.v1.PublicUser/GetDeviceOnlineStatistics"
+	PublicUser_DeviceWSConnect_FullMethodName           = "/api.public.user.v1.PublicUser/DeviceWSConnect"
+	PublicUser_CommissionWithdraw_FullMethodName        = "/api.public.user.v1.PublicUser/CommissionWithdraw"
+	PublicUser_QueryWithdrawalLog_FullMethodName        = "/api.public.user.v1.PublicUser/QueryWithdrawalLog"
+	PublicUser_UpdateUserSubscribeNote_FullMethodName   = "/api.public.user.v1.PublicUser/UpdateUserSubscribeNote"
+	PublicUser_UpdateUserRules_FullMethodName           = "/api.public.user.v1.PublicUser/UpdateUserRules"
+	PublicUser_DeleteCurrentUserAccount_FullMethodName  = "/api.public.user.v1.PublicUser/DeleteCurrentUserAccount"
+	PublicUser_GetUserTrafficStats_FullMethodName       = "/api.public.user.v1.PublicUser/GetUserTrafficStats"
 )
 
-// UserClient is the client API for User service.
+// PublicUserClient is the client API for PublicUser service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // Public User service
 // 公共用户服务（需要认证）
-type UserClient interface {
+type PublicUserClient interface {
 	// QueryUserInfo 查询用户信息
-	QueryUserInfo(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UserInfoReply, error)
+	QueryUserInfo(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*User, error)
 	// GetLoginLog 获取登录日志
-	GetLoginLog(ctx context.Context, in *GetLoginLogRequest, opts ...grpc.CallOption) (*LoginLogReply, error)
+	GetLoginLog(ctx context.Context, in *GetLoginLogRequest, opts ...grpc.CallOption) (*GetLoginLogReply, error)
 	// QueryUserBalanceLog 查询用户余额日志
-	QueryUserBalanceLog(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BalanceLogReply, error)
+	QueryUserBalanceLog(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*QueryUserBalanceLogReply, error)
 	// QueryUserCommissionLog 查询用户佣金日志
-	QueryUserCommissionLog(ctx context.Context, in *QueryUserCommissionLogRequest, opts ...grpc.CallOption) (*CommissionLogReply, error)
+	QueryUserCommissionLog(ctx context.Context, in *QueryUserCommissionLogRequest, opts ...grpc.CallOption) (*QueryUserCommissionLogReply, error)
 	// QueryUserAffiliate 查询用户推荐数量
-	QueryUserAffiliate(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UserAffiliateReply, error)
+	QueryUserAffiliate(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*QueryUserAffiliateCountReply, error)
 	// QueryUserAffiliateList 查询用户推荐列表
-	QueryUserAffiliateList(ctx context.Context, in *QueryUserAffiliateListRequest, opts ...grpc.CallOption) (*UserAffiliateListReply, error)
+	QueryUserAffiliateList(ctx context.Context, in *QueryUserAffiliateListRequest, opts ...grpc.CallOption) (*QueryUserAffiliateListReply, error)
 	// GetOAuthMethods 获取OAuth方法
-	GetOAuthMethods(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OAuthMethodsReply, error)
+	GetOAuthMethods(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetOAuthMethodsReply, error)
 	// QueryUserSubscribe 查询用户订阅
-	QueryUserSubscribe(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UserSubscribeReply, error)
+	QueryUserSubscribe(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*QueryUserSubscribeReply, error)
 	// GetSubscribeLog 获取订阅日志
-	GetSubscribeLog(ctx context.Context, in *GetSubscribeLogRequest, opts ...grpc.CallOption) (*SubscribeLogReply, error)
+	GetSubscribeLog(ctx context.Context, in *GetSubscribeLogRequest, opts ...grpc.CallOption) (*GetSubscribeLogReply, error)
 	// ResetUserSubscribeToken 重置订阅令牌
-	ResetUserSubscribeToken(ctx context.Context, in *ResetUserSubscribeTokenRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	ResetUserSubscribeToken(ctx context.Context, in *ResetUserSubscribeTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// PreUnsubscribe 预退订
-	PreUnsubscribe(ctx context.Context, in *PreUnsubscribeRequest, opts ...grpc.CallOption) (*UnsubscribeInfoReply, error)
+	PreUnsubscribe(ctx context.Context, in *PreUnsubscribeRequest, opts ...grpc.CallOption) (*PreUnsubscribeReply, error)
 	// Unsubscribe 退订
-	Unsubscribe(ctx context.Context, in *UnsubscribeRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	Unsubscribe(ctx context.Context, in *UnsubscribeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// UpdateUserNotify 更新通知设置
-	UpdateUserNotify(ctx context.Context, in *UpdateUserNotifyRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	UpdateUserNotify(ctx context.Context, in *UpdateUserNotifyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// UpdateUserPassword 更新密码
-	UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// BindTelegram 绑定Telegram
-	BindTelegram(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TelegramBindReply, error)
+	BindTelegram(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BindTelegramReply, error)
 	// UnbindTelegram 解绑Telegram
-	UnbindTelegram(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CommonReply, error)
+	UnbindTelegram(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// BindOAuth 绑定OAuth
-	BindOAuth(ctx context.Context, in *BindOAuthRequest, opts ...grpc.CallOption) (*OAuthBindReply, error)
+	BindOAuth(ctx context.Context, in *BindOAuthRequest, opts ...grpc.CallOption) (*BindOAuthReply, error)
 	// BindOAuthCallback OAuth回调
-	BindOAuthCallback(ctx context.Context, in *BindOAuthCallbackRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	BindOAuthCallback(ctx context.Context, in *BindOAuthCallbackRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// UnbindOAuth 解绑OAuth
-	UnbindOAuth(ctx context.Context, in *UnbindOAuthRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	UnbindOAuth(ctx context.Context, in *UnbindOAuthRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// VerifyEmail 验证邮箱
-	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// UpdateBindMobile 更新绑定手机
-	UpdateBindMobile(ctx context.Context, in *UpdateBindMobileRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	UpdateBindMobile(ctx context.Context, in *UpdateBindMobileRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// UpdateBindEmail 更新绑定邮箱
-	UpdateBindEmail(ctx context.Context, in *UpdateBindEmailRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	UpdateBindEmail(ctx context.Context, in *UpdateBindEmailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// GetDeviceList 获取设备列表
 	GetDeviceList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetDeviceListReply, error)
 	// UnbindDevice 解绑设备
-	UnbindDevice(ctx context.Context, in *UnbindDeviceRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	UnbindDevice(ctx context.Context, in *UnbindDeviceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// GetDeviceOnlineStatistics 获取设备在线统计
 	GetDeviceOnlineStatistics(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetDeviceOnlineStatisticsReply, error)
 	// DeviceWSConnect 设备WebSocket连接
-	DeviceWSConnect(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CommonReply, error)
+	DeviceWSConnect(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// CommissionWithdraw 佣金提现
-	CommissionWithdraw(ctx context.Context, in *CommissionWithdrawRequest, opts ...grpc.CallOption) (*WithdrawalLogReply, error)
+	CommissionWithdraw(ctx context.Context, in *CommissionWithdrawRequest, opts ...grpc.CallOption) (*WithdrawalLog, error)
 	// QueryWithdrawalLog 查询提现日志
-	QueryWithdrawalLog(ctx context.Context, in *QueryWithdrawalLogRequest, opts ...grpc.CallOption) (*WithdrawalLogListReply, error)
+	QueryWithdrawalLog(ctx context.Context, in *QueryWithdrawalLogRequest, opts ...grpc.CallOption) (*QueryWithdrawalLogReply, error)
 	// UpdateUserSubscribeNote 更新用户订阅备注
-	UpdateUserSubscribeNote(ctx context.Context, in *UpdateUserSubscribeNoteRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	UpdateUserSubscribeNote(ctx context.Context, in *UpdateUserSubscribeNoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// UpdateUserRules 更新用户规则
-	UpdateUserRules(ctx context.Context, in *UpdateUserRulesRequest, opts ...grpc.CallOption) (*CommonReply, error)
+	UpdateUserRules(ctx context.Context, in *UpdateUserRulesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// DeleteCurrentUserAccount 删除当前用户账号
-	DeleteCurrentUserAccount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CommonReply, error)
+	DeleteCurrentUserAccount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// GetUserTrafficStats 获取用户流量统计
 	GetUserTrafficStats(ctx context.Context, in *GetUserTrafficStatsRequest, opts ...grpc.CallOption) (*GetUserTrafficStatsReply, error)
 }
 
-type userClient struct {
+type publicUserClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewUserClient(cc grpc.ClientConnInterface) UserClient {
-	return &userClient{cc}
+func NewPublicUserClient(cc grpc.ClientConnInterface) PublicUserClient {
+	return &publicUserClient{cc}
 }
 
-func (c *userClient) QueryUserInfo(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UserInfoReply, error) {
+func (c *publicUserClient) QueryUserInfo(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*User, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UserInfoReply)
-	err := c.cc.Invoke(ctx, User_QueryUserInfo_FullMethodName, in, out, cOpts...)
+	out := new(User)
+	err := c.cc.Invoke(ctx, PublicUser_QueryUserInfo_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) GetLoginLog(ctx context.Context, in *GetLoginLogRequest, opts ...grpc.CallOption) (*LoginLogReply, error) {
+func (c *publicUserClient) GetLoginLog(ctx context.Context, in *GetLoginLogRequest, opts ...grpc.CallOption) (*GetLoginLogReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LoginLogReply)
-	err := c.cc.Invoke(ctx, User_GetLoginLog_FullMethodName, in, out, cOpts...)
+	out := new(GetLoginLogReply)
+	err := c.cc.Invoke(ctx, PublicUser_GetLoginLog_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) QueryUserBalanceLog(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BalanceLogReply, error) {
+func (c *publicUserClient) QueryUserBalanceLog(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*QueryUserBalanceLogReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BalanceLogReply)
-	err := c.cc.Invoke(ctx, User_QueryUserBalanceLog_FullMethodName, in, out, cOpts...)
+	out := new(QueryUserBalanceLogReply)
+	err := c.cc.Invoke(ctx, PublicUser_QueryUserBalanceLog_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) QueryUserCommissionLog(ctx context.Context, in *QueryUserCommissionLogRequest, opts ...grpc.CallOption) (*CommissionLogReply, error) {
+func (c *publicUserClient) QueryUserCommissionLog(ctx context.Context, in *QueryUserCommissionLogRequest, opts ...grpc.CallOption) (*QueryUserCommissionLogReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommissionLogReply)
-	err := c.cc.Invoke(ctx, User_QueryUserCommissionLog_FullMethodName, in, out, cOpts...)
+	out := new(QueryUserCommissionLogReply)
+	err := c.cc.Invoke(ctx, PublicUser_QueryUserCommissionLog_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) QueryUserAffiliate(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UserAffiliateReply, error) {
+func (c *publicUserClient) QueryUserAffiliate(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*QueryUserAffiliateCountReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UserAffiliateReply)
-	err := c.cc.Invoke(ctx, User_QueryUserAffiliate_FullMethodName, in, out, cOpts...)
+	out := new(QueryUserAffiliateCountReply)
+	err := c.cc.Invoke(ctx, PublicUser_QueryUserAffiliate_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) QueryUserAffiliateList(ctx context.Context, in *QueryUserAffiliateListRequest, opts ...grpc.CallOption) (*UserAffiliateListReply, error) {
+func (c *publicUserClient) QueryUserAffiliateList(ctx context.Context, in *QueryUserAffiliateListRequest, opts ...grpc.CallOption) (*QueryUserAffiliateListReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UserAffiliateListReply)
-	err := c.cc.Invoke(ctx, User_QueryUserAffiliateList_FullMethodName, in, out, cOpts...)
+	out := new(QueryUserAffiliateListReply)
+	err := c.cc.Invoke(ctx, PublicUser_QueryUserAffiliateList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) GetOAuthMethods(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OAuthMethodsReply, error) {
+func (c *publicUserClient) GetOAuthMethods(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetOAuthMethodsReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OAuthMethodsReply)
-	err := c.cc.Invoke(ctx, User_GetOAuthMethods_FullMethodName, in, out, cOpts...)
+	out := new(GetOAuthMethodsReply)
+	err := c.cc.Invoke(ctx, PublicUser_GetOAuthMethods_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) QueryUserSubscribe(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*UserSubscribeReply, error) {
+func (c *publicUserClient) QueryUserSubscribe(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*QueryUserSubscribeReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UserSubscribeReply)
-	err := c.cc.Invoke(ctx, User_QueryUserSubscribe_FullMethodName, in, out, cOpts...)
+	out := new(QueryUserSubscribeReply)
+	err := c.cc.Invoke(ctx, PublicUser_QueryUserSubscribe_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) GetSubscribeLog(ctx context.Context, in *GetSubscribeLogRequest, opts ...grpc.CallOption) (*SubscribeLogReply, error) {
+func (c *publicUserClient) GetSubscribeLog(ctx context.Context, in *GetSubscribeLogRequest, opts ...grpc.CallOption) (*GetSubscribeLogReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SubscribeLogReply)
-	err := c.cc.Invoke(ctx, User_GetSubscribeLog_FullMethodName, in, out, cOpts...)
+	out := new(GetSubscribeLogReply)
+	err := c.cc.Invoke(ctx, PublicUser_GetSubscribeLog_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) ResetUserSubscribeToken(ctx context.Context, in *ResetUserSubscribeTokenRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) ResetUserSubscribeToken(ctx context.Context, in *ResetUserSubscribeTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_ResetUserSubscribeToken_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_ResetUserSubscribeToken_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) PreUnsubscribe(ctx context.Context, in *PreUnsubscribeRequest, opts ...grpc.CallOption) (*UnsubscribeInfoReply, error) {
+func (c *publicUserClient) PreUnsubscribe(ctx context.Context, in *PreUnsubscribeRequest, opts ...grpc.CallOption) (*PreUnsubscribeReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(UnsubscribeInfoReply)
-	err := c.cc.Invoke(ctx, User_PreUnsubscribe_FullMethodName, in, out, cOpts...)
+	out := new(PreUnsubscribeReply)
+	err := c.cc.Invoke(ctx, PublicUser_PreUnsubscribe_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) Unsubscribe(ctx context.Context, in *UnsubscribeRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) Unsubscribe(ctx context.Context, in *UnsubscribeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_Unsubscribe_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_Unsubscribe_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) UpdateUserNotify(ctx context.Context, in *UpdateUserNotifyRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) UpdateUserNotify(ctx context.Context, in *UpdateUserNotifyRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_UpdateUserNotify_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_UpdateUserNotify_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) UpdateUserPassword(ctx context.Context, in *UpdateUserPasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_UpdateUserPassword_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_UpdateUserPassword_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) BindTelegram(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TelegramBindReply, error) {
+func (c *publicUserClient) BindTelegram(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BindTelegramReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TelegramBindReply)
-	err := c.cc.Invoke(ctx, User_BindTelegram_FullMethodName, in, out, cOpts...)
+	out := new(BindTelegramReply)
+	err := c.cc.Invoke(ctx, PublicUser_BindTelegram_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) UnbindTelegram(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) UnbindTelegram(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_UnbindTelegram_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_UnbindTelegram_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) BindOAuth(ctx context.Context, in *BindOAuthRequest, opts ...grpc.CallOption) (*OAuthBindReply, error) {
+func (c *publicUserClient) BindOAuth(ctx context.Context, in *BindOAuthRequest, opts ...grpc.CallOption) (*BindOAuthReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OAuthBindReply)
-	err := c.cc.Invoke(ctx, User_BindOAuth_FullMethodName, in, out, cOpts...)
+	out := new(BindOAuthReply)
+	err := c.cc.Invoke(ctx, PublicUser_BindOAuth_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) BindOAuthCallback(ctx context.Context, in *BindOAuthCallbackRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) BindOAuthCallback(ctx context.Context, in *BindOAuthCallbackRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_BindOAuthCallback_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_BindOAuthCallback_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) UnbindOAuth(ctx context.Context, in *UnbindOAuthRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) UnbindOAuth(ctx context.Context, in *UnbindOAuthRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_UnbindOAuth_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_UnbindOAuth_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_VerifyEmail_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_VerifyEmail_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) UpdateBindMobile(ctx context.Context, in *UpdateBindMobileRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) UpdateBindMobile(ctx context.Context, in *UpdateBindMobileRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_UpdateBindMobile_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_UpdateBindMobile_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) UpdateBindEmail(ctx context.Context, in *UpdateBindEmailRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) UpdateBindEmail(ctx context.Context, in *UpdateBindEmailRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_UpdateBindEmail_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_UpdateBindEmail_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) GetDeviceList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetDeviceListReply, error) {
+func (c *publicUserClient) GetDeviceList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetDeviceListReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetDeviceListReply)
-	err := c.cc.Invoke(ctx, User_GetDeviceList_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PublicUser_GetDeviceList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) UnbindDevice(ctx context.Context, in *UnbindDeviceRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) UnbindDevice(ctx context.Context, in *UnbindDeviceRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_UnbindDevice_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_UnbindDevice_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) GetDeviceOnlineStatistics(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetDeviceOnlineStatisticsReply, error) {
+func (c *publicUserClient) GetDeviceOnlineStatistics(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetDeviceOnlineStatisticsReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetDeviceOnlineStatisticsReply)
-	err := c.cc.Invoke(ctx, User_GetDeviceOnlineStatistics_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PublicUser_GetDeviceOnlineStatistics_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) DeviceWSConnect(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) DeviceWSConnect(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_DeviceWSConnect_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_DeviceWSConnect_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) CommissionWithdraw(ctx context.Context, in *CommissionWithdrawRequest, opts ...grpc.CallOption) (*WithdrawalLogReply, error) {
+func (c *publicUserClient) CommissionWithdraw(ctx context.Context, in *CommissionWithdrawRequest, opts ...grpc.CallOption) (*WithdrawalLog, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(WithdrawalLogReply)
-	err := c.cc.Invoke(ctx, User_CommissionWithdraw_FullMethodName, in, out, cOpts...)
+	out := new(WithdrawalLog)
+	err := c.cc.Invoke(ctx, PublicUser_CommissionWithdraw_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) QueryWithdrawalLog(ctx context.Context, in *QueryWithdrawalLogRequest, opts ...grpc.CallOption) (*WithdrawalLogListReply, error) {
+func (c *publicUserClient) QueryWithdrawalLog(ctx context.Context, in *QueryWithdrawalLogRequest, opts ...grpc.CallOption) (*QueryWithdrawalLogReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(WithdrawalLogListReply)
-	err := c.cc.Invoke(ctx, User_QueryWithdrawalLog_FullMethodName, in, out, cOpts...)
+	out := new(QueryWithdrawalLogReply)
+	err := c.cc.Invoke(ctx, PublicUser_QueryWithdrawalLog_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) UpdateUserSubscribeNote(ctx context.Context, in *UpdateUserSubscribeNoteRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) UpdateUserSubscribeNote(ctx context.Context, in *UpdateUserSubscribeNoteRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_UpdateUserSubscribeNote_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_UpdateUserSubscribeNote_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) UpdateUserRules(ctx context.Context, in *UpdateUserRulesRequest, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) UpdateUserRules(ctx context.Context, in *UpdateUserRulesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_UpdateUserRules_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_UpdateUserRules_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) DeleteCurrentUserAccount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CommonReply, error) {
+func (c *publicUserClient) DeleteCurrentUserAccount(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CommonReply)
-	err := c.cc.Invoke(ctx, User_DeleteCurrentUserAccount_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, PublicUser_DeleteCurrentUserAccount_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *userClient) GetUserTrafficStats(ctx context.Context, in *GetUserTrafficStatsRequest, opts ...grpc.CallOption) (*GetUserTrafficStatsReply, error) {
+func (c *publicUserClient) GetUserTrafficStats(ctx context.Context, in *GetUserTrafficStatsRequest, opts ...grpc.CallOption) (*GetUserTrafficStatsReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetUserTrafficStatsReply)
-	err := c.cc.Invoke(ctx, User_GetUserTrafficStats_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PublicUser_GetUserTrafficStats_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// UserServer is the server API for User service.
-// All implementations must embed UnimplementedUserServer
+// PublicUserServer is the server API for PublicUser service.
+// All implementations must embed UnimplementedPublicUserServer
 // for forward compatibility.
 //
 // Public User service
 // 公共用户服务（需要认证）
-type UserServer interface {
+type PublicUserServer interface {
 	// QueryUserInfo 查询用户信息
-	QueryUserInfo(context.Context, *emptypb.Empty) (*UserInfoReply, error)
+	QueryUserInfo(context.Context, *emptypb.Empty) (*User, error)
 	// GetLoginLog 获取登录日志
-	GetLoginLog(context.Context, *GetLoginLogRequest) (*LoginLogReply, error)
+	GetLoginLog(context.Context, *GetLoginLogRequest) (*GetLoginLogReply, error)
 	// QueryUserBalanceLog 查询用户余额日志
-	QueryUserBalanceLog(context.Context, *emptypb.Empty) (*BalanceLogReply, error)
+	QueryUserBalanceLog(context.Context, *emptypb.Empty) (*QueryUserBalanceLogReply, error)
 	// QueryUserCommissionLog 查询用户佣金日志
-	QueryUserCommissionLog(context.Context, *QueryUserCommissionLogRequest) (*CommissionLogReply, error)
+	QueryUserCommissionLog(context.Context, *QueryUserCommissionLogRequest) (*QueryUserCommissionLogReply, error)
 	// QueryUserAffiliate 查询用户推荐数量
-	QueryUserAffiliate(context.Context, *emptypb.Empty) (*UserAffiliateReply, error)
+	QueryUserAffiliate(context.Context, *emptypb.Empty) (*QueryUserAffiliateCountReply, error)
 	// QueryUserAffiliateList 查询用户推荐列表
-	QueryUserAffiliateList(context.Context, *QueryUserAffiliateListRequest) (*UserAffiliateListReply, error)
+	QueryUserAffiliateList(context.Context, *QueryUserAffiliateListRequest) (*QueryUserAffiliateListReply, error)
 	// GetOAuthMethods 获取OAuth方法
-	GetOAuthMethods(context.Context, *emptypb.Empty) (*OAuthMethodsReply, error)
+	GetOAuthMethods(context.Context, *emptypb.Empty) (*GetOAuthMethodsReply, error)
 	// QueryUserSubscribe 查询用户订阅
-	QueryUserSubscribe(context.Context, *emptypb.Empty) (*UserSubscribeReply, error)
+	QueryUserSubscribe(context.Context, *emptypb.Empty) (*QueryUserSubscribeReply, error)
 	// GetSubscribeLog 获取订阅日志
-	GetSubscribeLog(context.Context, *GetSubscribeLogRequest) (*SubscribeLogReply, error)
+	GetSubscribeLog(context.Context, *GetSubscribeLogRequest) (*GetSubscribeLogReply, error)
 	// ResetUserSubscribeToken 重置订阅令牌
-	ResetUserSubscribeToken(context.Context, *ResetUserSubscribeTokenRequest) (*CommonReply, error)
+	ResetUserSubscribeToken(context.Context, *ResetUserSubscribeTokenRequest) (*emptypb.Empty, error)
 	// PreUnsubscribe 预退订
-	PreUnsubscribe(context.Context, *PreUnsubscribeRequest) (*UnsubscribeInfoReply, error)
+	PreUnsubscribe(context.Context, *PreUnsubscribeRequest) (*PreUnsubscribeReply, error)
 	// Unsubscribe 退订
-	Unsubscribe(context.Context, *UnsubscribeRequest) (*CommonReply, error)
+	Unsubscribe(context.Context, *UnsubscribeRequest) (*emptypb.Empty, error)
 	// UpdateUserNotify 更新通知设置
-	UpdateUserNotify(context.Context, *UpdateUserNotifyRequest) (*CommonReply, error)
+	UpdateUserNotify(context.Context, *UpdateUserNotifyRequest) (*emptypb.Empty, error)
 	// UpdateUserPassword 更新密码
-	UpdateUserPassword(context.Context, *UpdateUserPasswordRequest) (*CommonReply, error)
+	UpdateUserPassword(context.Context, *UpdateUserPasswordRequest) (*emptypb.Empty, error)
 	// BindTelegram 绑定Telegram
-	BindTelegram(context.Context, *emptypb.Empty) (*TelegramBindReply, error)
+	BindTelegram(context.Context, *emptypb.Empty) (*BindTelegramReply, error)
 	// UnbindTelegram 解绑Telegram
-	UnbindTelegram(context.Context, *emptypb.Empty) (*CommonReply, error)
+	UnbindTelegram(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	// BindOAuth 绑定OAuth
-	BindOAuth(context.Context, *BindOAuthRequest) (*OAuthBindReply, error)
+	BindOAuth(context.Context, *BindOAuthRequest) (*BindOAuthReply, error)
 	// BindOAuthCallback OAuth回调
-	BindOAuthCallback(context.Context, *BindOAuthCallbackRequest) (*CommonReply, error)
+	BindOAuthCallback(context.Context, *BindOAuthCallbackRequest) (*emptypb.Empty, error)
 	// UnbindOAuth 解绑OAuth
-	UnbindOAuth(context.Context, *UnbindOAuthRequest) (*CommonReply, error)
+	UnbindOAuth(context.Context, *UnbindOAuthRequest) (*emptypb.Empty, error)
 	// VerifyEmail 验证邮箱
-	VerifyEmail(context.Context, *VerifyEmailRequest) (*CommonReply, error)
+	VerifyEmail(context.Context, *VerifyEmailRequest) (*emptypb.Empty, error)
 	// UpdateBindMobile 更新绑定手机
-	UpdateBindMobile(context.Context, *UpdateBindMobileRequest) (*CommonReply, error)
+	UpdateBindMobile(context.Context, *UpdateBindMobileRequest) (*emptypb.Empty, error)
 	// UpdateBindEmail 更新绑定邮箱
-	UpdateBindEmail(context.Context, *UpdateBindEmailRequest) (*CommonReply, error)
+	UpdateBindEmail(context.Context, *UpdateBindEmailRequest) (*emptypb.Empty, error)
 	// GetDeviceList 获取设备列表
 	GetDeviceList(context.Context, *emptypb.Empty) (*GetDeviceListReply, error)
 	// UnbindDevice 解绑设备
-	UnbindDevice(context.Context, *UnbindDeviceRequest) (*CommonReply, error)
+	UnbindDevice(context.Context, *UnbindDeviceRequest) (*emptypb.Empty, error)
 	// GetDeviceOnlineStatistics 获取设备在线统计
 	GetDeviceOnlineStatistics(context.Context, *emptypb.Empty) (*GetDeviceOnlineStatisticsReply, error)
 	// DeviceWSConnect 设备WebSocket连接
-	DeviceWSConnect(context.Context, *emptypb.Empty) (*CommonReply, error)
+	DeviceWSConnect(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	// CommissionWithdraw 佣金提现
-	CommissionWithdraw(context.Context, *CommissionWithdrawRequest) (*WithdrawalLogReply, error)
+	CommissionWithdraw(context.Context, *CommissionWithdrawRequest) (*WithdrawalLog, error)
 	// QueryWithdrawalLog 查询提现日志
-	QueryWithdrawalLog(context.Context, *QueryWithdrawalLogRequest) (*WithdrawalLogListReply, error)
+	QueryWithdrawalLog(context.Context, *QueryWithdrawalLogRequest) (*QueryWithdrawalLogReply, error)
 	// UpdateUserSubscribeNote 更新用户订阅备注
-	UpdateUserSubscribeNote(context.Context, *UpdateUserSubscribeNoteRequest) (*CommonReply, error)
+	UpdateUserSubscribeNote(context.Context, *UpdateUserSubscribeNoteRequest) (*emptypb.Empty, error)
 	// UpdateUserRules 更新用户规则
-	UpdateUserRules(context.Context, *UpdateUserRulesRequest) (*CommonReply, error)
+	UpdateUserRules(context.Context, *UpdateUserRulesRequest) (*emptypb.Empty, error)
 	// DeleteCurrentUserAccount 删除当前用户账号
-	DeleteCurrentUserAccount(context.Context, *emptypb.Empty) (*CommonReply, error)
+	DeleteCurrentUserAccount(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	// GetUserTrafficStats 获取用户流量统计
 	GetUserTrafficStats(context.Context, *GetUserTrafficStatsRequest) (*GetUserTrafficStatsReply, error)
-	mustEmbedUnimplementedUserServer()
+	mustEmbedUnimplementedPublicUserServer()
 }
 
-// UnimplementedUserServer must be embedded to have
+// UnimplementedPublicUserServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedUserServer struct{}
+type UnimplementedPublicUserServer struct{}
 
-func (UnimplementedUserServer) QueryUserInfo(context.Context, *emptypb.Empty) (*UserInfoReply, error) {
+func (UnimplementedPublicUserServer) QueryUserInfo(context.Context, *emptypb.Empty) (*User, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryUserInfo not implemented")
 }
-func (UnimplementedUserServer) GetLoginLog(context.Context, *GetLoginLogRequest) (*LoginLogReply, error) {
+func (UnimplementedPublicUserServer) GetLoginLog(context.Context, *GetLoginLogRequest) (*GetLoginLogReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetLoginLog not implemented")
 }
-func (UnimplementedUserServer) QueryUserBalanceLog(context.Context, *emptypb.Empty) (*BalanceLogReply, error) {
+func (UnimplementedPublicUserServer) QueryUserBalanceLog(context.Context, *emptypb.Empty) (*QueryUserBalanceLogReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryUserBalanceLog not implemented")
 }
-func (UnimplementedUserServer) QueryUserCommissionLog(context.Context, *QueryUserCommissionLogRequest) (*CommissionLogReply, error) {
+func (UnimplementedPublicUserServer) QueryUserCommissionLog(context.Context, *QueryUserCommissionLogRequest) (*QueryUserCommissionLogReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryUserCommissionLog not implemented")
 }
-func (UnimplementedUserServer) QueryUserAffiliate(context.Context, *emptypb.Empty) (*UserAffiliateReply, error) {
+func (UnimplementedPublicUserServer) QueryUserAffiliate(context.Context, *emptypb.Empty) (*QueryUserAffiliateCountReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryUserAffiliate not implemented")
 }
-func (UnimplementedUserServer) QueryUserAffiliateList(context.Context, *QueryUserAffiliateListRequest) (*UserAffiliateListReply, error) {
+func (UnimplementedPublicUserServer) QueryUserAffiliateList(context.Context, *QueryUserAffiliateListRequest) (*QueryUserAffiliateListReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryUserAffiliateList not implemented")
 }
-func (UnimplementedUserServer) GetOAuthMethods(context.Context, *emptypb.Empty) (*OAuthMethodsReply, error) {
+func (UnimplementedPublicUserServer) GetOAuthMethods(context.Context, *emptypb.Empty) (*GetOAuthMethodsReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetOAuthMethods not implemented")
 }
-func (UnimplementedUserServer) QueryUserSubscribe(context.Context, *emptypb.Empty) (*UserSubscribeReply, error) {
+func (UnimplementedPublicUserServer) QueryUserSubscribe(context.Context, *emptypb.Empty) (*QueryUserSubscribeReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryUserSubscribe not implemented")
 }
-func (UnimplementedUserServer) GetSubscribeLog(context.Context, *GetSubscribeLogRequest) (*SubscribeLogReply, error) {
+func (UnimplementedPublicUserServer) GetSubscribeLog(context.Context, *GetSubscribeLogRequest) (*GetSubscribeLogReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetSubscribeLog not implemented")
 }
-func (UnimplementedUserServer) ResetUserSubscribeToken(context.Context, *ResetUserSubscribeTokenRequest) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) ResetUserSubscribeToken(context.Context, *ResetUserSubscribeTokenRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method ResetUserSubscribeToken not implemented")
 }
-func (UnimplementedUserServer) PreUnsubscribe(context.Context, *PreUnsubscribeRequest) (*UnsubscribeInfoReply, error) {
+func (UnimplementedPublicUserServer) PreUnsubscribe(context.Context, *PreUnsubscribeRequest) (*PreUnsubscribeReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method PreUnsubscribe not implemented")
 }
-func (UnimplementedUserServer) Unsubscribe(context.Context, *UnsubscribeRequest) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) Unsubscribe(context.Context, *UnsubscribeRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method Unsubscribe not implemented")
 }
-func (UnimplementedUserServer) UpdateUserNotify(context.Context, *UpdateUserNotifyRequest) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) UpdateUserNotify(context.Context, *UpdateUserNotifyRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateUserNotify not implemented")
 }
-func (UnimplementedUserServer) UpdateUserPassword(context.Context, *UpdateUserPasswordRequest) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) UpdateUserPassword(context.Context, *UpdateUserPasswordRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateUserPassword not implemented")
 }
-func (UnimplementedUserServer) BindTelegram(context.Context, *emptypb.Empty) (*TelegramBindReply, error) {
+func (UnimplementedPublicUserServer) BindTelegram(context.Context, *emptypb.Empty) (*BindTelegramReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method BindTelegram not implemented")
 }
-func (UnimplementedUserServer) UnbindTelegram(context.Context, *emptypb.Empty) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) UnbindTelegram(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UnbindTelegram not implemented")
 }
-func (UnimplementedUserServer) BindOAuth(context.Context, *BindOAuthRequest) (*OAuthBindReply, error) {
+func (UnimplementedPublicUserServer) BindOAuth(context.Context, *BindOAuthRequest) (*BindOAuthReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method BindOAuth not implemented")
 }
-func (UnimplementedUserServer) BindOAuthCallback(context.Context, *BindOAuthCallbackRequest) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) BindOAuthCallback(context.Context, *BindOAuthCallbackRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method BindOAuthCallback not implemented")
 }
-func (UnimplementedUserServer) UnbindOAuth(context.Context, *UnbindOAuthRequest) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) UnbindOAuth(context.Context, *UnbindOAuthRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UnbindOAuth not implemented")
 }
-func (UnimplementedUserServer) VerifyEmail(context.Context, *VerifyEmailRequest) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) VerifyEmail(context.Context, *VerifyEmailRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method VerifyEmail not implemented")
 }
-func (UnimplementedUserServer) UpdateBindMobile(context.Context, *UpdateBindMobileRequest) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) UpdateBindMobile(context.Context, *UpdateBindMobileRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateBindMobile not implemented")
 }
-func (UnimplementedUserServer) UpdateBindEmail(context.Context, *UpdateBindEmailRequest) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) UpdateBindEmail(context.Context, *UpdateBindEmailRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateBindEmail not implemented")
 }
-func (UnimplementedUserServer) GetDeviceList(context.Context, *emptypb.Empty) (*GetDeviceListReply, error) {
+func (UnimplementedPublicUserServer) GetDeviceList(context.Context, *emptypb.Empty) (*GetDeviceListReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetDeviceList not implemented")
 }
-func (UnimplementedUserServer) UnbindDevice(context.Context, *UnbindDeviceRequest) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) UnbindDevice(context.Context, *UnbindDeviceRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UnbindDevice not implemented")
 }
-func (UnimplementedUserServer) GetDeviceOnlineStatistics(context.Context, *emptypb.Empty) (*GetDeviceOnlineStatisticsReply, error) {
+func (UnimplementedPublicUserServer) GetDeviceOnlineStatistics(context.Context, *emptypb.Empty) (*GetDeviceOnlineStatisticsReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetDeviceOnlineStatistics not implemented")
 }
-func (UnimplementedUserServer) DeviceWSConnect(context.Context, *emptypb.Empty) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) DeviceWSConnect(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeviceWSConnect not implemented")
 }
-func (UnimplementedUserServer) CommissionWithdraw(context.Context, *CommissionWithdrawRequest) (*WithdrawalLogReply, error) {
+func (UnimplementedPublicUserServer) CommissionWithdraw(context.Context, *CommissionWithdrawRequest) (*WithdrawalLog, error) {
 	return nil, status.Error(codes.Unimplemented, "method CommissionWithdraw not implemented")
 }
-func (UnimplementedUserServer) QueryWithdrawalLog(context.Context, *QueryWithdrawalLogRequest) (*WithdrawalLogListReply, error) {
+func (UnimplementedPublicUserServer) QueryWithdrawalLog(context.Context, *QueryWithdrawalLogRequest) (*QueryWithdrawalLogReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryWithdrawalLog not implemented")
 }
-func (UnimplementedUserServer) UpdateUserSubscribeNote(context.Context, *UpdateUserSubscribeNoteRequest) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) UpdateUserSubscribeNote(context.Context, *UpdateUserSubscribeNoteRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateUserSubscribeNote not implemented")
 }
-func (UnimplementedUserServer) UpdateUserRules(context.Context, *UpdateUserRulesRequest) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) UpdateUserRules(context.Context, *UpdateUserRulesRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateUserRules not implemented")
 }
-func (UnimplementedUserServer) DeleteCurrentUserAccount(context.Context, *emptypb.Empty) (*CommonReply, error) {
+func (UnimplementedPublicUserServer) DeleteCurrentUserAccount(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteCurrentUserAccount not implemented")
 }
-func (UnimplementedUserServer) GetUserTrafficStats(context.Context, *GetUserTrafficStatsRequest) (*GetUserTrafficStatsReply, error) {
+func (UnimplementedPublicUserServer) GetUserTrafficStats(context.Context, *GetUserTrafficStatsRequest) (*GetUserTrafficStatsReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetUserTrafficStats not implemented")
 }
-func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
-func (UnimplementedUserServer) testEmbeddedByValue()              {}
+func (UnimplementedPublicUserServer) mustEmbedUnimplementedPublicUserServer() {}
+func (UnimplementedPublicUserServer) testEmbeddedByValue()                    {}
 
-// UnsafeUserServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to UserServer will
+// UnsafePublicUserServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PublicUserServer will
 // result in compilation errors.
-type UnsafeUserServer interface {
-	mustEmbedUnimplementedUserServer()
+type UnsafePublicUserServer interface {
+	mustEmbedUnimplementedPublicUserServer()
 }
 
-func RegisterUserServer(s grpc.ServiceRegistrar, srv UserServer) {
-	// If the following call panics, it indicates UnimplementedUserServer was
+func RegisterPublicUserServer(s grpc.ServiceRegistrar, srv PublicUserServer) {
+	// If the following call panics, it indicates UnimplementedPublicUserServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&User_ServiceDesc, srv)
+	s.RegisterService(&PublicUser_ServiceDesc, srv)
 }
 
-func _User_QueryUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_QueryUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).QueryUserInfo(ctx, in)
+		return srv.(PublicUserServer).QueryUserInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_QueryUserInfo_FullMethodName,
+		FullMethod: PublicUser_QueryUserInfo_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).QueryUserInfo(ctx, req.(*emptypb.Empty))
+		return srv.(PublicUserServer).QueryUserInfo(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_GetLoginLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_GetLoginLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetLoginLogRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).GetLoginLog(ctx, in)
+		return srv.(PublicUserServer).GetLoginLog(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_GetLoginLog_FullMethodName,
+		FullMethod: PublicUser_GetLoginLog_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetLoginLog(ctx, req.(*GetLoginLogRequest))
+		return srv.(PublicUserServer).GetLoginLog(ctx, req.(*GetLoginLogRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_QueryUserBalanceLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_QueryUserBalanceLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).QueryUserBalanceLog(ctx, in)
+		return srv.(PublicUserServer).QueryUserBalanceLog(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_QueryUserBalanceLog_FullMethodName,
+		FullMethod: PublicUser_QueryUserBalanceLog_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).QueryUserBalanceLog(ctx, req.(*emptypb.Empty))
+		return srv.(PublicUserServer).QueryUserBalanceLog(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_QueryUserCommissionLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_QueryUserCommissionLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QueryUserCommissionLogRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).QueryUserCommissionLog(ctx, in)
+		return srv.(PublicUserServer).QueryUserCommissionLog(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_QueryUserCommissionLog_FullMethodName,
+		FullMethod: PublicUser_QueryUserCommissionLog_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).QueryUserCommissionLog(ctx, req.(*QueryUserCommissionLogRequest))
+		return srv.(PublicUserServer).QueryUserCommissionLog(ctx, req.(*QueryUserCommissionLogRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_QueryUserAffiliate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_QueryUserAffiliate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).QueryUserAffiliate(ctx, in)
+		return srv.(PublicUserServer).QueryUserAffiliate(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_QueryUserAffiliate_FullMethodName,
+		FullMethod: PublicUser_QueryUserAffiliate_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).QueryUserAffiliate(ctx, req.(*emptypb.Empty))
+		return srv.(PublicUserServer).QueryUserAffiliate(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_QueryUserAffiliateList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_QueryUserAffiliateList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QueryUserAffiliateListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).QueryUserAffiliateList(ctx, in)
+		return srv.(PublicUserServer).QueryUserAffiliateList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_QueryUserAffiliateList_FullMethodName,
+		FullMethod: PublicUser_QueryUserAffiliateList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).QueryUserAffiliateList(ctx, req.(*QueryUserAffiliateListRequest))
+		return srv.(PublicUserServer).QueryUserAffiliateList(ctx, req.(*QueryUserAffiliateListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_GetOAuthMethods_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_GetOAuthMethods_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).GetOAuthMethods(ctx, in)
+		return srv.(PublicUserServer).GetOAuthMethods(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_GetOAuthMethods_FullMethodName,
+		FullMethod: PublicUser_GetOAuthMethods_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetOAuthMethods(ctx, req.(*emptypb.Empty))
+		return srv.(PublicUserServer).GetOAuthMethods(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_QueryUserSubscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_QueryUserSubscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).QueryUserSubscribe(ctx, in)
+		return srv.(PublicUserServer).QueryUserSubscribe(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_QueryUserSubscribe_FullMethodName,
+		FullMethod: PublicUser_QueryUserSubscribe_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).QueryUserSubscribe(ctx, req.(*emptypb.Empty))
+		return srv.(PublicUserServer).QueryUserSubscribe(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_GetSubscribeLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_GetSubscribeLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetSubscribeLogRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).GetSubscribeLog(ctx, in)
+		return srv.(PublicUserServer).GetSubscribeLog(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_GetSubscribeLog_FullMethodName,
+		FullMethod: PublicUser_GetSubscribeLog_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetSubscribeLog(ctx, req.(*GetSubscribeLogRequest))
+		return srv.(PublicUserServer).GetSubscribeLog(ctx, req.(*GetSubscribeLogRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_ResetUserSubscribeToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_ResetUserSubscribeToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ResetUserSubscribeTokenRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).ResetUserSubscribeToken(ctx, in)
+		return srv.(PublicUserServer).ResetUserSubscribeToken(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_ResetUserSubscribeToken_FullMethodName,
+		FullMethod: PublicUser_ResetUserSubscribeToken_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).ResetUserSubscribeToken(ctx, req.(*ResetUserSubscribeTokenRequest))
+		return srv.(PublicUserServer).ResetUserSubscribeToken(ctx, req.(*ResetUserSubscribeTokenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_PreUnsubscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_PreUnsubscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PreUnsubscribeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).PreUnsubscribe(ctx, in)
+		return srv.(PublicUserServer).PreUnsubscribe(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_PreUnsubscribe_FullMethodName,
+		FullMethod: PublicUser_PreUnsubscribe_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).PreUnsubscribe(ctx, req.(*PreUnsubscribeRequest))
+		return srv.(PublicUserServer).PreUnsubscribe(ctx, req.(*PreUnsubscribeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_Unsubscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_Unsubscribe_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UnsubscribeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).Unsubscribe(ctx, in)
+		return srv.(PublicUserServer).Unsubscribe(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_Unsubscribe_FullMethodName,
+		FullMethod: PublicUser_Unsubscribe_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).Unsubscribe(ctx, req.(*UnsubscribeRequest))
+		return srv.(PublicUserServer).Unsubscribe(ctx, req.(*UnsubscribeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_UpdateUserNotify_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_UpdateUserNotify_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserNotifyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).UpdateUserNotify(ctx, in)
+		return srv.(PublicUserServer).UpdateUserNotify(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_UpdateUserNotify_FullMethodName,
+		FullMethod: PublicUser_UpdateUserNotify_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).UpdateUserNotify(ctx, req.(*UpdateUserNotifyRequest))
+		return srv.(PublicUserServer).UpdateUserNotify(ctx, req.(*UpdateUserNotifyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_UpdateUserPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_UpdateUserPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserPasswordRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).UpdateUserPassword(ctx, in)
+		return srv.(PublicUserServer).UpdateUserPassword(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_UpdateUserPassword_FullMethodName,
+		FullMethod: PublicUser_UpdateUserPassword_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).UpdateUserPassword(ctx, req.(*UpdateUserPasswordRequest))
+		return srv.(PublicUserServer).UpdateUserPassword(ctx, req.(*UpdateUserPasswordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_BindTelegram_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_BindTelegram_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).BindTelegram(ctx, in)
+		return srv.(PublicUserServer).BindTelegram(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_BindTelegram_FullMethodName,
+		FullMethod: PublicUser_BindTelegram_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).BindTelegram(ctx, req.(*emptypb.Empty))
+		return srv.(PublicUserServer).BindTelegram(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_UnbindTelegram_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_UnbindTelegram_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).UnbindTelegram(ctx, in)
+		return srv.(PublicUserServer).UnbindTelegram(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_UnbindTelegram_FullMethodName,
+		FullMethod: PublicUser_UnbindTelegram_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).UnbindTelegram(ctx, req.(*emptypb.Empty))
+		return srv.(PublicUserServer).UnbindTelegram(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_BindOAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_BindOAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(BindOAuthRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).BindOAuth(ctx, in)
+		return srv.(PublicUserServer).BindOAuth(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_BindOAuth_FullMethodName,
+		FullMethod: PublicUser_BindOAuth_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).BindOAuth(ctx, req.(*BindOAuthRequest))
+		return srv.(PublicUserServer).BindOAuth(ctx, req.(*BindOAuthRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_BindOAuthCallback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_BindOAuthCallback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(BindOAuthCallbackRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).BindOAuthCallback(ctx, in)
+		return srv.(PublicUserServer).BindOAuthCallback(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_BindOAuthCallback_FullMethodName,
+		FullMethod: PublicUser_BindOAuthCallback_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).BindOAuthCallback(ctx, req.(*BindOAuthCallbackRequest))
+		return srv.(PublicUserServer).BindOAuthCallback(ctx, req.(*BindOAuthCallbackRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_UnbindOAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_UnbindOAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UnbindOAuthRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).UnbindOAuth(ctx, in)
+		return srv.(PublicUserServer).UnbindOAuth(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_UnbindOAuth_FullMethodName,
+		FullMethod: PublicUser_UnbindOAuth_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).UnbindOAuth(ctx, req.(*UnbindOAuthRequest))
+		return srv.(PublicUserServer).UnbindOAuth(ctx, req.(*UnbindOAuthRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(VerifyEmailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).VerifyEmail(ctx, in)
+		return srv.(PublicUserServer).VerifyEmail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_VerifyEmail_FullMethodName,
+		FullMethod: PublicUser_VerifyEmail_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).VerifyEmail(ctx, req.(*VerifyEmailRequest))
+		return srv.(PublicUserServer).VerifyEmail(ctx, req.(*VerifyEmailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_UpdateBindMobile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_UpdateBindMobile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateBindMobileRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).UpdateBindMobile(ctx, in)
+		return srv.(PublicUserServer).UpdateBindMobile(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_UpdateBindMobile_FullMethodName,
+		FullMethod: PublicUser_UpdateBindMobile_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).UpdateBindMobile(ctx, req.(*UpdateBindMobileRequest))
+		return srv.(PublicUserServer).UpdateBindMobile(ctx, req.(*UpdateBindMobileRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_UpdateBindEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_UpdateBindEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateBindEmailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).UpdateBindEmail(ctx, in)
+		return srv.(PublicUserServer).UpdateBindEmail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_UpdateBindEmail_FullMethodName,
+		FullMethod: PublicUser_UpdateBindEmail_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).UpdateBindEmail(ctx, req.(*UpdateBindEmailRequest))
+		return srv.(PublicUserServer).UpdateBindEmail(ctx, req.(*UpdateBindEmailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_GetDeviceList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_GetDeviceList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).GetDeviceList(ctx, in)
+		return srv.(PublicUserServer).GetDeviceList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_GetDeviceList_FullMethodName,
+		FullMethod: PublicUser_GetDeviceList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetDeviceList(ctx, req.(*emptypb.Empty))
+		return srv.(PublicUserServer).GetDeviceList(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_UnbindDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_UnbindDevice_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UnbindDeviceRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).UnbindDevice(ctx, in)
+		return srv.(PublicUserServer).UnbindDevice(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_UnbindDevice_FullMethodName,
+		FullMethod: PublicUser_UnbindDevice_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).UnbindDevice(ctx, req.(*UnbindDeviceRequest))
+		return srv.(PublicUserServer).UnbindDevice(ctx, req.(*UnbindDeviceRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_GetDeviceOnlineStatistics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_GetDeviceOnlineStatistics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).GetDeviceOnlineStatistics(ctx, in)
+		return srv.(PublicUserServer).GetDeviceOnlineStatistics(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_GetDeviceOnlineStatistics_FullMethodName,
+		FullMethod: PublicUser_GetDeviceOnlineStatistics_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetDeviceOnlineStatistics(ctx, req.(*emptypb.Empty))
+		return srv.(PublicUserServer).GetDeviceOnlineStatistics(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_DeviceWSConnect_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_DeviceWSConnect_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).DeviceWSConnect(ctx, in)
+		return srv.(PublicUserServer).DeviceWSConnect(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_DeviceWSConnect_FullMethodName,
+		FullMethod: PublicUser_DeviceWSConnect_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).DeviceWSConnect(ctx, req.(*emptypb.Empty))
+		return srv.(PublicUserServer).DeviceWSConnect(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_CommissionWithdraw_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_CommissionWithdraw_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CommissionWithdrawRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).CommissionWithdraw(ctx, in)
+		return srv.(PublicUserServer).CommissionWithdraw(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_CommissionWithdraw_FullMethodName,
+		FullMethod: PublicUser_CommissionWithdraw_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).CommissionWithdraw(ctx, req.(*CommissionWithdrawRequest))
+		return srv.(PublicUserServer).CommissionWithdraw(ctx, req.(*CommissionWithdrawRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_QueryWithdrawalLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_QueryWithdrawalLog_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QueryWithdrawalLogRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).QueryWithdrawalLog(ctx, in)
+		return srv.(PublicUserServer).QueryWithdrawalLog(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_QueryWithdrawalLog_FullMethodName,
+		FullMethod: PublicUser_QueryWithdrawalLog_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).QueryWithdrawalLog(ctx, req.(*QueryWithdrawalLogRequest))
+		return srv.(PublicUserServer).QueryWithdrawalLog(ctx, req.(*QueryWithdrawalLogRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_UpdateUserSubscribeNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_UpdateUserSubscribeNote_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserSubscribeNoteRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).UpdateUserSubscribeNote(ctx, in)
+		return srv.(PublicUserServer).UpdateUserSubscribeNote(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_UpdateUserSubscribeNote_FullMethodName,
+		FullMethod: PublicUser_UpdateUserSubscribeNote_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).UpdateUserSubscribeNote(ctx, req.(*UpdateUserSubscribeNoteRequest))
+		return srv.(PublicUserServer).UpdateUserSubscribeNote(ctx, req.(*UpdateUserSubscribeNoteRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_UpdateUserRules_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_UpdateUserRules_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateUserRulesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).UpdateUserRules(ctx, in)
+		return srv.(PublicUserServer).UpdateUserRules(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_UpdateUserRules_FullMethodName,
+		FullMethod: PublicUser_UpdateUserRules_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).UpdateUserRules(ctx, req.(*UpdateUserRulesRequest))
+		return srv.(PublicUserServer).UpdateUserRules(ctx, req.(*UpdateUserRulesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_DeleteCurrentUserAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_DeleteCurrentUserAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).DeleteCurrentUserAccount(ctx, in)
+		return srv.(PublicUserServer).DeleteCurrentUserAccount(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_DeleteCurrentUserAccount_FullMethodName,
+		FullMethod: PublicUser_DeleteCurrentUserAccount_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).DeleteCurrentUserAccount(ctx, req.(*emptypb.Empty))
+		return srv.(PublicUserServer).DeleteCurrentUserAccount(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_GetUserTrafficStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicUser_GetUserTrafficStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetUserTrafficStatsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).GetUserTrafficStats(ctx, in)
+		return srv.(PublicUserServer).GetUserTrafficStats(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_GetUserTrafficStats_FullMethodName,
+		FullMethod: PublicUser_GetUserTrafficStats_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetUserTrafficStats(ctx, req.(*GetUserTrafficStatsRequest))
+		return srv.(PublicUserServer).GetUserTrafficStats(ctx, req.(*GetUserTrafficStatsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// User_ServiceDesc is the grpc.ServiceDesc for User service.
+// PublicUser_ServiceDesc is the grpc.ServiceDesc for PublicUser service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var User_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.public.user.v1.User",
-	HandlerType: (*UserServer)(nil),
+var PublicUser_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "api.public.user.v1.PublicUser",
+	HandlerType: (*PublicUserServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "QueryUserInfo",
-			Handler:    _User_QueryUserInfo_Handler,
+			Handler:    _PublicUser_QueryUserInfo_Handler,
 		},
 		{
 			MethodName: "GetLoginLog",
-			Handler:    _User_GetLoginLog_Handler,
+			Handler:    _PublicUser_GetLoginLog_Handler,
 		},
 		{
 			MethodName: "QueryUserBalanceLog",
-			Handler:    _User_QueryUserBalanceLog_Handler,
+			Handler:    _PublicUser_QueryUserBalanceLog_Handler,
 		},
 		{
 			MethodName: "QueryUserCommissionLog",
-			Handler:    _User_QueryUserCommissionLog_Handler,
+			Handler:    _PublicUser_QueryUserCommissionLog_Handler,
 		},
 		{
 			MethodName: "QueryUserAffiliate",
-			Handler:    _User_QueryUserAffiliate_Handler,
+			Handler:    _PublicUser_QueryUserAffiliate_Handler,
 		},
 		{
 			MethodName: "QueryUserAffiliateList",
-			Handler:    _User_QueryUserAffiliateList_Handler,
+			Handler:    _PublicUser_QueryUserAffiliateList_Handler,
 		},
 		{
 			MethodName: "GetOAuthMethods",
-			Handler:    _User_GetOAuthMethods_Handler,
+			Handler:    _PublicUser_GetOAuthMethods_Handler,
 		},
 		{
 			MethodName: "QueryUserSubscribe",
-			Handler:    _User_QueryUserSubscribe_Handler,
+			Handler:    _PublicUser_QueryUserSubscribe_Handler,
 		},
 		{
 			MethodName: "GetSubscribeLog",
-			Handler:    _User_GetSubscribeLog_Handler,
+			Handler:    _PublicUser_GetSubscribeLog_Handler,
 		},
 		{
 			MethodName: "ResetUserSubscribeToken",
-			Handler:    _User_ResetUserSubscribeToken_Handler,
+			Handler:    _PublicUser_ResetUserSubscribeToken_Handler,
 		},
 		{
 			MethodName: "PreUnsubscribe",
-			Handler:    _User_PreUnsubscribe_Handler,
+			Handler:    _PublicUser_PreUnsubscribe_Handler,
 		},
 		{
 			MethodName: "Unsubscribe",
-			Handler:    _User_Unsubscribe_Handler,
+			Handler:    _PublicUser_Unsubscribe_Handler,
 		},
 		{
 			MethodName: "UpdateUserNotify",
-			Handler:    _User_UpdateUserNotify_Handler,
+			Handler:    _PublicUser_UpdateUserNotify_Handler,
 		},
 		{
 			MethodName: "UpdateUserPassword",
-			Handler:    _User_UpdateUserPassword_Handler,
+			Handler:    _PublicUser_UpdateUserPassword_Handler,
 		},
 		{
 			MethodName: "BindTelegram",
-			Handler:    _User_BindTelegram_Handler,
+			Handler:    _PublicUser_BindTelegram_Handler,
 		},
 		{
 			MethodName: "UnbindTelegram",
-			Handler:    _User_UnbindTelegram_Handler,
+			Handler:    _PublicUser_UnbindTelegram_Handler,
 		},
 		{
 			MethodName: "BindOAuth",
-			Handler:    _User_BindOAuth_Handler,
+			Handler:    _PublicUser_BindOAuth_Handler,
 		},
 		{
 			MethodName: "BindOAuthCallback",
-			Handler:    _User_BindOAuthCallback_Handler,
+			Handler:    _PublicUser_BindOAuthCallback_Handler,
 		},
 		{
 			MethodName: "UnbindOAuth",
-			Handler:    _User_UnbindOAuth_Handler,
+			Handler:    _PublicUser_UnbindOAuth_Handler,
 		},
 		{
 			MethodName: "VerifyEmail",
-			Handler:    _User_VerifyEmail_Handler,
+			Handler:    _PublicUser_VerifyEmail_Handler,
 		},
 		{
 			MethodName: "UpdateBindMobile",
-			Handler:    _User_UpdateBindMobile_Handler,
+			Handler:    _PublicUser_UpdateBindMobile_Handler,
 		},
 		{
 			MethodName: "UpdateBindEmail",
-			Handler:    _User_UpdateBindEmail_Handler,
+			Handler:    _PublicUser_UpdateBindEmail_Handler,
 		},
 		{
 			MethodName: "GetDeviceList",
-			Handler:    _User_GetDeviceList_Handler,
+			Handler:    _PublicUser_GetDeviceList_Handler,
 		},
 		{
 			MethodName: "UnbindDevice",
-			Handler:    _User_UnbindDevice_Handler,
+			Handler:    _PublicUser_UnbindDevice_Handler,
 		},
 		{
 			MethodName: "GetDeviceOnlineStatistics",
-			Handler:    _User_GetDeviceOnlineStatistics_Handler,
+			Handler:    _PublicUser_GetDeviceOnlineStatistics_Handler,
 		},
 		{
 			MethodName: "DeviceWSConnect",
-			Handler:    _User_DeviceWSConnect_Handler,
+			Handler:    _PublicUser_DeviceWSConnect_Handler,
 		},
 		{
 			MethodName: "CommissionWithdraw",
-			Handler:    _User_CommissionWithdraw_Handler,
+			Handler:    _PublicUser_CommissionWithdraw_Handler,
 		},
 		{
 			MethodName: "QueryWithdrawalLog",
-			Handler:    _User_QueryWithdrawalLog_Handler,
+			Handler:    _PublicUser_QueryWithdrawalLog_Handler,
 		},
 		{
 			MethodName: "UpdateUserSubscribeNote",
-			Handler:    _User_UpdateUserSubscribeNote_Handler,
+			Handler:    _PublicUser_UpdateUserSubscribeNote_Handler,
 		},
 		{
 			MethodName: "UpdateUserRules",
-			Handler:    _User_UpdateUserRules_Handler,
+			Handler:    _PublicUser_UpdateUserRules_Handler,
 		},
 		{
 			MethodName: "DeleteCurrentUserAccount",
-			Handler:    _User_DeleteCurrentUserAccount_Handler,
+			Handler:    _PublicUser_DeleteCurrentUserAccount_Handler,
 		},
 		{
 			MethodName: "GetUserTrafficStats",
-			Handler:    _User_GetUserTrafficStats_Handler,
+			Handler:    _PublicUser_GetUserTrafficStats_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

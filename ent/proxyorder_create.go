@@ -69,13 +69,13 @@ func (_c *ProxyOrderCreate) SetNillableType(v *int8) *ProxyOrderCreate {
 }
 
 // SetQuantity sets the "quantity" field.
-func (_c *ProxyOrderCreate) SetQuantity(v int64) *ProxyOrderCreate {
+func (_c *ProxyOrderCreate) SetQuantity(v int32) *ProxyOrderCreate {
 	_c.mutation.SetQuantity(v)
 	return _c
 }
 
 // SetNillableQuantity sets the "quantity" field if the given value is not nil.
-func (_c *ProxyOrderCreate) SetNillableQuantity(v *int64) *ProxyOrderCreate {
+func (_c *ProxyOrderCreate) SetNillableQuantity(v *int32) *ProxyOrderCreate {
 	if v != nil {
 		_c.SetQuantity(*v)
 	}
@@ -561,7 +561,7 @@ func (_c *ProxyOrderCreate) createSpec() (*ProxyOrder, *sqlgraph.CreateSpec) {
 		_node.Type = value
 	}
 	if value, ok := _c.mutation.Quantity(); ok {
-		_spec.SetField(proxyorder.FieldQuantity, field.TypeInt64, value)
+		_spec.SetField(proxyorder.FieldQuantity, field.TypeInt32, value)
 		_node.Quantity = value
 	}
 	if value, ok := _c.mutation.Price(); ok {

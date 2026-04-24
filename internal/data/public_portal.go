@@ -157,11 +157,11 @@ func (r *publicPortalRepo) GetSubscribeList(ctx context.Context, language string
 			UnitTime:          sub.UnitTime,
 			Discount:          discounts,
 			Replacement:       sub.Replacement,
-			Inventory:         sub.Inventory,
+			Inventory:         int64(sub.Inventory),
 			Traffic:           sub.Traffic,
-			SpeedLimit:        sub.SpeedLimit,
-			DeviceLimit:       sub.DeviceLimit,
-			Quota:             sub.Quota,
+			SpeedLimit:        int64(sub.SpeedLimit),
+			DeviceLimit:       int64(sub.DeviceLimit),
+			Quota:             int64(sub.Quota),
 			Nodes:             nodes,
 			NodeTags:          nodeTags,
 			NodeGroupIds:      tool.Int64SliceToStringSlice(sub.NodeGroupIds),
@@ -169,10 +169,10 @@ func (r *publicPortalRepo) GetSubscribeList(ctx context.Context, language string
 			TrafficLimit:      trafficLimit,
 			Show:              sub.Show,
 			Sell:              sub.Sell,
-			Sort:              sub.Sort,
-			DeductionRatio:    deductionRatio,
+			Sort:              int64(sub.Sort),
+			DeductionRatio:    int64(deductionRatio),
 			AllowDeduction:    sub.AllowDeduction,
-			ResetCycle:        resetCycle,
+			ResetCycle:        int64(resetCycle),
 			RenewalReset:      sub.RenewalReset,
 			ShowOriginalPrice: sub.ShowOriginalPrice,
 			CreatedAt:         sub.CreatedAt.Unix(),
@@ -227,7 +227,7 @@ func (r *publicPortalRepo) CalculateOrderPrice(ctx context.Context, subscribeID,
 			r.logger.Errorf("[CalculateOrderPrice] 查询优惠券失败: %v", err)
 			return nil, errors.InternalServer("DATABASE_ERROR", "查询优惠券失败")
 		}
-		if couponInfo.Count != 0 && couponInfo.Count <= couponInfo.UsedCount {
+		if couponInfo.Count != 0 && couponInfo.Count <= int32(couponInfo.UsedCount) {
 			r.logger.Warnf("[CalculateOrderPrice] 优惠券已用完: coupon=%s", *coupon)
 			return nil, responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
 		}
@@ -351,7 +351,7 @@ func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, req *portalBiz
 			return "", errors.InternalServer("DATABASE_ERROR", "查询优惠券失败")
 		}
 
-		if coupon.Count != 0 && coupon.Count <= coupon.UsedCount {
+		if coupon.Count != 0 && coupon.Count <= int32(coupon.UsedCount) {
 			return "", responsecode.NewKratosError(responsecode.ErrCouponUsedUp)
 		}
 		expireTime := time.Unix(coupon.ExpireTime, 0)
@@ -466,7 +466,7 @@ func (r *publicPortalRepo) CreatePortalOrder(ctx context.Context, req *portalBiz
 			SetUserID(0). // ⚠️ Portal订单userId为0
 			SetOrderNo(orderNo).
 			SetType(1). // 订阅类型
-			SetQuantity(req.Quantity).
+			SetQuantity(int32(req.Quantity)).
 			SetPrice(price).
 			SetAmount(amount). // ⚠️ 不含手续费（= 原价*折扣 - 优惠券）
 			SetDiscount(discountAmount).
@@ -812,11 +812,11 @@ func (r *publicPortalRepo) CheckOrderStatus(ctx context.Context, orderNo, authTy
 			UnitTime:          subscribeEntity.UnitTime,
 			Discount:          discounts,
 			Replacement:       subscribeEntity.Replacement,
-			Inventory:         subscribeEntity.Inventory,
+			Inventory:         int64(subscribeEntity.Inventory),
 			Traffic:           subscribeEntity.Traffic,
-			SpeedLimit:        subscribeEntity.SpeedLimit,
-			DeviceLimit:       subscribeEntity.DeviceLimit,
-			Quota:             subscribeEntity.Quota,
+			SpeedLimit:        int64(subscribeEntity.SpeedLimit),
+			DeviceLimit:       int64(subscribeEntity.DeviceLimit),
+			Quota:             int64(subscribeEntity.Quota),
 			Nodes:             nodes,
 			NodeTags:          nodeTags,
 			NodeGroupIds:      tool.Int64SliceToStringSlice(subscribeEntity.NodeGroupIds),
@@ -824,10 +824,10 @@ func (r *publicPortalRepo) CheckOrderStatus(ctx context.Context, orderNo, authTy
 			TrafficLimit:      trafficLimit,
 			Show:              subscribeEntity.Show,
 			Sell:              subscribeEntity.Sell,
-			Sort:              subscribeEntity.Sort,
-			DeductionRatio:    deductionRatio,
+			Sort:              int64(subscribeEntity.Sort),
+			DeductionRatio:    int64(deductionRatio),
 			AllowDeduction:    subscribeEntity.AllowDeduction,
-			ResetCycle:        resetCycle,
+			ResetCycle:        int64(resetCycle),
 			RenewalReset:      subscribeEntity.RenewalReset,
 			ShowOriginalPrice: subscribeEntity.ShowOriginalPrice,
 			CreatedAt:         subscribeEntity.CreatedAt.Unix(),
@@ -862,7 +862,7 @@ func (r *publicPortalRepo) CheckOrderStatus(ctx context.Context, orderNo, authTy
 	return &portalBiz.OrderStatusInfo{
 		OrderNo:        order.OrderNo,
 		Subscribe:      subscribe,
-		Quantity:       order.Quantity,
+		Quantity:       int64(order.Quantity),
 		Price:          order.Price,
 		Amount:         order.Amount,
 		Discount:       order.Discount,

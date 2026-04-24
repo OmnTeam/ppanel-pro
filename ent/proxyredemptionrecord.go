@@ -29,7 +29,7 @@ type ProxyRedemptionRecord struct {
 	// 时间单位
 	UnitTime string `json:"unit_time,omitempty"`
 	// 数量
-	Quantity int64 `json:"quantity,omitempty"`
+	Quantity int32 `json:"quantity,omitempty"`
 	// 兑换时间
 	RedeemedAt time.Time `json:"redeemed_at,omitempty"`
 	// 创建时间
@@ -133,7 +133,7 @@ func (_m *ProxyRedemptionRecord) assignValues(columns []string, values []any) er
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field quantity", values[i])
 			} else if value.Valid {
-				_m.Quantity = value.Int64
+				_m.Quantity = int32(value.Int64)
 			}
 		case proxyredemptionrecord.FieldRedeemedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {

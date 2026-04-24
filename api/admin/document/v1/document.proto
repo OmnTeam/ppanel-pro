@@ -139,7 +139,7 @@ message GetDocumentListRequest {
 
 // 获取文档列表数据
 message GetDocumentListData {
-  int64 total = 1;
+  int32 total = 1;
   repeated Document list = 2;
 }
 

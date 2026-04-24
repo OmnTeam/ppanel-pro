@@ -3,13 +3,11 @@ package payment
 import (
 	"context"
 	"net/url"
-	"strconv"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/public/payment/v1"
 	paymentBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/payment"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 )
 
 // PaymentService Public Payment服务实现
@@ -25,34 +23,26 @@ func NewPaymentService(uc *paymentBiz.PaymentUseCase) *PaymentService {
 
 // GetAvailablePaymentMethods 获取可用支付方式
 func (s *PaymentService) GetAvailablePaymentMethods(ctx context.Context, req *emptypb.Empty) (*v1.PaymentMethodsReply, error) {
-	// 调用业务层
 	methods, err := s.uc.GetAvailablePaymentMethods(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	// 转换结果
 	list := make([]*v1.PaymentMethod, 0, len(methods))
 	for _, m := range methods {
 		list = append(list, &v1.PaymentMethod{
-			Id:          strconv.FormatInt(m.ID, 10),
+			Id:          m.ID,
 			Name:        m.Name,
 			Platform:    m.Platform,
 			Description: m.Description,
 			Icon:        m.Icon,
-			FeeMode:     m.FeeMode,
-			FeePercent:  strconv.FormatInt(m.FeePercent, 10),
-			FeeAmount:   strconv.FormatInt(m.FeeAmount, 10),
+			FeeMode:     uint32(m.FeeMode),
+			FeePercent:  m.FeePercent,
+			FeeAmount:   m.FeeAmount,
 		})
 	}
 
-	return &v1.PaymentMethodsReply{
-		Code:    int32(responsecode.GetAvailablePaymentMethodsSuccess),
-		Message: responsecode.CodeMessages[responsecode.GetAvailablePaymentMethodsSuccess],
-		Data: &v1.PaymentMethodsData{
-			List: list,
-		},
-	}, nil
+	return &v1.PaymentMethodsReply{List: list}, nil
 }
 
 // AlipayNotify 支付宝回调

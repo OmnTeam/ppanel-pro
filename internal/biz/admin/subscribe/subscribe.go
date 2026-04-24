@@ -54,7 +54,7 @@ type SubscribeRepo interface {
 	GetSubscribeByID(ctx context.Context, id int) (*ent.ProxySubscribe, error)
 	UpdateSubscribe(ctx context.Context, sub *model.Subscribe) error
 	DeleteSubscribe(ctx context.Context, id int) error
-	GetSubscribeList(ctx context.Context, req *model.SubscribeListParams) ([]*ent.ProxySubscribe, int64, error)
+	GetSubscribeList(ctx context.Context, req *model.SubscribeListParams) ([]*ent.ProxySubscribe, int32, error)
 	CheckSubscribeInUse(ctx context.Context, subscribeID int) (bool, error)
 	BatchDeleteSubscribe(ctx context.Context, ids []int) error
 	GetSubscribeMinSort(ctx context.Context, ids []int) (int64, error)
@@ -65,7 +65,7 @@ type SubscribeRepo interface {
 	GetSubscribeGroupByID(ctx context.Context, id int) (*ent.ProxySubscribeGroup, error)
 	UpdateSubscribeGroup(ctx context.Context, group *model.SubscribeGroup) error
 	DeleteSubscribeGroup(ctx context.Context, id int) error
-	GetSubscribeGroupList(ctx context.Context) ([]*ent.ProxySubscribeGroup, int64, error)
+	GetSubscribeGroupList(ctx context.Context) ([]*ent.ProxySubscribeGroup, int32, error)
 	BatchDeleteSubscribeGroup(ctx context.Context, ids []int) error
 
 	// User subscription query (for checking if subscribe is in use)
@@ -78,46 +78,43 @@ type SubscribeRepo interface {
 
 // CreateSubscribe create subscribe
 func (uc *SubscribeUseCase) CreateSubscribe(ctx context.Context, req *v1.CreateSubscribeRequest) error {
-	// Marshal discount to JSON
-	discountJSON := ""
-	if len(req.Discount) > 0 {
-		data, err := json.Marshal(convertDiscountToModel(req.Discount))
-		if err != nil {
-			uc.log.WithContext(ctx).Errorw("msg", "Marshal discount failed", "error", err)
-			return responsecode.NewKratosError(responsecode.ErrInternalError)
-		}
-		discountJSON = string(data)
+	discountJSON, err := marshalJSON(convertDiscountToModel(req.Discount))
+	if err != nil {
+		uc.log.WithContext(ctx).Errorw("msg", "Marshal discount failed", "error", err)
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
-
-	// Convert nodes to comma-separated string
-	nodesInt := make([]int, len(req.Nodes))
-	for i, v := range req.Nodes {
-		nodesInt[i] = int(v)
+	trafficLimitJSON, err := marshalJSON(convertTrafficLimitToModel(req.TrafficLimit))
+	if err != nil {
+		uc.log.WithContext(ctx).Errorw("msg", "Marshal traffic limit failed", "error", err)
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
-	nodesStr := int64SliceToString(nodesInt)
-	nodeTagsStr := stringSliceToString(req.NodeTags)
 
 	sub := &model.Subscribe{
-		Name:           req.Name,
-		Language:       req.Language,
-		Description:    req.Description,
-		UnitPrice:      req.UnitPrice,
-		UnitTime:       req.UnitTime,
-		Discount:       discountJSON,
-		Replacement:    req.Replacement,
-		Inventory:      req.Inventory,
-		Traffic:        req.Traffic,
-		SpeedLimit:     req.SpeedLimit,
-		DeviceLimit:    req.DeviceLimit,
-		Quota:          req.Quota,
-		Nodes:          nodesStr,
-		NodeTags:       nodeTagsStr,
-		Show:           getBoolValue(req.Show, false),
-		Sell:           getBoolValue(req.Sell, false),
-		DeductionRatio: req.DeductionRatio,
-		AllowDeduction: getBoolValue(req.AllowDeduction, true),
-		ResetCycle:     req.ResetCycle,
-		RenewalReset:   getBoolValue(req.RenewalReset, false),
+		Name:              req.Name,
+		Language:          req.Language,
+		Description:       req.Description,
+		UnitPrice:         req.UnitPrice,
+		UnitTime:          req.UnitTime,
+		Discount:          discountJSON,
+		Replacement:       req.Replacement,
+		Inventory:         int64(req.Inventory),
+		Traffic:           req.Traffic,
+		SpeedLimit:        int64(req.SpeedLimit),
+		DeviceLimit:       int64(req.DeviceLimit),
+		Quota:             int64(req.Quota),
+		Nodes:             int64SliceToString(req.Nodes),
+		NodeTags:          stringSliceToString(req.NodeTags),
+		NodeGroupIDs:      cloneInt64Slice(req.NodeGroupIds),
+		NodeGroupID:       req.NodeGroupId,
+		TrafficLimit:      trafficLimitJSON,
+		Show:              getBoolValue(req.Show, false),
+		Sell:              getBoolValue(req.Sell, false),
+		Sort:              0,
+		DeductionRatio:    int64(req.DeductionRatio),
+		AllowDeduction:    getBoolValue(req.AllowDeduction, true),
+		ResetCycle:        int64(req.ResetCycle),
+		RenewalReset:      getBoolValue(req.RenewalReset, false),
+		ShowOriginalPrice: req.ShowOriginalPrice,
 	}
 
 	if err := uc.repo.CreateSubscribe(ctx, sub); err != nil {
@@ -146,48 +143,44 @@ func (uc *SubscribeUseCase) UpdateSubscribe(ctx context.Context, req *v1.UpdateS
 		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
-	// Marshal discount to JSON
-	discountJSON := ""
-	if len(req.Discount) > 0 {
-		data, err := json.Marshal(convertDiscountToModel(req.Discount))
-		if err != nil {
-			uc.log.WithContext(ctx).Errorw("msg", "Marshal discount failed", "error", err)
-			return responsecode.NewKratosError(responsecode.ErrInternalError)
-		}
-		discountJSON = string(data)
+	discountJSON, err := marshalJSON(convertDiscountToModel(req.Discount))
+	if err != nil {
+		uc.log.WithContext(ctx).Errorw("msg", "Marshal discount failed", "error", err)
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
-
-	// Convert nodes to comma-separated string
-	nodesInt := make([]int, len(req.Nodes))
-	for i, v := range req.Nodes {
-		nodesInt[i] = int(v)
+	trafficLimitJSON, err := marshalJSON(convertTrafficLimitToModel(req.TrafficLimit))
+	if err != nil {
+		uc.log.WithContext(ctx).Errorw("msg", "Marshal traffic limit failed", "error", err)
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
-	nodesStr := int64SliceToString(nodesInt)
-	nodeTagsStr := stringSliceToString(req.NodeTags)
 
 	sub := &model.Subscribe{
-		ID:             int64(id),
-		Name:           req.Name,
-		Language:       req.Language,
-		Description:    req.Description,
-		UnitPrice:      req.UnitPrice,
-		UnitTime:       req.UnitTime,
-		Discount:       discountJSON,
-		Replacement:    req.Replacement,
-		Inventory:      req.Inventory,
-		Traffic:        req.Traffic,
-		SpeedLimit:     req.SpeedLimit,
-		DeviceLimit:    req.DeviceLimit,
-		Quota:          req.Quota,
-		Nodes:          nodesStr,
-		NodeTags:       nodeTagsStr,
-		Show:           getBoolValue(req.Show, false),
-		Sell:           getBoolValue(req.Sell, false),
-		Sort:           req.Sort,
-		DeductionRatio: req.DeductionRatio,
-		AllowDeduction: getBoolValue(req.AllowDeduction, true),
-		ResetCycle:     req.ResetCycle,
-		RenewalReset:   getBoolValue(req.RenewalReset, false),
+		ID:                int64(id),
+		Name:              req.Name,
+		Language:          req.Language,
+		Description:       req.Description,
+		UnitPrice:         req.UnitPrice,
+		UnitTime:          req.UnitTime,
+		Discount:          discountJSON,
+		Replacement:       req.Replacement,
+		Inventory:         int64(req.Inventory),
+		Traffic:           req.Traffic,
+		SpeedLimit:        int64(req.SpeedLimit),
+		DeviceLimit:       int64(req.DeviceLimit),
+		Quota:             int64(req.Quota),
+		Nodes:             int64SliceToString(req.Nodes),
+		NodeTags:          stringSliceToString(req.NodeTags),
+		NodeGroupIDs:      cloneInt64Slice(req.NodeGroupIds),
+		NodeGroupID:       req.NodeGroupId,
+		TrafficLimit:      trafficLimitJSON,
+		Show:              getBoolValue(req.Show, false),
+		Sell:              getBoolValue(req.Sell, false),
+		Sort:              int64(req.Sort),
+		DeductionRatio:    int64(req.DeductionRatio),
+		AllowDeduction:    getBoolValue(req.AllowDeduction, true),
+		ResetCycle:        int64(req.ResetCycle),
+		RenewalReset:      getBoolValue(req.RenewalReset, false),
+		ShowOriginalPrice: req.ShowOriginalPrice,
 	}
 
 	if err := uc.repo.UpdateSubscribe(ctx, sub); err != nil {
@@ -263,10 +256,11 @@ func (uc *SubscribeUseCase) GetSubscribeDetails(ctx context.Context, id int) (*v
 // GetSubscribeList get subscribe list
 func (uc *SubscribeUseCase) GetSubscribeList(ctx context.Context, req *v1.GetSubscribeListRequest) (*v1.GetSubscribeListData, error) {
 	params := &model.SubscribeListParams{
-		Page:     int(req.Page),
-		Size:     int(req.Size),
-		Language: req.Language,
-		Search:   req.Search,
+		Page:        int(req.Page),
+		Size:        int(req.Size),
+		Language:    req.Language,
+		Search:      req.Search,
+		NodeGroupID: req.NodeGroupId,
 	}
 
 	list, total, err := uc.repo.GetSubscribeList(ctx, params)
@@ -348,8 +342,8 @@ func (uc *SubscribeUseCase) SubscribeSort(ctx context.Context, req *v1.Subscribe
 
 	// Update sort values
 	for _, sub := range subscribes {
-		if newSort, ok := sortMap[int64(sub.ID)]; ok {
-			sub.Sort = int64(minSort + newSort)
+		if newSort, ok := sortMap[sub.ID]; ok {
+			sub.Sort = int32(minSort + newSort)
 		}
 	}
 
@@ -367,8 +361,12 @@ func (uc *SubscribeUseCase) SubscribeSort(ctx context.Context, req *v1.Subscribe
 // CreateSubscribeGroup create subscribe group
 func (uc *SubscribeUseCase) CreateSubscribeGroup(ctx context.Context, req *v1.CreateSubscribeGroupRequest) error {
 	group := &model.SubscribeGroup{
-		Name:        req.Name,
-		Description: req.Description,
+		Name:                req.Name,
+		Description:         req.Description,
+		IsExpiredGroup:      req.IsExpiredGroup,
+		ExpiredDaysLimit:    req.ExpiredDaysLimit,
+		MaxTrafficGBExpired: req.MaxTrafficGbExpired,
+		SpeedLimit:          int64(req.SpeedLimit),
 	}
 
 	if err := uc.repo.CreateSubscribeGroup(ctx, group); err != nil {
@@ -387,9 +385,13 @@ func (uc *SubscribeUseCase) UpdateSubscribeGroup(ctx context.Context, req *v1.Up
 	}
 
 	group := &model.SubscribeGroup{
-		ID:          id,
-		Name:        req.Name,
-		Description: req.Description,
+		ID:                  id,
+		Name:                req.Name,
+		Description:         req.Description,
+		IsExpiredGroup:      req.IsExpiredGroup,
+		ExpiredDaysLimit:    req.ExpiredDaysLimit,
+		MaxTrafficGBExpired: req.MaxTrafficGbExpired,
+		SpeedLimit:          int64(req.SpeedLimit),
 	}
 
 	if err := uc.repo.UpdateSubscribeGroup(ctx, group); err != nil {
@@ -436,11 +438,15 @@ func (uc *SubscribeUseCase) GetSubscribeGroupList(ctx context.Context) (*v1.GetS
 			desc = *group.Description
 		}
 		groups = append(groups, &v1.SubscribeGroupInfo{
-			Id:          int64(group.ID),
-			Name:        group.Name,
-			Description: desc,
-			CreatedAt:   group.CreatedAt.Unix(),
-			UpdatedAt:   group.UpdatedAt.Unix(),
+			Id:                  int64(group.ID),
+			Name:                group.Name,
+			Description:         desc,
+			IsExpiredGroup:      group.IsExpiredGroup,
+			ExpiredDaysLimit:    derefInt32(group.ExpiredDaysLimit),
+			MaxTrafficGbExpired: derefInt32(group.MaxTrafficGBExpired),
+			SpeedLimit:          int32(derefInt64(group.SpeedLimit)),
+			CreatedAt:           group.CreatedAt.Unix(),
+			UpdatedAt:           group.UpdatedAt.Unix(),
 		})
 	}
 
@@ -493,8 +499,64 @@ func convertDiscountFromJSON(discountJSON string) []*v1.SubscribeDiscount {
 	return result
 }
 
-// int64SliceToString convert intslice to comma-separated string
-func int64SliceToString(slice []int) string {
+func convertTrafficLimitToModel(limits []*v1.TrafficLimit) []model.TrafficLimit {
+	result := make([]model.TrafficLimit, 0, len(limits))
+	for _, limit := range limits {
+		result = append(result, model.TrafficLimit{
+			StatType:     limit.StatType,
+			StatValue:    limit.StatValue,
+			TrafficUsage: limit.TrafficUsage,
+			SpeedLimit:   int64(limit.SpeedLimit),
+		})
+	}
+	return result
+}
+
+func convertTrafficLimitFromJSON(raw string) []*v1.TrafficLimit {
+	if raw == "" {
+		return nil
+	}
+
+	var limits []model.TrafficLimit
+	if err := json.Unmarshal([]byte(raw), &limits); err != nil {
+		return nil
+	}
+
+	result := make([]*v1.TrafficLimit, 0, len(limits))
+	for _, limit := range limits {
+		result = append(result, &v1.TrafficLimit{
+			StatType:     limit.StatType,
+			StatValue:    limit.StatValue,
+			TrafficUsage: limit.TrafficUsage,
+			SpeedLimit:   int32(int64(limit.SpeedLimit)),
+		})
+	}
+	return result
+}
+
+func marshalJSON(v any) (string, error) {
+	if v == nil {
+		return "", nil
+	}
+	switch vv := v.(type) {
+	case []model.SubscribeDiscount:
+		if len(vv) == 0 {
+			return "", nil
+		}
+	case []model.TrafficLimit:
+		if len(vv) == 0 {
+			return "", nil
+		}
+	}
+	data, err := json.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+// int64SliceToString convert int64 slice to comma-separated string
+func int64SliceToString(slice []int64) string {
 	if len(slice) == 0 {
 		return ""
 	}
@@ -505,19 +567,19 @@ func int64SliceToString(slice []int) string {
 	return strings.Join(strs, ",")
 }
 
-// stringToInt64Slice convert comma-separated string to intslice
-func stringToInt64Slice(s string) []int {
+// stringToInt64Slice convert comma-separated string to int64 slice
+func stringToInt64Slice(s string) []int64 {
 	if s == "" {
 		return nil
 	}
 	parts := strings.Split(s, ",")
-	result := make([]int, 0, len(parts))
+	result := make([]int64, 0, len(parts))
 	for _, p := range parts {
 		p = strings.TrimSpace(p)
 		if p == "" {
 			continue
 		}
-		var val int
+		var val int64
 		fmt.Sscanf(p, "%d", &val)
 		result = append(result, val)
 	}
@@ -545,6 +607,28 @@ func getBoolValue(ptr *bool, defaultValue bool) bool {
 	return *ptr
 }
 
+func cloneInt64Slice(input []int64) []int64 {
+	if input == nil {
+		return nil
+	}
+	out := make([]int64, len(input))
+	copy(out, input)
+	return out
+}
+
+func derefInt32(v *int32) int32 {
+	if v == nil {
+		return 0
+	}
+	return *v
+}
+func derefInt64(v *int64) int64 {
+	if v == nil {
+		return 0
+	}
+	return *v
+}
+
 // convertSubscribeToProto convert ent subscribe to proto subscribe info
 func convertSubscribeToProto(sub *ent.ProxySubscribe) *v1.SubscribeInfo {
 	desc := ""
@@ -554,6 +638,10 @@ func convertSubscribeToProto(sub *ent.ProxySubscribe) *v1.SubscribeInfo {
 	discount := ""
 	if sub.Discount != nil {
 		discount = *sub.Discount
+	}
+	trafficLimit := ""
+	if sub.TrafficLimit != nil {
+		trafficLimit = *sub.TrafficLimit
 	}
 	deductionRatio := int64(0)
 	if sub.DeductionRatio != nil {
@@ -567,30 +655,34 @@ func convertSubscribeToProto(sub *ent.ProxySubscribe) *v1.SubscribeInfo {
 	renewalReset := sub.RenewalReset
 
 	return &v1.SubscribeInfo{
-		Id:             int64(sub.ID),
-		Name:           sub.Name,
-		Language:       sub.Language,
-		Description:    desc,
-		UnitPrice:      int64(sub.UnitPrice),
-		UnitTime:       "", // sub.UnitTime is a string like "1m", "1h", needs parsing
-		Discount:       convertDiscountFromJSON(discount),
-		Replacement:    int64(sub.Replacement),
-		Inventory:      int64(sub.Inventory),
-		Traffic:        int64(sub.Traffic),
-		SpeedLimit:     int64(sub.SpeedLimit),
-		DeviceLimit:    int64(sub.DeviceLimit),
-		Quota:          int64(sub.Quota),
-		Nodes:          convertIntSliceToInt64Slice(stringToInt64Slice(sub.Nodes)),
-		NodeTags:       stringToStringSlice(sub.NodeTags),
-		Show:           sub.Show,
-		Sell:           sub.Sell,
-		Sort:           int64(sub.Sort),
-		DeductionRatio: deductionRatio,
-		AllowDeduction: allowDeduction,
-		ResetCycle:     resetCycle,
-		RenewalReset:   renewalReset,
-		CreatedAt:      sub.CreatedAt.Unix(),
-		UpdatedAt:      sub.UpdatedAt.Unix(),
+		Id:                int64(sub.ID),
+		Name:              sub.Name,
+		Language:          sub.Language,
+		Description:       desc,
+		UnitPrice:         int64(sub.UnitPrice),
+		UnitTime:          sub.UnitTime,
+		Discount:          convertDiscountFromJSON(discount),
+		Replacement:       int64(sub.Replacement),
+		Inventory:         int32(sub.Inventory),
+		Traffic:           int64(sub.Traffic),
+		SpeedLimit:        int32(sub.SpeedLimit),
+		DeviceLimit:       int32(sub.DeviceLimit),
+		Quota:             int32(sub.Quota),
+		Nodes:             stringToInt64Slice(sub.Nodes),
+		NodeTags:          stringToStringSlice(sub.NodeTags),
+		NodeGroupIds:      cloneInt64Slice(sub.NodeGroupIds),
+		NodeGroupId:       derefInt64(sub.NodeGroupID),
+		TrafficLimit:      convertTrafficLimitFromJSON(trafficLimit),
+		Show:              sub.Show,
+		Sell:              sub.Sell,
+		Sort:              int32(sub.Sort),
+		DeductionRatio:    int32(deductionRatio),
+		AllowDeduction:    allowDeduction,
+		ResetCycle:        int32(resetCycle),
+		RenewalReset:      renewalReset,
+		ShowOriginalPrice: sub.ShowOriginalPrice,
+		CreatedAt:         sub.CreatedAt.Unix(),
+		UpdatedAt:         sub.UpdatedAt.Unix(),
 	}
 }
 
@@ -604,6 +696,10 @@ func convertSubscribeToProtoItem(sub *ent.ProxySubscribe) *v1.SubscribeItem {
 	if sub.Discount != nil {
 		discount = *sub.Discount
 	}
+	trafficLimit := ""
+	if sub.TrafficLimit != nil {
+		trafficLimit = *sub.TrafficLimit
+	}
 	deductionRatio := int64(0)
 	if sub.DeductionRatio != nil {
 		deductionRatio = int64(*sub.DeductionRatio)
@@ -616,53 +712,34 @@ func convertSubscribeToProtoItem(sub *ent.ProxySubscribe) *v1.SubscribeItem {
 	renewalReset := sub.RenewalReset
 
 	return &v1.SubscribeItem{
-		Id:             int64(sub.ID),
-		Name:           sub.Name,
-		Language:       sub.Language,
-		Description:    desc,
-		UnitPrice:      int64(sub.UnitPrice),
-		UnitTime:       "", // sub.UnitTime is a string like "1m", "1h", needs parsing
-		Discount:       convertDiscountFromJSON(discount),
-		Replacement:    int64(sub.Replacement),
-		Inventory:      int64(sub.Inventory),
-		Traffic:        int64(sub.Traffic),
-		SpeedLimit:     int64(sub.SpeedLimit),
-		DeviceLimit:    int64(sub.DeviceLimit),
-		Quota:          int64(sub.Quota),
-		Nodes:          convertIntSliceToInt64Slice(stringToInt64Slice(sub.Nodes)),
-		NodeTags:       stringToStringSlice(sub.NodeTags),
-		Show:           sub.Show,
-		Sell:           sub.Sell,
-		Sort:           int64(sub.Sort),
-		DeductionRatio: deductionRatio,
-		AllowDeduction: allowDeduction,
-		ResetCycle:     resetCycle,
-		RenewalReset:   renewalReset,
-		CreatedAt:      sub.CreatedAt.Unix(),
-		UpdatedAt:      sub.UpdatedAt.Unix(),
-		Sold:           0, // Will be set by caller
+		Id:                int64(sub.ID),
+		Name:              sub.Name,
+		Language:          sub.Language,
+		Description:       desc,
+		UnitPrice:         int64(sub.UnitPrice),
+		UnitTime:          sub.UnitTime,
+		Discount:          convertDiscountFromJSON(discount),
+		Replacement:       int64(sub.Replacement),
+		Inventory:         int32(sub.Inventory),
+		Traffic:           int64(sub.Traffic),
+		SpeedLimit:        int32(sub.SpeedLimit),
+		DeviceLimit:       int32(sub.DeviceLimit),
+		Quota:             int32(sub.Quota),
+		Nodes:             stringToInt64Slice(sub.Nodes),
+		NodeTags:          stringToStringSlice(sub.NodeTags),
+		NodeGroupIds:      cloneInt64Slice(sub.NodeGroupIds),
+		NodeGroupId:       derefInt64(sub.NodeGroupID),
+		TrafficLimit:      convertTrafficLimitFromJSON(trafficLimit),
+		Show:              sub.Show,
+		Sell:              sub.Sell,
+		Sort:              int32(sub.Sort),
+		DeductionRatio:    int32(deductionRatio),
+		AllowDeduction:    allowDeduction,
+		ResetCycle:        int32(resetCycle),
+		RenewalReset:      renewalReset,
+		ShowOriginalPrice: sub.ShowOriginalPrice,
+		CreatedAt:         sub.CreatedAt.Unix(),
+		UpdatedAt:         sub.UpdatedAt.Unix(),
+		Sold:              0, // Will be set by caller
 	}
-}
-
-// convertIntSliceToInt64Slice converts []int to []int64
-func convertIntSliceToInt64Slice(input []int) []int64 {
-	if input == nil {
-		return nil
-	}
-	result := make([]int64, len(input))
-	for i, v := range input {
-		result[i] = int64(v)
-	}
-	return result
-}
-
-func intSliceToStringSlice(input []int) []string {
-	if input == nil {
-		return nil
-	}
-	result := make([]string, len(input))
-	for i, v := range input {
-		result[i] = strconv.FormatInt(int64(v), 10)
-	}
-	return result
 }

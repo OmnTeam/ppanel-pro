@@ -105,16 +105,9 @@ message Ads {
   int64 updated_at = 11;
 }
 
-// GetAdsData 广告列表数据
-message GetAdsData {
-  repeated Ads list = 1;
-}
-
 // GetAds Reply
 message GetAdsReply {
-  int32 code = 1;        // 状态码
-  string message = 2;    // 消息内容
-  GetAdsData data = 3;   // 响应数据
+  repeated Ads list = 1;
 }
 
 // GetClient Request (empty)
@@ -141,47 +134,26 @@ message SubscribeClient {
   DownloadLink download_link = 7;
 }
 
-// GetClientData 客户端列表数据
-message GetClientData {
-  int64 total = 1;
-  repeated SubscribeClient list = 2;
-}
-
 // GetClient Reply
 message GetClientReply {
-  int32 code = 1;         // 状态码
-  string message = 2;     // 消息内容
-  GetClientData data = 3; // 响应数据
+  int32 total = 1;
+  repeated SubscribeClient list = 2;
 }
 
 // GetPrivacyPolicy Request (empty)
 message GetPrivacyPolicyRequest {}
 
-// GetPrivacyPolicyData 隐私政策数据
-message GetPrivacyPolicyData {
-  string privacy_policy = 1;
-}
-
 // GetPrivacyPolicy Reply
 message GetPrivacyPolicyReply {
-  int32 code = 1;                 // 状态码
-  string message = 2;             // 消息内容
-  GetPrivacyPolicyData data = 3;  // 响应数据
+  string privacy_policy = 1;
 }
 
 // GetTos Request (empty)
 message GetTosRequest {}
 
-// GetTosData 服务条款数据
-message GetTosData {
-  string tos_content = 1;
-}
-
 // GetTos Reply
 message GetTosReply {
-  int32 code = 1;       // 状态码
-  string message = 2;   // 消息内容
-  GetTosData data = 3;  // 响应数据
+  string tos_content = 1;
 }
 
 // GetGlobalConfig Request (empty)
@@ -275,8 +247,8 @@ message PublicVerifyCodeConfig {
   int64 verify_code_interval = 1;
 }
 
-// GetGlobalConfigData 全局配置数据
-message GetGlobalConfigData {
+// GetGlobalConfig Reply
+message GetGlobalConfigReply {
   SiteConfig site = 1;
   VerifyConfig verify = 2;
   AuthConfig auth = 3;
@@ -288,46 +260,25 @@ message GetGlobalConfigData {
   bool web_ad = 9;
 }
 
-// GetGlobalConfig Reply
-message GetGlobalConfigReply {
-  int32 code = 1;              // 状态码
-  string message = 2;          // 消息内容
-  GetGlobalConfigData data = 3; // 响应数据
-}
-
 // GetStat Request (empty)
 message GetStatRequest {}
 
 // Heartbeat Request (empty)
 message HeartbeatRequest {}
 
-// HeartbeatData 心跳数据
-message HeartbeatData {
+// Heartbeat Reply
+message HeartbeatReply {
   bool status = 1;
   string message = 2;
   int64 timestamp = 3;
 }
 
-// Heartbeat Reply
-message HeartbeatReply {
-  int32 code = 1;
-  string message = 2;
-  HeartbeatData data = 3;
-}
-
-// GetStatData 统计数据
-message GetStatData {
+// GetStat Reply
+message GetStatReply {
   int64 user = 1;
   int64 node = 2;
   int64 country = 3;
   repeated string protocol = 4;
-}
-
-// GetStat Reply
-message GetStatReply {
-  int32 code = 1;       // 状态码
-  string message = 2;   // 消息内容
-  GetStatData data = 3; // 响应数据
 }
 
 // SendEmailCode Request
@@ -343,17 +294,10 @@ message SendSmsCodeRequest {
   string telephone_area_code = 3;
 }
 
-// SendCodeData 发送验证码数据
-message SendCodeData {
-  bool status = 1;
-  string code = 2; // Only returned in development mode
-}
-
 // SendCode Reply (shared by email and SMS)
 message SendCodeReply {
-  int32 code = 1;        // 状态码
-  string message = 2;    // 消息内容
-  SendCodeData data = 3; // 响应数据
+  bool status = 1;
+  string code = 2; // Only returned in development mode
 }
 
 // CheckVerificationCode Request
@@ -364,14 +308,7 @@ message CheckVerificationCodeRequest {
   int32 type = 4;
 }
 
-// CheckVerificationCodeData 验证码校验数据
-message CheckVerificationCodeData {
-  bool status = 1;
-}
-
 // CheckVerificationCode Reply
 message CheckVerificationCodeReply {
-  int32 code = 1;                     // 状态码
-  string message = 2;                 // 消息内容
-  CheckVerificationCodeData data = 3; // 响应数据
+  bool status = 1;
 }

@@ -30,30 +30,11 @@ func isBlockedLegacyExtraPath(path string) bool {
 		return true
 	}
 
-	if isBlockedSubscribeTokenPath(path) {
-		return true
-	}
-
 	if isBlockedGeneratedPaymentNotifyPath(path) {
 		return true
 	}
 
 	return false
-}
-
-func isBlockedSubscribeTokenPath(path string) bool {
-	const prefix = "/v1/subscribe/"
-
-	if !strings.HasPrefix(path, prefix) {
-		return false
-	}
-
-	remainder := strings.TrimPrefix(path, prefix)
-	if remainder == "" || remainder == "config" {
-		return false
-	}
-
-	return !strings.Contains(remainder, "/")
 }
 
 func isBlockedGeneratedPaymentNotifyPath(path string) bool {

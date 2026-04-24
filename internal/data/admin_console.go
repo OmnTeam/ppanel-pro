@@ -17,6 +17,7 @@ import (
 	v1 "github.com/OmnTeam/ppanel-pro/internal/biz/admin/console"
 	"github.com/OmnTeam/ppanel-pro/internal/model"
 	"github.com/go-kratos/kratos/v2/log"
+	"github.com/redis/go-redis/v9"
 )
 
 type adminConsoleRepo struct {
@@ -56,11 +57,11 @@ func (r *adminConsoleRepo) QueryDateOrders(ctx context.Context, date time.Time) 
 	// Calculate totals in Go
 	var amountTotal, newOrderAmount, renewalOrderAmount int64
 	for _, order := range orders {
-		amountTotal += order.Amount
+		amountTotal += int64(order.Amount)
 		if order.IsNew {
-			newOrderAmount += order.Amount
+			newOrderAmount += int64(order.Amount)
 		} else {
-			renewalOrderAmount += order.Amount
+			renewalOrderAmount += int64(order.Amount)
 		}
 	}
 
@@ -93,11 +94,11 @@ func (r *adminConsoleRepo) QueryMonthlyOrders(ctx context.Context, date time.Tim
 	// Calculate totals in Go
 	var amountTotal, newOrderAmount, renewalOrderAmount int64
 	for _, order := range orders {
-		amountTotal += order.Amount
+		amountTotal += int64(order.Amount)
 		if order.IsNew {
-			newOrderAmount += order.Amount
+			newOrderAmount += int64(order.Amount)
 		} else {
-			renewalOrderAmount += order.Amount
+			renewalOrderAmount += int64(order.Amount)
 		}
 	}
 
@@ -125,11 +126,11 @@ func (r *adminConsoleRepo) QueryTotalOrders(ctx context.Context) (*v1.OrdersTota
 	// Calculate totals in Go
 	var amountTotal, newOrderAmount, renewalOrderAmount int64
 	for _, order := range orders {
-		amountTotal += order.Amount
+		amountTotal += int64(order.Amount)
 		if order.IsNew {
-			newOrderAmount += order.Amount
+			newOrderAmount += int64(order.Amount)
 		} else {
-			renewalOrderAmount += order.Amount
+			renewalOrderAmount += int64(order.Amount)
 		}
 	}
 
@@ -180,6 +181,9 @@ func (r *adminConsoleRepo) QueryDailyOrdersList(ctx context.Context, date time.T
 	for _, total := range dailyMap {
 		result = append(result, total)
 	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Date < result[j].Date
+	})
 
 	return result, nil
 }
@@ -225,6 +229,9 @@ func (r *adminConsoleRepo) QueryMonthlyOrdersList(ctx context.Context, date time
 	for _, total := range monthlyMap {
 		result = append(result, total)
 	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Date < result[j].Date
+	})
 
 	return result, nil
 }
@@ -425,13 +432,20 @@ func (r *adminConsoleRepo) QueryDailyUserStatisticsList(ctx context.Context, dat
 	}
 
 	// Process orders
+	orderSeen := make(map[string]map[int64]struct{})
 	for _, order := range orders {
 		dateStr := order.CreatedAt.Format("2006-01-02")
 		if _, exists := statsMap[dateStr]; !exists {
-			statsMap[dateStr] = &v1.UserStatistics{Date: dateStr}
+			continue
 		}
-
-		// For simplicity, we'll count each order as a user (this isn't exactly right but avoids complex DISTINCT counting)
+		if _, ok := orderSeen[dateStr]; !ok {
+			orderSeen[dateStr] = make(map[int64]struct{})
+		}
+		key := int64(order.UserID)
+		if _, ok := orderSeen[dateStr][key]; ok {
+			continue
+		}
+		orderSeen[dateStr][key] = struct{}{}
 		if order.IsNew {
 			statsMap[dateStr].NewOrderUsers++
 		} else {
@@ -444,6 +458,9 @@ func (r *adminConsoleRepo) QueryDailyUserStatisticsList(ctx context.Context, dat
 	for _, stat := range statsMap {
 		result = append(result, stat)
 	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Date < result[j].Date
+	})
 
 	return result, nil
 }
@@ -493,13 +510,20 @@ func (r *adminConsoleRepo) QueryMonthlyUserStatisticsList(ctx context.Context, d
 	}
 
 	// Process orders
+	orderSeen := make(map[string]map[int64]struct{})
 	for _, order := range orders {
 		monthStr := order.CreatedAt.Format("2006-01")
 		if _, exists := statsMap[monthStr]; !exists {
-			statsMap[monthStr] = &v1.UserStatistics{Date: monthStr}
+			continue
 		}
-
-		// For simplicity, we'll count each order as a user (this isn't exactly right but avoids complex DISTINCT counting)
+		if _, ok := orderSeen[monthStr]; !ok {
+			orderSeen[monthStr] = make(map[int64]struct{})
+		}
+		key := int64(order.UserID)
+		if _, ok := orderSeen[monthStr][key]; ok {
+			continue
+		}
+		orderSeen[monthStr][key] = struct{}{}
 		if order.IsNew {
 			statsMap[monthStr].NewOrderUsers++
 		} else {
@@ -512,6 +536,9 @@ func (r *adminConsoleRepo) QueryMonthlyUserStatisticsList(ctx context.Context, d
 	for _, stat := range statsMap {
 		result = append(result, stat)
 	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].Date < result[j].Date
+	})
 
 	return result, nil
 }
@@ -577,9 +604,21 @@ func (r *adminConsoleRepo) QueryOfflineServers(ctx context.Context) (int, error)
 
 // QueryOnlineUsers queries online user count
 func (r *adminConsoleRepo) QueryOnlineUsers(ctx context.Context) (int, error) {
-	// TODO: This requires an online user tracking system
-	// For now, return 0
-	return 0, nil
+	now := time.Now().Unix()
+	if err := r.data.rdb.ZRemRangeByScore(ctx, OnlineUserSubscribeCacheKeyWithGlobal, "-inf", fmt.Sprintf("%d", now)).Err(); err != nil {
+		if err == redis.Nil {
+			return 0, nil
+		}
+		return 0, err
+	}
+	count, err := r.data.rdb.ZCard(ctx, OnlineUserSubscribeCacheKeyWithGlobal).Result()
+	if err != nil {
+		if err == redis.Nil {
+			return 0, nil
+		}
+		return 0, err
+	}
+	return int(count), nil
 }
 
 // QueryTodayTraffic queries today's traffic
@@ -624,8 +663,8 @@ func (r *adminConsoleRepo) QueryMonthlyTraffic(ctx context.Context, date time.Ti
 	logs, err := r.data.db.ProxySystemLog.Query().
 		Where(
 			proxysystemlog.TypeEQ(int8(model.TypeTrafficStat)),
-			proxysystemlog.CreatedAtGTE(firstDay),
-			proxysystemlog.CreatedAtLTE(yesterdayEnd),
+			proxysystemlog.DateGTE(firstDay.Format(time.DateOnly)),
+			proxysystemlog.DateLTE(yesterdayEnd.Format(time.DateOnly)),
 		).
 		All(ctx)
 
@@ -706,13 +745,11 @@ func (r *adminConsoleRepo) QueryTodayUserTrafficRanking(ctx context.Context, dat
 func (r *adminConsoleRepo) QueryYesterdayUserTrafficRanking(ctx context.Context, date time.Time) ([]*v1.UserTrafficData, error) {
 	yesterday := date.AddDate(0, 0, -1)
 	yesterdayStart := time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 0, 0, 0, 0, yesterday.Location())
-	yesterdayEnd := yesterdayStart.Add(24 * time.Hour).Add(-time.Second)
 
 	log, err := r.data.db.ProxySystemLog.Query().
 		Where(
 			proxysystemlog.TypeEQ(int8(model.TypeUserTrafficRank)),
-			proxysystemlog.CreatedAtGTE(yesterdayStart),
-			proxysystemlog.CreatedAtLTE(yesterdayEnd),
+			proxysystemlog.DateEQ(yesterdayStart.Format(time.DateOnly)),
 		).
 		First(ctx)
 
@@ -816,13 +853,11 @@ func (r *adminConsoleRepo) QueryTodayServerTrafficRanking(ctx context.Context, d
 func (r *adminConsoleRepo) QueryYesterdayServerTrafficRanking(ctx context.Context, date time.Time) ([]*v1.ServerTrafficData, error) {
 	yesterday := date.AddDate(0, 0, -1)
 	yesterdayStart := time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 0, 0, 0, 0, yesterday.Location())
-	yesterdayEnd := yesterdayStart.Add(24 * time.Hour).Add(-time.Second)
 
 	log, err := r.data.db.ProxySystemLog.Query().
 		Where(
 			proxysystemlog.TypeEQ(int8(model.TypeServerTrafficRank)),
-			proxysystemlog.CreatedAtGTE(yesterdayStart),
-			proxysystemlog.CreatedAtLTE(yesterdayEnd),
+			proxysystemlog.DateEQ(yesterdayStart.Format(time.DateOnly)),
 		).
 		First(ctx)
 

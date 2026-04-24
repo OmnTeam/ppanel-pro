@@ -14,16 +14,16 @@ type UserRepo interface {
 
 	// GetLoginLog 获取登录日志
 	// 从proxy_system_log表查询type=6(Login)的日志
-	GetLoginLog(ctx context.Context, userID int, page, size int) ([]*LoginLog, int64, error)
+	GetLoginLog(ctx context.Context, userID int, page, size int) ([]*LoginLog, int32, error)
 
 	// QueryUserBalanceLog 查询用户余额日志
 	// 从proxy_system_log表查询type=8(Balance)的日志
 	// 固定查询全部，page=1, size=99999
-	QueryUserBalanceLog(ctx context.Context, userID int) ([]*BalanceLog, int64, error)
+	QueryUserBalanceLog(ctx context.Context, userID int) ([]*BalanceLog, int32, error)
 
 	// QueryUserCommissionLog 查询用户佣金日志
 	// 从proxy_system_log表查询type=9(Commission)的日志
-	QueryUserCommissionLog(ctx context.Context, userID int, page, size int) ([]*CommissionLog, int64, error)
+	QueryUserCommissionLog(ctx context.Context, userID int, page, size int) ([]*CommissionLog, int32, error)
 
 	// QueryUserAffiliate 查询用户推荐数量
 	// 查询referer_id=当前用户的用户数量
@@ -33,7 +33,7 @@ type UserRepo interface {
 	// QueryUserAffiliateList 查询用户推荐列表
 	// 查询referer_id=当前用户的用户列表
 	// 需要查询每个用户的AuthMethod并脱敏
-	QueryUserAffiliateList(ctx context.Context, userID int, page, size int) ([]*UserAffiliate, int64, error)
+	QueryUserAffiliateList(ctx context.Context, userID int, page, size int) ([]*UserAffiliate, int32, error)
 
 	// GetOAuthMethods 获取OAuth方法
 	// 查询当前用户的所有AuthMethods
@@ -42,11 +42,11 @@ type UserRepo interface {
 	// QueryUserSubscribe 查询用户订阅
 	// 查询status in (0,1,2,3)的订阅
 	// 需要解析Discount字段并计算ResetTime
-	QueryUserSubscribe(ctx context.Context, userID int) ([]*UserSubscribe, int64, error)
+	QueryUserSubscribe(ctx context.Context, userID int) ([]*UserSubscribe, int32, error)
 
 	// GetSubscribeLog 获取订阅日志
 	// 从proxy_system_log查询type=20(Subscribe)的日志
-	GetSubscribeLog(ctx context.Context, userID int, page, size int) ([]*UserSubscribeLog, int64, error)
+	GetSubscribeLog(ctx context.Context, userID int, page, size int) ([]*UserSubscribeLog, int32, error)
 
 	// ResetUserSubscribeToken 重置订阅令牌
 	// 验证UserSubscribeId属于当前用户
@@ -66,7 +66,7 @@ type UserRepo interface {
 
 	// UpdateUserNotify 更新通知设置
 	// 更新用户的4个通知开关
-	UpdateUserNotify(ctx context.Context, userID int, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify bool) error
+	UpdateUserNotify(ctx context.Context, userID int, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify *bool) error
 
 	// UpdateUserPassword 更新密码
 	// 使用加密函数加密密码
@@ -120,7 +120,7 @@ type UserRepo interface {
 
 	// GetDeviceList 获取设备列表
 	// 查询用户的所有设备
-	GetDeviceList(ctx context.Context, userID int) ([]*UserDevice, int64, error)
+	GetDeviceList(ctx context.Context, userID int) ([]*UserDevice, int32, error)
 
 	// UnbindDevice 解绑设备
 	// 验证设备属于当前用户并删除设备
@@ -162,8 +162,12 @@ type UserInfo struct {
 	EnableSubscribeNotify bool
 	EnableTradeNotify     bool
 	AuthMethods           []*AuthMethod
+	UserDevices           []*UserDevice
+	Rules                 []string
 	CreatedAt             int64
 	UpdatedAt             int64
+	DeletedAt             int64
+	IsDel                 bool
 }
 
 // AuthMethod 认证方法
@@ -217,6 +221,8 @@ type UserSubscribe struct {
 	OrderID     int64
 	SubscribeID int64
 	Subscribe   *Subscribe
+	NodeGroupID int64
+	GroupLocked bool
 	StartTime   int64
 	ExpireTime  int64
 	FinishedAt  int64
@@ -226,34 +232,54 @@ type UserSubscribe struct {
 	Upload      int64
 	Token       string
 	Status      int32
+	Short       string
 	CreatedAt   int64
 	UpdatedAt   int64
 }
 
 // Subscribe 订阅套餐信息
 type Subscribe struct {
-	ID             int64
-	Name           string
-	Description    string
-	Price          int64
-	Traffic        int64
-	DeviceLimit    int32
-	SpeedLimit     int32
-	UnitTime       int32
-	UnitPrice      int64
-	ResetCycle     int32
-	DeductionRatio int32
-	AllowDeduction bool
-	Discount       []*SubscribeDiscount
-	Enable         bool
-	CreatedAt      int64
-	UpdatedAt      int64
+	ID                int64
+	Name              string
+	Language          string
+	Description       string
+	UnitPrice         int64
+	UnitTime          string
+	Replacement       int64
+	Inventory         int64
+	Traffic           int64
+	SpeedLimit        int64
+	DeviceLimit       int64
+	Quota             int64
+	Nodes             []int64
+	NodeTags          []string
+	NodeGroupIDs      []int64
+	NodeGroupID       int64
+	TrafficLimit      []*TrafficLimit
+	Show              bool
+	Sell              bool
+	Sort              int64
+	DeductionRatio    int64
+	AllowDeduction    bool
+	ResetCycle        int64
+	RenewalReset      bool
+	ShowOriginalPrice bool
+	Discount          []*SubscribeDiscount
+	CreatedAt         int64
+	UpdatedAt         int64
 }
 
 // SubscribeDiscount 订阅折扣信息
 type SubscribeDiscount struct {
-	Quantity   int32
-	Percentage int32
+	Quantity int64
+	Discount float64
+}
+
+type TrafficLimit struct {
+	StatType     string
+	StatValue    int64
+	TrafficUsage int64
+	SpeedLimit   int64
 }
 
 // UserSubscribeLog 用户订阅日志
@@ -329,17 +355,17 @@ func (uc *UserUseCase) QueryUserInfo(ctx context.Context, userID int) (*UserInfo
 }
 
 // GetLoginLog 获取登录日志
-func (uc *UserUseCase) GetLoginLog(ctx context.Context, userID int, page, size int) ([]*LoginLog, int64, error) {
+func (uc *UserUseCase) GetLoginLog(ctx context.Context, userID int, page, size int) ([]*LoginLog, int32, error) {
 	return uc.repo.GetLoginLog(ctx, userID, page, size)
 }
 
 // QueryUserBalanceLog 查询用户余额日志
-func (uc *UserUseCase) QueryUserBalanceLog(ctx context.Context, userID int) ([]*BalanceLog, int64, error) {
+func (uc *UserUseCase) QueryUserBalanceLog(ctx context.Context, userID int) ([]*BalanceLog, int32, error) {
 	return uc.repo.QueryUserBalanceLog(ctx, userID)
 }
 
 // QueryUserCommissionLog 查询用户佣金日志
-func (uc *UserUseCase) QueryUserCommissionLog(ctx context.Context, userID int, page, size int) ([]*CommissionLog, int64, error) {
+func (uc *UserUseCase) QueryUserCommissionLog(ctx context.Context, userID int, page, size int) ([]*CommissionLog, int32, error) {
 	return uc.repo.QueryUserCommissionLog(ctx, userID, page, size)
 }
 
@@ -349,7 +375,7 @@ func (uc *UserUseCase) QueryUserAffiliate(ctx context.Context, userID int) (regi
 }
 
 // QueryUserAffiliateList 查询用户推荐列表
-func (uc *UserUseCase) QueryUserAffiliateList(ctx context.Context, userID int, page, size int) ([]*UserAffiliate, int64, error) {
+func (uc *UserUseCase) QueryUserAffiliateList(ctx context.Context, userID int, page, size int) ([]*UserAffiliate, int32, error) {
 	return uc.repo.QueryUserAffiliateList(ctx, userID, page, size)
 }
 
@@ -359,12 +385,12 @@ func (uc *UserUseCase) GetOAuthMethods(ctx context.Context, userID int) ([]*Auth
 }
 
 // QueryUserSubscribe 查询用户订阅
-func (uc *UserUseCase) QueryUserSubscribe(ctx context.Context, userID int) ([]*UserSubscribe, int64, error) {
+func (uc *UserUseCase) QueryUserSubscribe(ctx context.Context, userID int) ([]*UserSubscribe, int32, error) {
 	return uc.repo.QueryUserSubscribe(ctx, userID)
 }
 
 // GetSubscribeLog 获取订阅日志
-func (uc *UserUseCase) GetSubscribeLog(ctx context.Context, userID int, page, size int) ([]*UserSubscribeLog, int64, error) {
+func (uc *UserUseCase) GetSubscribeLog(ctx context.Context, userID int, page, size int) ([]*UserSubscribeLog, int32, error) {
 	return uc.repo.GetSubscribeLog(ctx, userID, page, size)
 }
 
@@ -384,7 +410,7 @@ func (uc *UserUseCase) Unsubscribe(ctx context.Context, userID, id int) error {
 }
 
 // UpdateUserNotify 更新通知设置
-func (uc *UserUseCase) UpdateUserNotify(ctx context.Context, userID int, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify bool) error {
+func (uc *UserUseCase) UpdateUserNotify(ctx context.Context, userID int, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify *bool) error {
 	return uc.repo.UpdateUserNotify(ctx, userID, enableLoginNotify, enableBalanceNotify, enableSubscribeNotify, enableTradeNotify)
 }
 
@@ -439,7 +465,7 @@ func (uc *UserUseCase) DeviceWSConnect(ctx context.Context) error {
 }
 
 // GetDeviceList 获取设备列表
-func (uc *UserUseCase) GetDeviceList(ctx context.Context, userID int) ([]*UserDevice, int64, error) {
+func (uc *UserUseCase) GetDeviceList(ctx context.Context, userID int) ([]*UserDevice, int32, error) {
 	return uc.repo.GetDeviceList(ctx, userID)
 }
 

@@ -85,14 +85,14 @@ func (_u *ProxyServerUpdate) SetNillableServerAddr(v *string) *ProxyServerUpdate
 }
 
 // SetSort sets the "sort" field.
-func (_u *ProxyServerUpdate) SetSort(v int) *ProxyServerUpdate {
+func (_u *ProxyServerUpdate) SetSort(v int32) *ProxyServerUpdate {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *ProxyServerUpdate) SetNillableSort(v *int) *ProxyServerUpdate {
+func (_u *ProxyServerUpdate) SetNillableSort(v *int32) *ProxyServerUpdate {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -100,7 +100,7 @@ func (_u *ProxyServerUpdate) SetNillableSort(v *int) *ProxyServerUpdate {
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *ProxyServerUpdate) AddSort(v int) *ProxyServerUpdate {
+func (_u *ProxyServerUpdate) AddSort(v int32) *ProxyServerUpdate {
 	_u.mutation.AddSort(v)
 	return _u
 }
@@ -332,10 +332,10 @@ func (_u *ProxyServerUpdate) sqlSave(ctx context.Context) (_node int, err error)
 		_spec.SetField(proxyserver.FieldServerAddr, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(proxyserver.FieldSort, field.TypeInt, value)
+		_spec.SetField(proxyserver.FieldSort, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(proxyserver.FieldSort, field.TypeInt, value)
+		_spec.AddField(proxyserver.FieldSort, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.Protocol(); ok {
 		_spec.SetField(proxyserver.FieldProtocol, field.TypeString, value)
@@ -444,14 +444,14 @@ func (_u *ProxyServerUpdateOne) SetNillableServerAddr(v *string) *ProxyServerUpd
 }
 
 // SetSort sets the "sort" field.
-func (_u *ProxyServerUpdateOne) SetSort(v int) *ProxyServerUpdateOne {
+func (_u *ProxyServerUpdateOne) SetSort(v int32) *ProxyServerUpdateOne {
 	_u.mutation.ResetSort()
 	_u.mutation.SetSort(v)
 	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (_u *ProxyServerUpdateOne) SetNillableSort(v *int) *ProxyServerUpdateOne {
+func (_u *ProxyServerUpdateOne) SetNillableSort(v *int32) *ProxyServerUpdateOne {
 	if v != nil {
 		_u.SetSort(*v)
 	}
@@ -459,7 +459,7 @@ func (_u *ProxyServerUpdateOne) SetNillableSort(v *int) *ProxyServerUpdateOne {
 }
 
 // AddSort adds value to the "sort" field.
-func (_u *ProxyServerUpdateOne) AddSort(v int) *ProxyServerUpdateOne {
+func (_u *ProxyServerUpdateOne) AddSort(v int32) *ProxyServerUpdateOne {
 	_u.mutation.AddSort(v)
 	return _u
 }
@@ -721,10 +721,10 @@ func (_u *ProxyServerUpdateOne) sqlSave(ctx context.Context) (_node *ProxyServer
 		_spec.SetField(proxyserver.FieldServerAddr, field.TypeString, value)
 	}
 	if value, ok := _u.mutation.Sort(); ok {
-		_spec.SetField(proxyserver.FieldSort, field.TypeInt, value)
+		_spec.SetField(proxyserver.FieldSort, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.AddedSort(); ok {
-		_spec.AddField(proxyserver.FieldSort, field.TypeInt, value)
+		_spec.AddField(proxyserver.FieldSort, field.TypeInt32, value)
 	}
 	if value, ok := _u.mutation.Protocol(); ok {
 		_spec.SetField(proxyserver.FieldProtocol, field.TypeString, value)

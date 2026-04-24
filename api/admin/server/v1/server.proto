@@ -163,6 +163,17 @@ message Protocol {
   string cert_mode = 45;
   string cert_dns_provider = 46;
   string cert_dns_env = 47;
+  string simnet_psk = 48;
+  int32 simnet_key_id = 49;
+  string simnet_ticket_id = 50;
+  string simnet_path = 51;
+  string simnet_carrier = 52;
+  bool simnet_af_enabled = 53;
+  string simnet_af_path_mode = 54;
+  string simnet_af_path_prefix = 55;
+  string simnet_af_path_suffix = 56;
+  string simnet_af_magic_mode = 57;
+  int32 simnet_af_response_jitter_ms = 58;
 }
 
 message SortItem {
@@ -286,7 +297,7 @@ message FilterServerListRequest {
 }
 
 message FilterServerListData {
-  int64 total = 1;
+  int32 total = 1;
   repeated Server list = 2;
 }
 
@@ -380,7 +391,7 @@ message FilterNodeListRequest {
 }
 
 message FilterNodeListData {
-  int64 total = 1;
+  int32 total = 1;
   repeated Node list = 2;
 }
 

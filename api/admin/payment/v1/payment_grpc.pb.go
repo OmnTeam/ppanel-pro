@@ -29,18 +29,11 @@ const (
 // PaymentServiceClient is the client API for PaymentService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// 支付方式管理服务
 type PaymentServiceClient interface {
-	// 创建支付方式
 	CreatePaymentMethod(ctx context.Context, in *CreatePaymentMethodRequest, opts ...grpc.CallOption) (*CreatePaymentMethodReply, error)
-	// 更新支付方式
 	UpdatePaymentMethod(ctx context.Context, in *UpdatePaymentMethodRequest, opts ...grpc.CallOption) (*UpdatePaymentMethodReply, error)
-	// 删除支付方式
 	DeletePaymentMethod(ctx context.Context, in *DeletePaymentMethodRequest, opts ...grpc.CallOption) (*DeletePaymentMethodReply, error)
-	// 获取支付方式列表
 	GetPaymentMethodList(ctx context.Context, in *GetPaymentMethodListRequest, opts ...grpc.CallOption) (*GetPaymentMethodListReply, error)
-	// 获取支付平台列表
 	GetPaymentPlatform(ctx context.Context, in *GetPaymentPlatformRequest, opts ...grpc.CallOption) (*GetPaymentPlatformReply, error)
 }
 
@@ -105,18 +98,11 @@ func (c *paymentServiceClient) GetPaymentPlatform(ctx context.Context, in *GetPa
 // PaymentServiceServer is the server API for PaymentService service.
 // All implementations must embed UnimplementedPaymentServiceServer
 // for forward compatibility.
-//
-// 支付方式管理服务
 type PaymentServiceServer interface {
-	// 创建支付方式
 	CreatePaymentMethod(context.Context, *CreatePaymentMethodRequest) (*CreatePaymentMethodReply, error)
-	// 更新支付方式
 	UpdatePaymentMethod(context.Context, *UpdatePaymentMethodRequest) (*UpdatePaymentMethodReply, error)
-	// 删除支付方式
 	DeletePaymentMethod(context.Context, *DeletePaymentMethodRequest) (*DeletePaymentMethodReply, error)
-	// 获取支付方式列表
 	GetPaymentMethodList(context.Context, *GetPaymentMethodListRequest) (*GetPaymentMethodListReply, error)
-	// 获取支付平台列表
 	GetPaymentPlatform(context.Context, *GetPaymentPlatformRequest) (*GetPaymentPlatformReply, error)
 	mustEmbedUnimplementedPaymentServiceServer()
 }

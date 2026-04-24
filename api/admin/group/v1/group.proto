@@ -3,6 +3,7 @@ syntax = "proto3";
 package api.admin.group.v1;
 
 import "google/api/annotations.proto";
+import "google/protobuf/wrappers.proto";
 
 option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/group/v1;v1";
 option java_multiple_files = true;
@@ -133,18 +134,19 @@ service Group {
 message NodeGroup {
   int64 id = 1;                     // 节点组ID
   string name = 2;                  // 节点组名称
-  string description = 3;           // 节点组描述
-  int32 sort = 4;                   // 排序
-  bool for_calculation = 5;         // 是否参与分组计算
-  bool is_expired_group = 6;        // 是否为过期组
-  int32 expired_days_limit = 7;     // 过期天数限制
-  int64 max_traffic_gb_expired = 8; // 过期后最大流量（GB）
-  int32 speed_limit = 9;            // 速度限制
-  int64 min_traffic_gb = 10;        // 最小流量（GB）
-  int64 max_traffic_gb = 11;        // 最大流量（GB）
-  int32 node_count = 12;            // 节点数量
-  int64 created_at = 13;            // 创建时间
-  int64 updated_at = 14;            // 更新时间
+  string type = 3;                  // 节点组类型
+  string description = 4;           // 节点组描述
+  int32 sort = 5;                   // 排序
+  bool for_calculation = 6;         // 是否参与分组计算
+  bool is_expired_group = 7;        // 是否为过期组
+  int32 expired_days_limit = 8;     // 过期天数限制
+  int64 max_traffic_gb_expired = 9; // 过期后最大流量（GB）
+  int32 speed_limit = 10;           // 速度限制
+  int64 min_traffic_gb = 11;        // 最小流量（GB）
+  int64 max_traffic_gb = 12;        // 最大流量（GB）
+  int64 node_count = 13;            // 节点数量
+  int64 created_at = 14;            // 创建时间
+  int64 updated_at = 15;            // 更新时间
 }
 
 // ===== 节点组管理请求和响应 =====
@@ -158,7 +160,7 @@ message GetNodeGroupListRequest {
 
 // GetNodeGroupListData 获取节点组列表数据
 message GetNodeGroupListData {
-  int64 total = 1;              // 总数
+  int32 total = 1;              // 总数
   repeated NodeGroup list = 2;  // 节点组列表
 }
 
@@ -172,15 +174,16 @@ message GetNodeGroupListReply {
 // CreateNodeGroupRequest 创建节点组请求
 message CreateNodeGroupRequest {
   string name = 1;                   // 节点组名称
-  string description = 2;            // 节点组描述
-  int32 sort = 3;                    // 排序
-  bool for_calculation = 4;          // 是否参与分组计算
-  bool is_expired_group = 5;         // 是否为过期组
-  int32 expired_days_limit = 6;      // 过期天数限制
-  int64 max_traffic_gb_expired = 7;  // 过期后最大流量（GB）
-  int32 speed_limit = 8;             // 速度限制
-  int64 min_traffic_gb = 9;          // 最小流量（GB）
-  int64 max_traffic_gb = 10;         // 最大流量（GB）
+  string type = 2;                   // 节点组类型
+  string description = 3;            // 节点组描述
+  int32 sort = 4;                    // 排序
+  google.protobuf.BoolValue for_calculation = 5;          // 是否参与分组计算
+  google.protobuf.BoolValue is_expired_group = 6;         // 是否为过期组
+  google.protobuf.Int32Value expired_days_limit = 7;      // 过期天数限制
+  google.protobuf.Int64Value max_traffic_gb_expired = 8;  // 过期后最大流量（GB）
+  google.protobuf.Int32Value speed_limit = 9;             // 速度限制
+  google.protobuf.Int64Value min_traffic_gb = 10;         // 最小流量（GB）
+  google.protobuf.Int64Value max_traffic_gb = 11;         // 最大流量（GB）
 }
 
 // CreateNodeGroupData 创建节点组数据
@@ -198,16 +201,17 @@ message CreateNodeGroupReply {
 // UpdateNodeGroupRequest 更新节点组请求
 message UpdateNodeGroupRequest {
   int64 id = 1;                       // 节点组ID
-  string name = 2;                   // 节点组名称
-  string description = 3;            // 节点组描述
-  int32 sort = 4;                    // 排序
-  bool for_calculation = 5;          // 是否参与分组计算
-  bool is_expired_group = 6;         // 是否为过期组
-  int32 expired_days_limit = 7;      // 过期天数限制
-  int64 max_traffic_gb_expired = 8;  // 过期后最大流量（GB）
-  int32 speed_limit = 9;             // 速度限制
-  int64 min_traffic_gb = 10;         // 最小流量（GB）
-  int64 max_traffic_gb = 11;         // 最大流量（GB）
+  string name = 2;                    // 节点组名称
+  string type = 3;                    // 节点组类型
+  string description = 4;             // 节点组描述
+  int32 sort = 5;                     // 排序
+  google.protobuf.BoolValue for_calculation = 6;          // 是否参与分组计算
+  google.protobuf.BoolValue is_expired_group = 7;         // 是否为过期组
+  google.protobuf.Int32Value expired_days_limit = 8;      // 过期天数限制
+  google.protobuf.Int64Value max_traffic_gb_expired = 9;  // 过期后最大流量（GB）
+  google.protobuf.Int32Value speed_limit = 10;            // 速度限制
+  google.protobuf.Int64Value min_traffic_gb = 11;         // 最小流量（GB）
+  google.protobuf.Int64Value max_traffic_gb = 12;         // 最大流量（GB）
 }
 
 // UpdateNodeGroupData 更新节点组数据
@@ -245,7 +249,7 @@ message DeleteNodeGroupReply {
 message RecalculationState {
   string state = 1;     // 状态：pending/running/completed/failed
   int64 progress = 2;   // 进度
-  int64 total = 3;      // 总数
+  int32 total = 3;      // 总数
 }
 
 // GroupConfig 分组配置
@@ -349,7 +353,7 @@ message GetGroupHistoryRequest {
 
 // GetGroupHistoryData 获取分组历史数据
 message GetGroupHistoryData {
-  int64 total = 1;                     // 总数
+  int32 total = 1;                     // 总数
   repeated GroupHistory list = 2;       // 分组历史列表
 }
 

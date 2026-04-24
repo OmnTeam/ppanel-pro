@@ -34,15 +34,15 @@ type ProxySubscribe struct {
 	// 替换
 	Replacement int64 `json:"replacement,omitempty"`
 	// 库存
-	Inventory int64 `json:"inventory,omitempty"`
+	Inventory int32 `json:"inventory,omitempty"`
 	// 流量
 	Traffic int64 `json:"traffic,omitempty"`
 	// 速度限制
-	SpeedLimit int64 `json:"speed_limit,omitempty"`
+	SpeedLimit int32 `json:"speed_limit,omitempty"`
 	// 设备数限制
-	DeviceLimit int64 `json:"device_limit,omitempty"`
+	DeviceLimit int32 `json:"device_limit,omitempty"`
 	// 配额
-	Quota int64 `json:"quota,omitempty"`
+	Quota int32 `json:"quota,omitempty"`
 	// 节点IDs
 	Nodes string `json:"nodes,omitempty"`
 	// 节点标签
@@ -58,13 +58,13 @@ type ProxySubscribe struct {
 	// 是否售卖
 	Sell bool `json:"sell,omitempty"`
 	// 排序
-	Sort int64 `json:"sort,omitempty"`
+	Sort int32 `json:"sort,omitempty"`
 	// 扣除比例
-	DeductionRatio *int64 `json:"deduction_ratio,omitempty"`
+	DeductionRatio *int32 `json:"deduction_ratio,omitempty"`
 	// 允许扣除
 	AllowDeduction bool `json:"allow_deduction,omitempty"`
 	// 重置周期
-	ResetCycle *int64 `json:"reset_cycle,omitempty"`
+	ResetCycle *int32 `json:"reset_cycle,omitempty"`
 	// 续费重置
 	RenewalReset bool `json:"renewal_reset,omitempty"`
 	// 显示原价
@@ -160,7 +160,7 @@ func (_m *ProxySubscribe) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field inventory", values[i])
 			} else if value.Valid {
-				_m.Inventory = value.Int64
+				_m.Inventory = int32(value.Int64)
 			}
 		case proxysubscribe.FieldTraffic:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -172,19 +172,19 @@ func (_m *ProxySubscribe) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field speed_limit", values[i])
 			} else if value.Valid {
-				_m.SpeedLimit = value.Int64
+				_m.SpeedLimit = int32(value.Int64)
 			}
 		case proxysubscribe.FieldDeviceLimit:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field device_limit", values[i])
 			} else if value.Valid {
-				_m.DeviceLimit = value.Int64
+				_m.DeviceLimit = int32(value.Int64)
 			}
 		case proxysubscribe.FieldQuota:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field quota", values[i])
 			} else if value.Valid {
-				_m.Quota = value.Int64
+				_m.Quota = int32(value.Int64)
 			}
 		case proxysubscribe.FieldNodes:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -236,14 +236,14 @@ func (_m *ProxySubscribe) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value.Valid {
-				_m.Sort = value.Int64
+				_m.Sort = int32(value.Int64)
 			}
 		case proxysubscribe.FieldDeductionRatio:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field deduction_ratio", values[i])
 			} else if value.Valid {
-				_m.DeductionRatio = new(int64)
-				*_m.DeductionRatio = value.Int64
+				_m.DeductionRatio = new(int32)
+				*_m.DeductionRatio = int32(value.Int64)
 			}
 		case proxysubscribe.FieldAllowDeduction:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -255,8 +255,8 @@ func (_m *ProxySubscribe) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field reset_cycle", values[i])
 			} else if value.Valid {
-				_m.ResetCycle = new(int64)
-				*_m.ResetCycle = value.Int64
+				_m.ResetCycle = new(int32)
+				*_m.ResetCycle = int32(value.Int64)
 			}
 		case proxysubscribe.FieldRenewalReset:
 			if value, ok := values[i].(*sql.NullBool); !ok {

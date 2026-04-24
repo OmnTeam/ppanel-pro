@@ -28,7 +28,7 @@ func (ProxyOrder) Fields() []ent.Field {
 		field.Int64("user_id").Default(0).Comment("用户ID"),
 		field.String("order_no").MaxLen(255).NotEmpty().Unique().Comment("订单号"),
 		field.Int8("type").Default(1).Comment("订单类型"),
-		field.Int64("quantity").Default(1).Comment("数量"),
+		field.Int32("quantity").Default(1).Comment("数量"),
 		field.Int64("price").Default(0).Comment("原价"),
 		field.Int64("amount").Default(0).Comment("实付金额"),
 		field.Int64("gift_amount").Default(0).Comment("赠送金额"),

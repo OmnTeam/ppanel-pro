@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -32,25 +33,15 @@ const (
 // PublicOrderClient is the client API for PublicOrder service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// Public Order service for user order operations
 type PublicOrderClient interface {
-	// Close order
-	CloseOrder(ctx context.Context, in *CloseOrderRequest, opts ...grpc.CallOption) (*OrderCloseReply, error)
-	// Query order detail
-	QueryOrderDetail(ctx context.Context, in *QueryOrderDetailRequest, opts ...grpc.CallOption) (*OrderDetailReply, error)
-	// Query order list
-	QueryOrderList(ctx context.Context, in *QueryOrderListRequest, opts ...grpc.CallOption) (*OrderListReply, error)
-	// Pre-create order (validate and calculate price)
-	PreCreateOrder(ctx context.Context, in *PreCreateOrderRequest, opts ...grpc.CallOption) (*OrderPreCreateReply, error)
-	// Purchase subscription
+	CloseOrder(ctx context.Context, in *CloseOrderRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	QueryOrderDetail(ctx context.Context, in *QueryOrderDetailRequest, opts ...grpc.CallOption) (*OrderDetail, error)
+	QueryOrderList(ctx context.Context, in *QueryOrderListRequest, opts ...grpc.CallOption) (*QueryOrderListReply, error)
+	PreCreateOrder(ctx context.Context, in *PreCreateOrderRequest, opts ...grpc.CallOption) (*PreCreateOrderReply, error)
 	Purchase(ctx context.Context, in *PurchaseRequest, opts ...grpc.CallOption) (*PurchaseReply, error)
-	// Recharge (add balance)
 	Recharge(ctx context.Context, in *RechargeRequest, opts ...grpc.CallOption) (*RechargeReply, error)
-	// Renewal subscription
 	Renewal(ctx context.Context, in *RenewalRequest, opts ...grpc.CallOption) (*RenewalReply, error)
-	// Reset traffic
-	ResetTraffic(ctx context.Context, in *ResetTrafficRequest, opts ...grpc.CallOption) (*TrafficResetReply, error)
+	ResetTraffic(ctx context.Context, in *ResetTrafficRequest, opts ...grpc.CallOption) (*ResetTrafficReply, error)
 }
 
 type publicOrderClient struct {
@@ -61,9 +52,9 @@ func NewPublicOrderClient(cc grpc.ClientConnInterface) PublicOrderClient {
 	return &publicOrderClient{cc}
 }
 
-func (c *publicOrderClient) CloseOrder(ctx context.Context, in *CloseOrderRequest, opts ...grpc.CallOption) (*OrderCloseReply, error) {
+func (c *publicOrderClient) CloseOrder(ctx context.Context, in *CloseOrderRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OrderCloseReply)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, PublicOrder_CloseOrder_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -71,9 +62,9 @@ func (c *publicOrderClient) CloseOrder(ctx context.Context, in *CloseOrderReques
 	return out, nil
 }
 
-func (c *publicOrderClient) QueryOrderDetail(ctx context.Context, in *QueryOrderDetailRequest, opts ...grpc.CallOption) (*OrderDetailReply, error) {
+func (c *publicOrderClient) QueryOrderDetail(ctx context.Context, in *QueryOrderDetailRequest, opts ...grpc.CallOption) (*OrderDetail, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OrderDetailReply)
+	out := new(OrderDetail)
 	err := c.cc.Invoke(ctx, PublicOrder_QueryOrderDetail_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -81,9 +72,9 @@ func (c *publicOrderClient) QueryOrderDetail(ctx context.Context, in *QueryOrder
 	return out, nil
 }
 
-func (c *publicOrderClient) QueryOrderList(ctx context.Context, in *QueryOrderListRequest, opts ...grpc.CallOption) (*OrderListReply, error) {
+func (c *publicOrderClient) QueryOrderList(ctx context.Context, in *QueryOrderListRequest, opts ...grpc.CallOption) (*QueryOrderListReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OrderListReply)
+	out := new(QueryOrderListReply)
 	err := c.cc.Invoke(ctx, PublicOrder_QueryOrderList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -91,9 +82,9 @@ func (c *publicOrderClient) QueryOrderList(ctx context.Context, in *QueryOrderLi
 	return out, nil
 }
 
-func (c *publicOrderClient) PreCreateOrder(ctx context.Context, in *PreCreateOrderRequest, opts ...grpc.CallOption) (*OrderPreCreateReply, error) {
+func (c *publicOrderClient) PreCreateOrder(ctx context.Context, in *PreCreateOrderRequest, opts ...grpc.CallOption) (*PreCreateOrderReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(OrderPreCreateReply)
+	out := new(PreCreateOrderReply)
 	err := c.cc.Invoke(ctx, PublicOrder_PreCreateOrder_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -131,9 +122,9 @@ func (c *publicOrderClient) Renewal(ctx context.Context, in *RenewalRequest, opt
 	return out, nil
 }
 
-func (c *publicOrderClient) ResetTraffic(ctx context.Context, in *ResetTrafficRequest, opts ...grpc.CallOption) (*TrafficResetReply, error) {
+func (c *publicOrderClient) ResetTraffic(ctx context.Context, in *ResetTrafficRequest, opts ...grpc.CallOption) (*ResetTrafficReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TrafficResetReply)
+	out := new(ResetTrafficReply)
 	err := c.cc.Invoke(ctx, PublicOrder_ResetTraffic_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -144,25 +135,15 @@ func (c *publicOrderClient) ResetTraffic(ctx context.Context, in *ResetTrafficRe
 // PublicOrderServer is the server API for PublicOrder service.
 // All implementations must embed UnimplementedPublicOrderServer
 // for forward compatibility.
-//
-// Public Order service for user order operations
 type PublicOrderServer interface {
-	// Close order
-	CloseOrder(context.Context, *CloseOrderRequest) (*OrderCloseReply, error)
-	// Query order detail
-	QueryOrderDetail(context.Context, *QueryOrderDetailRequest) (*OrderDetailReply, error)
-	// Query order list
-	QueryOrderList(context.Context, *QueryOrderListRequest) (*OrderListReply, error)
-	// Pre-create order (validate and calculate price)
-	PreCreateOrder(context.Context, *PreCreateOrderRequest) (*OrderPreCreateReply, error)
-	// Purchase subscription
+	CloseOrder(context.Context, *CloseOrderRequest) (*emptypb.Empty, error)
+	QueryOrderDetail(context.Context, *QueryOrderDetailRequest) (*OrderDetail, error)
+	QueryOrderList(context.Context, *QueryOrderListRequest) (*QueryOrderListReply, error)
+	PreCreateOrder(context.Context, *PreCreateOrderRequest) (*PreCreateOrderReply, error)
 	Purchase(context.Context, *PurchaseRequest) (*PurchaseReply, error)
-	// Recharge (add balance)
 	Recharge(context.Context, *RechargeRequest) (*RechargeReply, error)
-	// Renewal subscription
 	Renewal(context.Context, *RenewalRequest) (*RenewalReply, error)
-	// Reset traffic
-	ResetTraffic(context.Context, *ResetTrafficRequest) (*TrafficResetReply, error)
+	ResetTraffic(context.Context, *ResetTrafficRequest) (*ResetTrafficReply, error)
 	mustEmbedUnimplementedPublicOrderServer()
 }
 
@@ -173,16 +154,16 @@ type PublicOrderServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPublicOrderServer struct{}
 
-func (UnimplementedPublicOrderServer) CloseOrder(context.Context, *CloseOrderRequest) (*OrderCloseReply, error) {
+func (UnimplementedPublicOrderServer) CloseOrder(context.Context, *CloseOrderRequest) (*emptypb.Empty, error) {
 	return nil, status.Error(codes.Unimplemented, "method CloseOrder not implemented")
 }
-func (UnimplementedPublicOrderServer) QueryOrderDetail(context.Context, *QueryOrderDetailRequest) (*OrderDetailReply, error) {
+func (UnimplementedPublicOrderServer) QueryOrderDetail(context.Context, *QueryOrderDetailRequest) (*OrderDetail, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryOrderDetail not implemented")
 }
-func (UnimplementedPublicOrderServer) QueryOrderList(context.Context, *QueryOrderListRequest) (*OrderListReply, error) {
+func (UnimplementedPublicOrderServer) QueryOrderList(context.Context, *QueryOrderListRequest) (*QueryOrderListReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryOrderList not implemented")
 }
-func (UnimplementedPublicOrderServer) PreCreateOrder(context.Context, *PreCreateOrderRequest) (*OrderPreCreateReply, error) {
+func (UnimplementedPublicOrderServer) PreCreateOrder(context.Context, *PreCreateOrderRequest) (*PreCreateOrderReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method PreCreateOrder not implemented")
 }
 func (UnimplementedPublicOrderServer) Purchase(context.Context, *PurchaseRequest) (*PurchaseReply, error) {
@@ -194,7 +175,7 @@ func (UnimplementedPublicOrderServer) Recharge(context.Context, *RechargeRequest
 func (UnimplementedPublicOrderServer) Renewal(context.Context, *RenewalRequest) (*RenewalReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method Renewal not implemented")
 }
-func (UnimplementedPublicOrderServer) ResetTraffic(context.Context, *ResetTrafficRequest) (*TrafficResetReply, error) {
+func (UnimplementedPublicOrderServer) ResetTraffic(context.Context, *ResetTrafficRequest) (*ResetTrafficReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method ResetTraffic not implemented")
 }
 func (UnimplementedPublicOrderServer) mustEmbedUnimplementedPublicOrderServer() {}

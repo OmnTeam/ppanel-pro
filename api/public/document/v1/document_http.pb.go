@@ -20,29 +20,29 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
-const OperationDocumentQueryDocumentDetail = "/api.public.document.v1.Document/QueryDocumentDetail"
-const OperationDocumentQueryDocumentList = "/api.public.document.v1.Document/QueryDocumentList"
+const OperationPublicDocumentQueryDocumentDetail = "/api.public.document.v1.PublicDocument/QueryDocumentDetail"
+const OperationPublicDocumentQueryDocumentList = "/api.public.document.v1.PublicDocument/QueryDocumentList"
 
-type DocumentHTTPServer interface {
+type PublicDocumentHTTPServer interface {
 	// QueryDocumentDetail QueryDocumentDetail 查询文档详情
 	QueryDocumentDetail(context.Context, *QueryDocumentDetailRequest) (*DocumentDetailReply, error)
 	// QueryDocumentList QueryDocumentList 查询文档列表
 	QueryDocumentList(context.Context, *emptypb.Empty) (*DocumentListReply, error)
 }
 
-func RegisterDocumentHTTPServer(s *http.Server, srv DocumentHTTPServer) {
+func RegisterPublicDocumentHTTPServer(s *http.Server, srv PublicDocumentHTTPServer) {
 	r := s.Route("/")
-	r.GET("/v1/public/document/list", _Document_QueryDocumentList0_HTTP_Handler(srv))
-	r.GET("/v1/public/document/detail", _Document_QueryDocumentDetail0_HTTP_Handler(srv))
+	r.GET("/v1/public/document/list", _PublicDocument_QueryDocumentList0_HTTP_Handler(srv))
+	r.GET("/v1/public/document/detail", _PublicDocument_QueryDocumentDetail0_HTTP_Handler(srv))
 }
 
-func _Document_QueryDocumentList0_HTTP_Handler(srv DocumentHTTPServer) func(ctx http.Context) error {
+func _PublicDocument_QueryDocumentList0_HTTP_Handler(srv PublicDocumentHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in emptypb.Empty
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationDocumentQueryDocumentList)
+		http.SetOperation(ctx, OperationPublicDocumentQueryDocumentList)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.QueryDocumentList(ctx, req.(*emptypb.Empty))
 		})
@@ -55,13 +55,13 @@ func _Document_QueryDocumentList0_HTTP_Handler(srv DocumentHTTPServer) func(ctx 
 	}
 }
 
-func _Document_QueryDocumentDetail0_HTTP_Handler(srv DocumentHTTPServer) func(ctx http.Context) error {
+func _PublicDocument_QueryDocumentDetail0_HTTP_Handler(srv PublicDocumentHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in QueryDocumentDetailRequest
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
-		http.SetOperation(ctx, OperationDocumentQueryDocumentDetail)
+		http.SetOperation(ctx, OperationPublicDocumentQueryDocumentDetail)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.QueryDocumentDetail(ctx, req.(*QueryDocumentDetailRequest))
 		})
@@ -74,24 +74,24 @@ func _Document_QueryDocumentDetail0_HTTP_Handler(srv DocumentHTTPServer) func(ct
 	}
 }
 
-type DocumentHTTPClient interface {
+type PublicDocumentHTTPClient interface {
 	QueryDocumentDetail(ctx context.Context, req *QueryDocumentDetailRequest, opts ...http.CallOption) (rsp *DocumentDetailReply, err error)
 	QueryDocumentList(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *DocumentListReply, err error)
 }
 
-type DocumentHTTPClientImpl struct {
+type PublicDocumentHTTPClientImpl struct {
 	cc *http.Client
 }
 
-func NewDocumentHTTPClient(client *http.Client) DocumentHTTPClient {
-	return &DocumentHTTPClientImpl{client}
+func NewPublicDocumentHTTPClient(client *http.Client) PublicDocumentHTTPClient {
+	return &PublicDocumentHTTPClientImpl{client}
 }
 
-func (c *DocumentHTTPClientImpl) QueryDocumentDetail(ctx context.Context, in *QueryDocumentDetailRequest, opts ...http.CallOption) (*DocumentDetailReply, error) {
+func (c *PublicDocumentHTTPClientImpl) QueryDocumentDetail(ctx context.Context, in *QueryDocumentDetailRequest, opts ...http.CallOption) (*DocumentDetailReply, error) {
 	var out DocumentDetailReply
 	pattern := "/v1/public/document/detail"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationDocumentQueryDocumentDetail))
+	opts = append(opts, http.Operation(OperationPublicDocumentQueryDocumentDetail))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -100,11 +100,11 @@ func (c *DocumentHTTPClientImpl) QueryDocumentDetail(ctx context.Context, in *Qu
 	return &out, nil
 }
 
-func (c *DocumentHTTPClientImpl) QueryDocumentList(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*DocumentListReply, error) {
+func (c *PublicDocumentHTTPClientImpl) QueryDocumentList(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*DocumentListReply, error) {
 	var out DocumentListReply
 	pattern := "/v1/public/document/list"
 	path := binding.EncodeURL(pattern, in, true)
-	opts = append(opts, http.Operation(OperationDocumentQueryDocumentList))
+	opts = append(opts, http.Operation(OperationPublicDocumentQueryDocumentList))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

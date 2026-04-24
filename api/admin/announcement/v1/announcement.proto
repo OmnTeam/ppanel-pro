@@ -62,7 +62,7 @@ message Announcement {
 // 创建公告请求（仅 title 和 content，与原项目一致）
 message CreateAnnouncementRequest {
   string title = 1 [(validate.rules).string = {min_len: 1, max_len: 255}];
-  string content = 2;
+  string content = 2 [(validate.rules).string = {min_len: 1}];
 }
 
 // 公告数据
@@ -105,7 +105,7 @@ message ListAnnouncementsRequest {
 // 获取公告列表数据
 message ListAnnouncementsData {
   repeated Announcement list = 1;
-  int64 total = 2;
+  int32 total = 2;
 }
 
 // 获取公告列表响应

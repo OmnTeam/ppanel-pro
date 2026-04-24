@@ -20,149 +20,149 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Document_QueryDocumentList_FullMethodName   = "/api.public.document.v1.Document/QueryDocumentList"
-	Document_QueryDocumentDetail_FullMethodName = "/api.public.document.v1.Document/QueryDocumentDetail"
+	PublicDocument_QueryDocumentList_FullMethodName   = "/api.public.document.v1.PublicDocument/QueryDocumentList"
+	PublicDocument_QueryDocumentDetail_FullMethodName = "/api.public.document.v1.PublicDocument/QueryDocumentDetail"
 )
 
-// DocumentClient is the client API for Document service.
+// PublicDocumentClient is the client API for PublicDocument service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
 // Public Document service
 // 公共文档服务（需要认证）
-type DocumentClient interface {
+type PublicDocumentClient interface {
 	// QueryDocumentList 查询文档列表
 	QueryDocumentList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DocumentListReply, error)
 	// QueryDocumentDetail 查询文档详情
 	QueryDocumentDetail(ctx context.Context, in *QueryDocumentDetailRequest, opts ...grpc.CallOption) (*DocumentDetailReply, error)
 }
 
-type documentClient struct {
+type publicDocumentClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewDocumentClient(cc grpc.ClientConnInterface) DocumentClient {
-	return &documentClient{cc}
+func NewPublicDocumentClient(cc grpc.ClientConnInterface) PublicDocumentClient {
+	return &publicDocumentClient{cc}
 }
 
-func (c *documentClient) QueryDocumentList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DocumentListReply, error) {
+func (c *publicDocumentClient) QueryDocumentList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DocumentListReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DocumentListReply)
-	err := c.cc.Invoke(ctx, Document_QueryDocumentList_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PublicDocument_QueryDocumentList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *documentClient) QueryDocumentDetail(ctx context.Context, in *QueryDocumentDetailRequest, opts ...grpc.CallOption) (*DocumentDetailReply, error) {
+func (c *publicDocumentClient) QueryDocumentDetail(ctx context.Context, in *QueryDocumentDetailRequest, opts ...grpc.CallOption) (*DocumentDetailReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DocumentDetailReply)
-	err := c.cc.Invoke(ctx, Document_QueryDocumentDetail_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PublicDocument_QueryDocumentDetail_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// DocumentServer is the server API for Document service.
-// All implementations must embed UnimplementedDocumentServer
+// PublicDocumentServer is the server API for PublicDocument service.
+// All implementations must embed UnimplementedPublicDocumentServer
 // for forward compatibility.
 //
 // Public Document service
 // 公共文档服务（需要认证）
-type DocumentServer interface {
+type PublicDocumentServer interface {
 	// QueryDocumentList 查询文档列表
 	QueryDocumentList(context.Context, *emptypb.Empty) (*DocumentListReply, error)
 	// QueryDocumentDetail 查询文档详情
 	QueryDocumentDetail(context.Context, *QueryDocumentDetailRequest) (*DocumentDetailReply, error)
-	mustEmbedUnimplementedDocumentServer()
+	mustEmbedUnimplementedPublicDocumentServer()
 }
 
-// UnimplementedDocumentServer must be embedded to have
+// UnimplementedPublicDocumentServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedDocumentServer struct{}
+type UnimplementedPublicDocumentServer struct{}
 
-func (UnimplementedDocumentServer) QueryDocumentList(context.Context, *emptypb.Empty) (*DocumentListReply, error) {
+func (UnimplementedPublicDocumentServer) QueryDocumentList(context.Context, *emptypb.Empty) (*DocumentListReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryDocumentList not implemented")
 }
-func (UnimplementedDocumentServer) QueryDocumentDetail(context.Context, *QueryDocumentDetailRequest) (*DocumentDetailReply, error) {
+func (UnimplementedPublicDocumentServer) QueryDocumentDetail(context.Context, *QueryDocumentDetailRequest) (*DocumentDetailReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryDocumentDetail not implemented")
 }
-func (UnimplementedDocumentServer) mustEmbedUnimplementedDocumentServer() {}
-func (UnimplementedDocumentServer) testEmbeddedByValue()                  {}
+func (UnimplementedPublicDocumentServer) mustEmbedUnimplementedPublicDocumentServer() {}
+func (UnimplementedPublicDocumentServer) testEmbeddedByValue()                        {}
 
-// UnsafeDocumentServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to DocumentServer will
+// UnsafePublicDocumentServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PublicDocumentServer will
 // result in compilation errors.
-type UnsafeDocumentServer interface {
-	mustEmbedUnimplementedDocumentServer()
+type UnsafePublicDocumentServer interface {
+	mustEmbedUnimplementedPublicDocumentServer()
 }
 
-func RegisterDocumentServer(s grpc.ServiceRegistrar, srv DocumentServer) {
-	// If the following call panics, it indicates UnimplementedDocumentServer was
+func RegisterPublicDocumentServer(s grpc.ServiceRegistrar, srv PublicDocumentServer) {
+	// If the following call panics, it indicates UnimplementedPublicDocumentServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&Document_ServiceDesc, srv)
+	s.RegisterService(&PublicDocument_ServiceDesc, srv)
 }
 
-func _Document_QueryDocumentList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicDocument_QueryDocumentList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DocumentServer).QueryDocumentList(ctx, in)
+		return srv.(PublicDocumentServer).QueryDocumentList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Document_QueryDocumentList_FullMethodName,
+		FullMethod: PublicDocument_QueryDocumentList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DocumentServer).QueryDocumentList(ctx, req.(*emptypb.Empty))
+		return srv.(PublicDocumentServer).QueryDocumentList(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Document_QueryDocumentDetail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicDocument_QueryDocumentDetail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QueryDocumentDetailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DocumentServer).QueryDocumentDetail(ctx, in)
+		return srv.(PublicDocumentServer).QueryDocumentDetail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Document_QueryDocumentDetail_FullMethodName,
+		FullMethod: PublicDocument_QueryDocumentDetail_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DocumentServer).QueryDocumentDetail(ctx, req.(*QueryDocumentDetailRequest))
+		return srv.(PublicDocumentServer).QueryDocumentDetail(ctx, req.(*QueryDocumentDetailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Document_ServiceDesc is the grpc.ServiceDesc for Document service.
+// PublicDocument_ServiceDesc is the grpc.ServiceDesc for PublicDocument service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Document_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.public.document.v1.Document",
-	HandlerType: (*DocumentServer)(nil),
+var PublicDocument_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "api.public.document.v1.PublicDocument",
+	HandlerType: (*PublicDocumentServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "QueryDocumentList",
-			Handler:    _Document_QueryDocumentList_Handler,
+			Handler:    _PublicDocument_QueryDocumentList_Handler,
 		},
 		{
 			MethodName: "QueryDocumentDetail",
-			Handler:    _Document_QueryDocumentDetail_Handler,
+			Handler:    _PublicDocument_QueryDocumentDetail_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

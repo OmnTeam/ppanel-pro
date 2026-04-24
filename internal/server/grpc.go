@@ -114,6 +114,6 @@ func NewGRPCServer(c *conf.Server, authMiddleware *appmiddleware.ServiceContext,
 	// Public Ticket模块服务注册
 	publicticketv1.RegisterTicketServer(srv, publicTicket)
 	// Public User模块服务注册
-	publicuserv1.RegisterUserServer(srv, publicUser)
+	publicuserv1.RegisterPublicUserServer(srv, publicUser)
 	return srv
 }

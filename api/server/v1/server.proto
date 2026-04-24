@@ -206,8 +206,64 @@ message NodeOutbound {
 
 // Protocol 协议配置
 message Protocol {
-	string type = 1;          // 协议类型
-	map<string, string> config = 2;    // 协议配置
+	string type = 1;
+	int32 port = 2;
+	bool enable = 3;
+	string security = 4;
+	string sni = 5;
+	bool allow_insecure = 6;
+	string fingerprint = 7;
+	string reality_server_addr = 8;
+	int32 reality_server_port = 9;
+	string reality_private_key = 10;
+	string reality_public_key = 11;
+	string reality_short_id = 12;
+	string transport = 13;
+	string host = 14;
+	string path = 15;
+	string service_name = 16;
+	string cipher = 17;
+	string server_key = 18;
+	string flow = 19;
+	string hop_ports = 20;
+	int32 hop_interval = 21;
+	string obfs_password = 22;
+	bool disable_sni = 23;
+	bool reduce_rtt = 24;
+	string udp_relay_mode = 25;
+	string congestion_controller = 26;
+	string multiplex = 27;
+	string padding_scheme = 28;
+	int32 up_mbps = 29;
+	int32 down_mbps = 30;
+	string obfs = 31;
+	string obfs_host = 32;
+	string obfs_path = 33;
+	string xhttp_mode = 34;
+	string xhttp_extra = 35;
+	string encryption = 36;
+	string encryption_mode = 37;
+	string encryption_rtt = 38;
+	string encryption_ticket = 39;
+	string encryption_server_padding = 40;
+	string encryption_private_key = 41;
+	string encryption_client_padding = 42;
+	string encryption_password = 43;
+	double ratio = 44;
+	string cert_mode = 45;
+	string cert_dns_provider = 46;
+	string cert_dns_env = 47;
+	string simnet_psk = 48;
+	int32 simnet_key_id = 49;
+	string simnet_ticket_id = 50;
+	string simnet_path = 51;
+	string simnet_carrier = 52;
+	bool simnet_af_enabled = 53;
+	string simnet_af_path_mode = 54;
+	string simnet_af_path_prefix = 55;
+	string simnet_af_path_suffix = 56;
+	string simnet_af_magic_mode = 57;
+	int32 simnet_af_response_jitter_ms = 58;
 }
 
 // QueryServerProtocolConfigReply 查询服务器协议配置响应
@@ -220,5 +276,5 @@ message QueryServerProtocolConfigReply {
 	repeated string block = 6;  // 阻止列表
 	repeated NodeOutbound outbound = 7;  // 出站配置
 	repeated Protocol protocols = 8;  // 协议配置
-	int64 total = 9;          // 总数
+	int32 total = 9;          // 总数
 }

@@ -64,9 +64,9 @@ var (
 	// DefaultIsExpiredGroup holds the default value on creation for the "is_expired_group" field.
 	DefaultIsExpiredGroup bool
 	// DefaultExpiredDaysLimit holds the default value on creation for the "expired_days_limit" field.
-	DefaultExpiredDaysLimit int64
+	DefaultExpiredDaysLimit int32
 	// DefaultMaxTrafficGBExpired holds the default value on creation for the "max_traffic_gb_expired" field.
-	DefaultMaxTrafficGBExpired int64
+	DefaultMaxTrafficGBExpired int32
 	// DefaultSpeedLimit holds the default value on creation for the "speed_limit" field.
 	DefaultSpeedLimit int64
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.

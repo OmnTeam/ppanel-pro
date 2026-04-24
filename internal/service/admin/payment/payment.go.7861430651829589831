@@ -1,0 +1,239 @@
+package payment
+
+import (
+	"context"
+	"encoding/json"
+	"strings"
+
+	v1 "github.com/OmnTeam/ppanel-pro/api/admin/payment/v1"
+	paymentbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/payment"
+	middleware "github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
+	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	paymentpkg "github.com/OmnTeam/ppanel-pro/pkg/payment"
+	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/go-kratos/kratos/v2/log"
+	"google.golang.org/protobuf/types/known/structpb"
+)
+
+// PaymentService 支付方式服务
+type PaymentService struct {
+	v1.UnimplementedPaymentServiceServer
+
+	uc  *paymentbiz.PaymentUsecase
+	log *log.Helper
+}
+
+func NewPaymentService(uc *paymentbiz.PaymentUsecase, logger log.Logger) *PaymentService {
+	return &PaymentService{uc: uc, log: log.NewHelper(logger)}
+}
+
+func (s *PaymentService) CreatePaymentMethod(ctx context.Context, req *v1.CreatePaymentMethodRequest) (*v1.CreatePaymentMethodReply, error) {
+	if req.Config == nil || req.Enable == nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	configJSON, err := tool.StructToJSON(req.Config)
+	if err != nil {
+		return nil, err
+	}
+
+	method, err := s.uc.CreatePaymentMethod(
+		ctx,
+		req.Name,
+		req.Platform,
+		req.Description,
+		req.Icon,
+		req.Domain,
+		configJSON,
+		int32(req.FeeMode),
+		req.FeePercent,
+		req.FeeAmount,
+		req.Sort,
+		req.Enable,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := s.toPaymentConfig(method)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.CreatePaymentMethodReply{
+		Code:    int32(responsecode.AdminCreatePaymentMethodSuccess),
+		Message: responsecode.CodeMessages[responsecode.AdminCreatePaymentMethodSuccess],
+		Data:    data,
+	}, nil
+}
+
+func (s *PaymentService) UpdatePaymentMethod(ctx context.Context, req *v1.UpdatePaymentMethodRequest) (*v1.UpdatePaymentMethodReply, error) {
+	if req.Config == nil || req.Enable == nil || req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	configJSON, err := tool.StructToJSON(req.Config)
+	if err != nil {
+		return nil, err
+	}
+
+	method, err := s.uc.UpdatePaymentMethod(
+		ctx,
+		int(req.Id),
+		req.Name,
+		req.Platform,
+		req.Description,
+		req.Icon,
+		req.Domain,
+		configJSON,
+		int32(req.FeeMode),
+		req.FeePercent,
+		req.FeeAmount,
+		req.Sort,
+		req.Enable,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := s.toPaymentConfig(method)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.UpdatePaymentMethodReply{
+		Code:    int32(responsecode.AdminUpdatePaymentMethodSuccess),
+		Message: responsecode.CodeMessages[responsecode.AdminUpdatePaymentMethodSuccess],
+		Data:    data,
+	}, nil
+}
+
+func (s *PaymentService) DeletePaymentMethod(ctx context.Context, req *v1.DeletePaymentMethodRequest) (*v1.DeletePaymentMethodReply, error) {
+	if req.Id <= 0 {
+		return nil, responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+	if err := s.uc.DeletePaymentMethod(ctx, int(req.Id)); err != nil {
+		return nil, err
+	}
+	return &v1.DeletePaymentMethodReply{
+		Code:    int32(responsecode.AdminDeletePaymentMethodSuccess),
+		Message: responsecode.CodeMessages[responsecode.AdminDeletePaymentMethodSuccess],
+	}, nil
+}
+
+func (s *PaymentService) GetPaymentMethodList(ctx context.Context, req *v1.GetPaymentMethodListRequest) (*v1.GetPaymentMethodListReply, error) {
+	var enable *bool
+	if req.Enable != nil {
+		enable = req.Enable
+	}
+
+	total, list, err := s.uc.GetPaymentMethodList(ctx, int(req.Page), int(req.Size), req.Platform, req.Search, enable)
+	if err != nil {
+		return nil, err
+	}
+
+	gatewayMode := middleware.GetGatewayMode(ctx)
+	methods := make([]*v1.PaymentMethodDetail, 0, len(list))
+	for _, method := range list {
+		item, err := s.toPaymentMethodDetail(method, gatewayMode)
+		if err != nil {
+			return nil, err
+		}
+		methods = append(methods, item)
+	}
+
+	return &v1.GetPaymentMethodListReply{
+		Code:    int32(responsecode.AdminGetPaymentMethodListSuccess),
+		Message: responsecode.CodeMessages[responsecode.AdminGetPaymentMethodListSuccess],
+		Data: &v1.GetPaymentMethodListData{
+			Total: total,
+			List:  methods,
+		},
+	}, nil
+}
+
+func (s *PaymentService) GetPaymentPlatform(ctx context.Context, req *v1.GetPaymentPlatformRequest) (*v1.GetPaymentPlatformReply, error) {
+	platforms := s.uc.GetPaymentPlatform(ctx)
+	platformList := make([]*v1.PaymentPlatform, 0, len(platforms))
+	for _, platform := range platforms {
+		platformList = append(platformList, &v1.PaymentPlatform{
+			Platform:                 platform.Platform,
+			PlatformUrl:              platform.PlatformUrl,
+			PlatformFieldDescription: platform.PlatformFieldDescription,
+		})
+	}
+	return &v1.GetPaymentPlatformReply{
+		Code:    int32(responsecode.AdminGetPaymentPlatformSuccess),
+		Message: responsecode.CodeMessages[responsecode.AdminGetPaymentPlatformSuccess],
+		Data:    &v1.GetPaymentPlatformData{List: platformList},
+	}, nil
+}
+
+func (s *PaymentService) toPaymentConfig(method *paymentbiz.PaymentMethod) (*v1.PaymentConfig, error) {
+	configStruct, err := s.parseConfig(method.Config)
+	if err != nil {
+		return nil, err
+	}
+	enable := method.Enable
+	return &v1.PaymentConfig{
+		Id:          method.ID,
+		Name:        method.Name,
+		Platform:    method.Platform,
+		Description: method.Description,
+		Icon:        method.Icon,
+		Domain:      method.Domain,
+		Config:      configStruct,
+		FeeMode:     uint32(method.FeeMode),
+		FeePercent:  method.FeePercent,
+		FeeAmount:   method.FeeAmount,
+		Sort:        method.Sort,
+		Enable:      &enable,
+	}, nil
+}
+
+func (s *PaymentService) toPaymentMethodDetail(method *paymentbiz.PaymentMethod, gatewayMode bool) (*v1.PaymentMethodDetail, error) {
+	configStruct, err := s.parseConfig(method.Config)
+	if err != nil {
+		return nil, err
+	}
+	return &v1.PaymentMethodDetail{
+		Id:          method.ID,
+		Name:        method.Name,
+		Platform:    method.Platform,
+		Description: method.Description,
+		Icon:        method.Icon,
+		Domain:      method.Domain,
+		Config:      configStruct,
+		FeeMode:     uint32(method.FeeMode),
+		FeePercent:  method.FeePercent,
+		FeeAmount:   method.FeeAmount,
+		Sort:        method.Sort,
+		Enable:      method.Enable,
+		NotifyUrl:   s.buildNotifyURL(method, gatewayMode),
+	}, nil
+}
+
+func (s *PaymentService) buildNotifyURL(method *paymentbiz.PaymentMethod, gatewayMode bool) string {
+	if method == nil || paymentpkg.ParsePlatform(method.Platform) == paymentpkg.Balance {
+		return ""
+	}
+	base := strings.TrimSpace(method.Domain)
+	if base == "" {
+		host := strings.TrimSpace(method.SiteHost)
+		if host == "" {
+			return ""
+		}
+		base = "https://" + host
+	}
+	if gatewayMode {
+		base = strings.TrimRight(base, "/") + "/api"
+	}
+	return strings.TrimRight(base, "/") + "/v1/notify/" + method.Platform + "/" + method.Token
+}
+
+func (s *PaymentService) parseConfig(configJSON string) (*structpb.Struct, error) {
+	if strings.TrimSpace(configJSON) == "" {
+		return &structpb.Struct{}, nil
+	}
+	var data map[string]interface{}
+	if err := json.Unmarshal([]byte(configJSON), &data); err != nil {
+		return &structpb.Struct{}, err
+	}
+	return structpb.NewStruct(data)
+}

@@ -12,7 +12,7 @@ func TestLegacyRouteGuardBlocksNewOnlyPaths(t *testing.T) {
 		{path: "/v1/admin/group/migrate", want: true},
 		{path: "/v1/auth/check-telephone", want: true},
 		{path: "/v1/payment/demo/alipay/notify", want: true},
-		{path: "/v1/subscribe/demo", want: true},
+		{path: "/v1/subscribe/demo", want: false},
 		{path: "/v1/auth/check/telephone", want: false},
 		{path: "/v1/subscribe/config", want: false},
 	}

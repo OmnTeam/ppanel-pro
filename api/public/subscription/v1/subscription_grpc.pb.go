@@ -30,7 +30,7 @@ const (
 // 订阅配置服务 - 生成客户端配置
 type SubscriptionClient interface {
 	// GetSubscribeConfig 获取订阅配置
-	// 根据token获取用户订阅配置文件，支持多种客户端格式
+	// 根据老项目请求参数生成订阅配置
 	GetSubscribeConfig(ctx context.Context, in *GetSubscribeConfigRequest, opts ...grpc.CallOption) (*GetSubscribeConfigReply, error)
 }
 
@@ -60,7 +60,7 @@ func (c *subscriptionClient) GetSubscribeConfig(ctx context.Context, in *GetSubs
 // 订阅配置服务 - 生成客户端配置
 type SubscriptionServer interface {
 	// GetSubscribeConfig 获取订阅配置
-	// 根据token获取用户订阅配置文件，支持多种客户端格式
+	// 根据老项目请求参数生成订阅配置
 	GetSubscribeConfig(context.Context, *GetSubscribeConfigRequest) (*GetSubscribeConfigReply, error)
 	mustEmbedUnimplementedSubscriptionServer()
 }

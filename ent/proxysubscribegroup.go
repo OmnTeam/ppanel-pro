@@ -25,9 +25,9 @@ type ProxySubscribeGroup struct {
 	// 是否为过期节点组
 	IsExpiredGroup bool `json:"is_expired_group,omitempty"`
 	// 过期天数限制
-	ExpiredDaysLimit *int64 `json:"expired_days_limit,omitempty"`
+	ExpiredDaysLimit *int32 `json:"expired_days_limit,omitempty"`
 	// 过期组最大流量GB
-	MaxTrafficGBExpired *int64 `json:"max_traffic_gb_expired,omitempty"`
+	MaxTrafficGBExpired *int32 `json:"max_traffic_gb_expired,omitempty"`
 	// 过期组限速
 	SpeedLimit *int64 `json:"speed_limit,omitempty"`
 	// 创建时间
@@ -94,15 +94,15 @@ func (_m *ProxySubscribeGroup) assignValues(columns []string, values []any) erro
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field expired_days_limit", values[i])
 			} else if value.Valid {
-				_m.ExpiredDaysLimit = new(int64)
-				*_m.ExpiredDaysLimit = value.Int64
+				_m.ExpiredDaysLimit = new(int32)
+				*_m.ExpiredDaysLimit = int32(value.Int64)
 			}
 		case proxysubscribegroup.FieldMaxTrafficGBExpired:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field max_traffic_gb_expired", values[i])
 			} else if value.Valid {
-				_m.MaxTrafficGBExpired = new(int64)
-				*_m.MaxTrafficGBExpired = value.Int64
+				_m.MaxTrafficGBExpired = new(int32)
+				*_m.MaxTrafficGBExpired = int32(value.Int64)
 			}
 		case proxysubscribegroup.FieldSpeedLimit:
 			if value, ok := values[i].(*sql.NullInt64); !ok {

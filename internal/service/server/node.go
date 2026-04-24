@@ -202,16 +202,65 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 	// 转换Protocol配置
 	protocolConfigs := make([]*v1.Protocol, 0, len(config.Protocols))
 	for _, protocol := range config.Protocols {
-		// 解析Config JSON字符串为map
-		var configMap map[string]string
-		if err := json.Unmarshal([]byte(protocol.Config), &configMap); err != nil {
-			s.log.Errorf("[QueryServerProtocolConfig] failed to parse protocol config type=%s err=%v", protocol.Type, err)
-			configMap = make(map[string]string)
-		}
-
 		protocolConfigs = append(protocolConfigs, &v1.Protocol{
-			Type:   protocol.Type,
-			Config: configMap,
+			Type:                     protocol.Type,
+			Port:                     protocol.Port,
+			Enable:                   protocol.Enable,
+			Security:                 protocol.Security,
+			Sni:                      protocol.SNI,
+			AllowInsecure:            protocol.AllowInsecure,
+			Fingerprint:              protocol.Fingerprint,
+			RealityServerAddr:        protocol.RealityServerAddr,
+			RealityServerPort:        protocol.RealityServerPort,
+			RealityPrivateKey:        protocol.RealityPrivateKey,
+			RealityPublicKey:         protocol.RealityPublicKey,
+			RealityShortId:           protocol.RealityShortId,
+			Transport:                protocol.Transport,
+			Host:                     protocol.Host,
+			Path:                     protocol.Path,
+			ServiceName:              protocol.ServiceName,
+			Cipher:                   protocol.Cipher,
+			ServerKey:                protocol.ServerKey,
+			Flow:                     protocol.Flow,
+			HopPorts:                 protocol.HopPorts,
+			HopInterval:              protocol.HopInterval,
+			ObfsPassword:             protocol.ObfsPassword,
+			DisableSni:               protocol.DisableSNI,
+			ReduceRtt:                protocol.ReduceRtt,
+			UdpRelayMode:             protocol.UDPRelayMode,
+			CongestionController:     protocol.CongestionController,
+			Multiplex:                protocol.Multiplex,
+			PaddingScheme:            protocol.PaddingScheme,
+			UpMbps:                   protocol.UpMbps,
+			DownMbps:                 protocol.DownMbps,
+			Obfs:                     protocol.Obfs,
+			ObfsHost:                 protocol.ObfsHost,
+			ObfsPath:                 protocol.ObfsPath,
+			XhttpMode:                protocol.XhttpMode,
+			XhttpExtra:               protocol.XhttpExtra,
+			Encryption:               protocol.Encryption,
+			EncryptionMode:           protocol.EncryptionMode,
+			EncryptionRtt:            protocol.EncryptionRtt,
+			EncryptionTicket:         protocol.EncryptionTicket,
+			EncryptionServerPadding:  protocol.EncryptionServerPadding,
+			EncryptionPrivateKey:     protocol.EncryptionPrivateKey,
+			EncryptionClientPadding:  protocol.EncryptionClientPadding,
+			EncryptionPassword:       protocol.EncryptionPassword,
+			Ratio:                    protocol.Ratio,
+			CertMode:                 protocol.CertMode,
+			CertDnsProvider:          protocol.CertDNSProvider,
+			CertDnsEnv:               protocol.CertDNSEnv,
+			SimnetPsk:                protocol.SimnetPsk,
+			SimnetKeyId:              protocol.SimnetKeyID,
+			SimnetTicketId:           protocol.SimnetTicketID,
+			SimnetPath:               protocol.SimnetPath,
+			SimnetCarrier:            protocol.SimnetCarrier,
+			SimnetAfEnabled:          protocol.SimnetAfEnabled,
+			SimnetAfPathMode:         protocol.SimnetAfPathMode,
+			SimnetAfPathPrefix:       protocol.SimnetAfPathPrefix,
+			SimnetAfPathSuffix:       protocol.SimnetAfPathSuffix,
+			SimnetAfMagicMode:        protocol.SimnetAfMagicMode,
+			SimnetAfResponseJitterMs: protocol.SimnetAfResponseJitterMs,
 		})
 	}
 
@@ -224,7 +273,7 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 		Block:                  config.Block,
 		Outbound:               outboundConfigs,
 		Protocols:              protocolConfigs,
-		Total:                  config.Total,
+		Total:                  int32(config.Total),
 	}
 	s.log.Infof(
 		"[QueryServerProtocolConfig] reply ready server_id=%d total=%d dns=%d outbound=%d protocols=%d",

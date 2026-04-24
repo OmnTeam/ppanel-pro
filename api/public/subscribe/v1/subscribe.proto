@@ -6,92 +6,83 @@ option go_package = "github.com/OmnTeam/ppanel-pro/api/public/subscribe/v1;v1";
 
 import "google/api/annotations.proto";
 
-// Public Subscribe service
-// 公共订阅服务（需要认证）
-service Subscribe {
-  // QuerySubscribeList 查询订阅列表
-  rpc QuerySubscribeList (QuerySubscribeListRequest) returns (SubscribeListReply) {
+service PublicSubscribe {
+  rpc QuerySubscribeList(QuerySubscribeListRequest) returns (QuerySubscribeListReply) {
     option (google.api.http) = {
       get: "/v1/public/subscribe/list"
     };
   }
 
-  // QueryUserSubscribeNodeList 查询当前用户订阅节点列表
-  rpc QueryUserSubscribeNodeList (QueryUserSubscribeNodeListRequest) returns (QueryUserSubscribeNodeListReply) {
+  rpc QueryUserSubscribeNodeList(QueryUserSubscribeNodeListRequest) returns (QueryUserSubscribeNodeListReply) {
     option (google.api.http) = {
       get: "/v1/public/subscribe/node/list"
     };
   }
 }
 
-// QuerySubscribeListRequest 查询订阅列表请求
 message QuerySubscribeListRequest {
-  string language = 1;  // 语言
+  string language = 1;
 }
 
-// SubscribeListData 订阅列表数据
-message SubscribeListData {
-  repeated SubscribeItem list = 1;
+message QuerySubscribeListReply {
+  repeated Subscribe list = 1;
   int32 total = 2;
 }
 
-// SubscribeListReply 查询订阅列表响应
-message SubscribeListReply {
-  int32 code = 1;              // 状态码
-  string message = 2;          // 消息内容
-  SubscribeListData data = 3;  // 响应数据
-}
-
-// SubscribeItem 订阅项
-message SubscribeItem {
-  string id = 1;
+message Subscribe {
+  int64 id = 1;
   string name = 2;
   string language = 3;
   string description = 4;
-  string unit_price = 5;
+  int64 unit_price = 5;
   string unit_time = 6;
   repeated SubscribeDiscount discount = 7;
-  string replacement = 8;
-  string inventory = 9;
-  string traffic = 10;
-  string speed_limit = 11;
-  string device_limit = 12;
-  string quota = 13;
-  repeated int32 nodes = 14;
+  int64 replacement = 8;
+  int32 inventory = 9;
+  int64 traffic = 10;
+  int32 speed_limit = 11;
+  int32 device_limit = 12;
+  int32 quota = 13;
+  repeated int64 nodes = 14;
   repeated string node_tags = 15;
-  bool show = 16;
-  bool sell = 17;
-  string sort = 18;
-  string deduction_ratio = 19;
-  bool allow_deduction = 20;
-  int32 reset_cycle = 21;
-  string created_at = 22;
-  string updated_at = 23;
+  repeated int64 node_group_ids = 16;
+  int64 node_group_id = 17;
+  repeated TrafficLimit traffic_limit = 18;
+  bool show = 19;
+  bool sell = 20;
+  int32 sort = 21;
+  int32 deduction_ratio = 22;
+  bool allow_deduction = 23;
+  int32 reset_cycle = 24;
+  bool renewal_reset = 25;
+  bool show_original_price = 26;
+  int64 created_at = 27;
+  int64 updated_at = 28;
 }
 
-// SubscribeDiscount 订阅折扣
 message SubscribeDiscount {
-  int32 quantity = 1;
-  int32 percentage = 2;
+  int64 quantity = 1;
+  double discount = 2;
+}
+
+message TrafficLimit {
+  string stat_type = 1;
+  int64 stat_value = 2;
+  int64 traffic_usage = 3;
+  int32 speed_limit = 4;
 }
 
 message QueryUserSubscribeNodeListRequest {}
 
-message QueryUserSubscribeNodeListData {
+message QueryUserSubscribeNodeListReply {
   repeated UserSubscribeInfo list = 1;
 }
 
-message QueryUserSubscribeNodeListReply {
-  int32 code = 1;
-  string message = 2;
-  QueryUserSubscribeNodeListData data = 3;
-}
-
 message UserSubscribeInfo {
-  string id = 1;
-  string user_id = 2;
-  string order_id = 3;
-  string subscribe_id = 4;
+  int64 id = 1;
+  int64 user_id = 2;
+  int64 order_id = 3;
+  int64 subscribe_id = 4;
   int64 start_time = 5;
   int64 expire_time = 6;
   int64 finished_at = 7;
@@ -100,7 +91,7 @@ message UserSubscribeInfo {
   int64 download = 10;
   int64 upload = 11;
   string token = 12;
-  int32 status = 13;
+  uint32 status = 13;
   int64 created_at = 14;
   int64 updated_at = 15;
   bool is_try_out = 16;
@@ -108,7 +99,7 @@ message UserSubscribeInfo {
 }
 
 message UserSubscribeNodeInfo {
-  string id = 1;
+  int64 id = 1;
   string name = 2;
   string uuid = 3;
   string protocol = 4;
@@ -124,3 +115,5 @@ message UserSubscribeNodeInfo {
   string longitude_center = 14;
   int64 created_at = 15;
 }
+
+

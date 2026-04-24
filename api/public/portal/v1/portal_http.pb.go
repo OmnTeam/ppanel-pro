@@ -28,17 +28,11 @@ const OperationPortalPurchaseCheckout = "/api.public.portal.v1.Portal/PurchaseCh
 const OperationPortalQueryPurchaseOrder = "/api.public.portal.v1.Portal/QueryPurchaseOrder"
 
 type PortalHTTPServer interface {
-	// GetAvailablePaymentMethods GetAvailablePaymentMethods 获取可用支付方式（未登录）
 	GetAvailablePaymentMethods(context.Context, *emptypb.Empty) (*GetAvailablePaymentMethodsReply, error)
-	// GetSubscription GetSubscription 获取订阅（未登录）
 	GetSubscription(context.Context, *GetSubscriptionRequest) (*GetSubscriptionReply, error)
-	// PrePurchaseOrder PrePurchaseOrder 预购买订单（未登录）- 计算价格
 	PrePurchaseOrder(context.Context, *PrePurchaseOrderRequest) (*PrePurchaseOrderReply, error)
-	// Purchase Purchase 购买/创建订单（未登录）
 	Purchase(context.Context, *PurchaseRequest) (*PurchaseReply, error)
-	// PurchaseCheckout PurchaseCheckout 购买结账（未登录）- 获取支付信息
 	PurchaseCheckout(context.Context, *PurchaseCheckoutRequest) (*PurchaseCheckoutReply, error)
-	// QueryPurchaseOrder QueryPurchaseOrder 查询购买订单状态（未登录）
 	QueryPurchaseOrder(context.Context, *QueryPurchaseOrderRequest) (*QueryPurchaseOrderReply, error)
 }
 

@@ -70,12 +70,12 @@ func IsExpiredGroup(v bool) predicate.ProxySubscribeGroup {
 }
 
 // ExpiredDaysLimit applies equality check predicate on the "expired_days_limit" field. It's identical to ExpiredDaysLimitEQ.
-func ExpiredDaysLimit(v int64) predicate.ProxySubscribeGroup {
+func ExpiredDaysLimit(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldEQ(FieldExpiredDaysLimit, v))
 }
 
 // MaxTrafficGBExpired applies equality check predicate on the "max_traffic_gb_expired" field. It's identical to MaxTrafficGBExpiredEQ.
-func MaxTrafficGBExpired(v int64) predicate.ProxySubscribeGroup {
+func MaxTrafficGBExpired(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldEQ(FieldMaxTrafficGBExpired, v))
 }
 
@@ -245,42 +245,42 @@ func IsExpiredGroupNEQ(v bool) predicate.ProxySubscribeGroup {
 }
 
 // ExpiredDaysLimitEQ applies the EQ predicate on the "expired_days_limit" field.
-func ExpiredDaysLimitEQ(v int64) predicate.ProxySubscribeGroup {
+func ExpiredDaysLimitEQ(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldEQ(FieldExpiredDaysLimit, v))
 }
 
 // ExpiredDaysLimitNEQ applies the NEQ predicate on the "expired_days_limit" field.
-func ExpiredDaysLimitNEQ(v int64) predicate.ProxySubscribeGroup {
+func ExpiredDaysLimitNEQ(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldNEQ(FieldExpiredDaysLimit, v))
 }
 
 // ExpiredDaysLimitIn applies the In predicate on the "expired_days_limit" field.
-func ExpiredDaysLimitIn(vs ...int64) predicate.ProxySubscribeGroup {
+func ExpiredDaysLimitIn(vs ...int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldIn(FieldExpiredDaysLimit, vs...))
 }
 
 // ExpiredDaysLimitNotIn applies the NotIn predicate on the "expired_days_limit" field.
-func ExpiredDaysLimitNotIn(vs ...int64) predicate.ProxySubscribeGroup {
+func ExpiredDaysLimitNotIn(vs ...int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldNotIn(FieldExpiredDaysLimit, vs...))
 }
 
 // ExpiredDaysLimitGT applies the GT predicate on the "expired_days_limit" field.
-func ExpiredDaysLimitGT(v int64) predicate.ProxySubscribeGroup {
+func ExpiredDaysLimitGT(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldGT(FieldExpiredDaysLimit, v))
 }
 
 // ExpiredDaysLimitGTE applies the GTE predicate on the "expired_days_limit" field.
-func ExpiredDaysLimitGTE(v int64) predicate.ProxySubscribeGroup {
+func ExpiredDaysLimitGTE(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldGTE(FieldExpiredDaysLimit, v))
 }
 
 // ExpiredDaysLimitLT applies the LT predicate on the "expired_days_limit" field.
-func ExpiredDaysLimitLT(v int64) predicate.ProxySubscribeGroup {
+func ExpiredDaysLimitLT(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldLT(FieldExpiredDaysLimit, v))
 }
 
 // ExpiredDaysLimitLTE applies the LTE predicate on the "expired_days_limit" field.
-func ExpiredDaysLimitLTE(v int64) predicate.ProxySubscribeGroup {
+func ExpiredDaysLimitLTE(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldLTE(FieldExpiredDaysLimit, v))
 }
 
@@ -295,42 +295,42 @@ func ExpiredDaysLimitNotNil() predicate.ProxySubscribeGroup {
 }
 
 // MaxTrafficGBExpiredEQ applies the EQ predicate on the "max_traffic_gb_expired" field.
-func MaxTrafficGBExpiredEQ(v int64) predicate.ProxySubscribeGroup {
+func MaxTrafficGBExpiredEQ(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldEQ(FieldMaxTrafficGBExpired, v))
 }
 
 // MaxTrafficGBExpiredNEQ applies the NEQ predicate on the "max_traffic_gb_expired" field.
-func MaxTrafficGBExpiredNEQ(v int64) predicate.ProxySubscribeGroup {
+func MaxTrafficGBExpiredNEQ(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldNEQ(FieldMaxTrafficGBExpired, v))
 }
 
 // MaxTrafficGBExpiredIn applies the In predicate on the "max_traffic_gb_expired" field.
-func MaxTrafficGBExpiredIn(vs ...int64) predicate.ProxySubscribeGroup {
+func MaxTrafficGBExpiredIn(vs ...int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldIn(FieldMaxTrafficGBExpired, vs...))
 }
 
 // MaxTrafficGBExpiredNotIn applies the NotIn predicate on the "max_traffic_gb_expired" field.
-func MaxTrafficGBExpiredNotIn(vs ...int64) predicate.ProxySubscribeGroup {
+func MaxTrafficGBExpiredNotIn(vs ...int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldNotIn(FieldMaxTrafficGBExpired, vs...))
 }
 
 // MaxTrafficGBExpiredGT applies the GT predicate on the "max_traffic_gb_expired" field.
-func MaxTrafficGBExpiredGT(v int64) predicate.ProxySubscribeGroup {
+func MaxTrafficGBExpiredGT(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldGT(FieldMaxTrafficGBExpired, v))
 }
 
 // MaxTrafficGBExpiredGTE applies the GTE predicate on the "max_traffic_gb_expired" field.
-func MaxTrafficGBExpiredGTE(v int64) predicate.ProxySubscribeGroup {
+func MaxTrafficGBExpiredGTE(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldGTE(FieldMaxTrafficGBExpired, v))
 }
 
 // MaxTrafficGBExpiredLT applies the LT predicate on the "max_traffic_gb_expired" field.
-func MaxTrafficGBExpiredLT(v int64) predicate.ProxySubscribeGroup {
+func MaxTrafficGBExpiredLT(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldLT(FieldMaxTrafficGBExpired, v))
 }
 
 // MaxTrafficGBExpiredLTE applies the LTE predicate on the "max_traffic_gb_expired" field.
-func MaxTrafficGBExpiredLTE(v int64) predicate.ProxySubscribeGroup {
+func MaxTrafficGBExpiredLTE(v int32) predicate.ProxySubscribeGroup {
 	return predicate.ProxySubscribeGroup(sql.FieldLTE(FieldMaxTrafficGBExpired, v))
 }
 

@@ -55,13 +55,13 @@ func (_c *ProxyRedemptionRecordCreate) SetNillableUnitTime(v *string) *ProxyRede
 }
 
 // SetQuantity sets the "quantity" field.
-func (_c *ProxyRedemptionRecordCreate) SetQuantity(v int64) *ProxyRedemptionRecordCreate {
+func (_c *ProxyRedemptionRecordCreate) SetQuantity(v int32) *ProxyRedemptionRecordCreate {
 	_c.mutation.SetQuantity(v)
 	return _c
 }
 
 // SetNillableQuantity sets the "quantity" field if the given value is not nil.
-func (_c *ProxyRedemptionRecordCreate) SetNillableQuantity(v *int64) *ProxyRedemptionRecordCreate {
+func (_c *ProxyRedemptionRecordCreate) SetNillableQuantity(v *int32) *ProxyRedemptionRecordCreate {
 	if v != nil {
 		_c.SetQuantity(*v)
 	}
@@ -245,7 +245,7 @@ func (_c *ProxyRedemptionRecordCreate) createSpec() (*ProxyRedemptionRecord, *sq
 		_node.UnitTime = value
 	}
 	if value, ok := _c.mutation.Quantity(); ok {
-		_spec.SetField(proxyredemptionrecord.FieldQuantity, field.TypeInt64, value)
+		_spec.SetField(proxyredemptionrecord.FieldQuantity, field.TypeInt32, value)
 		_node.Quantity = value
 	}
 	if value, ok := _c.mutation.RedeemedAt(); ok {

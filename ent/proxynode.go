@@ -38,7 +38,7 @@ type ProxyNode struct {
 	// 是否隐藏
 	IsHidden bool `json:"is_hidden,omitempty"`
 	// 排序
-	Sort int `json:"sort,omitempty"`
+	Sort int32 `json:"sort,omitempty"`
 	// 节点组ID列表
 	NodeGroupIds []int64 `json:"node_group_ids,omitempty"`
 	// 创建时间
@@ -142,7 +142,7 @@ func (_m *ProxyNode) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value.Valid {
-				_m.Sort = int(value.Int64)
+				_m.Sort = int32(value.Int64)
 			}
 		case proxynode.FieldNodeGroupIds:
 			if value, ok := values[i].(*[]byte); !ok {

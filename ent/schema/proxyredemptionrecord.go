@@ -29,7 +29,7 @@ func (ProxyRedemptionRecord) Fields() []ent.Field {
 		field.Int64("user_id").Comment("用户ID"),
 		field.Int64("subscribe_id").Comment("订阅ID"),
 		field.String("unit_time").Default("month").MaxLen(50).Comment("时间单位"),
-		field.Int64("quantity").Default(1).Comment("数量"),
+		field.Int32("quantity").Default(1).Comment("数量"),
 		field.Time("redeemed_at").Default(time.Now).Immutable().Comment("兑换时间"),
 		field.Time("created_at").Default(time.Now).Immutable().Comment("创建时间"),
 	}

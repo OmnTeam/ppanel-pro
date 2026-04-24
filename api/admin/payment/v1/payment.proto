@@ -8,9 +8,7 @@ import "validate/validate.proto";
 
 option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/payment/v1;v1";
 
-// 支付方式管理服务
 service PaymentService {
-  // 创建支付方式
   rpc CreatePaymentMethod(CreatePaymentMethodRequest) returns (CreatePaymentMethodReply) {
     option (google.api.http) = {
       post: "/v1/admin/payment"
@@ -18,7 +16,6 @@ service PaymentService {
     };
   }
 
-  // 更新支付方式
   rpc UpdatePaymentMethod(UpdatePaymentMethodRequest) returns (UpdatePaymentMethodReply) {
     option (google.api.http) = {
       put: "/v1/admin/payment"
@@ -26,21 +23,18 @@ service PaymentService {
     };
   }
 
-  // 删除支付方式
   rpc DeletePaymentMethod(DeletePaymentMethodRequest) returns (DeletePaymentMethodReply) {
     option (google.api.http) = {
       delete: "/v1/admin/payment"
     };
   }
 
-  // 获取支付方式列表
   rpc GetPaymentMethodList(GetPaymentMethodListRequest) returns (GetPaymentMethodListReply) {
     option (google.api.http) = {
       get: "/v1/admin/payment/list"
     };
   }
 
-  // 获取支付平台列表
   rpc GetPaymentPlatform(GetPaymentPlatformRequest) returns (GetPaymentPlatformReply) {
     option (google.api.http) = {
       get: "/v1/admin/payment/platform"
@@ -48,8 +42,7 @@ service PaymentService {
   }
 }
 
-// 支付方式信息
-message PaymentMethod {
+message PaymentConfig {
   int64 id = 1;
   string name = 2;
   string platform = 3;
@@ -57,22 +50,35 @@ message PaymentMethod {
   string icon = 5;
   string domain = 6;
   google.protobuf.Struct config = 7;
-  uint32 fee_mode = 8;          // 手续费模式
-  int64 fee_percent = 9;       // 手续费百分比
-  int64 fee_amount = 10;       // 手续费固定金额（分）
-  bool enable = 11;
-  string notify_url = 12;
-  string token = 13;
+  uint32 fee_mode = 8;
+  int64 fee_percent = 9;
+  int64 fee_amount = 10;
+  int32 sort = 11;
+  optional bool enable = 12;
 }
 
-// 支付平台信息
+message PaymentMethodDetail {
+  int64 id = 1;
+  string name = 2;
+  string platform = 3;
+  string description = 4;
+  string icon = 5;
+  string domain = 6;
+  google.protobuf.Struct config = 7;
+  uint32 fee_mode = 8;
+  int64 fee_percent = 9;
+  int64 fee_amount = 10;
+  int32 sort = 11;
+  bool enable = 12;
+  string notify_url = 13;
+}
+
 message PaymentPlatform {
   string platform = 1 [json_name = "platform"];
   string platform_url = 2 [json_name = "platform_url"];
   map<string, string> platform_field_description = 3 [json_name = "platform_field_description"];
 }
 
-// 创建支付方式请求
 message CreatePaymentMethodRequest {
   string name = 1 [(validate.rules).string.min_len = 1];
   string platform = 2 [(validate.rules).string.min_len = 1];
@@ -80,20 +86,19 @@ message CreatePaymentMethodRequest {
   string icon = 4;
   string domain = 5;
   google.protobuf.Struct config = 6;
-  uint32 fee_mode = 7;       // 手续费模式
-  int64 fee_percent = 8;    // 手续费百分比
-  int64 fee_amount = 9;     // 手续费固定金额（分）
-  optional bool enable = 10;
+  uint32 fee_mode = 7;
+  int64 fee_percent = 8;
+  int64 fee_amount = 9;
+  int32 sort = 10;
+  optional bool enable = 11;
 }
 
-// 创建支付方式响应
 message CreatePaymentMethodReply {
-  int32 code = 1;           // 状态码
-  string message = 2;       // 消息内容
-  PaymentMethod data = 3;   // 响应数据
+  int32 code = 1;
+  string message = 2;
+  PaymentConfig data = 3;
 }
 
-// 更新支付方式请求
 message UpdatePaymentMethodRequest {
   int64 id = 1 [(validate.rules).int64.gt = 0];
   string name = 2 [(validate.rules).string.min_len = 1];
@@ -105,28 +110,25 @@ message UpdatePaymentMethodRequest {
   uint32 fee_mode = 8;
   int64 fee_percent = 9;
   int64 fee_amount = 10;
-  optional bool enable = 11;
+  int32 sort = 11;
+  optional bool enable = 12;
 }
 
-// 更新支付方式响应
 message UpdatePaymentMethodReply {
-  int32 code = 1;           // 状态码
-  string message = 2;       // 消息内容
-  PaymentMethod data = 3;   // 响应数据
+  int32 code = 1;
+  string message = 2;
+  PaymentConfig data = 3;
 }
 
-// 删除支付方式请求
 message DeletePaymentMethodRequest {
-  int64 id = 1;
+  int64 id = 1 [(validate.rules).int64.gt = 0];
 }
 
-// 删除支付方式响应
 message DeletePaymentMethodReply {
-  int32 code = 1;     // 状态码
-  string message = 2; // 消息内容
+  int32 code = 1;
+  string message = 2;
 }
 
-// 获取支付方式列表请求
 message GetPaymentMethodListRequest {
   int32 page = 1;
   int32 size = 2;
@@ -135,30 +137,26 @@ message GetPaymentMethodListRequest {
   optional bool enable = 5;
 }
 
-// 获取支付方式列表数据
 message GetPaymentMethodListData {
-  int64 total = 1;
-  repeated PaymentMethod list = 2;
+  int32 total = 1;
+  repeated PaymentMethodDetail list = 2;
 }
 
-// 获取支付方式列表响应
 message GetPaymentMethodListReply {
-  int32 code = 1;                         // 状态码
-  string message = 2;                     // 消息内容
-  GetPaymentMethodListData data = 3;      // 响应数据
+  int32 code = 1;
+  string message = 2;
+  GetPaymentMethodListData data = 3;
 }
 
-// 获取支付平台请求
 message GetPaymentPlatformRequest {}
 
-// 获取支付平台数据
 message GetPaymentPlatformData {
   repeated PaymentPlatform list = 1 [json_name = "list"];
 }
 
-// 获取支付平台响应
 message GetPaymentPlatformReply {
-  int32 code = 1;                       // 状态码
-  string message = 2;                   // 消息内容
-  GetPaymentPlatformData data = 3;      // 响应数据
+  int32 code = 1;
+  string message = 2;
+  GetPaymentPlatformData data = 3;
 }
+

@@ -28,7 +28,7 @@ func (ProxyServer) Fields() []ent.Field {
 		field.String("country").MaxLen(128).Default("").Comment("国家"),
 		field.String("city").MaxLen(128).Default("").Comment("城市"),
 		field.String("server_addr").StorageKey("address").MaxLen(100).Default("").Comment("服务器地址"),
-		field.Int("sort").Default(0).Comment("排序"),
+		field.Int32("sort").Default(0).Comment("排序"),
 		field.Text("protocol").StorageKey("protocols").Optional().Comment("协议配置JSON"),
 		field.Time("last_reported_at").Optional().Nillable().Comment("最后报告时间"),
 		field.String("longitude").MaxLen(50).Default("0.0").Comment("经度"),

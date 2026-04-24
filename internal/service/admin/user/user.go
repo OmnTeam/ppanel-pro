@@ -275,6 +275,7 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 		Where(
 			proxyuserauthmethod.UserIDEQ(user.ID),
 		).
+		Order(ent.Desc(proxyuserauthmethod.FieldAuthType)).
 		All(ctx)
 	if err != nil {
 		s.logger.Errorf("Failed to query auth methods for user %d: %v", user.ID, err)
@@ -347,7 +348,7 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 	// 处理指针字段
 	var balance int64
 	if user.Balance != nil {
-		balance = int64(*user.Balance)
+		balance = *user.Balance
 	}
 	referCode := ""
 	if user.ReferCode != nil {
@@ -355,15 +356,15 @@ func (s *UserService) convertToProto(ctx context.Context, user *ent.ProxyUser) (
 	}
 	var refererID int64
 	if user.RefererID != nil {
-		refererID = int64(*user.RefererID)
+		refererID = *user.RefererID
 	}
 	var commission int64
 	if user.Commission != nil {
-		commission = int64(*user.Commission)
+		commission = *user.Commission
 	}
 	var giftAmount int64
 	if user.GiftAmount != nil {
-		giftAmount = int64(*user.GiftAmount)
+		giftAmount = *user.GiftAmount
 	}
 	avatar := ""
 	if user.Avatar != nil {

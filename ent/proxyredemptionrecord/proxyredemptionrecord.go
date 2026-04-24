@@ -78,7 +78,7 @@ var (
 	// UnitTimeValidator is a validator for the "unit_time" field. It is called by the builders before save.
 	UnitTimeValidator func(string) error
 	// DefaultQuantity holds the default value on creation for the "quantity" field.
-	DefaultQuantity int64
+	DefaultQuantity int32
 	// DefaultRedeemedAt holds the default value on creation for the "redeemed_at" field.
 	DefaultRedeemedAt func() time.Time
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.

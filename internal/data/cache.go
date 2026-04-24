@@ -13,6 +13,8 @@ const (
 	StatusCacheKey = "node:status:%d"
 	// OnlineUserCacheKeyWithSubscribe 在线用户订阅缓存键格式
 	OnlineUserCacheKeyWithSubscribe = "node:online:subscribe:%d:%s"
+	// OnlineUserSubscribeCacheKeyWithGlobal 全局在线订阅缓存键
+	OnlineUserSubscribeCacheKeyWithGlobal = "node:online:subscribe:global"
 	// CacheExpiry 缓存过期时间（秒）
 	CacheExpiry = 300
 

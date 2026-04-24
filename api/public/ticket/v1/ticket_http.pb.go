@@ -10,6 +10,7 @@ import (
 	context "context"
 	http "github.com/go-kratos/kratos/v2/transport/http"
 	binding "github.com/go-kratos/kratos/v2/transport/http/binding"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -27,15 +28,15 @@ const OperationTicketUpdateUserTicketStatus = "/api.public.ticket.v1.Ticket/Upda
 
 type TicketHTTPServer interface {
 	// CreateUserTicket CreateUserTicket creates a new ticket
-	CreateUserTicket(context.Context, *CreateUserTicketRequest) (*TicketCreateReply, error)
+	CreateUserTicket(context.Context, *CreateUserTicketRequest) (*emptypb.Empty, error)
 	// CreateUserTicketFollow CreateUserTicketFollow creates a follow-up for ticket
-	CreateUserTicketFollow(context.Context, *CreateUserTicketFollowRequest) (*TicketFollowReply, error)
+	CreateUserTicketFollow(context.Context, *CreateUserTicketFollowRequest) (*emptypb.Empty, error)
 	// GetUserTicketDetails GetUserTicketDetails gets ticket details
-	GetUserTicketDetails(context.Context, *GetUserTicketDetailsRequest) (*TicketDetailReply, error)
+	GetUserTicketDetails(context.Context, *GetUserTicketDetailsRequest) (*TicketInfo, error)
 	// GetUserTicketList GetUserTicketList gets user's ticket list with pagination
-	GetUserTicketList(context.Context, *GetUserTicketListRequest) (*TicketListReply, error)
+	GetUserTicketList(context.Context, *GetUserTicketListRequest) (*GetUserTicketListReply, error)
 	// UpdateUserTicketStatus UpdateUserTicketStatus updates ticket status
-	UpdateUserTicketStatus(context.Context, *UpdateUserTicketStatusRequest) (*TicketStatusReply, error)
+	UpdateUserTicketStatus(context.Context, *UpdateUserTicketStatusRequest) (*emptypb.Empty, error)
 }
 
 func RegisterTicketHTTPServer(s *http.Server, srv TicketHTTPServer) {
@@ -64,7 +65,7 @@ func _Ticket_CreateUserTicket0_HTTP_Handler(srv TicketHTTPServer) func(ctx http.
 		if err != nil {
 			return err
 		}
-		reply := out.(*TicketCreateReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
@@ -83,7 +84,7 @@ func _Ticket_GetUserTicketList0_HTTP_Handler(srv TicketHTTPServer) func(ctx http
 		if err != nil {
 			return err
 		}
-		reply := out.(*TicketListReply)
+		reply := out.(*GetUserTicketListReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -102,7 +103,7 @@ func _Ticket_GetUserTicketDetails0_HTTP_Handler(srv TicketHTTPServer) func(ctx h
 		if err != nil {
 			return err
 		}
-		reply := out.(*TicketDetailReply)
+		reply := out.(*TicketInfo)
 		return ctx.Result(200, reply)
 	}
 }
@@ -124,7 +125,7 @@ func _Ticket_UpdateUserTicketStatus0_HTTP_Handler(srv TicketHTTPServer) func(ctx
 		if err != nil {
 			return err
 		}
-		reply := out.(*TicketStatusReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
@@ -146,17 +147,17 @@ func _Ticket_CreateUserTicketFollow0_HTTP_Handler(srv TicketHTTPServer) func(ctx
 		if err != nil {
 			return err
 		}
-		reply := out.(*TicketFollowReply)
+		reply := out.(*emptypb.Empty)
 		return ctx.Result(200, reply)
 	}
 }
 
 type TicketHTTPClient interface {
-	CreateUserTicket(ctx context.Context, req *CreateUserTicketRequest, opts ...http.CallOption) (rsp *TicketCreateReply, err error)
-	CreateUserTicketFollow(ctx context.Context, req *CreateUserTicketFollowRequest, opts ...http.CallOption) (rsp *TicketFollowReply, err error)
-	GetUserTicketDetails(ctx context.Context, req *GetUserTicketDetailsRequest, opts ...http.CallOption) (rsp *TicketDetailReply, err error)
-	GetUserTicketList(ctx context.Context, req *GetUserTicketListRequest, opts ...http.CallOption) (rsp *TicketListReply, err error)
-	UpdateUserTicketStatus(ctx context.Context, req *UpdateUserTicketStatusRequest, opts ...http.CallOption) (rsp *TicketStatusReply, err error)
+	CreateUserTicket(ctx context.Context, req *CreateUserTicketRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	CreateUserTicketFollow(ctx context.Context, req *CreateUserTicketFollowRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
+	GetUserTicketDetails(ctx context.Context, req *GetUserTicketDetailsRequest, opts ...http.CallOption) (rsp *TicketInfo, err error)
+	GetUserTicketList(ctx context.Context, req *GetUserTicketListRequest, opts ...http.CallOption) (rsp *GetUserTicketListReply, err error)
+	UpdateUserTicketStatus(ctx context.Context, req *UpdateUserTicketStatusRequest, opts ...http.CallOption) (rsp *emptypb.Empty, err error)
 }
 
 type TicketHTTPClientImpl struct {
@@ -167,8 +168,8 @@ func NewTicketHTTPClient(client *http.Client) TicketHTTPClient {
 	return &TicketHTTPClientImpl{client}
 }
 
-func (c *TicketHTTPClientImpl) CreateUserTicket(ctx context.Context, in *CreateUserTicketRequest, opts ...http.CallOption) (*TicketCreateReply, error) {
-	var out TicketCreateReply
+func (c *TicketHTTPClientImpl) CreateUserTicket(ctx context.Context, in *CreateUserTicketRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/ticket"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationTicketCreateUserTicket))
@@ -180,8 +181,8 @@ func (c *TicketHTTPClientImpl) CreateUserTicket(ctx context.Context, in *CreateU
 	return &out, nil
 }
 
-func (c *TicketHTTPClientImpl) CreateUserTicketFollow(ctx context.Context, in *CreateUserTicketFollowRequest, opts ...http.CallOption) (*TicketFollowReply, error) {
-	var out TicketFollowReply
+func (c *TicketHTTPClientImpl) CreateUserTicketFollow(ctx context.Context, in *CreateUserTicketFollowRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/ticket/follow"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationTicketCreateUserTicketFollow))
@@ -193,8 +194,8 @@ func (c *TicketHTTPClientImpl) CreateUserTicketFollow(ctx context.Context, in *C
 	return &out, nil
 }
 
-func (c *TicketHTTPClientImpl) GetUserTicketDetails(ctx context.Context, in *GetUserTicketDetailsRequest, opts ...http.CallOption) (*TicketDetailReply, error) {
-	var out TicketDetailReply
+func (c *TicketHTTPClientImpl) GetUserTicketDetails(ctx context.Context, in *GetUserTicketDetailsRequest, opts ...http.CallOption) (*TicketInfo, error) {
+	var out TicketInfo
 	pattern := "/v1/public/ticket/detail"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationTicketGetUserTicketDetails))
@@ -206,8 +207,8 @@ func (c *TicketHTTPClientImpl) GetUserTicketDetails(ctx context.Context, in *Get
 	return &out, nil
 }
 
-func (c *TicketHTTPClientImpl) GetUserTicketList(ctx context.Context, in *GetUserTicketListRequest, opts ...http.CallOption) (*TicketListReply, error) {
-	var out TicketListReply
+func (c *TicketHTTPClientImpl) GetUserTicketList(ctx context.Context, in *GetUserTicketListRequest, opts ...http.CallOption) (*GetUserTicketListReply, error) {
+	var out GetUserTicketListReply
 	pattern := "/v1/public/ticket/list"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationTicketGetUserTicketList))
@@ -219,8 +220,8 @@ func (c *TicketHTTPClientImpl) GetUserTicketList(ctx context.Context, in *GetUse
 	return &out, nil
 }
 
-func (c *TicketHTTPClientImpl) UpdateUserTicketStatus(ctx context.Context, in *UpdateUserTicketStatusRequest, opts ...http.CallOption) (*TicketStatusReply, error) {
-	var out TicketStatusReply
+func (c *TicketHTTPClientImpl) UpdateUserTicketStatus(ctx context.Context, in *UpdateUserTicketStatusRequest, opts ...http.CallOption) (*emptypb.Empty, error) {
+	var out emptypb.Empty
 	pattern := "/v1/public/ticket"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationTicketUpdateUserTicketStatus))

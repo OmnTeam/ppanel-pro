@@ -24,28 +24,32 @@ const (
 
 // Subscribe subscribe model for data layer
 type Subscribe struct {
-	ID             int64
-	Name           string
-	Language       string
-	Description    string
-	UnitPrice      int64
-	UnitTime       string
-	Discount       string // JSON string
-	Replacement    int64
-	Inventory      int64
-	Traffic        int64
-	SpeedLimit     int64
-	DeviceLimit    int64
-	Quota          int64
-	Nodes          string // Comma-separated int64 IDs
-	NodeTags       string // Comma-separated tags
-	Show           bool
-	Sell           bool
-	Sort           int64
-	DeductionRatio int64
-	AllowDeduction bool
-	ResetCycle     int64
-	RenewalReset   bool
+	ID                int64
+	Name              string
+	Language          string
+	Description       string
+	UnitPrice         int64
+	UnitTime          string
+	Discount          string // JSON string
+	Replacement       int64
+	Inventory         int64
+	Traffic           int64
+	SpeedLimit        int64
+	DeviceLimit       int64
+	Quota             int64
+	Nodes             string // Comma-separated int64 IDs
+	NodeTags          string // Comma-separated tags
+	NodeGroupIDs      []int64
+	NodeGroupID       int64
+	TrafficLimit      string // JSON string
+	Show              bool
+	Sell              bool
+	Sort              int64
+	DeductionRatio    int64
+	AllowDeduction    bool
+	ResetCycle        int64
+	RenewalReset      bool
+	ShowOriginalPrice bool
 }
 
 // SubscribeDiscount discount configuration
@@ -56,16 +60,29 @@ type SubscribeDiscount struct {
 
 // SubscribeListParams subscribe list query parameters
 type SubscribeListParams struct {
-	Page     int
-	Size     int
-	Language string
-	Search   string
-	IDs      []int64 // For filtering by specific IDs
+	Page        int
+	Size        int
+	Language    string
+	Search      string
+	NodeGroupID int64
+	IDs         []int64 // For filtering by specific IDs
 }
 
 // SubscribeGroup subscribe group model
 type SubscribeGroup struct {
-	ID          int64
-	Name        string
-	Description string
+	ID                  int64
+	Name                string
+	Description         string
+	IsExpiredGroup      bool
+	ExpiredDaysLimit    int64
+	MaxTrafficGBExpired int64
+	SpeedLimit          int64
+}
+
+// TrafficLimit traffic limit configuration
+type TrafficLimit struct {
+	StatType     string `json:"stat_type"`
+	StatValue    int64  `json:"stat_value"`
+	TrafficUsage int64  `json:"traffic_usage"`
+	SpeedLimit   int64  `json:"speed_limit"`
 }

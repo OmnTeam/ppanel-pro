@@ -131,15 +131,15 @@ var (
 	// DefaultReplacement holds the default value on creation for the "replacement" field.
 	DefaultReplacement int64
 	// DefaultInventory holds the default value on creation for the "inventory" field.
-	DefaultInventory int64
+	DefaultInventory int32
 	// DefaultTraffic holds the default value on creation for the "traffic" field.
 	DefaultTraffic int64
 	// DefaultSpeedLimit holds the default value on creation for the "speed_limit" field.
-	DefaultSpeedLimit int64
+	DefaultSpeedLimit int32
 	// DefaultDeviceLimit holds the default value on creation for the "device_limit" field.
-	DefaultDeviceLimit int64
+	DefaultDeviceLimit int32
 	// DefaultQuota holds the default value on creation for the "quota" field.
-	DefaultQuota int64
+	DefaultQuota int32
 	// DefaultNodes holds the default value on creation for the "nodes" field.
 	DefaultNodes string
 	// NodesValidator is a validator for the "nodes" field. It is called by the builders before save.
@@ -155,13 +155,13 @@ var (
 	// DefaultSell holds the default value on creation for the "sell" field.
 	DefaultSell bool
 	// DefaultSort holds the default value on creation for the "sort" field.
-	DefaultSort int64
+	DefaultSort int32
 	// DefaultDeductionRatio holds the default value on creation for the "deduction_ratio" field.
-	DefaultDeductionRatio int64
+	DefaultDeductionRatio int32
 	// DefaultAllowDeduction holds the default value on creation for the "allow_deduction" field.
 	DefaultAllowDeduction bool
 	// DefaultResetCycle holds the default value on creation for the "reset_cycle" field.
-	DefaultResetCycle int64
+	DefaultResetCycle int32
 	// DefaultRenewalReset holds the default value on creation for the "renewal_reset" field.
 	DefaultRenewalReset bool
 	// DefaultShowOriginalPrice holds the default value on creation for the "show_original_price" field.

@@ -27,9 +27,10 @@ type AuthMethod struct {
 
 // UpdateAuthMethodRequest 更新认证方法请求
 type UpdateAuthMethodRequest struct {
+	ID      int64
 	Method  string
 	Config  interface{}
-	Enabled bool
+	Enabled *bool
 }
 
 // AuthMethodRepo 认证方法仓储接口
@@ -62,6 +63,9 @@ func (uc *AuthMethodUsecase) GetAuthMethodConfig(ctx context.Context, method str
 		uc.logger.WithContext(ctx).Errorf("find one by method failed: method=%s, error=%v", method, err)
 		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
+	if authMethod == nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrAuthMethodNotFound)
+	}
 
 	// 第37-38行：tool.DeepCopy(resp, method)
 	// 第39-44行：解析 Config
@@ -80,7 +84,17 @@ func (uc *AuthMethodUsecase) UpdateAuthMethodConfig(ctx context.Context, req *Up
 	}
 
 	// 第41行：tool.DeepCopy(method, req) - 关键！将 req 的字段复制到 method
-	method = tool.DeepCopy(method, req)
+	if method == nil {
+		method = &AuthMethod{
+			ID:     req.ID,
+			Method: req.Method,
+		}
+	} else {
+		method = tool.DeepCopy(method, req)
+	}
+	if req.Enabled != nil {
+		method.Enabled = *req.Enabled
+	}
 
 	// 第42-69行：处理 Config
 	if req.Config != nil {
@@ -262,5 +276,42 @@ func (uc *AuthMethodUsecase) TestSmsSend(ctx context.Context, mobile string) (bo
 	}
 
 	uc.logger.WithContext(ctx).Infof("test sms send to: %s success", mobile)
+	return true, "短信发送测试成功", nil
+}
+
+func (uc *AuthMethodUsecase) TestSmsSendWithAreaCode(ctx context.Context, areaCode, telephone string) (bool, string, error) {
+	authMethod, err := uc.repo.FindByMethod(ctx, "mobile")
+	if err != nil || authMethod == nil {
+		uc.logger.WithContext(ctx).Errorf("find mobile auth method failed: %v", err)
+		return false, "", responsecode.NewKratosError(responsecode.ErrAuthMethodNotFound)
+	}
+
+	var mobileConfig auth.MobileAuthConfig
+	if authMethod.Config != "" {
+		if err := json.Unmarshal([]byte(authMethod.Config), &mobileConfig); err != nil {
+			uc.logger.WithContext(ctx).Errorf("unmarshal mobile config failed: %v", err)
+			return false, "", responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+		}
+	}
+
+	platformConfigJSON, err := json.Marshal(mobileConfig.PlatformConfig)
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorf("marshal platform config failed: %v", err)
+		return false, "", responsecode.NewKratosError(responsecode.ErrInvalidParameter)
+	}
+
+	client, err := sms.NewSender(mobileConfig.Platform, string(platformConfigJSON))
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorf("new sms sender err: %v", err)
+		return false, fmt.Sprintf("send sms err: %v", err), responsecode.NewKratosError(responsecode.ErrSMSSendFailed)
+	}
+
+	err = client.SendCode(areaCode, telephone, "123456")
+	if err != nil {
+		uc.logger.WithContext(ctx).Errorf("send sms err: %v", err)
+		return false, fmt.Sprintf("send sms err: %v", err), responsecode.NewKratosError(responsecode.ErrSMSSendFailed)
+	}
+
+	uc.logger.WithContext(ctx).Infof("test sms send to: %s%s success", areaCode, telephone)
 	return true, "短信发送测试成功", nil
 }

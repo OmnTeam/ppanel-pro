@@ -130,7 +130,7 @@ message BalanceLog {
 }
 
 message FilterBalanceLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated BalanceLog list = 2;
 }
 
@@ -157,7 +157,7 @@ message CommissionLog {
 }
 
 message FilterCommissionLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated CommissionLog list = 2;
 }
 
@@ -187,7 +187,7 @@ message EmailLog {
 }
 
 message FilterEmailLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated EmailLog list = 2;
 }
 
@@ -203,6 +203,7 @@ message FilterGiftLogRequest {
   int32 size = 2;
   string date = 3;
   int64 user_id = 4;
+  string search = 5;
 }
 
 message GiftLog {
@@ -217,7 +218,7 @@ message GiftLog {
 }
 
 message FilterGiftLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated GiftLog list = 2;
 }
 
@@ -233,6 +234,7 @@ message FilterLoginLogRequest {
   int32 size = 2;
   string date = 3;
   int64 user_id = 4;
+  string search = 5;
 }
 
 message LoginLog {
@@ -245,7 +247,7 @@ message LoginLog {
 }
 
 message FilterLoginLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated LoginLog list = 2;
 }
 
@@ -259,7 +261,7 @@ message FilterLoginLogReply {
 message GetMessageLogListRequest {
   int32 page = 1;
   int32 size = 2;
-  int32 type = 3;       // 1: Email, 2: Mobile
+  int32 type = 3;       // 日志类型
   string search = 4;
 }
 
@@ -275,7 +277,7 @@ message MessageLog {
 }
 
 message GetMessageLogListData {
-  int64 total = 1;
+  int32 total = 1;
   repeated MessageLog list = 2;
 }
 
@@ -305,7 +307,7 @@ message MobileLog {
 }
 
 message FilterMobileLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated MobileLog list = 2;
 }
 
@@ -321,6 +323,7 @@ message FilterRegisterLogRequest {
   int32 size = 2;
   string date = 3;
   int64 user_id = 4;
+  string search = 5;
 }
 
 message RegisterLog {
@@ -333,7 +336,7 @@ message RegisterLog {
 }
 
 message FilterRegisterLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated RegisterLog list = 2;
 }
 
@@ -355,13 +358,13 @@ message ServerTrafficLog {
   int64 server_id = 1;
   int64 upload = 2;
   int64 download = 3;
-  int64 total = 4;
+  int32 total = 4;
   string date = 5;
   bool details = 6;
 }
 
 message FilterServerTrafficLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated ServerTrafficLog list = 2;
 }
 
@@ -390,7 +393,7 @@ message SubscribeLog {
 }
 
 message FilterSubscribeLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated SubscribeLog list = 2;
 }
 
@@ -406,6 +409,7 @@ message FilterResetSubscribeLogRequest {
   int32 size = 2;
   string date = 3;
   int64 user_subscribe_id = 4;
+  string search = 5;
 }
 
 message ResetSubscribeLog {
@@ -417,7 +421,7 @@ message ResetSubscribeLog {
 }
 
 message FilterResetSubscribeLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated ResetSubscribeLog list = 2;
 }
 
@@ -441,13 +445,13 @@ message UserSubscribeTrafficLog {
   int64 user_id = 2;
   int64 upload = 3;
   int64 download = 4;
-  int64 total = 5;
+  int32 total = 5;
   string date = 6;
   bool details = 7;
 }
 
 message FilterUserSubscribeTrafficLogData {
-  int64 total = 1;
+  int32 total = 1;
   repeated UserSubscribeTrafficLog list = 2;
 }
 
@@ -466,6 +470,7 @@ message FilterTrafficLogDetailsRequest {
   int64 subscribe_id = 5;
   int64 start_time = 6;   // Unix timestamp in seconds
   int64 end_time = 7;     // Unix timestamp in seconds
+  string date = 8;
 }
 
 message TrafficLogDetail {
@@ -479,7 +484,7 @@ message TrafficLogDetail {
 }
 
 message FilterTrafficLogDetailsData {
-  int64 total = 1;
+  int32 total = 1;
   repeated TrafficLogDetail list = 2;
 }
 

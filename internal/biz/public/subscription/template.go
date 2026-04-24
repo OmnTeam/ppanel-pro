@@ -3,7 +3,10 @@ package subscription
 import (
 	"bytes"
 	"encoding/base64"
+	"encoding/hex"
+	"encoding/json"
 	"reflect"
+	"strings"
 	"text/template"
 	"time"
 
@@ -57,7 +60,7 @@ func RenderTemplate(
 	}
 
 	// 4. 解析模板
-	tmpl, err := template.New("subscribe").Funcs(sprig.TxtFuncMap()).Parse(templateStr)
+	tmpl, err := template.New("subscribe").Funcs(templateFuncMap()).Parse(templateStr)
 	if err != nil {
 		return nil, err
 	}
@@ -78,6 +81,145 @@ func RenderTemplate(
 	}
 
 	return buf.Bytes(), nil
+}
+
+func templateFuncMap() template.FuncMap {
+	funcs := sprig.TxtFuncMap()
+	funcs["simnetHexPSK"] = simnetHexPSK
+	funcs["buildOmnxtSimnetConfigs"] = buildOmnxtSimnetConfigs
+	return funcs
+}
+
+func simnetHexPSK(psk string) string {
+	trimmed := strings.TrimSpace(psk)
+	if trimmed == "" {
+		return ""
+	}
+	if len(trimmed)%2 == 0 {
+		if _, err := hex.DecodeString(trimmed); err == nil {
+			return strings.ToLower(trimmed)
+		}
+	}
+	return hex.EncodeToString([]byte(trimmed))
+}
+
+func buildOmnxtSimnetConfigs(proxies []map[string]interface{}, params map[string]string) []map[string]interface{} {
+	result := make([]map[string]interface{}, 0)
+	proxyMode := strings.TrimSpace(params["proxy_mode"])
+	if proxyMode == "" {
+		proxyMode = "global"
+	}
+
+	dnsServers := []string{"1.1.1.1"}
+	if raw := strings.TrimSpace(params["dns_servers"]); raw != "" {
+		parts := strings.FieldsFunc(raw, func(r rune) bool {
+			return r == ',' || r == '\n' || r == '\r'
+		})
+		parsed := make([]string, 0, len(parts))
+		for _, item := range parts {
+			item = strings.TrimSpace(item)
+			if item != "" {
+				parsed = append(parsed, item)
+			}
+		}
+		if len(parsed) > 0 {
+			dnsServers = parsed
+		}
+	}
+
+	for _, proxy := range proxies {
+		if mapString(proxy["Type"]) != "simnet" {
+			continue
+		}
+
+		item := map[string]interface{}{
+			"tag":                          mapString(proxy["Name"]),
+			"server_addr":                  mapString(proxy["Server"]),
+			"server_port":                  mapInt(proxy["Port"]),
+			"protocol":                     "simnet",
+			"sni":                          mapString(proxy["SNI"]),
+			"allow_insecure":               mapBool(proxy["AllowInsecure"]),
+			"simnet_psk":                   simnetHexPSK(mapString(proxy["SimnetPsk"])),
+			"simnet_key_id":                mapInt(proxy["SimnetKeyID"]),
+			"simnet_ticket_id":             mapStringOrNil(proxy["SimnetTicketID"]),
+			"simnet_path":                  mapStringOrNil(proxy["SimnetPath"]),
+			"simnet_carrier":               defaultString(mapString(proxy["SimnetCarrier"]), "h2"),
+			"simnet_af_enabled":            mapBool(proxy["SimnetAfEnabled"]),
+			"simnet_af_path_mode":          defaultString(mapString(proxy["SimnetAfPathMode"]), "api"),
+			"simnet_af_path_prefix":        mapStringOrNil(proxy["SimnetAfPathPrefix"]),
+			"simnet_af_path_suffix":        mapStringOrNil(proxy["SimnetAfPathSuffix"]),
+			"simnet_af_magic_mode":         defaultString(mapString(proxy["SimnetAfMagicMode"]), "derived"),
+			"simnet_af_response_jitter_ms": defaultInt(mapInt(proxy["SimnetAfResponseJitterMs"]), 50),
+			"proxy_mode":                   proxyMode,
+			"dns_servers":                  dnsServers,
+		}
+		result = append(result, item)
+	}
+
+	return result
+}
+
+func mapString(value interface{}) string {
+	if s, ok := value.(string); ok {
+		return strings.TrimSpace(s)
+	}
+	return ""
+}
+
+func mapBool(value interface{}) bool {
+	if b, ok := value.(bool); ok {
+		return b
+	}
+	return false
+}
+
+func mapInt(value interface{}) int {
+	switch v := value.(type) {
+	case int:
+		return v
+	case int8:
+		return int(v)
+	case int16:
+		return int(v)
+	case int32:
+		return int(v)
+	case int64:
+		return int(v)
+	case uint16:
+		return int(v)
+	case uint32:
+		return int(v)
+	case uint64:
+		return int(v)
+	case float64:
+		return int(v)
+	case json.Number:
+		n, _ := v.Int64()
+		return int(n)
+	default:
+		return 0
+	}
+}
+
+func mapStringOrNil(value interface{}) interface{} {
+	if s := mapString(value); s != "" {
+		return s
+	}
+	return nil
+}
+
+func defaultString(value, fallback string) string {
+	if value != "" {
+		return value
+	}
+	return fallback
+}
+
+func defaultInt(value, fallback int) int {
+	if value != 0 {
+		return value
+	}
+	return fallback
 }
 
 // structToMap 将结构体转换为map（按照原项目逻辑）

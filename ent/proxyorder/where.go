@@ -75,7 +75,7 @@ func Type(v int8) predicate.ProxyOrder {
 }
 
 // Quantity applies equality check predicate on the "quantity" field. It's identical to QuantityEQ.
-func Quantity(v int64) predicate.ProxyOrder {
+func Quantity(v int32) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldEQ(FieldQuantity, v))
 }
 
@@ -360,42 +360,42 @@ func TypeLTE(v int8) predicate.ProxyOrder {
 }
 
 // QuantityEQ applies the EQ predicate on the "quantity" field.
-func QuantityEQ(v int64) predicate.ProxyOrder {
+func QuantityEQ(v int32) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldEQ(FieldQuantity, v))
 }
 
 // QuantityNEQ applies the NEQ predicate on the "quantity" field.
-func QuantityNEQ(v int64) predicate.ProxyOrder {
+func QuantityNEQ(v int32) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldNEQ(FieldQuantity, v))
 }
 
 // QuantityIn applies the In predicate on the "quantity" field.
-func QuantityIn(vs ...int64) predicate.ProxyOrder {
+func QuantityIn(vs ...int32) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldIn(FieldQuantity, vs...))
 }
 
 // QuantityNotIn applies the NotIn predicate on the "quantity" field.
-func QuantityNotIn(vs ...int64) predicate.ProxyOrder {
+func QuantityNotIn(vs ...int32) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldNotIn(FieldQuantity, vs...))
 }
 
 // QuantityGT applies the GT predicate on the "quantity" field.
-func QuantityGT(v int64) predicate.ProxyOrder {
+func QuantityGT(v int32) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldGT(FieldQuantity, v))
 }
 
 // QuantityGTE applies the GTE predicate on the "quantity" field.
-func QuantityGTE(v int64) predicate.ProxyOrder {
+func QuantityGTE(v int32) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldGTE(FieldQuantity, v))
 }
 
 // QuantityLT applies the LT predicate on the "quantity" field.
-func QuantityLT(v int64) predicate.ProxyOrder {
+func QuantityLT(v int32) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldLT(FieldQuantity, v))
 }
 
 // QuantityLTE applies the LTE predicate on the "quantity" field.
-func QuantityLTE(v int64) predicate.ProxyOrder {
+func QuantityLTE(v int32) predicate.ProxyOrder {
 	return predicate.ProxyOrder(sql.FieldLTE(FieldQuantity, v))
 }
 

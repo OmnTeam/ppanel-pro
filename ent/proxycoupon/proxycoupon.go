@@ -79,7 +79,7 @@ var (
 	// CodeValidator is a validator for the "code" field. It is called by the builders before save.
 	CodeValidator func(string) error
 	// DefaultCount holds the default value on creation for the "count" field.
-	DefaultCount int64
+	DefaultCount int32
 	// DefaultType holds the default value on creation for the "type" field.
 	DefaultType int8
 	// DefaultDiscount holds the default value on creation for the "discount" field.
@@ -95,7 +95,7 @@ var (
 	// SubscribeValidator is a validator for the "subscribe" field. It is called by the builders before save.
 	SubscribeValidator func(string) error
 	// DefaultUsedCount holds the default value on creation for the "used_count" field.
-	DefaultUsedCount int64
+	DefaultUsedCount int8
 	// DefaultEnable holds the default value on creation for the "enable" field.
 	DefaultEnable bool
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.

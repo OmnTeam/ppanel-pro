@@ -31,21 +31,12 @@ const (
 // PortalClient is the client API for Portal service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// Portal service for unregistered users
-// 为未注册用户提供的公共门户服务
 type PortalClient interface {
-	// GetSubscription 获取订阅（未登录）
 	GetSubscription(ctx context.Context, in *GetSubscriptionRequest, opts ...grpc.CallOption) (*GetSubscriptionReply, error)
-	// PrePurchaseOrder 预购买订单（未登录）- 计算价格
 	PrePurchaseOrder(ctx context.Context, in *PrePurchaseOrderRequest, opts ...grpc.CallOption) (*PrePurchaseOrderReply, error)
-	// Purchase 购买/创建订单（未登录）
 	Purchase(ctx context.Context, in *PurchaseRequest, opts ...grpc.CallOption) (*PurchaseReply, error)
-	// GetAvailablePaymentMethods 获取可用支付方式（未登录）
 	GetAvailablePaymentMethods(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAvailablePaymentMethodsReply, error)
-	// PurchaseCheckout 购买结账（未登录）- 获取支付信息
 	PurchaseCheckout(ctx context.Context, in *PurchaseCheckoutRequest, opts ...grpc.CallOption) (*PurchaseCheckoutReply, error)
-	// QueryPurchaseOrder 查询购买订单状态（未登录）
 	QueryPurchaseOrder(ctx context.Context, in *QueryPurchaseOrderRequest, opts ...grpc.CallOption) (*QueryPurchaseOrderReply, error)
 }
 
@@ -120,21 +111,12 @@ func (c *portalClient) QueryPurchaseOrder(ctx context.Context, in *QueryPurchase
 // PortalServer is the server API for Portal service.
 // All implementations must embed UnimplementedPortalServer
 // for forward compatibility.
-//
-// Portal service for unregistered users
-// 为未注册用户提供的公共门户服务
 type PortalServer interface {
-	// GetSubscription 获取订阅（未登录）
 	GetSubscription(context.Context, *GetSubscriptionRequest) (*GetSubscriptionReply, error)
-	// PrePurchaseOrder 预购买订单（未登录）- 计算价格
 	PrePurchaseOrder(context.Context, *PrePurchaseOrderRequest) (*PrePurchaseOrderReply, error)
-	// Purchase 购买/创建订单（未登录）
 	Purchase(context.Context, *PurchaseRequest) (*PurchaseReply, error)
-	// GetAvailablePaymentMethods 获取可用支付方式（未登录）
 	GetAvailablePaymentMethods(context.Context, *emptypb.Empty) (*GetAvailablePaymentMethodsReply, error)
-	// PurchaseCheckout 购买结账（未登录）- 获取支付信息
 	PurchaseCheckout(context.Context, *PurchaseCheckoutRequest) (*PurchaseCheckoutReply, error)
-	// QueryPurchaseOrder 查询购买订单状态（未登录）
 	QueryPurchaseOrder(context.Context, *QueryPurchaseOrderRequest) (*QueryPurchaseOrderReply, error)
 	mustEmbedUnimplementedPortalServer()
 }

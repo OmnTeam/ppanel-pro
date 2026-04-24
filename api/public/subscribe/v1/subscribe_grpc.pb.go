@@ -19,149 +19,139 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Subscribe_QuerySubscribeList_FullMethodName         = "/api.public.subscribe.v1.Subscribe/QuerySubscribeList"
-	Subscribe_QueryUserSubscribeNodeList_FullMethodName = "/api.public.subscribe.v1.Subscribe/QueryUserSubscribeNodeList"
+	PublicSubscribe_QuerySubscribeList_FullMethodName         = "/api.public.subscribe.v1.PublicSubscribe/QuerySubscribeList"
+	PublicSubscribe_QueryUserSubscribeNodeList_FullMethodName = "/api.public.subscribe.v1.PublicSubscribe/QueryUserSubscribeNodeList"
 )
 
-// SubscribeClient is the client API for Subscribe service.
+// PublicSubscribeClient is the client API for PublicSubscribe service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// Public Subscribe service
-// 公共订阅服务（需要认证）
-type SubscribeClient interface {
-	// QuerySubscribeList 查询订阅列表
-	QuerySubscribeList(ctx context.Context, in *QuerySubscribeListRequest, opts ...grpc.CallOption) (*SubscribeListReply, error)
-	// QueryUserSubscribeNodeList 查询当前用户订阅节点列表
+type PublicSubscribeClient interface {
+	QuerySubscribeList(ctx context.Context, in *QuerySubscribeListRequest, opts ...grpc.CallOption) (*QuerySubscribeListReply, error)
 	QueryUserSubscribeNodeList(ctx context.Context, in *QueryUserSubscribeNodeListRequest, opts ...grpc.CallOption) (*QueryUserSubscribeNodeListReply, error)
 }
 
-type subscribeClient struct {
+type publicSubscribeClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewSubscribeClient(cc grpc.ClientConnInterface) SubscribeClient {
-	return &subscribeClient{cc}
+func NewPublicSubscribeClient(cc grpc.ClientConnInterface) PublicSubscribeClient {
+	return &publicSubscribeClient{cc}
 }
 
-func (c *subscribeClient) QuerySubscribeList(ctx context.Context, in *QuerySubscribeListRequest, opts ...grpc.CallOption) (*SubscribeListReply, error) {
+func (c *publicSubscribeClient) QuerySubscribeList(ctx context.Context, in *QuerySubscribeListRequest, opts ...grpc.CallOption) (*QuerySubscribeListReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SubscribeListReply)
-	err := c.cc.Invoke(ctx, Subscribe_QuerySubscribeList_FullMethodName, in, out, cOpts...)
+	out := new(QuerySubscribeListReply)
+	err := c.cc.Invoke(ctx, PublicSubscribe_QuerySubscribeList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *subscribeClient) QueryUserSubscribeNodeList(ctx context.Context, in *QueryUserSubscribeNodeListRequest, opts ...grpc.CallOption) (*QueryUserSubscribeNodeListReply, error) {
+func (c *publicSubscribeClient) QueryUserSubscribeNodeList(ctx context.Context, in *QueryUserSubscribeNodeListRequest, opts ...grpc.CallOption) (*QueryUserSubscribeNodeListReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(QueryUserSubscribeNodeListReply)
-	err := c.cc.Invoke(ctx, Subscribe_QueryUserSubscribeNodeList_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, PublicSubscribe_QueryUserSubscribeNodeList_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// SubscribeServer is the server API for Subscribe service.
-// All implementations must embed UnimplementedSubscribeServer
+// PublicSubscribeServer is the server API for PublicSubscribe service.
+// All implementations must embed UnimplementedPublicSubscribeServer
 // for forward compatibility.
-//
-// Public Subscribe service
-// 公共订阅服务（需要认证）
-type SubscribeServer interface {
-	// QuerySubscribeList 查询订阅列表
-	QuerySubscribeList(context.Context, *QuerySubscribeListRequest) (*SubscribeListReply, error)
-	// QueryUserSubscribeNodeList 查询当前用户订阅节点列表
+type PublicSubscribeServer interface {
+	QuerySubscribeList(context.Context, *QuerySubscribeListRequest) (*QuerySubscribeListReply, error)
 	QueryUserSubscribeNodeList(context.Context, *QueryUserSubscribeNodeListRequest) (*QueryUserSubscribeNodeListReply, error)
-	mustEmbedUnimplementedSubscribeServer()
+	mustEmbedUnimplementedPublicSubscribeServer()
 }
 
-// UnimplementedSubscribeServer must be embedded to have
+// UnimplementedPublicSubscribeServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedSubscribeServer struct{}
+type UnimplementedPublicSubscribeServer struct{}
 
-func (UnimplementedSubscribeServer) QuerySubscribeList(context.Context, *QuerySubscribeListRequest) (*SubscribeListReply, error) {
+func (UnimplementedPublicSubscribeServer) QuerySubscribeList(context.Context, *QuerySubscribeListRequest) (*QuerySubscribeListReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method QuerySubscribeList not implemented")
 }
-func (UnimplementedSubscribeServer) QueryUserSubscribeNodeList(context.Context, *QueryUserSubscribeNodeListRequest) (*QueryUserSubscribeNodeListReply, error) {
+func (UnimplementedPublicSubscribeServer) QueryUserSubscribeNodeList(context.Context, *QueryUserSubscribeNodeListRequest) (*QueryUserSubscribeNodeListReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method QueryUserSubscribeNodeList not implemented")
 }
-func (UnimplementedSubscribeServer) mustEmbedUnimplementedSubscribeServer() {}
-func (UnimplementedSubscribeServer) testEmbeddedByValue()                   {}
+func (UnimplementedPublicSubscribeServer) mustEmbedUnimplementedPublicSubscribeServer() {}
+func (UnimplementedPublicSubscribeServer) testEmbeddedByValue()                         {}
 
-// UnsafeSubscribeServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to SubscribeServer will
+// UnsafePublicSubscribeServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PublicSubscribeServer will
 // result in compilation errors.
-type UnsafeSubscribeServer interface {
-	mustEmbedUnimplementedSubscribeServer()
+type UnsafePublicSubscribeServer interface {
+	mustEmbedUnimplementedPublicSubscribeServer()
 }
 
-func RegisterSubscribeServer(s grpc.ServiceRegistrar, srv SubscribeServer) {
-	// If the following call panics, it indicates UnimplementedSubscribeServer was
+func RegisterPublicSubscribeServer(s grpc.ServiceRegistrar, srv PublicSubscribeServer) {
+	// If the following call panics, it indicates UnimplementedPublicSubscribeServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&Subscribe_ServiceDesc, srv)
+	s.RegisterService(&PublicSubscribe_ServiceDesc, srv)
 }
 
-func _Subscribe_QuerySubscribeList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicSubscribe_QuerySubscribeList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QuerySubscribeListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SubscribeServer).QuerySubscribeList(ctx, in)
+		return srv.(PublicSubscribeServer).QuerySubscribeList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Subscribe_QuerySubscribeList_FullMethodName,
+		FullMethod: PublicSubscribe_QuerySubscribeList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SubscribeServer).QuerySubscribeList(ctx, req.(*QuerySubscribeListRequest))
+		return srv.(PublicSubscribeServer).QuerySubscribeList(ctx, req.(*QuerySubscribeListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Subscribe_QueryUserSubscribeNodeList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _PublicSubscribe_QueryUserSubscribeNodeList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(QueryUserSubscribeNodeListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SubscribeServer).QueryUserSubscribeNodeList(ctx, in)
+		return srv.(PublicSubscribeServer).QueryUserSubscribeNodeList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Subscribe_QueryUserSubscribeNodeList_FullMethodName,
+		FullMethod: PublicSubscribe_QueryUserSubscribeNodeList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SubscribeServer).QueryUserSubscribeNodeList(ctx, req.(*QueryUserSubscribeNodeListRequest))
+		return srv.(PublicSubscribeServer).QueryUserSubscribeNodeList(ctx, req.(*QueryUserSubscribeNodeListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Subscribe_ServiceDesc is the grpc.ServiceDesc for Subscribe service.
+// PublicSubscribe_ServiceDesc is the grpc.ServiceDesc for PublicSubscribe service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Subscribe_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "api.public.subscribe.v1.Subscribe",
-	HandlerType: (*SubscribeServer)(nil),
+var PublicSubscribe_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "api.public.subscribe.v1.PublicSubscribe",
+	HandlerType: (*PublicSubscribeServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "QuerySubscribeList",
-			Handler:    _Subscribe_QuerySubscribeList_Handler,
+			Handler:    _PublicSubscribe_QuerySubscribeList_Handler,
 		},
 		{
 			MethodName: "QueryUserSubscribeNodeList",
-			Handler:    _Subscribe_QueryUserSubscribeNodeList_Handler,
+			Handler:    _PublicSubscribe_QueryUserSubscribeNodeList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

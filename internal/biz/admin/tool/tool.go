@@ -2,8 +2,11 @@ package tool
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"runtime/debug"
 	"strings"
+	"time"
 
 	v1 "github.com/OmnTeam/ppanel-pro/api/admin/tool/v1"
 	systembiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/system"
@@ -36,9 +39,11 @@ func (uc *ToolUseCase) GetSystemLog(ctx context.Context, req *v1.GetSystemLogReq
 
 	logs := make([]*structpb.Struct, 0, len(lines))
 	for _, line := range lines {
-		item, err := structpb.NewStruct(map[string]any{
-			"line": line,
-		})
+		var payload map[string]any
+		if err := json.Unmarshal([]byte(line), &payload); err != nil {
+			continue
+		}
+		item, err := structpb.NewStruct(payload)
 		if err != nil {
 			continue
 		}
@@ -57,14 +62,47 @@ func (uc *ToolUseCase) RestartSystem(ctx context.Context, req *v1.RestartSystemR
 // GetVersion gets version information
 func (uc *ToolUseCase) GetVersion(ctx context.Context) (*v1.VersionResponse, error) {
 	version := "unknown"
+	buildTime := "unknown"
+
+	if buildInfo, ok := debug.ReadBuildInfo(); ok {
+		if candidate := strings.TrimSpace(buildInfo.Main.Version); candidate != "" && candidate != "(devel)" {
+			version = candidate
+		}
+		for _, setting := range buildInfo.Settings {
+			switch setting.Key {
+			case "vcs.time":
+				if t, err := time.Parse(time.RFC3339, strings.TrimSpace(setting.Value)); err == nil {
+					buildTime = t.Format("2006-01-02 15:04:05")
+				}
+			case "vcs.revision":
+				if version == "unknown" {
+					value := strings.TrimSpace(setting.Value)
+					if value != "" {
+						version = value
+					}
+				}
+			}
+		}
+	}
+
 	if uc.systemUC != nil {
 		if module, err := uc.systemUC.GetSystemModule(ctx); err == nil && strings.TrimSpace(module.ServiceVersion) != "" {
 			version = module.ServiceVersion
 		}
 	}
 
+	version = strings.TrimSpace(version)
+	if version == "" || version == "unknown version" {
+		version = "unknown"
+	}
+	if strings.HasPrefix(version, "v") {
+		return &v1.VersionResponse{
+			Version: fmt.Sprintf("%s(%s)", strings.TrimPrefix(version, "v"), buildTime),
+		}, nil
+	}
+
 	return &v1.VersionResponse{
-		Version: fmt.Sprintf("%s(%s) Develop", version, "unknown"),
+		Version: fmt.Sprintf("%s(%s) Develop", version, buildTime),
 	}, nil
 }
 

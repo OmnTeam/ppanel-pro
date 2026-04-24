@@ -105,16 +105,9 @@ message CheckUserRequest {
   string email = 1;
 }
 
-// CheckUserData 检查用户响应数据
-message CheckUserData {
-  bool exist = 1;
-}
-
 // CheckUser reply
 message CheckUserReply {
-  int32 code = 1;  // 状态码
-  string message = 2;  // 消息内容
-  CheckUserData data = 3;  // 响应数据
+  bool exist = 1;
 }
 
 // ============================================================================
@@ -127,16 +120,9 @@ message CheckUserTelephoneRequest {
   string telephone_area_code = 2;
 }
 
-// CheckUserTelephoneData 检查用户手机响应数据
-message CheckUserTelephoneData {
-  bool exist = 1;
-}
-
 // CheckUserTelephone reply
 message CheckUserTelephoneReply {
-  int32 code = 1;  // 状态码
-  string message = 2;  // 消息内容
-  CheckUserTelephoneData data = 3;  // 响应数据
+  bool exist = 1;
 }
 
 // ============================================================================
@@ -261,31 +247,18 @@ message TelephoneResetPasswordRequest {
 // 通用响应格式
 // ============================================================================
 
-// LoginData 登录响应数据（用于所有登录、注册、重置密码操作）
-message LoginData {
-  string token = 1; // JWT token
-}
-
-// LoginReply 登录响应（统一响应格式）
+// LoginReply 登录响应
 message LoginReply {
-  int32 code = 1;  // 状态码
-  string message = 2;  // 消息内容
-  LoginData data = 3;  // 响应数据
+  string token = 1;
 }
 
 message GenerateCaptchaRequest {}
 
-message GenerateCaptchaData {
+message GenerateCaptchaReply {
   string type = 1;
   string id = 2;
   string image = 3;
   string block_image = 4;
-}
-
-message GenerateCaptchaReply {
-  int32 code = 1;
-  string message = 2;
-  GenerateCaptchaData data = 3;
 }
 
 message VerifySliderCaptchaRequest {
@@ -295,14 +268,8 @@ message VerifySliderCaptchaRequest {
   string trail = 4;
 }
 
-message VerifySliderCaptchaData {
-  string token = 1;
-}
-
 message VerifySliderCaptchaReply {
-  int32 code = 1;
-  string message = 2;
-  VerifySliderCaptchaData data = 3;
+  string token = 1;
 }
 
 message DeviceLoginRequest {
@@ -311,5 +278,4 @@ message DeviceLoginRequest {
   string user_agent = 3;
   string cf_token = 4;
   string short_code = 5;
-  string login_type = 6;
 }

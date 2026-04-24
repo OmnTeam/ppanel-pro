@@ -28,13 +28,13 @@ func (_c *ProxyRedemptionCodeCreate) SetCode(v string) *ProxyRedemptionCodeCreat
 }
 
 // SetTotalCount sets the "total_count" field.
-func (_c *ProxyRedemptionCodeCreate) SetTotalCount(v int64) *ProxyRedemptionCodeCreate {
+func (_c *ProxyRedemptionCodeCreate) SetTotalCount(v int32) *ProxyRedemptionCodeCreate {
 	_c.mutation.SetTotalCount(v)
 	return _c
 }
 
 // SetNillableTotalCount sets the "total_count" field if the given value is not nil.
-func (_c *ProxyRedemptionCodeCreate) SetNillableTotalCount(v *int64) *ProxyRedemptionCodeCreate {
+func (_c *ProxyRedemptionCodeCreate) SetNillableTotalCount(v *int32) *ProxyRedemptionCodeCreate {
 	if v != nil {
 		_c.SetTotalCount(*v)
 	}
@@ -42,13 +42,13 @@ func (_c *ProxyRedemptionCodeCreate) SetNillableTotalCount(v *int64) *ProxyRedem
 }
 
 // SetUsedCount sets the "used_count" field.
-func (_c *ProxyRedemptionCodeCreate) SetUsedCount(v int64) *ProxyRedemptionCodeCreate {
+func (_c *ProxyRedemptionCodeCreate) SetUsedCount(v int32) *ProxyRedemptionCodeCreate {
 	_c.mutation.SetUsedCount(v)
 	return _c
 }
 
 // SetNillableUsedCount sets the "used_count" field if the given value is not nil.
-func (_c *ProxyRedemptionCodeCreate) SetNillableUsedCount(v *int64) *ProxyRedemptionCodeCreate {
+func (_c *ProxyRedemptionCodeCreate) SetNillableUsedCount(v *int32) *ProxyRedemptionCodeCreate {
 	if v != nil {
 		_c.SetUsedCount(*v)
 	}
@@ -84,13 +84,13 @@ func (_c *ProxyRedemptionCodeCreate) SetNillableUnitTime(v *string) *ProxyRedemp
 }
 
 // SetQuantity sets the "quantity" field.
-func (_c *ProxyRedemptionCodeCreate) SetQuantity(v int64) *ProxyRedemptionCodeCreate {
+func (_c *ProxyRedemptionCodeCreate) SetQuantity(v int32) *ProxyRedemptionCodeCreate {
 	_c.mutation.SetQuantity(v)
 	return _c
 }
 
 // SetNillableQuantity sets the "quantity" field if the given value is not nil.
-func (_c *ProxyRedemptionCodeCreate) SetNillableQuantity(v *int64) *ProxyRedemptionCodeCreate {
+func (_c *ProxyRedemptionCodeCreate) SetNillableQuantity(v *int32) *ProxyRedemptionCodeCreate {
 	if v != nil {
 		_c.SetQuantity(*v)
 	}
@@ -324,11 +324,11 @@ func (_c *ProxyRedemptionCodeCreate) createSpec() (*ProxyRedemptionCode, *sqlgra
 		_node.Code = value
 	}
 	if value, ok := _c.mutation.TotalCount(); ok {
-		_spec.SetField(proxyredemptioncode.FieldTotalCount, field.TypeInt64, value)
+		_spec.SetField(proxyredemptioncode.FieldTotalCount, field.TypeInt32, value)
 		_node.TotalCount = value
 	}
 	if value, ok := _c.mutation.UsedCount(); ok {
-		_spec.SetField(proxyredemptioncode.FieldUsedCount, field.TypeInt64, value)
+		_spec.SetField(proxyredemptioncode.FieldUsedCount, field.TypeInt32, value)
 		_node.UsedCount = value
 	}
 	if value, ok := _c.mutation.SubscribePlan(); ok {
@@ -340,7 +340,7 @@ func (_c *ProxyRedemptionCodeCreate) createSpec() (*ProxyRedemptionCode, *sqlgra
 		_node.UnitTime = value
 	}
 	if value, ok := _c.mutation.Quantity(); ok {
-		_spec.SetField(proxyredemptioncode.FieldQuantity, field.TypeInt64, value)
+		_spec.SetField(proxyredemptioncode.FieldQuantity, field.TypeInt32, value)
 		_node.Quantity = value
 	}
 	if value, ok := _c.mutation.Status(); ok {

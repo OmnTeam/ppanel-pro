@@ -4,6 +4,7 @@ package api.admin.authmethod.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";
+import "google/protobuf/wrappers.proto";
 import "validate/validate.proto";
 
 option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/authmethod/v1;v1";
@@ -65,8 +66,9 @@ service AuthMethodService {
 
 // 平台信息
 message Platform {
-  string name = 1;
-  string label = 2;
+  string platform = 1;
+  string platform_url = 2;
+  map<string, string> platform_field_description = 3;
 }
 
 // 认证方法配置
@@ -84,9 +86,10 @@ message GetAuthMethodConfigRequest {
 
 // 更新认证方法配置请求
 message UpdateAuthMethodConfigRequest {
-  string method = 1 [(validate.rules).string.min_len = 1];
-  google.protobuf.Struct config = 2;
-  bool enabled = 3;
+  int64 id = 1;
+  string method = 2 [(validate.rules).string.min_len = 1];
+  google.protobuf.Struct config = 3;
+  google.protobuf.BoolValue enabled = 4;
 }
 
 // 获取邮件平台请求
@@ -108,7 +111,8 @@ message TestEmailSendRequest {
 
 // 测试短信发送请求
 message TestSmsSendRequest {
-  string mobile = 1 [(validate.rules).string.min_len = 1];
+  string area_code = 1 [(validate.rules).string.min_len = 1];
+  string telephone = 2 [(validate.rules).string.min_len = 1];
 }
 
 // 认证方法配置数据

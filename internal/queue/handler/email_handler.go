@@ -168,7 +168,7 @@ func (h *BatchEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) e
 			h.log.WithContext(ctx).Infof("[BatchEmailHandler] Worker stopped by context cancellation, taskID: %d", taskID)
 			// 更新任务状态
 			_ = h.db.ProxyTask.UpdateOneID(taskID).
-				SetCurrent(count).
+				SetCurrent(uint32(count)).
 				Exec(ctx)
 			return nil
 		default:
@@ -194,7 +194,7 @@ func (h *BatchEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) e
 		}
 
 		err = h.db.ProxyTask.UpdateOneID(taskID).
-			SetCurrent(count).
+			SetCurrent(uint32(count)).
 			SetErrors(errorJSON).
 			Exec(ctx)
 		if err != nil {
@@ -208,7 +208,7 @@ func (h *BatchEmailHandler) ProcessTask(ctx context.Context, task *asynq.Task) e
 	// 标记任务为完成
 	err = h.db.ProxyTask.UpdateOneID(taskID).
 		SetStatus(int8(taskmodel.StatusCompleted)).
-		SetCurrent(count).
+		SetCurrent(uint32(count)).
 		Exec(ctx)
 	if err != nil {
 		h.log.WithContext(ctx).Errorf("[BatchEmailHandler] Failed to update task status to Completed: %v", err)

@@ -821,7 +821,7 @@ func compatLegacyGetServerUserList(ctx context.Context, dataLayer *data.Data, re
 				ID:          userSub.ID,
 				UUID:        compatStringValue(userSub.UUID),
 				SpeedLimit:  compatLegacyEffectiveSpeedLimit(ctx, dataLayer, subscribePlan, userSub, now),
-				DeviceLimit: subscribePlan.DeviceLimit,
+				DeviceLimit: int64(subscribePlan.DeviceLimit),
 			})
 		}
 	}
@@ -1235,7 +1235,7 @@ func compatLegacyEffectiveSpeedLimit(ctx context.Context, dataLayer *data.Data, 
 	if subscribePlan == nil || userSub == nil {
 		return 0
 	}
-	baseSpeedLimit := subscribePlan.SpeedLimit
+	baseSpeedLimit := int64(subscribePlan.SpeedLimit)
 	if subscribePlan.TrafficLimit == nil || strings.TrimSpace(*subscribePlan.TrafficLimit) == "" {
 		return baseSpeedLimit
 	}

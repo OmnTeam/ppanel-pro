@@ -90,7 +90,7 @@ var (
 	// DefaultFeeAmount holds the default value on creation for the "fee_amount" field.
 	DefaultFeeAmount int64
 	// DefaultSort holds the default value on creation for the "sort" field.
-	DefaultSort int64
+	DefaultSort int32
 	// DefaultEnable holds the default value on creation for the "enable" field.
 	DefaultEnable bool
 	// TokenValidator is a validator for the "token" field. It is called by the builders before save.

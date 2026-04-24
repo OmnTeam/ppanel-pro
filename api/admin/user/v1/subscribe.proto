@@ -109,7 +109,7 @@ message GetUserSubscribeRequest {
 }
 
 message GetUserSubscribeData {
-  int64 total = 1;
+  int32 total = 1;
   repeated UserSubscribe list = 2;
 }
 
@@ -182,7 +182,7 @@ message GetUserSubscribeDevicesRequest {
 }
 
 message GetUserSubscribeDevicesData {
-  int64 total = 1;
+  int32 total = 1;
   repeated UserDevice list = 2;
 }
 
@@ -204,7 +204,7 @@ message GetUserSubscribeLogsRequest {
 }
 
 message GetUserSubscribeLogsData {
-  int64 total = 1;
+  int32 total = 1;
   repeated UserSubscribeLog list = 2;
 }
 
@@ -224,7 +224,7 @@ message GetUserSubscribeResetTrafficLogsRequest {
 }
 
 message GetUserSubscribeResetTrafficLogsData {
-  int64 total = 1;
+  int32 total = 1;
   repeated ResetSubscribeTrafficLog list = 2;
 }
 
@@ -248,7 +248,7 @@ message GetUserSubscribeTrafficLogsRequest {
 }
 
 message GetUserSubscribeTrafficLogsData {
-  int64 total = 1;
+  int32 total = 1;
   repeated TrafficLog list = 2;
 }
 
@@ -346,24 +346,24 @@ message Subscribe {
   int64 unit_price = 4;
   string unit_time = 5;
   int64 traffic = 6;
-  int64 speed_limit = 7;
-  int64 device_limit = 8;
-  int64 reset_cycle = 9;
+  int32 speed_limit = 7;
+  int32 device_limit = 8;
+  int32 reset_cycle = 9;
   int64 created_at = 10;
   int64 updated_at = 11;
   string language = 12;
   repeated SubscribeDiscount discount = 13;
   int64 replacement = 14;
-  int64 inventory = 15;
-  int64 quota = 16;
+  int32 inventory = 15;
+  int32 quota = 16;
   repeated int64 nodes = 17;
   repeated string node_tags = 18;
   repeated int64 node_group_ids = 19;
   int64 node_group_id = 20;
   bool show = 21;
   bool sell = 22;
-  int64 sort = 23;
-  int64 deduction_ratio = 24;
+  int32 sort = 23;
+  int32 deduction_ratio = 24;
   bool allow_deduction = 25;
   bool renewal_reset = 26;
   bool show_original_price = 27;
@@ -379,7 +379,7 @@ message TrafficLimit {
   string stat_type = 1;
   int64 stat_value = 2;
   int64 traffic_usage = 3;
-  int64 speed_limit = 4;
+  int32 speed_limit = 4;
 }
 
 // UserSubscribeLog 用户订阅日志
@@ -412,3 +412,5 @@ message TrafficLog {
   int64 upload = 6;
   int64 timestamp = 7;
 }
+
+

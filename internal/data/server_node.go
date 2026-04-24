@@ -191,7 +191,7 @@ func (r *serverNodeRepo) GetServerUserList(ctx context.Context, serverID int64, 
 				ID:          userSub.ID,
 				UUID:        serverNodeStringValue(userSub.UUID),
 				SpeedLimit:  r.effectiveSpeedLimit(ctx, plan, userSub, now),
-				DeviceLimit: plan.DeviceLimit,
+				DeviceLimit: int64(plan.DeviceLimit),
 			})
 		}
 	}
@@ -543,10 +543,65 @@ func (r *serverNodeRepo) QueryServerProtocolConfig(ctx context.Context, serverID
 	// 构建协议配置响应
 	protocolConfigs := make([]*serverBiz.Protocol, 0, len(protocols))
 	for _, p := range protocols {
-		configJSON, _ := json.Marshal(p)
 		protocolConfigs = append(protocolConfigs, &serverBiz.Protocol{
-			Type:   p["type"].(string),
-			Config: string(configJSON),
+			Type:                     serverNodeMapString(p["type"]),
+			Port:                     int32(serverNodeMapInt64(p["port"])),
+			Enable:                   serverNodeMapBool(p["enable"]),
+			Security:                 serverNodeMapString(p["security"]),
+			SNI:                      serverNodeMapString(p["sni"]),
+			AllowInsecure:            serverNodeMapBool(p["allow_insecure"]),
+			Fingerprint:              serverNodeMapString(p["fingerprint"]),
+			RealityServerAddr:        serverNodeMapString(p["reality_server_addr"]),
+			RealityServerPort:        int32(serverNodeMapInt64(p["reality_server_port"])),
+			RealityPrivateKey:        serverNodeMapString(p["reality_private_key"]),
+			RealityPublicKey:         serverNodeMapString(p["reality_public_key"]),
+			RealityShortId:           serverNodeMapString(p["reality_short_id"]),
+			Transport:                serverNodeMapString(p["transport"]),
+			Host:                     serverNodeMapString(p["host"]),
+			Path:                     serverNodeMapString(p["path"]),
+			ServiceName:              serverNodeMapString(p["service_name"]),
+			Cipher:                   serverNodeMapString(p["cipher"]),
+			ServerKey:                serverNodeMapString(p["server_key"]),
+			Flow:                     serverNodeMapString(p["flow"]),
+			HopPorts:                 serverNodeMapString(p["hop_ports"]),
+			HopInterval:              int32(serverNodeMapInt64(p["hop_interval"])),
+			ObfsPassword:             serverNodeMapString(p["obfs_password"]),
+			DisableSNI:               serverNodeMapBool(p["disable_sni"]),
+			ReduceRtt:                serverNodeMapBool(p["reduce_rtt"]),
+			UDPRelayMode:             serverNodeMapString(p["udp_relay_mode"]),
+			CongestionController:     serverNodeMapString(p["congestion_controller"]),
+			Multiplex:                serverNodeMapString(p["multiplex"]),
+			PaddingScheme:            serverNodeMapString(p["padding_scheme"]),
+			UpMbps:                   int32(serverNodeMapInt64(p["up_mbps"])),
+			DownMbps:                 int32(serverNodeMapInt64(p["down_mbps"])),
+			Obfs:                     serverNodeMapString(p["obfs"]),
+			ObfsHost:                 serverNodeMapString(p["obfs_host"]),
+			ObfsPath:                 serverNodeMapString(p["obfs_path"]),
+			XhttpMode:                serverNodeMapString(p["xhttp_mode"]),
+			XhttpExtra:               serverNodeMapString(p["xhttp_extra"]),
+			Encryption:               serverNodeMapString(p["encryption"]),
+			EncryptionMode:           serverNodeMapString(p["encryption_mode"]),
+			EncryptionRtt:            serverNodeMapString(p["encryption_rtt"]),
+			EncryptionTicket:         serverNodeMapString(p["encryption_ticket"]),
+			EncryptionServerPadding:  serverNodeMapString(p["encryption_server_padding"]),
+			EncryptionPrivateKey:     serverNodeMapString(p["encryption_private_key"]),
+			EncryptionClientPadding:  serverNodeMapString(p["encryption_client_padding"]),
+			EncryptionPassword:       serverNodeMapString(p["encryption_password"]),
+			Ratio:                    serverNodeMapFloat64(p["ratio"]),
+			CertMode:                 serverNodeMapString(p["cert_mode"]),
+			CertDNSProvider:          serverNodeMapString(p["cert_dns_provider"]),
+			CertDNSEnv:               serverNodeMapString(p["cert_dns_env"]),
+			SimnetPsk:                serverNodeMapString(p["simnet_psk"]),
+			SimnetKeyID:              int32(serverNodeMapInt64(p["simnet_key_id"])),
+			SimnetTicketID:           serverNodeMapString(p["simnet_ticket_id"]),
+			SimnetPath:               serverNodeMapString(p["simnet_path"]),
+			SimnetCarrier:            serverNodeMapString(p["simnet_carrier"]),
+			SimnetAfEnabled:          serverNodeMapBool(p["simnet_af_enabled"]),
+			SimnetAfPathMode:         serverNodeMapString(p["simnet_af_path_mode"]),
+			SimnetAfPathPrefix:       serverNodeMapString(p["simnet_af_path_prefix"]),
+			SimnetAfPathSuffix:       serverNodeMapString(p["simnet_af_path_suffix"]),
+			SimnetAfMagicMode:        serverNodeMapString(p["simnet_af_magic_mode"]),
+			SimnetAfResponseJitterMs: int32(serverNodeMapInt64(p["simnet_af_response_jitter_ms"])),
 		})
 	}
 
@@ -557,8 +612,60 @@ func (r *serverNodeRepo) QueryServerProtocolConfig(ctx context.Context, serverID
 		Block:                  block,
 		Outbound:               outboundConfigs,
 		Protocols:              protocolConfigs,
-		Total:                  int64(len(protocolConfigs)),
+		Total:                  int32(len(protocolConfigs)),
 	}, nil
+}
+
+func serverNodeMapString(value interface{}) string {
+	if s, ok := value.(string); ok {
+		return strings.TrimSpace(s)
+	}
+	return ""
+}
+
+func serverNodeMapBool(value interface{}) bool {
+	if b, ok := value.(bool); ok {
+		return b
+	}
+	return false
+}
+
+func serverNodeMapInt64(value interface{}) int64 {
+	switch v := value.(type) {
+	case int:
+		return int64(v)
+	case int32:
+		return int64(v)
+	case int64:
+		return v
+	case float64:
+		return int64(v)
+	case json.Number:
+		n, _ := v.Int64()
+		return n
+	default:
+		return 0
+	}
+}
+
+func serverNodeMapFloat64(value interface{}) float64 {
+	switch v := value.(type) {
+	case float64:
+		return v
+	case float32:
+		return float64(v)
+	case int:
+		return float64(v)
+	case int32:
+		return float64(v)
+	case int64:
+		return float64(v)
+	case json.Number:
+		n, _ := v.Float64()
+		return n
+	default:
+		return 0
+	}
 }
 
 func (r *serverNodeRepo) matchedSubscribePlans(ctx context.Context, nodeGroupIDs, nodeIDs []int64, nodeTags []string) ([]*ent.ProxySubscribe, error) {
@@ -734,7 +841,7 @@ func (r *serverNodeRepo) effectiveSpeedLimit(ctx context.Context, subscribePlan 
 	if subscribePlan == nil || userSub == nil {
 		return 0
 	}
-	baseSpeedLimit := subscribePlan.SpeedLimit
+	baseSpeedLimit := int64(subscribePlan.SpeedLimit)
 	if subscribePlan.TrafficLimit == nil || strings.TrimSpace(*subscribePlan.TrafficLimit) == "" {
 		return baseSpeedLimit
 	}
