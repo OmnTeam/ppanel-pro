@@ -1,0 +1,91 @@
+name: Release Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    env:
+      APP_NAME: ppanel-pro
+      BUILD_CMD: ./cmd/ppanel-pro
+      CGO_ENABLED: '0'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            archive: tar.gz
+          - goos: windows
+            goarch: amd64
+            archive: zip
+          - goos: linux
+            goarch: arm64
+            archive: tar.gz
+          - goos: windows
+            goarch: arm64
+            archive: zip
+          - goos: darwin
+            goarch: arm64
+            archive: tar.gz
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Build binary
+        shell: bash
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          VERSION: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist build
+
+          ext=""
+          if [ "$GOOS" = "windows" ]; then
+            ext=".exe"
+          fi
+
+          out="build/${APP_NAME}-${GOOS}-${GOARCH}${ext}"
+          go build -trimpath -ldflags "-s -w -X main.Version=${VERSION}" -o "$out" "$BUILD_CMD"
+
+          package_dir="dist/${APP_NAME}-${GOOS}-${GOARCH}"
+          mkdir -p "$package_dir"
+          cp "$out" "$package_dir/${APP_NAME}${ext}"
+
+          if [ -d configs ]; then
+            cp -R configs "$package_dir/configs"
+          fi
+          [ -f README.md ] && cp README.md "$package_dir/"
+          [ -f LICENSE ] && cp LICENSE "$package_dir/"
+
+          if [ "${{ matrix.archive }}" = "zip" ]; then
+            (cd dist && zip -r "${APP_NAME}-${GOOS}-${GOARCH}.zip" "${APP_NAME}-${GOOS}-${GOARCH}")
+          else
+            tar -C dist -czf "dist/${APP_NAME}-${GOOS}-${GOARCH}.tar.gz" "${APP_NAME}-${GOOS}-${GOARCH}"
+          fi
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.tar.gz
+            dist/*.zip
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+
