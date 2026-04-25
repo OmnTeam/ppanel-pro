@@ -264,6 +264,9 @@ message Protocol {
 	string simnet_af_path_suffix = 56;
 	string simnet_af_magic_mode = 57;
 	int32 simnet_af_response_jitter_ms = 58;
+	bool simnet_af_handshake_polymorphism = 59;
+	bool simnet_af_settings_jitter = 60;
+	bool simnet_af_fake_header_injection = 61;
 }
 
 // QueryServerProtocolConfigReply 查询服务器协议配置响应

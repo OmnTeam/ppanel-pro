@@ -3685,18 +3685,82 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.admin.user.v1.GetUserSubscribeTrafficLogsReply'
+    /v1/auth/admin/captcha/generate:
+        post:
+            tags:
+                - Auth
+            description: AdminGenerateCaptcha generates admin captcha data
+            operationId: Auth_AdminGenerateCaptcha
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.auth.v1.GenerateCaptchaReply'
+    /v1/auth/admin/captcha/slider/verify:
+        post:
+            tags:
+                - Auth
+            description: AdminVerifySliderCaptcha verifies admin slider captcha
+            operationId: Auth_AdminVerifySliderCaptcha
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.public.auth.v1.VerifySliderCaptchaRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.auth.v1.VerifySliderCaptchaReply'
+    /v1/auth/admin/login:
+        post:
+            tags:
+                - Auth
+            description: AdminLogin logs in admin with email and password
+            operationId: Auth_AdminLogin
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.public.auth.v1.UserLoginRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.auth.v1.LoginReply'
+    /v1/auth/admin/reset:
+        post:
+            tags:
+                - Auth
+            description: AdminResetPassword resets admin password with email
+            operationId: Auth_AdminResetPassword
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.public.auth.v1.ResetPasswordRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.public.auth.v1.LoginReply'
     /v1/auth/captcha/generate:
         post:
             tags:
                 - Auth
             description: GenerateCaptcha generates captcha data
             operationId: Auth_GenerateCaptcha
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/api.public.auth.v1.GenerateCaptchaRequest'
-                required: true
             responses:
                 "200":
                     description: OK
@@ -8561,7 +8625,7 @@ components:
                     type: string
                 allowInsecure:
                     type: boolean
-                fingerprint32:
+                fingerprint:
                     type: string
                 realityServerAddr:
                     type: string
@@ -8672,6 +8736,12 @@ components:
                 simnetAfResponseJitterMs:
                     type: integer
                     format: int32
+                simnetAfHandshakePolymorphism:
+                    type: boolean
+                simnetAfSettingsJitter:
+                    type: boolean
+                simnetAfFakeHeaderInjection:
+                    type: boolean
             description: Protocol represents a server protocol configuration with all fields
         api.admin.server.v1.QueryNodeTagData:
             type: object
@@ -11709,9 +11779,6 @@ components:
                     type: string
                 blockImage:
                     type: string
-        api.public.auth.v1.GenerateCaptchaRequest:
-            type: object
-            properties: {}
         api.public.auth.v1.LoginReply:
             type: object
             properties:
@@ -13879,6 +13946,12 @@ components:
                 simnetAfResponseJitterMs:
                     type: integer
                     format: int32
+                simnetAfHandshakePolymorphism:
+                    type: boolean
+                simnetAfSettingsJitter:
+                    type: boolean
+                simnetAfFakeHeaderInjection:
+                    type: boolean
             description: Protocol 协议配置
         api.server.v1.PushOnlineUsersReply:
             type: object

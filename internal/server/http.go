@@ -40,6 +40,7 @@ import (
 	subscriptionv1 "github.com/OmnTeam/ppanel-pro/api/public/subscription/v1"
 	publicticketv1 "github.com/OmnTeam/ppanel-pro/api/public/ticket/v1"
 	publicuserv1 "github.com/OmnTeam/ppanel-pro/api/public/user/v1"
+	authcompatadapter "github.com/OmnTeam/ppanel-pro/internal/adapter/authcompat"
 	subscriptionbiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
 	"github.com/OmnTeam/ppanel-pro/internal/data"
@@ -105,7 +106,7 @@ func NewHTTPServer(c *conf.Server, appConf *conf.Application, authMiddleware *ap
 			authMiddleware.Auth(),      // 对齐旧项目认证语义
 		),
 		http.ErrorEncoder(CustomErrorEncoder), // 使用自定义错误编码器，所有错误返回HTTP 200
-		//http.RequestDecoder(CustomRequestDecoder),   // 使用自定义请求解码器，处理前端空对象问题
+		//http.RequestDecoder(CustomRequestDecoder),   // 兼容空 body 的验证码请求，与管理端行为对齐
 		http.ResponseEncoder(CustomResponseEncoder), // 使用自定义响应编码器，解决 int64 序列化问题
 		http.StrictSlash(false),                     // 禁用尾部斜杠自动重定向，通过手动注册两个路由来支持
 		http.NotFoundHandler(newCORSAwareFallbackHandler(c.Cors, nethttp.StatusNotFound)),
@@ -146,7 +147,7 @@ func NewHTTPServer(c *conf.Server, appConf *conf.Application, authMiddleware *ap
 	adminuserv1.RegisterUserDeviceServiceHTTPServer(srv, adminUserDevice)
 	adminuserv1.RegisterUserSubscribeServiceHTTPServer(srv, adminUserSubscribe)
 	// Auth模块服务注册
-	auth.SetAuthCompat(newAuthCompatAdapter(authCompat))
+	auth.SetAuthCompat(authcompatadapter.New(authCompat))
 	publicauthv1.RegisterAuthHTTPServer(srv, auth)
 	// Auth OAuth模块服务注册
 	authoauthv1.RegisterOAuthHTTPServer(srv, oauthSvc)

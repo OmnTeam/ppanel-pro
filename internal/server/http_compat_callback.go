@@ -9,11 +9,10 @@ import (
 	"strings"
 
 	publicpaymentv1 "github.com/OmnTeam/ppanel-pro/api/public/payment/v1"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
 	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
+	telegramcallback "github.com/OmnTeam/ppanel-pro/internal/adapter/telegramcallback"
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
 	"github.com/OmnTeam/ppanel-pro/internal/data"
-	authmodel "github.com/OmnTeam/ppanel-pro/internal/model/auth"
 	publicpaymentservice "github.com/OmnTeam/ppanel-pro/internal/service/public/payment"
 	"github.com/OmnTeam/ppanel-pro/pkg/payment"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
@@ -21,8 +20,6 @@ import (
 	khttp "github.com/go-kratos/kratos/v2/transport/http"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
-
-const compatTelegramBindMessage = "Your Telegram account has been bound successfully.\n\nUser ID: {{.Id}}\nBind Time: {{.Time}}"
 
 func registerLegacyCallbackCompatRoutes(r *khttp.Router, dataLayer *data.Data, appConf *conf.Application, publicPayment *publicpaymentservice.PaymentService, logger log.Logger) {
 	if r == nil {
@@ -49,7 +46,7 @@ func registerLegacyCallbackCompatRoutes(r *khttp.Router, dataLayer *data.Data, a
 		helper := log.NewHelper(logger)
 		secret := strings.TrimSpace(ctx.Query().Get("secret"))
 
-		botToken, err := compatTelegramBotToken(ctx, dataLayer)
+		botToken, err := telegramcallback.ResolveBotToken(ctx, dataLayer)
 		if err != nil {
 			helper.Errorf("[compatTelegramWebhook] load bot token failed: %v", err)
 			return compatJSON(ctx, nil)
@@ -66,7 +63,7 @@ func registerLegacyCallbackCompatRoutes(r *khttp.Router, dataLayer *data.Data, a
 		}
 
 		_, _ = compatMiddleware(ctx, &update, func(inner context.Context, req interface{}) (interface{}, error) {
-			compatHandleTelegramUpdate(inner, dataLayer, req.(*tgbotapi.Update), botToken, logger)
+			telegramcallback.HandleUpdate(inner, dataLayer, req.(*tgbotapi.Update), botToken, logger)
 			return nil, nil
 		})
 
@@ -280,38 +277,4 @@ func compatBuildAlipayNotifyRequest(ctx khttp.Context, token string) *publicpaym
 		Sign:           form.Get("sign"),
 		ExtraParams:    extras,
 	}
-}
-
-func compatTelegramBotToken(ctx context.Context, dataLayer *data.Data) (string, error) {
-	if dataLayer == nil || dataLayer.DB() == nil {
-		return "", nil
-	}
-
-	method, err := dataLayer.DB().ProxyAuthMethod.Query().
-		Where(proxyauthmethod.MethodEQ("telegram")).
-		Only(ctx)
-	if err == nil && method != nil && strings.TrimSpace(method.Config) != "" {
-		var cfg authmodel.TelegramAuthConfig
-		if cfgErr := cfg.Unmarshal(method.Config); cfgErr == nil && strings.TrimSpace(cfg.BotToken) != "" {
-			return strings.TrimSpace(cfg.BotToken), nil
-		}
-	}
-
-	value, err := compatSystemValue(ctx, dataLayer, "telegram", "bot_token", "BotToken")
-	if err != nil {
-		return "", err
-	}
-	return strings.TrimSpace(value), nil
-}
-
-func compatSendTelegramMessage(botToken string, chatID int64, text string) {
-	if strings.TrimSpace(botToken) == "" || chatID == 0 || strings.TrimSpace(text) == "" {
-		return
-	}
-	bot, err := tgbotapi.NewBotAPI(botToken)
-	if err != nil {
-		return
-	}
-	msg := tgbotapi.NewMessage(chatID, text)
-	_, _ = bot.Send(msg)
 }

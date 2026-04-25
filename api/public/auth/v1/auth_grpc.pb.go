@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,17 +20,21 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Auth_CheckUser_FullMethodName              = "/api.public.auth.v1.Auth/CheckUser"
-	Auth_CheckUserTelephone_FullMethodName     = "/api.public.auth.v1.Auth/CheckUserTelephone"
-	Auth_UserLogin_FullMethodName              = "/api.public.auth.v1.Auth/UserLogin"
-	Auth_TelephoneLogin_FullMethodName         = "/api.public.auth.v1.Auth/TelephoneLogin"
-	Auth_UserRegister_FullMethodName           = "/api.public.auth.v1.Auth/UserRegister"
-	Auth_TelephoneRegister_FullMethodName      = "/api.public.auth.v1.Auth/TelephoneRegister"
-	Auth_ResetPassword_FullMethodName          = "/api.public.auth.v1.Auth/ResetPassword"
-	Auth_TelephoneResetPassword_FullMethodName = "/api.public.auth.v1.Auth/TelephoneResetPassword"
-	Auth_GenerateCaptcha_FullMethodName        = "/api.public.auth.v1.Auth/GenerateCaptcha"
-	Auth_VerifySliderCaptcha_FullMethodName    = "/api.public.auth.v1.Auth/VerifySliderCaptcha"
-	Auth_DeviceLogin_FullMethodName            = "/api.public.auth.v1.Auth/DeviceLogin"
+	Auth_CheckUser_FullMethodName                = "/api.public.auth.v1.Auth/CheckUser"
+	Auth_CheckUserTelephone_FullMethodName       = "/api.public.auth.v1.Auth/CheckUserTelephone"
+	Auth_UserLogin_FullMethodName                = "/api.public.auth.v1.Auth/UserLogin"
+	Auth_TelephoneLogin_FullMethodName           = "/api.public.auth.v1.Auth/TelephoneLogin"
+	Auth_UserRegister_FullMethodName             = "/api.public.auth.v1.Auth/UserRegister"
+	Auth_TelephoneRegister_FullMethodName        = "/api.public.auth.v1.Auth/TelephoneRegister"
+	Auth_ResetPassword_FullMethodName            = "/api.public.auth.v1.Auth/ResetPassword"
+	Auth_TelephoneResetPassword_FullMethodName   = "/api.public.auth.v1.Auth/TelephoneResetPassword"
+	Auth_GenerateCaptcha_FullMethodName          = "/api.public.auth.v1.Auth/GenerateCaptcha"
+	Auth_VerifySliderCaptcha_FullMethodName      = "/api.public.auth.v1.Auth/VerifySliderCaptcha"
+	Auth_AdminGenerateCaptcha_FullMethodName     = "/api.public.auth.v1.Auth/AdminGenerateCaptcha"
+	Auth_AdminVerifySliderCaptcha_FullMethodName = "/api.public.auth.v1.Auth/AdminVerifySliderCaptcha"
+	Auth_AdminLogin_FullMethodName               = "/api.public.auth.v1.Auth/AdminLogin"
+	Auth_AdminResetPassword_FullMethodName       = "/api.public.auth.v1.Auth/AdminResetPassword"
+	Auth_DeviceLogin_FullMethodName              = "/api.public.auth.v1.Auth/DeviceLogin"
 )
 
 // AuthClient is the client API for Auth service.
@@ -53,9 +58,17 @@ type AuthClient interface {
 	// TelephoneResetPassword resets user password with telephone
 	TelephoneResetPassword(ctx context.Context, in *TelephoneResetPasswordRequest, opts ...grpc.CallOption) (*LoginReply, error)
 	// GenerateCaptcha generates captcha data
-	GenerateCaptcha(ctx context.Context, in *GenerateCaptchaRequest, opts ...grpc.CallOption) (*GenerateCaptchaReply, error)
+	GenerateCaptcha(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GenerateCaptchaReply, error)
 	// VerifySliderCaptcha verifies slider captcha
 	VerifySliderCaptcha(ctx context.Context, in *VerifySliderCaptchaRequest, opts ...grpc.CallOption) (*VerifySliderCaptchaReply, error)
+	// AdminGenerateCaptcha generates admin captcha data
+	AdminGenerateCaptcha(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GenerateCaptchaReply, error)
+	// AdminVerifySliderCaptcha verifies admin slider captcha
+	AdminVerifySliderCaptcha(ctx context.Context, in *VerifySliderCaptchaRequest, opts ...grpc.CallOption) (*VerifySliderCaptchaReply, error)
+	// AdminLogin logs in admin with email and password
+	AdminLogin(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
+	// AdminResetPassword resets admin password with email
+	AdminResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*LoginReply, error)
 	// DeviceLogin logs in user with device identifier
 	DeviceLogin(ctx context.Context, in *DeviceLoginRequest, opts ...grpc.CallOption) (*LoginReply, error)
 }
@@ -148,7 +161,7 @@ func (c *authClient) TelephoneResetPassword(ctx context.Context, in *TelephoneRe
 	return out, nil
 }
 
-func (c *authClient) GenerateCaptcha(ctx context.Context, in *GenerateCaptchaRequest, opts ...grpc.CallOption) (*GenerateCaptchaReply, error) {
+func (c *authClient) GenerateCaptcha(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GenerateCaptchaReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GenerateCaptchaReply)
 	err := c.cc.Invoke(ctx, Auth_GenerateCaptcha_FullMethodName, in, out, cOpts...)
@@ -162,6 +175,46 @@ func (c *authClient) VerifySliderCaptcha(ctx context.Context, in *VerifySliderCa
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(VerifySliderCaptchaReply)
 	err := c.cc.Invoke(ctx, Auth_VerifySliderCaptcha_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authClient) AdminGenerateCaptcha(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GenerateCaptchaReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GenerateCaptchaReply)
+	err := c.cc.Invoke(ctx, Auth_AdminGenerateCaptcha_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authClient) AdminVerifySliderCaptcha(ctx context.Context, in *VerifySliderCaptchaRequest, opts ...grpc.CallOption) (*VerifySliderCaptchaReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VerifySliderCaptchaReply)
+	err := c.cc.Invoke(ctx, Auth_AdminVerifySliderCaptcha_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authClient) AdminLogin(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*LoginReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginReply)
+	err := c.cc.Invoke(ctx, Auth_AdminLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authClient) AdminResetPassword(ctx context.Context, in *ResetPasswordRequest, opts ...grpc.CallOption) (*LoginReply, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LoginReply)
+	err := c.cc.Invoke(ctx, Auth_AdminResetPassword_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -199,9 +252,17 @@ type AuthServer interface {
 	// TelephoneResetPassword resets user password with telephone
 	TelephoneResetPassword(context.Context, *TelephoneResetPasswordRequest) (*LoginReply, error)
 	// GenerateCaptcha generates captcha data
-	GenerateCaptcha(context.Context, *GenerateCaptchaRequest) (*GenerateCaptchaReply, error)
+	GenerateCaptcha(context.Context, *emptypb.Empty) (*GenerateCaptchaReply, error)
 	// VerifySliderCaptcha verifies slider captcha
 	VerifySliderCaptcha(context.Context, *VerifySliderCaptchaRequest) (*VerifySliderCaptchaReply, error)
+	// AdminGenerateCaptcha generates admin captcha data
+	AdminGenerateCaptcha(context.Context, *emptypb.Empty) (*GenerateCaptchaReply, error)
+	// AdminVerifySliderCaptcha verifies admin slider captcha
+	AdminVerifySliderCaptcha(context.Context, *VerifySliderCaptchaRequest) (*VerifySliderCaptchaReply, error)
+	// AdminLogin logs in admin with email and password
+	AdminLogin(context.Context, *UserLoginRequest) (*LoginReply, error)
+	// AdminResetPassword resets admin password with email
+	AdminResetPassword(context.Context, *ResetPasswordRequest) (*LoginReply, error)
 	// DeviceLogin logs in user with device identifier
 	DeviceLogin(context.Context, *DeviceLoginRequest) (*LoginReply, error)
 	mustEmbedUnimplementedAuthServer()
@@ -238,11 +299,23 @@ func (UnimplementedAuthServer) ResetPassword(context.Context, *ResetPasswordRequ
 func (UnimplementedAuthServer) TelephoneResetPassword(context.Context, *TelephoneResetPasswordRequest) (*LoginReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method TelephoneResetPassword not implemented")
 }
-func (UnimplementedAuthServer) GenerateCaptcha(context.Context, *GenerateCaptchaRequest) (*GenerateCaptchaReply, error) {
+func (UnimplementedAuthServer) GenerateCaptcha(context.Context, *emptypb.Empty) (*GenerateCaptchaReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GenerateCaptcha not implemented")
 }
 func (UnimplementedAuthServer) VerifySliderCaptcha(context.Context, *VerifySliderCaptchaRequest) (*VerifySliderCaptchaReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method VerifySliderCaptcha not implemented")
+}
+func (UnimplementedAuthServer) AdminGenerateCaptcha(context.Context, *emptypb.Empty) (*GenerateCaptchaReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminGenerateCaptcha not implemented")
+}
+func (UnimplementedAuthServer) AdminVerifySliderCaptcha(context.Context, *VerifySliderCaptchaRequest) (*VerifySliderCaptchaReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminVerifySliderCaptcha not implemented")
+}
+func (UnimplementedAuthServer) AdminLogin(context.Context, *UserLoginRequest) (*LoginReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminLogin not implemented")
+}
+func (UnimplementedAuthServer) AdminResetPassword(context.Context, *ResetPasswordRequest) (*LoginReply, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminResetPassword not implemented")
 }
 func (UnimplementedAuthServer) DeviceLogin(context.Context, *DeviceLoginRequest) (*LoginReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeviceLogin not implemented")
@@ -413,7 +486,7 @@ func _Auth_TelephoneResetPassword_Handler(srv interface{}, ctx context.Context, 
 }
 
 func _Auth_GenerateCaptcha_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GenerateCaptchaRequest)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -425,7 +498,7 @@ func _Auth_GenerateCaptcha_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: Auth_GenerateCaptcha_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).GenerateCaptcha(ctx, req.(*GenerateCaptchaRequest))
+		return srv.(AuthServer).GenerateCaptcha(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -444,6 +517,78 @@ func _Auth_VerifySliderCaptcha_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServer).VerifySliderCaptcha(ctx, req.(*VerifySliderCaptchaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Auth_AdminGenerateCaptcha_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).AdminGenerateCaptcha(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_AdminGenerateCaptcha_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).AdminGenerateCaptcha(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Auth_AdminVerifySliderCaptcha_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifySliderCaptchaRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).AdminVerifySliderCaptcha(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_AdminVerifySliderCaptcha_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).AdminVerifySliderCaptcha(ctx, req.(*VerifySliderCaptchaRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Auth_AdminLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).AdminLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_AdminLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).AdminLogin(ctx, req.(*UserLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Auth_AdminResetPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResetPasswordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServer).AdminResetPassword(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auth_AdminResetPassword_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServer).AdminResetPassword(ctx, req.(*ResetPasswordRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -512,6 +657,22 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "VerifySliderCaptcha",
 			Handler:    _Auth_VerifySliderCaptcha_Handler,
+		},
+		{
+			MethodName: "AdminGenerateCaptcha",
+			Handler:    _Auth_AdminGenerateCaptcha_Handler,
+		},
+		{
+			MethodName: "AdminVerifySliderCaptcha",
+			Handler:    _Auth_AdminVerifySliderCaptcha_Handler,
+		},
+		{
+			MethodName: "AdminLogin",
+			Handler:    _Auth_AdminLogin_Handler,
+		},
+		{
+			MethodName: "AdminResetPassword",
+			Handler:    _Auth_AdminResetPassword_Handler,
 		},
 		{
 			MethodName: "DeviceLogin",

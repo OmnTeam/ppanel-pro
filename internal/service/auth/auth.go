@@ -9,6 +9,7 @@ import (
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
 	"github.com/OmnTeam/ppanel-pro/pkg/constant"
 	"github.com/go-kratos/kratos/v2/transport"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 type CompatGenerateCaptchaResult struct {
@@ -28,10 +29,25 @@ type CompatDeviceLoginParams struct {
 	Meta       authbiz.RequestMeta
 }
 
+type CompatAdminLoginParams struct {
+	Email    string
+	Password string
+	Meta     authbiz.RequestMeta
+}
+
+type CompatAdminResetPasswordParams struct {
+	Email    string
+	Password string
+	Code     string
+	Meta     authbiz.RequestMeta
+}
+
 type AuthCompatProvider interface {
 	GenerateCaptcha(ctx context.Context) (*CompatGenerateCaptchaResult, error)
 	VerifySliderCaptcha(ctx context.Context, id string, x, y int, trail string) (*CompatSliderVerifyResult, error)
 	DeviceLogin(ctx context.Context, params *CompatDeviceLoginParams) (*authbiz.LoginResult, error)
+	AdminLogin(ctx context.Context, params *CompatAdminLoginParams) (*authbiz.LoginResult, error)
+	AdminResetPassword(ctx context.Context, params *CompatAdminResetPasswordParams) (*authbiz.LoginResult, error)
 }
 
 type AuthService struct {
@@ -159,7 +175,7 @@ func (s *AuthService) TelephoneResetPassword(ctx context.Context, req *pb.Teleph
 	return loginReply(result.Token, responsecode.PasswordResetSuccess), nil
 }
 
-func (s *AuthService) GenerateCaptcha(ctx context.Context, req *pb.GenerateCaptchaRequest) (*pb.GenerateCaptchaReply, error) {
+func (s *AuthService) GenerateCaptcha(ctx context.Context, req *emptypb.Empty) (*pb.GenerateCaptchaReply, error) {
 	if s.authCompat == nil {
 		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
@@ -190,6 +206,49 @@ func (s *AuthService) VerifySliderCaptcha(ctx context.Context, req *pb.VerifySli
 	return &pb.VerifySliderCaptchaReply{
 		Token: result.Token,
 	}, nil
+}
+
+func (s *AuthService) AdminGenerateCaptcha(ctx context.Context, req *emptypb.Empty) (*pb.GenerateCaptchaReply, error) {
+	return s.GenerateCaptcha(ctx, req)
+}
+
+func (s *AuthService) AdminVerifySliderCaptcha(ctx context.Context, req *pb.VerifySliderCaptchaRequest) (*pb.VerifySliderCaptchaReply, error) {
+	return s.VerifySliderCaptcha(ctx, req)
+}
+
+func (s *AuthService) AdminLogin(ctx context.Context, req *pb.UserLoginRequest) (*pb.LoginReply, error) {
+	if s.authCompat == nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
+	}
+
+	result, err := s.authCompat.AdminLogin(ctx, &CompatAdminLoginParams{
+		Email:    req.Email,
+		Password: req.Password,
+		Meta:     buildRequestMeta(ctx, req.Ip, req.UserAgent, req.LoginType, req.Identifier, req.CfToken, req.CaptchaId, req.CaptchaCode, req.SliderToken),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return loginReply(result.Token, responsecode.UserLoginSuccess), nil
+}
+
+func (s *AuthService) AdminResetPassword(ctx context.Context, req *pb.ResetPasswordRequest) (*pb.LoginReply, error) {
+	if s.authCompat == nil {
+		return nil, responsecode.NewKratosError(responsecode.ErrInternalError)
+	}
+
+	result, err := s.authCompat.AdminResetPassword(ctx, &CompatAdminResetPasswordParams{
+		Email:    req.Email,
+		Password: req.Password,
+		Code:     req.Code,
+		Meta:     buildRequestMeta(ctx, req.Ip, req.UserAgent, req.LoginType, req.Identifier, req.CfToken, req.CaptchaId, req.CaptchaCode, req.SliderToken),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return loginReply(result.Token, responsecode.PasswordResetSuccess), nil
 }
 
 func (s *AuthService) DeviceLogin(ctx context.Context, req *pb.DeviceLoginRequest) (*pb.LoginReply, error) {

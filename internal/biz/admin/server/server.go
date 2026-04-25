@@ -165,7 +165,9 @@ func (uc *ServerUsecase) CreateServer(ctx context.Context, name, country, city, 
 			}
 		}
 		if protocol.Type == "simnet" {
-			if protocol.Security == "" {
+			if strings.TrimSpace(protocol.SNI) == "" {
+				protocol.Security = ""
+			} else if protocol.Security == "" || protocol.Security == "none" {
 				protocol.Security = "tls"
 			}
 			if protocol.SimnetCarrier == "" {
@@ -235,7 +237,9 @@ func (uc *ServerUsecase) UpdateServer(ctx context.Context, id int, name, country
 			}
 		}
 		if protocol.Type == "simnet" {
-			if protocol.Security == "" {
+			if strings.TrimSpace(protocol.SNI) == "" {
+				protocol.Security = ""
+			} else if protocol.Security == "" || protocol.Security == "none" {
 				protocol.Security = "tls"
 			}
 			if protocol.SimnetCarrier == "" {

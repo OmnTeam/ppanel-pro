@@ -7,6 +7,7 @@ option java_multiple_files = true;
 option java_package = "api.public.auth.v1";
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 
 service Auth {
   // CheckUser checks if user email exists
@@ -72,10 +73,9 @@ service Auth {
   }
 
   // GenerateCaptcha generates captcha data
-  rpc GenerateCaptcha(GenerateCaptchaRequest) returns (GenerateCaptchaReply) {
+  rpc GenerateCaptcha(google.protobuf.Empty) returns (GenerateCaptchaReply) {
     option (google.api.http) = {
       post: "/v1/auth/captcha/generate"
-      body: "*"
     };
   }
 
@@ -83,6 +83,37 @@ service Auth {
   rpc VerifySliderCaptcha(VerifySliderCaptchaRequest) returns (VerifySliderCaptchaReply) {
     option (google.api.http) = {
       post: "/v1/auth/captcha/slider/verify"
+      body: "*"
+    };
+  }
+
+  // AdminGenerateCaptcha generates admin captcha data
+  rpc AdminGenerateCaptcha(google.protobuf.Empty) returns (GenerateCaptchaReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/admin/captcha/generate"
+    };
+  }
+
+  // AdminVerifySliderCaptcha verifies admin slider captcha
+  rpc AdminVerifySliderCaptcha(VerifySliderCaptchaRequest) returns (VerifySliderCaptchaReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/admin/captcha/slider/verify"
+      body: "*"
+    };
+  }
+
+  // AdminLogin logs in admin with email and password
+  rpc AdminLogin(UserLoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/admin/login"
+      body: "*"
+    };
+  }
+
+  // AdminResetPassword resets admin password with email
+  rpc AdminResetPassword(ResetPasswordRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/admin/reset"
       body: "*"
     };
   }
@@ -251,8 +282,6 @@ message TelephoneResetPasswordRequest {
 message LoginReply {
   string token = 1;
 }
-
-message GenerateCaptchaRequest {}
 
 message GenerateCaptchaReply {
   string type = 1;
