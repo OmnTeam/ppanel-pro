@@ -296,6 +296,7 @@ func (uc *SubscriptionUseCase) GetSubscribeConfig(ctx context.Context, req *v1.G
 	userInfo.Download = userSubscribe.Download
 	userInfo.Upload = userSubscribe.Upload
 	userInfo.Traffic = userSubscribe.Traffic
+	userInfo.SubscribeID = userSubscribe.ID
 	if userSubscribe.ExpireTime > 0 {
 		userInfo.ExpiredAt = time.UnixMilli(userSubscribe.ExpireTime)
 	}
@@ -368,6 +369,9 @@ type UserInfo struct {
 	Upload       int64     `json:"upload"`
 	Traffic      int64     `json:"traffic"`
 	SubscribeURL string    `json:"subscribe_url"`
+	// SubscribeID is the ProxyUserSubscribe table primary key (SID).
+	// Used by SimNet per-user key_id derivation to match the Node's key_id.
+	SubscribeID int64 `json:"subscribe_id"`
 }
 
 // NodeInfo 节点信息

@@ -103,7 +103,7 @@ func simnetHexPSK(psk string) string {
 	return hex.EncodeToString([]byte(trimmed))
 }
 
-func buildOmnxtSimnetConfigs(proxies []map[string]interface{}, params map[string]string) []map[string]interface{} {
+func buildOmnxtSimnetConfigs(proxies []map[string]interface{}, userInfo UserInfo, params map[string]string) []map[string]interface{} {
 	result := make([]map[string]interface{}, 0)
 	proxyMode := strings.TrimSpace(params["proxy_mode"])
 	if proxyMode == "" {
@@ -127,6 +127,19 @@ func buildOmnxtSimnetConfigs(proxies []map[string]interface{}, params map[string
 		}
 	}
 
+	// Per-user authentication: each user gets a unique PSK (hex-encoded UUID)
+	// and key_id derived from their subscription ID (SID).  The Node registers
+	// all per-user keys in its StaticKeyResolver so the SimNet handshake
+	// authenticates the specific user via the key_id frame header field.
+	// IMPORTANT: key_id MUST use SubscribeID (ProxyUserSubscribe.ID), NOT
+	// UserInfo.ID (User table PK), because the Node's assembler uses
+	// ServerUser.ID which is the subscribe record ID.
+	userKeyID := int(userInfo.SubscribeID % (1<<31 - 1))
+	if userKeyID == 0 {
+		userKeyID = 1 // Avoid collision with server key_id=0
+	}
+	userPSK := simnetHexPSK(hex.EncodeToString([]byte(userInfo.Password)))
+
 	for _, proxy := range proxies {
 		if mapString(proxy["Type"]) != "simnet" {
 			continue
@@ -139,8 +152,13 @@ func buildOmnxtSimnetConfigs(proxies []map[string]interface{}, params map[string
 			"protocol":                     "simnet",
 			"sni":                          mapString(proxy["SNI"]),
 			"allow_insecure":               mapBool(proxy["AllowInsecure"]),
-			"simnet_psk":                   simnetHexPSK(mapString(proxy["SimnetPsk"])),
-			"simnet_key_id":                mapInt(proxy["SimnetKeyID"]),
+			"simnet_psk":                   userPSK,
+			"simnet_key_id":                userKeyID,
+			// Server PSK is needed for AF path/magic/content-type derivation.
+			// The Node uses credentials[0] (server PSK, key_id=0) for AF, so
+			// the SDK must also use the same key material for path matching.
+			"simnet_server_psk":            mapStringOrNil(proxy["SimnetPSK"]),
+			"simnet_server_key_id":         defaultInt(mapInt(proxy["SimnetKeyID"]), 0),
 			"simnet_ticket_id":             mapStringOrNil(proxy["SimnetTicketID"]),
 			"simnet_path":                  mapStringOrNil(proxy["SimnetPath"]),
 			"simnet_carrier":               defaultString(mapString(proxy["SimnetCarrier"]), "h2"),

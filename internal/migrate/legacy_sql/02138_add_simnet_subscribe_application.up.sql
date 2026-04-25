@@ -19,7 +19,7 @@ INSERT IGNORE INTO `subscribe_application` (
   '',
   'OmnXT',
   0,
-  '{{ buildOmnxtSimnetConfigs .Proxies .Params | toPrettyJson }}',
+  '{{ buildOmnxtSimnetConfigs .Proxies .UserInfo .Params | toPrettyJson }}',
   'json',
   '{}',
   NOW(3),
