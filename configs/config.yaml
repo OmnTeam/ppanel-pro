@@ -34,7 +34,8 @@ server:
 
 log:
   level: info
-  path: logs
+  format: json # 支持: json / console（text、plain 也等价于 console）
+  path: logs # 写目录时输出为 logs/ppanel-pro.log，也可直接写文件路径
   max_size_mb: 100
   max_backups: 30
   max_age_days: 7
