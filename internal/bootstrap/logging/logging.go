@@ -47,10 +47,11 @@ func New(cfg Config, serviceID, serviceName, serviceVersion string) (*zap.Logger
 	if cfg.Level == "" {
 		cfg.Level = "info"
 	}
-	if cfg.Format == "" {
-		cfg.Format = "json"
+	format, err := parseFormat(cfg.Format)
+	if err != nil {
+		return nil, nil, err
 	}
-	cfg.Format = normalizeFormat(cfg.Format)
+	cfg.Format = format
 	if cfg.MaxSizeMB <= 0 {
 		cfg.MaxSizeMB = 100
 	}
@@ -265,19 +266,19 @@ func stringify(v any) string {
 	}
 }
 
-func normalizeFormat(format string) string {
+func parseFormat(format string) (string, error) {
 	switch strings.ToLower(strings.TrimSpace(format)) {
 	case "", "json":
-		return "json"
-	case "console", "text", "plain":
-		return "console"
+		return "json", nil
+	case "console", "text", "plain", "pretty":
+		return "console", nil
 	default:
-		return "json"
+		return "", fmt.Errorf("unsupported log format %q: supported values are json, console, text, plain, pretty", format)
 	}
 }
 
 func newEncoder(format string, cfg zapcore.EncoderConfig) zapcore.Encoder {
-	if normalizeFormat(format) == "console" {
+	if format == "console" {
 		return zapcore.NewConsoleEncoder(cfg)
 	}
 	return zapcore.NewJSONEncoder(cfg)

@@ -34,11 +34,24 @@ server:
 
 log:
   level: info
-  format: json # 支持: json / console（text、plain 也等价于 console）
-  path: logs # 写目录时输出为 logs/ppanel-pro.log，也可直接写文件路径
+  # 输出格式配置：
+  # - json: 结构化 JSON，适合采集到 Loki / ELK / Datadog 等日志系统
+  # - console: 人类可读文本
+  # - text / plain / pretty: console 的别名，效果等同于 console
+  format: json
+  # 是否关闭标准输出；false=同时输出到控制台，true=仅写文件
+  disable_console: false
+  # 日志输出路径：
+  # - 写目录，如 logs，会输出到 logs/ppanel-pro.log
+  # - 写文件，如 logs/ppanel-pro.log，会直接写入该文件
+  path: logs
+  # 单个日志文件最大体积（MB），超过后轮转
   max_size_mb: 100
+  # 最多保留多少个历史日志文件
   max_backups: 30
+  # 历史日志最多保留多少天
   max_age_days: 7
+  # 是否压缩历史日志文件为 .gz
   compress: true
 
 data:
