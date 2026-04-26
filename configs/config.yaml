@@ -31,6 +31,15 @@ server:
       - "Authorization"
     allow_credentials: true
     max_age: 86400
+
+log:
+  level: info
+  path: logs
+  max_size_mb: 100
+  max_backups: 30
+  max_age_days: 7
+  compress: true
+
 data:
   database:
     driver: mysql
@@ -98,3 +107,4 @@ app:
     email: "admin@qq.com"
     password: "123456"
     algo: "default"
+

@@ -28,7 +28,6 @@ require (
 	github.com/hibiken/asynq v0.25.1
 	github.com/jinzhu/copier v0.4.0
 	github.com/klauspost/compress v1.18.1
-	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/nyaruka/phonenumbers v1.6.6
 	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.16.0
@@ -41,6 +40,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.24.0
 	go.opentelemetry.io/otel/trace v1.24.0
 	go.uber.org/automaxprocs v1.5.1
+	go.uber.org/zap v1.27.1
 	golang.org/x/crypto v0.40.0
 	golang.org/x/oauth2 v0.20.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20240528184218-531527333157
@@ -103,6 +103,7 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mattn/go-sqlite3 v1.14.32 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
@@ -126,6 +127,7 @@ require (
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.uber.org/mock v0.5.0 // indirect
+	go.uber.org/multierr v1.10.0 // indirect
 	golang.org/x/arch v0.20.0 // indirect
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394 // indirect
 	golang.org/x/mod v0.25.0 // indirect
@@ -138,4 +140,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/ini.v1 v1.56.0 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )

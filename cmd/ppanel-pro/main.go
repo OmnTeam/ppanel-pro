@@ -2,9 +2,12 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 
+	bootstraplog "github.com/OmnTeam/ppanel-pro/internal/bootstrap/logging"
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
+	ppanelLogger "github.com/OmnTeam/ppanel-pro/pkg/logger"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -50,18 +53,16 @@ func newApp(logger log.Logger, gs *grpc.Server, hs *http.Server) *kratos.App {
 func main() {
 	flag.Parse()
 
+	if Name == "" {
+		Name = "ppanel-pro"
+	}
+	if Version == "" {
+		Version = "dev"
+	}
+
 	// 抑制 Redis 客户端的警告信息
 	os.Setenv("REDIS_LOG_LEVEL", "ERROR")
 
-	logger := log.With(log.NewStdLogger(os.Stdout),
-		"ts", log.DefaultTimestamp,
-		"caller", log.DefaultCaller,
-		"service.id", id,
-		"service.name", Name,
-		"service.version", Version,
-		"trace.id", tracing.TraceID(),
-		"span.id", tracing.SpanID(),
-	)
 	c := config.New(
 		config.WithSource(
 			file.NewSource(flagconf),
@@ -79,17 +80,31 @@ func main() {
 	}
 	conf.SetLegacyDebugMode(bc.GetDebug())
 
-	// 调试：打印bootstrap配置
-	if bc.App != nil {
-		log.NewHelper(logger).Infof("Bootstrap.App is not nil: %+v", bc.App)
-		if bc.App.Admin != nil {
-			log.NewHelper(logger).Infof("Admin config found in bootstrap: email=%s", bc.App.Admin.Email)
-		} else {
-			log.NewHelper(logger).Warnf("Admin config is nil in bootstrap.App")
+	logConfig := bootstraplog.DefaultConfig(Name)
+	if value := c.Value("log"); value.Load() != nil {
+		if err := value.Scan(&logConfig); err != nil {
+			panic(fmt.Errorf("scan log config: %w", err))
 		}
-	} else {
-		log.NewHelper(logger).Warnf("Bootstrap.App is nil")
 	}
+
+	zapLogger, closeLogger, err := bootstraplog.New(logConfig, id, Name, Version)
+	if err != nil {
+		panic(err)
+	}
+	defer func() {
+		if err := closeLogger(); err != nil {
+			fmt.Fprintf(os.Stderr, "close logger: %v\n", err)
+		}
+	}()
+
+	ppanelLogger.SetWriter(bootstraplog.NewPPanelWriter(zapLogger))
+
+	logger := log.With(
+		bootstraplog.NewKratosLogger(zapLogger),
+		"caller", log.DefaultCaller,
+		"trace.id", tracing.TraceID(),
+		"span.id", tracing.SpanID(),
+	)
 
 	app, cleanup, err := wireApp(bc.Server, bc.Data, bc.App, logger)
 	if err != nil {
@@ -97,7 +112,6 @@ func main() {
 	}
 	defer cleanup()
 
-	// start and wait for stop signal
 	if err := app.Run(); err != nil {
 		panic(err)
 	}
