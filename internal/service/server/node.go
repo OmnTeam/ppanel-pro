@@ -202,6 +202,9 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 	// 转换Protocol配置
 	protocolConfigs := make([]*v1.Protocol, 0, len(config.Protocols))
 	for _, protocol := range config.Protocols {
+		if !protocol.Enable {
+			continue
+		}
 		protocolConfigs = append(protocolConfigs, &v1.Protocol{
 			Type:                          protocol.Type,
 			Port:                          protocol.Port,
