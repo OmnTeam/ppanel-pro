@@ -990,7 +990,7 @@ func compatLegacyQueryServerProtocolConfig(ctx context.Context, dataLayer *data.
 		if len(requested) > 0 {
 			var filtered []*servermodel.Protocol
 			for _, protocol := range protocols {
-				if protocol == nil {
+				if protocol == nil || !protocol.Enable {
 					continue
 				}
 				if _, ok := requested[protocol.Type]; ok {
