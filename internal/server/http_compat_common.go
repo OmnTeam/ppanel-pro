@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	publicpaymentservice "github.com/OmnTeam/ppanel-pro/internal/service/public/payment"
+	serverservice "github.com/OmnTeam/ppanel-pro/internal/service/server"
 
 	authbiz "github.com/OmnTeam/ppanel-pro/internal/biz/auth"
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
@@ -31,6 +32,7 @@ func registerLegacyCompatRoutes(
 	dataLayer *data.Data,
 	appConf *conf.Application,
 	publicPayment *publicpaymentservice.PaymentService,
+	serverService *serverservice.ServerService,
 	logger log.Logger,
 ) {
 	if srv == nil {
@@ -39,7 +41,7 @@ func registerLegacyCompatRoutes(
 
 	r := srv.Route("/")
 	registerLegacyCallbackCompatRoutes(r, dataLayer, appConf, publicPayment, logger)
-	registerLegacyServerCompatRoutes(r, dataLayer)
+	registerLegacyServerCompatRoutes(r, dataLayer, serverService)
 }
 
 func compatMiddleware(ctx khttp.Context, req interface{}, fn func(context.Context, interface{}) (interface{}, error)) (interface{}, error) {

@@ -191,6 +191,16 @@ func (uc *ServerNodeUsecase) validateSecretKey(ctx context.Context, secretKey st
 
 // GetServerConfig 获取服务器配置
 func (uc *ServerNodeUsecase) GetServerConfig(ctx context.Context, serverID int64, protocol, secretKey string) (*ServerConfig, error) {
+	valid, err := uc.validateSecretKey(ctx, secretKey)
+	if err != nil {
+		uc.logger.Errorf("Load node secret failed: %v", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if !valid {
+		uc.logger.Errorf("Invalid secret key for server %d", serverID)
+		return nil, responsecode.ErrUnauthorized()
+	}
+
 	config, err := uc.repo.GetServerConfig(ctx, serverID, protocol)
 	if err != nil {
 		uc.logger.Errorf("GetServerConfig failed: %v", err)
@@ -202,6 +212,16 @@ func (uc *ServerNodeUsecase) GetServerConfig(ctx context.Context, serverID int64
 
 // GetServerUserList 获取服务器用户列表
 func (uc *ServerNodeUsecase) GetServerUserList(ctx context.Context, serverID int64, protocol, secretKey string) ([]*ServerUser, error) {
+	valid, err := uc.validateSecretKey(ctx, secretKey)
+	if err != nil {
+		uc.logger.Errorf("Load node secret failed: %v", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if !valid {
+		uc.logger.Errorf("Invalid secret key for server %d", serverID)
+		return nil, responsecode.ErrUnauthorized()
+	}
+
 	users, err := uc.repo.GetServerUserList(ctx, serverID, protocol)
 	if err != nil {
 		uc.logger.Errorf("GetServerUserList failed: %v", err)
@@ -213,7 +233,17 @@ func (uc *ServerNodeUsecase) GetServerUserList(ctx context.Context, serverID int
 
 // PushUserTraffic 推送用户流量
 func (uc *ServerNodeUsecase) PushUserTraffic(ctx context.Context, req *PushUserTrafficRequest) error {
-	err := uc.repo.PushUserTraffic(ctx, req)
+	valid, err := uc.validateSecretKey(ctx, req.SecretKey)
+	if err != nil {
+		uc.logger.Errorf("Load node secret failed: %v", err)
+		return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if !valid {
+		uc.logger.Errorf("Invalid secret key for server %d", req.ServerID)
+		return responsecode.ErrUnauthorized()
+	}
+
+	err = uc.repo.PushUserTraffic(ctx, req)
 	if err != nil {
 		uc.logger.Errorf("PushUserTraffic failed: %v", err)
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
@@ -224,7 +254,17 @@ func (uc *ServerNodeUsecase) PushUserTraffic(ctx context.Context, req *PushUserT
 
 // PushServerStatus 推送服务器状态
 func (uc *ServerNodeUsecase) PushServerStatus(ctx context.Context, req *PushServerStatusRequest) error {
-	err := uc.repo.PushServerStatus(ctx, req)
+	valid, err := uc.validateSecretKey(ctx, req.SecretKey)
+	if err != nil {
+		uc.logger.Errorf("Load node secret failed: %v", err)
+		return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if !valid {
+		uc.logger.Errorf("Invalid secret key for server %d", req.ServerID)
+		return responsecode.ErrUnauthorized()
+	}
+
+	err = uc.repo.PushServerStatus(ctx, req)
 	if err != nil {
 		uc.logger.Errorf("PushServerStatus failed: %v", err)
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
@@ -235,7 +275,17 @@ func (uc *ServerNodeUsecase) PushServerStatus(ctx context.Context, req *PushServ
 
 // PushOnlineUsers 推送在线用户
 func (uc *ServerNodeUsecase) PushOnlineUsers(ctx context.Context, req *PushOnlineUsersRequest) error {
-	err := uc.repo.PushOnlineUsers(ctx, req)
+	valid, err := uc.validateSecretKey(ctx, req.SecretKey)
+	if err != nil {
+		uc.logger.Errorf("Load node secret failed: %v", err)
+		return responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if !valid {
+		uc.logger.Errorf("Invalid secret key for server %d", req.ServerID)
+		return responsecode.ErrUnauthorized()
+	}
+
+	err = uc.repo.PushOnlineUsers(ctx, req)
 	if err != nil {
 		uc.logger.Errorf("PushOnlineUsers failed: %v", err)
 		return responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
@@ -263,25 +313,37 @@ func (uc *ServerNodeUsecase) QueryServerProtocolConfig(ctx context.Context, serv
 		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
 	}
 
-	if len(protocols) > 0 && config != nil {
-		requested := make(map[string]struct{}, len(protocols))
-		for _, protocol := range protocols {
-			if protocol = strings.TrimSpace(protocol); protocol != "" {
-				requested[protocol] = struct{}{}
+	if config != nil {
+		enabledProtocols := make([]*Protocol, 0, len(config.Protocols))
+		for _, protocol := range config.Protocols {
+			if protocol == nil || !protocol.Enable {
+				continue
 			}
+			enabledProtocols = append(enabledProtocols, protocol)
 		}
-		if len(requested) > 0 {
-			filtered := make([]*Protocol, 0, len(config.Protocols))
-			for _, protocol := range config.Protocols {
-				if protocol == nil {
-					continue
-				}
-				if _, ok := requested[protocol.Type]; ok {
-					filtered = append(filtered, protocol)
+		config.Protocols = enabledProtocols
+		config.Total = int32(len(enabledProtocols))
+
+		if len(protocols) > 0 {
+			requested := make(map[string]struct{}, len(protocols))
+			for _, protocol := range protocols {
+				if protocol = strings.TrimSpace(protocol); protocol != "" {
+					requested[protocol] = struct{}{}
 				}
 			}
-			config.Protocols = filtered
-			config.Total = int32(len(filtered))
+			if len(requested) > 0 {
+				filtered := make([]*Protocol, 0, len(config.Protocols))
+				for _, protocol := range config.Protocols {
+					if protocol == nil {
+						continue
+					}
+					if _, ok := requested[protocol.Type]; ok {
+						filtered = append(filtered, protocol)
+					}
+				}
+				config.Protocols = filtered
+				config.Total = int32(len(filtered))
+			}
 		}
 	}
 

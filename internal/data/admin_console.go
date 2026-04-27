@@ -432,23 +432,31 @@ func (r *adminConsoleRepo) QueryDailyUserStatisticsList(ctx context.Context, dat
 	}
 
 	// Process orders
-	orderSeen := make(map[string]map[int64]struct{})
+	newOrderSeen := make(map[string]map[int64]struct{})
+	renewalOrderSeen := make(map[string]map[int64]struct{})
 	for _, order := range orders {
 		dateStr := order.CreatedAt.Format("2006-01-02")
 		if _, exists := statsMap[dateStr]; !exists {
 			continue
 		}
-		if _, ok := orderSeen[dateStr]; !ok {
-			orderSeen[dateStr] = make(map[int64]struct{})
-		}
 		key := int64(order.UserID)
-		if _, ok := orderSeen[dateStr][key]; ok {
-			continue
-		}
-		orderSeen[dateStr][key] = struct{}{}
 		if order.IsNew {
+			if _, ok := newOrderSeen[dateStr]; !ok {
+				newOrderSeen[dateStr] = make(map[int64]struct{})
+			}
+			if _, ok := newOrderSeen[dateStr][key]; ok {
+				continue
+			}
+			newOrderSeen[dateStr][key] = struct{}{}
 			statsMap[dateStr].NewOrderUsers++
 		} else {
+			if _, ok := renewalOrderSeen[dateStr]; !ok {
+				renewalOrderSeen[dateStr] = make(map[int64]struct{})
+			}
+			if _, ok := renewalOrderSeen[dateStr][key]; ok {
+				continue
+			}
+			renewalOrderSeen[dateStr][key] = struct{}{}
 			statsMap[dateStr].RenewalOrderUsers++
 		}
 	}
@@ -510,23 +518,31 @@ func (r *adminConsoleRepo) QueryMonthlyUserStatisticsList(ctx context.Context, d
 	}
 
 	// Process orders
-	orderSeen := make(map[string]map[int64]struct{})
+	newOrderSeen := make(map[string]map[int64]struct{})
+	renewalOrderSeen := make(map[string]map[int64]struct{})
 	for _, order := range orders {
 		monthStr := order.CreatedAt.Format("2006-01")
 		if _, exists := statsMap[monthStr]; !exists {
 			continue
 		}
-		if _, ok := orderSeen[monthStr]; !ok {
-			orderSeen[monthStr] = make(map[int64]struct{})
-		}
 		key := int64(order.UserID)
-		if _, ok := orderSeen[monthStr][key]; ok {
-			continue
-		}
-		orderSeen[monthStr][key] = struct{}{}
 		if order.IsNew {
+			if _, ok := newOrderSeen[monthStr]; !ok {
+				newOrderSeen[monthStr] = make(map[int64]struct{})
+			}
+			if _, ok := newOrderSeen[monthStr][key]; ok {
+				continue
+			}
+			newOrderSeen[monthStr][key] = struct{}{}
 			statsMap[monthStr].NewOrderUsers++
 		} else {
+			if _, ok := renewalOrderSeen[monthStr]; !ok {
+				renewalOrderSeen[monthStr] = make(map[int64]struct{})
+			}
+			if _, ok := renewalOrderSeen[monthStr][key]; ok {
+				continue
+			}
+			renewalOrderSeen[monthStr][key] = struct{}{}
 			statsMap[monthStr].RenewalOrderUsers++
 		}
 	}
