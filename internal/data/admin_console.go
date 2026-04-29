@@ -634,7 +634,59 @@ func (r *adminConsoleRepo) QueryOnlineUsers(ctx context.Context) (int, error) {
 		}
 		return 0, err
 	}
+	if count == 0 {
+		fallbackCount, fallbackErr := r.queryOnlineUsersFromServerCaches(ctx)
+		if fallbackErr != nil {
+			return 0, fallbackErr
+		}
+		return fallbackCount, nil
+	}
 	return int(count), nil
+}
+
+func (r *adminConsoleRepo) queryOnlineUsersFromServerCaches(ctx context.Context) (int, error) {
+	var (
+		cursor      uint64
+		subscribeID = make(map[int64]struct{})
+	)
+
+	for {
+		keys, nextCursor, err := r.data.rdb.Scan(ctx, cursor, "node:online:subscribe:*", 200).Result()
+		if err != nil {
+			if err == redis.Nil {
+				return 0, nil
+			}
+			return 0, err
+		}
+		for _, key := range keys {
+			if key == OnlineUserSubscribeCacheKeyWithGlobal {
+				continue
+			}
+			raw, err := r.data.rdb.Get(ctx, key).Result()
+			if err != nil {
+				if err == redis.Nil {
+					continue
+				}
+				return 0, err
+			}
+			if raw == "" {
+				continue
+			}
+			var onlineUsers map[int64][]string
+			if err := json.Unmarshal([]byte(raw), &onlineUsers); err != nil {
+				continue
+			}
+			for sid := range onlineUsers {
+				subscribeID[sid] = struct{}{}
+			}
+		}
+		cursor = nextCursor
+		if cursor == 0 {
+			break
+		}
+	}
+
+	return len(subscribeID), nil
 }
 
 // QueryTodayTraffic queries today's traffic

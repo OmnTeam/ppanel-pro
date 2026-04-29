@@ -1035,7 +1035,7 @@ func compatSanitizeOutboundList(values []CompatLegacyNodeOutbound) []CompatLegac
 
 func compatNormalizeOnlineUserIP(ip string) (string, bool) {
 	normalizedIP := strings.TrimSpace(ip)
-	if normalizedIP == "" || net.ParseIP(normalizedIP) == nil {
+	if normalizedIP == "" {
 		return "", false
 	}
 	return normalizedIP, true

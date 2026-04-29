@@ -91,6 +91,7 @@ type ServerRepo interface {
 	ResetServerSort(ctx context.Context, sortItems []*SortItem) error
 	GetServerStatus(ctx context.Context, serverID int) (*ServerResourceStatus, error)
 	GetOnlineUsers(ctx context.Context, serverID int64, protocol string) (map[int64][]string, error)
+	GetOnlineUsersByServer(ctx context.Context, serverID int64) (map[string]map[int64][]string, error)
 	GetUserSubscribeInfo(ctx context.Context, subscribeID int) (*UserSubscribeInfo, error)
 }
 
@@ -342,6 +343,20 @@ func (uc *ServerUsecase) getOnlineUsers(ctx context.Context, serverID int64, pro
 				ipList = append(ipList, &ServerOnlineIP{IP: ip, Protocol: protocol.Type})
 			}
 			result = append(result, &ServerOnlineUser{IP: ipList, SubscribeID: subscribeID})
+		}
+	}
+	if len(result) == 0 {
+		allOnlineData, err := uc.repo.GetOnlineUsersByServer(ctx, serverID)
+		if err == nil {
+			for protocol, onlineData := range allOnlineData {
+				for subscribeID, ips := range onlineData {
+					ipList := make([]*ServerOnlineIP, 0, len(ips))
+					for _, ip := range ips {
+						ipList = append(ipList, &ServerOnlineIP{IP: ip, Protocol: protocol})
+					}
+					result = append(result, &ServerOnlineUser{IP: ipList, SubscribeID: subscribeID})
+				}
+			}
 		}
 	}
 	return uc.mergeOnlineUsers(ctx, result)

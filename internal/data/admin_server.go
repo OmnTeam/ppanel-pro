@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/OmnTeam/ppanel-pro/ent"
@@ -181,6 +182,56 @@ func (r *adminServerRepo) GetOnlineUsers(ctx context.Context, serverID int64, pr
 		onlineUsers[subscribeID] = dedupeStringSlicePreserveOrder(ips)
 	}
 	return onlineUsers, nil
+}
+
+func (r *adminServerRepo) GetOnlineUsersByServer(ctx context.Context, serverID int64) (map[string]map[int64][]string, error) {
+	if r.data == nil || r.data.rdb == nil {
+		return map[string]map[int64][]string{}, nil
+	}
+
+	pattern := fmt.Sprintf("node:online:subscribe:%d:*", serverID)
+	result := make(map[string]map[int64][]string)
+	var cursor uint64
+
+	for {
+		keys, nextCursor, err := r.data.rdb.Scan(ctx, cursor, pattern, 200).Result()
+		if err != nil {
+			if err == redis.Nil {
+				return result, nil
+			}
+			return nil, err
+		}
+		for _, key := range keys {
+			protocol := strings.TrimPrefix(key, fmt.Sprintf("node:online:subscribe:%d:", serverID))
+			if protocol == key {
+				continue
+			}
+			raw, err := r.data.rdb.Get(ctx, key).Result()
+			if err != nil {
+				if err == redis.Nil {
+					continue
+				}
+				return nil, err
+			}
+			if raw == "" {
+				continue
+			}
+			var onlineUsers map[int64][]string
+			if err := json.Unmarshal([]byte(raw), &onlineUsers); err != nil {
+				continue
+			}
+			for subscribeID, ips := range onlineUsers {
+				onlineUsers[subscribeID] = dedupeStringSlicePreserveOrder(ips)
+			}
+			result[protocol] = onlineUsers
+		}
+		cursor = nextCursor
+		if cursor == 0 {
+			break
+		}
+	}
+
+	return result, nil
 }
 
 func dedupeStringSlicePreserveOrder(values []string) []string {
