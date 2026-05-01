@@ -26,6 +26,10 @@ func (r *publicSubscriptionRepo) createExpiredNodesFromDB(ctx context.Context, u
 		r.log.Debugf("No expired node group configured: %v", err)
 		return r.createExpiredNodesDefault()
 	}
+	if !isSubscriptionNodeGroupTypeAccessible(expiredGroup.GroupType, subscriptionNodeGroupAccessSubscribe) {
+		r.log.Debugf("Expired node group %d is not accessible for subscribe output, type=%s", expiredGroup.ID, expiredGroup.GroupType)
+		return r.createExpiredNodesDefault()
+	}
 
 	// 2. 检查用户是否在过期天数限制内
 	if userSubscribe.ExpireTime == 0 {
@@ -54,10 +58,11 @@ func (r *publicSubscriptionRepo) createExpiredNodesFromDB(ctx context.Context, u
 		}
 	}
 
-	// 4. 查询过期节点组的节点
+	// 4. 过期节点也必须满足“已启用且未隐藏”，并且只能来自过期分组。
 	nodes, err := r.data.db.ProxyNode.Query().
 		Where(
 			proxynode.EnabledEQ(true),
+			proxynode.IsHiddenEQ(false),
 		).
 		Where(func(s *sql.Selector) {
 			s.Where(sql.ExprP("JSON_CONTAINS("+proxynode.FieldNodeGroupIds+", ?)", fmt.Sprintf("%d", expiredGroup.ID)))

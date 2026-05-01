@@ -4,95 +4,62 @@ import (
 	"context"
 	"strings"
 
-	"entgo.io/ent/dialect/sql"
 	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
+	"github.com/OmnTeam/ppanel-pro/ent/proxyservergroup"
 	subscriptionbiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
 	"github.com/OmnTeam/ppanel-pro/pkg/tool"
 )
 
-// getNodesByGroup 按照原项目逻辑获取分组节点
+// getNodesByGroup 在开启节点分组时取节点：
+// 1. 订阅直接绑定的节点始终保留；
+// 2. 再补充分组内可用于订阅输出的节点；
+// 3. 两类节点都必须满足“已启用且未隐藏”。
 func (r *publicSubscriptionRepo) getNodesByGroup(ctx context.Context, userSubscribe *subscriptionbiz.UserSubscribe, subscribePlan *ent.ProxySubscribe) ([]*ent.ProxyNode, error) {
-	nodeGroupId, source := resolveSubscriptionNodeGroupID(userSubscribe, subscribePlan)
-	r.log.Infof("Using %s: %d", source, nodeGroupId)
+	directNodeIDs := sanitizeSubscribeNodeIDs(subscribePlan)
+	resultNodes, nodeIDMap, err := r.queryVisibleNodesByIDs(ctx, directNodeIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	nodeGroupID, source := resolveSubscriptionNodeGroupID(userSubscribe, subscribePlan)
+	r.log.Infof("Using %s: %d", source, nodeGroupID)
 
 	var currentNodeGroup *ent.ProxyServerGroup
-	if nodeGroupId > 0 {
-		accessibleGroup, err := r.getAccessibleNodeGroupForSubscribe(ctx, nodeGroupId)
+	if nodeGroupID > 0 {
+		accessibleGroup, err := r.getAccessibleNodeGroupForSubscribe(ctx, nodeGroupID)
 		if err != nil {
 			return nil, err
 		}
 		if accessibleGroup == nil {
-			r.log.Infof("Subscribe node group %d from %s is not accessible, fallback to public nodes", nodeGroupId, source)
-			nodeGroupId = 0
+			r.log.Infof("Subscribe node group %d from %s is not accessible, keep direct subscribe nodes only", nodeGroupID, source)
+			nodeGroupID = 0
 		} else {
 			currentNodeGroup = accessibleGroup
 		}
 	}
 
-	// 查询所有启用且非隐藏的节点
-	allNodes, err := r.data.db.ProxyNode.Query().
-		Where(
-			proxynode.EnabledEQ(true),
-			proxynode.IsHiddenEQ(false),
-		).
-		Order(ent.Asc(proxynode.FieldSort)).
-		All(ctx)
-
-	if err != nil {
-		r.log.Errorf("Failed to query nodes: %v", err)
-		return nil, err
-	}
-
-	// 过滤节点
-	var resultNodes []*ent.ProxyNode
-	nodeIdMap := make(map[int64]bool)
-
-	for _, n := range allNodes {
-		// 1. 公共节点（node_group_ids 为空），所有人可见
-		if n.NodeGroupIds == nil || len(n.NodeGroupIds) == 0 {
-			if !nodeIdMap[n.ID] {
-				resultNodes = append(resultNodes, n)
-				nodeIdMap[n.ID] = true
-			}
-			continue
+	if nodeGroupID > 0 {
+		groupNodes, err := r.queryVisibleNodesByGroupID(ctx, nodeGroupID)
+		if err != nil {
+			return nil, err
 		}
-
-		// 2. 如果有节点组，检查节点是否属于该节点组
-		if nodeGroupId != 0 {
-			for _, gid := range n.NodeGroupIds {
-				if gid == nodeGroupId {
-					if !nodeIdMap[n.ID] {
-						resultNodes = append(resultNodes, n)
-						nodeIdMap[n.ID] = true
-					}
-					break
-				}
+		for _, node := range groupNodes {
+			if !nodeIDMap[node.ID] {
+				resultNodes = append(resultNodes, node)
+				nodeIDMap[node.ID] = true
 			}
 		}
 	}
 
-	// 旧项目在分组模式下仍然会补上 subscribe.nodes 里直接绑定的节点。
-	directNodeIDs := tool.StringToInt64Slice(subscribePlan.Nodes)
-	if len(directNodeIDs) > 0 {
-		for _, n := range allNodes {
-			if tool.Contains(directNodeIDs, n.ID) && !nodeIdMap[n.ID] {
-				resultNodes = append(resultNodes, n)
-				nodeIdMap[n.ID] = true
-			}
-		}
-	}
+	r.log.Infof("Found %d nodes (group=%d direct=%d)", len(resultNodes), nodeGroupID, len(directNodeIDs))
 
-	r.log.Infof("Found %d nodes (group=%d)", len(resultNodes), nodeGroupId)
-
-	// 4. 为分组节点设置节点组名称为 tag（如果节点没有 tag）
+	// 为分组节点补一个 tag，兼容旧订阅模板里对 tag 的使用。
 	if currentNodeGroup != nil && currentNodeGroup.Name != "" {
-		for _, n := range resultNodes {
-			// 只为分组节点设置 tag，公共节点不设置
-			// 并且只在节点没有 tag 时设置
-			if n.Tags == "" && n.NodeGroupIds != nil && len(n.NodeGroupIds) > 0 {
-				n.Tags = currentNodeGroup.Name
-				r.log.Debugf("Set node_group name as tag for node %d: %s", n.ID, currentNodeGroup.Name)
+		for _, node := range resultNodes {
+			if node.Tags == "" && containsInt64(node.NodeGroupIds, currentNodeGroup.ID) {
+				node.Tags = currentNodeGroup.Name
+				r.log.Debugf("Set node_group name as tag for node %d: %s", node.ID, currentNodeGroup.Name)
 			}
 		}
 	}
@@ -127,73 +94,39 @@ func resolveNodeGroupID(nodeGroupIDs []int64, preferred int64) int64 {
 	return 0
 }
 
-// getNodesByTag 按照标签和节点ID获取节点
+// getNodesByTag 在未开启分组时取节点：
+// 1. 直接绑定节点与 tag 匹配节点做并集；
+// 2. 直接绑定节点不受 tag 结果影响；
+// 3. 所有节点都必须满足“已启用且未隐藏”。
 func (r *publicSubscriptionRepo) getNodesByTag(ctx context.Context, subscribePlan *ent.ProxySubscribe) ([]*ent.ProxyNode, error) {
-	// 解析节点ID和标签
-	rawNodeIDs := tool.StringToInt64Slice(subscribePlan.Nodes)
-	nodeIDs := make([]int64, 0, len(rawNodeIDs))
-	for _, id := range rawNodeIDs {
-		if id > 0 {
-			nodeIDs = append(nodeIDs, id)
-		}
-	}
-	tags := tool.StringToStringSlice(subscribePlan.NodeTags)
-	tags = tool.RemoveDuplicateElements(tags...)
+	nodeIDs := sanitizeSubscribeNodeIDs(subscribePlan)
+	tags := sanitizeSubscribeTags(subscribePlan)
 
-	r.log.Infof("Subscribe nodes: raw=%v valid=%d, tags: %v", subscribePlan.Nodes, len(nodeIDs), len(tags))
+	r.log.Infof("Subscribe nodes: raw=%v valid=%d, tags=%v", subscribePlan.Nodes, len(nodeIDs), tags)
 
-	// 如果没有指定有效节点和标签，返回空列表
 	if len(nodeIDs) == 0 && len(tags) == 0 {
 		return []*ent.ProxyNode{}, nil
 	}
 
-	// 构建节点查询
-	query := r.data.db.ProxyNode.Query().
-		Where(
-			proxynode.EnabledEQ(true),
-			proxynode.IsHiddenEQ(false),
-		)
-
-	// 解析节点ID并添加到查询条件
-	if len(nodeIDs) > 0 {
-		anyNodeIds := make([]any, len(nodeIDs))
-		for i, id := range nodeIDs {
-			anyNodeIds[i] = id
-		}
-		query = query.Where(func(s *sql.Selector) {
-			s.Where(sql.In(proxynode.FieldID, anyNodeIds...))
-		})
-	}
-
-	// 根据标签过滤
-	if len(tags) > 0 {
-		query = query.Where(func(s *sql.Selector) {
-			conditions := make([]*sql.Predicate, 0, len(tags))
-			for _, tag := range tags {
-				tag = strings.TrimSpace(tag)
-				if tag == "" {
-					continue
-				}
-				conditions = append(conditions, sql.ExprP("FIND_IN_SET(?, "+proxynode.FieldTags+")", tag))
-			}
-			if len(conditions) > 0 {
-				s.Where(sql.Or(conditions...))
-			}
-		})
-	}
-
-	// 查询节点
-	nodes, err := query.
-		Order(ent.Asc(proxynode.FieldSort)).
-		Limit(1000).
-		All(ctx)
-
+	resultNodes, nodeIDMap, err := r.queryVisibleNodesByIDs(ctx, nodeIDs)
 	if err != nil {
-		r.log.Errorf("Failed to query nodes: %v", err)
 		return nil, err
 	}
 
-	return nodes, nil
+	if len(tags) > 0 {
+		tagNodes, err := r.queryVisibleNodesByTags(ctx, tags)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range tagNodes {
+			if !nodeIDMap[node.ID] {
+				resultNodes = append(resultNodes, node)
+				nodeIDMap[node.ID] = true
+			}
+		}
+	}
+
+	return resultNodes, nil
 }
 
 const (
@@ -209,7 +142,7 @@ func normalizeSubscriptionNodeGroupType(groupType string) string {
 	case subscriptionNodeGroupTypeSubscribe:
 		return subscriptionNodeGroupTypeSubscribe
 	default:
-		return subscriptionNodeGroupTypeCommon
+		return strings.ToLower(strings.TrimSpace(groupType))
 	}
 }
 
@@ -228,7 +161,12 @@ func (r *publicSubscriptionRepo) getAccessibleNodeGroupForSubscribe(ctx context.
 		return nil, nil
 	}
 
-	nodeGroup, err := r.data.db.ProxyServerGroup.Get(ctx, nodeGroupID)
+	nodeGroup, err := r.data.db.ProxyServerGroup.Query().
+		Where(
+			proxyservergroup.IDEQ(nodeGroupID),
+			proxyservergroup.IsExpiredGroupEQ(false),
+		).
+		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			r.log.Debugf("Subscribe node group %d not found", nodeGroupID)
@@ -244,4 +182,137 @@ func (r *publicSubscriptionRepo) getAccessibleNodeGroupForSubscribe(ctx context.
 	}
 
 	return nodeGroup, nil
+}
+
+func sanitizeSubscribeNodeIDs(subscribePlan *ent.ProxySubscribe) []int64 {
+	if subscribePlan == nil {
+		return nil
+	}
+	rawNodeIDs := tool.StringToInt64Slice(subscribePlan.Nodes)
+	nodeIDs := make([]int64, 0, len(rawNodeIDs))
+	seen := make(map[int64]struct{}, len(rawNodeIDs))
+	for _, id := range rawNodeIDs {
+		if id <= 0 {
+			continue
+		}
+		if _, ok := seen[id]; ok {
+			continue
+		}
+		seen[id] = struct{}{}
+		nodeIDs = append(nodeIDs, id)
+	}
+	return nodeIDs
+}
+
+func sanitizeSubscribeTags(subscribePlan *ent.ProxySubscribe) []string {
+	if subscribePlan == nil {
+		return nil
+	}
+	tags := tool.StringToStringSlice(subscribePlan.NodeTags)
+	cleaned := make([]string, 0, len(tags))
+	seen := make(map[string]struct{}, len(tags))
+	for _, tag := range tags {
+		tag = strings.TrimSpace(tag)
+		if tag == "" {
+			continue
+		}
+		if _, ok := seen[tag]; ok {
+			continue
+		}
+		seen[tag] = struct{}{}
+		cleaned = append(cleaned, tag)
+	}
+	return cleaned
+}
+
+func (r *publicSubscriptionRepo) queryVisibleNodesByIDs(ctx context.Context, nodeIDs []int64) ([]*ent.ProxyNode, map[int64]bool, error) {
+	result := make([]*ent.ProxyNode, 0)
+	seen := make(map[int64]bool)
+	if len(nodeIDs) == 0 {
+		return result, seen, nil
+	}
+
+	nodes, err := r.data.db.ProxyNode.Query().
+		Where(
+			proxynode.EnabledEQ(true),
+			proxynode.IsHiddenEQ(false),
+			proxynode.IDIn(nodeIDs...),
+		).
+		Order(ent.Asc(proxynode.FieldSort)).
+		All(ctx)
+	if err != nil {
+		r.log.Errorf("Failed to query visible nodes by ids: %v", err)
+		return nil, nil, err
+	}
+
+	for _, node := range nodes {
+		if !seen[node.ID] {
+			result = append(result, node)
+			seen[node.ID] = true
+		}
+	}
+
+	return result, seen, nil
+}
+
+func (r *publicSubscriptionRepo) queryVisibleNodesByGroupID(ctx context.Context, nodeGroupID int64) ([]*ent.ProxyNode, error) {
+	if nodeGroupID <= 0 {
+		return []*ent.ProxyNode{}, nil
+	}
+
+	// Ent 当前对 JSON 数组包含查询不够方便，这里先查出可见节点再做一次内存过滤。
+	nodes, err := r.data.db.ProxyNode.Query().
+		Where(
+			proxynode.EnabledEQ(true),
+			proxynode.IsHiddenEQ(false),
+		).
+		Order(ent.Asc(proxynode.FieldSort)).
+		All(ctx)
+	if err != nil {
+		r.log.Errorf("Failed to query visible nodes for group %d: %v", nodeGroupID, err)
+		return nil, err
+	}
+
+	result := make([]*ent.ProxyNode, 0, len(nodes))
+	for _, node := range nodes {
+		if containsInt64(node.NodeGroupIds, nodeGroupID) {
+			result = append(result, node)
+		}
+	}
+	return result, nil
+}
+
+func (r *publicSubscriptionRepo) queryVisibleNodesByTags(ctx context.Context, tags []string) ([]*ent.ProxyNode, error) {
+	if len(tags) == 0 {
+		return []*ent.ProxyNode{}, nil
+	}
+
+	nodes, err := r.data.db.ProxyNode.Query().
+		Where(
+			proxynode.EnabledEQ(true),
+			proxynode.IsHiddenEQ(false),
+		).
+		Order(ent.Asc(proxynode.FieldSort)).
+		All(ctx)
+	if err != nil {
+		r.log.Errorf("Failed to query visible nodes by tags: %v", err)
+		return nil, err
+	}
+
+	result := make([]*ent.ProxyNode, 0, len(nodes))
+	for _, node := range nodes {
+		if nodeMatchesTags(node.Tags, tags) {
+			result = append(result, node)
+		}
+	}
+	return result, nil
+}
+
+func containsInt64(items []int64, target int64) bool {
+	for _, item := range items {
+		if item == target {
+			return true
+		}
+	}
+	return false
 }

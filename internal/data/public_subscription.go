@@ -107,9 +107,14 @@ func (r *publicSubscriptionRepo) ValidateTokenAndGetSubscribe(ctx context.Contex
 
 // GetAvailableNodes 获取可用节点列表 - 按照原项目逻辑实现
 func (r *publicSubscriptionRepo) GetAvailableNodes(ctx context.Context, userSubscribe *subscriptionbiz.UserSubscribe) ([]*subscriptionbiz.NodeInfo, error) {
-	// 1. 检查订阅是否过期
+	isGroupMode := r.isGroupEnabled(ctx)
+
+	// 1. 过期订阅只允许在开启分组时走“过期节点组”；否则返回默认过期提示节点。
 	if r.isSubscriptionExpired(userSubscribe) {
-		return r.createExpiredNodesFromDB(ctx, userSubscribe), nil
+		if isGroupMode {
+			return r.createExpiredNodesFromDB(ctx, userSubscribe), nil
+		}
+		return r.createExpiredNodesDefault(), nil
 	}
 
 	// 2. 获取订阅套餐详情
@@ -123,9 +128,6 @@ func (r *publicSubscriptionRepo) GetAvailableNodes(ctx context.Context, userSubs
 		r.log.Errorf("Failed to query subscribe plan: %v", err)
 		return nil, fmt.Errorf("subscribe plan not found")
 	}
-
-	// 3. 判断是否使用分组模式
-	isGroupMode := r.isGroupEnabled(ctx)
 
 	var nodes []*ent.ProxyNode
 
