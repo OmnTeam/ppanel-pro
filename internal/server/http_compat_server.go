@@ -397,7 +397,8 @@ func registerLegacyServerCompatRoutes(r *khttp.Router, dataLayer *data.Data, ser
 	r.POST("/v1/server/online", func(ctx khttp.Context) error {
 		var req compatLegacyPushOnlineUsersRequest
 		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req)
+		_ = ctx.BindQuery(&req.compatLegacyServerCommon)
+		compatLegacyPopulateV1ServerCommon(ctx.Request(), &req.compatLegacyServerCommon)
 		if !serverService.CompatV1ServerSecretAllowed(ctx, provider, req.SecretKey) {
 			return ctx.String(http.StatusForbidden, "Forbidden")
 		}

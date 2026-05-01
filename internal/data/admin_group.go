@@ -1436,7 +1436,7 @@ func (r *adminGroupRepo) ResetGroups(ctx context.Context) error {
 	}
 	if err = tx.ProxySubscribe.Update().
 		SetNodeGroupIds([]int64{}).
-		ClearNodeGroupID().
+		SetNodeGroupID(0).
 		Exec(ctx); err != nil {
 		r.logger.Errorf("Failed to clear subscribe node groups: %v", err)
 		return err

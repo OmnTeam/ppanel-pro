@@ -171,15 +171,35 @@ func (r *publicSubscriptionRepo) GetAvailableNodes(ctx context.Context, userSubs
 		}
 
 		var matched *servermodel.Protocol
+		var firstEnabled *servermodel.Protocol
+		var firstAvailable *servermodel.Protocol
 		for _, protocol := range protocols {
-			if protocol != nil && protocol.Type == node.Protocol {
+			if protocol == nil {
+				continue
+			}
+			if firstAvailable == nil {
+				firstAvailable = protocol
+			}
+			if protocol.Enable && firstEnabled == nil {
+				firstEnabled = protocol
+			}
+			if strings.EqualFold(strings.TrimSpace(protocol.Type), strings.TrimSpace(node.Protocol)) {
 				matched = protocol
 				break
 			}
 		}
 		if matched == nil {
-			r.log.Warnf("No matching protocol found for node %d with protocol %s", node.ID, node.Protocol)
+			matched = firstEnabled
+		}
+		if matched == nil {
+			matched = firstAvailable
+		}
+		if matched == nil {
+			r.log.Warnf("No protocol config found for node %d with protocol %s", node.ID, node.Protocol)
 			continue
+		}
+		if !strings.EqualFold(strings.TrimSpace(matched.Type), strings.TrimSpace(node.Protocol)) {
+			r.log.Warnf("Node %d protocol %s not found in server %d, fallback to protocol %s", node.ID, node.Protocol, server.ID, matched.Type)
 		}
 
 		nodeInfo := &subscriptionbiz.NodeInfo{
@@ -188,7 +208,7 @@ func (r *publicSubscriptionRepo) GetAvailableNodes(ctx context.Context, userSubs
 			Name:        node.Name,
 			Server:      node.Address,
 			Port:        node.Port,
-			Type:        node.Protocol,
+			Type:        matched.Type,
 			Tags:        tool.StringToStringSlice(node.Tags),
 			NodeGroupID: resolveNodeGroupID(node.NodeGroupIds, effectiveNodeGroupID),
 

@@ -14,12 +14,28 @@ import (
 // getNodesByGroup 按照原项目逻辑获取分组节点
 func (r *publicSubscriptionRepo) getNodesByGroup(ctx context.Context, userSubscribe *subscriptionbiz.UserSubscribe, subscribePlan *ent.ProxySubscribe) ([]*ent.ProxyNode, error) {
 	nodeGroupId, source := resolveSubscriptionNodeGroupID(userSubscribe, subscribePlan)
-
 	r.log.Infof("Using %s: %d", source, nodeGroupId)
 
-	// 查询所有启用的节点
+	var currentNodeGroup *ent.ProxyServerGroup
+	if nodeGroupId > 0 {
+		accessibleGroup, err := r.getAccessibleNodeGroupForSubscribe(ctx, nodeGroupId)
+		if err != nil {
+			return nil, err
+		}
+		if accessibleGroup == nil {
+			r.log.Infof("Subscribe node group %d from %s is not accessible, fallback to public nodes", nodeGroupId, source)
+			nodeGroupId = 0
+		} else {
+			currentNodeGroup = accessibleGroup
+		}
+	}
+
+	// 查询所有启用且非隐藏的节点
 	allNodes, err := r.data.db.ProxyNode.Query().
-		Where(proxynode.EnabledEQ(true)).
+		Where(
+			proxynode.EnabledEQ(true),
+			proxynode.IsHiddenEQ(false),
+		).
 		Order(ent.Asc(proxynode.FieldSort)).
 		All(ctx)
 
@@ -70,17 +86,13 @@ func (r *publicSubscriptionRepo) getNodesByGroup(ctx context.Context, userSubscr
 	r.log.Infof("Found %d nodes (group=%d)", len(resultNodes), nodeGroupId)
 
 	// 4. 为分组节点设置节点组名称为 tag（如果节点没有 tag）
-	if nodeGroupId > 0 {
-		// 查询节点组信息
-		nodeGroup, err := r.data.db.ProxyServerGroup.Get(ctx, nodeGroupId)
-		if err == nil && nodeGroup != nil && nodeGroup.Name != "" {
-			for _, n := range resultNodes {
-				// 只为分组节点设置 tag，公共节点不设置
-				// 并且只在节点没有 tag 时设置
-				if n.Tags == "" && n.NodeGroupIds != nil && len(n.NodeGroupIds) > 0 {
-					n.Tags = nodeGroup.Name
-					r.log.Debugf("Set node_group name as tag for node %d: %s", n.ID, nodeGroup.Name)
-				}
+	if currentNodeGroup != nil && currentNodeGroup.Name != "" {
+		for _, n := range resultNodes {
+			// 只为分组节点设置 tag，公共节点不设置
+			// 并且只在节点没有 tag 时设置
+			if n.Tags == "" && n.NodeGroupIds != nil && len(n.NodeGroupIds) > 0 {
+				n.Tags = currentNodeGroup.Name
+				r.log.Debugf("Set node_group name as tag for node %d: %s", n.ID, currentNodeGroup.Name)
 			}
 		}
 	}
@@ -118,33 +130,39 @@ func resolveNodeGroupID(nodeGroupIDs []int64, preferred int64) int64 {
 // getNodesByTag 按照标签和节点ID获取节点
 func (r *publicSubscriptionRepo) getNodesByTag(ctx context.Context, subscribePlan *ent.ProxySubscribe) ([]*ent.ProxyNode, error) {
 	// 解析节点ID和标签
-	nodeIdsStr := subscribePlan.Nodes
+	rawNodeIDs := tool.StringToInt64Slice(subscribePlan.Nodes)
+	nodeIDs := make([]int64, 0, len(rawNodeIDs))
+	for _, id := range rawNodeIDs {
+		if id > 0 {
+			nodeIDs = append(nodeIDs, id)
+		}
+	}
 	tags := tool.StringToStringSlice(subscribePlan.NodeTags)
 	tags = tool.RemoveDuplicateElements(tags...)
 
-	r.log.Infof("Subscribe nodes: %v, tags: %v", nodeIdsStr, len(tags))
+	r.log.Infof("Subscribe nodes: raw=%v valid=%d, tags: %v", subscribePlan.Nodes, len(nodeIDs), len(tags))
 
-	// 如果没有指定节点和标签，返回空列表
-	if nodeIdsStr == "" && len(tags) == 0 {
+	// 如果没有指定有效节点和标签，返回空列表
+	if len(nodeIDs) == 0 && len(tags) == 0 {
 		return []*ent.ProxyNode{}, nil
 	}
 
 	// 构建节点查询
 	query := r.data.db.ProxyNode.Query().
-		Where(proxynode.EnabledEQ(true))
+		Where(
+			proxynode.EnabledEQ(true),
+			proxynode.IsHiddenEQ(false),
+		)
 
 	// 解析节点ID并添加到查询条件
-	if nodeIdsStr != "" {
-		nodeIds := tool.StringToInt64Slice(nodeIdsStr)
-		if len(nodeIds) > 0 {
-			anyNodeIds := make([]any, len(nodeIds))
-			for i, id := range nodeIds {
-				anyNodeIds[i] = id
-			}
-			query = query.Where(func(s *sql.Selector) {
-				s.Where(sql.In(proxynode.FieldID, anyNodeIds...))
-			})
+	if len(nodeIDs) > 0 {
+		anyNodeIds := make([]any, len(nodeIDs))
+		for i, id := range nodeIDs {
+			anyNodeIds[i] = id
 		}
+		query = query.Where(func(s *sql.Selector) {
+			s.Where(sql.In(proxynode.FieldID, anyNodeIds...))
+		})
 	}
 
 	// 根据标签过滤
@@ -176,4 +194,54 @@ func (r *publicSubscriptionRepo) getNodesByTag(ctx context.Context, subscribePla
 	}
 
 	return nodes, nil
+}
+
+const (
+	subscriptionNodeGroupTypeCommon      = "common"
+	subscriptionNodeGroupTypeSubscribe   = "subscribe"
+	subscriptionNodeGroupAccessSubscribe = "subscribe"
+)
+
+func normalizeSubscriptionNodeGroupType(groupType string) string {
+	switch strings.ToLower(strings.TrimSpace(groupType)) {
+	case "", subscriptionNodeGroupTypeCommon:
+		return subscriptionNodeGroupTypeCommon
+	case subscriptionNodeGroupTypeSubscribe:
+		return subscriptionNodeGroupTypeSubscribe
+	default:
+		return subscriptionNodeGroupTypeCommon
+	}
+}
+
+func isSubscriptionNodeGroupTypeAccessible(groupType, accessType string) bool {
+	switch accessType {
+	case subscriptionNodeGroupAccessSubscribe:
+		resolved := normalizeSubscriptionNodeGroupType(groupType)
+		return resolved == subscriptionNodeGroupTypeCommon || resolved == subscriptionNodeGroupTypeSubscribe
+	default:
+		return false
+	}
+}
+
+func (r *publicSubscriptionRepo) getAccessibleNodeGroupForSubscribe(ctx context.Context, nodeGroupID int64) (*ent.ProxyServerGroup, error) {
+	if nodeGroupID == 0 {
+		return nil, nil
+	}
+
+	nodeGroup, err := r.data.db.ProxyServerGroup.Get(ctx, nodeGroupID)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			r.log.Debugf("Subscribe node group %d not found", nodeGroupID)
+			return nil, nil
+		}
+		r.log.Errorf("Failed to query subscribe node group %d: %v", nodeGroupID, err)
+		return nil, err
+	}
+
+	if !isSubscriptionNodeGroupTypeAccessible(nodeGroup.GroupType, subscriptionNodeGroupAccessSubscribe) {
+		r.log.Infof("Subscribe node group %d is not accessible for subscribe output, type=%s", nodeGroupID, nodeGroup.GroupType)
+		return nil, nil
+	}
+
+	return nodeGroup, nil
 }
