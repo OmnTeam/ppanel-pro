@@ -7,20 +7,8 @@ import (
 
 	"github.com/OmnTeam/ppanel-pro/ent"
 	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
 	"github.com/OmnTeam/ppanel-pro/internal/data"
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/redis/go-redis/v9"
-)
-
-const (
-	compatLegacyCacheUserIDPrefix             = "cache:user:id:"
-	compatLegacyCacheUserEmailPrefix          = "cache:user:email:"
-	compatLegacyCacheUserSubscribeTokenPrefix = "cache:user:subscribe:token:"
-	compatLegacyCacheUserSubscribeUserPrefix  = "cache:user:subscribe:user:"
-	compatLegacyCacheUserSubscribeIDPrefix    = "cache:user:subscribe:id:"
-	compatLegacyCacheSubscribeIDPrefix        = "cache:subscribe:id:"
-	compatLegacyCacheSubscribeServersPrefix   = "cache:subscribe:servers:"
 )
 
 type compatPathTokenRequest struct {
@@ -111,95 +99,6 @@ func compatNormalizeConfigKey(key string) string {
 	key = strings.TrimSpace(strings.ToLower(key))
 	key = strings.ReplaceAll(key, "_", "")
 	return key
-}
-
-func compatUserEmails(ctx context.Context, dataLayer *data.Data, userID int64) ([]string, error) {
-	if dataLayer == nil || dataLayer.DB() == nil {
-		return nil, fmt.Errorf("data layer unavailable")
-	}
-
-	methods, err := dataLayer.DB().ProxyUserAuthMethod.Query().
-		Where(
-			proxyuserauthmethod.UserIDEQ(userID),
-			proxyuserauthmethod.AuthTypeEQ("email"),
-		).
-		All(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	result := make([]string, 0, len(methods))
-	for _, item := range methods {
-		if email := strings.TrimSpace(item.AuthIdentifier); email != "" {
-			result = append(result, email)
-		}
-	}
-	return result, nil
-}
-
-func compatDeleteKeys(ctx context.Context, rdb *redis.Client, keys ...string) {
-	if rdb == nil || len(keys) == 0 {
-		return
-	}
-
-	filtered := make([]string, 0, len(keys))
-	for _, key := range keys {
-		if key = strings.TrimSpace(key); key != "" {
-			filtered = append(filtered, key)
-		}
-	}
-	if len(filtered) == 0 {
-		return
-	}
-	_ = rdb.Del(ctx, filtered...).Err()
-}
-
-func compatClearUserCache(ctx context.Context, rdb *redis.Client, userID int64, extraEmails ...string) {
-	keys := []string{fmt.Sprintf("%s%d", compatLegacyCacheUserIDPrefix, userID)}
-	for _, email := range extraEmails {
-		if email = strings.TrimSpace(email); email != "" {
-			keys = append(keys, fmt.Sprintf("%s%s", compatLegacyCacheUserEmailPrefix, email))
-		}
-	}
-	compatDeleteKeys(ctx, rdb, keys...)
-}
-
-func compatClearUserSubscribeCaches(ctx context.Context, rdb *redis.Client, userSub *ent.ProxyUserSubscribe) {
-	if userSub == nil {
-		return
-	}
-
-	keys := []string{
-		fmt.Sprintf("%s%d", compatLegacyCacheUserSubscribeUserPrefix, userSub.UserID),
-		fmt.Sprintf("%s%d", compatLegacyCacheUserSubscribeIDPrefix, userSub.ID),
-	}
-	if userSub.Token != nil && strings.TrimSpace(*userSub.Token) != "" {
-		keys = append(keys, fmt.Sprintf("%s%s", compatLegacyCacheUserSubscribeTokenPrefix, *userSub.Token))
-	}
-	compatDeleteKeys(ctx, rdb, keys...)
-}
-
-func compatClearSubscribeCaches(ctx context.Context, rdb *redis.Client, subscribeID int64) {
-	compatDeleteKeys(
-		ctx,
-		rdb,
-		fmt.Sprintf("%s%d", compatLegacyCacheSubscribeIDPrefix, subscribeID),
-		fmt.Sprintf("%s%d", compatLegacyCacheSubscribeServersPrefix, subscribeID),
-	)
-}
-
-func compatValidateRequiredString(value, typeName, fieldName string) error {
-	if strings.TrimSpace(value) == "" {
-		return compatRequiredFieldError(typeName, fieldName)
-	}
-	return nil
-}
-
-func compatValidateRequiredInt(value int, typeName, fieldName string) error {
-	if value == 0 {
-		return compatRequiredFieldError(typeName, fieldName)
-	}
-	return nil
 }
 
 func compatRequiredFieldError(typeName, fieldName string) error {

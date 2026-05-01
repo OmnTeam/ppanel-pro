@@ -100,6 +100,7 @@ func (r *adminUserSubscribeRepo) GetUserSubscribe(ctx context.Context, req *v1.G
 			proxyusersubscribe.ExpireTimeGT(now),
 			proxyusersubscribe.FinishedAtGTE(sevenDaysAgo),
 			proxyusersubscribe.ExpireTimeEQ(time.UnixMilli(0)),
+			proxyusersubscribe.ExpireTimeIsNil(),
 		),
 	)
 
@@ -191,13 +192,7 @@ func (r *adminUserSubscribeRepo) CreateUserSubscribe(ctx context.Context, req *v
 	subscribeUUID := uuid.New().String()
 
 	startTime := time.Now()
-	var expireTime *time.Time
-	if req.ExpiredAt > 0 {
-		t := time.UnixMilli(req.ExpiredAt)
-		expireTime = &t
-	}
 
-	// 创建用户订阅
 	create := r.data.db.ProxyUserSubscribe.Create().
 		SetUserID(userID).
 		SetOrderID(0).
@@ -211,9 +206,10 @@ func (r *adminUserSubscribeRepo) CreateUserSubscribe(ctx context.Context, req *v
 		SetToken(tokenStr).
 		SetUUID(subscribeUUID).
 		SetStatus(1)
-	if expireTime != nil {
-		create = create.SetExpireTime(*expireTime)
+	if req.ExpiredAt > 0 {
+		create = create.SetExpireTime(time.UnixMilli(req.ExpiredAt))
 	}
+
 	created, err := create.Save(ctx)
 
 	if err != nil {

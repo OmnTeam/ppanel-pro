@@ -9,14 +9,11 @@ import (
 	publicpaymentservice "github.com/OmnTeam/ppanel-pro/internal/service/public/payment"
 	serverservice "github.com/OmnTeam/ppanel-pro/internal/service/server"
 
-	authbiz "github.com/OmnTeam/ppanel-pro/internal/biz/auth"
 	"github.com/OmnTeam/ppanel-pro/internal/conf"
 	"github.com/OmnTeam/ppanel-pro/internal/data"
 	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	"github.com/OmnTeam/ppanel-pro/pkg/constant"
 	kerrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
-	"github.com/go-kratos/kratos/v2/transport"
 	khttp "github.com/go-kratos/kratos/v2/transport/http"
 )
 
@@ -103,64 +100,4 @@ func compatCodeError(code int, msg string) error {
 
 func compatParamError(msg string) error {
 	return compatCodeError(400, msg)
-}
-
-func loginData(result interface{}) map[string]string {
-	loginResult := result.(*authbiz.LoginResult)
-	return map[string]string{"token": loginResult.Token}
-}
-
-func buildCompatRequestMeta(ctx context.Context, fallbackIP, fallbackUserAgent, fallbackLoginType, identifier, cfToken, captchaID, captchaCode, sliderToken string) authbiz.RequestMeta {
-	meta := authbiz.RequestMeta{
-		Identifier:  identifier,
-		LoginType:   fallbackLoginType,
-		IP:          fallbackIP,
-		UserAgent:   fallbackUserAgent,
-		CfToken:     cfToken,
-		CaptchaID:   captchaID,
-		CaptchaCode: captchaCode,
-		SliderToken: sliderToken,
-	}
-
-	if tr, ok := transport.FromServerContext(ctx); ok {
-		if loginType := firstCompatHeader(tr, "Login-Type"); loginType != "" {
-			meta.LoginType = loginType
-		}
-		if ip := firstCompatHeader(tr, "X-Original-Forwarded-For", "X-Forwarded-For", "X-Real-IP"); ip != "" {
-			meta.IP = firstCompatForwardedIP(ip)
-		}
-		if userAgent := firstCompatHeader(tr, "User-Agent"); userAgent != "" {
-			meta.UserAgent = userAgent
-		}
-	}
-
-	if meta.LoginType == "" {
-		if value, ok := ctx.Value(constant.LoginType).(string); ok {
-			meta.LoginType = value
-		}
-	}
-	if meta.Identifier == "" {
-		if value, ok := ctx.Value(constant.CtxKeyIdentifier).(string); ok {
-			meta.Identifier = value
-		}
-	}
-
-	return meta
-}
-
-func firstCompatHeader(tr transport.Transporter, keys ...string) string {
-	for _, key := range keys {
-		if value := strings.TrimSpace(tr.RequestHeader().Get(key)); value != "" {
-			return value
-		}
-	}
-	return ""
-}
-
-func firstCompatForwardedIP(raw string) string {
-	if raw == "" {
-		return ""
-	}
-	parts := strings.Split(raw, ",")
-	return strings.TrimSpace(parts[0])
 }
