@@ -42,8 +42,8 @@ log:
   # 是否关闭标准输出；false=同时输出到控制台，true=仅写文件
   disable_console: false
   # 日志输出路径：
-  # - 写目录，如 logs，会输出到 logs/ppanel-pro.log
-  # - 写文件，如 logs/ppanel-pro.log，会直接写入该文件
+  # - 写目录，如 logs，会输出到 logs/ppanel-pro.debug.log / info / warn / error
+  # - 写文件，如 logs/ppanel-pro.log，会直接拆分成 logs/ppanel-pro.debug.log / info / warn / error
   path: logs
   # 单个日志文件最大体积（MB），超过后轮转
   max_size_mb: 100

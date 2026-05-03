@@ -82,29 +82,27 @@ func New(cfg Config, serviceID, serviceName, serviceVersion string) (*zap.Logger
 	encoder := newEncoder(cfg.Format, encoderConfig)
 
 	cores := make([]zapcore.Core, 0, 2)
+	var fileLoggers *leveledLoggers
 
 	if !cfg.DisableConsole {
 		cores = append(cores, zapcore.NewCore(encoder, zapcore.AddSync(os.Stdout), level))
 	}
 
-	var rotateLogger *lumberjack.Logger
 	if cfg.Path != "" {
 		filePath, err := resolveLogPath(cfg.Path, serviceName)
 		if err != nil {
 			return nil, nil, err
 		}
-		if err := os.MkdirAll(filepath.Dir(filePath), 0o755); err != nil {
-			return nil, nil, fmt.Errorf("create log directory: %w", err)
+		fileLoggers, err = newLeveledLoggers(filePath, cfg)
+		if err != nil {
+			return nil, nil, err
 		}
-		rotateLogger = &lumberjack.Logger{
-			Filename:   filePath,
-			MaxSize:    cfg.MaxSizeMB,
-			MaxBackups: cfg.MaxBackups,
-			MaxAge:     cfg.MaxAgeDays,
-			Compress:   cfg.Compress,
-			LocalTime:  true,
-		}
-		cores = append(cores, zapcore.NewCore(encoder, zapcore.AddSync(rotateLogger), level))
+		cores = append(cores,
+			zapcore.NewCore(encoder, zapcore.AddSync(fileLoggers.debug), exactLevelEnabler(level, zap.DebugLevel)),
+			zapcore.NewCore(encoder, zapcore.AddSync(fileLoggers.info), exactLevelEnabler(level, zap.InfoLevel)),
+			zapcore.NewCore(encoder, zapcore.AddSync(fileLoggers.warn), exactLevelEnabler(level, zap.WarnLevel)),
+			zapcore.NewCore(encoder, zapcore.AddSync(fileLoggers.error), errorLevelEnabler(level)),
+		)
 	}
 
 	if len(cores) == 0 {
@@ -125,8 +123,8 @@ func New(cfg Config, serviceID, serviceName, serviceVersion string) (*zap.Logger
 		if err := base.Sync(); err != nil && !isIgnorableSyncError(err) {
 			firstErr = err
 		}
-		if rotateLogger != nil {
-			if err := rotateLogger.Close(); err != nil && firstErr == nil {
+		if fileLoggers != nil {
+			if err := fileLoggers.Close(); err != nil && firstErr == nil {
 				firstErr = err
 			}
 		}
@@ -142,6 +140,30 @@ func NewKratosLogger(base *zap.Logger) kratoslog.Logger {
 
 func NewPPanelWriter(base *zap.Logger) ppanellog.Writer {
 	return &ppanelZapWriter{logger: base.Named("ppanel")}
+}
+
+type leveledLoggers struct {
+	debug *lumberjack.Logger
+	info  *lumberjack.Logger
+	warn  *lumberjack.Logger
+	error *lumberjack.Logger
+}
+
+func (l *leveledLoggers) Close() error {
+	if l == nil {
+		return nil
+	}
+
+	var firstErr error
+	for _, logger := range []*lumberjack.Logger{l.debug, l.info, l.warn, l.error} {
+		if logger == nil {
+			continue
+		}
+		if err := logger.Close(); err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	return firstErr
 }
 
 type kratosZapLogger struct {
@@ -284,12 +306,56 @@ func newEncoder(format string, cfg zapcore.EncoderConfig) zapcore.Encoder {
 	return zapcore.NewJSONEncoder(cfg)
 }
 
+func newLeveledLoggers(basePath string, cfg Config) (*leveledLoggers, error) {
+	if err := os.MkdirAll(filepath.Dir(basePath), 0o755); err != nil {
+		return nil, fmt.Errorf("create log directory: %w", err)
+	}
+
+	build := func(path string) *lumberjack.Logger {
+		return &lumberjack.Logger{
+			Filename:   path,
+			MaxSize:    cfg.MaxSizeMB,
+			MaxBackups: cfg.MaxBackups,
+			MaxAge:     cfg.MaxAgeDays,
+			Compress:   cfg.Compress,
+			LocalTime:  true,
+		}
+	}
+
+	return &leveledLoggers{
+		debug: build(appendLevelSuffix(basePath, "debug")),
+		info:  build(appendLevelSuffix(basePath, "info")),
+		warn:  build(appendLevelSuffix(basePath, "warn")),
+		error: build(appendLevelSuffix(basePath, "error")),
+	}, nil
+}
+
 func resolveLogPath(pathValue, serviceName string) (string, error) {
 	cleaned := filepath.Clean(pathValue)
 	if cleaned == "." || cleaned == string(filepath.Separator) || filepath.Ext(cleaned) == "" {
 		return filepath.Join(cleaned, serviceName+".log"), nil
 	}
 	return cleaned, nil
+}
+
+func appendLevelSuffix(basePath, level string) string {
+	ext := filepath.Ext(basePath)
+	if ext == "" {
+		return basePath + "." + level
+	}
+	return strings.TrimSuffix(basePath, ext) + "." + level + ext
+}
+
+func exactLevelEnabler(global zap.AtomicLevel, target zapcore.Level) zap.LevelEnablerFunc {
+	return func(level zapcore.Level) bool {
+		return global.Enabled(level) && level == target
+	}
+}
+
+func errorLevelEnabler(global zap.AtomicLevel) zap.LevelEnablerFunc {
+	return func(level zapcore.Level) bool {
+		return global.Enabled(level) && level >= zap.ErrorLevel
+	}
 }
 
 func isIgnorableSyncError(err error) bool {
