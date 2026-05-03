@@ -2,10 +2,13 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/ppanel-pro/ent/proxysystemlog"
 	"github.com/OmnTeam/ppanel-pro/ent/proxytrafficlog"
+	"github.com/OmnTeam/ppanel-pro/internal/model"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/hibiken/asynq"
 	"github.com/redis/go-redis/v9"
@@ -61,10 +64,15 @@ func (h *TrafficStatHandler) ProcessTask(ctx context.Context, t *asynq.Task) err
 		// Continue processing
 	}
 
-	// 4. 缓存统计数据到Redis
+	// 4. 按老项目逻辑写入 system_logs，供控制台昨日/本月统计读取
+	if err := h.persistStatisticsLog(ctx, date, userTop10, serverTop10, totalTraffic); err != nil {
+		h.logger.WithContext(ctx).Errorf("[TrafficStatHandler] Failed to persist statistics log: %v", err)
+	}
+
+	// 5. 缓存统计数据到Redis
 	h.cacheStatistics(ctx, date, userTop10, serverTop10, totalTraffic)
 
-	// 5. 清理旧的流量日志（可选，根据配置）
+	// 6. 清理旧的流量日志（可选，根据配置）
 	// h.cleanOldTrafficLogs(ctx, end, 7) // 保留7天
 
 	h.logger.WithContext(ctx).Infof("[TrafficStatHandler] Traffic statistics task completed: date=%s, users=%d, servers=%d, total_upload=%d, total_download=%d",
@@ -226,6 +234,65 @@ func (h *TrafficStatHandler) processTotalTraffic(ctx context.Context, start, end
 	total.Total = total.Upload + total.Download
 
 	return total, nil
+}
+
+func (h *TrafficStatHandler) persistStatisticsLog(ctx context.Context, date string, userTop10 []*UserTrafficStat, serverTop10 []*ServerTrafficStat, totalTraffic *TotalTrafficStat) error {
+	userRank := model.UserTrafficRank{Rank: make([]model.UserTraffic, 0, len(userTop10))}
+	for _, stat := range userTop10 {
+		userRank.Rank = append(userRank.Rank, model.UserTraffic{
+			UserID:      stat.UserID,
+			SubscribeID: stat.SubscribeID,
+			Upload:      stat.Upload,
+			Download:    stat.Download,
+			Total:       stat.Total,
+		})
+	}
+
+	serverRank := model.ServerTrafficRank{Rank: make([]model.ServerTraffic, 0, len(serverTop10))}
+	for _, stat := range serverTop10 {
+		serverRank.Rank = append(serverRank.Rank, model.ServerTraffic{
+			ServerID: stat.ServerID,
+			Upload:   stat.Upload,
+			Download: stat.Download,
+			Total:    stat.Total,
+		})
+	}
+
+	payloads := []struct {
+		logType int8
+		data    any
+	}{
+		{logType: model.TypeUserTrafficRank, data: userRank},
+		{logType: model.TypeServerTrafficRank, data: serverRank},
+		{logType: model.TypeTrafficStat, data: model.TrafficStat{Upload: totalTraffic.Upload, Download: totalTraffic.Download, Total: totalTraffic.Total}},
+	}
+
+	for _, payload := range payloads {
+		content, err := json.Marshal(payload.data)
+		if err != nil {
+			return err
+		}
+
+		if _, err := h.db.ProxySystemLog.Delete().
+			Where(
+				proxysystemlog.TypeEQ(payload.logType),
+				proxysystemlog.DateEQ(date),
+			).Exec(ctx); err != nil {
+			return err
+		}
+
+		if _, err := h.db.ProxySystemLog.Create().
+			SetType(payload.logType).
+			SetDate(date).
+			SetObjectID(0).
+			SetContent(string(content)).
+			SetCreatedAt(time.Now()).
+			Save(ctx); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // cacheStatistics 缓存统计数据到Redis

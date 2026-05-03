@@ -318,7 +318,7 @@ func (r *serverNodeRepo) PushServerStatus(ctx context.Context, req *serverBiz.Pu
 
 // PushOnlineUsers 推送在线用户
 func (r *serverNodeRepo) PushOnlineUsers(ctx context.Context, req *serverBiz.PushOnlineUsersRequest) error {
-	if req == nil || req.ServerID <= 0 || len(req.Users) == 0 {
+	if req == nil || req.ServerID <= 0 {
 		return fmt.Errorf("invalid request parameters")
 	}
 	for _, user := range req.Users {
@@ -351,32 +351,29 @@ func (r *serverNodeRepo) PushOnlineUsers(ctx context.Context, req *serverBiz.Pus
 	// 格式：node:online:subscribe:{serverID}:{protocol}
 	key := fmt.Sprintf("node:online:subscribe:%d:%s", req.ServerID, req.Protocol)
 
-	// 序列化在线用户数据
-	data, err := json.Marshal(onlineUsers)
-	if err != nil {
-		r.log.Errorf("Marshal online users failed: %v", err)
-		return err
+	if len(onlineUsers) == 0 {
+		if err := r.data.rdb.Del(ctx, key).Err(); err != nil && err != redis.Nil {
+			r.log.Errorf("Redis Del failed: %v", err)
+			return err
+		}
+	} else {
+		// 序列化在线用户数据
+		data, err := json.Marshal(onlineUsers)
+		if err != nil {
+			r.log.Errorf("Marshal online users failed: %v", err)
+			return err
+		}
+
+		// 存储到Redis（设置过期时间为5分钟）
+		err = r.data.rdb.Set(ctx, key, data, 5*time.Minute).Err()
+		if err != nil {
+			r.log.Errorf("Redis Set failed: %v", err)
+			return err
+		}
 	}
 
-	// 存储到Redis（设置过期时间为5分钟）
-	err = r.data.rdb.Set(ctx, key, data, 5*time.Minute).Err()
-	if err != nil {
-		r.log.Errorf("Redis Set failed: %v", err)
-		return err
-	}
-
-	now := time.Now()
-	expireAt := now.Add(5 * time.Minute).Unix()
-	pipe := r.data.rdb.Pipeline()
-	pipe.ZRemRangeByScore(ctx, "node:online:subscribe:global", "-inf", fmt.Sprintf("%d", now.Unix()))
-	for subscribeID := range onlineUsers {
-		pipe.ZAdd(ctx, "node:online:subscribe:global", redis.Z{
-			Score:  float64(expireAt),
-			Member: subscribeID,
-		})
-	}
-	if _, err = pipe.Exec(ctx); err != nil {
-		r.log.Errorf("PushOnlineUsers update global online cache failed: %v", err)
+	if err := RebuildOnlineUserSubscribeGlobalCache(ctx, r.data.rdb); err != nil {
+		r.log.Errorf("PushOnlineUsers rebuild global online cache failed: %v", err)
 		return err
 	}
 

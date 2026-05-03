@@ -515,7 +515,7 @@ func (s *ServerService) CompatPushServerStatus(ctx context.Context, provider Com
 }
 
 func (s *ServerService) CompatPushOnlineUsers(ctx context.Context, provider CompatLegacyProvider, req *CompatLegacyPushOnlineUsersRequest) error {
-	if provider == nil || provider.DB() == nil || req == nil || req.ServerID <= 0 || len(req.Users) == 0 {
+	if provider == nil || provider.DB() == nil || req == nil || req.ServerID <= 0 {
 		return errors.New("invalid request parameters")
 	}
 	for i := range req.Users {
@@ -537,23 +537,22 @@ func (s *ServerService) CompatPushOnlineUsers(ctx context.Context, provider Comp
 		onlineUsers[user.SID] = compatAppendUniqueOnlineUserIP(onlineUsers[user.SID], user.IP)
 	}
 
-	encoded, err := json.Marshal(onlineUsers)
-	if err != nil {
-		return err
-	}
-	if err := provider.Redis().Set(ctx, fmt.Sprintf("node:online:subscribe:%d:%s", req.ServerID, req.Protocol), encoded, 5*time.Minute).Err(); err != nil {
-		return err
+	key := fmt.Sprintf("node:online:subscribe:%d:%s", req.ServerID, req.Protocol)
+	if len(onlineUsers) == 0 {
+		if err := provider.Redis().Del(ctx, key).Err(); err != nil && err != redis.Nil {
+			return err
+		}
+	} else {
+		encoded, err := json.Marshal(onlineUsers)
+		if err != nil {
+			return err
+		}
+		if err := provider.Redis().Set(ctx, key, encoded, 5*time.Minute).Err(); err != nil {
+			return err
+		}
 	}
 
-	now := time.Now()
-	expireAt := now.Add(5 * time.Minute).Unix()
-	pipe := provider.Redis().Pipeline()
-	pipe.ZRemRangeByScore(ctx, "node:online:subscribe:global", "-inf", fmt.Sprintf("%d", now.Unix()))
-	for subscribeID := range onlineUsers {
-		pipe.ZAdd(ctx, "node:online:subscribe:global", redis.Z{Score: float64(expireAt), Member: subscribeID})
-	}
-	_, err = pipe.Exec(ctx)
-	return err
+	return compatRebuildOnlineUserSubscribeGlobalCache(ctx, provider.Redis())
 }
 
 func (s *ServerService) CompatQueryServerProtocolConfig(ctx context.Context, provider CompatLegacyProvider, req *CompatLegacyQueryServerConfigRequest) (*CompatLegacyQueryServerConfigResponse, error) {
@@ -1030,6 +1029,78 @@ func compatSanitizeOutboundList(values []CompatLegacyNodeOutbound) []CompatLegac
 		return nil
 	}
 	return result
+}
+
+func compatRebuildOnlineUserSubscribeGlobalCache(ctx context.Context, rdb redis.UniversalClient) error {
+	if rdb == nil {
+		return nil
+	}
+
+	now := time.Now()
+	scores := make(map[int64]int64)
+	var cursor uint64
+
+	for {
+		keys, nextCursor, err := rdb.Scan(ctx, cursor, "node:online:subscribe:*", 200).Result()
+		if err != nil {
+			if err == redis.Nil {
+				break
+			}
+			return err
+		}
+		for _, key := range keys {
+			if key == "node:online:subscribe:global" {
+				continue
+			}
+			raw, err := rdb.Get(ctx, key).Result()
+			if err != nil {
+				if err == redis.Nil {
+					continue
+				}
+				return err
+			}
+			if raw == "" {
+				continue
+			}
+			ttl, err := rdb.TTL(ctx, key).Result()
+			if err != nil {
+				if err == redis.Nil {
+					continue
+				}
+				return err
+			}
+			if ttl <= 0 {
+				continue
+			}
+
+			var onlineUsers map[int64][]string
+			if err := json.Unmarshal([]byte(raw), &onlineUsers); err != nil {
+				continue
+			}
+
+			expireAt := now.Add(ttl).Unix()
+			for sid := range onlineUsers {
+				if expireAt > scores[sid] {
+					scores[sid] = expireAt
+				}
+			}
+		}
+		cursor = nextCursor
+		if cursor == 0 {
+			break
+		}
+	}
+
+	pipe := rdb.Pipeline()
+	pipe.Del(ctx, "node:online:subscribe:global")
+	for sid, expireAt := range scores {
+		pipe.ZAdd(ctx, "node:online:subscribe:global", redis.Z{
+			Score:  float64(expireAt),
+			Member: sid,
+		})
+	}
+	_, err := pipe.Exec(ctx)
+	return err
 }
 
 func compatNormalizeOnlineUserIP(ip string) (string, bool) {

@@ -345,20 +345,7 @@ func (uc *ServerUsecase) getOnlineUsers(ctx context.Context, serverID int64, pro
 			result = append(result, &ServerOnlineUser{IP: ipList, SubscribeID: subscribeID})
 		}
 	}
-	if len(result) == 0 {
-		allOnlineData, err := uc.repo.GetOnlineUsersByServer(ctx, serverID)
-		if err == nil {
-			for protocol, onlineData := range allOnlineData {
-				for subscribeID, ips := range onlineData {
-					ipList := make([]*ServerOnlineIP, 0, len(ips))
-					for _, ip := range ips {
-						ipList = append(ipList, &ServerOnlineIP{IP: ip, Protocol: protocol})
-					}
-					result = append(result, &ServerOnlineUser{IP: ipList, SubscribeID: subscribeID})
-				}
-			}
-		}
-	}
+
 	return uc.mergeOnlineUsers(ctx, result)
 }
 
@@ -383,3 +370,4 @@ func (uc *ServerUsecase) mergeOnlineUsers(ctx context.Context, users []*ServerOn
 	}
 	return result
 }
+
