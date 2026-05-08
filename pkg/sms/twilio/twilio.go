@@ -3,8 +3,8 @@ package twilio
 import (
 	"fmt"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/logger"
-	"github.com/OmnTeam/ppanel-pro/pkg/templatex"
+	"github.com/OmnTeam/npanel-pro/pkg/logger"
+	"github.com/OmnTeam/npanel-pro/pkg/templatex"
 	"github.com/twilio/twilio-go"
 	twilioApi "github.com/twilio/twilio-go/rest/api/v2010"
 )

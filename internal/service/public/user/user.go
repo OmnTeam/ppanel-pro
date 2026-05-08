@@ -8,11 +8,11 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/public/user/v1"
-	userBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/user"
-	withdrawalBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/withdrawal"
-	"github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/public/user/v1"
+	userBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/user"
+	withdrawalBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/withdrawal"
+	"github.com/OmnTeam/npanel-pro/internal/pkg/middleware"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 // UserService Public User服务实现

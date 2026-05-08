@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/server/v1"
-	serverBiz "github.com/OmnTeam/ppanel-pro/internal/biz/server"
+	v1 "github.com/OmnTeam/npanel-pro/api/server/v1"
+	serverBiz "github.com/OmnTeam/npanel-pro/internal/biz/server"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

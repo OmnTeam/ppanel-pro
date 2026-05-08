@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
-	serverbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/server"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxynode"
+	serverbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/server"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

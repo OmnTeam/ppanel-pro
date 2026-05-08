@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/tool/v1"
-	systembiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/system"
-	"github.com/OmnTeam/ppanel-pro/pkg/ip"
-	ppanelLogger "github.com/OmnTeam/ppanel-pro/pkg/logger"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/tool/v1"
+	systembiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/system"
+	"github.com/OmnTeam/npanel-pro/pkg/ip"
+	npanelLogger "github.com/OmnTeam/npanel-pro/pkg/logger"
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/structpb"
 )
@@ -32,7 +32,7 @@ func NewToolUseCase(logger log.Logger, systemUC *systembiz.SystemUsecase) *ToolU
 
 // GetSystemLog gets system logs
 func (uc *ToolUseCase) GetSystemLog(ctx context.Context, req *v1.GetSystemLogRequest) ([]*structpb.Struct, error) {
-	lines, err := ppanelLogger.ReadLastNLines("./logs", 50)
+	lines, err := npanelLogger.ReadLastNLines("./logs", 50)
 	if err != nil {
 		return nil, err
 	}

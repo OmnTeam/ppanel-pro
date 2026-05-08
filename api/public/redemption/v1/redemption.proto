@@ -4,7 +4,7 @@ package api.public.redemption.v1;
 
 import "google/api/annotations.proto";
 
-option go_package = "github.com/OmnTeam/ppanel-pro/api/public/redemption/v1;v1";
+option go_package = "github.com/OmnTeam/npanel-pro/api/public/redemption/v1;v1";
 option java_multiple_files = true;
 option java_package = "api.public.redemption.v1";
 

@@ -3,7 +3,7 @@ package data
 import (
 	"context"
 
-	serverbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/server"
+	serverbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/server"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

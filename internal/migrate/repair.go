@@ -3,7 +3,7 @@ package migrate
 import (
 	"context"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

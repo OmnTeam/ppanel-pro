@@ -9,9 +9,9 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptioncode"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptionrecord"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
+	"github.com/OmnTeam/npanel-pro/ent/proxyredemptioncode"
+	"github.com/OmnTeam/npanel-pro/ent/proxyredemptionrecord"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuser"
 )
 
 // ProxyRedemptionRecord is the model entity for the ProxyRedemptionRecord schema.

@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyads"
+	"github.com/OmnTeam/npanel-pro/ent/proxyads"
 )
 
 // ProxyAds is the model entity for the ProxyAds schema.

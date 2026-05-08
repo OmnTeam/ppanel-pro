@@ -6,9 +6,9 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/application/v1"
-	applicationbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/application"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/application/v1"
+	applicationbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/application"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 // SubscribeApplicationService 订阅应用配置服务

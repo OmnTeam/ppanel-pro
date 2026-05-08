@@ -1,6 +1,6 @@
 -- migrations/02008_create_user_reset_subscribe_log.up.sql
 -- Purpose: Create user_reset_subscribe_log table
--- Author: PPanel Team, 2025-04-22
+-- Author: NPanel Team, 2025-04-22
 
 CREATE TABLE IF NOT EXISTS `user_reset_subscribe_log`
 (

@@ -7,11 +7,11 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/user/v1"
-	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
-	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/user/v1"
+	userbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/user"
+	logmodel "github.com/OmnTeam/npanel-pro/internal/model/log"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 )
 
 // UserSubscribeService 用户订阅服务

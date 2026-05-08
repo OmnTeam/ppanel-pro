@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/random"
+	"github.com/OmnTeam/npanel-pro/pkg/random"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/fs"
+	"github.com/OmnTeam/npanel-pro/pkg/fs"
 	"github.com/stretchr/testify/assert"
 )
 

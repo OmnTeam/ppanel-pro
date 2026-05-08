@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/logger"
+	"github.com/OmnTeam/npanel-pro/pkg/logger"
 	"github.com/stretchr/testify/assert"
 )
 

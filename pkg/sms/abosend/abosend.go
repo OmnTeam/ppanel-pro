@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/random"
-	"github.com/OmnTeam/ppanel-pro/pkg/templatex"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/pkg/random"
+	"github.com/OmnTeam/npanel-pro/pkg/templatex"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 	"github.com/go-resty/resty/v2"
 )
 

@@ -3,8 +3,8 @@ package server
 import (
 	nethttp "net/http"
 
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
-	pkgmiddleware "github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
+	pkgmiddleware "github.com/OmnTeam/npanel-pro/internal/pkg/middleware"
 )
 
 func newCORSAwareFallbackHandler(corsConfig *conf.Server_CORS, statusCode int) nethttp.Handler {

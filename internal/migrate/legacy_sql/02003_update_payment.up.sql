@@ -1,6 +1,6 @@
 -- 2025-04-22 16:16:00
 -- Purpose: Update payment table
--- Author: PPanel Team, 2025-04-21
+-- Author: NPanel Team, 2025-04-21
 
 SET FOREIGN_KEY_CHECKS = 0;
 

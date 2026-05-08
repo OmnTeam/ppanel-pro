@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribeapplication"
+	"github.com/OmnTeam/npanel-pro/ent/proxysubscribeapplication"
 )
 
 // ProxySubscribeApplicationCreate is the builder for creating a ProxySubscribeApplication entity.

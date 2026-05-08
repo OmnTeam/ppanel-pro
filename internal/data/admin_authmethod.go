@@ -5,9 +5,9 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
-	authmethodbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/authmethod"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyauthmethod"
+	authmethodbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/authmethod"
 )
 
 type adminAuthMethodRepo struct {

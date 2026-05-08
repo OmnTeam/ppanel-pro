@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
 )
 
 type V2RayTransportOptions struct {

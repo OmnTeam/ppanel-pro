@@ -1,9 +1,9 @@
 package server
 
 import (
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
-	"github.com/OmnTeam/ppanel-pro/internal/data"
-	middleware2 "github.com/OmnTeam/ppanel-pro/internal/middleware"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
+	"github.com/OmnTeam/npanel-pro/internal/data"
+	middleware2 "github.com/OmnTeam/npanel-pro/internal/middleware"
 	"github.com/google/wire"
 )
 

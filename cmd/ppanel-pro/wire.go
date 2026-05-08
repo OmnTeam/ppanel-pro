@@ -6,11 +6,11 @@
 package main
 
 import (
-	"github.com/OmnTeam/ppanel-pro/internal/biz"
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
-	"github.com/OmnTeam/ppanel-pro/internal/data"
-	"github.com/OmnTeam/ppanel-pro/internal/server"
-	"github.com/OmnTeam/ppanel-pro/internal/service"
+	"github.com/OmnTeam/npanel-pro/internal/biz"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
+	"github.com/OmnTeam/npanel-pro/internal/data"
+	"github.com/OmnTeam/npanel-pro/internal/server"
+	"github.com/OmnTeam/npanel-pro/internal/service"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/log"

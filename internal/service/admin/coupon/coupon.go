@@ -4,10 +4,10 @@ import (
 	"context"
 	"strings"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/coupon/v1"
-	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/coupon"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/coupon/v1"
+	"github.com/OmnTeam/npanel-pro/internal/biz/admin/coupon"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 )
 
 func requireString(value string) error {

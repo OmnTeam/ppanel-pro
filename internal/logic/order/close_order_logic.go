@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyorder"
-	modellog "github.com/OmnTeam/ppanel-pro/internal/model/log"
-	"github.com/OmnTeam/ppanel-pro/internal/service"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyorder"
+	modellog "github.com/OmnTeam/npanel-pro/internal/model/log"
+	"github.com/OmnTeam/npanel-pro/internal/service"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

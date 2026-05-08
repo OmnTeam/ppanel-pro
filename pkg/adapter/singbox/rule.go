@@ -3,8 +3,8 @@ package singbox
 import (
 	"strconv"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/logger"
-	"github.com/OmnTeam/ppanel-pro/pkg/rules"
+	"github.com/OmnTeam/npanel-pro/pkg/logger"
+	"github.com/OmnTeam/npanel-pro/pkg/rules"
 )
 
 type Rule struct {

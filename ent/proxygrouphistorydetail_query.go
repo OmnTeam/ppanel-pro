@@ -11,8 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/OmnTeam/ppanel-pro/ent/predicate"
-	"github.com/OmnTeam/ppanel-pro/ent/proxygrouphistorydetail"
+	"github.com/OmnTeam/npanel-pro/ent/predicate"
+	"github.com/OmnTeam/npanel-pro/ent/proxygrouphistorydetail"
 )
 
 // ProxyGroupHistoryDetailQuery is the builder for querying ProxyGroupHistoryDetail entities.

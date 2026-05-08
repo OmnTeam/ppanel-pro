@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyticket"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyticketfollow"
-	ticketbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/ticket"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyticket"
+	"github.com/OmnTeam/npanel-pro/ent/proxyticketfollow"
+	ticketbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/ticket"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 )

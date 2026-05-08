@@ -39,7 +39,7 @@ func handleAppleCallBack(ctx context.Context, request CallbackRequest) {
 		ClientID:     ClientID,
 		KeyID:        KeyID,
 		ClientSecret: ClientSecret,
-		RedirectURI:  "https://test.ppanel.dev:8443/auth/apple/callback",
+		RedirectURI:  "https://test.npanel.dev:8443/auth/apple/callback",
 	})
 	if err != nil {
 		fmt.Println("error creating apple client: " + err.Error())

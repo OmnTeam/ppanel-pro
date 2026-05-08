@@ -8,7 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
+	"github.com/OmnTeam/npanel-pro/ent/proxypayment"
 )
 
 // ProxyPayment is the model entity for the ProxyPayment schema.

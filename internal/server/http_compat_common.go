@@ -6,12 +6,12 @@ import (
 	"strconv"
 	"strings"
 
-	publicpaymentservice "github.com/OmnTeam/ppanel-pro/internal/service/public/payment"
-	serverservice "github.com/OmnTeam/ppanel-pro/internal/service/server"
+	publicpaymentservice "github.com/OmnTeam/npanel-pro/internal/service/public/payment"
+	serverservice "github.com/OmnTeam/npanel-pro/internal/service/server"
 
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
-	"github.com/OmnTeam/ppanel-pro/internal/data"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
+	"github.com/OmnTeam/npanel-pro/internal/data"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	kerrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 	khttp "github.com/go-kratos/kratos/v2/transport/http"

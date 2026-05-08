@@ -1,6 +1,6 @@
 package singbox
 
-import "github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
+import "github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
 
 type AnyTLSOutboundOptions struct {
 	ServerOptions

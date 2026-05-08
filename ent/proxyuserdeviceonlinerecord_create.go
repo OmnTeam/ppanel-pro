@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdeviceonlinerecord"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuserdeviceonlinerecord"
 )
 
 // ProxyUserDeviceOnlineRecordCreate is the builder for creating a ProxyUserDeviceOnlineRecord entity.

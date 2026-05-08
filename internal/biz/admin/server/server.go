@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/internal/model/server"
-	"github.com/OmnTeam/ppanel-pro/pkg/ip"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/internal/model/server"
+	"github.com/OmnTeam/npanel-pro/pkg/ip"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/log"
 )
 
@@ -370,4 +370,3 @@ func (uc *ServerUsecase) mergeOnlineUsers(ctx context.Context, users []*ServerOn
 	}
 	return result
 }
-

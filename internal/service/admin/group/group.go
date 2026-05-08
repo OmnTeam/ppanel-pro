@@ -3,9 +3,9 @@ package group
 import (
 	"context"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/group/v1"
-	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/group"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/group/v1"
+	"github.com/OmnTeam/npanel-pro/internal/biz/admin/group"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 // GroupService group service implementation

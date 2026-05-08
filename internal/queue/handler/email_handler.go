@@ -7,11 +7,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxytask"
-	taskmodel "github.com/OmnTeam/ppanel-pro/internal/model/task"
-	"github.com/OmnTeam/ppanel-pro/pkg/email"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxytask"
+	taskmodel "github.com/OmnTeam/npanel-pro/internal/model/task"
+	"github.com/OmnTeam/npanel-pro/pkg/email"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/hibiken/asynq"
 )

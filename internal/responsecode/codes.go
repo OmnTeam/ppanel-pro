@@ -1,6 +1,6 @@
 package responsecode
 
-// 兼容 ppanel-server 的响应码表
+// 兼容 npanel-server 的响应码表
 // 保持当前 responsecode 实现方式，但返回码与旧项目完全一致
 
 const (

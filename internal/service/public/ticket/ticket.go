@@ -3,9 +3,9 @@ package ticket
 import (
 	"context"
 
-	pb "github.com/OmnTeam/ppanel-pro/api/public/ticket/v1"
-	ticketBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/ticket"
-	"github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
+	pb "github.com/OmnTeam/npanel-pro/api/public/ticket/v1"
+	ticketBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/ticket"
+	"github.com/OmnTeam/npanel-pro/internal/pkg/middleware"
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/emptypb"
 )

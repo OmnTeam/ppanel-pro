@@ -3,7 +3,7 @@ package general
 import (
 	"testing"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
 )
 
 func createServer() proxy.Proxy {

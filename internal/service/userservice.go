@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	pb "github.com/OmnTeam/ppanel-pro/api/admin/user/v1"
+	pb "github.com/OmnTeam/npanel-pro/api/admin/user/v1"
 )
 
 type UserServiceService struct {

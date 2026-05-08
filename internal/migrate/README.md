@@ -124,7 +124,7 @@ app:
 data:
   database:
     driver: mysql
-    source: root:password@tcp(127.0.0.1:3306)/ppanel_pro?parseTime=True&loc=Local
+    source: root:password@tcp(127.0.0.1:3306)/npanel_pro?parseTime=True&loc=Local
   redis:
     addr: 127.0.0.1:6379
     password:

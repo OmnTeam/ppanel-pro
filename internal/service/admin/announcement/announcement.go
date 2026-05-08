@@ -5,9 +5,9 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/announcement/v1"
-	announcementbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/announcement"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/announcement/v1"
+	announcementbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/announcement"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 // AnnouncementService 公告服务

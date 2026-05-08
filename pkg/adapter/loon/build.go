@@ -6,8 +6,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
-	"github.com/OmnTeam/ppanel-pro/pkg/logger"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/logger"
 )
 
 //go:embed *.tpl

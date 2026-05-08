@@ -5,14 +5,14 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyserver"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribeapplication"
-	applicationbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/application"
-	publicsubscriptionbiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
-	servermodel "github.com/OmnTeam/ppanel-pro/internal/model/server"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxynode"
+	"github.com/OmnTeam/npanel-pro/ent/proxyserver"
+	"github.com/OmnTeam/npanel-pro/ent/proxysubscribeapplication"
+	applicationbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/application"
+	publicsubscriptionbiz "github.com/OmnTeam/npanel-pro/internal/biz/public/subscription"
+	servermodel "github.com/OmnTeam/npanel-pro/internal/model/server"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 )
 
 type subscribeApplicationRepo struct {

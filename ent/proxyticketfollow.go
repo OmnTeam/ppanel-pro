@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyticketfollow"
+	"github.com/OmnTeam/npanel-pro/ent/proxyticketfollow"
 )
 
 // ProxyTicketFollow is the model entity for the ProxyTicketFollow schema.

@@ -3,9 +3,9 @@ package public
 import (
 	"context"
 
-	pb "github.com/OmnTeam/ppanel-pro/api/public/order/v1"
-	publicBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public"
-	"github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
+	pb "github.com/OmnTeam/npanel-pro/api/public/order/v1"
+	publicBiz "github.com/OmnTeam/npanel-pro/internal/biz/public"
+	"github.com/OmnTeam/npanel-pro/internal/pkg/middleware"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 

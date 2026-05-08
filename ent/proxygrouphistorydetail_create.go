@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/OmnTeam/ppanel-pro/ent/proxygrouphistorydetail"
+	"github.com/OmnTeam/npanel-pro/ent/proxygrouphistorydetail"
 )
 
 // ProxyGroupHistoryDetailCreate is the builder for creating a ProxyGroupHistoryDetail entity.

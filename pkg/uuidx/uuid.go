@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/random"
+	"github.com/OmnTeam/npanel-pro/pkg/random"
 	"github.com/gofrs/uuid/v5"
 )
 

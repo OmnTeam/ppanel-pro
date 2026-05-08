@@ -11,9 +11,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/OmnTeam/ppanel-pro/ent/predicate"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserwithdrawal"
+	"github.com/OmnTeam/npanel-pro/ent/predicate"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuser"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuserwithdrawal"
 )
 
 // ProxyUserWithdrawalQuery is the builder for querying ProxyUserWithdrawal entities.

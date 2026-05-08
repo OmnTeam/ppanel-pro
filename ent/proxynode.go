@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
+	"github.com/OmnTeam/npanel-pro/ent/proxynode"
 )
 
 // ProxyNode is the model entity for the ProxyNode schema.

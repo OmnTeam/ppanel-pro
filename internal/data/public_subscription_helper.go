@@ -4,11 +4,11 @@ import (
 	"context"
 	"strings"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyservergroup"
-	subscriptionbiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxynode"
+	"github.com/OmnTeam/npanel-pro/ent/proxyservergroup"
+	subscriptionbiz "github.com/OmnTeam/npanel-pro/internal/biz/public/subscription"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 )
 
 // getNodesByGroup 在开启节点分组时取节点：

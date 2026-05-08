@@ -10,8 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/OmnTeam/ppanel-pro/ent/predicate"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyschemamigrations"
+	"github.com/OmnTeam/npanel-pro/ent/predicate"
+	"github.com/OmnTeam/npanel-pro/ent/proxyschemamigrations"
 )
 
 // ProxySchemaMigrationsUpdate is the builder for updating ProxySchemaMigrations entities.

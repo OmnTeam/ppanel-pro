@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

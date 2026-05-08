@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/public/subscription/v1"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	v1 "github.com/OmnTeam/npanel-pro/api/public/subscription/v1"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 )
 
 var ErrLegacyAccessDenied = errors.New("access denied")

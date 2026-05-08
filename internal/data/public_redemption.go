@@ -1,8 +1,8 @@
 package data
 
 import (
-	"github.com/OmnTeam/ppanel-pro/ent"
-	redemptionBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/redemption"
+	"github.com/OmnTeam/npanel-pro/ent"
+	redemptionBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/redemption"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/hibiken/asynq"
 	"github.com/redis/go-redis/v9"

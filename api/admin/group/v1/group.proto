@@ -5,7 +5,7 @@ package api.admin.group.v1;
 import "google/api/annotations.proto";
 import "google/protobuf/wrappers.proto";
 
-option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/group/v1;v1";
+option go_package = "github.com/OmnTeam/npanel-pro/api/admin/group/v1;v1";
 option java_multiple_files = true;
 option java_package = "api.admin.group.v1";
 

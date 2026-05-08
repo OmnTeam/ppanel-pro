@@ -3,9 +3,9 @@ package subscribe
 import (
 	"context"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/subscribe/v1"
-	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/subscribe"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/subscribe/v1"
+	"github.com/OmnTeam/npanel-pro/internal/biz/admin/subscribe"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 // SubscribeService subscribe service implementation

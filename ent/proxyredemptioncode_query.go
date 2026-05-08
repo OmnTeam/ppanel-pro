@@ -12,9 +12,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/OmnTeam/ppanel-pro/ent/predicate"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptioncode"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptionrecord"
+	"github.com/OmnTeam/npanel-pro/ent/predicate"
+	"github.com/OmnTeam/npanel-pro/ent/proxyredemptioncode"
+	"github.com/OmnTeam/npanel-pro/ent/proxyredemptionrecord"
 )
 
 // ProxyRedemptionCodeQuery is the builder for querying ProxyRedemptionCode entities.

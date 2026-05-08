@@ -3,7 +3,7 @@ package tool
 import (
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/logger"
+	"github.com/OmnTeam/npanel-pro/pkg/logger"
 )
 
 func AddTime(unit string, quantity int64, baseTime ...time.Time) time.Time {

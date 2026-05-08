@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
 )
 
 // 生成 Trojan 配置

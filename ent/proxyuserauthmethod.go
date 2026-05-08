@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuserauthmethod"
 )
 
 // ProxyUserAuthMethod is the model entity for the ProxyUserAuthMethod schema.

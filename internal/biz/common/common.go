@@ -4,7 +4,7 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

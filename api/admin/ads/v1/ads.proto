@@ -5,7 +5,7 @@ package api.admin.ads.v1;
 import "google/api/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/ads/v1;v1";
+option go_package = "github.com/OmnTeam/npanel-pro/api/admin/ads/v1;v1";
 
 // 广告服务
 service AdsService {

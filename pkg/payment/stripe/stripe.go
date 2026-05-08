@@ -7,7 +7,7 @@ import (
 
 	"github.com/stripe/stripe-go/v81/webhookendpoint"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/logger"
+	"github.com/OmnTeam/npanel-pro/pkg/logger"
 	"github.com/stripe/stripe-go/v81"
 	"github.com/stripe/stripe-go/v81/customer"
 	"github.com/stripe/stripe-go/v81/ephemeralkey"

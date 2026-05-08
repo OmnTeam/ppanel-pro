@@ -4,8 +4,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/syncx"
-	"github.com/OmnTeam/ppanel-pro/pkg/timex"
+	"github.com/OmnTeam/npanel-pro/pkg/syncx"
+	"github.com/OmnTeam/npanel-pro/pkg/timex"
 )
 
 type limitedExecutor struct {

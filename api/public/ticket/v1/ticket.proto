@@ -5,7 +5,7 @@ package api.public.ticket.v1;
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-option go_package = "github.com/OmnTeam/ppanel-pro/api/public/ticket/v1;v1";
+option go_package = "github.com/OmnTeam/npanel-pro/api/public/ticket/v1;v1";
 option java_multiple_files = true;
 option java_package = "api.public.ticket.v1";
 

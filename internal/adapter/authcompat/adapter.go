@@ -3,9 +3,9 @@ package authcompat
 import (
 	"context"
 
-	authbiz "github.com/OmnTeam/ppanel-pro/internal/biz/auth"
-	"github.com/OmnTeam/ppanel-pro/internal/data"
-	authservice "github.com/OmnTeam/ppanel-pro/internal/service/auth"
+	authbiz "github.com/OmnTeam/npanel-pro/internal/biz/auth"
+	"github.com/OmnTeam/npanel-pro/internal/data"
+	authservice "github.com/OmnTeam/npanel-pro/internal/service/auth"
 )
 
 type adapter struct {

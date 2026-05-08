@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

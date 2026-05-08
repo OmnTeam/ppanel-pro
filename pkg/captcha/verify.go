@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/redis/go-redis/v9"
 )
 

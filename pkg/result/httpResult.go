@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/xerr"
+	"github.com/OmnTeam/npanel-pro/pkg/xerr"
 )
 
 // HttpResult HTTP Result

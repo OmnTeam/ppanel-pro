@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyannouncement"
+	"github.com/OmnTeam/npanel-pro/ent/proxyannouncement"
 )
 
 // ProxyAnnouncement is the model entity for the ProxyAnnouncement schema.

@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
-	"github.com/OmnTeam/ppanel-pro/internal/migrate"
-	"github.com/OmnTeam/ppanel-pro/internal/queue/handler"
-	"github.com/OmnTeam/ppanel-pro/internal/service"
-	"github.com/OmnTeam/ppanel-pro/pkg/device"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
+	"github.com/OmnTeam/npanel-pro/internal/migrate"
+	"github.com/OmnTeam/npanel-pro/internal/queue/handler"
+	"github.com/OmnTeam/npanel-pro/internal/service"
+	"github.com/OmnTeam/npanel-pro/pkg/device"
 
 	"github.com/go-kratos/kratos/v2/log"
 	_ "github.com/go-sql-driver/mysql"

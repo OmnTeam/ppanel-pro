@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/email/smtp"
-	"github.com/OmnTeam/ppanel-pro/pkg/logger"
+	"github.com/OmnTeam/npanel-pro/pkg/email/smtp"
+	"github.com/OmnTeam/npanel-pro/pkg/logger"
 )
 
 type Sender interface {

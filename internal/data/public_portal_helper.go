@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	portalBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/portal"
+	"github.com/OmnTeam/npanel-pro/ent"
+	portalBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/portal"
 )
 
 // SubscribeDiscount 订阅折扣配置

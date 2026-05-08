@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyads"
-	adsbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/ads"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyads"
+	adsbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/ads"
 
 	"github.com/go-kratos/kratos/v2/log"
 )

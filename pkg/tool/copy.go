@@ -10,7 +10,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/constant"
+	"github.com/OmnTeam/npanel-pro/pkg/constant"
 )
 
 // CopyOption 定义复制选项的函数类型

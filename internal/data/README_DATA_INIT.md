@@ -51,7 +51,7 @@
 服务启动时会自动执行数据初始化：
 ```bash
 # 正常启动服务
-./bin/ppanel-pro -conf ./configs
+./bin/npanel-pro -conf ./configs
 ```
 
 ### 2. 手动数据初始化
@@ -85,7 +85,7 @@ go run ./cmd/export-data -conf ./configs -output my_backup.json
 data:
   database:
     driver: mysql
-    source: root:password@tcp(127.0.0.1:3306)/ppanel_pro?parseTime=True&loc=Local
+    source: root:password@tcp(127.0.0.1:3306)/npanel_pro?parseTime=True&loc=Local
   redis:
     addr: 127.0.0.1:6379
     password:

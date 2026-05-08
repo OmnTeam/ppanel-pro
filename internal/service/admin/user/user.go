@@ -7,15 +7,15 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/user/v1"
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdevice"
-	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
-	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
-	"github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	"github.com/OmnTeam/ppanel-pro/pkg/phone"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/user/v1"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuserauthmethod"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuserdevice"
+	userbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/user"
+	logmodel "github.com/OmnTeam/npanel-pro/internal/model/log"
+	"github.com/OmnTeam/npanel-pro/internal/pkg/middleware"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/pkg/phone"
 )
 
 func parseStringInt64(s string) (int64, error) {

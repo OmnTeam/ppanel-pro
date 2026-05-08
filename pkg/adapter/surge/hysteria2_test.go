@@ -3,7 +3,7 @@ package surge
 import (
 	"testing"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
 )
 
 func TestBuildHysteria2(t *testing.T) {

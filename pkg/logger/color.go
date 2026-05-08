@@ -3,7 +3,7 @@ package logger
 import (
 	"sync/atomic"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/color"
+	"github.com/OmnTeam/npanel-pro/pkg/color"
 )
 
 // WithColor is a helper function to add color to a string, only in plain encoding

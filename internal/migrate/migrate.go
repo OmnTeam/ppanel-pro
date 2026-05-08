@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
-	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
-	"github.com/OmnTeam/ppanel-pro/internal/model/auth"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
-	"github.com/OmnTeam/ppanel-pro/pkg/uuidx"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyauthmethod"
+	"github.com/OmnTeam/npanel-pro/ent/proxypayment"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
+	"github.com/OmnTeam/npanel-pro/internal/model/auth"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/pkg/uuidx"
 
 	"github.com/go-kratos/kratos/v2/log"
 )

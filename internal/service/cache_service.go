@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyorder"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyorder"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuserauthmethod"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/redis/go-redis/v9"
 )

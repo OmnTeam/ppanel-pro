@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"time"
 
-	pb "github.com/OmnTeam/ppanel-pro/api/public/common/v1"
-	"github.com/OmnTeam/ppanel-pro/internal/biz/common"
+	pb "github.com/OmnTeam/npanel-pro/api/public/common/v1"
+	"github.com/OmnTeam/npanel-pro/internal/biz/common"
 )
 
 type CommonService struct {

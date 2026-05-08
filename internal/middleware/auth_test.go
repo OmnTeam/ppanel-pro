@@ -3,7 +3,7 @@ package middleware
 import (
 	"testing"
 
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
 )
 
 func TestShouldSkipAuthLegacyAnonymousCoverage(t *testing.T) {

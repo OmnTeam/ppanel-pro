@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	pb "github.com/OmnTeam/ppanel-pro/api/auth/oauth/v1"
-	"github.com/OmnTeam/ppanel-pro/internal/biz/auth/oauth"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	pb "github.com/OmnTeam/npanel-pro/api/auth/oauth/v1"
+	"github.com/OmnTeam/npanel-pro/internal/biz/auth/oauth"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/transport"
 )

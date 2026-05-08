@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyorder"
-	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
-	paymentBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/payment"
-	queueTypes "github.com/OmnTeam/ppanel-pro/internal/queue/types"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyorder"
+	"github.com/OmnTeam/npanel-pro/ent/proxypayment"
+	paymentBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/payment"
+	queueTypes "github.com/OmnTeam/npanel-pro/internal/queue/types"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/hibiken/asynq"
 )

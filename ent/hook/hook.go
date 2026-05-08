@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent"
 )
 
 // The ProxyAdsFunc type is an adapter to allow the use of ordinary

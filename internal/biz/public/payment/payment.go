@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
-	"github.com/OmnTeam/ppanel-pro/pkg/payment/alipay"
-	"github.com/OmnTeam/ppanel-pro/pkg/payment/epay"
-	"github.com/OmnTeam/ppanel-pro/pkg/payment/stripe"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
+	"github.com/OmnTeam/npanel-pro/pkg/payment/alipay"
+	"github.com/OmnTeam/npanel-pro/pkg/payment/epay"
+	"github.com/OmnTeam/npanel-pro/pkg/payment/stripe"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

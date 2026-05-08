@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
 )
 
 type v2rayShareLink struct {

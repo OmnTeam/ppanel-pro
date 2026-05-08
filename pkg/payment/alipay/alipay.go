@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/logger"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/pkg/logger"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 	"github.com/pkg/errors"
 	"github.com/smartwalle/alipay/v3"
 )

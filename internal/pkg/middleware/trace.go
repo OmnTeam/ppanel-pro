@@ -12,7 +12,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.24.0"
 	oteltrace "go.opentelemetry.io/otel/trace"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/trace"
+	"github.com/OmnTeam/npanel-pro/pkg/trace"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

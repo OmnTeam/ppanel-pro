@@ -42,8 +42,8 @@ log:
   # 是否关闭标准输出；false=同时输出到控制台，true=仅写文件
   disable_console: false
   # 日志输出路径：
-  # - 写目录，如 logs，会输出到 logs/ppanel-pro.debug.log / info / warn / error
-  # - 写文件，如 logs/ppanel-pro.log，会直接拆分成 logs/ppanel-pro.debug.log / info / warn / error
+  # - 写目录，如 logs，会输出到 logs/npanel-pro.debug.log / info / warn / error
+  # - 写文件，如 logs/npanel-pro.log，会直接拆分成 logs/npanel-pro.debug.log / info / warn / error
   path: logs
   # 单个日志文件最大体积（MB），超过后轮转
   max_size_mb: 100
@@ -57,7 +57,7 @@ log:
 data:
   database:
     driver: mysql
-    source: root:password@tcp(127.0.0.1:3306)/ppanel?parseTime=True&loc=Local
+    source: root:password@tcp(127.0.0.1:3306)/npanel?parseTime=True&loc=Local
   redis:
     addr: 127.0.0.1:6379
     password:
@@ -70,7 +70,7 @@ data:
 app:
   site:
     host: "localhost:8088"
-    site_name: "PPanel Pro"
+    site_name: "Next Panel Pro"
     site_desc: "Professional Panel Management System"
     site_logo: "/assets/logo.png"
     keywords: "panel,management,pro"
@@ -118,7 +118,7 @@ app:
     user_agent_list: ""
 
   admin:
-    email: "admin@qq.com"
+    email: "next@npanel.dev"
     password: "123456"
     algo: "default"
 

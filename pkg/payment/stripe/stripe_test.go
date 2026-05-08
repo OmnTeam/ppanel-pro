@@ -20,7 +20,7 @@ func TestStripeAlipay(t *testing.T) {
 	}
 	user := User{
 		UserId: 1,
-		Email:  "tension@ppanel.dev",
+		Email:  "tension@npanel.dev",
 	}
 	result, err := client.CreatePaymentSheet(&order, &user)
 	if err != nil {
@@ -45,7 +45,7 @@ func TestStripeWechat(t *testing.T) {
 	}
 	user := User{
 		UserId: 1,
-		Email:  "tension@ppanel.dev",
+		Email:  "tension@npanel.dev",
 	}
 	result, err := client.CreatePaymentSheet(&order, &user)
 	if err != nil {

@@ -10,9 +10,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptionrecord"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserwithdrawal"
+	"github.com/OmnTeam/npanel-pro/ent/proxyredemptionrecord"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuser"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuserwithdrawal"
 )
 
 // ProxyUserCreate is the builder for creating a ProxyUser entity.

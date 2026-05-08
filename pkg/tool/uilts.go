@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/hash"
-	"github.com/OmnTeam/ppanel-pro/pkg/jwt"
-	"github.com/OmnTeam/ppanel-pro/pkg/random"
-	"github.com/OmnTeam/ppanel-pro/pkg/snowflake"
+	"github.com/OmnTeam/npanel-pro/pkg/hash"
+	"github.com/OmnTeam/npanel-pro/pkg/jwt"
+	"github.com/OmnTeam/npanel-pro/pkg/random"
+	"github.com/OmnTeam/npanel-pro/pkg/snowflake"
 )
 
 func MicrosecondsStr(elapsed time.Duration) string {

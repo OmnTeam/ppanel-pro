@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
-	"github.com/OmnTeam/ppanel-pro/pkg/logger"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/logger"
 )
 
 func buildVMess(data proxy.Proxy, password string) string {

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package api.admin.log.v1;
 
-option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/log/v1;v1";
+option go_package = "github.com/OmnTeam/npanel-pro/api/admin/log/v1;v1";
 option java_multiple_files = true;
 option java_package = "api.admin.log.v1";
 

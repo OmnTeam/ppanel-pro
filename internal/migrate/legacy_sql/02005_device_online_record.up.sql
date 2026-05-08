@@ -1,6 +1,6 @@
 -- migrations/02005_create_user_device_online_record.up.sql
 -- Purpose: Create table for tracking user device online records
--- Author: PPanel Team, 2025-04-22
+-- Author: NPanel Team, 2025-04-22
 
 CREATE TABLE IF NOT EXISTS `user_device_online_record`
 (

@@ -49,7 +49,7 @@ export DEVICE_SECURITY_SECRET="your-device-secret-key-here"
 ### 1. 在服务中启用设备中间件
 
 ```go
-import "github.com/OmnTeam/ppanel-pro/internal/middleware"
+import "github.com/OmnTeam/npanel-pro/internal/middleware"
 
 // 创建服务上下文
 svc := &middleware.ServiceContext{
@@ -274,7 +274,7 @@ func (s *DeviceService) Login(ctx context.Context, req *pb.DeviceLoginRequest) (
 export LOG_LEVEL=debug
 
 # 启动服务
-go run ./cmd/ppanel-pro -conf=configs/config.yaml
+go run ./cmd/npanel-pro -conf=configs/config.yaml
 ```
 
 ### 监控加解密性能

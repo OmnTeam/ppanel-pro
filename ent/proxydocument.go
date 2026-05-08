@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxydocument"
+	"github.com/OmnTeam/npanel-pro/ent/proxydocument"
 )
 
 // ProxyDocument is the model entity for the ProxyDocument schema.

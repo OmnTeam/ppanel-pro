@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
-	publicsubscriptionbiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	publicsubscriptionbiz "github.com/OmnTeam/npanel-pro/internal/biz/public/subscription"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

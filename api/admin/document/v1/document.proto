@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/wrappers.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/document/v1;v1";
+option go_package = "github.com/OmnTeam/npanel-pro/api/admin/document/v1;v1";
 
 // 文档管理服务
 service DocumentService {

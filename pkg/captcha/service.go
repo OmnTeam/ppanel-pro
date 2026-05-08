@@ -3,7 +3,7 @@ package captcha
 import (
 	"context"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 	"github.com/redis/go-redis/v9"
 )
 

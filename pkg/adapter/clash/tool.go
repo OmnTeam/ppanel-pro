@@ -1,7 +1,7 @@
 package clash
 
 import (
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
 )
 
 func clashTransport(c *Proxy, transportType string, transportConfig proxy.TransportConfig) {

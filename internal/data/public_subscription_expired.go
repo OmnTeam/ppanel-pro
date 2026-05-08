@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyserver"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyservergroup"
-	subscriptionbiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
-	servermodel "github.com/OmnTeam/ppanel-pro/internal/model/server"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxynode"
+	"github.com/OmnTeam/npanel-pro/ent/proxyserver"
+	"github.com/OmnTeam/npanel-pro/ent/proxyservergroup"
+	subscriptionbiz "github.com/OmnTeam/npanel-pro/internal/biz/public/subscription"
+	servermodel "github.com/OmnTeam/npanel-pro/internal/model/server"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 )
 
 // createExpiredNodesFromDB 按照原项目逻辑从数据库获取过期节点组

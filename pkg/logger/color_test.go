@@ -4,7 +4,7 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/color"
+	"github.com/OmnTeam/npanel-pro/pkg/color"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/user/v1"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/user/v1"
 )
 
 // DeviceRepo 设备仓储接口

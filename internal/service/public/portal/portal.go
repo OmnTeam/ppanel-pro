@@ -6,8 +6,8 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/public/portal/v1"
-	portalBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/portal"
+	v1 "github.com/OmnTeam/npanel-pro/api/public/portal/v1"
+	portalBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/portal"
 )
 
 func convertPortalTrafficLimits(items []portalBiz.TrafficLimit) []*v1.TrafficLimit {

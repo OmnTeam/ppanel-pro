@@ -3,7 +3,7 @@ package logger
 // A LogConf is a logging config
 type LogConf struct {
 	// ServiceName represents the service name
-	ServiceName string `yaml:"ServiceName" default:"PPanel"`
+	ServiceName string `yaml:"ServiceName" default:"NPanel"`
 	// Mode represents the logging mode, default is `console`
 	// console: log to console
 	// file: log to file

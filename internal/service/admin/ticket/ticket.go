@@ -3,9 +3,9 @@ package ticket
 import (
 	"context"
 
-	pb "github.com/OmnTeam/ppanel-pro/api/admin/ticket/v1"
-	ticketbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/ticket"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	pb "github.com/OmnTeam/npanel-pro/api/admin/ticket/v1"
+	ticketbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/ticket"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 type TicketService struct {

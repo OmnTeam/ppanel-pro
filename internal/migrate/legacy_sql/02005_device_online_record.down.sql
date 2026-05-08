@@ -1,6 +1,6 @@
 -- migrations/02004_create_user_device_online_record.down.sql
 -- Purpose: Drop user device online record table
--- Author: PPanel Team, 2025-04-22
+-- Author: NPanel Team, 2025-04-22
 
 DROP TABLE IF EXISTS `user_device_online_record`;
 

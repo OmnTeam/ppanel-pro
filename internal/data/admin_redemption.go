@@ -7,13 +7,13 @@ import (
 	"math/big"
 	"time"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/redemption/v1"
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptioncode"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptionrecord"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribe"
-	redemptionbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/redemption"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/redemption/v1"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyredemptioncode"
+	"github.com/OmnTeam/npanel-pro/ent/proxyredemptionrecord"
+	"github.com/OmnTeam/npanel-pro/ent/proxysubscribe"
+	redemptionbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/redemption"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

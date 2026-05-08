@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/timex"
+	"github.com/OmnTeam/npanel-pro/pkg/timex"
 )
 
 type (

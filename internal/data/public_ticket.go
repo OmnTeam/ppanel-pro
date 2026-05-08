@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyticket"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyticketfollow"
-	ticketBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/ticket"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyticket"
+	"github.com/OmnTeam/npanel-pro/ent/proxyticketfollow"
+	ticketBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/ticket"
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 )

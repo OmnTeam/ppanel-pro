@@ -6,9 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v2/log"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxydocument"
-	documentbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/document"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxydocument"
+	documentbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/document"
 )
 
 type adminDocumentRepo struct {

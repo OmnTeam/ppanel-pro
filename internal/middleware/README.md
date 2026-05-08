@@ -92,7 +92,7 @@ svc.PanDomain() // 泛域名订阅处理
 ### 1. 创建服务上下文
 
 ```go
-import "github.com/OmnTeam/ppanel-pro/internal/middleware"
+import "github.com/OmnTeam/npanel-pro/internal/middleware"
 
 // 创建中间件服务上下文
 svc := &middleware.ServiceContext{
@@ -179,10 +179,10 @@ data:
 ```bash
 # 编译测试
 go build ./internal/middleware
-go build ./cmd/ppanel-pro
+go build ./cmd/npanel-pro
 
 # 启动测试
-go run ./cmd/ppanel-pro -conf=configs/config.yaml
+go run ./cmd/npanel-pro -conf=configs/config.yaml
 ```
 
 ## 📊 迁移状态

@@ -1,6 +1,6 @@
 -- migrations/02003_update_payment.down.sql
 -- Purpose: Revert updates to payment and order tables
--- Author: PPanel Team, 2025-04-21
+-- Author: NPanel Team, 2025-04-21
 
 SET FOREIGN_KEY_CHECKS = 0;
 

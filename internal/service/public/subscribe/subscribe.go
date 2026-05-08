@@ -3,9 +3,9 @@ package subscribe
 import (
 	"context"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/public/subscribe/v1"
-	subscribeBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscribe"
-	appmiddleware "github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
+	v1 "github.com/OmnTeam/npanel-pro/api/public/subscribe/v1"
+	subscribeBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/subscribe"
+	appmiddleware "github.com/OmnTeam/npanel-pro/internal/pkg/middleware"
 )
 
 type SubscribeService struct {

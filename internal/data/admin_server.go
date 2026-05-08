@@ -7,11 +7,11 @@ import (
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyserver"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
-	serverbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/server"
-	servermodel "github.com/OmnTeam/ppanel-pro/internal/model/server"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyserver"
+	"github.com/OmnTeam/npanel-pro/ent/proxyusersubscribe"
+	serverbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/server"
+	servermodel "github.com/OmnTeam/npanel-pro/internal/model/server"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/redis/go-redis/v9"
 )

@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysystemlog"
+	"github.com/OmnTeam/npanel-pro/ent/proxysystemlog"
 )
 
 // ProxySystemLogCreate is the builder for creating a ProxySystemLog entity.

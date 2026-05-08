@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/internal/model/auth"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	"github.com/OmnTeam/ppanel-pro/pkg/email"
-	"github.com/OmnTeam/ppanel-pro/pkg/sms"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
-	"github.com/OmnTeam/ppanel-pro/pkg/types"
+	"github.com/OmnTeam/npanel-pro/internal/model/auth"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/pkg/email"
+	"github.com/OmnTeam/npanel-pro/pkg/sms"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/pkg/types"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

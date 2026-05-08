@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"time"
 
-	pb "github.com/OmnTeam/ppanel-pro/api/admin/system/v1"
-	systembiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/system"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	pb "github.com/OmnTeam/npanel-pro/api/admin/system/v1"
+	systembiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/system"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

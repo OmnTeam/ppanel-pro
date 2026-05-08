@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/trace"
+	"github.com/OmnTeam/npanel-pro/pkg/trace"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/timex"
+	"github.com/OmnTeam/npanel-pro/pkg/timex"
 )
 
 // WithCallerSkip returns a Logger with given caller skip

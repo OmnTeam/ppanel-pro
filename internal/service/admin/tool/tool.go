@@ -3,9 +3,9 @@ package tool
 import (
 	"context"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/tool/v1"
-	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/tool"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/tool/v1"
+	"github.com/OmnTeam/npanel-pro/internal/biz/admin/tool"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 // ToolService tool service implementation

@@ -3,10 +3,10 @@ package server
 import (
 	"context"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/server/v1"
-	serverbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/server"
-	servermodel "github.com/OmnTeam/ppanel-pro/internal/model/server"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/server/v1"
+	serverbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/server"
+	servermodel "github.com/OmnTeam/npanel-pro/internal/model/server"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

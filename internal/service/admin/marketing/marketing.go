@@ -4,10 +4,10 @@ import (
 	"context"
 	"strings"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/marketing/v1"
-	marketingbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/marketing"
-	taskmodel "github.com/OmnTeam/ppanel-pro/internal/model/task"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/marketing/v1"
+	marketingbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/marketing"
+	taskmodel "github.com/OmnTeam/npanel-pro/internal/model/task"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

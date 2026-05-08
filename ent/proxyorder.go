@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyorder"
+	"github.com/OmnTeam/npanel-pro/ent/proxyorder"
 )
 
 // ProxyOrder is the model entity for the ProxyOrder schema.

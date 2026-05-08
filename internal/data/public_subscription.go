@@ -10,16 +10,16 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v2/log"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyserver"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribe"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribeapplication"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserauthmethod"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
-	subscriptionbiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
-	servermodel "github.com/OmnTeam/ppanel-pro/internal/model/server"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyserver"
+	"github.com/OmnTeam/npanel-pro/ent/proxysubscribe"
+	"github.com/OmnTeam/npanel-pro/ent/proxysubscribeapplication"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuser"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuserauthmethod"
+	"github.com/OmnTeam/npanel-pro/ent/proxyusersubscribe"
+	subscriptionbiz "github.com/OmnTeam/npanel-pro/internal/biz/public/subscription"
+	servermodel "github.com/OmnTeam/npanel-pro/internal/model/server"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 )
 
 type publicSubscriptionRepo struct {
@@ -409,7 +409,7 @@ func (r *publicSubscriptionRepo) GetSiteName(ctx context.Context) string {
 	if r.data.conf != nil && r.data.conf.Site != nil {
 		return r.data.conf.Site.SiteName
 	}
-	return "ppanel"
+	return "npanel"
 }
 
 func (r *publicSubscriptionRepo) GetSubscribeRuntimeConfig(ctx context.Context) (*subscriptionbiz.SubscribeRuntimeConfig, error) {

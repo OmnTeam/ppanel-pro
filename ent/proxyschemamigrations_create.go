@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyschemamigrations"
+	"github.com/OmnTeam/npanel-pro/ent/proxyschemamigrations"
 )
 
 // ProxySchemaMigrationsCreate is the builder for creating a ProxySchemaMigrations entity.

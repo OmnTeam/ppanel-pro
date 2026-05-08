@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxygrouphistory"
+	"github.com/OmnTeam/npanel-pro/ent/proxygrouphistory"
 )
 
 // ProxyGroupHistory is the model entity for the ProxyGroupHistory schema.

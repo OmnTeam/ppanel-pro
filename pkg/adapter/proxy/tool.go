@@ -2,7 +2,7 @@ package proxy
 
 import (
 	"encoding/base64"
-	"github.com/OmnTeam/ppanel-pro/pkg/uuidx"
+	"github.com/OmnTeam/npanel-pro/pkg/uuidx"
 )
 
 func GenerateShadowsocks2022Password(ss Shadowsocks, password string) (string, string) {

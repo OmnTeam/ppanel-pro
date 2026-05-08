@@ -5,9 +5,9 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/order/v1"
-	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/order"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/order/v1"
+	"github.com/OmnTeam/npanel-pro/internal/biz/admin/order"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 const (

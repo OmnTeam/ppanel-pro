@@ -7,9 +7,9 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/authmethod/v1"
-	authmethodbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/authmethod"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/authmethod/v1"
+	authmethodbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/authmethod"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 // AuthMethodService 认证方法服务

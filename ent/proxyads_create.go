@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyads"
+	"github.com/OmnTeam/npanel-pro/ent/proxyads"
 )
 
 // ProxyAdsCreate is the builder for creating a ProxyAds entity.

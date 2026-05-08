@@ -3,7 +3,7 @@ package data
 import (
 	"time"
 
-	queueTypes "github.com/OmnTeam/ppanel-pro/internal/queue/types"
+	queueTypes "github.com/OmnTeam/npanel-pro/internal/queue/types"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/hibiken/asynq"
 )

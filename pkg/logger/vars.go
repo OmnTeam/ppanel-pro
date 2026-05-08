@@ -3,7 +3,7 @@ package logger
 import (
 	"errors"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/syncx"
+	"github.com/OmnTeam/npanel-pro/pkg/syncx"
 )
 
 const (

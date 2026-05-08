@@ -8,11 +8,11 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/logger"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
-	"github.com/OmnTeam/ppanel-pro/pkg/traffic"
+	"github.com/OmnTeam/npanel-pro/pkg/logger"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/pkg/traffic"
 )
 
 //go:embed *.tpl

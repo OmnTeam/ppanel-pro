@@ -6,8 +6,8 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/public/payment/v1"
-	paymentBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/payment"
+	v1 "github.com/OmnTeam/npanel-pro/api/public/payment/v1"
+	paymentBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/payment"
 )
 
 // PaymentService Public Payment服务实现

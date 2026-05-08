@@ -7,9 +7,9 @@ func TestEmailSend(t *testing.T) {
 	config := &Config{
 		Host:     "smtp.mail.me.com",
 		Port:     587,
-		User:     "support@ppanel.dev",
+		User:     "support@npanel.dev",
 		Pass:     "password",
-		From:     "support@ppanel.dev",
+		From:     "support@npanel.dev",
 		SSL:      true,
 		SiteName: "",
 	}

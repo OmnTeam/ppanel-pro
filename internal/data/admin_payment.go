@@ -8,13 +8,13 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxypayment"
-	paymentbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/payment"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	paymentpkg "github.com/OmnTeam/ppanel-pro/pkg/payment"
-	stripepkg "github.com/OmnTeam/ppanel-pro/pkg/payment/stripe"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxypayment"
+	paymentbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/payment"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
+	paymentpkg "github.com/OmnTeam/npanel-pro/pkg/payment"
+	stripepkg "github.com/OmnTeam/npanel-pro/pkg/payment/stripe"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 )
 
 type adminPaymentRepo struct {

@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptioncode"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyredemptionrecord"
+	"github.com/OmnTeam/npanel-pro/ent/proxyredemptioncode"
+	"github.com/OmnTeam/npanel-pro/ent/proxyredemptionrecord"
 )
 
 // ProxyRedemptionCodeCreate is the builder for creating a ProxyRedemptionCode entity.

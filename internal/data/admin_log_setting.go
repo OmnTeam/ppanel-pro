@@ -4,10 +4,10 @@ import (
 	"context"
 	"strconv"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/log/v1"
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
-	logbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/log"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/log/v1"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxysystem"
+	logbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/log"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

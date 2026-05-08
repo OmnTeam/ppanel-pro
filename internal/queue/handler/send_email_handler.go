@@ -8,10 +8,10 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
-	queueTypes "github.com/OmnTeam/ppanel-pro/internal/queue/types"
-	"github.com/OmnTeam/ppanel-pro/pkg/email"
+	"github.com/OmnTeam/npanel-pro/ent"
+	logmodel "github.com/OmnTeam/npanel-pro/internal/model/log"
+	queueTypes "github.com/OmnTeam/npanel-pro/internal/queue/types"
+	"github.com/OmnTeam/npanel-pro/pkg/email"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/hibiken/asynq"
 )

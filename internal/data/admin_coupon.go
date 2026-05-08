@@ -6,9 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v2/log"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxycoupon"
-	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/coupon"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxycoupon"
+	"github.com/OmnTeam/npanel-pro/internal/biz/admin/coupon"
 )
 
 const couponModule = "data/admin_coupon"

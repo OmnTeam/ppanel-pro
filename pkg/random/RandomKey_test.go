@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/snowflake"
+	"github.com/OmnTeam/npanel-pro/pkg/snowflake"
 
 	"github.com/stretchr/testify/assert"
 )

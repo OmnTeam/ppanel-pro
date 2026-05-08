@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	bootstraplog "github.com/OmnTeam/ppanel-pro/internal/bootstrap/logging"
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
-	ppanelLogger "github.com/OmnTeam/ppanel-pro/pkg/logger"
+	bootstraplog "github.com/OmnTeam/npanel-pro/internal/bootstrap/logging"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
+	npanelLogger "github.com/OmnTeam/npanel-pro/pkg/logger"
 
 	"github.com/go-kratos/kratos/v2"
 	"github.com/go-kratos/kratos/v2/config"
@@ -54,7 +54,7 @@ func main() {
 	flag.Parse()
 
 	if Name == "" {
-		Name = "ppanel-pro"
+		Name = "npanel-pro"
 	}
 	if Version == "" {
 		Version = "dev"
@@ -97,7 +97,7 @@ func main() {
 		}
 	}()
 
-	ppanelLogger.SetWriter(bootstraplog.NewPPanelWriter(zapLogger))
+	npanelLogger.SetWriter(bootstraplog.NewNPanelWriter(zapLogger))
 
 	logger := log.With(
 		bootstraplog.NewKratosLogger(zapLogger),

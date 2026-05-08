@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
 	khttp "github.com/go-kratos/kratos/v2/transport/http"
 )
 

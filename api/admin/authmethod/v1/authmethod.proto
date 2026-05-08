@@ -7,7 +7,7 @@ import "google/protobuf/struct.proto";
 import "google/protobuf/wrappers.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/authmethod/v1;v1";
+option go_package = "github.com/OmnTeam/npanel-pro/api/admin/authmethod/v1;v1";
 
 // 认证方法服务
 service AuthMethodService {

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/predicate"
+	"github.com/OmnTeam/npanel-pro/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.

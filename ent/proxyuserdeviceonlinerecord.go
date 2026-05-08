@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserdeviceonlinerecord"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuserdeviceonlinerecord"
 )
 
 // ProxyUserDeviceOnlineRecord is the model entity for the ProxyUserDeviceOnlineRecord schema.

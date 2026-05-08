@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserwithdrawal"
-	"github.com/OmnTeam/ppanel-pro/internal/biz/public/withdrawal"
-	systemlog "github.com/OmnTeam/ppanel-pro/internal/model/log"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuserwithdrawal"
+	"github.com/OmnTeam/npanel-pro/internal/biz/public/withdrawal"
+	systemlog "github.com/OmnTeam/npanel-pro/internal/model/log"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

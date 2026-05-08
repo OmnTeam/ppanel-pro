@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/uuidx"
+	"github.com/OmnTeam/npanel-pro/pkg/uuidx"
 )
 
 func TestBuildSurfboard(t *testing.T) {

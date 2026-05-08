@@ -3,8 +3,8 @@ package syncx
 import (
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/lang"
-	"github.com/OmnTeam/ppanel-pro/pkg/timex"
+	"github.com/OmnTeam/npanel-pro/pkg/lang"
+	"github.com/OmnTeam/npanel-pro/pkg/timex"
 )
 
 // A Cond is used to wait for conditions

@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxynode"
-	"github.com/OmnTeam/ppanel-pro/ent/proxytrafficlog"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxynode"
+	"github.com/OmnTeam/npanel-pro/ent/proxytrafficlog"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/hibiken/asynq"
 	"github.com/redis/go-redis/v9"

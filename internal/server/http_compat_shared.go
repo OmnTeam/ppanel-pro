@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
-	"github.com/OmnTeam/ppanel-pro/internal/data"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxysystem"
+	"github.com/OmnTeam/npanel-pro/internal/data"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

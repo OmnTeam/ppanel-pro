@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribeapplication"
+	"github.com/OmnTeam/npanel-pro/ent/proxysubscribeapplication"
 )
 
 // ProxySubscribeApplication is the model entity for the ProxySubscribeApplication schema.

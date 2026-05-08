@@ -3,8 +3,8 @@ package smsbao
 import (
 	"fmt"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/templatex"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/pkg/templatex"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 	"github.com/go-resty/resty/v2"
 )
 

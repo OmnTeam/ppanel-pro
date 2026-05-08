@@ -1,7 +1,7 @@
 package singbox
 
 import (
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
 )
 
 type VMessOutboundOptions struct {

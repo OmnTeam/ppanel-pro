@@ -6,11 +6,11 @@ import (
 	"sort"
 	"time"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/log/v1"
-	"github.com/OmnTeam/ppanel-pro/ent"
-	logbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/log"
-	logmodel "github.com/OmnTeam/ppanel-pro/internal/model/log"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/log/v1"
+	"github.com/OmnTeam/npanel-pro/ent"
+	logbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/log"
+	logmodel "github.com/OmnTeam/npanel-pro/internal/model/log"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

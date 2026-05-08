@@ -4,10 +4,10 @@ import (
 	"context"
 	"strings"
 
-	pb "github.com/OmnTeam/ppanel-pro/api/public/auth/v1"
-	authbiz "github.com/OmnTeam/ppanel-pro/internal/biz/auth"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	"github.com/OmnTeam/ppanel-pro/pkg/constant"
+	pb "github.com/OmnTeam/npanel-pro/api/public/auth/v1"
+	authbiz "github.com/OmnTeam/npanel-pro/internal/biz/auth"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/pkg/constant"
 	"github.com/go-kratos/kratos/v2/transport"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )

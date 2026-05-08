@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/timex"
+	"github.com/OmnTeam/npanel-pro/pkg/timex"
 	"github.com/stretchr/testify/assert"
 )
 

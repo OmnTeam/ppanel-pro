@@ -5,8 +5,8 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/user/v1"
-	"github.com/OmnTeam/ppanel-pro/ent"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/user/v1"
+	"github.com/OmnTeam/npanel-pro/ent"
 )
 
 // AuthMethodRepo 认证方法仓储接口

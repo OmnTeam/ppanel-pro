@@ -3,9 +3,9 @@ package console
 import (
 	"context"
 
-	"github.com/OmnTeam/ppanel-pro/api/admin/console/v1"
-	consolebiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/console"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/api/admin/console/v1"
+	consolebiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/console"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

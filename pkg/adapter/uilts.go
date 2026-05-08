@@ -5,10 +5,10 @@ import (
 	"log"
 	"strings"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
-	"github.com/OmnTeam/ppanel-pro/pkg/logger"
-	"github.com/OmnTeam/ppanel-pro/pkg/random"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/logger"
+	"github.com/OmnTeam/npanel-pro/pkg/random"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 )
 
 // addNode creates a new proxy node based on the provided server data and host/port

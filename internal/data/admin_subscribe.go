@@ -8,13 +8,13 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribe"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysubscribegroup"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyusersubscribe"
-	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/subscribe"
-	"github.com/OmnTeam/ppanel-pro/internal/model"
-	"github.com/OmnTeam/ppanel-pro/pkg/uuidx"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxysubscribe"
+	"github.com/OmnTeam/npanel-pro/ent/proxysubscribegroup"
+	"github.com/OmnTeam/npanel-pro/ent/proxyusersubscribe"
+	"github.com/OmnTeam/npanel-pro/internal/biz/admin/subscribe"
+	"github.com/OmnTeam/npanel-pro/internal/model"
+	"github.com/OmnTeam/npanel-pro/pkg/uuidx"
 )
 
 const subscribeModule = "data/admin_subscribe"

@@ -20,8 +20,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/random"
-	"github.com/OmnTeam/ppanel-pro/pkg/snowflake"
+	"github.com/OmnTeam/npanel-pro/pkg/random"
+	"github.com/OmnTeam/npanel-pro/pkg/snowflake"
 
 	"github.com/gofrs/uuid/v5"
 )

@@ -10,7 +10,7 @@ import (
 func TestAes(t *testing.T) {
 	params := map[string]interface{}{
 		"method":   "email",
-		"account":  "admin@ppanel.dev",
+		"account":  "admin@npanel.dev",
 		"password": "password",
 	}
 	marshal, _ := json.Marshal(params)

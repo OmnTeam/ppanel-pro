@@ -5,7 +5,7 @@ package api.admin.announcement.v1;
 import "google/api/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/announcement/v1;v1";
+option go_package = "github.com/OmnTeam/npanel-pro/api/admin/announcement/v1;v1";
 
 // 公告服务
 service AnnouncementService {

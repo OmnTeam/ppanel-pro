@@ -6,7 +6,7 @@ import (
 	"io"
 	"testing"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/logger"
+	"github.com/OmnTeam/npanel-pro/pkg/logger"
 )
 
 type Buffer struct {

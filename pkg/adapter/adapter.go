@@ -3,16 +3,16 @@ package adapter
 import (
 	"embed"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/clash"
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/general"
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/loon"
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/quantumultx"
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/shadowrocket"
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/singbox"
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/surfboard"
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/surge"
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/v2rayn"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/clash"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/general"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/loon"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/quantumultx"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/shadowrocket"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/singbox"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/surfboard"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/surge"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/v2rayn"
 )
 
 //go:embed template/*

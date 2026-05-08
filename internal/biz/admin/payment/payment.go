@@ -3,9 +3,9 @@ package payment
 import (
 	"context"
 
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	paymentPkg "github.com/OmnTeam/ppanel-pro/pkg/payment"
-	"github.com/OmnTeam/ppanel-pro/pkg/types"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
+	paymentPkg "github.com/OmnTeam/npanel-pro/pkg/payment"
+	"github.com/OmnTeam/npanel-pro/pkg/types"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

@@ -4,8 +4,8 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxysystem"
 )
 
 func loadSystemConfigMap(ctx context.Context, client *ent.Client, category string) (map[string]string, error) {

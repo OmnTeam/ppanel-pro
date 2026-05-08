@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	"github.com/OmnTeam/ppanel-pro/pkg/oauth/apple"
-	"github.com/OmnTeam/ppanel-pro/pkg/oauth/google"
-	"github.com/OmnTeam/ppanel-pro/pkg/oauth/telegram"
-	"github.com/OmnTeam/ppanel-pro/pkg/random"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/pkg/oauth/apple"
+	"github.com/OmnTeam/npanel-pro/pkg/oauth/google"
+	"github.com/OmnTeam/npanel-pro/pkg/oauth/telegram"
+	"github.com/OmnTeam/npanel-pro/pkg/random"
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 	"golang.org/x/oauth2"
@@ -25,7 +25,7 @@ const (
 	OAuthFacebook = "facebook"
 
 	// Telegram特殊常量
-	TelegramDomain = "ppanel.com"
+	TelegramDomain = "npanel.com"
 	AuthExpire     = 86400 // 24小时（秒）
 )
 

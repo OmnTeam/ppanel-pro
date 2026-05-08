@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package api.admin.user.v1;
 
-option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/user/v1;v1";
+option go_package = "github.com/OmnTeam/npanel-pro/api/admin/user/v1;v1";
 
 import "google/api/annotations.proto";
 

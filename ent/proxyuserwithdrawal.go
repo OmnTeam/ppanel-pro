@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuser"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyuserwithdrawal"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuser"
+	"github.com/OmnTeam/npanel-pro/ent/proxyuserwithdrawal"
 )
 
 // ProxyUserWithdrawal is the model entity for the ProxyUserWithdrawal schema.

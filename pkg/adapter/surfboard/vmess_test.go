@@ -3,7 +3,7 @@ package surfboard
 import (
 	"testing"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
 )
 
 func createVMess() proxy.Proxy {

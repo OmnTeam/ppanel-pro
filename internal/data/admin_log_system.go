@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysystemlog"
-	logbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/log"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxysystemlog"
+	logbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/log"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

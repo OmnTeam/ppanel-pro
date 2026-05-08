@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
-	queueTypes "github.com/OmnTeam/ppanel-pro/internal/queue/types"
-	"github.com/OmnTeam/ppanel-pro/internal/service"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
+	queueTypes "github.com/OmnTeam/npanel-pro/internal/queue/types"
+	"github.com/OmnTeam/npanel-pro/internal/service"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/hibiken/asynq"
 	"github.com/redis/go-redis/v9"

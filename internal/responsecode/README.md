@@ -36,9 +36,9 @@ package service
 
 import (
     "context"
-    v1 "github.com/OmnTeam/ppanel-pro/api/coupon/v1"
-    "github.com/OmnTeam/ppanel-pro/internal/biz"
-    "github.com/OmnTeam/ppanel-pro/internal/responsecode"
+    v1 "github.com/OmnTeam/npanel-pro/api/coupon/v1"
+    "github.com/OmnTeam/npanel-pro/internal/biz"
+    "github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 func (s *CouponService) CreateCoupon(ctx context.Context, req *v1.CreateCouponRequest) (*v1.CouponReply, error) {
@@ -59,7 +59,7 @@ func (s *CouponService) CreateCoupon(ctx context.Context, req *v1.CreateCouponRe
 package biz
 
 import (
-    "github.com/OmnTeam/ppanel-pro/internal/responsecode"
+    "github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 // 示例1: 参数验证错误
@@ -152,7 +152,7 @@ func (uc *UserUsecase) CreateUser(ctx context.Context, email string) (*User, err
 package data
 
 import (
-    "github.com/OmnTeam/ppanel-pro/internal/responsecode"
+    "github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 // 示例1: 数据库查询错误

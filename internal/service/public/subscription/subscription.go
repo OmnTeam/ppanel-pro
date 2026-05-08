@@ -3,9 +3,9 @@ package subscription
 import (
 	"context"
 
-	pb "github.com/OmnTeam/ppanel-pro/api/public/subscription/v1"
-	subscriptionbiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
-	"github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
+	pb "github.com/OmnTeam/npanel-pro/api/public/subscription/v1"
+	subscriptionbiz "github.com/OmnTeam/npanel-pro/internal/biz/public/subscription"
+	"github.com/OmnTeam/npanel-pro/internal/pkg/middleware"
 )
 
 type PublicSubscriptionService struct {

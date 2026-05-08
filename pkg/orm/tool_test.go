@@ -3,7 +3,7 @@ package orm
 import (
 	"testing"
 
-	"github.com/OmnTeam/ppanel-pro/internal/model/task"
+	"github.com/OmnTeam/npanel-pro/internal/model/task"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

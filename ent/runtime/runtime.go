@@ -2,7 +2,7 @@
 
 package runtime
 
-// The schema-stitching logic is generated in github.com/OmnTeam/ppanel-pro/ent/runtime.go
+// The schema-stitching logic is generated in github.com/OmnTeam/npanel-pro/ent/runtime.go
 
 const (
 	Version = "v0.14.5"                                         // Version of ent codegen.

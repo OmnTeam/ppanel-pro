@@ -4,7 +4,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/errorx"
+	"github.com/OmnTeam/npanel-pro/pkg/errorx"
 )
 
 // A ResourceManager is a manager that used to manage resources

@@ -7,9 +7,9 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	subscriptionbiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/subscription"
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	subscriptionbiz "github.com/OmnTeam/npanel-pro/internal/biz/public/subscription"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 )
 
 // PanDomainMiddleware 泛域名订阅中间件

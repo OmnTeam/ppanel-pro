@@ -5,7 +5,7 @@ package api.admin.redemption.v1;
 import "google/api/annotations.proto";
 import "validate/validate.proto";
 
-option go_package = "github.com/OmnTeam/ppanel-pro/api/admin/redemption/v1;v1";
+option go_package = "github.com/OmnTeam/npanel-pro/api/admin/redemption/v1;v1";
 option java_multiple_files = true;
 option java_package = "api.admin.redemption.v1";
 

@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/internal/logic/order"
-	"github.com/OmnTeam/ppanel-pro/internal/queue/types"
-	"github.com/OmnTeam/ppanel-pro/internal/service"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/internal/logic/order"
+	"github.com/OmnTeam/npanel-pro/internal/queue/types"
+	"github.com/OmnTeam/npanel-pro/internal/service"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/hibiken/asynq"
 )

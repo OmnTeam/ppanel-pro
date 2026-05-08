@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"strings"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/payment/v1"
-	paymentbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/payment"
-	middleware "github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	paymentpkg "github.com/OmnTeam/ppanel-pro/pkg/payment"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/payment/v1"
+	paymentbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/payment"
+	middleware "github.com/OmnTeam/npanel-pro/internal/pkg/middleware"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
+	paymentpkg "github.com/OmnTeam/npanel-pro/pkg/payment"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/structpb"
 )

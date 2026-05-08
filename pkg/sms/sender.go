@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/sms/abosend"
-	"github.com/OmnTeam/ppanel-pro/pkg/sms/alibabacloud"
-	"github.com/OmnTeam/ppanel-pro/pkg/sms/smsbao"
-	"github.com/OmnTeam/ppanel-pro/pkg/sms/twilio"
+	"github.com/OmnTeam/npanel-pro/pkg/sms/abosend"
+	"github.com/OmnTeam/npanel-pro/pkg/sms/alibabacloud"
+	"github.com/OmnTeam/npanel-pro/pkg/sms/smsbao"
+	"github.com/OmnTeam/npanel-pro/pkg/sms/twilio"
 )
 
 type Sender interface {

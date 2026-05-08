@@ -3,9 +3,9 @@ package data
 import (
 	"context"
 
-	"github.com/OmnTeam/ppanel-pro/ent/proxyannouncement"
-	announcementBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/announcement"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/ent/proxyannouncement"
+	announcementBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/announcement"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
 

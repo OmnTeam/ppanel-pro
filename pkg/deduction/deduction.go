@@ -6,7 +6,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
 )
 
 const (

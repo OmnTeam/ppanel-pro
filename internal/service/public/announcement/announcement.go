@@ -3,8 +3,8 @@ package announcement
 import (
 	"context"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/public/announcement/v1"
-	announcementBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/announcement"
+	v1 "github.com/OmnTeam/npanel-pro/api/public/announcement/v1"
+	announcementBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/announcement"
 )
 
 // AnnouncementService Public Announcement服务实现

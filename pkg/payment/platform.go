@@ -1,6 +1,6 @@
 package payment
 
-import "github.com/OmnTeam/ppanel-pro/pkg/types"
+import "github.com/OmnTeam/npanel-pro/pkg/types"
 
 type Platform int
 

@@ -10,7 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/OmnTeam/ppanel-pro/ent/proxydocument"
+	"github.com/OmnTeam/npanel-pro/ent/proxydocument"
 )
 
 // ProxyDocumentCreate is the builder for creating a ProxyDocument entity.

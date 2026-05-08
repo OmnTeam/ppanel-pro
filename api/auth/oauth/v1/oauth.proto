@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package api.auth.oauth.v1;
 
-option go_package = "github.com/OmnTeam/ppanel-pro/api/auth/oauth/v1;v1";
+option go_package = "github.com/OmnTeam/npanel-pro/api/auth/oauth/v1;v1";
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";

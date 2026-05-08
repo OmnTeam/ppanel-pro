@@ -5,7 +5,7 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent"
 )
 
 // OrderRepo is the interface for order repository

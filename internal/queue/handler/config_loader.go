@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyauthmethod"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
-	authmodel "github.com/OmnTeam/ppanel-pro/internal/model/auth"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyauthmethod"
+	"github.com/OmnTeam/npanel-pro/ent/proxysystem"
+	authmodel "github.com/OmnTeam/npanel-pro/internal/model/auth"
 )
 
 type queueEmailConfig struct {

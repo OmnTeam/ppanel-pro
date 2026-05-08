@@ -11,12 +11,12 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	"github.com/OmnTeam/ppanel-pro/pkg/constant"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/pkg/constant"
 	"github.com/go-kratos/kratos/v2/log"
 
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
-	pkgaes "github.com/OmnTeam/ppanel-pro/pkg/aes"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
+	pkgaes "github.com/OmnTeam/npanel-pro/pkg/aes"
 )
 
 const (

@@ -3,9 +3,9 @@ package redemption
 import (
 	"context"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/redemption/v1"
-	"github.com/OmnTeam/ppanel-pro/internal/biz/admin/redemption"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/redemption/v1"
+	"github.com/OmnTeam/npanel-pro/internal/biz/admin/redemption"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 // RedemptionService redemption service implementation

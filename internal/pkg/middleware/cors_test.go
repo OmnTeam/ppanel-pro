@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/OmnTeam/ppanel-pro/internal/conf"
+	"github.com/OmnTeam/npanel-pro/internal/conf"
 )
 
 func TestCORSFilterPreflightUsesConfig(t *testing.T) {

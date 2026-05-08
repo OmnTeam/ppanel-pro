@@ -5,12 +5,12 @@ package enttest
 import (
 	"context"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent"
 	// required by schema hooks.
-	_ "github.com/OmnTeam/ppanel-pro/ent/runtime"
+	_ "github.com/OmnTeam/npanel-pro/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
-	"github.com/OmnTeam/ppanel-pro/ent/migrate"
+	"github.com/OmnTeam/npanel-pro/ent/migrate"
 )
 
 type (

@@ -3,10 +3,10 @@ package redemption
 import (
 	"context"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/public/redemption/v1"
-	redemptionBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/redemption"
-	"github.com/OmnTeam/ppanel-pro/internal/pkg/middleware"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
+	v1 "github.com/OmnTeam/npanel-pro/api/public/redemption/v1"
+	redemptionBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/redemption"
+	"github.com/OmnTeam/npanel-pro/internal/pkg/middleware"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 )
 
 // RedemptionService 兑换码服务

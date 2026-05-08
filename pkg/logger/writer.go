@@ -11,8 +11,8 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/color"
-	"github.com/OmnTeam/ppanel-pro/pkg/errorx"
+	"github.com/OmnTeam/npanel-pro/pkg/color"
+	"github.com/OmnTeam/npanel-pro/pkg/errorx"
 	fatihcolor "github.com/fatih/color"
 )
 

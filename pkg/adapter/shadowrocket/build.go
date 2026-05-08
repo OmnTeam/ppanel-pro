@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/general"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/general"
 
 	"encoding/base64"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
-	"github.com/OmnTeam/ppanel-pro/pkg/traffic"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/traffic"
 )
 
 type UserInfo struct {

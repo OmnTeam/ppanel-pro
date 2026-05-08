@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/OmnTeam/ppanel-pro/ent/proxysystem"
+	"github.com/OmnTeam/npanel-pro/ent/proxysystem"
 )
 
 // ProxySystem is the model entity for the ProxySystem schema.

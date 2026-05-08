@@ -5,8 +5,8 @@ import (
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/public/document/v1"
-	documentBiz "github.com/OmnTeam/ppanel-pro/internal/biz/public/document"
+	v1 "github.com/OmnTeam/npanel-pro/api/public/document/v1"
+	documentBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/document"
 )
 
 // DocumentService Public Document服务实现

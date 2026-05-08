@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/OmnTeam/ppanel-pro/pkg/constant"
-	"github.com/OmnTeam/ppanel-pro/pkg/tool"
-	"github.com/OmnTeam/ppanel-pro/pkg/uuidx"
+	"github.com/OmnTeam/npanel-pro/pkg/constant"
+	"github.com/OmnTeam/npanel-pro/pkg/tool"
+	"github.com/OmnTeam/npanel-pro/pkg/uuidx"
 )
 
 type sessionTokenOptions struct {

@@ -5,10 +5,10 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 
-	v1 "github.com/OmnTeam/ppanel-pro/api/admin/user/v1"
-	userbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/user"
-	"github.com/OmnTeam/ppanel-pro/internal/responsecode"
-	"github.com/OmnTeam/ppanel-pro/pkg/phone"
+	v1 "github.com/OmnTeam/npanel-pro/api/admin/user/v1"
+	userbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/user"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
+	"github.com/OmnTeam/npanel-pro/pkg/phone"
 )
 
 // UserAuthMethodService 用户认证方法服务

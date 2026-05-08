@@ -1,4 +1,4 @@
-module github.com/OmnTeam/ppanel-pro
+module github.com/OmnTeam/npanel-pro
 
 go 1.24.0
 

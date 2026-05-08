@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	ppanellog "github.com/OmnTeam/ppanel-pro/pkg/logger"
+	npanellog "github.com/OmnTeam/npanel-pro/pkg/logger"
 	kratoslog "github.com/go-kratos/kratos/v2/log"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -39,7 +39,7 @@ func DefaultConfig(serviceName string) Config {
 
 func New(cfg Config, serviceID, serviceName, serviceVersion string) (*zap.Logger, func() error, error) {
 	if serviceName == "" {
-		serviceName = "ppanel-pro"
+		serviceName = "npanel-pro"
 	}
 	if serviceVersion == "" {
 		serviceVersion = "dev"
@@ -138,8 +138,8 @@ func NewKratosLogger(base *zap.Logger) kratoslog.Logger {
 	return &kratosZapLogger{logger: base.Named("kratos")}
 }
 
-func NewPPanelWriter(base *zap.Logger) ppanellog.Writer {
-	return &ppanelZapWriter{logger: base.Named("ppanel")}
+func NewNPanelWriter(base *zap.Logger) npanellog.Writer {
+	return &npanelZapWriter{logger: base.Named("npanel")}
 }
 
 type leveledLoggers struct {
@@ -187,44 +187,44 @@ func (l *kratosZapLogger) Log(level kratoslog.Level, keyvals ...interface{}) err
 	return nil
 }
 
-type ppanelZapWriter struct {
+type npanelZapWriter struct {
 	logger *zap.Logger
 }
 
-func (w *ppanelZapWriter) Alert(v any) {
+func (w *npanelZapWriter) Alert(v any) {
 	w.logger.Warn(stringify(v), zap.String("kind", "alert"))
 }
 
-func (w *ppanelZapWriter) Close() error {
+func (w *npanelZapWriter) Close() error {
 	return nil
 }
 
-func (w *ppanelZapWriter) Debug(v any, fields ...ppanellog.LogField) {
+func (w *npanelZapWriter) Debug(v any, fields ...npanellog.LogField) {
 	w.logger.Debug(stringify(v), toZapFields(fields)...)
 }
 
-func (w *ppanelZapWriter) Error(v any, fields ...ppanellog.LogField) {
+func (w *npanelZapWriter) Error(v any, fields ...npanellog.LogField) {
 	w.logger.Error(stringify(v), toZapFields(fields)...)
 }
 
-func (w *ppanelZapWriter) Info(v any, fields ...ppanellog.LogField) {
+func (w *npanelZapWriter) Info(v any, fields ...npanellog.LogField) {
 	w.logger.Info(stringify(v), toZapFields(fields)...)
 }
 
-func (w *ppanelZapWriter) Severe(v any) {
+func (w *npanelZapWriter) Severe(v any) {
 	w.logger.Error(stringify(v), zap.String("kind", "severe"))
 }
 
-func (w *ppanelZapWriter) Slow(v any, fields ...ppanellog.LogField) {
+func (w *npanelZapWriter) Slow(v any, fields ...npanellog.LogField) {
 	baseFields := append([]zap.Field{zap.String("kind", "slow")}, toZapFields(fields)...)
 	w.logger.Warn(stringify(v), baseFields...)
 }
 
-func (w *ppanelZapWriter) Stack(v any) {
+func (w *npanelZapWriter) Stack(v any) {
 	w.logger.Error(stringify(v), zap.String("kind", "stack"))
 }
 
-func (w *ppanelZapWriter) Stat(v any, fields ...ppanellog.LogField) {
+func (w *npanelZapWriter) Stat(v any, fields ...npanellog.LogField) {
 	baseFields := append([]zap.Field{zap.String("kind", "stat")}, toZapFields(fields)...)
 	w.logger.Info(stringify(v), baseFields...)
 }
@@ -262,7 +262,7 @@ func splitKeyvals(keyvals []interface{}) (string, []zap.Field) {
 	return msg, fields
 }
 
-func toZapFields(fields []ppanellog.LogField) []zap.Field {
+func toZapFields(fields []npanellog.LogField) []zap.Field {
 	if len(fields) == 0 {
 		return nil
 	}

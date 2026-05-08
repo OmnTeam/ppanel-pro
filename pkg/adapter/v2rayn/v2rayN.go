@@ -1,8 +1,8 @@
 package v2rayn
 
 import (
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/general"
-	"github.com/OmnTeam/ppanel-pro/pkg/adapter/proxy"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/general"
+	"github.com/OmnTeam/npanel-pro/pkg/adapter/proxy"
 )
 
 type v2rayShareLink struct {

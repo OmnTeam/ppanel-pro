@@ -7,9 +7,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/go-kratos/kratos/v2/log"
 
-	"github.com/OmnTeam/ppanel-pro/ent"
-	"github.com/OmnTeam/ppanel-pro/ent/proxyannouncement"
-	announcementbiz "github.com/OmnTeam/ppanel-pro/internal/biz/admin/announcement"
+	"github.com/OmnTeam/npanel-pro/ent"
+	"github.com/OmnTeam/npanel-pro/ent/proxyannouncement"
+	announcementbiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/announcement"
 )
 
 type adminAnnouncementRepo struct {
