@@ -12,8 +12,8 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     env:
-      APP_NAME: npanel-pro
-      BUILD_CMD: ./cmd/npanel-pro
+      APP_NAME: ppanel-pro
+      BUILD_CMD: ./cmd/ppanel-pro
       CGO_ENABLED: '0'
     strategy:
       fail-fast: false
@@ -88,4 +88,3 @@ jobs:
           generate_release_notes: true
           draft: false
           prerelease: false
-
