@@ -587,6 +587,12 @@ func (r *serverNodeRepo) QueryServerProtocolConfig(ctx context.Context, serverID
 			SimnetReverseListenPort:       int32(serverNodeMapInt64(p["simnet_reverse_listen_port"])),
 			SimnetReverseTargetHost:       serverNodeMapString(p["simnet_reverse_target_host"]),
 			SimnetReverseTargetPort:       int32(serverNodeMapInt64(p["simnet_reverse_target_port"])),
+			SimnetFallbackEnabled:         serverNodeMapBool(p["simnet_fallback_enabled"]),
+			SimnetFallbackTargetScheme:    serverNodeMapString(p["simnet_fallback_target_scheme"]),
+			SimnetFallbackTargetHost:      serverNodeMapString(p["simnet_fallback_target_host"]),
+			SimnetFallbackTargetPort:      int32(serverNodeMapInt64(p["simnet_fallback_target_port"])),
+			SimnetFallbackHostHeader:      serverNodeMapString(p["simnet_fallback_host_header"]),
+			SimnetFallbackTLSSNI:          serverNodeMapString(p["simnet_fallback_tls_sni"]),
 		})
 	}
 

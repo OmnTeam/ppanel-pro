@@ -8732,6 +8732,19 @@ components:
                 simnetReverseTargetPort:
                     type: integer
                     format: int32
+                simnetFallbackEnabled:
+                    type: boolean
+                simnetFallbackTargetScheme:
+                    type: string
+                simnetFallbackTargetHost:
+                    type: string
+                simnetFallbackTargetPort:
+                    type: integer
+                    format: int32
+                simnetFallbackHostHeader:
+                    type: string
+                simnetFallbackTlsSni:
+                    type: string
             description: Protocol represents a server protocol configuration with all fields
         api.admin.server.v1.QueryNodeTagData:
             type: object
@@ -13954,6 +13967,19 @@ components:
                 simnetReverseTargetPort:
                     type: integer
                     format: int32
+                simnetFallbackEnabled:
+                    type: boolean
+                simnetFallbackTargetScheme:
+                    type: string
+                simnetFallbackTargetHost:
+                    type: string
+                simnetFallbackTargetPort:
+                    type: integer
+                    format: int32
+                simnetFallbackHostHeader:
+                    type: string
+                simnetFallbackTlsSni:
+                    type: string
             description: Protocol 协议配置
         api.server.v1.PushOnlineUsersReply:
             type: object

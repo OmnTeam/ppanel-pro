@@ -143,6 +143,12 @@ type Protocol struct {
 	SimnetReverseListenPort       int32
 	SimnetReverseTargetHost       string
 	SimnetReverseTargetPort       int32
+	SimnetFallbackEnabled         bool
+	SimnetFallbackTargetScheme    string
+	SimnetFallbackTargetHost      string
+	SimnetFallbackTargetPort      int32
+	SimnetFallbackHostHeader      string
+	SimnetFallbackTLSSNI          string
 }
 
 // ProtocolConfig 协议配置响应

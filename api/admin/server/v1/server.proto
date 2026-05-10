@@ -182,6 +182,12 @@ message Protocol {
   int32 simnet_reverse_listen_port = 64;
   string simnet_reverse_target_host = 65;
   int32 simnet_reverse_target_port = 66;
+  bool simnet_fallback_enabled = 67;
+  string simnet_fallback_target_scheme = 68;
+  string simnet_fallback_target_host = 69;
+  int32 simnet_fallback_target_port = 70;
+  string simnet_fallback_host_header = 71;
+  string simnet_fallback_tls_sni = 72;
 }
 
 message SortItem {

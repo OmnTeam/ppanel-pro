@@ -272,6 +272,12 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 			SimnetReverseListenPort:       protocol.SimnetReverseListenPort,
 			SimnetReverseTargetHost:       protocol.SimnetReverseTargetHost,
 			SimnetReverseTargetPort:       protocol.SimnetReverseTargetPort,
+			SimnetFallbackEnabled:         protocol.SimnetFallbackEnabled,
+			SimnetFallbackTargetScheme:    protocol.SimnetFallbackTargetScheme,
+			SimnetFallbackTargetHost:      protocol.SimnetFallbackTargetHost,
+			SimnetFallbackTargetPort:      protocol.SimnetFallbackTargetPort,
+			SimnetFallbackHostHeader:      protocol.SimnetFallbackHostHeader,
+			SimnetFallbackTlsSni:          protocol.SimnetFallbackTLSSNI,
 		})
 	}
 

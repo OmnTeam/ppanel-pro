@@ -70,6 +70,12 @@ type Protocol struct {
 	SimnetReverseListenPort       int32   `json:"simnet_reverse_listen_port,omitempty"`
 	SimnetReverseTargetHost       string  `json:"simnet_reverse_target_host,omitempty"`
 	SimnetReverseTargetPort       int32   `json:"simnet_reverse_target_port,omitempty"`
+	SimnetFallbackEnabled         bool    `json:"simnet_fallback_enabled,omitempty"`
+	SimnetFallbackTargetScheme    string  `json:"simnet_fallback_target_scheme,omitempty"`
+	SimnetFallbackTargetHost      string  `json:"simnet_fallback_target_host,omitempty"`
+	SimnetFallbackTargetPort      int32   `json:"simnet_fallback_target_port,omitempty"`
+	SimnetFallbackHostHeader      string  `json:"simnet_fallback_host_header,omitempty"`
+	SimnetFallbackTLSSNI          string  `json:"simnet_fallback_tls_sni,omitempty"`
 }
 
 // MarshalProtocols converts protocol array to JSON string
