@@ -396,14 +396,17 @@ func registerLegacyServerCompatRoutes(r *khttp.Router, dataLayer *data.Data, ser
 
 	r.POST("/v1/server/online", func(ctx khttp.Context) error {
 		var req compatLegacyPushOnlineUsersRequest
-		if err := ctx.Bind(&req); err != nil {
-			return compatLegacyServerJSONError(ctx, err)
-		}
 		if err := ctx.BindQuery(&req.compatLegacyServerCommon); err != nil {
 			return compatLegacyServerJSONError(ctx, err)
 		}
-		log.Infof("/v1/server/online req body: %v", req)
 		compatLegacyPopulateV1ServerCommon(ctx.Request(), &req.compatLegacyServerCommon)
+		var body struct {
+			Users []compatLegacyOnlineUser `json:"users"`
+		}
+		if err := json.NewDecoder(ctx.Request().Body).Decode(&body); err != nil {
+			return compatLegacyServerJSONError(ctx, err)
+		}
+		req.Users = body.Users
 		if !serverService.CompatV1ServerSecretAllowed(ctx, provider, req.SecretKey) {
 			return ctx.String(http.StatusForbidden, "Forbidden")
 		}
