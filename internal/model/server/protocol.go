@@ -65,6 +65,11 @@ type Protocol struct {
 	SimnetAfHandshakePolymorphism bool    `json:"simnet_af_handshake_polymorphism,omitempty"`
 	SimnetAfSettingsJitter        bool    `json:"simnet_af_settings_jitter,omitempty"`
 	SimnetAfFakeHeaderInjection   bool    `json:"simnet_af_fake_header_injection,omitempty"`
+	SimnetReverseEnabled          bool    `json:"simnet_reverse_enabled,omitempty"`
+	SimnetReverseListenAddr       string  `json:"simnet_reverse_listen_addr,omitempty"`
+	SimnetReverseListenPort       int32   `json:"simnet_reverse_listen_port,omitempty"`
+	SimnetReverseTargetHost       string  `json:"simnet_reverse_target_host,omitempty"`
+	SimnetReverseTargetPort       int32   `json:"simnet_reverse_target_port,omitempty"`
 }
 
 // MarshalProtocols converts protocol array to JSON string

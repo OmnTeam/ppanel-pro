@@ -177,6 +177,11 @@ message Protocol {
   bool simnet_af_handshake_polymorphism = 59;
   bool simnet_af_settings_jitter = 60;
   bool simnet_af_fake_header_injection = 61;
+  bool simnet_reverse_enabled = 62;
+  string simnet_reverse_listen_addr = 63;
+  int32 simnet_reverse_listen_port = 64;
+  string simnet_reverse_target_host = 65;
+  int32 simnet_reverse_target_port = 66;
 }
 
 message SortItem {

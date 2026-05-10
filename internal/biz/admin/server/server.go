@@ -127,6 +127,54 @@ func NewServerUsecase(repo ServerRepo, nodeRepo NodeRepo, logger log.Logger) *Se
 	return &ServerUsecase{repo: repo, nodeRepo: nodeRepo, log: log.NewHelper(logger)}
 }
 
+func normalizeSimnetProtocol(protocol *server.Protocol, address string) {
+	if protocol.Type != "simnet" {
+		return
+	}
+	if protocol.Port == 0 {
+		protocol.Port = 443
+	}
+	if protocol.SimnetCarrier == "" || protocol.SimnetCarrier == "grpc" {
+		protocol.SimnetCarrier = "h2"
+	}
+	if protocol.CertMode == "http" || protocol.CertMode == "dns" {
+		if strings.TrimSpace(protocol.SNI) == "" && isLikelyDomainAddress(address) {
+			protocol.SNI = strings.TrimSpace(address)
+		}
+		if protocol.Security == "" || protocol.Security == "none" {
+			protocol.Security = "tls"
+		}
+	} else if strings.TrimSpace(protocol.SNI) == "" {
+		protocol.Security = ""
+	} else if protocol.Security == "" || protocol.Security == "none" {
+		protocol.Security = "tls"
+	}
+	if protocol.SimnetAfPathMode == "" {
+		protocol.SimnetAfPathMode = "api"
+	}
+	if protocol.SimnetAfMagicMode == "" {
+		protocol.SimnetAfMagicMode = "derived"
+	}
+	if protocol.SimnetAfResponseJitterMs == 0 {
+		protocol.SimnetAfResponseJitterMs = 50
+	}
+}
+
+func isLikelyDomainAddress(address string) bool {
+	address = strings.TrimSpace(address)
+	if address == "" || strings.Contains(address, ":") {
+		return false
+	}
+	hasLetter := false
+	for _, r := range address {
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') {
+			hasLetter = true
+			break
+		}
+	}
+	return hasLetter && strings.Contains(address, ".")
+}
+
 func (uc *ServerUsecase) CreateServer(ctx context.Context, name, country, city, address string, sort int64, protocols []*server.Protocol) (*Server, error) {
 	if err := server.ValidateProtocols(protocols); err != nil {
 		return nil, err
@@ -165,25 +213,7 @@ func (uc *ServerUsecase) CreateServer(ctx context.Context, name, country, city, 
 				protocol.ServerKey = tool.GenerateCipher(protocol.ServerKey, length)
 			}
 		}
-		if protocol.Type == "simnet" {
-			if strings.TrimSpace(protocol.SNI) == "" {
-				protocol.Security = ""
-			} else if protocol.Security == "" || protocol.Security == "none" {
-				protocol.Security = "tls"
-			}
-			if protocol.SimnetCarrier == "" {
-				protocol.SimnetCarrier = "h2"
-			}
-			if protocol.SimnetAfPathMode == "" {
-				protocol.SimnetAfPathMode = "api"
-			}
-			if protocol.SimnetAfMagicMode == "" {
-				protocol.SimnetAfMagicMode = "derived"
-			}
-			if protocol.SimnetAfResponseJitterMs == 0 {
-				protocol.SimnetAfResponseJitterMs = 50
-			}
-		}
+		normalizeSimnetProtocol(protocol, address)
 	}
 	if country == "" && city == "" && address != "" {
 		location, err := ip.GetRegionByIp(address)
@@ -237,25 +267,7 @@ func (uc *ServerUsecase) UpdateServer(ctx context.Context, id int, name, country
 				protocol.ServerKey = tool.GenerateCipher(protocol.ServerKey, length)
 			}
 		}
-		if protocol.Type == "simnet" {
-			if strings.TrimSpace(protocol.SNI) == "" {
-				protocol.Security = ""
-			} else if protocol.Security == "" || protocol.Security == "none" {
-				protocol.Security = "tls"
-			}
-			if protocol.SimnetCarrier == "" {
-				protocol.SimnetCarrier = "h2"
-			}
-			if protocol.SimnetAfPathMode == "" {
-				protocol.SimnetAfPathMode = "api"
-			}
-			if protocol.SimnetAfMagicMode == "" {
-				protocol.SimnetAfMagicMode = "derived"
-			}
-			if protocol.SimnetAfResponseJitterMs == 0 {
-				protocol.SimnetAfResponseJitterMs = 50
-			}
-		}
+		normalizeSimnetProtocol(protocol, address)
 	}
 	if address != existingServer.Address || existingServer.Country == "" || country == "" {
 		location, err := ip.GetRegionByIp(address)

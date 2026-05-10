@@ -582,6 +582,11 @@ func (r *serverNodeRepo) QueryServerProtocolConfig(ctx context.Context, serverID
 			SimnetAfHandshakePolymorphism: serverNodeMapBool(p["simnet_af_handshake_polymorphism"]),
 			SimnetAfSettingsJitter:        serverNodeMapBool(p["simnet_af_settings_jitter"]),
 			SimnetAfFakeHeaderInjection:   serverNodeMapBool(p["simnet_af_fake_header_injection"]),
+			SimnetReverseEnabled:          serverNodeMapBool(p["simnet_reverse_enabled"]),
+			SimnetReverseListenAddr:       serverNodeMapString(p["simnet_reverse_listen_addr"]),
+			SimnetReverseListenPort:       int32(serverNodeMapInt64(p["simnet_reverse_listen_port"])),
+			SimnetReverseTargetHost:       serverNodeMapString(p["simnet_reverse_target_host"]),
+			SimnetReverseTargetPort:       int32(serverNodeMapInt64(p["simnet_reverse_target_port"])),
 		})
 	}
 

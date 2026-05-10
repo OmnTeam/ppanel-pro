@@ -267,6 +267,11 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 			SimnetAfHandshakePolymorphism: protocol.SimnetAfHandshakePolymorphism,
 			SimnetAfSettingsJitter:        protocol.SimnetAfSettingsJitter,
 			SimnetAfFakeHeaderInjection:   protocol.SimnetAfFakeHeaderInjection,
+			SimnetReverseEnabled:          protocol.SimnetReverseEnabled,
+			SimnetReverseListenAddr:       protocol.SimnetReverseListenAddr,
+			SimnetReverseListenPort:       protocol.SimnetReverseListenPort,
+			SimnetReverseTargetHost:       protocol.SimnetReverseTargetHost,
+			SimnetReverseTargetPort:       protocol.SimnetReverseTargetPort,
 		})
 	}
 

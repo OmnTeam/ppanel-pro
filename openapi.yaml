@@ -8742,6 +8742,18 @@ components:
                     type: boolean
                 simnetAfFakeHeaderInjection:
                     type: boolean
+                simnetReverseEnabled:
+                    type: boolean
+                simnetReverseListenAddr:
+                    type: string
+                simnetReverseListenPort:
+                    type: integer
+                    format: int32
+                simnetReverseTargetHost:
+                    type: string
+                simnetReverseTargetPort:
+                    type: integer
+                    format: int32
             description: Protocol represents a server protocol configuration with all fields
         api.admin.server.v1.QueryNodeTagData:
             type: object
@@ -13952,6 +13964,18 @@ components:
                     type: boolean
                 simnetAfFakeHeaderInjection:
                     type: boolean
+                simnetReverseEnabled:
+                    type: boolean
+                simnetReverseListenAddr:
+                    type: string
+                simnetReverseListenPort:
+                    type: integer
+                    format: int32
+                simnetReverseTargetHost:
+                    type: string
+                simnetReverseTargetPort:
+                    type: integer
+                    format: int32
             description: Protocol 协议配置
         api.server.v1.PushOnlineUsersReply:
             type: object

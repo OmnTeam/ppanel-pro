@@ -138,6 +138,11 @@ type Protocol struct {
 	SimnetAfHandshakePolymorphism bool
 	SimnetAfSettingsJitter        bool
 	SimnetAfFakeHeaderInjection   bool
+	SimnetReverseEnabled          bool
+	SimnetReverseListenAddr       string
+	SimnetReverseListenPort       int32
+	SimnetReverseTargetHost       string
+	SimnetReverseTargetPort       int32
 }
 
 // ProtocolConfig 协议配置响应
