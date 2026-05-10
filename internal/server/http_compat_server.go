@@ -80,8 +80,8 @@ func (r *compatLegacyPushUserTrafficRequest) UnmarshalJSON(data []byte) error {
 }
 
 type compatLegacyOnlineUser struct {
-	SID int64  `json:"uid"`
-	IP  string `json:"ip"`
+	SID int64  `json:"UID"`
+	IP  string `json:"IP"`
 }
 
 func (u *compatLegacyOnlineUser) UnmarshalJSON(data []byte) error {
@@ -89,7 +89,7 @@ func (u *compatLegacyOnlineUser) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &raw); err != nil {
 		return err
 	}
-	u.SID = compatLegacyInt64Field(raw, "uid", "sid")
+	u.SID = compatLegacyInt64Field(raw, "uid")
 	u.IP = compatLegacyStringField(raw, "ip")
 	return nil
 }
@@ -396,8 +396,13 @@ func registerLegacyServerCompatRoutes(r *khttp.Router, dataLayer *data.Data, ser
 
 	r.POST("/v1/server/online", func(ctx khttp.Context) error {
 		var req compatLegacyPushOnlineUsersRequest
-		_ = ctx.Bind(&req)
-		_ = ctx.BindQuery(&req.compatLegacyServerCommon)
+		if err := ctx.Bind(&req); err != nil {
+			return compatLegacyServerJSONError(ctx, err)
+		}
+		if err := ctx.BindQuery(&req.compatLegacyServerCommon); err != nil {
+			return compatLegacyServerJSONError(ctx, err)
+		}
+		log.Infof("/v1/server/online req body: %v", req)
 		compatLegacyPopulateV1ServerCommon(ctx.Request(), &req.compatLegacyServerCommon)
 		if !serverService.CompatV1ServerSecretAllowed(ctx, provider, req.SecretKey) {
 			return ctx.String(http.StatusForbidden, "Forbidden")

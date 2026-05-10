@@ -318,7 +318,7 @@ func (r *serverNodeRepo) PushServerStatus(ctx context.Context, req *serverBiz.Pu
 
 // PushOnlineUsers 推送在线用户
 func (r *serverNodeRepo) PushOnlineUsers(ctx context.Context, req *serverBiz.PushOnlineUsersRequest) error {
-	if req == nil || req.ServerID <= 0 {
+	if req == nil || req.ServerID <= 0 || len(req.Users) == 0 {
 		return fmt.Errorf("invalid request parameters")
 	}
 	for _, user := range req.Users {
@@ -372,8 +372,8 @@ func (r *serverNodeRepo) PushOnlineUsers(ctx context.Context, req *serverBiz.Pus
 		}
 	}
 
-	if err := RebuildOnlineUserSubscribeGlobalCache(ctx, r.data.rdb); err != nil {
-		r.log.Errorf("PushOnlineUsers rebuild global online cache failed: %v", err)
+	if err := UpdateOnlineUserSubscribeGlobalCache(ctx, r.data.rdb, onlineUsers); err != nil {
+		r.log.Errorf("PushOnlineUsers update global online cache failed: %v", err)
 		return err
 	}
 

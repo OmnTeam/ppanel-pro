@@ -515,7 +515,7 @@ func (s *ServerService) CompatPushServerStatus(ctx context.Context, provider Com
 }
 
 func (s *ServerService) CompatPushOnlineUsers(ctx context.Context, provider CompatLegacyProvider, req *CompatLegacyPushOnlineUsersRequest) error {
-	if provider == nil || provider.DB() == nil || req == nil || req.ServerID <= 0 {
+	if provider == nil || provider.DB() == nil || req == nil || req.ServerID <= 0 || len(req.Users) == 0 {
 		return errors.New("invalid request parameters")
 	}
 	for i := range req.Users {
@@ -534,7 +534,7 @@ func (s *ServerService) CompatPushOnlineUsers(ctx context.Context, provider Comp
 
 	onlineUsers := make(map[int64][]string)
 	for _, user := range req.Users {
-		onlineUsers[user.SID] = compatAppendUniqueOnlineUserIP(onlineUsers[user.SID], user.IP)
+		onlineUsers[user.SID] = append(onlineUsers[user.SID], user.IP)
 	}
 
 	key := fmt.Sprintf("node:online:subscribe:%d:%s", req.ServerID, req.Protocol)
@@ -552,7 +552,7 @@ func (s *ServerService) CompatPushOnlineUsers(ctx context.Context, provider Comp
 		}
 	}
 
-	return compatRebuildOnlineUserSubscribeGlobalCache(ctx, provider.Redis())
+	return compatUpdateOnlineUserSubscribeGlobalCache(ctx, provider.Redis(), onlineUsers)
 }
 
 func (s *ServerService) CompatQueryServerProtocolConfig(ctx context.Context, provider CompatLegacyProvider, req *CompatLegacyQueryServerConfigRequest) (*CompatLegacyQueryServerConfigResponse, error) {
@@ -1031,69 +1031,15 @@ func compatSanitizeOutboundList(values []CompatLegacyNodeOutbound) []CompatLegac
 	return result
 }
 
-func compatRebuildOnlineUserSubscribeGlobalCache(ctx context.Context, rdb redis.UniversalClient) error {
+func compatUpdateOnlineUserSubscribeGlobalCache(ctx context.Context, rdb redis.UniversalClient, subscribe map[int64][]string) error {
 	if rdb == nil {
 		return nil
 	}
-
 	now := time.Now()
-	scores := make(map[int64]int64)
-	var cursor uint64
-
-	for {
-		keys, nextCursor, err := rdb.Scan(ctx, cursor, "node:online:subscribe:*", 200).Result()
-		if err != nil {
-			if err == redis.Nil {
-				break
-			}
-			return err
-		}
-		for _, key := range keys {
-			if key == "node:online:subscribe:global" {
-				continue
-			}
-			raw, err := rdb.Get(ctx, key).Result()
-			if err != nil {
-				if err == redis.Nil {
-					continue
-				}
-				return err
-			}
-			if raw == "" {
-				continue
-			}
-			ttl, err := rdb.TTL(ctx, key).Result()
-			if err != nil {
-				if err == redis.Nil {
-					continue
-				}
-				return err
-			}
-			if ttl <= 0 {
-				continue
-			}
-
-			var onlineUsers map[int64][]string
-			if err := json.Unmarshal([]byte(raw), &onlineUsers); err != nil {
-				continue
-			}
-
-			expireAt := now.Add(ttl).Unix()
-			for sid := range onlineUsers {
-				if expireAt > scores[sid] {
-					scores[sid] = expireAt
-				}
-			}
-		}
-		cursor = nextCursor
-		if cursor == 0 {
-			break
-		}
-	}
-
+	expireAt := now.Add(5 * time.Minute).Unix()
 	pipe := rdb.Pipeline()
-	pipe.Del(ctx, "node:online:subscribe:global")
-	for sid, expireAt := range scores {
+	pipe.ZRemRangeByScore(ctx, "node:online:subscribe:global", "-inf", fmt.Sprintf("%d", now.Unix()))
+	for sid := range subscribe {
 		pipe.ZAdd(ctx, "node:online:subscribe:global", redis.Z{
 			Score:  float64(expireAt),
 			Member: sid,
@@ -1109,15 +1055,6 @@ func compatNormalizeOnlineUserIP(ip string) (string, bool) {
 		return "", false
 	}
 	return normalizedIP, true
-}
-
-func compatAppendUniqueOnlineUserIP(ips []string, ip string) []string {
-	for _, existingIP := range ips {
-		if existingIP == ip {
-			return ips
-		}
-	}
-	return append(ips, ip)
 }
 
 func compatIsLegacyUnlimitedTime(value *time.Time) bool {

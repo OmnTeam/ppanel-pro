@@ -56,69 +56,15 @@ type onlineUserScore struct {
 	expireAt int64
 }
 
-func RebuildOnlineUserSubscribeGlobalCache(ctx context.Context, rdb redis.UniversalClient) error {
+func UpdateOnlineUserSubscribeGlobalCache(ctx context.Context, rdb redis.UniversalClient, subscribe OnlineUserSubscribe) error {
 	if rdb == nil {
 		return nil
 	}
-
 	now := time.Now()
-	scores := make(map[int64]int64)
-	var cursor uint64
-
-	for {
-		keys, nextCursor, err := rdb.Scan(ctx, cursor, "node:online:subscribe:*", 200).Result()
-		if err != nil {
-			if err == redis.Nil {
-				break
-			}
-			return err
-		}
-		for _, key := range keys {
-			if key == OnlineUserSubscribeCacheKeyWithGlobal {
-				continue
-			}
-			raw, err := rdb.Get(ctx, key).Result()
-			if err != nil {
-				if err == redis.Nil {
-					continue
-				}
-				return err
-			}
-			if raw == "" {
-				continue
-			}
-			ttl, err := rdb.TTL(ctx, key).Result()
-			if err != nil {
-				if err == redis.Nil {
-					continue
-				}
-				return err
-			}
-			if ttl <= 0 {
-				continue
-			}
-
-			var onlineUsers OnlineUserSubscribe
-			if err := json.Unmarshal([]byte(raw), &onlineUsers); err != nil {
-				continue
-			}
-
-			expireAt := now.Add(ttl).Unix()
-			for sid := range onlineUsers {
-				if expireAt > scores[sid] {
-					scores[sid] = expireAt
-				}
-			}
-		}
-		cursor = nextCursor
-		if cursor == 0 {
-			break
-		}
-	}
-
+	expireAt := now.Add(5 * time.Minute).Unix()
 	pipe := rdb.Pipeline()
-	pipe.Del(ctx, OnlineUserSubscribeCacheKeyWithGlobal)
-	for sid, expireAt := range scores {
+	pipe.ZRemRangeByScore(ctx, OnlineUserSubscribeCacheKeyWithGlobal, "-inf", fmt.Sprintf("%d", now.Unix()))
+	for sid := range subscribe {
 		pipe.ZAdd(ctx, OnlineUserSubscribeCacheKeyWithGlobal, redis.Z{
 			Score:  float64(expireAt),
 			Member: sid,
