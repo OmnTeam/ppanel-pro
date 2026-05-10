@@ -149,6 +149,44 @@ type Protocol struct {
 	SimnetFallbackTargetPort      int32
 	SimnetFallbackHostHeader      string
 	SimnetFallbackTLSSNI          string
+
+	// OmniFlow 基础配置
+	OmniflowCarrier     string
+	OmniflowPath        string
+	OmniflowContentType string
+	OmniflowProfilePath string
+	OmniflowProfileJson string
+	OmniflowServerHost  string
+	OmniflowServerPort  int32
+	OmniflowCaCertPath  string
+	OmniflowTargetMeta  string
+	OmniflowSpkiPin     string
+
+	// OmniFlow H3 Fallback 策略
+	OmniflowH3FallbackEnabled          bool
+	OmniflowH3FallbackPolicy           string
+	OmniflowH3FallbackTimeoutMs        int32
+	OmniflowH3FallbackRetryBudget      int32
+	OmniflowH3FallbackSmokeEnabled     bool
+	OmniflowH3FallbackSmokeIntervalSec int32
+	OmniflowH3FallbackSmokeTimeoutMs   int32
+
+	// OmniFlow 连接管理
+	OmniflowMaxAgeSec      int32
+	OmniflowIdleTimeoutSec int32
+	OmniflowMaxConnections int32
+
+	// OmniFlow 抗指纹
+	OmniflowAdaptiveTlsEnabled    bool
+	OmniflowTlsFingerprint        string
+	OmniflowSniMode               string
+	OmniflowPaddingMode           string
+	OmniflowTrafficShapingEnabled bool
+
+	// OmniFlow 回退 Carrier
+	OmniflowFallbackCarrierEnabled bool
+	OmniflowFallbackConnectTunnel  bool
+	OmniflowFallbackWssEnabled     bool
 }
 
 // ProtocolConfig 协议配置响应

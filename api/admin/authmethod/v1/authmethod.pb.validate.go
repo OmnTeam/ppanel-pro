@@ -1413,7 +1413,7 @@ func (m *PlatformListData) validate(all bool) error {
 
 	var errors []error
 
-	for idx, item := range m.GetPlatforms() {
+	for idx, item := range m.GetList() {
 		_, _ = idx, item
 
 		if all {
@@ -1421,7 +1421,7 @@ func (m *PlatformListData) validate(all bool) error {
 			case interface{ ValidateAll() error }:
 				if err := v.ValidateAll(); err != nil {
 					errors = append(errors, PlatformListDataValidationError{
-						field:  fmt.Sprintf("Platforms[%v]", idx),
+						field:  fmt.Sprintf("List[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -1429,7 +1429,7 @@ func (m *PlatformListData) validate(all bool) error {
 			case interface{ Validate() error }:
 				if err := v.Validate(); err != nil {
 					errors = append(errors, PlatformListDataValidationError{
-						field:  fmt.Sprintf("Platforms[%v]", idx),
+						field:  fmt.Sprintf("List[%v]", idx),
 						reason: "embedded message failed validation",
 						cause:  err,
 					})
@@ -1438,7 +1438,7 @@ func (m *PlatformListData) validate(all bool) error {
 		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return PlatformListDataValidationError{
-					field:  fmt.Sprintf("Platforms[%v]", idx),
+					field:  fmt.Sprintf("List[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -1931,238 +1931,3 @@ var _ interface {
 	ErrorName() string
 } = AuthMethodListReplyValidationError{}
 
-// Validate checks the field values on TestSendData with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *TestSendData) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on TestSendData with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in TestSendDataMultiError, or
-// nil if none found.
-func (m *TestSendData) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *TestSendData) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Success
-
-	// no validation rules for ResultMessage
-
-	if len(errors) > 0 {
-		return TestSendDataMultiError(errors)
-	}
-
-	return nil
-}
-
-// TestSendDataMultiError is an error wrapping multiple validation errors
-// returned by TestSendData.ValidateAll() if the designated constraints aren't met.
-type TestSendDataMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m TestSendDataMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m TestSendDataMultiError) AllErrors() []error { return m }
-
-// TestSendDataValidationError is the validation error returned by
-// TestSendData.Validate if the designated constraints aren't met.
-type TestSendDataValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e TestSendDataValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e TestSendDataValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e TestSendDataValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e TestSendDataValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e TestSendDataValidationError) ErrorName() string { return "TestSendDataValidationError" }
-
-// Error satisfies the builtin error interface
-func (e TestSendDataValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sTestSendData.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = TestSendDataValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = TestSendDataValidationError{}
-
-// Validate checks the field values on TestSendReply with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *TestSendReply) Validate() error {
-	return m.validate(false)
-}
-
-// ValidateAll checks the field values on TestSendReply with the rules defined
-// in the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in TestSendReplyMultiError, or
-// nil if none found.
-func (m *TestSendReply) ValidateAll() error {
-	return m.validate(true)
-}
-
-func (m *TestSendReply) validate(all bool) error {
-	if m == nil {
-		return nil
-	}
-
-	var errors []error
-
-	// no validation rules for Code
-
-	// no validation rules for Message
-
-	if all {
-		switch v := interface{}(m.GetData()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, TestSendReplyValidationError{
-					field:  "Data",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, TestSendReplyValidationError{
-					field:  "Data",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetData()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return TestSendReplyValidationError{
-				field:  "Data",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if len(errors) > 0 {
-		return TestSendReplyMultiError(errors)
-	}
-
-	return nil
-}
-
-// TestSendReplyMultiError is an error wrapping multiple validation errors
-// returned by TestSendReply.ValidateAll() if the designated constraints
-// aren't met.
-type TestSendReplyMultiError []error
-
-// Error returns a concatenation of all the error messages it wraps.
-func (m TestSendReplyMultiError) Error() string {
-	msgs := make([]string, 0, len(m))
-	for _, err := range m {
-		msgs = append(msgs, err.Error())
-	}
-	return strings.Join(msgs, "; ")
-}
-
-// AllErrors returns a list of validation violation errors.
-func (m TestSendReplyMultiError) AllErrors() []error { return m }
-
-// TestSendReplyValidationError is the validation error returned by
-// TestSendReply.Validate if the designated constraints aren't met.
-type TestSendReplyValidationError struct {
-	field  string
-	reason string
-	cause  error
-	key    bool
-}
-
-// Field function returns field value.
-func (e TestSendReplyValidationError) Field() string { return e.field }
-
-// Reason function returns reason value.
-func (e TestSendReplyValidationError) Reason() string { return e.reason }
-
-// Cause function returns cause value.
-func (e TestSendReplyValidationError) Cause() error { return e.cause }
-
-// Key function returns key value.
-func (e TestSendReplyValidationError) Key() bool { return e.key }
-
-// ErrorName returns error name.
-func (e TestSendReplyValidationError) ErrorName() string { return "TestSendReplyValidationError" }
-
-// Error satisfies the builtin error interface
-func (e TestSendReplyValidationError) Error() string {
-	cause := ""
-	if e.cause != nil {
-		cause = fmt.Sprintf(" | caused by: %v", e.cause)
-	}
-
-	key := ""
-	if e.key {
-		key = "key for "
-	}
-
-	return fmt.Sprintf(
-		"invalid %sTestSendReply.%s: %s%s",
-		key,
-		e.field,
-		e.reason,
-		cause)
-}
-
-var _ error = TestSendReplyValidationError{}
-
-var _ interface {
-	Field() string
-	Reason() string
-	Key() bool
-	Cause() error
-	ErrorName() string
-} = TestSendReplyValidationError{}

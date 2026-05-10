@@ -278,6 +278,44 @@ message Protocol {
 	int32 simnet_fallback_target_port = 70;
 	string simnet_fallback_host_header = 71;
 	string simnet_fallback_tls_sni = 72;
+
+	// OmniFlow 基础配置
+	string omniflow_carrier = 73;                    // h2 或 h3
+	string omniflow_path = 74;                       // HTTP 路径
+	string omniflow_content_type = 75;               // Content-Type
+	string omniflow_profile_path = 76;               // Profile 文件路径
+	string omniflow_profile_json = 77;               // Profile JSON
+	string omniflow_server_host = 78;                // 服务器主机
+	int32 omniflow_server_port = 79;                 // 服务器端口
+	string omniflow_ca_cert_path = 80;               // CA 证书路径
+	string omniflow_target_meta = 81;                // 加密目标元数据
+	string omniflow_spki_pin = 82;                   // SPKI Pin
+
+	// OmniFlow H3 Fallback
+	bool omniflow_h3_fallback_enabled = 83;
+	string omniflow_h3_fallback_policy = 84;         // always/timeout/never
+	int32 omniflow_h3_fallback_timeout_ms = 85;
+	int32 omniflow_h3_fallback_retry_budget = 86;
+	bool omniflow_h3_fallback_smoke_enabled = 87;
+	int32 omniflow_h3_fallback_smoke_interval_sec = 88;
+	int32 omniflow_h3_fallback_smoke_timeout_ms = 89;
+
+	// OmniFlow 连接管理
+	int32 omniflow_max_age_sec = 90;
+	int32 omniflow_idle_timeout_sec = 91;
+	int32 omniflow_max_connections = 92;
+
+	// OmniFlow 抗指纹
+	bool omniflow_adaptive_tls_enabled = 93;
+	string omniflow_tls_fingerprint = 94;            // chrome/firefox/safari
+	string omniflow_sni_mode = 95;                   // direct/transparent_forward
+	string omniflow_padding_mode = 96;               // random/mtu_align/fixed_overhead
+	bool omniflow_traffic_shaping_enabled = 97;
+
+	// OmniFlow 回退 Carrier
+	bool omniflow_fallback_carrier_enabled = 98;
+	bool omniflow_fallback_connect_tunnel = 99;
+	bool omniflow_fallback_wss_enabled = 100;
 }
 
 // QueryServerProtocolConfigReply 查询服务器协议配置响应

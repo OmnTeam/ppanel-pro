@@ -8745,6 +8745,75 @@ components:
                     type: string
                 simnetFallbackTlsSni:
                     type: string
+                omniflowCarrier:
+                    type: string
+                    description: OmniFlow 基础配置
+                omniflowPath:
+                    type: string
+                omniflowContentType:
+                    type: string
+                omniflowProfilePath:
+                    type: string
+                omniflowProfileJson:
+                    type: string
+                omniflowServerHost:
+                    type: string
+                omniflowServerPort:
+                    type: integer
+                    format: int32
+                omniflowCaCertPath:
+                    type: string
+                omniflowTargetMeta:
+                    type: string
+                omniflowSpkiPin:
+                    type: string
+                omniflowH3FallbackEnabled:
+                    type: boolean
+                    description: OmniFlow H3 Fallback
+                omniflowH3FallbackPolicy:
+                    type: string
+                omniflowH3FallbackTimeoutMs:
+                    type: integer
+                    format: int32
+                omniflowH3FallbackRetryBudget:
+                    type: integer
+                    format: int32
+                omniflowH3FallbackSmokeEnabled:
+                    type: boolean
+                omniflowH3FallbackSmokeIntervalSec:
+                    type: integer
+                    format: int32
+                omniflowH3FallbackSmokeTimeoutMs:
+                    type: integer
+                    format: int32
+                omniflowMaxAgeSec:
+                    type: integer
+                    description: OmniFlow 连接管理
+                    format: int32
+                omniflowIdleTimeoutSec:
+                    type: integer
+                    format: int32
+                omniflowMaxConnections:
+                    type: integer
+                    format: int32
+                omniflowAdaptiveTlsEnabled:
+                    type: boolean
+                    description: OmniFlow 抗指纹
+                omniflowTlsFingerprint:
+                    type: string
+                omniflowSniMode:
+                    type: string
+                omniflowPaddingMode:
+                    type: string
+                omniflowTrafficShapingEnabled:
+                    type: boolean
+                omniflowFallbackCarrierEnabled:
+                    type: boolean
+                    description: OmniFlow 回退 Carrier
+                omniflowFallbackConnectTunnel:
+                    type: boolean
+                omniflowFallbackWssEnabled:
+                    type: boolean
             description: Protocol represents a server protocol configuration with all fields
         api.admin.server.v1.QueryNodeTagData:
             type: object
@@ -13980,6 +14049,75 @@ components:
                     type: string
                 simnetFallbackTlsSni:
                     type: string
+                omniflowCarrier:
+                    type: string
+                    description: OmniFlow 基础配置
+                omniflowPath:
+                    type: string
+                omniflowContentType:
+                    type: string
+                omniflowProfilePath:
+                    type: string
+                omniflowProfileJson:
+                    type: string
+                omniflowServerHost:
+                    type: string
+                omniflowServerPort:
+                    type: integer
+                    format: int32
+                omniflowCaCertPath:
+                    type: string
+                omniflowTargetMeta:
+                    type: string
+                omniflowSpkiPin:
+                    type: string
+                omniflowH3FallbackEnabled:
+                    type: boolean
+                    description: OmniFlow H3 Fallback
+                omniflowH3FallbackPolicy:
+                    type: string
+                omniflowH3FallbackTimeoutMs:
+                    type: integer
+                    format: int32
+                omniflowH3FallbackRetryBudget:
+                    type: integer
+                    format: int32
+                omniflowH3FallbackSmokeEnabled:
+                    type: boolean
+                omniflowH3FallbackSmokeIntervalSec:
+                    type: integer
+                    format: int32
+                omniflowH3FallbackSmokeTimeoutMs:
+                    type: integer
+                    format: int32
+                omniflowMaxAgeSec:
+                    type: integer
+                    description: OmniFlow 连接管理
+                    format: int32
+                omniflowIdleTimeoutSec:
+                    type: integer
+                    format: int32
+                omniflowMaxConnections:
+                    type: integer
+                    format: int32
+                omniflowAdaptiveTlsEnabled:
+                    type: boolean
+                    description: OmniFlow 抗指纹
+                omniflowTlsFingerprint:
+                    type: string
+                omniflowSniMode:
+                    type: string
+                omniflowPaddingMode:
+                    type: string
+                omniflowTrafficShapingEnabled:
+                    type: boolean
+                omniflowFallbackCarrierEnabled:
+                    type: boolean
+                    description: OmniFlow 回退 Carrier
+                omniflowFallbackConnectTunnel:
+                    type: boolean
+                omniflowFallbackWssEnabled:
+                    type: boolean
             description: Protocol 协议配置
         api.server.v1.PushOnlineUsersReply:
             type: object

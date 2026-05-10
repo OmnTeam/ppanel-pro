@@ -76,6 +76,44 @@ type Protocol struct {
 	SimnetFallbackTargetPort      int32   `json:"simnet_fallback_target_port,omitempty"`
 	SimnetFallbackHostHeader      string  `json:"simnet_fallback_host_header,omitempty"`
 	SimnetFallbackTLSSNI          string  `json:"simnet_fallback_tls_sni,omitempty"`
+
+	// OmniFlow 基础配置
+	OmniflowCarrier     string `json:"omniflow_carrier,omitempty"`
+	OmniflowPath        string `json:"omniflow_path,omitempty"`
+	OmniflowContentType string `json:"omniflow_content_type,omitempty"`
+	OmniflowProfilePath string `json:"omniflow_profile_path,omitempty"`
+	OmniflowProfileJson string `json:"omniflow_profile_json,omitempty"`
+	OmniflowServerHost  string `json:"omniflow_server_host,omitempty"`
+	OmniflowServerPort  int32  `json:"omniflow_server_port,omitempty"`
+	OmniflowCaCertPath  string `json:"omniflow_ca_cert_path,omitempty"`
+	OmniflowTargetMeta  string `json:"omniflow_target_meta,omitempty"`
+	OmniflowSpkiPin     string `json:"omniflow_spki_pin,omitempty"`
+
+	// OmniFlow H3 Fallback 策略
+	OmniflowH3FallbackEnabled          bool   `json:"omniflow_h3_fallback_enabled,omitempty"`
+	OmniflowH3FallbackPolicy           string `json:"omniflow_h3_fallback_policy,omitempty"`
+	OmniflowH3FallbackTimeoutMs        int32  `json:"omniflow_h3_fallback_timeout_ms,omitempty"`
+	OmniflowH3FallbackRetryBudget      int32  `json:"omniflow_h3_fallback_retry_budget,omitempty"`
+	OmniflowH3FallbackSmokeEnabled     bool   `json:"omniflow_h3_fallback_smoke_enabled,omitempty"`
+	OmniflowH3FallbackSmokeIntervalSec int32  `json:"omniflow_h3_fallback_smoke_interval_sec,omitempty"`
+	OmniflowH3FallbackSmokeTimeoutMs   int32  `json:"omniflow_h3_fallback_smoke_timeout_ms,omitempty"`
+
+	// OmniFlow 连接管理
+	OmniflowMaxAgeSec      int32 `json:"omniflow_max_age_sec,omitempty"`
+	OmniflowIdleTimeoutSec int32 `json:"omniflow_idle_timeout_sec,omitempty"`
+	OmniflowMaxConnections int32 `json:"omniflow_max_connections,omitempty"`
+
+	// OmniFlow 抗指纹
+	OmniflowAdaptiveTlsEnabled    bool   `json:"omniflow_adaptive_tls_enabled,omitempty"`
+	OmniflowTlsFingerprint        string `json:"omniflow_tls_fingerprint,omitempty"`
+	OmniflowSniMode               string `json:"omniflow_sni_mode,omitempty"`
+	OmniflowPaddingMode           string `json:"omniflow_padding_mode,omitempty"`
+	OmniflowTrafficShapingEnabled bool   `json:"omniflow_traffic_shaping_enabled,omitempty"`
+
+	// OmniFlow 回退 Carrier
+	OmniflowFallbackCarrierEnabled bool `json:"omniflow_fallback_carrier_enabled,omitempty"`
+	OmniflowFallbackConnectTunnel  bool `json:"omniflow_fallback_connect_tunnel,omitempty"`
+	OmniflowFallbackWssEnabled     bool `json:"omniflow_fallback_wss_enabled,omitempty"`
 }
 
 // MarshalProtocols converts protocol array to JSON string
