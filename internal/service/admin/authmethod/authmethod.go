@@ -20,7 +20,6 @@ type AuthMethodService struct {
 	logger *log.Helper
 }
 
-// NewAuthMethodService 创建认证方法服务
 func NewAuthMethodService(uc *authmethodbiz.AuthMethodUsecase, logger log.Logger) *AuthMethodService {
 	return &AuthMethodService{
 		uc:     uc,
@@ -28,7 +27,6 @@ func NewAuthMethodService(uc *authmethodbiz.AuthMethodUsecase, logger log.Logger
 	}
 }
 
-// GetAuthMethodConfig 获取认证方法配置
 func (s *AuthMethodService) GetAuthMethodConfig(ctx context.Context, req *v1.GetAuthMethodConfigRequest) (*v1.AuthMethodConfigReply, error) {
 	auth, err := s.uc.GetAuthMethodConfig(ctx, req.Method)
 	if err != nil {
@@ -50,9 +48,7 @@ func (s *AuthMethodService) GetAuthMethodConfig(ctx context.Context, req *v1.Get
 	}, nil
 }
 
-// UpdateAuthMethodConfig 更新认证方法配置
 func (s *AuthMethodService) UpdateAuthMethodConfig(ctx context.Context, req *v1.UpdateAuthMethodConfigRequest) (*v1.AuthMethodConfigReply, error) {
-	// 构造 biz 层请求（对应原项目的 types.UpdateAuthMethodConfigRequest）
 	bizReq := &authmethodbiz.UpdateAuthMethodRequest{
 		ID:     req.Id,
 		Method: req.Method,
@@ -60,19 +56,15 @@ func (s *AuthMethodService) UpdateAuthMethodConfig(ctx context.Context, req *v1.
 	if req.Enabled != nil {
 		bizReq.Enabled = &req.Enabled.Value
 	}
-
-	// 将 protobuf Struct 转换为 interface{}（对应原项目的 req.Config）
 	if req.Config != nil {
 		bizReq.Config = req.Config.AsMap()
 	}
 
-	// 调用 biz 层更新配置
 	result, err := s.uc.UpdateAuthMethodConfig(ctx, bizReq)
 	if err != nil {
 		return nil, err
 	}
 
-	// 对应原项目第75-82行：构造响应并解析 Config
 	config, _ := s.parseConfig(result.Config)
 	return &v1.AuthMethodConfigReply{
 		Code:    int32(responsecode.AdminUpdateAuthMethodConfigSuccess),
@@ -88,9 +80,7 @@ func (s *AuthMethodService) UpdateAuthMethodConfig(ctx context.Context, req *v1.
 	}, nil
 }
 
-// GetEmailPlatform 获取邮件平台列表
 func (s *AuthMethodService) GetEmailPlatform(ctx context.Context, req *v1.GetEmailPlatformRequest) (*v1.PlatformListReply, error) {
-	// 平台列表是全局配置
 	platforms := s.uc.GetEmailPlatforms(ctx)
 	result := make([]*v1.Platform, 0, len(platforms))
 	for _, p := range platforms {
@@ -101,17 +91,15 @@ func (s *AuthMethodService) GetEmailPlatform(ctx context.Context, req *v1.GetEma
 		})
 	}
 	return &v1.PlatformListReply{
-		Code:    int32(responsecode.AdminGetEmailPlatformSuccess),
-		Message: responsecode.CodeMessages[responsecode.AdminGetEmailPlatformSuccess],
+		Code: 200,
+		Msg:  "success",
 		Data: &v1.PlatformListData{
-			Platforms: result,
+			List: result,
 		},
 	}, nil
 }
 
-// GetSmsPlatform 获取短信平台列表
 func (s *AuthMethodService) GetSmsPlatform(ctx context.Context, req *v1.GetSmsPlatformRequest) (*v1.PlatformListReply, error) {
-	// 平台列表是全局配置
 	platforms := s.uc.GetSmsPlatforms(ctx)
 	result := make([]*v1.Platform, 0, len(platforms))
 	for _, p := range platforms {
@@ -122,15 +110,14 @@ func (s *AuthMethodService) GetSmsPlatform(ctx context.Context, req *v1.GetSmsPl
 		})
 	}
 	return &v1.PlatformListReply{
-		Code:    int32(responsecode.AdminGetSmsPlatformSuccess),
-		Message: responsecode.CodeMessages[responsecode.AdminGetSmsPlatformSuccess],
+		Code: 200,
+		Msg:  "success",
 		Data: &v1.PlatformListData{
-			Platforms: result,
+			List: result,
 		},
 	}, nil
 }
 
-// GetAuthMethodList 获取认证方法列表
 func (s *AuthMethodService) GetAuthMethodList(ctx context.Context, req *v1.GetAuthMethodListRequest) (*v1.AuthMethodListReply, error) {
 	list, err := s.uc.GetAuthMethodList(ctx)
 	if err != nil {
@@ -156,39 +143,28 @@ func (s *AuthMethodService) GetAuthMethodList(ctx context.Context, req *v1.GetAu
 	}, nil
 }
 
-// TestEmailSend 测试邮件发送
-func (s *AuthMethodService) TestEmailSend(ctx context.Context, req *v1.TestEmailSendRequest) (*v1.TestSendReply, error) {
-	success, message, err := s.uc.TestEmailSend(ctx, req.Email)
+func (s *AuthMethodService) TestEmailSend(ctx context.Context, req *v1.TestEmailSendRequest) (*v1.ActionReply, error) {
+	_, _, err := s.uc.TestEmailSend(ctx, req.Email)
 	if err != nil {
 		return nil, err
 	}
-	return &v1.TestSendReply{
-		Code:    int32(responsecode.AdminTestEmailSendSuccess),
-		Message: responsecode.CodeMessages[responsecode.AdminTestEmailSendSuccess],
-		Data: &v1.TestSendData{
-			Success:       success,
-			ResultMessage: message,
-		},
+	return &v1.ActionReply{
+		Code: 200,
+		Msg:  "success",
 	}, nil
 }
 
-// TestSmsSend 测试短信发送
-func (s *AuthMethodService) TestSmsSend(ctx context.Context, req *v1.TestSmsSendRequest) (*v1.TestSendReply, error) {
-	success, message, err := s.uc.TestSmsSendWithAreaCode(ctx, req.AreaCode, req.Telephone)
+func (s *AuthMethodService) TestSmsSend(ctx context.Context, req *v1.TestSmsSendRequest) (*v1.ActionReply, error) {
+	_, _, err := s.uc.TestSmsSendWithAreaCode(ctx, req.AreaCode, req.Telephone)
 	if err != nil {
 		return nil, err
 	}
-	return &v1.TestSendReply{
-		Code:    int32(responsecode.AdminTestSmsSendSuccess),
-		Message: responsecode.CodeMessages[responsecode.AdminTestSmsSendSuccess],
-		Data: &v1.TestSendData{
-			Success:       success,
-			ResultMessage: message,
-		},
+	return &v1.ActionReply{
+		Code: 200,
+		Msg:  "success",
 	}, nil
 }
 
-// parseConfig 解析JSON配置为Struct
 func (s *AuthMethodService) parseConfig(configJSON string) (*structpb.Struct, error) {
 	if configJSON == "" {
 		return &structpb.Struct{}, nil
@@ -202,7 +178,6 @@ func (s *AuthMethodService) parseConfig(configJSON string) (*structpb.Struct, er
 	return structpb.NewStruct(data)
 }
 
-// marshalConfig 将Struct转换为JSON
 func (s *AuthMethodService) marshalConfig(config *structpb.Struct) (string, error) {
 	if config == nil {
 		return "{}", nil

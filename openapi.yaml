@@ -410,7 +410,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.admin.authmethod.v1.TestSendReply'
+                                $ref: '#/components/schemas/api.admin.authmethod.v1.ActionReply'
     /v1/admin/auth-method/test_sms_send:
         post:
             tags:
@@ -429,7 +429,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/api.admin.authmethod.v1.TestSendReply'
+                                $ref: '#/components/schemas/api.admin.authmethod.v1.ActionReply'
     /v1/admin/console/revenue:
         get:
             tags:
@@ -6004,6 +6004,14 @@ components:
                 downloadLink:
                     $ref: '#/components/schemas/api.admin.application.v1.DownloadLink'
             description: 更新订阅应用配置请求
+        api.admin.authmethod.v1.ActionReply:
+            type: object
+            properties:
+                code:
+                    type: integer
+                    format: int32
+                msg:
+                    type: string
         api.admin.authmethod.v1.AuthMethodConfig:
             type: object
             properties:
@@ -6015,13 +6023,11 @@ components:
                     type: object
                 enabled:
                     type: boolean
-            description: 认证方法配置
         api.admin.authmethod.v1.AuthMethodConfigData:
             type: object
             properties:
                 config:
                     $ref: '#/components/schemas/api.admin.authmethod.v1.AuthMethodConfig'
-            description: 认证方法配置数据
         api.admin.authmethod.v1.AuthMethodConfigReply:
             type: object
             properties:
@@ -6032,7 +6038,6 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.authmethod.v1.AuthMethodConfigData'
-            description: 认证方法配置响应
         api.admin.authmethod.v1.AuthMethodListData:
             type: object
             properties:
@@ -6040,7 +6045,6 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.admin.authmethod.v1.AuthMethodConfig'
-            description: 认证方法列表数据
         api.admin.authmethod.v1.AuthMethodListReply:
             type: object
             properties:
@@ -6051,7 +6055,6 @@ components:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.authmethod.v1.AuthMethodListData'
-            description: 认证方法列表响应
         api.admin.authmethod.v1.Platform:
             type: object
             properties:
@@ -6063,51 +6066,28 @@ components:
                     type: object
                     additionalProperties:
                         type: string
-            description: 平台信息
         api.admin.authmethod.v1.PlatformListData:
             type: object
             properties:
-                platforms:
+                list:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.admin.authmethod.v1.Platform'
-            description: 平台列表数据
         api.admin.authmethod.v1.PlatformListReply:
             type: object
             properties:
                 code:
                     type: integer
                     format: int32
-                message:
+                msg:
                     type: string
                 data:
                     $ref: '#/components/schemas/api.admin.authmethod.v1.PlatformListData'
-            description: 平台列表响应
         api.admin.authmethod.v1.TestEmailSendRequest:
             type: object
             properties:
                 email:
                     type: string
-            description: 测试邮件发送请求
-        api.admin.authmethod.v1.TestSendData:
-            type: object
-            properties:
-                success:
-                    type: boolean
-                resultMessage:
-                    type: string
-            description: 测试发送数据
-        api.admin.authmethod.v1.TestSendReply:
-            type: object
-            properties:
-                code:
-                    type: integer
-                    format: int32
-                message:
-                    type: string
-                data:
-                    $ref: '#/components/schemas/api.admin.authmethod.v1.TestSendData'
-            description: 测试发送响应
         api.admin.authmethod.v1.TestSmsSendRequest:
             type: object
             properties:
@@ -6115,7 +6095,6 @@ components:
                     type: string
                 telephone:
                     type: string
-            description: 测试短信发送请求
         api.admin.authmethod.v1.UpdateAuthMethodConfigRequest:
             type: object
             properties:
@@ -6127,7 +6106,6 @@ components:
                     type: object
                 enabled:
                     type: boolean
-            description: 更新认证方法配置请求
         api.admin.coupon.v1.BatchDeleteCouponReply:
             type: object
             properties:

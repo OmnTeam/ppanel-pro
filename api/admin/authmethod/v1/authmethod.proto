@@ -48,7 +48,7 @@ service AuthMethodService {
   }
 
   // 测试邮件发送
-  rpc TestEmailSend(TestEmailSendRequest) returns (TestSendReply) {
+  rpc TestEmailSend(TestEmailSendRequest) returns (ActionReply) {
     option (google.api.http) = {
       post: "/v1/admin/auth-method/test_email_send"
       body: "*"
@@ -56,7 +56,7 @@ service AuthMethodService {
   }
 
   // 测试短信发送
-  rpc TestSmsSend(TestSmsSendRequest) returns (TestSendReply) {
+  rpc TestSmsSend(TestSmsSendRequest) returns (ActionReply) {
     option (google.api.http) = {
       post: "/v1/admin/auth-method/test_sms_send"
       body: "*"
@@ -64,14 +64,12 @@ service AuthMethodService {
   }
 }
 
-// 平台信息
 message Platform {
   string platform = 1;
   string platform_url = 2;
   map<string, string> platform_field_description = 3;
 }
 
-// 认证方法配置
 message AuthMethodConfig {
   int64 id = 1;
   string method = 2;
@@ -79,12 +77,10 @@ message AuthMethodConfig {
   bool enabled = 4;
 }
 
-// 获取认证方法配置请求
 message GetAuthMethodConfigRequest {
   string method = 1 [(validate.rules).string.min_len = 1];
 }
 
-// 更新认证方法配置请求
 message UpdateAuthMethodConfigRequest {
   int64 id = 1;
   string method = 2 [(validate.rules).string.min_len = 1];
@@ -92,74 +88,50 @@ message UpdateAuthMethodConfigRequest {
   google.protobuf.BoolValue enabled = 4;
 }
 
-// 获取邮件平台请求
-message GetEmailPlatformRequest {
-}
+message GetEmailPlatformRequest {}
+message GetSmsPlatformRequest {}
+message GetAuthMethodListRequest {}
 
-// 获取短信平台请求
-message GetSmsPlatformRequest {
-}
-
-// 获取认证方法列表请求
-message GetAuthMethodListRequest {
-}
-
-// 测试邮件发送请求
 message TestEmailSendRequest {
   string email = 1 [(validate.rules).string.email = true];
 }
 
-// 测试短信发送请求
 message TestSmsSendRequest {
   string area_code = 1 [(validate.rules).string.min_len = 1];
   string telephone = 2 [(validate.rules).string.min_len = 1];
 }
 
-// 认证方法配置数据
 message AuthMethodConfigData {
   AuthMethodConfig config = 1;
 }
 
-// 认证方法配置响应
 message AuthMethodConfigReply {
-  int32 code = 1;                    // 状态码
-  string message = 2;                // 消息内容
-  AuthMethodConfigData data = 3;     // 响应数据
+  int32 code = 1;
+  string message = 2;
+  AuthMethodConfigData data = 3;
 }
 
-// 平台列表数据
 message PlatformListData {
-  repeated Platform platforms = 1;
+  repeated Platform list = 1;
 }
 
-// 平台列表响应
 message PlatformListReply {
-  int32 code = 1;                // 状态码
-  string message = 2;            // 消息内容
-  PlatformListData data = 3;     // 响应数据
+  int32 code = 1;
+  string msg = 2;
+  PlatformListData data = 3;
 }
 
-// 认证方法列表数据
 message AuthMethodListData {
   repeated AuthMethodConfig list = 1;
 }
 
-// 认证方法列表响应
 message AuthMethodListReply {
-  int32 code = 1;                 // 状态码
-  string message = 2;             // 消息内容
-  AuthMethodListData data = 3;    // 响应数据
+  int32 code = 1;
+  string message = 2;
+  AuthMethodListData data = 3;
 }
 
-// 测试发送数据
-message TestSendData {
-  bool success = 1;
-  string result_message = 2;  // 测试结果消息
-}
-
-// 测试发送响应
-message TestSendReply {
-  int32 code = 1;             // 状态码
-  string message = 2;         // 消息内容
-  TestSendData data = 3;      // 响应数据
+message ActionReply {
+  int32 code = 1;
+  string msg = 2;
 }

@@ -37,9 +37,9 @@ type AuthMethodServiceHTTPServer interface {
 	// GetSmsPlatform 获取短信支持平台列表
 	GetSmsPlatform(context.Context, *GetSmsPlatformRequest) (*PlatformListReply, error)
 	// TestEmailSend 测试邮件发送
-	TestEmailSend(context.Context, *TestEmailSendRequest) (*TestSendReply, error)
+	TestEmailSend(context.Context, *TestEmailSendRequest) (*ActionReply, error)
 	// TestSmsSend 测试短信发送
-	TestSmsSend(context.Context, *TestSmsSendRequest) (*TestSendReply, error)
+	TestSmsSend(context.Context, *TestSmsSendRequest) (*ActionReply, error)
 	// UpdateAuthMethodConfig 更新认证方法配置
 	UpdateAuthMethodConfig(context.Context, *UpdateAuthMethodConfigRequest) (*AuthMethodConfigReply, error)
 }
@@ -170,7 +170,7 @@ func _AuthMethodService_TestEmailSend0_HTTP_Handler(srv AuthMethodServiceHTTPSer
 		if err != nil {
 			return err
 		}
-		reply := out.(*TestSendReply)
+		reply := out.(*ActionReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -192,7 +192,7 @@ func _AuthMethodService_TestSmsSend0_HTTP_Handler(srv AuthMethodServiceHTTPServe
 		if err != nil {
 			return err
 		}
-		reply := out.(*TestSendReply)
+		reply := out.(*ActionReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -202,8 +202,8 @@ type AuthMethodServiceHTTPClient interface {
 	GetAuthMethodList(ctx context.Context, req *GetAuthMethodListRequest, opts ...http.CallOption) (rsp *AuthMethodListReply, err error)
 	GetEmailPlatform(ctx context.Context, req *GetEmailPlatformRequest, opts ...http.CallOption) (rsp *PlatformListReply, err error)
 	GetSmsPlatform(ctx context.Context, req *GetSmsPlatformRequest, opts ...http.CallOption) (rsp *PlatformListReply, err error)
-	TestEmailSend(ctx context.Context, req *TestEmailSendRequest, opts ...http.CallOption) (rsp *TestSendReply, err error)
-	TestSmsSend(ctx context.Context, req *TestSmsSendRequest, opts ...http.CallOption) (rsp *TestSendReply, err error)
+	TestEmailSend(ctx context.Context, req *TestEmailSendRequest, opts ...http.CallOption) (rsp *ActionReply, err error)
+	TestSmsSend(ctx context.Context, req *TestSmsSendRequest, opts ...http.CallOption) (rsp *ActionReply, err error)
 	UpdateAuthMethodConfig(ctx context.Context, req *UpdateAuthMethodConfigRequest, opts ...http.CallOption) (rsp *AuthMethodConfigReply, err error)
 }
 
@@ -267,8 +267,8 @@ func (c *AuthMethodServiceHTTPClientImpl) GetSmsPlatform(ctx context.Context, in
 	return &out, nil
 }
 
-func (c *AuthMethodServiceHTTPClientImpl) TestEmailSend(ctx context.Context, in *TestEmailSendRequest, opts ...http.CallOption) (*TestSendReply, error) {
-	var out TestSendReply
+func (c *AuthMethodServiceHTTPClientImpl) TestEmailSend(ctx context.Context, in *TestEmailSendRequest, opts ...http.CallOption) (*ActionReply, error) {
+	var out ActionReply
 	pattern := "/v1/admin/auth-method/test_email_send"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationAuthMethodServiceTestEmailSend))
@@ -280,8 +280,8 @@ func (c *AuthMethodServiceHTTPClientImpl) TestEmailSend(ctx context.Context, in 
 	return &out, nil
 }
 
-func (c *AuthMethodServiceHTTPClientImpl) TestSmsSend(ctx context.Context, in *TestSmsSendRequest, opts ...http.CallOption) (*TestSendReply, error) {
-	var out TestSendReply
+func (c *AuthMethodServiceHTTPClientImpl) TestSmsSend(ctx context.Context, in *TestSmsSendRequest, opts ...http.CallOption) (*ActionReply, error) {
+	var out ActionReply
 	pattern := "/v1/admin/auth-method/test_sms_send"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationAuthMethodServiceTestSmsSend))

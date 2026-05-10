@@ -45,9 +45,9 @@ type AuthMethodServiceClient interface {
 	// 获取认证方法列表
 	GetAuthMethodList(ctx context.Context, in *GetAuthMethodListRequest, opts ...grpc.CallOption) (*AuthMethodListReply, error)
 	// 测试邮件发送
-	TestEmailSend(ctx context.Context, in *TestEmailSendRequest, opts ...grpc.CallOption) (*TestSendReply, error)
+	TestEmailSend(ctx context.Context, in *TestEmailSendRequest, opts ...grpc.CallOption) (*ActionReply, error)
 	// 测试短信发送
-	TestSmsSend(ctx context.Context, in *TestSmsSendRequest, opts ...grpc.CallOption) (*TestSendReply, error)
+	TestSmsSend(ctx context.Context, in *TestSmsSendRequest, opts ...grpc.CallOption) (*ActionReply, error)
 }
 
 type authMethodServiceClient struct {
@@ -108,9 +108,9 @@ func (c *authMethodServiceClient) GetAuthMethodList(ctx context.Context, in *Get
 	return out, nil
 }
 
-func (c *authMethodServiceClient) TestEmailSend(ctx context.Context, in *TestEmailSendRequest, opts ...grpc.CallOption) (*TestSendReply, error) {
+func (c *authMethodServiceClient) TestEmailSend(ctx context.Context, in *TestEmailSendRequest, opts ...grpc.CallOption) (*ActionReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TestSendReply)
+	out := new(ActionReply)
 	err := c.cc.Invoke(ctx, AuthMethodService_TestEmailSend_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -118,9 +118,9 @@ func (c *authMethodServiceClient) TestEmailSend(ctx context.Context, in *TestEma
 	return out, nil
 }
 
-func (c *authMethodServiceClient) TestSmsSend(ctx context.Context, in *TestSmsSendRequest, opts ...grpc.CallOption) (*TestSendReply, error) {
+func (c *authMethodServiceClient) TestSmsSend(ctx context.Context, in *TestSmsSendRequest, opts ...grpc.CallOption) (*ActionReply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(TestSendReply)
+	out := new(ActionReply)
 	err := c.cc.Invoke(ctx, AuthMethodService_TestSmsSend_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -145,9 +145,9 @@ type AuthMethodServiceServer interface {
 	// 获取认证方法列表
 	GetAuthMethodList(context.Context, *GetAuthMethodListRequest) (*AuthMethodListReply, error)
 	// 测试邮件发送
-	TestEmailSend(context.Context, *TestEmailSendRequest) (*TestSendReply, error)
+	TestEmailSend(context.Context, *TestEmailSendRequest) (*ActionReply, error)
 	// 测试短信发送
-	TestSmsSend(context.Context, *TestSmsSendRequest) (*TestSendReply, error)
+	TestSmsSend(context.Context, *TestSmsSendRequest) (*ActionReply, error)
 	mustEmbedUnimplementedAuthMethodServiceServer()
 }
 
@@ -173,10 +173,10 @@ func (UnimplementedAuthMethodServiceServer) GetSmsPlatform(context.Context, *Get
 func (UnimplementedAuthMethodServiceServer) GetAuthMethodList(context.Context, *GetAuthMethodListRequest) (*AuthMethodListReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAuthMethodList not implemented")
 }
-func (UnimplementedAuthMethodServiceServer) TestEmailSend(context.Context, *TestEmailSendRequest) (*TestSendReply, error) {
+func (UnimplementedAuthMethodServiceServer) TestEmailSend(context.Context, *TestEmailSendRequest) (*ActionReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method TestEmailSend not implemented")
 }
-func (UnimplementedAuthMethodServiceServer) TestSmsSend(context.Context, *TestSmsSendRequest) (*TestSendReply, error) {
+func (UnimplementedAuthMethodServiceServer) TestSmsSend(context.Context, *TestSmsSendRequest) (*ActionReply, error) {
 	return nil, status.Error(codes.Unimplemented, "method TestSmsSend not implemented")
 }
 func (UnimplementedAuthMethodServiceServer) mustEmbedUnimplementedAuthMethodServiceServer() {}
