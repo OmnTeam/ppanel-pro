@@ -39,12 +39,18 @@ func (s *ServerService) GetServerConfig(ctx context.Context, req *v1.GetServerCo
 		configMap = make(map[string]string)
 	}
 
+	// 获取设备计数模式和准入控制开关
+	deviceCountMode, _ := s.uc.GetDeviceCountMode(ctx)
+	deviceAdmissionEnabled, _ := s.uc.GetDeviceAdmissionEnabled(ctx)
+
 	return &v1.GetServerConfigReply{
 		Code:    0,
 		Message: "success",
 		Basic: &v1.ServerBasic{
-			PushInterval: config.PushInterval,
-			PullInterval: config.PullInterval,
+			PushInterval:           config.PushInterval,
+			PullInterval:           config.PullInterval,
+			DeviceCountMode:        deviceCountMode,
+			DeviceAdmissionEnabled: deviceAdmissionEnabled,
 		},
 		Protocol: config.Protocol,
 		Config:   configMap,
@@ -330,4 +336,14 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 		len(reply.Protocols),
 	)
 	return reply, nil
+}
+
+// SessionCheck 会话准入检查
+func (s *ServerService) SessionCheck(ctx context.Context, req *v1.SessionCheckRequest) (*v1.SessionCheckResponse, error) {
+	return s.uc.SessionCheck(ctx, req)
+}
+
+// SessionRelease 会话释放
+func (s *ServerService) SessionRelease(ctx context.Context, req *v1.SessionReleaseRequest) (*v1.SessionReleaseResponse, error) {
+	return s.uc.SessionRelease(ctx, req)
 }

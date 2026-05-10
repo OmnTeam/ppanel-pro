@@ -39,6 +39,13 @@ const (
 	VerifyConfigKey     = "system:verify_config"
 	GlobalConfigKey     = "system:global_config"
 	CommonStatCacheKey  = "common:stat"
+
+	// Device admission control cache keys
+	DeviceOnlineKeyPrefix     = "device:online:"  // + user_id
+	DeviceSessionKeyPrefix    = "device:session:" // + user_id:identifier
+	NodeSessionsKeyPrefix     = "node:sessions:"  // + server_id
+	DeviceCountModeKey        = "system:device_count_mode"
+	DeviceAdmissionEnabledKey = "system:device_admission_enabled"
 )
 
 // Status 服务器状态

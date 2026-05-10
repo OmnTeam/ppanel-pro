@@ -55,6 +55,22 @@ service Server {
 			get: "/v2/server/{server_id}"
 		};
 	}
+
+	// SessionCheck 会话准入检查
+	rpc SessionCheck (SessionCheckRequest) returns (SessionCheckResponse) {
+		option (google.api.http) = {
+			post: "/v1/server/session/check"
+			body: "*"
+		};
+	}
+
+	// SessionRelease 会话释放
+	rpc SessionRelease (SessionReleaseRequest) returns (SessionReleaseResponse) {
+		option (google.api.http) = {
+			post: "/v1/server/session/release"
+			body: "*"
+		};
+	}
 }
 
 // ============================================================================
@@ -70,8 +86,10 @@ message GetServerConfigRequest {
 
 // ServerBasic 服务器基础配置
 message ServerBasic {
-	int64 push_interval = 1;  // 推送间隔（秒）
-	int64 pull_interval = 2;  // 拉取间隔（秒）
+	int64 push_interval = 1;       // 推送间隔（秒）
+	int64 pull_interval = 2;       // 拉取间隔（秒）
+	string device_count_mode = 3;  // 设备计数模式：“ip” 或 “connection”
+	bool device_admission_enabled = 4;  // 设备准入控制全局开关
 }
 
 // GetServerConfigReply 获取服务器配置响应
@@ -163,6 +181,7 @@ message PushServerStatusReply {
 message OnlineUser {
 	int64 sid = 1;            // 订阅ID
 	string ip = 2;            // IP地址
+	int64 connected_at = 3;   // 连接时间戳
 }
 
 // PushOnlineUsersRequest 推送在线用户请求
@@ -329,4 +348,40 @@ message QueryServerProtocolConfigReply {
 	repeated NodeOutbound outbound = 7;  // 出站配置
 	repeated Protocol protocols = 8;  // 协议配置
 	int32 total = 9;          // 总数
+}
+
+// ============================================================================
+// SessionCheck / SessionRelease - 设备准入控制
+// ============================================================================
+
+// SessionCheckRequest 会话准入检查请求
+message SessionCheckRequest {
+	int64  server_id     = 1;  // 服务器ID
+	string secret_key    = 2;  // 密钥
+	int64  user_id       = 3;  // 用户ID
+	string client_ip     = 4;  // 客户端IP
+	string protocol      = 5;  // 协议类型
+	string connection_id = 6;  // 连接ID
+}
+
+// SessionCheckResponse 会话准入检查响应
+message SessionCheckResponse {
+	bool   allowed = 1;  // 是否允许
+	int64  current = 2;  // 当前连接数
+	int64  limit   = 3;  // 连接数限制
+	string reason  = 4;  // 拒绝原因
+}
+
+// SessionReleaseRequest 会话释放请求
+message SessionReleaseRequest {
+	int64  server_id     = 1;  // 服务器ID
+	string secret_key    = 2;  // 密钥
+	int64  user_id       = 3;  // 用户ID
+	string client_ip     = 4;  // 客户端IP
+	string connection_id = 5;  // 连接ID
+}
+
+// SessionReleaseResponse 会话释放响应
+message SessionReleaseResponse {
+	bool success = 1;  // 是否成功
 }

@@ -25,6 +25,8 @@ const (
 	Server_PushServerStatus_FullMethodName          = "/api.server.v1.Server/PushServerStatus"
 	Server_PushOnlineUsers_FullMethodName           = "/api.server.v1.Server/PushOnlineUsers"
 	Server_QueryServerProtocolConfig_FullMethodName = "/api.server.v1.Server/QueryServerProtocolConfig"
+	Server_SessionCheck_FullMethodName              = "/api.server.v1.Server/SessionCheck"
+	Server_SessionRelease_FullMethodName            = "/api.server.v1.Server/SessionRelease"
 )
 
 // ServerClient is the client API for Server service.
@@ -46,6 +48,10 @@ type ServerClient interface {
 	PushOnlineUsers(ctx context.Context, in *PushOnlineUsersRequest, opts ...grpc.CallOption) (*PushOnlineUsersReply, error)
 	// QueryServerProtocolConfig 查询服务器协议配置
 	QueryServerProtocolConfig(ctx context.Context, in *QueryServerProtocolConfigRequest, opts ...grpc.CallOption) (*QueryServerProtocolConfigReply, error)
+	// SessionCheck 会话准入检查
+	SessionCheck(ctx context.Context, in *SessionCheckRequest, opts ...grpc.CallOption) (*SessionCheckResponse, error)
+	// SessionRelease 会话释放
+	SessionRelease(ctx context.Context, in *SessionReleaseRequest, opts ...grpc.CallOption) (*SessionReleaseResponse, error)
 }
 
 type serverClient struct {
@@ -116,6 +122,26 @@ func (c *serverClient) QueryServerProtocolConfig(ctx context.Context, in *QueryS
 	return out, nil
 }
 
+func (c *serverClient) SessionCheck(ctx context.Context, in *SessionCheckRequest, opts ...grpc.CallOption) (*SessionCheckResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SessionCheckResponse)
+	err := c.cc.Invoke(ctx, Server_SessionCheck_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *serverClient) SessionRelease(ctx context.Context, in *SessionReleaseRequest, opts ...grpc.CallOption) (*SessionReleaseResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SessionReleaseResponse)
+	err := c.cc.Invoke(ctx, Server_SessionRelease_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ServerServer is the server API for Server service.
 // All implementations must embed UnimplementedServerServer
 // for forward compatibility.
@@ -135,6 +161,10 @@ type ServerServer interface {
 	PushOnlineUsers(context.Context, *PushOnlineUsersRequest) (*PushOnlineUsersReply, error)
 	// QueryServerProtocolConfig 查询服务器协议配置
 	QueryServerProtocolConfig(context.Context, *QueryServerProtocolConfigRequest) (*QueryServerProtocolConfigReply, error)
+	// SessionCheck 会话准入检查
+	SessionCheck(context.Context, *SessionCheckRequest) (*SessionCheckResponse, error)
+	// SessionRelease 会话释放
+	SessionRelease(context.Context, *SessionReleaseRequest) (*SessionReleaseResponse, error)
 	mustEmbedUnimplementedServerServer()
 }
 
@@ -162,6 +192,12 @@ func (UnimplementedServerServer) PushOnlineUsers(context.Context, *PushOnlineUse
 }
 func (UnimplementedServerServer) QueryServerProtocolConfig(context.Context, *QueryServerProtocolConfigRequest) (*QueryServerProtocolConfigReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method QueryServerProtocolConfig not implemented")
+}
+func (UnimplementedServerServer) SessionCheck(context.Context, *SessionCheckRequest) (*SessionCheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SessionCheck not implemented")
+}
+func (UnimplementedServerServer) SessionRelease(context.Context, *SessionReleaseRequest) (*SessionReleaseResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SessionRelease not implemented")
 }
 func (UnimplementedServerServer) mustEmbedUnimplementedServerServer() {}
 func (UnimplementedServerServer) testEmbeddedByValue()                {}
@@ -292,6 +328,42 @@ func _Server_QueryServerProtocolConfig_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Server_SessionCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SessionCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerServer).SessionCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Server_SessionCheck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerServer).SessionCheck(ctx, req.(*SessionCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Server_SessionRelease_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SessionReleaseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ServerServer).SessionRelease(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Server_SessionRelease_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ServerServer).SessionRelease(ctx, req.(*SessionReleaseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Server_ServiceDesc is the grpc.ServiceDesc for Server service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -322,6 +394,14 @@ var Server_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "QueryServerProtocolConfig",
 			Handler:    _Server_QueryServerProtocolConfig_Handler,
+		},
+		{
+			MethodName: "SessionCheck",
+			Handler:    _Server_SessionCheck_Handler,
+		},
+		{
+			MethodName: "SessionRelease",
+			Handler:    _Server_SessionRelease_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

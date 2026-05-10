@@ -58,8 +58,10 @@ type CompatLegacyGetServerUserListRequest struct {
 }
 
 type CompatLegacyServerBasic struct {
-	PushInterval int64 `json:"push_interval"`
-	PullInterval int64 `json:"pull_interval"`
+	PushInterval           int64  `json:"push_interval"`
+	PullInterval           int64  `json:"pull_interval"`
+	DeviceCountMode        string `json:"device_count_mode,omitempty"`
+	DeviceAdmissionEnabled bool   `json:"device_admission_enabled,omitempty"`
 }
 
 type CompatLegacyGetServerConfigResponse struct {
@@ -325,10 +327,16 @@ func (s *ServerService) CompatGetServerConfig(ctx context.Context, provider Comp
 		pushInterval = nodeConfig.NodePushInterval
 	}
 
+	// 获取设备计数模式和准入控制开关
+	deviceCountMode, _ := s.uc.GetDeviceCountMode(ctx)
+	deviceAdmissionEnabled, _ := s.uc.GetDeviceAdmissionEnabled(ctx)
+
 	resp := &CompatLegacyGetServerConfigResponse{
 		Basic: CompatLegacyServerBasic{
-			PullInterval: pullInterval,
-			PushInterval: pushInterval,
+			PullInterval:           pullInterval,
+			PushInterval:           pushInterval,
+			DeviceCountMode:        deviceCountMode,
+			DeviceAdmissionEnabled: deviceAdmissionEnabled,
 		},
 		Protocol: req.Protocol,
 		Config:   config,

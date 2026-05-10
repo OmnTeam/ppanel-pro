@@ -2,8 +2,10 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
+	v1 "github.com/OmnTeam/npanel-pro/api/server/v1"
 	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -17,6 +19,11 @@ type ServerNodeRepo interface {
 	PushServerStatus(ctx context.Context, req *PushServerStatusRequest) error
 	PushOnlineUsers(ctx context.Context, req *PushOnlineUsersRequest) error
 	QueryServerProtocolConfig(ctx context.Context, serverID int64) (*ProtocolConfig, error)
+	SessionCheck(ctx context.Context, serverID int64, userID int64, identifier string, deviceLimit int64) (allowed bool, current int64, err error)
+	SessionRelease(ctx context.Context, userID int64, identifier string) error
+	GetDeviceCountMode(ctx context.Context) (string, error)
+	GetDeviceAdmissionEnabled(ctx context.Context) (bool, error)
+	GetUserDeviceLimit(ctx context.Context, userID int64) (int64, error)
 }
 
 // ServerConfig 服务器配置
@@ -259,6 +266,16 @@ func (uc *ServerNodeUsecase) GetServerConfig(ctx context.Context, serverID int64
 	return config, nil
 }
 
+// GetDeviceAdmissionEnabled 获取设备准入控制全局开关
+func (uc *ServerNodeUsecase) GetDeviceAdmissionEnabled(ctx context.Context) (bool, error) {
+	return uc.repo.GetDeviceAdmissionEnabled(ctx)
+}
+
+// GetDeviceCountMode 获取设备计数模式
+func (uc *ServerNodeUsecase) GetDeviceCountMode(ctx context.Context) (string, error) {
+	return uc.repo.GetDeviceCountMode(ctx)
+}
+
 // GetServerUserList 获取服务器用户列表
 func (uc *ServerNodeUsecase) GetServerUserList(ctx context.Context, serverID int64, protocol, secretKey string) ([]*ServerUser, error) {
 	valid, err := uc.validateSecretKey(ctx, secretKey)
@@ -341,6 +358,120 @@ func (uc *ServerNodeUsecase) PushOnlineUsers(ctx context.Context, req *PushOnlin
 	}
 
 	return nil
+}
+
+// SessionCheck 设备准入检查
+func (uc *ServerNodeUsecase) SessionCheck(ctx context.Context, req *v1.SessionCheckRequest) (*v1.SessionCheckResponse, error) {
+	// 1. 验证密钥
+	valid, err := uc.validateSecretKey(ctx, req.SecretKey)
+	if err != nil {
+		uc.logger.Errorf("Load node secret failed: %v", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if !valid {
+		uc.logger.Errorf("Invalid secret key for SessionCheck server %d", req.ServerId)
+		return nil, responsecode.ErrUnauthorized()
+	}
+
+	// 检查全局开关
+	enabled, err := uc.repo.GetDeviceAdmissionEnabled(ctx)
+	if err != nil {
+		// 开关读取失败，保守策略：放行
+		return &v1.SessionCheckResponse{Allowed: true, Current: 0, Limit: 0, Reason: ""}, nil
+	}
+	if !enabled {
+		// 功能未启用，直接放行
+		return &v1.SessionCheckResponse{Allowed: true, Current: 0, Limit: 0, Reason: ""}, nil
+	}
+
+	// 2. 读取 device_count_mode
+	mode, err := uc.repo.GetDeviceCountMode(ctx)
+	if err != nil {
+		uc.logger.Errorf("GetDeviceCountMode failed: %v", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	// 3. 根据模式确定 identifier
+	identifier := req.ClientIp
+	if mode == "connection" {
+		if req.ConnectionId != "" {
+			identifier = req.ConnectionId
+		}
+	}
+
+	// 4. 查询用户的 device_limit
+	deviceLimit, err := uc.repo.GetUserDeviceLimit(ctx, req.UserId)
+	if err != nil {
+		uc.logger.Errorf("GetUserDeviceLimit failed for user %d: %v", req.UserId, err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	// device_limit == 0 表示不限制，直接放行
+	if deviceLimit == 0 {
+		return &v1.SessionCheckResponse{
+			Allowed: true,
+			Current: 0,
+			Limit:   0,
+			Reason:  "",
+		}, nil
+	}
+
+	// 5. 调用 repo.SessionCheck
+	allowed, current, err := uc.repo.SessionCheck(ctx, req.ServerId, req.UserId, identifier, deviceLimit)
+	if err != nil {
+		uc.logger.Errorf("SessionCheck failed for user %d: %v", req.UserId, err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	// 6. 构造响应
+	resp := &v1.SessionCheckResponse{
+		Allowed: allowed,
+		Current: current,
+		Limit:   deviceLimit,
+	}
+	if !allowed {
+		resp.Reason = fmt.Sprintf("device limit exceeded: current=%d, limit=%d", current, deviceLimit)
+	}
+	return resp, nil
+}
+
+// SessionRelease 会话释放
+func (uc *ServerNodeUsecase) SessionRelease(ctx context.Context, req *v1.SessionReleaseRequest) (*v1.SessionReleaseResponse, error) {
+	// 1. 验证密钥
+	valid, err := uc.validateSecretKey(ctx, req.SecretKey)
+	if err != nil {
+		uc.logger.Errorf("Load node secret failed: %v", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+	if !valid {
+		uc.logger.Errorf("Invalid secret key for SessionRelease server %d", req.ServerId)
+		return nil, responsecode.ErrUnauthorized()
+	}
+
+	// 2. 读取 device_count_mode
+	mode, err := uc.repo.GetDeviceCountMode(ctx)
+	if err != nil {
+		uc.logger.Errorf("GetDeviceCountMode failed: %v", err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseQuery)
+	}
+
+	// 3. 确定 identifier
+	identifier := req.ClientIp
+	if mode == "connection" {
+		if req.ConnectionId != "" {
+			identifier = req.ConnectionId
+		}
+	}
+
+	// 4. 调用 repo.SessionRelease
+	err = uc.repo.SessionRelease(ctx, req.UserId, identifier)
+	if err != nil {
+		uc.logger.Errorf("SessionRelease failed for user %d: %v", req.UserId, err)
+		return nil, responsecode.NewKratosError(responsecode.ErrDatabaseUpdate)
+	}
+
+	// 5. 返回成功
+	return &v1.SessionReleaseResponse{Success: true}, nil
 }
 
 // QueryServerProtocolConfig 查询服务器协议配置

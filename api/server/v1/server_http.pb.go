@@ -25,6 +25,8 @@ const OperationServerPushOnlineUsers = "/api.server.v1.Server/PushOnlineUsers"
 const OperationServerPushServerStatus = "/api.server.v1.Server/PushServerStatus"
 const OperationServerPushUserTraffic = "/api.server.v1.Server/PushUserTraffic"
 const OperationServerQueryServerProtocolConfig = "/api.server.v1.Server/QueryServerProtocolConfig"
+const OperationServerSessionCheck = "/api.server.v1.Server/SessionCheck"
+const OperationServerSessionRelease = "/api.server.v1.Server/SessionRelease"
 
 type ServerHTTPServer interface {
 	// GetServerConfig GetServerConfig 获取服务器配置
@@ -39,6 +41,10 @@ type ServerHTTPServer interface {
 	PushUserTraffic(context.Context, *PushUserTrafficRequest) (*PushUserTrafficReply, error)
 	// QueryServerProtocolConfig QueryServerProtocolConfig 查询服务器协议配置
 	QueryServerProtocolConfig(context.Context, *QueryServerProtocolConfigRequest) (*QueryServerProtocolConfigReply, error)
+	// SessionCheck SessionCheck 会话准入检查
+	SessionCheck(context.Context, *SessionCheckRequest) (*SessionCheckResponse, error)
+	// SessionRelease SessionRelease 会话释放
+	SessionRelease(context.Context, *SessionReleaseRequest) (*SessionReleaseResponse, error)
 }
 
 func RegisterServerHTTPServer(s *http.Server, srv ServerHTTPServer) {
@@ -49,6 +55,8 @@ func RegisterServerHTTPServer(s *http.Server, srv ServerHTTPServer) {
 	r.POST("/v1/server/status", _Server_PushServerStatus0_HTTP_Handler(srv))
 	r.POST("/v1/server/online", _Server_PushOnlineUsers0_HTTP_Handler(srv))
 	r.GET("/v2/server/{server_id}", _Server_QueryServerProtocolConfig0_HTTP_Handler(srv))
+	r.POST("/v1/server/session/check", _Server_SessionCheck0_HTTP_Handler(srv))
+	r.POST("/v1/server/session/release", _Server_SessionRelease0_HTTP_Handler(srv))
 }
 
 func _Server_GetServerConfig0_HTTP_Handler(srv ServerHTTPServer) func(ctx http.Context) error {
@@ -177,6 +185,50 @@ func _Server_QueryServerProtocolConfig0_HTTP_Handler(srv ServerHTTPServer) func(
 	}
 }
 
+func _Server_SessionCheck0_HTTP_Handler(srv ServerHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SessionCheckRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServerSessionCheck)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SessionCheck(ctx, req.(*SessionCheckRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SessionCheckResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Server_SessionRelease0_HTTP_Handler(srv ServerHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SessionReleaseRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationServerSessionRelease)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SessionRelease(ctx, req.(*SessionReleaseRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SessionReleaseResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ServerHTTPClient interface {
 	// GetServerConfig GetServerConfig 获取服务器配置
 	GetServerConfig(ctx context.Context, req *GetServerConfigRequest, opts ...http.CallOption) (rsp *GetServerConfigReply, err error)
@@ -190,6 +242,10 @@ type ServerHTTPClient interface {
 	PushUserTraffic(ctx context.Context, req *PushUserTrafficRequest, opts ...http.CallOption) (rsp *PushUserTrafficReply, err error)
 	// QueryServerProtocolConfig QueryServerProtocolConfig 查询服务器协议配置
 	QueryServerProtocolConfig(ctx context.Context, req *QueryServerProtocolConfigRequest, opts ...http.CallOption) (rsp *QueryServerProtocolConfigReply, err error)
+	// SessionCheck SessionCheck 会话准入检查
+	SessionCheck(ctx context.Context, req *SessionCheckRequest, opts ...http.CallOption) (rsp *SessionCheckResponse, err error)
+	// SessionRelease SessionRelease 会话释放
+	SessionRelease(ctx context.Context, req *SessionReleaseRequest, opts ...http.CallOption) (rsp *SessionReleaseResponse, err error)
 }
 
 type ServerHTTPClientImpl struct {
@@ -278,6 +334,34 @@ func (c *ServerHTTPClientImpl) QueryServerProtocolConfig(ctx context.Context, in
 	opts = append(opts, http.Operation(OperationServerQueryServerProtocolConfig))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// SessionCheck SessionCheck 会话准入检查
+func (c *ServerHTTPClientImpl) SessionCheck(ctx context.Context, in *SessionCheckRequest, opts ...http.CallOption) (*SessionCheckResponse, error) {
+	var out SessionCheckResponse
+	pattern := "/v1/server/session/check"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationServerSessionCheck))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// SessionRelease SessionRelease 会话释放
+func (c *ServerHTTPClientImpl) SessionRelease(ctx context.Context, in *SessionReleaseRequest, opts ...http.CallOption) (*SessionReleaseResponse, error) {
+	var out SessionReleaseResponse
+	pattern := "/v1/server/session/release"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationServerSessionRelease))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

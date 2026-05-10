@@ -5433,6 +5433,44 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/api.server.v1.PushUserTrafficReply'
+    /v1/server/session/check:
+        post:
+            tags:
+                - Server
+            description: SessionCheck 会话准入检查
+            operationId: Server_SessionCheck
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.server.v1.SessionCheckRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.server.v1.SessionCheckResponse'
+    /v1/server/session/release:
+        post:
+            tags:
+                - Server
+            description: SessionRelease 会话释放
+            operationId: Server_SessionRelease
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/api.server.v1.SessionReleaseRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/api.server.v1.SessionReleaseResponse'
     /v1/server/status:
         post:
             tags:
@@ -13890,6 +13928,8 @@ components:
                     type: string
                 ip:
                     type: string
+                connectedAt:
+                    type: string
             description: OnlineUser 在线用户信息
         api.server.v1.Protocol:
             type: object
@@ -14234,6 +14274,10 @@ components:
                     type: string
                 pullInterval:
                     type: string
+                deviceCountMode:
+                    type: string
+                deviceAdmissionEnabled:
+                    type: boolean
             description: ServerBasic 服务器基础配置
         api.server.v1.ServerUser:
             type: object
@@ -14247,6 +14291,54 @@ components:
                 deviceLimit:
                     type: string
             description: ServerUser 服务器用户信息
+        api.server.v1.SessionCheckRequest:
+            type: object
+            properties:
+                serverId:
+                    type: string
+                secretKey:
+                    type: string
+                userId:
+                    type: string
+                clientIp:
+                    type: string
+                protocol:
+                    type: string
+                connectionId:
+                    type: string
+            description: SessionCheckRequest 会话准入检查请求
+        api.server.v1.SessionCheckResponse:
+            type: object
+            properties:
+                allowed:
+                    type: boolean
+                current:
+                    type: string
+                limit:
+                    type: string
+                reason:
+                    type: string
+            description: SessionCheckResponse 会话准入检查响应
+        api.server.v1.SessionReleaseRequest:
+            type: object
+            properties:
+                serverId:
+                    type: string
+                secretKey:
+                    type: string
+                userId:
+                    type: string
+                clientIp:
+                    type: string
+                connectionId:
+                    type: string
+            description: SessionReleaseRequest 会话释放请求
+        api.server.v1.SessionReleaseResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+            description: SessionReleaseResponse 会话释放响应
         api.server.v1.UserTraffic:
             type: object
             properties:

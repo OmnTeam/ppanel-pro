@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/OmnTeam/npanel-pro/ent/proxynode"
 	"github.com/OmnTeam/npanel-pro/ent/proxyservergroup"
 	"github.com/OmnTeam/npanel-pro/ent/proxysubscribe"
+	"github.com/OmnTeam/npanel-pro/ent/proxysystem"
 	"github.com/OmnTeam/npanel-pro/ent/proxytrafficlog"
 	"github.com/OmnTeam/npanel-pro/ent/proxyusersubscribe"
 	serverBiz "github.com/OmnTeam/npanel-pro/internal/biz/server"
@@ -961,4 +963,204 @@ func serverNodeSanitizeStringList(values []string) []string {
 		}
 	}
 	return result
+}
+
+// sessionCheckScript is the Lua script for atomic device session check
+var sessionCheckScript = redis.NewScript(`
+-- KEYS[1] = device:online:{user_id}
+-- KEYS[2] = device:session:{user_id}:{identifier}
+-- ARGV[1] = device_limit
+-- ARGV[2] = server_id
+-- ARGV[3] = protocol
+-- ARGV[4] = connected_at (unix timestamp string)
+
+-- Existing session (reconnect / same IP reuse) -> allow directly
+if redis.call('EXISTS', KEYS[2]) == 1 then
+    redis.call('HSET', KEYS[2], 'server_id', ARGV[2], 'protocol', ARGV[3], 'last_seen', ARGV[4])
+    redis.call('EXPIRE', KEYS[2], 120)
+    redis.call('EXPIRE', KEYS[1], 120)
+    local current = tonumber(redis.call('GET', KEYS[1])) or 0
+    return {1, current}
+end
+
+-- New device/connection -> check limit
+local current = tonumber(redis.call('GET', KEYS[1])) or 0
+local limit = tonumber(ARGV[1])
+if limit > 0 and current >= limit then
+    return {0, current}
+end
+
+-- Allow -> increment count, create session
+redis.call('INCR', KEYS[1])
+redis.call('EXPIRE', KEYS[1], 120)
+redis.call('HSET', KEYS[2], 'server_id', ARGV[2], 'protocol', ARGV[3], 'connected_at', ARGV[4])
+redis.call('EXPIRE', KEYS[2], 120)
+return {1, current + 1}
+`)
+
+// SessionCheck performs atomic device admission check using Redis Lua script
+func (r *serverNodeRepo) SessionCheck(ctx context.Context, serverID int64, userID int64, identifier string, deviceLimit int64) (allowed bool, current int64, err error) {
+	if r.data.rdb == nil {
+		return true, 0, nil
+	}
+
+	onlineKey := fmt.Sprintf("%s%d", DeviceOnlineKeyPrefix, userID)
+	sessionKey := fmt.Sprintf("%s%d:%s", DeviceSessionKeyPrefix, userID, identifier)
+
+	nowStr := strconv.FormatInt(time.Now().Unix(), 10)
+	serverIDStr := strconv.FormatInt(serverID, 10)
+	limitStr := strconv.FormatInt(deviceLimit, 10)
+
+	result, err := sessionCheckScript.Run(ctx, r.data.rdb,
+		[]string{onlineKey, sessionKey},
+		limitStr, serverIDStr, "", nowStr,
+	).Int64Slice()
+	if err != nil {
+		r.log.Errorf("SessionCheck Lua script failed: %v", err)
+		return false, 0, err
+	}
+
+	if len(result) < 2 {
+		return false, 0, fmt.Errorf("unexpected Lua script result length: %d", len(result))
+	}
+
+	return result[0] == 1, result[1], nil
+}
+
+// SessionRelease releases a device session and decrements the online counter
+func (r *serverNodeRepo) SessionRelease(ctx context.Context, userID int64, identifier string) error {
+	if r.data.rdb == nil {
+		return nil
+	}
+
+	sessionKey := fmt.Sprintf("%s%d:%s", DeviceSessionKeyPrefix, userID, identifier)
+	exists, err := r.data.rdb.Exists(ctx, sessionKey).Result()
+	if err != nil {
+		r.log.Errorf("SessionRelease check exists failed: %v", err)
+		return err
+	}
+	if exists > 0 {
+		// Delete session key
+		r.data.rdb.Del(ctx, sessionKey)
+		// Decrement online count (ensure not below 0)
+		onlineKey := fmt.Sprintf("%s%d", DeviceOnlineKeyPrefix, userID)
+		r.data.rdb.Decr(ctx, onlineKey)
+		// If count becomes 0 or negative, delete the key
+		val, _ := r.data.rdb.Get(ctx, onlineKey).Int64()
+		if val <= 0 {
+			r.data.rdb.Del(ctx, onlineKey)
+		}
+	}
+	return nil
+}
+
+// GetDeviceCountMode reads device_count_mode from system config
+func (r *serverNodeRepo) GetDeviceCountMode(ctx context.Context) (string, error) {
+	if r.data.rdb != nil {
+		// Try Redis cache first
+		val, err := r.data.rdb.Get(ctx, DeviceCountModeKey).Result()
+		if err == nil && val != "" {
+			return val, nil
+		}
+	}
+
+	// Fall back to database
+	entry, err := r.data.db.ProxySystem.Query().
+		Where(
+			proxysystem.CategoryEQ("server"),
+			proxysystem.KeyIn("device_count_mode", "DeviceCountMode"),
+		).
+		First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			// Default to "ip" mode
+			if r.data.rdb != nil {
+				r.data.rdb.Set(ctx, DeviceCountModeKey, "ip", 5*time.Minute)
+			}
+			return "ip", nil
+		}
+		r.log.Errorf("GetDeviceCountMode query failed: %v", err)
+		return "ip", err
+	}
+
+	mode := strings.TrimSpace(entry.Value)
+	if mode == "" {
+		mode = "ip"
+	}
+
+	// Cache in Redis
+	if r.data.rdb != nil {
+		r.data.rdb.Set(ctx, DeviceCountModeKey, mode, 5*time.Minute)
+	}
+
+	return mode, nil
+}
+
+// GetDeviceAdmissionEnabled reads device_admission_enabled from system config
+func (r *serverNodeRepo) GetDeviceAdmissionEnabled(ctx context.Context) (bool, error) {
+	if r.data.rdb != nil {
+		// Try Redis cache first
+		val, err := r.data.rdb.Get(ctx, DeviceAdmissionEnabledKey).Result()
+		if err == nil && val != "" {
+			return val == "true", nil
+		}
+	}
+
+	// Fall back to database
+	entry, err := r.data.db.ProxySystem.Query().
+		Where(
+			proxysystem.CategoryEQ("server"),
+			proxysystem.KeyIn("device_admission_enabled", "DeviceAdmissionEnabled"),
+		).
+		First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			// Default to false (disabled)
+			if r.data.rdb != nil {
+				r.data.rdb.Set(ctx, DeviceAdmissionEnabledKey, "false", 5*time.Minute)
+			}
+			return false, nil
+		}
+		r.log.Errorf("GetDeviceAdmissionEnabled query failed: %v", err)
+		return false, err
+	}
+
+	value := strings.TrimSpace(entry.Value)
+	enabled := value == "true"
+
+	// Cache in Redis
+	if r.data.rdb != nil {
+		r.data.rdb.Set(ctx, DeviceAdmissionEnabledKey, value, 5*time.Minute)
+	}
+
+	return enabled, nil
+}
+
+// GetUserDeviceLimit queries the device_limit for a user from their active subscription plan
+func (r *serverNodeRepo) GetUserDeviceLimit(ctx context.Context, userID int64) (int64, error) {
+	// Find user's active subscription
+	userSub, err := r.data.db.ProxyUserSubscribe.Query().
+		Where(
+			proxyusersubscribe.UserIDEQ(userID),
+			proxyusersubscribe.StatusIn(int8(0), int8(1)),
+		).
+		First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			// No active subscription, no limit
+			return 0, nil
+		}
+		return 0, fmt.Errorf("query user subscribe failed: %w", err)
+	}
+
+	// Get subscribe plan's device_limit
+	plan, err := r.data.db.ProxySubscribe.Get(ctx, userSub.SubscribeID)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return 0, nil
+		}
+		return 0, fmt.Errorf("query subscribe plan failed: %w", err)
+	}
+
+	return int64(plan.DeviceLimit), nil
 }
