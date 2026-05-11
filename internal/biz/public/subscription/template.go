@@ -5,7 +5,9 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"net/url"
 	"reflect"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -87,6 +89,7 @@ func templateFuncMap() template.FuncMap {
 	funcs := sprig.TxtFuncMap()
 	funcs["simnetHexPSK"] = simnetHexPSK
 	funcs["buildOmnxtSimnetConfigs"] = buildOmnxtSimnetConfigs
+	funcs["buildOmnxtProtocolLinks"] = buildOmnxtProtocolLinks
 	return funcs
 }
 
@@ -146,14 +149,14 @@ func buildOmnxtSimnetConfigs(proxies []map[string]interface{}, userInfo UserInfo
 		}
 
 		item := map[string]interface{}{
-			"tag":                          mapString(proxy["Name"]),
-			"server_addr":                  mapString(proxy["Server"]),
-			"server_port":                  mapInt(proxy["Port"]),
-			"protocol":                     "simnet",
-			"sni":                          mapString(proxy["SNI"]),
-			"allow_insecure":               mapBool(proxy["AllowInsecure"]),
-			"simnet_psk":                   userPSK,
-			"simnet_key_id":                userKeyID,
+			"tag":            mapString(proxy["Name"]),
+			"server_addr":    mapString(proxy["Server"]),
+			"server_port":    mapInt(proxy["Port"]),
+			"protocol":       "simnet",
+			"sni":            mapString(proxy["SNI"]),
+			"allow_insecure": mapBool(proxy["AllowInsecure"]),
+			"simnet_psk":     userPSK,
+			"simnet_key_id":  userKeyID,
 			// Server PSK is needed for AF path/magic/content-type derivation.
 			// The Node uses credentials[0] (server PSK, key_id=0) for AF, so
 			// the SDK must also use the same key material for path matching.
@@ -175,6 +178,111 @@ func buildOmnxtSimnetConfigs(proxies []map[string]interface{}, userInfo UserInfo
 	}
 
 	return result
+}
+
+func buildOmnxtProtocolLinks(proxies []map[string]interface{}, userInfo UserInfo, params map[string]string) []string {
+	configs := buildOmnxtSimnetConfigs(proxies, userInfo, params)
+	result := make([]string, 0, len(configs))
+
+	for _, item := range configs {
+		serverAddr := mapString(item["server_addr"])
+		serverPort := mapInt(item["server_port"])
+		tag := mapString(item["tag"])
+
+		if serverAddr == "" || serverPort == 0 {
+			continue
+		}
+
+		payload := map[string]interface{}{
+			"protocol":                     mapString(item["protocol"]),
+			"server_addr":                  serverAddr,
+			"server_port":                  serverPort,
+			"sni":                          mapString(item["sni"]),
+			"simnet_psk":                   mapString(item["simnet_psk"]),
+			"simnet_key_id":                mapInt(item["simnet_key_id"]),
+			"simnet_ticket_id":             item["simnet_ticket_id"],
+			"simnet_path":                  item["simnet_path"],
+			"simnet_carrier":               mapString(item["simnet_carrier"]),
+			"simnet_af_enabled":            mapBool(item["simnet_af_enabled"]),
+			"simnet_af_path_mode":          mapString(item["simnet_af_path_mode"]),
+			"simnet_af_path_prefix":        item["simnet_af_path_prefix"],
+			"simnet_af_path_suffix":        item["simnet_af_path_suffix"],
+			"simnet_af_magic_mode":         mapString(item["simnet_af_magic_mode"]),
+			"simnet_af_response_jitter_ms": mapInt(item["simnet_af_response_jitter_ms"]),
+			"proxy_mode":                   item["proxy_mode"],
+			"dns_servers":                  item["dns_servers"],
+		}
+
+		encodedPayload := encodeProtocolPayload(payload)
+		if encodedPayload == "" {
+			continue
+		}
+		result = append(result, "simnet://"+encodedPayload+"#"+url.QueryEscape(tag))
+	}
+
+	return result
+}
+
+func findProxyByName(proxies []map[string]interface{}, name string) map[string]interface{} {
+	for _, proxy := range proxies {
+		if mapString(proxy["Name"]) == name {
+			return proxy
+		}
+	}
+	return nil
+}
+
+func encodeProtocolPayload(payload map[string]interface{}) string {
+	values := url.Values{}
+	for key, value := range payload {
+		switch v := value.(type) {
+		case nil:
+			continue
+		case string:
+			if strings.TrimSpace(v) != "" {
+				values.Set(key, v)
+			}
+		case bool:
+			if v {
+				values.Set(key, "1")
+			}
+		case int:
+			if v != 0 {
+				values.Set(key, strconv.Itoa(v))
+			}
+		case int32:
+			if v != 0 {
+				values.Set(key, strconv.FormatInt(int64(v), 10))
+			}
+		case int64:
+			if v != 0 {
+				values.Set(key, strconv.FormatInt(v, 10))
+			}
+		case []string:
+			if len(v) > 0 {
+				values.Set(key, strings.Join(v, ","))
+			}
+		case []interface{}:
+			items := make([]string, 0, len(v))
+			for _, item := range v {
+				if s := mapString(item); s != "" {
+					items = append(items, s)
+				}
+			}
+			if len(items) > 0 {
+				values.Set(key, strings.Join(items, ","))
+			}
+		default:
+			if s := mapString(v); s != "" {
+				values.Set(key, s)
+			}
+		}
+	}
+
+	if len(values) == 0 {
+		return ""
+	}
+	return base64.StdEncoding.EncodeToString([]byte(values.Encode()))
 }
 
 func mapString(value interface{}) string {

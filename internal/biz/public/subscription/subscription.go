@@ -286,6 +286,7 @@ func (uc *SubscriptionUseCase) GetSubscribeConfig(ctx context.Context, req *v1.G
 	if err != nil {
 		return nil, err
 	}
+	nodes = filterSubscriptionNodesByUserAgent(nodes, userAgent)
 
 	// 7. 生成订阅URL（按照原项目逻辑）
 	subscribeURL := uc.getSubscribeV2URL(ctx, req.Token, requestURI, requestHost, gatewayMode)
@@ -329,6 +330,55 @@ func (uc *SubscriptionUseCase) GetSubscribeConfig(ctx context.Context, req *v1.G
 		Config: configBytes,
 		Header: header,
 	}, nil
+}
+
+func filterSubscriptionNodesByUserAgent(nodes []*NodeInfo, userAgent string) []*NodeInfo {
+	if len(nodes) == 0 || !shouldHideExperimentalProtocols(userAgent) {
+		return nodes
+	}
+
+	filtered := make([]*NodeInfo, 0, len(nodes))
+	for _, node := range nodes {
+		if node == nil || isExperimentalSubscriptionProtocol(node.Type) {
+			continue
+		}
+		filtered = append(filtered, node)
+	}
+	return filtered
+}
+
+func shouldHideExperimentalProtocols(userAgent string) bool {
+	ua := strings.ToLower(strings.TrimSpace(userAgent))
+	if ua == "" {
+		return false
+	}
+
+	keywords := []string{
+		"clash",
+		"stash",
+		"v2ray",
+		"v2box",
+		"xray",
+		"sing-box",
+		"singbox",
+		"nekobox",
+		"hiddify",
+	}
+	for _, keyword := range keywords {
+		if strings.Contains(ua, keyword) {
+			return true
+		}
+	}
+	return false
+}
+
+func isExperimentalSubscriptionProtocol(protocolType string) bool {
+	switch strings.ToLower(strings.TrimSpace(protocolType)) {
+	case "simnet", "omn", "omniflow":
+		return true
+	default:
+		return false
+	}
 }
 
 // UserSubscribe 用户订阅信息
@@ -385,59 +435,87 @@ type NodeInfo struct {
 	Tags        []string
 	NodeGroupID int64
 
-	Security                      string
-	SNI                           string
-	AllowInsecure                 bool
-	Fingerprint                   string
-	RealityServerAddr             string
-	RealityServerPort             int
-	RealityPrivateKey             string
-	RealityPublicKey              string
-	RealityShortId                string
-	Transport                     string
-	Host                          string
-	Path                          string
-	ServiceName                   string
-	Method                        string
-	ServerKey                     string
-	Flow                          string
-	HopPorts                      string
-	HopInterval                   int
-	ObfsPassword                  string
-	UpMbps                        int
-	DownMbps                      int
-	DisableSNI                    bool
-	ReduceRtt                     bool
-	UDPRelayMode                  string
-	CongestionController          string
-	PaddingScheme                 string
-	Multiplex                     string
-	XhttpMode                     string
-	XhttpExtra                    string
-	Encryption                    string
-	EncryptionMode                string
-	EncryptionRtt                 string
-	EncryptionTicket              string
-	EncryptionServerPadding       string
-	EncryptionPrivateKey          string
-	EncryptionClientPadding       string
-	EncryptionPassword            string
-	Ratio                         float64
-	CertMode                      string
-	CertDNSProvider               string
-	CertDNSEnv                    string
-	SimnetPsk                     string
-	SimnetKeyID                   int
-	SimnetTicketID                string
-	SimnetPath                    string
-	SimnetCarrier                 string
-	SimnetAfEnabled               bool
-	SimnetAfPathMode              string
-	SimnetAfPathPrefix            string
-	SimnetAfPathSuffix            string
-	SimnetAfMagicMode             string
-	SimnetAfResponseJitterMs      int
-	SimnetAfHandshakePolymorphism bool
-	SimnetAfSettingsJitter        bool
-	SimnetAfFakeHeaderInjection   bool
+	Security                           string
+	SNI                                string
+	AllowInsecure                      bool
+	Fingerprint                        string
+	RealityServerAddr                  string
+	RealityServerPort                  int
+	RealityPrivateKey                  string
+	RealityPublicKey                   string
+	RealityShortId                     string
+	Transport                          string
+	Host                               string
+	Path                               string
+	ServiceName                        string
+	Method                             string
+	ServerKey                          string
+	Flow                               string
+	HopPorts                           string
+	HopInterval                        int
+	ObfsPassword                       string
+	UpMbps                             int
+	DownMbps                           int
+	DisableSNI                         bool
+	ReduceRtt                          bool
+	UDPRelayMode                       string
+	CongestionController               string
+	PaddingScheme                      string
+	Multiplex                          string
+	XhttpMode                          string
+	XhttpExtra                         string
+	Encryption                         string
+	EncryptionMode                     string
+	EncryptionRtt                      string
+	EncryptionTicket                   string
+	EncryptionServerPadding            string
+	EncryptionPrivateKey               string
+	EncryptionClientPadding            string
+	EncryptionPassword                 string
+	Ratio                              float64
+	CertMode                           string
+	CertDNSProvider                    string
+	CertDNSEnv                         string
+	SimnetPsk                          string
+	SimnetKeyID                        int
+	SimnetTicketID                     string
+	SimnetPath                         string
+	SimnetCarrier                      string
+	SimnetAfEnabled                    bool
+	SimnetAfPathMode                   string
+	SimnetAfPathPrefix                 string
+	SimnetAfPathSuffix                 string
+	SimnetAfMagicMode                  string
+	SimnetAfResponseJitterMs           int
+	SimnetAfHandshakePolymorphism      bool
+	SimnetAfSettingsJitter             bool
+	SimnetAfFakeHeaderInjection        bool
+	OmniflowCarrier                    string
+	OmniflowPath                       string
+	OmniflowContentType                string
+	OmniflowProfilePath                string
+	OmniflowProfileJson                string
+	OmniflowServerHost                 string
+	OmniflowServerPort                 int
+	OmniflowCaCertPath                 string
+	OmniflowTargetMeta                 string
+	OmniflowSpkiPin                    string
+	OmniflowH3FallbackEnabled          bool
+	OmniflowH3FallbackPolicy           string
+	OmniflowH3FallbackTimeoutMs        int
+	OmniflowH3FallbackRetryBudget      int
+	OmniflowH3FallbackSmokeEnabled     bool
+	OmniflowH3FallbackSmokeIntervalSec int
+	OmniflowH3FallbackSmokeTimeoutMs   int
+	OmniflowMaxAgeSec                  int
+	OmniflowIdleTimeoutSec             int
+	OmniflowMaxConnections             int
+	OmniflowAdaptiveTlsEnabled         bool
+	OmniflowTlsFingerprint             string
+	OmniflowSniMode                    string
+	OmniflowPaddingMode                string
+	OmniflowTrafficShapingEnabled      bool
+	OmniflowFallbackCarrierEnabled     bool
+	OmniflowFallbackConnectTunnel      bool
+	OmniflowFallbackWssEnabled         bool
 }

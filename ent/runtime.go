@@ -1006,21 +1006,7 @@ func init() {
 	// proxysubscribeapplication.DefaultScheme holds the default value on creation for the scheme field.
 	proxysubscribeapplication.DefaultScheme = proxysubscribeapplicationDescScheme.Default.(string)
 	// proxysubscribeapplication.SchemeValidator is a validator for the "scheme" field. It is called by the builders before save.
-	proxysubscribeapplication.SchemeValidator = func() func(string) error {
-		validators := proxysubscribeapplicationDescScheme.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(scheme string) error {
-			for _, fn := range fns {
-				if err := fn(scheme); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
+	proxysubscribeapplication.SchemeValidator = proxysubscribeapplicationDescScheme.Validators[0].(func(string) error)
 	// proxysubscribeapplicationDescUserAgent is the schema descriptor for user_agent field.
 	proxysubscribeapplicationDescUserAgent := proxysubscribeapplicationFields[5].Descriptor()
 	// proxysubscribeapplication.DefaultUserAgent holds the default value on creation for the user_agent field.

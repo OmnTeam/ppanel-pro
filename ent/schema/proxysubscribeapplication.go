@@ -28,7 +28,7 @@ func (ProxySubscribeApplication) Fields() []ent.Field {
 		field.String("name").MaxLen(255).NotEmpty().Default("").Comment("应用名称"),
 		field.Text("icon").SchemaType(map[string]string{dialect.MySQL: "mediumtext"}).Optional().Nillable().Comment("应用图标"),
 		field.String("description").MaxLen(255).Optional().Nillable().Comment("应用描述"),
-		field.String("scheme").MaxLen(255).NotEmpty().Default("").Comment("应用Scheme"),
+		field.String("scheme").MaxLen(255).Default("").Comment("应用Scheme"),
 		field.String("user_agent").MaxLen(255).NotEmpty().Default("").Comment("User Agent"),
 		field.Bool("is_default").Default(false).Comment("是否默认应用"),
 		field.Text("subscribe_template").SchemaType(map[string]string{dialect.MySQL: "mediumtext"}).Optional().Nillable().Comment("订阅模板"),
