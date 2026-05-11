@@ -124,6 +124,10 @@ func normalizeSystemConfigKey(key string) string {
 		return "Block"
 	case "outbound":
 		return "Outbound"
+	case "device_admission_enabled":
+		return "DeviceAdmissionEnabled"
+	case "device_count_mode":
+		return "DeviceCountMode"
 	case "node_multiplier", "node_multiplier_config", "NodeMultiplier":
 		return "NodeMultiplierConfig"
 	case "web_ad":

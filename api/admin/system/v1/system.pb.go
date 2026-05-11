@@ -7,11 +7,12 @@
 package v1
 
 import (
+	reflect "reflect"
+	sync "sync"
+
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
-	reflect "reflect"
-	sync "sync"
 )
 
 const (
@@ -1031,6 +1032,8 @@ type NodeConfig struct {
 	Dns                    []*NodeDNS      `protobuf:"bytes,6,rep,name=dns,proto3" json:"dns,omitempty"`                                                                        // DNS配置
 	Block                  []string        `protobuf:"bytes,7,rep,name=block,proto3" json:"block,omitempty"`                                                                    // 屏蔽列表
 	Outbound               []*NodeOutbound `protobuf:"bytes,8,rep,name=outbound,proto3" json:"outbound,omitempty"`                                                              // 出站配置
+	DeviceAdmissionEnabled bool            `protobuf:"varint,9,opt,name=device_admission_enabled,json=deviceAdmissionEnabled,proto3" json:"device_admission_enabled,omitempty"`
+	DeviceCountMode        string          `protobuf:"bytes,10,opt,name=device_count_mode,json=deviceCountMode,proto3" json:"device_count_mode,omitempty"`
 }
 
 func (x *NodeConfig) Reset() {
@@ -1119,6 +1122,20 @@ func (x *NodeConfig) GetOutbound() []*NodeOutbound {
 		return x.Outbound
 	}
 	return nil
+}
+
+func (x *NodeConfig) GetDeviceAdmissionEnabled() bool {
+	if x != nil {
+		return x.DeviceAdmissionEnabled
+	}
+	return false
+}
+
+func (x *NodeConfig) GetDeviceCountMode() string {
+	if x != nil {
+		return x.DeviceCountMode
+	}
+	return ""
 }
 
 // PrivacyPolicyConfig 隐私政策配置
@@ -1285,6 +1302,8 @@ type UpdateNodeConfigRequest struct {
 	Dns                    []*NodeDNS      `protobuf:"bytes,6,rep,name=dns,proto3" json:"dns,omitempty"`
 	Block                  []string        `protobuf:"bytes,7,rep,name=block,proto3" json:"block,omitempty"`
 	Outbound               []*NodeOutbound `protobuf:"bytes,8,rep,name=outbound,proto3" json:"outbound,omitempty"`
+	DeviceAdmissionEnabled bool            `protobuf:"varint,9,opt,name=device_admission_enabled,json=deviceAdmissionEnabled,proto3" json:"device_admission_enabled,omitempty"`
+	DeviceCountMode        string          `protobuf:"bytes,10,opt,name=device_count_mode,json=deviceCountMode,proto3" json:"device_count_mode,omitempty"`
 }
 
 func (x *UpdateNodeConfigRequest) Reset() {
@@ -1373,6 +1392,20 @@ func (x *UpdateNodeConfigRequest) GetOutbound() []*NodeOutbound {
 		return x.Outbound
 	}
 	return nil
+}
+
+func (x *UpdateNodeConfigRequest) GetDeviceAdmissionEnabled() bool {
+	if x != nil {
+		return x.DeviceAdmissionEnabled
+	}
+	return false
+}
+
+func (x *UpdateNodeConfigRequest) GetDeviceCountMode() string {
+	if x != nil {
+		return x.DeviceCountMode
+	}
+	return ""
 }
 
 type UpdateNodeConfigData struct {

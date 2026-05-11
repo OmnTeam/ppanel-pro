@@ -53,6 +53,8 @@ type NodeConfig struct {
 	DNS                    string `json:"DNS"`      // JSON string
 	Block                  string `json:"Block"`    // JSON string
 	Outbound               string `json:"Outbound"` // JSON string
+	DeviceAdmissionEnabled bool   `json:"DeviceAdmissionEnabled"`
+	DeviceCountMode        string `json:"DeviceCountMode"`
 }
 
 // PrivacyPolicyConfig 隐私政策配置

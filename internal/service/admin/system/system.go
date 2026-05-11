@@ -204,6 +204,8 @@ func convertBizNodeConfigToPb(config *systembiz.NodeConfig) *pb.NodeConfig {
 		NodePushInterval:       int64(config.NodePushInterval),
 		TrafficReportThreshold: int64(config.TrafficReportThreshold),
 		IpStrategy:             config.IPStrategy,
+		DeviceAdmissionEnabled: config.DeviceAdmissionEnabled,
+		DeviceCountMode:        config.DeviceCountMode,
 	}
 
 	// Parse JSON fields
@@ -254,6 +256,8 @@ func convertPbNodeConfigToBiz(req *pb.UpdateNodeConfigRequest) *systembiz.NodeCo
 		NodePushInterval:       int(req.NodePushInterval),
 		TrafficReportThreshold: int(req.TrafficReportThreshold),
 		IPStrategy:             req.IpStrategy,
+		DeviceAdmissionEnabled: req.DeviceAdmissionEnabled,
+		DeviceCountMode:        req.DeviceCountMode,
 	}
 
 	// Convert DNS list to JSON

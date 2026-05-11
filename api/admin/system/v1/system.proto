@@ -304,6 +304,8 @@ message NodeConfig {
   repeated NodeDNS dns = 6;              // DNS配置
   repeated string block = 7;             // 屏蔽列表
   repeated NodeOutbound outbound = 8;    // 出站配置
+  bool device_admission_enabled = 9;     // 设备准入检查开关
+  string device_count_mode = 10;         // 设备计数模式 (ip/connection)
 }
 
 // PrivacyPolicyConfig 隐私政策配置
@@ -330,6 +332,8 @@ message UpdateNodeConfigRequest {
   repeated NodeDNS dns = 6;
   repeated string block = 7;
   repeated NodeOutbound outbound = 8;
+  bool device_admission_enabled = 9;     // 设备准入检查开关
+  string device_count_mode = 10;         // 设备计数模式 (ip/connection)
 }
 
 message UpdateNodeConfigData {
