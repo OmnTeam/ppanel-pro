@@ -349,16 +349,25 @@ func legacyNodeList(ctx context.Context, d *Data, userSub *ent.ProxyUserSubscrib
 				tags = append(tags, trimmed)
 			}
 		}
+		selectedIDs := make(map[int64]struct{})
 		for _, node := range enabledNodes {
-			if len(nodeIDs) > 0 && !tool.Contains(nodeIDs, node.ID) {
-				continue
-			}
-			if len(tags) > 0 && !nodeMatchesTags(node.Tags, tags) {
-				continue
-			}
 			if len(nodeIDs) == 0 && len(tags) == 0 {
 				continue
 			}
+			matched := false
+			if len(nodeIDs) > 0 && tool.Contains(nodeIDs, node.ID) {
+				matched = true
+			}
+			if len(tags) > 0 && nodeMatchesTags(node.Tags, tags) {
+				matched = true
+			}
+			if !matched {
+				continue
+			}
+			if _, ok := selectedIDs[node.ID]; ok {
+				continue
+			}
+			selectedIDs[node.ID] = struct{}{}
 			selected = append(selected, node)
 		}
 	}
