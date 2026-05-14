@@ -203,6 +203,7 @@ func (r *publicSubscriptionRepo) createExpiredNodesFromDB(ctx context.Context, u
 			OmniflowFallbackWssEnabled:         matched.OmniflowFallbackWssEnabled,
 		}
 
+		nodeInfo.NormalizeSimnet()
 		nodeInfos = append(nodeInfos, nodeInfo)
 	}
 

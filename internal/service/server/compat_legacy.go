@@ -581,6 +581,7 @@ func (s *ServerService) CompatQueryServerProtocolConfig(ctx context.Context, pro
 		if protocol == nil || !protocol.Enable {
 			continue
 		}
+		protocol.NormalizeSimnet()
 		enabledProtocols = append(enabledProtocols, protocol)
 	}
 	protocols = enabledProtocols

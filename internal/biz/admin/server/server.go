@@ -149,15 +149,7 @@ func normalizeSimnetProtocol(protocol *server.Protocol, address string) {
 	} else if protocol.Security == "" || protocol.Security == "none" {
 		protocol.Security = "tls"
 	}
-	if protocol.SimnetAfPathMode == "" {
-		protocol.SimnetAfPathMode = "api"
-	}
-	if protocol.SimnetAfMagicMode == "" {
-		protocol.SimnetAfMagicMode = "derived"
-	}
-	if protocol.SimnetAfResponseJitterMs == 0 {
-		protocol.SimnetAfResponseJitterMs = 50
-	}
+	protocol.NormalizeSimnet()
 }
 
 func isLikelyDomainAddress(address string) bool {

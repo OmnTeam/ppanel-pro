@@ -299,6 +299,7 @@ func (r *publicSubscriptionRepo) GetAvailableNodes(ctx context.Context, userSubs
 			OmniflowFallbackWssEnabled:         matched.OmniflowFallbackWssEnabled,
 		}
 
+		nodeInfo.NormalizeSimnet()
 		nodeInfos = append(nodeInfos, nodeInfo)
 	}
 

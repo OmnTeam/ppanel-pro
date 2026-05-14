@@ -39,6 +39,7 @@ func RenderTemplate(
 	// 1. 转换节点为Proxy格式
 	proxies := make([]map[string]interface{}, 0, len(nodes))
 	for _, node := range nodes {
+		node.NormalizeSimnet()
 		proxyMap := structToMap(node)
 		proxies = append(proxies, proxyMap)
 	}
@@ -148,6 +149,7 @@ func buildOmnxtSimnetConfigs(proxies []map[string]interface{}, userInfo UserInfo
 			continue
 		}
 
+		afEnabled := mapBool(proxy["SimnetAfEnabled"])
 		item := map[string]interface{}{
 			"tag":            mapString(proxy["Name"]),
 			"server_addr":    mapString(proxy["Server"]),
@@ -160,19 +162,24 @@ func buildOmnxtSimnetConfigs(proxies []map[string]interface{}, userInfo UserInfo
 			// Server PSK is needed for AF path/magic/content-type derivation.
 			// The Node uses credentials[0] (server PSK, key_id=0) for AF, so
 			// the SDK must also use the same key material for path matching.
-			"simnet_server_psk":            mapStringOrNil(proxy["SimnetPSK"]),
-			"simnet_server_key_id":         defaultInt(mapInt(proxy["SimnetKeyID"]), 0),
-			"simnet_ticket_id":             mapStringOrNil(proxy["SimnetTicketID"]),
-			"simnet_path":                  mapStringOrNil(proxy["SimnetPath"]),
-			"simnet_carrier":               defaultString(mapString(proxy["SimnetCarrier"]), "h2"),
-			"simnet_af_enabled":            mapBool(proxy["SimnetAfEnabled"]),
-			"simnet_af_path_mode":          defaultString(mapString(proxy["SimnetAfPathMode"]), "api"),
-			"simnet_af_path_prefix":        mapStringOrNil(proxy["SimnetAfPathPrefix"]),
-			"simnet_af_path_suffix":        mapStringOrNil(proxy["SimnetAfPathSuffix"]),
-			"simnet_af_magic_mode":         defaultString(mapString(proxy["SimnetAfMagicMode"]), "derived"),
-			"simnet_af_response_jitter_ms": defaultInt(mapInt(proxy["SimnetAfResponseJitterMs"]), 50),
-			"proxy_mode":                   proxyMode,
-			"dns_servers":                  dnsServers,
+			"simnet_server_psk":    mapStringOrNil(proxy["SimnetPSK"]),
+			"simnet_server_key_id": defaultInt(mapInt(proxy["SimnetKeyID"]), 0),
+			"simnet_ticket_id":     mapStringOrNil(proxy["SimnetTicketID"]),
+			"simnet_path":          defaultString(mapString(proxy["SimnetPath"]), "/simnet/session"),
+			"simnet_carrier":       defaultString(mapString(proxy["SimnetCarrier"]), "h2"),
+			"simnet_af_enabled":    afEnabled,
+			"proxy_mode":           proxyMode,
+			"dns_servers":          dnsServers,
+		}
+		if afEnabled {
+			item["simnet_af_path_mode"] = defaultString(mapString(proxy["SimnetAfPathMode"]), "api")
+			item["simnet_af_path_prefix"] = mapStringOrNil(proxy["SimnetAfPathPrefix"])
+			item["simnet_af_path_suffix"] = mapStringOrNil(proxy["SimnetAfPathSuffix"])
+			item["simnet_af_magic_mode"] = defaultString(mapString(proxy["SimnetAfMagicMode"]), "derived")
+			item["simnet_af_response_jitter_ms"] = defaultInt(mapInt(proxy["SimnetAfResponseJitterMs"]), 50)
+			item["simnet_af_handshake_polymorphism"] = mapBool(proxy["SimnetAfHandshakePolymorphism"])
+			item["simnet_af_settings_jitter"] = mapBool(proxy["SimnetAfSettingsJitter"])
+			item["simnet_af_fake_header_injection"] = mapBool(proxy["SimnetAfFakeHeaderInjection"])
 		}
 		result = append(result, item)
 	}
@@ -193,24 +200,30 @@ func buildOmnxtProtocolLinks(proxies []map[string]interface{}, userInfo UserInfo
 			continue
 		}
 
+		afEnabled := mapBool(item["simnet_af_enabled"])
 		payload := map[string]interface{}{
-			"protocol":                     mapString(item["protocol"]),
-			"server_addr":                  serverAddr,
-			"server_port":                  serverPort,
-			"sni":                          mapString(item["sni"]),
-			"simnet_psk":                   mapString(item["simnet_psk"]),
-			"simnet_key_id":                mapInt(item["simnet_key_id"]),
-			"simnet_ticket_id":             item["simnet_ticket_id"],
-			"simnet_path":                  item["simnet_path"],
-			"simnet_carrier":               mapString(item["simnet_carrier"]),
-			"simnet_af_enabled":            mapBool(item["simnet_af_enabled"]),
-			"simnet_af_path_mode":          mapString(item["simnet_af_path_mode"]),
-			"simnet_af_path_prefix":        item["simnet_af_path_prefix"],
-			"simnet_af_path_suffix":        item["simnet_af_path_suffix"],
-			"simnet_af_magic_mode":         mapString(item["simnet_af_magic_mode"]),
-			"simnet_af_response_jitter_ms": mapInt(item["simnet_af_response_jitter_ms"]),
-			"proxy_mode":                   item["proxy_mode"],
-			"dns_servers":                  item["dns_servers"],
+			"protocol":          mapString(item["protocol"]),
+			"server_addr":       serverAddr,
+			"server_port":       serverPort,
+			"sni":               mapString(item["sni"]),
+			"simnet_psk":        mapString(item["simnet_psk"]),
+			"simnet_key_id":     mapInt(item["simnet_key_id"]),
+			"simnet_ticket_id":  item["simnet_ticket_id"],
+			"simnet_path":       item["simnet_path"],
+			"simnet_carrier":    mapString(item["simnet_carrier"]),
+			"simnet_af_enabled": afEnabled,
+			"proxy_mode":        item["proxy_mode"],
+			"dns_servers":       item["dns_servers"],
+		}
+		if afEnabled {
+			payload["simnet_af_path_mode"] = mapString(item["simnet_af_path_mode"])
+			payload["simnet_af_path_prefix"] = item["simnet_af_path_prefix"]
+			payload["simnet_af_path_suffix"] = item["simnet_af_path_suffix"]
+			payload["simnet_af_magic_mode"] = mapString(item["simnet_af_magic_mode"])
+			payload["simnet_af_response_jitter_ms"] = mapInt(item["simnet_af_response_jitter_ms"])
+			payload["simnet_af_handshake_polymorphism"] = mapBool(item["simnet_af_handshake_polymorphism"])
+			payload["simnet_af_settings_jitter"] = mapBool(item["simnet_af_settings_jitter"])
+			payload["simnet_af_fake_header_injection"] = mapBool(item["simnet_af_fake_header_injection"])
 		}
 
 		encodedPayload := encodeProtocolPayload(payload)

@@ -14,6 +14,7 @@ import (
 	"github.com/OmnTeam/npanel-pro/ent/proxysystem"
 	"github.com/OmnTeam/npanel-pro/ent/proxyusersubscribe"
 	subscribeBiz "github.com/OmnTeam/npanel-pro/internal/biz/public/subscribe"
+	servermodel "github.com/OmnTeam/npanel-pro/internal/model/server"
 	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/OmnTeam/npanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/log"
@@ -518,12 +519,13 @@ func buildLegacyNodeInfos(ctx context.Context, d *Data, userSub *ent.ProxyUserSu
 		if server == nil {
 			continue
 		}
+		protocols := cleanLegacyNodeProtocols(server.Protocol)
 		result = append(result, &subscribeBiz.UserSubscribeNodeInfo{
 			ID:              node.ID,
 			Name:            node.Name,
 			Uuid:            stringValue(userSub.UUID),
 			Protocol:        node.Protocol,
-			Protocols:       server.Protocol,
+			Protocols:       protocols,
 			Port:            uint32(node.Port),
 			Address:         node.Address,
 			Tags:            strings.Split(node.Tags, ","),
@@ -537,4 +539,70 @@ func buildLegacyNodeInfos(ctx context.Context, d *Data, userSub *ent.ProxyUserSu
 		})
 	}
 	return result, nil
+}
+
+func cleanLegacyNodeProtocols(raw string) string {
+	if strings.TrimSpace(raw) == "" {
+		return raw
+	}
+	var protocols []*servermodel.Protocol
+	if err := json.Unmarshal([]byte(raw), &protocols); err != nil {
+		return raw
+	}
+	for _, protocol := range protocols {
+		cleanSimnetProtocolForClient(protocol)
+	}
+	cleaned, err := json.Marshal(protocols)
+	if err != nil {
+		return raw
+	}
+	return string(cleaned)
+}
+
+func cleanSimnetProtocolForClient(protocol *servermodel.Protocol) {
+	if protocol == nil || protocol.Type != "simnet" {
+		return
+	}
+	protocol.SimnetPsk = strings.TrimSpace(protocol.SimnetPsk)
+	protocol.SimnetTicketID = strings.TrimSpace(protocol.SimnetTicketID)
+	protocol.SimnetCarrier = defaultLegacySimnetString(protocol.SimnetCarrier, "h2")
+	if strings.TrimSpace(protocol.SimnetPath) == "" {
+		protocol.SimnetPath = "/simnet/session"
+	} else {
+		protocol.SimnetPath = strings.TrimSpace(protocol.SimnetPath)
+	}
+	if !protocol.SimnetAfEnabled {
+		protocol.SimnetAfPathMode = ""
+		protocol.SimnetAfMagicMode = ""
+		protocol.SimnetAfPathPrefix = ""
+		protocol.SimnetAfPathSuffix = ""
+		protocol.SimnetAfResponseJitterMs = 0
+		protocol.SimnetAfHandshakePolymorphism = false
+		protocol.SimnetAfSettingsJitter = false
+		protocol.SimnetAfFakeHeaderInjection = false
+		return
+	}
+	protocol.SimnetAfPathMode = defaultLegacySimnetString(protocol.SimnetAfPathMode, "api")
+	protocol.SimnetAfMagicMode = defaultLegacySimnetString(protocol.SimnetAfMagicMode, "derived")
+	protocol.SimnetAfPathPrefix = strings.TrimSpace(protocol.SimnetAfPathPrefix)
+	protocol.SimnetAfPathSuffix = strings.TrimSpace(protocol.SimnetAfPathSuffix)
+	if protocol.SimnetAfResponseJitterMs == 0 {
+		protocol.SimnetAfResponseJitterMs = 50
+	}
+	if !protocol.SimnetAfHandshakePolymorphism {
+		protocol.SimnetAfHandshakePolymorphism = true
+	}
+	if !protocol.SimnetAfSettingsJitter {
+		protocol.SimnetAfSettingsJitter = true
+	}
+	if !protocol.SimnetAfFakeHeaderInjection {
+		protocol.SimnetAfFakeHeaderInjection = true
+	}
+}
+
+func defaultLegacySimnetString(value, fallback string) string {
+	if trimmed := strings.TrimSpace(value); trimmed != "" {
+		return trimmed
+	}
+	return fallback
 }

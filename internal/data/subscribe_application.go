@@ -168,7 +168,7 @@ func (r *subscribeApplicationRepo) GetPreviewNodes(ctx context.Context) ([]*publ
 			continue
 		}
 
-		result = append(result, &publicsubscriptionbiz.NodeInfo{
+		nodeInfo := &publicsubscriptionbiz.NodeInfo{
 			ID:          node.ID,
 			Sort:        int(node.Sort),
 			Name:        node.Name,
@@ -233,7 +233,9 @@ func (r *subscribeApplicationRepo) GetPreviewNodes(ctx context.Context) ([]*publ
 			SimnetAfHandshakePolymorphism: matched.SimnetAfHandshakePolymorphism,
 			SimnetAfSettingsJitter:        matched.SimnetAfSettingsJitter,
 			SimnetAfFakeHeaderInjection:   matched.SimnetAfFakeHeaderInjection,
-		})
+		}
+		nodeInfo.NormalizeSimnet()
+		result = append(result, nodeInfo)
 	}
 
 	return result, nil

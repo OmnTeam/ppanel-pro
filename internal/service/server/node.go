@@ -3,11 +3,70 @@ package server
 import (
 	"context"
 	"encoding/json"
+	"strings"
 
 	v1 "github.com/OmnTeam/npanel-pro/api/server/v1"
 	serverBiz "github.com/OmnTeam/npanel-pro/internal/biz/server"
 	"github.com/go-kratos/kratos/v2/log"
 )
+
+func normalizeSimnetProtocolForResponse(protocol *serverBiz.Protocol) *serverBiz.Protocol {
+	if protocol == nil || protocol.Type != "simnet" {
+		return protocol
+	}
+	normalized := *protocol
+	if strings.TrimSpace(normalized.SimnetPath) == "" {
+		normalized.SimnetPath = "/simnet/session"
+	}
+	if !normalized.SimnetFallbackEnabled || strings.TrimSpace(normalized.SimnetFallbackTargetHost) == "" {
+		normalized.SimnetFallbackEnabled = false
+		normalized.SimnetFallbackTargetScheme = ""
+		normalized.SimnetFallbackTargetHost = ""
+		normalized.SimnetFallbackTargetPort = 0
+		normalized.SimnetFallbackHostHeader = ""
+		normalized.SimnetFallbackTLSSNI = ""
+	} else {
+		normalized.SimnetFallbackTargetHost = strings.TrimSpace(normalized.SimnetFallbackTargetHost)
+		normalized.SimnetFallbackHostHeader = strings.TrimSpace(normalized.SimnetFallbackHostHeader)
+		normalized.SimnetFallbackTLSSNI = strings.TrimSpace(normalized.SimnetFallbackTLSSNI)
+		switch strings.ToLower(strings.TrimSpace(normalized.SimnetFallbackTargetScheme)) {
+		case "http", "https":
+			normalized.SimnetFallbackTargetScheme = strings.ToLower(strings.TrimSpace(normalized.SimnetFallbackTargetScheme))
+		default:
+			normalized.SimnetFallbackTargetScheme = "https"
+		}
+	}
+	if !normalized.SimnetAfEnabled {
+		normalized.SimnetAfPathMode = ""
+		normalized.SimnetAfPathPrefix = ""
+		normalized.SimnetAfPathSuffix = ""
+		normalized.SimnetAfMagicMode = ""
+		normalized.SimnetAfResponseJitterMs = 0
+		normalized.SimnetAfHandshakePolymorphism = false
+		normalized.SimnetAfSettingsJitter = false
+		normalized.SimnetAfFakeHeaderInjection = false
+		return &normalized
+	}
+	if normalized.SimnetAfPathMode == "" {
+		normalized.SimnetAfPathMode = "api"
+	}
+	if normalized.SimnetAfMagicMode == "" {
+		normalized.SimnetAfMagicMode = "derived"
+	}
+	if normalized.SimnetAfResponseJitterMs == 0 {
+		normalized.SimnetAfResponseJitterMs = 50
+	}
+	if !normalized.SimnetAfHandshakePolymorphism {
+		normalized.SimnetAfHandshakePolymorphism = true
+	}
+	if !normalized.SimnetAfSettingsJitter {
+		normalized.SimnetAfSettingsJitter = true
+	}
+	if !normalized.SimnetAfFakeHeaderInjection {
+		normalized.SimnetAfFakeHeaderInjection = true
+	}
+	return &normalized
+}
 
 // ServerService 节点服务器服务
 type ServerService struct {
@@ -211,6 +270,7 @@ func (s *ServerService) QueryServerProtocolConfig(ctx context.Context, req *v1.Q
 		if !protocol.Enable {
 			continue
 		}
+		protocol = normalizeSimnetProtocolForResponse(protocol)
 		protocolConfigs = append(protocolConfigs, &v1.Protocol{
 			Type:                          protocol.Type,
 			Port:                          protocol.Port,

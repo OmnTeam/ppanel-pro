@@ -1,6 +1,9 @@
 package server
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"strings"
+)
 
 // Protocol represents a server protocol configuration - 完全按照原项目定义
 type Protocol struct {
@@ -114,6 +117,62 @@ type Protocol struct {
 	OmniflowFallbackCarrierEnabled bool `json:"omniflow_fallback_carrier_enabled,omitempty"`
 	OmniflowFallbackConnectTunnel  bool `json:"omniflow_fallback_connect_tunnel,omitempty"`
 	OmniflowFallbackWssEnabled     bool `json:"omniflow_fallback_wss_enabled,omitempty"`
+}
+
+func (p *Protocol) NormalizeSimnet() {
+	if p == nil || p.Type != "simnet" {
+		return
+	}
+	if strings.TrimSpace(p.SimnetPath) == "" {
+		p.SimnetPath = "/simnet/session"
+	}
+	if !p.SimnetFallbackEnabled || strings.TrimSpace(p.SimnetFallbackTargetHost) == "" {
+		p.SimnetFallbackEnabled = false
+		p.SimnetFallbackTargetScheme = ""
+		p.SimnetFallbackTargetHost = ""
+		p.SimnetFallbackTargetPort = 0
+		p.SimnetFallbackHostHeader = ""
+		p.SimnetFallbackTLSSNI = ""
+	} else {
+		p.SimnetFallbackTargetHost = strings.TrimSpace(p.SimnetFallbackTargetHost)
+		p.SimnetFallbackHostHeader = strings.TrimSpace(p.SimnetFallbackHostHeader)
+		p.SimnetFallbackTLSSNI = strings.TrimSpace(p.SimnetFallbackTLSSNI)
+		switch strings.ToLower(strings.TrimSpace(p.SimnetFallbackTargetScheme)) {
+		case "http", "https":
+			p.SimnetFallbackTargetScheme = strings.ToLower(strings.TrimSpace(p.SimnetFallbackTargetScheme))
+		default:
+			p.SimnetFallbackTargetScheme = "https"
+		}
+	}
+	if !p.SimnetAfEnabled {
+		p.SimnetAfPathMode = ""
+		p.SimnetAfMagicMode = ""
+		p.SimnetAfPathPrefix = ""
+		p.SimnetAfPathSuffix = ""
+		p.SimnetAfResponseJitterMs = 0
+		p.SimnetAfHandshakePolymorphism = false
+		p.SimnetAfSettingsJitter = false
+		p.SimnetAfFakeHeaderInjection = false
+		return
+	}
+	if p.SimnetAfPathMode == "" {
+		p.SimnetAfPathMode = "api"
+	}
+	if p.SimnetAfMagicMode == "" {
+		p.SimnetAfMagicMode = "derived"
+	}
+	if p.SimnetAfResponseJitterMs == 0 {
+		p.SimnetAfResponseJitterMs = 50
+	}
+	if !p.SimnetAfHandshakePolymorphism {
+		p.SimnetAfHandshakePolymorphism = true
+	}
+	if !p.SimnetAfSettingsJitter {
+		p.SimnetAfSettingsJitter = true
+	}
+	if !p.SimnetAfFakeHeaderInjection {
+		p.SimnetAfFakeHeaderInjection = true
+	}
 }
 
 // MarshalProtocols converts protocol array to JSON string

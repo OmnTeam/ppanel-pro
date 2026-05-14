@@ -519,3 +519,41 @@ type NodeInfo struct {
 	OmniflowFallbackConnectTunnel      bool
 	OmniflowFallbackWssEnabled         bool
 }
+
+func (n *NodeInfo) NormalizeSimnet() {
+	if n == nil || n.Type != "simnet" {
+		return
+	}
+	if strings.TrimSpace(n.SimnetPath) == "" {
+		n.SimnetPath = "/simnet/session"
+	}
+	if !n.SimnetAfEnabled {
+		n.SimnetAfPathMode = ""
+		n.SimnetAfMagicMode = ""
+		n.SimnetAfPathPrefix = ""
+		n.SimnetAfPathSuffix = ""
+		n.SimnetAfResponseJitterMs = 0
+		n.SimnetAfHandshakePolymorphism = false
+		n.SimnetAfSettingsJitter = false
+		n.SimnetAfFakeHeaderInjection = false
+		return
+	}
+	if n.SimnetAfPathMode == "" {
+		n.SimnetAfPathMode = "api"
+	}
+	if n.SimnetAfMagicMode == "" {
+		n.SimnetAfMagicMode = "derived"
+	}
+	if n.SimnetAfResponseJitterMs == 0 {
+		n.SimnetAfResponseJitterMs = 50
+	}
+	if !n.SimnetAfHandshakePolymorphism {
+		n.SimnetAfHandshakePolymorphism = true
+	}
+	if !n.SimnetAfSettingsJitter {
+		n.SimnetAfSettingsJitter = true
+	}
+	if !n.SimnetAfFakeHeaderInjection {
+		n.SimnetAfFakeHeaderInjection = true
+	}
+}
