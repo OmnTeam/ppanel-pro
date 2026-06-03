@@ -1,0 +1,15 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  bin = "./tmp/main"
+  cmd = "go build -o ./tmp/main ./cmd/ppanel-pro"
+  args_bin = ["-conf", "./configs"]
+  delay = 1000
+  exclude_dir = ["tmp", "bin", "vendor", "ent", "architecture-handbook", ".git"]
+  exclude_regex = ["_test\\.go$", "\\.pb\\.go$", "\\.pb\\.validate\\.go$"]
+  include_ext = ["go", "yaml", "yml"]
+  stop_on_error = true
+
+[log]
+  time = true

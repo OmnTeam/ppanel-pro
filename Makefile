@@ -49,6 +49,11 @@ api:
 build:
 	mkdir -p bin/ && go build -ldflags "-X main.Version=$(VERSION)" -o ./bin/ ./...
 
+.PHONY: build-linux
+# build linux amd64 binary (output: bin/ppanel-pro)
+build-linux:
+	mkdir -p bin/ && GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags "-X main.Version=$(VERSION)" -o ./bin/ppanel-pro ./cmd/ppanel-pro
+
 .PHONY: generate
 # generate
 generate:
@@ -63,42 +68,41 @@ all:
 	make generate;
 
 .PHONY: seed
-# seed default data into database
+# default data is seeded on service startup (internal/migrate.InitBasicData)
 seed:
-	go run ./cmd/seed-data -conf ./configs
+	@echo "Default data seeds on startup via internal/migrate. Run: make dev"
 
 .PHONY: migrate
-# migrate database schema and seed data
+# schema + default data bootstrap on first service start
 migrate:
-	@echo "执行数据库迁移..."
-	go run ./cmd/migrate-tenant -conf ./configs
+	@echo "New databases migrate on startup via AutoMigrateWithData. Run: go run ./cmd/ppanel-pro -conf ./configs"
 
 .PHONY: export-data
-# export database data to json
+# no standalone export command; use database backup tools
 export-data:
-	go run ./cmd/export-data -conf ./configs
+	@echo "No standalone export command. Use database backup tools (e.g. mysqldump)."
 
 .PHONY: backup-data
-# backup all database data (users will be limited to 10)
+# backup via database tools
 backup-data: export-data
-	@echo "数据备份完成"
+	@echo "Use database backup tools (e.g. mysqldump) for full backups."
 
 .PHONY: test-migrate
-# test migration functionality
+# no standalone migration test command
 test-migrate:
-	@echo "测试迁移功能..."
-	@echo "1. 基础迁移测试: make test-migrate-basic"
-	@echo "2. 完整迁移测试: make test-migrate-full"
+	@echo "No standalone migration test command."
+	@echo "Verify by starting the service: make dev"
+	@echo "Or: go run ./cmd/ppanel-pro -conf ./configs"
 
 .PHONY: test-migrate-basic
-# test basic migration
+# no standalone migration test command
 test-migrate-basic:
-	go run ./cmd/test-migrate -conf ./configs -mode basic
+	@echo "No standalone migration test command. Start the service to verify: make dev"
 
 .PHONY: test-migrate-full
-# test full migration
+# no standalone migration test command
 test-migrate-full:
-	go run ./cmd/test-migrate -conf ./configs -mode full
+	@echo "No standalone migration test command. Start the service to verify: make dev"
 
 # show help
 help:

@@ -9,12 +9,12 @@
 ### 1. 自动数据初始化
 - 服务启动时自动执行数据初始化
 - 智能检测已存在数据，避免重复初始化
-- 初始化失败不影响服务正常启动
+- 新库或 legacy 库初始化失败会阻止服务启动
 
 ### 2. 初始化的数据类型
 
 #### 认证方法 (Auth Methods)
-- **邮件认证**: SMTP配置，支持邮箱验证和通知
+- **邮件认证**: SMTP 配置，支持邮箱验证和通知；四个 `*_template` 由 `ensureEmailAuthMethodTemplates` 从 `pkg/email/template.go` 回填（legacy SQL 骨架为空）
 - **手机认证**: 使用abosend短信平台
 - **OAuth认证**: Apple、Google、GitHub登录
 - **设备认证**: 设备管理和安全配置
@@ -36,14 +36,10 @@
 - **节点配置**: 推送间隔和流量报告设置
 
 #### 默认公告 (Announcements)
-- 欢迎公告
-- 系统更新通知
-- 使用指南
+- 由 legacy SQL seed（`00002_init_basic_data.up.sql`）提供
 
 #### 默认文档 (Documents)
-- 用户使用指南
-- 客户端配置教程
-- 常见问题解答
+- 由 legacy SQL seed 提供
 
 ## 使用方法
 
@@ -55,28 +51,25 @@
 ```
 
 ### 2. 手动数据初始化
-```bash
-# 仅执行数据初始化
-make seed
+默认数据在**服务启动时**由 `internal/migrate` 自动写入（`InitBasicData` + legacy SQL seed）。`make seed` 仅打印提示，不会单独执行 seed：
 
-# 或者直接运行
-go run ./cmd/seed-data -conf ./configs
+```bash
+make dev
+# 或
+go run ./cmd/ppanel-pro -conf ./configs
 ```
 
 ### 3. 完整数据库迁移
+新库首次启动走 `AutoMigrateWithData`（结构迁移 + 基础数据）。`make migrate` 同样仅为提示：
+
 ```bash
-# 执行数据库迁移和数据初始化
 make migrate
+# 实际迁移请启动服务：
+go run ./cmd/ppanel-pro -conf ./configs
 ```
 
 ### 4. 数据备份和导出
-```bash
-# 导出所有数据到JSON文件
-make export-data
-
-# 或者指定输出文件
-go run ./cmd/export-data -conf ./configs -output my_backup.json
-```
+当前仓库未提供独立导出命令，请使用数据库原生备份工具（如 `mysqldump`）备份重要数据。
 
 ## 配置文件
 
@@ -138,25 +131,4 @@ data:
 
 ## 扩展自定义数据
 
-可以通过修改 `internal/data/init_default_data.go` 文件来添加自定义的初始化数据：
-
-```go
-// 在相应的初始化函数中添加新数据
-func initCustomData(client *ent.Client, helper *log.Helper) error {
-    // 添加你的自定义数据
-    _, err := client.ProxyCustomTable.Create().
-        SetName("Custom Data").
-        Save(ctx)
-    if err != nil {
-        return err
-    }
-    return nil
-}
-```
-
-然后在 `InitDefaultData` 函数中调用：
-```go
-if err := initCustomData(client, helper); err != nil {
-    return fmt.Errorf("初始化自定义数据失败: %w", err)
-}
-```
+在 `internal/migrate/migrate.go` 的 `InitBasicData` 中增加初始化步骤，或扩展 `initLegacyDefaultData` 所用的 embedded SQL。

@@ -101,6 +101,23 @@ go build -o ./bin/ppanel-pro ./cmd/ppanel-pro
 ./bin/ppanel-pro -conf ./configs
 ```
 
+One-off run without hot reload:
+
+```bash
+go run ./cmd/ppanel-pro -conf ./configs
+```
+
+Run the package `./cmd/ppanel-pro`, not `main.go` alone (Wire’s `wireApp` lives in `wire_gen.go`).
+
+### Local development (Air)
+
+```bash
+go install github.com/air-verse/air@latest
+air
+```
+
+Requires `configs/config.yaml` and reachable MySQL/Redis. Edits under `internal/` and `pkg/` trigger rebuild and restart. Regenerate Proto/Wire/Ent (`make api`, `wire`, `go generate`) before relying on hot reload for those changes.
+
 ### Docker
 
 ```bash

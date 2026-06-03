@@ -1,5 +1,9 @@
 # Kratos 中间件迁移完成
 
+> **已过时**：当前 Server 实际装配以 `internal/server/http.go`、`grpc.go` 为准。  
+> 请参阅本地手册 **`architecture-handbook/中间件架构.md`**（与《架构手册》同目录）。  
+> 下文为早期 Gin→Kratos 迁移说明，其中 `svc.CORS()`、`svc.Trace()` 等并未全部挂到运行时链路上。
+
 ## 概述
 
 已成功将原始的Gin中间件**100%逻辑一致性**地迁移到**Kratos框架**。所有中间件都正确适配了Kratos的中间件接口和传输层机制。

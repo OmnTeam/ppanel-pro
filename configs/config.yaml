@@ -57,10 +57,10 @@ log:
 data:
   database:
     driver: mysql
-    source: root:password@tcp(127.0.0.1:3306)/npanel?parseTime=True&loc=Local
+    source: np_demo:mnaRFTSWn675jk3Y@tcp(118.193.38.119:3306)/np_demo?parseTime=True&loc=Local
   redis:
     addr: 127.0.0.1:6379
-    password:
+    password: 
     read_timeout: 0.2s
     write_timeout: 0.2s
     db: 0

@@ -31,7 +31,8 @@
 核心迁移器，包含以下功能：
 - `AutoMigrate()`: 仅数据库结构迁移
 - `AutoMigrateWithData()`: 完整迁移（结构+数据）
-- `InitBasicData()`: 初始化基础数据
+- `InitBasicData()`: 初始化基础数据（legacy SQL + 邮件模板回填）
+- `ensureEmailAuthMethodTemplates()`: 邮件认证空模板幂等回填
 - `CreateDefaultAdminUser()`: 创建默认管理员
 
 ### 2. 修复工具 (`repair.go`)
@@ -40,47 +41,35 @@
 ## 使用方法
 
 ### 1. 自动迁移（服务启动时）
-服务启动时会自动执行数据初始化：
+服务启动时在 `internal/data/data.go` 中调用 migrator：
+
 ```go
-// 在 data.go 中
-if err := InitDefaultData(client, logger); err != nil {
-    log.NewHelper(logger).Warnf("failed to initialize default data: %v", err)
-}
+migrator := migrate.NewMigrator(client, logger, appConf, c.Database.Driver, c.Database.Source)
+// 新库: AutoMigrateWithData；已有 legacy 库: InitBasicData + CreateDefaultAdminUser
 ```
 
 ### 2. 手动迁移
 
-#### 基础迁移（仅数据库结构）
+#### 基础数据同步
 ```bash
-# 仅执行数据库结构迁移
-make seed
-# 或者
-go run ./cmd/seed-data -conf ./configs
+# 启动服务即会执行 InitBasicData（含邮件模板回填）
+make dev
+# 或
+go run ./cmd/ppanel-pro -conf ./configs
 ```
 
 #### 完整迁移
 ```bash
-# 执行完整迁移（结构+数据）
-make migrate
-
-# 或者直接运行
-go run ./cmd/migrate-tenant -conf ./configs
+make migrate   # 提示：新库首次启动时自动完成结构+数据迁移
 ```
 
-#### 迁移测试
-```bash
-# 测试迁移功能
-make test-migrate
-
-# 或分步测试
-make test-migrate-basic  # 基础迁移
-make test-migrate-full   # 完整迁移
-```
+#### 迁移验证
+当前仓库未提供独立迁移测试命令。请启动服务并检查日志，或查询 `auth_method.config` 等表确认数据已写入。
 
 ## 默认数据详情
 
 ### 1. 认证方法
-- **邮件认证**: SMTP配置框架
+- **邮件认证**: SMTP 配置框架；默认 HTML 模板来自 `pkg/email/template.go`，启动时由 `ensureEmailAuthMethodTemplates` 回填；运行时 `EmailAuthConfig.Unmarshal` 亦会兜底空模板
 - **手机认证**: abosend短信平台（包含测试密钥）
 - **OAuth认证**: Apple、Google、GitHub配置
 - **设备认证**: 设备管理配置
@@ -144,7 +133,7 @@ data:
 
 ### 2. 数据备份
 - 迁移前备份现有数据
-- 使用 `make backup-data` 导出重要配置
+- 请使用数据库原生备份工具（如 `mysqldump`）备份重要配置
 
 ### 3. 性能考虑
 - 大量数据迁移时建议分批执行
@@ -216,10 +205,6 @@ type CustomMigrator interface {
 ```
 
 ### 3. 数据验证
-迁移完成后，使用测试工具验证数据完整性：
-
-```bash
-make test-migrate-all
-```
+迁移完成后，请启动服务并检查日志，或查询数据库确认初始化数据完整性。
 
 这个迁移系统确保了数据库结构的一致性和初始数据的完整性，为项目的部署和维护提供了可靠的解决方案。

@@ -2,6 +2,8 @@ package auth
 
 import (
 	"encoding/json"
+
+	"github.com/OmnTeam/npanel-pro/pkg/email"
 )
 
 // AppleAuthConfig Apple 认证配置
@@ -115,57 +117,54 @@ type EmailAuthConfig struct {
 	TrafficExceedEmailTemplate string      `json:"traffic_exceed_email_template"`
 }
 
-func (l *EmailAuthConfig) Marshal() string {
-	// 设置默认模板
-	if l.ExpirationEmailTemplate == "" {
-		l.ExpirationEmailTemplate = DefaultExpirationEmailTemplate
-	}
-	if l.MaintenanceEmailTemplate == "" {
-		l.MaintenanceEmailTemplate = DefaultMaintenanceEmailTemplate
-	}
-	if l.TrafficExceedEmailTemplate == "" {
-		l.TrafficExceedEmailTemplate = DefaultTrafficExceedEmailTemplate
+// ApplyDefaultEmailTemplates fills empty template fields from pkg/email defaults.
+func (l *EmailAuthConfig) ApplyDefaultEmailTemplates() {
+	if l == nil {
+		return
 	}
 	if l.VerifyEmailTemplate == "" {
-		l.VerifyEmailTemplate = DefaultEmailVerifyTemplate
+		l.VerifyEmailTemplate = email.DefaultEmailVerifyTemplate
 	}
+	if l.ExpirationEmailTemplate == "" {
+		l.ExpirationEmailTemplate = email.DefaultExpirationEmailTemplate
+	}
+	if l.MaintenanceEmailTemplate == "" {
+		l.MaintenanceEmailTemplate = email.DefaultMaintenanceEmailTemplate
+	}
+	if l.TrafficExceedEmailTemplate == "" {
+		l.TrafficExceedEmailTemplate = email.DefaultTrafficExceedEmailTemplate
+	}
+}
+
+func newDefaultEmailAuthConfig() *EmailAuthConfig {
+	config := &EmailAuthConfig{
+		Platform:           "smtp",
+		PlatformConfig:     new(SMTPConfig),
+		EnableVerify:       true,
+		EnableNotify:       true,
+		EnableDomainSuffix: false,
+		DomainSuffixList:   "",
+	}
+	config.ApplyDefaultEmailTemplates()
+	return config
+}
+
+func (l *EmailAuthConfig) Marshal() string {
+	l.ApplyDefaultEmailTemplates()
 
 	bytes, err := json.Marshal(l)
 	if err != nil {
-		config := &EmailAuthConfig{
-			Platform:                   "smtp",
-			PlatformConfig:             new(SMTPConfig),
-			EnableVerify:               true,
-			EnableNotify:               true,
-			EnableDomainSuffix:         false,
-			DomainSuffixList:           "",
-			VerifyEmailTemplate:        DefaultEmailVerifyTemplate,
-			ExpirationEmailTemplate:    DefaultExpirationEmailTemplate,
-			MaintenanceEmailTemplate:   DefaultMaintenanceEmailTemplate,
-			TrafficExceedEmailTemplate: DefaultTrafficExceedEmailTemplate,
-		}
-		bytes, _ = json.Marshal(config)
+		bytes, _ = json.Marshal(newDefaultEmailAuthConfig())
 	}
 	return string(bytes)
 }
 
 func (l *EmailAuthConfig) Unmarshal(data string) {
-	err := json.Unmarshal([]byte(data), &l)
-	if err != nil {
-		config := &EmailAuthConfig{
-			Platform:                   "smtp",
-			PlatformConfig:             new(SMTPConfig),
-			EnableVerify:               true,
-			EnableNotify:               true,
-			EnableDomainSuffix:         false,
-			DomainSuffixList:           "",
-			VerifyEmailTemplate:        DefaultEmailVerifyTemplate,
-			ExpirationEmailTemplate:    DefaultExpirationEmailTemplate,
-			MaintenanceEmailTemplate:   DefaultMaintenanceEmailTemplate,
-			TrafficExceedEmailTemplate: DefaultTrafficExceedEmailTemplate,
-		}
-		_ = json.Unmarshal([]byte(config.Marshal()), &l)
+	if err := json.Unmarshal([]byte(data), &l); err != nil {
+		_ = json.Unmarshal([]byte(newDefaultEmailAuthConfig().Marshal()), &l)
+		return
 	}
+	l.ApplyDefaultEmailTemplates()
 }
 
 // SMTPConfig Email SMTP 配置
@@ -324,34 +323,3 @@ func (l *DeviceConfig) Marshal() string {
 func (l *DeviceConfig) Unmarshal(data string) error {
 	return json.Unmarshal([]byte(data), l)
 }
-
-// 默认邮件模板
-const (
-	DefaultEmailVerifyTemplate = `
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-    <h2>验证您的邮箱</h2>
-    <p>您的验证码是: <strong>{{.Code}}</strong></p>
-    <p>此验证码将在 {{.ExpireMinutes}} 分钟后过期。</p>
-</div>`
-
-	DefaultExpirationEmailTemplate = `
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-    <h2>订阅即将过期</h2>
-    <p>您的订阅将在 {{.Days}} 天后过期。</p>
-    <p>请及时续费以继续使用服务。</p>
-</div>`
-
-	DefaultMaintenanceEmailTemplate = `
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-    <h2>系统维护通知</h2>
-    <p>系统将在 {{.Time}} 进行维护。</p>
-    <p>维护期间服务将暂时不可用，请您谅解。</p>
-</div>`
-
-	DefaultTrafficExceedEmailTemplate = `
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-    <h2>流量使用提醒</h2>
-    <p>您的流量使用已达到 {{.Percentage}}%。</p>
-    <p>剩余流量: {{.Remaining}}，请合理使用。</p>
-</div>`
-)

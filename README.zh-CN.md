@@ -101,6 +101,32 @@ go build -o ./bin/ppanel-pro ./cmd/ppanel-pro
 ./bin/ppanel-pro -conf ./configs
 ```
 
+单次运行（无热重载）：
+
+```bash
+go run ./cmd/ppanel-pro -conf ./configs
+```
+
+注意请编译整个包 `./cmd/ppanel-pro`，不要只运行 `main.go`（否则会缺少 `wire_gen.go` 中的 `wireApp`）。
+
+### 本地开发（Air 热重载）
+
+安装 [Air](https://github.com/air-verse/air)（一次性）：
+
+```bash
+go install github.com/air-verse/air@latest
+```
+
+在仓库根目录启动（需已准备 `configs/config.yaml`，且 MySQL、Redis 可连接）：
+
+```bash
+air
+```
+
+保存 `internal/`、`pkg/` 等目录下的 `.go` 或配置 yaml 后，Air 会自动重新编译并重启进程（默认 HTTP `8081`、gRPC `9012`，以配置为准）。
+
+热重载**不会**自动生成代码。修改 Proto / Wire / Ent 后请先执行 `make api`、`wire` 或 `go generate ./...`，再保存业务代码触发重建。
+
 ### Docker
 
 ```bash

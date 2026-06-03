@@ -5,6 +5,8 @@
 *.dll
 *.dylib
 
+# Config files
+configs/config.yaml
 # Test binary, built with `go test -c`
 *.test
 
@@ -31,12 +33,16 @@ Thumbs.db
 *.key
 *.log
 bin/
+tmp/
 
 # Develop tools
 .vscode/
 .idea/
 *.swp
 .*
+!.air.toml
 !.github/
 !.github/workflows/
 !.github/workflows/*.yml
+
+architecture-handbook/

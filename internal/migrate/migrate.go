@@ -8,7 +8,6 @@ import (
 
 	"github.com/OmnTeam/npanel-pro/ent"
 	"github.com/OmnTeam/npanel-pro/ent/proxyauthmethod"
-	"github.com/OmnTeam/npanel-pro/ent/proxypayment"
 	"github.com/OmnTeam/npanel-pro/internal/conf"
 	"github.com/OmnTeam/npanel-pro/internal/model/auth"
 	"github.com/OmnTeam/npanel-pro/pkg/tool"
@@ -79,6 +78,9 @@ func (m *Migrator) InitBasicData(ctx context.Context) error {
 	if err := m.initLegacyDefaultData(ctx); err != nil {
 		return fmt.Errorf("failed to init legacy default data: %w", err)
 	}
+	if err := m.ensureEmailAuthMethodTemplates(ctx); err != nil {
+		return fmt.Errorf("failed to ensure email auth method templates: %w", err)
+	}
 
 	m.logger.Info("Basic data initialization completed")
 	return nil
@@ -145,138 +147,41 @@ func (m *Migrator) CreateDefaultAdminUser(ctx context.Context) error {
 	return nil
 }
 
-// initAuthMethods 初始化认证方法
-func (m *Migrator) initAuthMethods(ctx context.Context) error {
-	// 邮件认证配置
-	emailConfig := auth.EmailAuthConfig{
-		Platform:           "smtp",
-		EnableVerify:       false,
-		EnableNotify:       false,
-		EnableDomainSuffix: false,
-		DomainSuffixList:   "",
-		PlatformConfig: auth.SMTPConfig{
-			Host: "",
-			Port: 587,
-			User: "",
-			Pass: "",
-			From: "",
-			SSL:  false,
-		},
-		VerifyEmailTemplate:        "",
-		ExpirationEmailTemplate:    "",
-		MaintenanceEmailTemplate:   "",
-		TrafficExceedEmailTemplate: "",
-	}
-	emailConfigJSON, _ := json.Marshal(emailConfig)
-
-	// 手机认证配置 - 使用abosend平台
-	mobileConfig := auth.MobileAuthConfig{
-		Platform:        "abosend",
-		EnableWhitelist: false,
-		Whitelist:       []string{},
-		PlatformConfig: auth.AbosendConfig{
-			ApiDomain: "https://smsapi.abosend.com",
-			Access:    "UVTtbbTz",
-			Secret:    "CVRZQVJLTJWTBDXDWSYSOITEWLUMBRCO",
-			Template:  "Your verification code is: {{.code}}",
-		},
-	}
-	mobileConfigJSON, _ := json.Marshal(mobileConfig)
-
-	authMethods := []struct {
-		method  string
-		config  string
-		enabled bool
-	}{
-		{"email", string(emailConfigJSON), true},
-		{"mobile", string(mobileConfigJSON), true},
-		{"apple", `{"team_id":"","key_id":"","client_id":"","client_secret":"","redirect_url":""}`, false},
-		{"google", `{"client_id":"","client_secret":"","redirect_url":""}`, false},
-		{"github", `{"client_id":"","client_secret":"","redirect_url":""}`, false},
-		{"telegram", `{"bot_token":"","enable_notify":false,"webhook_domain":""}`, false},
-		{"device", `{"show_ads":false,"only_real_device":false,"enable_security":false,"security_secret":""}`, false},
-	}
-
-	// 创建认证方法，根据method查询是否已存在
-	createdCount := 0
-	for _, authMethod := range authMethods {
-		// 检查是否已存在该认证方法
-		exist, err := m.client.ProxyAuthMethod.Query().
-			Where(proxyauthmethod.Method(authMethod.method)).
-			Exist(ctx)
-		if err != nil {
-			return fmt.Errorf("failed to check auth method %s: %w", authMethod.method, err)
-		}
-
-		if exist {
-			m.logger.Infof("Auth method %s already exists, skip creation", authMethod.method)
-			continue
-		}
-
-		// 创建认证方法
-		_, err = m.client.ProxyAuthMethod.Create().
-			SetMethod(authMethod.method).
-			SetConfig(authMethod.config).
-			SetEnabled(authMethod.enabled).
-			SetCreatedAt(time.Now()).
-			SetUpdatedAt(time.Now()).
-			Save(ctx)
-		if err != nil {
-			return fmt.Errorf("failed to create auth method %s: %w", authMethod.method, err)
-		}
-		createdCount++
-	}
-
-	m.logger.Infof("Successfully initialized %d new auth methods", createdCount)
-	return nil
-}
-
-// initPaymentMethods 初始化支付方式
-func (m *Migrator) initPaymentMethods(ctx context.Context) error {
-	// 默认支付方式 - 简化版本，暂时只创建余额支付
-	paymentName := "余额支付"
-	paymentPlatform := "balance"
-
-	// 检查是否已存在该支付方式
-	exist, err := m.client.ProxyPayment.Query().
-		Where(proxypayment.Name(paymentName)).
-		Exist(ctx)
+func (m *Migrator) ensureEmailAuthMethodTemplates(ctx context.Context) error {
+	method, err := m.client.ProxyAuthMethod.Query().
+		Where(proxyauthmethod.Method("email")).
+		Only(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to check payment method %s: %w", paymentName, err)
+		if ent.IsNotFound(err) {
+			return nil
+		}
+		return fmt.Errorf("failed to query email auth method: %w", err)
 	}
 
-	if exist {
-		m.logger.Infof("Payment method %s already exists, skip creation", paymentName)
+	var raw auth.EmailAuthConfig
+	if err := json.Unmarshal([]byte(method.Config), &raw); err != nil {
+		return fmt.Errorf("failed to parse email auth config: %w", err)
+	}
+
+	needsUpdate := raw.VerifyEmailTemplate == "" ||
+		raw.ExpirationEmailTemplate == "" ||
+		raw.MaintenanceEmailTemplate == "" ||
+		raw.TrafficExceedEmailTemplate == ""
+	if !needsUpdate {
 		return nil
 	}
 
-	// 创建支付方式
-	_, err = m.client.ProxyPayment.Create().
-		SetName(paymentName).
-		SetPlatform(paymentPlatform).
-		SetDescription("使用账户余额进行支付").
-		SetIcon("").
-		SetDomain("").
-		SetConfig("{}").
-		SetFeeMode(0).
-		SetFeePercent(0).
-		SetFeeAmount(0).
-		SetEnable(true).
-		SetToken("").
-		Save(ctx)
+	var config auth.EmailAuthConfig
+	config.Unmarshal(method.Config)
 
+	_, err = m.client.ProxyAuthMethod.UpdateOneID(method.ID).
+		SetConfig(config.Marshal()).
+		SetUpdatedAt(time.Now()).
+		Save(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to create balance payment: %w", err)
+		return fmt.Errorf("failed to update email auth method templates: %w", err)
 	}
 
-	m.logger.Infof("Successfully created payment method: %s", paymentName)
-	return nil
-}
-
-// initSystemConfig 初始化系统配置
-func (m *Migrator) initSystemConfig(ctx context.Context) error {
-	// Deprecated: legacy default data must be initialized via embedded legacy SQL to stay
-	// identical to the old project. Keep this method as a no-op to avoid seeding wrong keys.
-	m.logger.Info("initSystemConfig is deprecated; legacy default system data is loaded by initLegacyDefaultData")
+	m.logger.Info("Email auth method templates backfilled with defaults")
 	return nil
 }
