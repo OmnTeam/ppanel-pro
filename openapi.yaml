@@ -12307,8 +12307,6 @@ components:
             properties:
                 status:
                     type: boolean
-                code:
-                    type: string
             description: SendCode Reply (shared by email and SMS)
         api.public.common.v1.SendEmailCodeRequest:
             type: object

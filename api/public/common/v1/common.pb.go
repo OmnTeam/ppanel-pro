@@ -1989,8 +1989,7 @@ type SendCodeReply struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Status bool   `protobuf:"varint,1,opt,name=status,proto3" json:"status,omitempty"`
-	Code   string `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"` // Only returned in development mode
+	Status bool `protobuf:"varint,1,opt,name=status,proto3" json:"status,omitempty"`
 }
 
 func (x *SendCodeReply) Reset() {
@@ -2030,13 +2029,6 @@ func (x *SendCodeReply) GetStatus() bool {
 		return x.Status
 	}
 	return false
-}
-
-func (x *SendCodeReply) GetCode() string {
-	if x != nil {
-		return x.Code
-	}
-	return ""
 }
 
 // CheckVerificationCode Request

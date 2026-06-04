@@ -297,7 +297,6 @@ message SendSmsCodeRequest {
 // SendCode Reply (shared by email and SMS)
 message SendCodeReply {
   bool status = 1;
-  string code = 2; // Only returned in development mode
 }
 
 // CheckVerificationCode Request

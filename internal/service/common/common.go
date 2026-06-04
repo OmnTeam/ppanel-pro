@@ -273,28 +273,20 @@ func (s *CommonService) GetStat(ctx context.Context, req *pb.GetStatRequest) (*p
 
 // SendEmailCode sends email verification code
 func (s *CommonService) SendEmailCode(ctx context.Context, req *pb.SendEmailCodeRequest) (*pb.SendCodeReply, error) {
-	code, err := s.uc.SendEmailCode(ctx, req.Email, req.Type)
-	if err != nil {
+	if _, err := s.uc.SendEmailCode(ctx, req.Email, req.Type); err != nil {
 		return nil, err
 	}
 
-	return &pb.SendCodeReply{
-		Status: true,
-		Code:   code, // Only returned in development mode
-	}, nil
+	return &pb.SendCodeReply{Status: true}, nil
 }
 
 // SendSmsCode sends SMS verification code
 func (s *CommonService) SendSmsCode(ctx context.Context, req *pb.SendSmsCodeRequest) (*pb.SendCodeReply, error) {
-	code, err := s.uc.SendSmsCode(ctx, req.Telephone, req.TelephoneAreaCode, req.Type)
-	if err != nil {
+	if _, err := s.uc.SendSmsCode(ctx, req.Telephone, req.TelephoneAreaCode, req.Type); err != nil {
 		return nil, err
 	}
 
-	return &pb.SendCodeReply{
-		Status: true,
-		Code:   code, // Only returned in development mode
-	}, nil
+	return &pb.SendCodeReply{Status: true}, nil
 }
 
 // CheckVerificationCode checks verification code
