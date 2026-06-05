@@ -2,9 +2,12 @@ package common
 
 import (
 	"context"
+	"net/mail"
 	"strconv"
+	"strings"
 
 	"github.com/OmnTeam/npanel-pro/internal/conf"
+	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/go-kratos/kratos/v2/log"
 )
 
@@ -25,7 +28,7 @@ type CommonRepo interface {
 	// GetStatistics gets system statistics (user count, node count, etc.)
 	GetStatistics(ctx context.Context) (*Statistics, error)
 	// SendEmailVerificationCode sends email verification code
-	SendEmailVerificationCode(ctx context.Context, email string, verifyType int32) (code string, err error)
+	SendEmailVerificationCode(ctx context.Context, email string, verifyType int32) error
 	// SendSmsVerificationCode sends SMS verification code
 	SendSmsVerificationCode(ctx context.Context, telephone, telephoneArea string, verifyType int32) (code string, err error)
 	// CheckVerificationCode checks verification code
@@ -423,14 +426,22 @@ func int64FromMap(values map[string]string, fallback int64, keys ...string) int6
 }
 
 // SendEmailCode sends email verification code
-func (uc *CommonUsecase) SendEmailCode(ctx context.Context, email string, verifyType int32) (string, error) {
-	code, err := uc.repo.SendEmailVerificationCode(ctx, email, verifyType)
-	if err != nil {
-		uc.log.Errorw("SendEmailVerificationCode error", "error", err, "email", email)
-		return "", err
+func (uc *CommonUsecase) SendEmailCode(ctx context.Context, email string, verifyType int32) error {
+	if strings.TrimSpace(email) == "" {
+		uc.log.Warnw("SendEmailCode invalid email", "email", email)
+		return responsecode.NewKratosError(responsecode.ErrInvalidEmail)
+	}
+	if _, err := mail.ParseAddress(email); err != nil {
+		uc.log.Warnw("SendEmailCode invalid email", "error", err, "email", email)
+		return responsecode.NewKratosError(responsecode.ErrInvalidEmail)
 	}
 
-	return code, nil
+	if err := uc.repo.SendEmailVerificationCode(ctx, email, verifyType); err != nil {
+		uc.log.Errorw("SendEmailVerificationCode error", "error", err, "email", email)
+		return err
+	}
+
+	return nil
 }
 
 // SendSmsCode sends SMS verification code

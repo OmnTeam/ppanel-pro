@@ -468,7 +468,7 @@ const (
 	ErrQueueEnqueueError                  = 80001 // 队列入队错误
 	ErrDebugModeError                     = 90001 // 调试模式已启用
 	ErrSmsNotEnabled                      = 90003 // 电话登录未启用
-	ErrEmailNotEnabled                    = 90004 // 邮件功能未启用
+	ErrEmailNotEnabled                    = 90004 // 邮件功能未启用或 SMTP 未配置
 	ErrGetAuthenticatorError              = 90005 // 不支持的登录方法
 	ErrAuthenticatorNotSupportedError     = 90006 // 认证器不支持此方法
 	ErrTelephoneAreaCodeIsEmpty           = 90007 // 电话区号为空
@@ -478,6 +478,7 @@ const (
 	ErrDeviceExist                        = 90013 // 设备已存在
 	ErrTelephoneError                     = 90014 // 电话号码错误
 	ErrTodaySendCountExceedsLimit         = 90015 // 今日发送次数超限
+	ErrInvalidEmail                       = 90016 // 邮箱格式不合法
 	ErrUseridNotMatch                     = 90018 // 用户 ID 不匹配
 
 	// ==== 权限/请求错误码（与旧项目一致） ====
@@ -656,7 +657,7 @@ func getCodeMessage(code int) string {
 	case 90003:
 		return "Telephone login is not enabled"
 	case 90004:
-		return "Email function is not enabled yet"
+		return "Email is not enabled or SMTP is not configured"
 	case 90005:
 		return "Unsupported login method"
 	case 90006:
@@ -679,6 +680,8 @@ func getCodeMessage(code int) string {
 		return "telephone number error"
 	case 90015:
 		return "This account has reached the limit of sending times today"
+	case 90016:
+		return "Invalid email address"
 	case 90017:
 		return "Device does not exist"
 	case 90018:

@@ -19,6 +19,7 @@ import (
 	"github.com/OmnTeam/npanel-pro/ent/proxyuser"
 	"github.com/OmnTeam/npanel-pro/ent/proxyuserauthmethod"
 	v1 "github.com/OmnTeam/npanel-pro/internal/biz/common"
+	authmodel "github.com/OmnTeam/npanel-pro/internal/model/auth"
 	"github.com/OmnTeam/npanel-pro/internal/queue/types"
 	"github.com/OmnTeam/npanel-pro/internal/responsecode"
 	"github.com/OmnTeam/npanel-pro/pkg/limit"
@@ -235,8 +236,49 @@ func (r *commonRepo) GetStatistics(ctx context.Context) (*v1.Statistics, error) 
 	return stat, nil
 }
 
+func (r *commonRepo) ensureEmailChannelReady(ctx context.Context) error {
+	method, err := r.data.db.ProxyAuthMethod.Query().
+		Where(proxyauthmethod.MethodEQ("email")).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			r.log.Warnw("SendEmailVerificationCode email auth method not found")
+			return responsecode.NewKratosError(responsecode.ErrEmailNotEnabled)
+		}
+		r.log.Errorw("SendEmailVerificationCode load email auth method error", "error", err)
+		return responsecode.NewDatabaseQueryError()
+	}
+
+	var emailCfg authmodel.EmailAuthConfig
+	emailCfg.Unmarshal(method.Config)
+	if !method.Enabled || emailCfg.Platform != "smtp" || !isSMTPConfigured(&emailCfg) {
+		r.log.Warnw("SendEmailVerificationCode email channel not ready", "enabled", method.Enabled, "platform", emailCfg.Platform)
+		return responsecode.NewKratosError(responsecode.ErrEmailNotEnabled)
+	}
+	return nil
+}
+
+func isSMTPConfigured(cfg *authmodel.EmailAuthConfig) bool {
+	if cfg == nil || cfg.PlatformConfig == nil {
+		return false
+	}
+	raw, err := json.Marshal(cfg.PlatformConfig)
+	if err != nil {
+		return false
+	}
+	var smtpCfg authmodel.SMTPConfig
+	if err := json.Unmarshal(raw, &smtpCfg); err != nil {
+		return false
+	}
+	return smtpCfg.Host != "" && smtpCfg.Port > 0 && smtpCfg.From != ""
+}
+
 // SendEmailVerificationCode sends email verification code
-func (r *commonRepo) SendEmailVerificationCode(ctx context.Context, email string, verifyType int32) (string, error) {
+func (r *commonRepo) SendEmailVerificationCode(ctx context.Context, email string, verifyType int32) error {
+	if err := r.ensureEmailChannelReady(ctx); err != nil {
+		return err
+	}
+
 	scene := parseVerifyType(verifyType)
 	cacheKey := verifyCodeEmailCacheKey(scene, email)
 	verifyCfg := r.loadVerifyCodeConfig(ctx)
@@ -246,22 +288,22 @@ func (r *commonRepo) SendEmailVerificationCode(ctx context.Context, email string
 	permit, err := intervalLimiter.Take(email)
 	if err != nil {
 		r.log.Errorw("SendEmailVerificationCode interval limiter error", "error", err, "email", email)
-		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 	if !intervalLimiter.ParsePermitState(permit) {
 		r.log.Warnw("SendEmailVerificationCode interval limit exceeded", "email", email)
-		return "", responsecode.NewKratosError(responsecode.ErrTooManyRequests)
+		return responsecode.NewKratosError(responsecode.ErrTooManyRequests)
 	}
 
 	dailyLimiter := limit.NewPeriodLimit(86400, int(verifyCfg.Limit), r.data.rdb, SendCountLimitKeyPrefix, limit.Align())
 	permit, err = dailyLimiter.Take(fmt.Sprintf("%s:%s:%s", "email", scene, email))
 	if err != nil {
 		r.log.Errorw("SendEmailVerificationCode daily limiter error", "error", err, "email", email)
-		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 	if !dailyLimiter.ParsePermitState(permit) {
 		r.log.Warnw("SendEmailVerificationCode daily limit exceeded", "email", email)
-		return "", responsecode.NewKratosError(responsecode.ErrTodaySendCountExceedsLimit)
+		return responsecode.NewKratosError(responsecode.ErrTodaySendCountExceedsLimit)
 	}
 
 	authMethod, err := r.data.db.ProxyUserAuthMethod.Query().
@@ -272,15 +314,15 @@ func (r *commonRepo) SendEmailVerificationCode(ctx context.Context, email string
 		First(ctx)
 	if err != nil && !ent.IsNotFound(err) {
 		r.log.Errorw("SendEmailVerificationCode query user error", "error", err, "email", email)
-		return "", responsecode.NewDatabaseQueryError()
+		return responsecode.NewDatabaseQueryError()
 	}
 
 	if scene == verifySceneRegister && authMethod != nil {
 		r.log.Warnw("SendEmailVerificationCode user already exists", "email", email)
-		return "", responsecode.NewKratosError(responsecode.ErrUserAlreadyExists)
+		return responsecode.NewKratosError(responsecode.ErrUserAlreadyExists)
 	} else if scene == verifySceneSecurity && authMethod == nil {
 		r.log.Warnw("SendEmailVerificationCode user not found", "email", email)
-		return "", responsecode.NewKratosError(responsecode.ErrUserNotExist)
+		return responsecode.NewKratosError(responsecode.ErrUserNotExist)
 	}
 
 	code := tool.KeyNew(6, 0)
@@ -292,12 +334,12 @@ func (r *commonRepo) SendEmailVerificationCode(ctx context.Context, email string
 	val, err := json.Marshal(cachePayload)
 	if err != nil {
 		r.log.Errorw("SendEmailVerificationCode marshal error", "error", err, "email", email)
-		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	if err := r.data.rdb.Set(ctx, cacheKey, string(val), 5*time.Minute).Err(); err != nil {
 		r.log.Errorw("SendEmailVerificationCode Redis error", "error", err, "cache_key", cacheKey)
-		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	siteLogo := ""
@@ -322,7 +364,7 @@ func (r *commonRepo) SendEmailVerificationCode(ctx context.Context, email string
 	payloadBytes, err := json.Marshal(emailPayload)
 	if err != nil {
 		r.log.Errorw("SendEmailVerificationCode marshal task payload error", "error", err, "email", email)
-		return "", responsecode.NewKratosError(responsecode.ErrInternalError)
+		return responsecode.NewKratosError(responsecode.ErrInternalError)
 	}
 
 	task := asynq.NewTask(types.ForthwithSendEmail, payloadBytes, asynq.MaxRetry(3))
@@ -330,12 +372,12 @@ func (r *commonRepo) SendEmailVerificationCode(ctx context.Context, email string
 	taskInfo, err := r.data.queue.Enqueue(task)
 	if err != nil {
 		r.log.Errorw("SendEmailVerificationCode enqueue error", "error", err, "payload", string(payloadBytes))
-		return "", responsecode.NewKratosError(responsecode.ErrQueueEnqueueError)
+		return responsecode.NewKratosError(responsecode.ErrQueueEnqueueError)
 	}
 
 	r.log.Infow("Email verification code sent", "email", email, "code", code, "task_id", taskInfo.ID, "cache_key", cacheKey)
 
-	return code, nil
+	return nil
 }
 
 // SendSmsVerificationCode sends SMS verification code

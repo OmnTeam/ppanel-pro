@@ -59,7 +59,10 @@ service Common {
     };
   }
 
-  // Send email verification code
+  // Send email verification code.
+  // Error codes: 200 success (queued); 90016 invalid email; 90004 email disabled or SMTP not configured;
+  // 401 send too frequently; 90015 daily limit; 20001 email exists (register); 20002 user not found (security);
+  // 500 internal; 80001 queue enqueue failed.
   rpc SendEmailCode(SendEmailCodeRequest) returns (SendCodeReply) {
     option (google.api.http) = {
       post: "/v1/common/send_code"

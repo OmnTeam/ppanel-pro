@@ -22,7 +22,7 @@ func NewKratosError(code int) error {
 		httpCode = 401
 	case code == 40005 || code == 40006 || code == 40007 || code == 40008:
 		httpCode = 403
-	case code == 500 || code == 10001 || code == 10002 || code == 10003 || code == 10004 || code == 80001 || code == 90001 || code == 90002 || code == 90003 || code == 90004 || code == 90005 || code == 90006 || code == 90007 || code == 90008 || code == 90009 || code == 90010 || code == 90011 || code == 90012 || code == 90013 || code == 90014 || code == 90015 || code == 90017 || code == 90018:
+	case code == 500 || code == 10001 || code == 10002 || code == 10003 || code == 10004 || code == 80001 || code == 90001 || code == 90002 || code == 90003 || code == 90004 || code == 90005 || code == 90006 || code == 90007 || code == 90008 || code == 90009 || code == 90010 || code == 90011 || code == 90012 || code == 90013 || code == 90014 || code == 90015 || code == 90016 || code == 90017 || code == 90018:
 		httpCode = 500
 	default:
 		httpCode = 400
@@ -143,6 +143,8 @@ func getKratosReason(code int) string {
 		return "TELEPHONE_ERROR"
 	case 90015:
 		return "TODAY_SEND_COUNT_EXCEEDS_LIMIT"
+	case 90016:
+		return "INVALID_EMAIL"
 	case 90018:
 		return "USERID_NOT_MATCH"
 	case 20006:

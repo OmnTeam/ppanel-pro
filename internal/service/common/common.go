@@ -273,7 +273,7 @@ func (s *CommonService) GetStat(ctx context.Context, req *pb.GetStatRequest) (*p
 
 // SendEmailCode sends email verification code
 func (s *CommonService) SendEmailCode(ctx context.Context, req *pb.SendEmailCodeRequest) (*pb.SendCodeReply, error) {
-	if _, err := s.uc.SendEmailCode(ctx, req.Email, req.Type); err != nil {
+	if err := s.uc.SendEmailCode(ctx, req.Email, req.Type); err != nil {
 		return nil, err
 	}
 

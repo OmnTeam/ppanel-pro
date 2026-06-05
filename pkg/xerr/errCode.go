@@ -109,6 +109,7 @@ const (
 	TelephoneExist                     uint32 = 90012
 	DeviceExist                        uint32 = 90013
 	TelephoneError                     uint32 = 90014
+	InvalidEmail                       uint32 = 90016
 )
 const (
 	DeviceNotExist uint32 = 90017
