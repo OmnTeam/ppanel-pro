@@ -515,6 +515,12 @@ type NodeInfo struct {
 	OmniflowSniMode                    string
 	OmniflowPaddingMode                string
 	OmniflowTrafficShapingEnabled      bool
+	OmniflowAfEnabled                  bool
+	OmniflowAfPathMode                 string
+	OmniflowAfPathPrefix               string
+	OmniflowAfPathSuffix               string
+	OmniflowAfPathRotationSecs         int
+	OmniflowAfPathSkewSlots            int
 	OmniflowFallbackCarrierEnabled     bool
 	OmniflowFallbackConnectTunnel      bool
 	OmniflowFallbackWssEnabled         bool

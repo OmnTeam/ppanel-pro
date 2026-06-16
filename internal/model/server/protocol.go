@@ -112,6 +112,12 @@ type Protocol struct {
 	OmniflowSniMode               string `json:"omniflow_sni_mode,omitempty"`
 	OmniflowPaddingMode           string `json:"omniflow_padding_mode,omitempty"`
 	OmniflowTrafficShapingEnabled bool   `json:"omniflow_traffic_shaping_enabled,omitempty"`
+	OmniflowAfEnabled             bool   `json:"omniflow_af_enabled,omitempty"`
+	OmniflowAfPathMode            string `json:"omniflow_af_path_mode,omitempty"`
+	OmniflowAfPathPrefix          string `json:"omniflow_af_path_prefix,omitempty"`
+	OmniflowAfPathSuffix          string `json:"omniflow_af_path_suffix,omitempty"`
+	OmniflowAfPathRotationSecs    int32  `json:"omniflow_af_path_rotation_secs,omitempty"`
+	OmniflowAfPathSkewSlots       int32  `json:"omniflow_af_path_skew_slots,omitempty"`
 
 	// OmniFlow 回退 Carrier
 	OmniflowFallbackCarrierEnabled bool `json:"omniflow_fallback_carrier_enabled,omitempty"`
@@ -172,6 +178,33 @@ func (p *Protocol) NormalizeSimnet() {
 	}
 	if !p.SimnetAfFakeHeaderInjection {
 		p.SimnetAfFakeHeaderInjection = true
+	}
+}
+
+func (p *Protocol) NormalizeOmniflow() {
+	if p == nil || (p.Type != "omniflow" && p.Type != "omniflow-h3") {
+		return
+	}
+	if !p.OmniflowAfEnabled {
+		p.OmniflowAfPathMode = ""
+		p.OmniflowAfPathPrefix = ""
+		p.OmniflowAfPathSuffix = ""
+		p.OmniflowAfPathRotationSecs = 0
+		p.OmniflowAfPathSkewSlots = 0
+		return
+	}
+	if strings.TrimSpace(p.OmniflowAfPathMode) == "" {
+		p.OmniflowAfPathMode = "random"
+	} else {
+		p.OmniflowAfPathMode = strings.ToLower(strings.TrimSpace(p.OmniflowAfPathMode))
+	}
+	p.OmniflowAfPathPrefix = strings.TrimSpace(p.OmniflowAfPathPrefix)
+	p.OmniflowAfPathSuffix = strings.TrimSpace(p.OmniflowAfPathSuffix)
+	if p.OmniflowAfPathRotationSecs <= 0 {
+		p.OmniflowAfPathRotationSecs = 300
+	}
+	if p.OmniflowAfPathSkewSlots <= 0 {
+		p.OmniflowAfPathSkewSlots = 1
 	}
 }
 

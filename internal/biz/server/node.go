@@ -189,6 +189,12 @@ type Protocol struct {
 	OmniflowSniMode               string
 	OmniflowPaddingMode           string
 	OmniflowTrafficShapingEnabled bool
+	OmniflowAfEnabled             bool
+	OmniflowAfPathMode            string
+	OmniflowAfPathPrefix          string
+	OmniflowAfPathSuffix          string
+	OmniflowAfPathRotationSecs    int32
+	OmniflowAfPathSkewSlots       int32
 
 	// OmniFlow 回退 Carrier
 	OmniflowFallbackCarrierEnabled bool

@@ -90,3 +90,44 @@ func TestProtocolNormalizeSimnetDefaultsEnabledAfSubFeatures(t *testing.T) {
 		t.Fatal("expected enabled AF to default fake header injection on")
 	}
 }
+
+func TestProtocolNormalizeOmniflowClearsDisabledAfPath(t *testing.T) {
+	protocol := &Protocol{
+		Type:                       "omniflow",
+		OmniflowAfEnabled:          false,
+		OmniflowAfPathMode:         "random",
+		OmniflowAfPathPrefix:       "/cdn",
+		OmniflowAfPathSuffix:       ".woff2",
+		OmniflowAfPathRotationSecs: 120,
+		OmniflowAfPathSkewSlots:    2,
+	}
+
+	protocol.NormalizeOmniflow()
+
+	if protocol.OmniflowAfPathMode != "" ||
+		protocol.OmniflowAfPathPrefix != "" ||
+		protocol.OmniflowAfPathSuffix != "" ||
+		protocol.OmniflowAfPathRotationSecs != 0 ||
+		protocol.OmniflowAfPathSkewSlots != 0 {
+		t.Fatalf("expected disabled OmniFlow AF path fields to be cleared, got %+v", protocol)
+	}
+}
+
+func TestProtocolNormalizeOmniflowDefaultsEnabledAfPath(t *testing.T) {
+	protocol := &Protocol{
+		Type:              "omniflow-h3",
+		OmniflowAfEnabled: true,
+	}
+
+	protocol.NormalizeOmniflow()
+
+	if protocol.OmniflowAfPathMode != "random" {
+		t.Fatalf("expected default random path mode, got %q", protocol.OmniflowAfPathMode)
+	}
+	if protocol.OmniflowAfPathRotationSecs != 300 {
+		t.Fatalf("expected default rotation 300, got %d", protocol.OmniflowAfPathRotationSecs)
+	}
+	if protocol.OmniflowAfPathSkewSlots != 1 {
+		t.Fatalf("expected default skew slots 1, got %d", protocol.OmniflowAfPathSkewSlots)
+	}
+}

@@ -150,6 +150,7 @@ func normalizeSimnetProtocol(protocol *server.Protocol, address string) {
 		protocol.Security = "tls"
 	}
 	protocol.NormalizeSimnet()
+	protocol.NormalizeOmniflow()
 }
 
 func isLikelyDomainAddress(address string) bool {

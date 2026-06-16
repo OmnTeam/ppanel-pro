@@ -222,6 +222,13 @@ message Protocol {
   string omniflow_padding_mode = 96;               // random/mtu_align/fixed_overhead
   bool omniflow_traffic_shaping_enabled = 97;
 
+  bool omniflow_af_enabled = 101;                  // 启用随机 AF path
+  string omniflow_af_path_mode = 102;              // api/random
+  string omniflow_af_path_prefix = 103;            // 随机 path 前缀
+  string omniflow_af_path_suffix = 104;            // 随机 path 后缀
+  int32 omniflow_af_path_rotation_secs = 105;      // path 轮转秒数
+  int32 omniflow_af_path_skew_slots = 106;         // 允许偏移 slot 数
+
   // OmniFlow 回退 Carrier
   bool omniflow_fallback_carrier_enabled = 98;
   bool omniflow_fallback_connect_tunnel = 99;

@@ -8845,6 +8845,20 @@ components:
                     type: string
                 omniflowTrafficShapingEnabled:
                     type: boolean
+                omniflowAfEnabled:
+                    type: boolean
+                omniflowAfPathMode:
+                    type: string
+                omniflowAfPathPrefix:
+                    type: string
+                omniflowAfPathSuffix:
+                    type: string
+                omniflowAfPathRotationSecs:
+                    type: integer
+                    format: int32
+                omniflowAfPathSkewSlots:
+                    type: integer
+                    format: int32
                 omniflowFallbackCarrierEnabled:
                     type: boolean
                     description: OmniFlow 回退 Carrier
@@ -14149,6 +14163,20 @@ components:
                     type: string
                 omniflowTrafficShapingEnabled:
                     type: boolean
+                omniflowAfEnabled:
+                    type: boolean
+                omniflowAfPathMode:
+                    type: string
+                omniflowAfPathPrefix:
+                    type: string
+                omniflowAfPathSuffix:
+                    type: string
+                omniflowAfPathRotationSecs:
+                    type: integer
+                    format: int32
+                omniflowAfPathSkewSlots:
+                    type: integer
+                    format: int32
                 omniflowFallbackCarrierEnabled:
                     type: boolean
                     description: OmniFlow 回退 Carrier
