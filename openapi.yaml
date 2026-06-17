@@ -8859,6 +8859,20 @@ components:
                 omniflowAfPathSkewSlots:
                     type: integer
                     format: int32
+                omniflowFallbackEnabled:
+                    type: boolean
+                    description: OmniFlow 同端口浏览器 Fallback 反向代理
+                omniflowFallbackTargetScheme:
+                    type: string
+                omniflowFallbackTargetHost:
+                    type: string
+                omniflowFallbackTargetPort:
+                    type: integer
+                    format: int32
+                omniflowFallbackHostHeader:
+                    type: string
+                omniflowFallbackTlsSni:
+                    type: string
                 omniflowFallbackCarrierEnabled:
                     type: boolean
                     description: OmniFlow 回退 Carrier
@@ -14177,6 +14191,20 @@ components:
                 omniflowAfPathSkewSlots:
                     type: integer
                     format: int32
+                omniflowFallbackEnabled:
+                    type: boolean
+                    description: OmniFlow 同端口浏览器 Fallback 反向代理
+                omniflowFallbackTargetScheme:
+                    type: string
+                omniflowFallbackTargetHost:
+                    type: string
+                omniflowFallbackTargetPort:
+                    type: integer
+                    format: int32
+                omniflowFallbackHostHeader:
+                    type: string
+                omniflowFallbackTlsSni:
+                    type: string
                 omniflowFallbackCarrierEnabled:
                     type: boolean
                     description: OmniFlow 回退 Carrier

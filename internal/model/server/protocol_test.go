@@ -93,13 +93,19 @@ func TestProtocolNormalizeSimnetDefaultsEnabledAfSubFeatures(t *testing.T) {
 
 func TestProtocolNormalizeOmniflowClearsDisabledAfPath(t *testing.T) {
 	protocol := &Protocol{
-		Type:                       "omniflow",
-		OmniflowAfEnabled:          false,
-		OmniflowAfPathMode:         "random",
-		OmniflowAfPathPrefix:       "/cdn",
-		OmniflowAfPathSuffix:       ".woff2",
-		OmniflowAfPathRotationSecs: 120,
-		OmniflowAfPathSkewSlots:    2,
+		Type:                         "omniflow",
+		OmniflowFallbackEnabled:      false,
+		OmniflowFallbackTargetScheme: "https",
+		OmniflowFallbackTargetHost:   "www.example.com",
+		OmniflowFallbackTargetPort:   443,
+		OmniflowFallbackHostHeader:   "www.example.com",
+		OmniflowFallbackTLSSNI:       "www.example.com",
+		OmniflowAfEnabled:            false,
+		OmniflowAfPathMode:           "random",
+		OmniflowAfPathPrefix:         "/cdn",
+		OmniflowAfPathSuffix:         ".woff2",
+		OmniflowAfPathRotationSecs:   120,
+		OmniflowAfPathSkewSlots:      2,
 	}
 
 	protocol.NormalizeOmniflow()
@@ -110,6 +116,43 @@ func TestProtocolNormalizeOmniflowClearsDisabledAfPath(t *testing.T) {
 		protocol.OmniflowAfPathRotationSecs != 0 ||
 		protocol.OmniflowAfPathSkewSlots != 0 {
 		t.Fatalf("expected disabled OmniFlow AF path fields to be cleared, got %+v", protocol)
+	}
+	if protocol.OmniflowFallbackEnabled ||
+		protocol.OmniflowFallbackTargetScheme != "" ||
+		protocol.OmniflowFallbackTargetHost != "" ||
+		protocol.OmniflowFallbackTargetPort != 0 ||
+		protocol.OmniflowFallbackHostHeader != "" ||
+		protocol.OmniflowFallbackTLSSNI != "" {
+		t.Fatalf("expected disabled OmniFlow fallback fields to be cleared, got %+v", protocol)
+	}
+}
+
+func TestProtocolNormalizeOmniflowKeepsEnabledFallback(t *testing.T) {
+	protocol := &Protocol{
+		Type:                         "omniflow-h3",
+		OmniflowFallbackEnabled:      true,
+		OmniflowFallbackTargetScheme: " HTTP ",
+		OmniflowFallbackTargetHost:   " www.example.com ",
+		OmniflowFallbackHostHeader:   " fallback.example.com ",
+		OmniflowFallbackTLSSNI:       " tls.example.com ",
+	}
+
+	protocol.NormalizeOmniflow()
+
+	if !protocol.OmniflowFallbackEnabled {
+		t.Fatal("fallback should stay enabled")
+	}
+	if protocol.OmniflowFallbackTargetScheme != "http" {
+		t.Fatalf("expected normalized scheme, got %q", protocol.OmniflowFallbackTargetScheme)
+	}
+	if protocol.OmniflowFallbackTargetHost != "www.example.com" {
+		t.Fatalf("expected trimmed target host, got %q", protocol.OmniflowFallbackTargetHost)
+	}
+	if protocol.OmniflowFallbackHostHeader != "fallback.example.com" {
+		t.Fatalf("expected trimmed host header, got %q", protocol.OmniflowFallbackHostHeader)
+	}
+	if protocol.OmniflowFallbackTLSSNI != "tls.example.com" {
+		t.Fatalf("expected trimmed TLS SNI, got %q", protocol.OmniflowFallbackTLSSNI)
 	}
 }
 

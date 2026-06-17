@@ -196,6 +196,14 @@ type Protocol struct {
 	OmniflowAfPathRotationSecs    int32
 	OmniflowAfPathSkewSlots       int32
 
+	// OmniFlow 同端口浏览器 Fallback 反向代理
+	OmniflowFallbackEnabled      bool
+	OmniflowFallbackTargetScheme string
+	OmniflowFallbackTargetHost   string
+	OmniflowFallbackTargetPort   int32
+	OmniflowFallbackHostHeader   string
+	OmniflowFallbackTLSSNI       string
+
 	// OmniFlow 回退 Carrier
 	OmniflowFallbackCarrierEnabled bool
 	OmniflowFallbackConnectTunnel  bool

@@ -119,6 +119,14 @@ type Protocol struct {
 	OmniflowAfPathRotationSecs    int32  `json:"omniflow_af_path_rotation_secs,omitempty"`
 	OmniflowAfPathSkewSlots       int32  `json:"omniflow_af_path_skew_slots,omitempty"`
 
+	// OmniFlow 同端口浏览器 Fallback 反向代理
+	OmniflowFallbackEnabled      bool   `json:"omniflow_fallback_enabled,omitempty"`
+	OmniflowFallbackTargetScheme string `json:"omniflow_fallback_target_scheme,omitempty"`
+	OmniflowFallbackTargetHost   string `json:"omniflow_fallback_target_host,omitempty"`
+	OmniflowFallbackTargetPort   int32  `json:"omniflow_fallback_target_port,omitempty"`
+	OmniflowFallbackHostHeader   string `json:"omniflow_fallback_host_header,omitempty"`
+	OmniflowFallbackTLSSNI       string `json:"omniflow_fallback_tls_sni,omitempty"`
+
 	// OmniFlow 回退 Carrier
 	OmniflowFallbackCarrierEnabled bool `json:"omniflow_fallback_carrier_enabled,omitempty"`
 	OmniflowFallbackConnectTunnel  bool `json:"omniflow_fallback_connect_tunnel,omitempty"`
@@ -184,6 +192,24 @@ func (p *Protocol) NormalizeSimnet() {
 func (p *Protocol) NormalizeOmniflow() {
 	if p == nil || (p.Type != "omniflow" && p.Type != "omniflow-h3") {
 		return
+	}
+	if !p.OmniflowFallbackEnabled || strings.TrimSpace(p.OmniflowFallbackTargetHost) == "" {
+		p.OmniflowFallbackEnabled = false
+		p.OmniflowFallbackTargetScheme = ""
+		p.OmniflowFallbackTargetHost = ""
+		p.OmniflowFallbackTargetPort = 0
+		p.OmniflowFallbackHostHeader = ""
+		p.OmniflowFallbackTLSSNI = ""
+	} else {
+		p.OmniflowFallbackTargetHost = strings.TrimSpace(p.OmniflowFallbackTargetHost)
+		p.OmniflowFallbackHostHeader = strings.TrimSpace(p.OmniflowFallbackHostHeader)
+		p.OmniflowFallbackTLSSNI = strings.TrimSpace(p.OmniflowFallbackTLSSNI)
+		switch strings.ToLower(strings.TrimSpace(p.OmniflowFallbackTargetScheme)) {
+		case "http", "https":
+			p.OmniflowFallbackTargetScheme = strings.ToLower(strings.TrimSpace(p.OmniflowFallbackTargetScheme))
+		default:
+			p.OmniflowFallbackTargetScheme = "https"
+		}
 	}
 	if !p.OmniflowAfEnabled {
 		p.OmniflowAfPathMode = ""

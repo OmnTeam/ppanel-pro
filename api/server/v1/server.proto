@@ -338,6 +338,14 @@ message Protocol {
 	int32 omniflow_af_path_rotation_secs = 105;      // path 轮转秒数
 	int32 omniflow_af_path_skew_slots = 106;         // 允许偏移 slot 数
 
+	// OmniFlow 同端口浏览器 Fallback 反向代理
+	bool omniflow_fallback_enabled = 107;
+	string omniflow_fallback_target_scheme = 108;    // https/http
+	string omniflow_fallback_target_host = 109;      // 目标网站 host
+	int32 omniflow_fallback_target_port = 110;       // 目标网站端口
+	string omniflow_fallback_host_header = 111;      // 上游 Host header
+	string omniflow_fallback_tls_sni = 112;          // 上游 TLS SNI
+
 	// OmniFlow 回退 Carrier
 	bool omniflow_fallback_carrier_enabled = 98;
 	bool omniflow_fallback_connect_tunnel = 99;

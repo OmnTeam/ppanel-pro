@@ -521,6 +521,12 @@ type NodeInfo struct {
 	OmniflowAfPathSuffix               string
 	OmniflowAfPathRotationSecs         int
 	OmniflowAfPathSkewSlots            int
+	OmniflowFallbackEnabled            bool
+	OmniflowFallbackTargetScheme       string
+	OmniflowFallbackTargetHost         string
+	OmniflowFallbackTargetPort         int
+	OmniflowFallbackHostHeader         string
+	OmniflowFallbackTLSSNI             string
 	OmniflowFallbackCarrierEnabled     bool
 	OmniflowFallbackConnectTunnel      bool
 	OmniflowFallbackWssEnabled         bool
