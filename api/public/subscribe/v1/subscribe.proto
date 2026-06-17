@@ -114,6 +114,60 @@ message UserSubscribeNodeInfo {
   string latitude_center = 13;
   string longitude_center = 14;
   int64 created_at = 15;
-}
+  string sni = 16;
 
+  // OmniFlow 基础配置
+  string omniflow_carrier = 73;
+  string omniflow_path = 74;
+  string omniflow_content_type = 75;
+  string omniflow_profile_path = 76;
+  string omniflow_profile_json = 77;
+  string omniflow_server_host = 78;
+  int32 omniflow_server_port = 79;
+  string omniflow_ca_cert_path = 80;
+  string omniflow_target_meta = 81;
+  string omniflow_spki_pin = 82;
+
+  // OmniFlow H3 Fallback
+  bool omniflow_h3_fallback_enabled = 83;
+  string omniflow_h3_fallback_policy = 84;
+  int32 omniflow_h3_fallback_timeout_ms = 85;
+  int32 omniflow_h3_fallback_retry_budget = 86;
+  bool omniflow_h3_fallback_smoke_enabled = 87;
+  int32 omniflow_h3_fallback_smoke_interval_sec = 88;
+  int32 omniflow_h3_fallback_smoke_timeout_ms = 89;
+
+  // OmniFlow 连接管理
+  int32 omniflow_max_age_sec = 90;
+  int32 omniflow_idle_timeout_sec = 91;
+  int32 omniflow_max_connections = 92;
+
+  // OmniFlow 抗指纹
+  bool omniflow_adaptive_tls_enabled = 93;
+  string omniflow_tls_fingerprint = 94;
+  string omniflow_sni_mode = 95;
+  string omniflow_padding_mode = 96;
+  bool omniflow_traffic_shaping_enabled = 97;
+
+  // OmniFlow 回退 Carrier
+  bool omniflow_fallback_carrier_enabled = 98;
+  bool omniflow_fallback_connect_tunnel = 99;
+  bool omniflow_fallback_wss_enabled = 100;
+
+  // OmniFlow 随机 AF path
+  bool omniflow_af_enabled = 101;
+  string omniflow_af_path_mode = 102;
+  string omniflow_af_path_prefix = 103;
+  string omniflow_af_path_suffix = 104;
+  int32 omniflow_af_path_rotation_secs = 105;
+  int32 omniflow_af_path_skew_slots = 106;
+
+  // OmniFlow 同端口浏览器 Fallback 反向代理
+  bool omniflow_fallback_enabled = 107;
+  string omniflow_fallback_target_scheme = 108;
+  string omniflow_fallback_target_host = 109;
+  int32 omniflow_fallback_target_port = 110;
+  string omniflow_fallback_host_header = 111;
+  string omniflow_fallback_tls_sni = 112;
+}
 

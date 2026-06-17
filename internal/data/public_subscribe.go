@@ -520,7 +520,7 @@ func buildLegacyNodeInfos(ctx context.Context, d *Data, userSub *ent.ProxyUserSu
 			continue
 		}
 		protocols := cleanLegacyNodeProtocols(server.Protocol)
-		result = append(result, &subscribeBiz.UserSubscribeNodeInfo{
+		nodeInfo := &subscribeBiz.UserSubscribeNodeInfo{
 			ID:              node.ID,
 			Name:            node.Name,
 			Uuid:            stringValue(userSub.UUID),
@@ -536,9 +536,97 @@ func buildLegacyNodeInfos(ctx context.Context, d *Data, userSub *ent.ProxyUserSu
 			LatitudeCenter:  server.LatitudeCenter,
 			LongitudeCenter: server.LongitudeCenter,
 			CreatedAt:       node.CreatedAt.Unix(),
-		})
+		}
+		if matched := legacyMatchedServerProtocol(server.Protocol, node.Protocol); matched != nil {
+			applyLegacyOmniflowProtocol(nodeInfo, matched)
+		}
+		result = append(result, nodeInfo)
 	}
 	return result, nil
+}
+
+func legacyMatchedServerProtocol(protocolsJSON string, nodeProtocol string) *servermodel.Protocol {
+	protocols, err := servermodel.UnmarshalProtocols(protocolsJSON)
+	if err != nil {
+		return nil
+	}
+	var matched *servermodel.Protocol
+	var firstEnabled *servermodel.Protocol
+	var firstAvailable *servermodel.Protocol
+	for _, protocol := range protocols {
+		if protocol == nil {
+			continue
+		}
+		if firstAvailable == nil {
+			firstAvailable = protocol
+		}
+		if protocol.Enable && firstEnabled == nil {
+			firstEnabled = protocol
+		}
+		if strings.EqualFold(strings.TrimSpace(protocol.Type), strings.TrimSpace(nodeProtocol)) {
+			matched = protocol
+			break
+		}
+	}
+	if matched != nil {
+		matched.NormalizeOmniflow()
+		return matched
+	}
+	if firstEnabled != nil {
+		firstEnabled.NormalizeOmniflow()
+		return firstEnabled
+	}
+	if firstAvailable != nil {
+		firstAvailable.NormalizeOmniflow()
+	}
+	return firstAvailable
+}
+
+func applyLegacyOmniflowProtocol(nodeInfo *subscribeBiz.UserSubscribeNodeInfo, protocol *servermodel.Protocol) {
+	if nodeInfo == nil || protocol == nil {
+		return
+	}
+	nodeInfo.SNI = protocol.SNI
+	nodeInfo.OmniflowCarrier = protocol.OmniflowCarrier
+	nodeInfo.OmniflowPath = protocol.OmniflowPath
+	nodeInfo.OmniflowContentType = protocol.OmniflowContentType
+	nodeInfo.OmniflowProfilePath = protocol.OmniflowProfilePath
+	nodeInfo.OmniflowProfileJson = protocol.OmniflowProfileJson
+	nodeInfo.OmniflowServerHost = protocol.OmniflowServerHost
+	nodeInfo.OmniflowServerPort = int(protocol.OmniflowServerPort)
+	nodeInfo.OmniflowCaCertPath = protocol.OmniflowCaCertPath
+	nodeInfo.OmniflowTargetMeta = protocol.OmniflowTargetMeta
+	nodeInfo.OmniflowSpkiPin = protocol.OmniflowSpkiPin
+	nodeInfo.OmniflowH3FallbackEnabled = protocol.OmniflowH3FallbackEnabled
+	nodeInfo.OmniflowH3FallbackPolicy = protocol.OmniflowH3FallbackPolicy
+	nodeInfo.OmniflowH3FallbackTimeoutMs = int(protocol.OmniflowH3FallbackTimeoutMs)
+	nodeInfo.OmniflowH3FallbackRetryBudget = int(protocol.OmniflowH3FallbackRetryBudget)
+	nodeInfo.OmniflowH3FallbackSmokeEnabled = protocol.OmniflowH3FallbackSmokeEnabled
+	nodeInfo.OmniflowH3FallbackSmokeIntervalSec = int(protocol.OmniflowH3FallbackSmokeIntervalSec)
+	nodeInfo.OmniflowH3FallbackSmokeTimeoutMs = int(protocol.OmniflowH3FallbackSmokeTimeoutMs)
+	nodeInfo.OmniflowMaxAgeSec = int(protocol.OmniflowMaxAgeSec)
+	nodeInfo.OmniflowIdleTimeoutSec = int(protocol.OmniflowIdleTimeoutSec)
+	nodeInfo.OmniflowMaxConnections = int(protocol.OmniflowMaxConnections)
+	nodeInfo.OmniflowAdaptiveTlsEnabled = protocol.OmniflowAdaptiveTlsEnabled
+	nodeInfo.OmniflowTlsFingerprint = protocol.OmniflowTlsFingerprint
+	nodeInfo.OmniflowSniMode = protocol.OmniflowSniMode
+	nodeInfo.OmniflowPaddingMode = protocol.OmniflowPaddingMode
+	nodeInfo.OmniflowTrafficShapingEnabled = protocol.OmniflowTrafficShapingEnabled
+	nodeInfo.OmniflowAfEnabled = protocol.OmniflowAfEnabled
+	nodeInfo.OmniflowAfPathMode = protocol.OmniflowAfPathMode
+	nodeInfo.OmniflowAfPathPrefix = protocol.OmniflowAfPathPrefix
+	nodeInfo.OmniflowAfPathSuffix = protocol.OmniflowAfPathSuffix
+	nodeInfo.OmniflowAfPathRotationSecs = int(protocol.OmniflowAfPathRotationSecs)
+	nodeInfo.OmniflowAfPathSkewSlots = int(protocol.OmniflowAfPathSkewSlots)
+	nodeInfo.OmniflowFallbackEnabled = protocol.OmniflowFallbackEnabled
+	nodeInfo.OmniflowFallbackTargetScheme = protocol.OmniflowFallbackTargetScheme
+	nodeInfo.OmniflowFallbackTargetHost = protocol.OmniflowFallbackTargetHost
+	nodeInfo.OmniflowFallbackTargetPort = int(protocol.OmniflowFallbackTargetPort)
+	nodeInfo.OmniflowFallbackHostHeader = protocol.OmniflowFallbackHostHeader
+	nodeInfo.OmniflowFallbackTLSSNI = protocol.OmniflowFallbackTLSSNI
+	nodeInfo.OmniflowFallbackCarrierEnabled = protocol.OmniflowFallbackCarrierEnabled
+	nodeInfo.OmniflowFallbackConnectTunnel = protocol.OmniflowFallbackConnectTunnel
+	nodeInfo.OmniflowFallbackWssEnabled = protocol.OmniflowFallbackWssEnabled
 }
 
 func cleanLegacyNodeProtocols(raw string) string {

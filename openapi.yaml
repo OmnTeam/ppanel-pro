@@ -4106,7 +4106,11 @@ paths:
         post:
             tags:
                 - Common
-            description: Send email verification code
+            description: |-
+                Send email verification code.
+                 Error codes: 200 success (queued); 90016 invalid email; 90004 email disabled or SMTP not configured;
+                 401 send too frequently; 90015 daily limit; 20001 email exists (register); 20002 user not found (security);
+                 500 internal; 80001 queue enqueue failed.
             operationId: Common_SendEmailCode
             requestBody:
                 content:
@@ -9939,6 +9943,10 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.admin.system.v1.NodeOutbound'
+                deviceAdmissionEnabled:
+                    type: boolean
+                deviceCountMode:
+                    type: string
             description: NodeConfig 节点配置
         api.admin.system.v1.NodeDNS:
             type: object
@@ -10208,6 +10216,10 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/api.admin.system.v1.NodeOutbound'
+                deviceAdmissionEnabled:
+                    type: boolean
+                deviceCountMode:
+                    type: string
             description: UpdateNodeConfig
         api.admin.system.v1.UpdatePrivacyPolicyConfigData:
             type: object
@@ -13222,6 +13234,106 @@ components:
                 longitudeCenter:
                     type: string
                 createdAt:
+                    type: string
+                sni:
+                    type: string
+                omniflowCarrier:
+                    type: string
+                    description: OmniFlow 基础配置
+                omniflowPath:
+                    type: string
+                omniflowContentType:
+                    type: string
+                omniflowProfilePath:
+                    type: string
+                omniflowProfileJson:
+                    type: string
+                omniflowServerHost:
+                    type: string
+                omniflowServerPort:
+                    type: integer
+                    format: int32
+                omniflowCaCertPath:
+                    type: string
+                omniflowTargetMeta:
+                    type: string
+                omniflowSpkiPin:
+                    type: string
+                omniflowH3FallbackEnabled:
+                    type: boolean
+                    description: OmniFlow H3 Fallback
+                omniflowH3FallbackPolicy:
+                    type: string
+                omniflowH3FallbackTimeoutMs:
+                    type: integer
+                    format: int32
+                omniflowH3FallbackRetryBudget:
+                    type: integer
+                    format: int32
+                omniflowH3FallbackSmokeEnabled:
+                    type: boolean
+                omniflowH3FallbackSmokeIntervalSec:
+                    type: integer
+                    format: int32
+                omniflowH3FallbackSmokeTimeoutMs:
+                    type: integer
+                    format: int32
+                omniflowMaxAgeSec:
+                    type: integer
+                    description: OmniFlow 连接管理
+                    format: int32
+                omniflowIdleTimeoutSec:
+                    type: integer
+                    format: int32
+                omniflowMaxConnections:
+                    type: integer
+                    format: int32
+                omniflowAdaptiveTlsEnabled:
+                    type: boolean
+                    description: OmniFlow 抗指纹
+                omniflowTlsFingerprint:
+                    type: string
+                omniflowSniMode:
+                    type: string
+                omniflowPaddingMode:
+                    type: string
+                omniflowTrafficShapingEnabled:
+                    type: boolean
+                omniflowFallbackCarrierEnabled:
+                    type: boolean
+                    description: OmniFlow 回退 Carrier
+                omniflowFallbackConnectTunnel:
+                    type: boolean
+                omniflowFallbackWssEnabled:
+                    type: boolean
+                omniflowAfEnabled:
+                    type: boolean
+                    description: OmniFlow 随机 AF path
+                omniflowAfPathMode:
+                    type: string
+                omniflowAfPathPrefix:
+                    type: string
+                omniflowAfPathSuffix:
+                    type: string
+                omniflowAfPathRotationSecs:
+                    type: integer
+                    format: int32
+                omniflowAfPathSkewSlots:
+                    type: integer
+                    format: int32
+                omniflowFallbackEnabled:
+                    type: boolean
+                    description: OmniFlow 同端口浏览器 Fallback 反向代理
+                omniflowFallbackTargetScheme:
+                    type: string
+                omniflowFallbackTargetHost:
+                    type: string
+                omniflowFallbackTargetPort:
+                    type: integer
+                    format: int32
+                omniflowFallbackHostHeader:
+                    type: string
+                omniflowFallbackTlsSni:
                     type: string
         api.public.subscription.v1.GetSubscribeConfigReply:
             type: object
