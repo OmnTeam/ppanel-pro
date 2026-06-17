@@ -2,7 +2,7 @@ module github.com/OmnTeam/npanel-pro
 
 go 1.25.0
 
-toolchain go1.25.11
+toolchain go1.26.4
 
 require (
 	entgo.io/ent v0.14.5
