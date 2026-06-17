@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"reflect"
-	"runtime/debug"
 	"strings"
 	"time"
 
+	"github.com/OmnTeam/npanel-pro/internal/buildmeta"
 	"github.com/OmnTeam/npanel-pro/pkg/tool"
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -172,13 +172,7 @@ func (uc *SystemUsecase) GetCurrencyConfig(ctx context.Context) (*CurrencyConfig
 func (uc *SystemUsecase) GetSystemModule(ctx context.Context) (*SystemModule, error) {
 	_ = ctx
 
-	version := "unknown version"
-	if buildInfo, ok := debug.ReadBuildInfo(); ok {
-		candidate := strings.TrimSpace(buildInfo.Main.Version)
-		if candidate != "" && candidate != "(devel)" {
-			version = candidate
-		}
-	}
+	version := buildmeta.Version()
 
 	return &SystemModule{
 		ServiceName:    "ApiService",

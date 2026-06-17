@@ -10,6 +10,7 @@ import (
 
 	v1 "github.com/OmnTeam/npanel-pro/api/admin/tool/v1"
 	systembiz "github.com/OmnTeam/npanel-pro/internal/biz/admin/system"
+	"github.com/OmnTeam/npanel-pro/internal/buildmeta"
 	"github.com/OmnTeam/npanel-pro/pkg/ip"
 	npanelLogger "github.com/OmnTeam/npanel-pro/pkg/logger"
 	"github.com/go-kratos/kratos/v2/log"
@@ -61,11 +62,11 @@ func (uc *ToolUseCase) RestartSystem(ctx context.Context, req *v1.RestartSystemR
 
 // GetVersion gets version information
 func (uc *ToolUseCase) GetVersion(ctx context.Context) (*v1.VersionResponse, error) {
-	version := "unknown"
+	version := buildmeta.MainVersion()
 	buildTime := "unknown"
 
 	if buildInfo, ok := debug.ReadBuildInfo(); ok {
-		if candidate := strings.TrimSpace(buildInfo.Main.Version); candidate != "" && candidate != "(devel)" {
+		if candidate := strings.TrimSpace(buildInfo.Main.Version); version == "" && candidate != "" && candidate != "(devel)" {
 			version = candidate
 		}
 		for _, setting := range buildInfo.Settings {
@@ -75,7 +76,7 @@ func (uc *ToolUseCase) GetVersion(ctx context.Context) (*v1.VersionResponse, err
 					buildTime = t.Format("2006-01-02 15:04:05")
 				}
 			case "vcs.revision":
-				if version == "unknown" {
+				if version == "" {
 					value := strings.TrimSpace(setting.Value)
 					if value != "" {
 						version = value
@@ -87,7 +88,9 @@ func (uc *ToolUseCase) GetVersion(ctx context.Context) (*v1.VersionResponse, err
 
 	if uc.systemUC != nil {
 		if module, err := uc.systemUC.GetSystemModule(ctx); err == nil && strings.TrimSpace(module.ServiceVersion) != "" {
-			version = module.ServiceVersion
+			if version == "" || version == "unknown" || version == "unknown version" {
+				version = module.ServiceVersion
+			}
 		}
 	}
 

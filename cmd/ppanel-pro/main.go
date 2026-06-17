@@ -6,6 +6,7 @@ import (
 	"os"
 
 	bootstraplog "github.com/OmnTeam/npanel-pro/internal/bootstrap/logging"
+	"github.com/OmnTeam/npanel-pro/internal/buildmeta"
 	"github.com/OmnTeam/npanel-pro/internal/conf"
 	npanelLogger "github.com/OmnTeam/npanel-pro/pkg/logger"
 
@@ -59,6 +60,7 @@ func main() {
 	if Version == "" {
 		Version = "dev"
 	}
+	buildmeta.SetMainVersion(Version)
 
 	// 抑制 Redis 客户端的警告信息
 	os.Setenv("REDIS_LOG_LEVEL", "ERROR")
