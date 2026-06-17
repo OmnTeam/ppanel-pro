@@ -333,7 +333,10 @@ func (uc *SubscriptionUseCase) GetSubscribeConfig(ctx context.Context, req *v1.G
 }
 
 func filterSubscriptionNodesByUserAgent(nodes []*NodeInfo, userAgent string) []*NodeInfo {
-	if len(nodes) == 0 || !shouldHideExperimentalProtocols(userAgent) {
+	// 默认剔除实验性协议（simnet/omniflow）。
+	// 仅当请求来自自有客户端/SDK（UA 命中 omnxt 或 slaglab）时才放行。
+	// 开源客户端不支持这两个新协议，且必须搭配我方节点列表与 SDK 才能使用。
+	if len(nodes) == 0 || isOfficialClient(userAgent) {
 		return nodes
 	}
 
@@ -347,24 +350,20 @@ func filterSubscriptionNodesByUserAgent(nodes []*NodeInfo, userAgent string) []*
 	return filtered
 }
 
-func shouldHideExperimentalProtocols(userAgent string) bool {
+// isOfficialClient 判断请求是否来自自有客户端/SDK。
+// 只有命中的客户端才允许下发 simnet/omniflow 等实验性协议。
+func isOfficialClient(userAgent string) bool {
 	ua := strings.ToLower(strings.TrimSpace(userAgent))
 	if ua == "" {
 		return false
 	}
 
-	keywords := []string{
-		"clash",
-		"stash",
-		"v2ray",
-		"v2box",
-		"xray",
-		"sing-box",
-		"singbox",
-		"nekobox",
-		"hiddify",
+	// 自有客户端/SDK 的 UA 关键字白名单
+	officialKeywords := []string{
+		"omnxt",
+		"slaglab",
 	}
-	for _, keyword := range keywords {
+	for _, keyword := range officialKeywords {
 		if strings.Contains(ua, keyword) {
 			return true
 		}

@@ -91,6 +91,10 @@ func (s *SubscribeService) QueryUserSubscribeNodeList(ctx context.Context, req *
 		return nil, err
 	}
 
+	// simnet/omniflow 等新协议仅对自有客户端/SDK（UA 命中 omnxt 或 slaglab）放行，
+	// 其它客户端一律剔除，避免下发开源客户端无法使用的节点配置。
+	subscribeBiz.FilterExperimentalNodesForClient(list, appmiddleware.GetUserAgent(ctx))
+
 	items := make([]*v1.UserSubscribeInfo, 0, len(list))
 	for _, item := range list {
 		nodes := make([]*v1.UserSubscribeNodeInfo, 0, len(item.Nodes))
