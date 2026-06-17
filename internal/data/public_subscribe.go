@@ -590,43 +590,20 @@ func applyLegacyOmniflowProtocol(nodeInfo *subscribeBiz.UserSubscribeNodeInfo, p
 	nodeInfo.OmniflowCarrier = protocol.OmniflowCarrier
 	nodeInfo.OmniflowPath = protocol.OmniflowPath
 	nodeInfo.OmniflowContentType = protocol.OmniflowContentType
-	nodeInfo.OmniflowProfilePath = protocol.OmniflowProfilePath
 	nodeInfo.OmniflowProfileJson = protocol.OmniflowProfileJson
-	nodeInfo.OmniflowServerHost = protocol.OmniflowServerHost
-	nodeInfo.OmniflowServerPort = int(protocol.OmniflowServerPort)
 	nodeInfo.OmniflowCaCertPath = protocol.OmniflowCaCertPath
 	nodeInfo.OmniflowTargetMeta = protocol.OmniflowTargetMeta
 	nodeInfo.OmniflowSpkiPin = protocol.OmniflowSpkiPin
-	nodeInfo.OmniflowH3FallbackEnabled = protocol.OmniflowH3FallbackEnabled
-	nodeInfo.OmniflowH3FallbackPolicy = protocol.OmniflowH3FallbackPolicy
-	nodeInfo.OmniflowH3FallbackTimeoutMs = int(protocol.OmniflowH3FallbackTimeoutMs)
-	nodeInfo.OmniflowH3FallbackRetryBudget = int(protocol.OmniflowH3FallbackRetryBudget)
-	nodeInfo.OmniflowH3FallbackSmokeEnabled = protocol.OmniflowH3FallbackSmokeEnabled
-	nodeInfo.OmniflowH3FallbackSmokeIntervalSec = int(protocol.OmniflowH3FallbackSmokeIntervalSec)
-	nodeInfo.OmniflowH3FallbackSmokeTimeoutMs = int(protocol.OmniflowH3FallbackSmokeTimeoutMs)
-	nodeInfo.OmniflowMaxAgeSec = int(protocol.OmniflowMaxAgeSec)
-	nodeInfo.OmniflowIdleTimeoutSec = int(protocol.OmniflowIdleTimeoutSec)
-	nodeInfo.OmniflowMaxConnections = int(protocol.OmniflowMaxConnections)
 	nodeInfo.OmniflowAdaptiveTlsEnabled = protocol.OmniflowAdaptiveTlsEnabled
 	nodeInfo.OmniflowTlsFingerprint = protocol.OmniflowTlsFingerprint
 	nodeInfo.OmniflowSniMode = protocol.OmniflowSniMode
 	nodeInfo.OmniflowPaddingMode = protocol.OmniflowPaddingMode
-	nodeInfo.OmniflowTrafficShapingEnabled = protocol.OmniflowTrafficShapingEnabled
 	nodeInfo.OmniflowAfEnabled = protocol.OmniflowAfEnabled
 	nodeInfo.OmniflowAfPathMode = protocol.OmniflowAfPathMode
 	nodeInfo.OmniflowAfPathPrefix = protocol.OmniflowAfPathPrefix
 	nodeInfo.OmniflowAfPathSuffix = protocol.OmniflowAfPathSuffix
 	nodeInfo.OmniflowAfPathRotationSecs = int(protocol.OmniflowAfPathRotationSecs)
 	nodeInfo.OmniflowAfPathSkewSlots = int(protocol.OmniflowAfPathSkewSlots)
-	nodeInfo.OmniflowFallbackEnabled = protocol.OmniflowFallbackEnabled
-	nodeInfo.OmniflowFallbackTargetScheme = protocol.OmniflowFallbackTargetScheme
-	nodeInfo.OmniflowFallbackTargetHost = protocol.OmniflowFallbackTargetHost
-	nodeInfo.OmniflowFallbackTargetPort = int(protocol.OmniflowFallbackTargetPort)
-	nodeInfo.OmniflowFallbackHostHeader = protocol.OmniflowFallbackHostHeader
-	nodeInfo.OmniflowFallbackTLSSNI = protocol.OmniflowFallbackTLSSNI
-	nodeInfo.OmniflowFallbackCarrierEnabled = protocol.OmniflowFallbackCarrierEnabled
-	nodeInfo.OmniflowFallbackConnectTunnel = protocol.OmniflowFallbackConnectTunnel
-	nodeInfo.OmniflowFallbackWssEnabled = protocol.OmniflowFallbackWssEnabled
 }
 
 func cleanLegacyNodeProtocols(raw string) string {

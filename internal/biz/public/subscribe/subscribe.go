@@ -93,47 +93,24 @@ type UserSubscribeNodeInfo struct {
 	LongitudeCenter string
 	CreatedAt       int64
 
-	SNI                                string
-	OmniflowCarrier                    string
-	OmniflowPath                       string
-	OmniflowContentType                string
-	OmniflowProfilePath                string
-	OmniflowProfileJson                string
-	OmniflowServerHost                 string
-	OmniflowServerPort                 int
-	OmniflowCaCertPath                 string
-	OmniflowTargetMeta                 string
-	OmniflowSpkiPin                    string
-	OmniflowH3FallbackEnabled          bool
-	OmniflowH3FallbackPolicy           string
-	OmniflowH3FallbackTimeoutMs        int
-	OmniflowH3FallbackRetryBudget      int
-	OmniflowH3FallbackSmokeEnabled     bool
-	OmniflowH3FallbackSmokeIntervalSec int
-	OmniflowH3FallbackSmokeTimeoutMs   int
-	OmniflowMaxAgeSec                  int
-	OmniflowIdleTimeoutSec             int
-	OmniflowMaxConnections             int
-	OmniflowAdaptiveTlsEnabled         bool
-	OmniflowTlsFingerprint             string
-	OmniflowSniMode                    string
-	OmniflowPaddingMode                string
-	OmniflowTrafficShapingEnabled      bool
-	OmniflowAfEnabled                  bool
-	OmniflowAfPathMode                 string
-	OmniflowAfPathPrefix               string
-	OmniflowAfPathSuffix               string
-	OmniflowAfPathRotationSecs         int
-	OmniflowAfPathSkewSlots            int
-	OmniflowFallbackEnabled            bool
-	OmniflowFallbackTargetScheme       string
-	OmniflowFallbackTargetHost         string
-	OmniflowFallbackTargetPort         int
-	OmniflowFallbackHostHeader         string
-	OmniflowFallbackTLSSNI             string
-	OmniflowFallbackCarrierEnabled     bool
-	OmniflowFallbackConnectTunnel      bool
-	OmniflowFallbackWssEnabled         bool
+	SNI                        string
+	OmniflowCarrier            string
+	OmniflowPath               string
+	OmniflowContentType        string
+	OmniflowProfileJson        string
+	OmniflowCaCertPath         string
+	OmniflowTargetMeta         string
+	OmniflowSpkiPin            string
+	OmniflowAdaptiveTlsEnabled bool
+	OmniflowTlsFingerprint     string
+	OmniflowSniMode            string
+	OmniflowPaddingMode        string
+	OmniflowAfEnabled          bool
+	OmniflowAfPathMode         string
+	OmniflowAfPathPrefix       string
+	OmniflowAfPathSuffix       string
+	OmniflowAfPathRotationSecs int
+	OmniflowAfPathSkewSlots    int
 }
 
 // SubscribeUseCase Public Subscribe用例
