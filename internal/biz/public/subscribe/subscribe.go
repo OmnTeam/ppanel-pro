@@ -2,6 +2,7 @@ package subscribe
 
 import (
 	"context"
+	"strings"
 )
 
 // SubscribeRepo Public Subscribe数据仓库接口
@@ -130,4 +131,71 @@ func (uc *SubscribeUseCase) QuerySubscribeList(ctx context.Context, language str
 
 func (uc *SubscribeUseCase) QueryUserSubscribeNodeList(ctx context.Context, userID int64) ([]*UserSubscribeInfo, error) {
 	return uc.repo.QueryUserSubscribeNodeList(ctx, userID)
+}
+
+// FilterExperimentalNodesForClient 按客户端 User-Agent 过滤实验性协议节点。
+// simnet/omniflow 等新协议仅对自有客户端/SDK（UA 命中 omnxt 或 slaglab）放行，
+// 其它客户端（含开源客户端、空 UA、未知 UA）一律剔除，避免下发无法使用的配置。
+func FilterExperimentalNodesForClient(list []*UserSubscribeInfo, userAgent string) {
+	if len(list) == 0 || isOfficialClient(userAgent) {
+		return
+	}
+	for _, item := range list {
+		if item == nil {
+			continue
+		}
+		filtered := make([]*UserSubscribeNodeInfo, 0, len(item.Nodes))
+		for _, node := range item.Nodes {
+			if node == nil || isExperimentalProtocol(node.Protocol) || isExperimentalProtocol(node.Protocols) {
+				continue
+			}
+			filtered = append(filtered, node)
+		}
+		item.Nodes = filtered
+	}
+}
+
+// isExperimentalProtocol 判断单个 protocol 字符串或 protocols JSON 是否为实验性协议。
+// protocol 字段可能是单个类型（如 "simnet"），protocols 字段是 JSON 数组文本，
+// 任一包含 simnet/omn/omniflow 即视为实验性节点，需要剔除。
+func isExperimentalProtocol(protocol string) bool {
+	lower := strings.ToLower(protocol)
+	if lower == "" {
+		return false
+	}
+	for _, keyword := range experimentalProtocolKeywords {
+		if strings.Contains(lower, keyword) {
+			return true
+		}
+	}
+	return false
+}
+
+// isOfficialClient 判断请求是否来自自有客户端/SDK。
+func isOfficialClient(userAgent string) bool {
+	ua := strings.ToLower(strings.TrimSpace(userAgent))
+	if ua == "" {
+		return false
+	}
+	for _, keyword := range officialClientKeywords {
+		if strings.Contains(ua, keyword) {
+			return true
+		}
+	}
+	return false
+}
+
+// officialClientKeywords 自有客户端/SDK 的 UA 关键字白名单。
+// 命中其一即可下发实验性协议。
+var officialClientKeywords = []string{
+	"omnxt",
+	"slaglab",
+}
+
+// experimentalProtocolKeywords 需要对非自有客户端隐藏的实验性协议关键字。
+// simnet / omniflow 是新协议；omn 是 omniflow 的旧别名。
+var experimentalProtocolKeywords = []string{
+	"simnet",
+	"omniflow",
+	"omn",
 }
