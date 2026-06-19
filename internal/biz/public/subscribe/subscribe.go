@@ -134,7 +134,7 @@ func (uc *SubscribeUseCase) QueryUserSubscribeNodeList(ctx context.Context, user
 }
 
 // FilterExperimentalNodesForClient 按客户端 User-Agent 过滤实验性协议节点。
-// simnet/omniflow 等新协议仅对自有客户端/SDK（UA 命中 omnxt 或 slaglab）放行，
+// simnet/omniflow 等新协议仅对自有客户端/SDK（UA 命中 omnxt、slag 或 slaglab）放行，
 // 其它客户端（含开源客户端、空 UA、未知 UA）一律剔除，避免下发无法使用的配置。
 func FilterExperimentalNodesForClient(list []*UserSubscribeInfo, userAgent string) {
 	if len(list) == 0 || isOfficialClient(userAgent) {
@@ -146,7 +146,7 @@ func FilterExperimentalNodesForClient(list []*UserSubscribeInfo, userAgent strin
 		}
 		filtered := make([]*UserSubscribeNodeInfo, 0, len(item.Nodes))
 		for _, node := range item.Nodes {
-			if node == nil || isExperimentalProtocol(node.Protocol) || isExperimentalProtocol(node.Protocols) {
+			if node == nil || isExperimentalProtocol(node.Protocol) {
 				continue
 			}
 			filtered = append(filtered, node)
@@ -155,9 +155,7 @@ func FilterExperimentalNodesForClient(list []*UserSubscribeInfo, userAgent strin
 	}
 }
 
-// isExperimentalProtocol 判断单个 protocol 字符串或 protocols JSON 是否为实验性协议。
-// protocol 字段可能是单个类型（如 "simnet"），protocols 字段是 JSON 数组文本，
-// 任一包含 simnet/omn/omniflow 即视为实验性节点，需要剔除。
+// isExperimentalProtocol 判断单个 protocol 字符串是否为实验性协议。
 func isExperimentalProtocol(protocol string) bool {
 	lower := strings.ToLower(protocol)
 	if lower == "" {
@@ -189,6 +187,7 @@ func isOfficialClient(userAgent string) bool {
 // 命中其一即可下发实验性协议。
 var officialClientKeywords = []string{
 	"omnxt",
+	"slag/",
 	"slaglab",
 }
 

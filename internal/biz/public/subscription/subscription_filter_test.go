@@ -14,6 +14,7 @@ func TestIsOfficialClient(t *testing.T) {
 		{"omnxt embedded", "Mozilla/5.0 omnxt-client/0.9", true},
 		{"slaglab exact lower", "slaglab/0.4", true},
 		{"slaglab upper", "SlaGLab/0.4", true},
+		{"slag android", "Slag/1.0.0 (Android; Android W528JS release-keys; arm64) AnyiNet/2.0", true},
 
 		// 非白名单应隐藏实验协议
 		{"clash", "clash-verge/1.0", false},

@@ -33,6 +33,34 @@ func TestFilterExperimentalNodesForClient(t *testing.T) {
 		}
 	})
 
+	t.Run("official android slag keeps all nodes", func(t *testing.T) {
+		list := mkList()
+		FilterExperimentalNodesForClient(list, "Slag/1.0.0 (Android; Android W528JS release-keys; arm64) AnyiNet/2.0")
+		if len(list[0].Nodes) != 4 {
+			t.Fatalf("expected 4 nodes for official client, got %d", len(list[0].Nodes))
+		}
+	})
+
+	t.Run("vmess node keeps mixed protocol metadata", func(t *testing.T) {
+		list := []*UserSubscribeInfo{
+			{
+				ID: 10,
+				Nodes: []*UserSubscribeNodeInfo{
+					{
+						ID:       4,
+						Protocol: "vmess",
+						Protocols: `[{"type":"simnet","enable":false},{"type":"omniflow","enable":false},` +
+							`{"type":"vmess","enable":true,"port":1566}]`,
+					},
+				},
+			},
+		}
+		FilterExperimentalNodesForClient(list, "clash-verge/1.0")
+		if len(list[0].Nodes) != 1 {
+			t.Fatalf("expected vmess node to survive mixed protocol metadata, got %d", len(list[0].Nodes))
+		}
+	})
+
 	t.Run("third-party client hides experimental nodes", func(t *testing.T) {
 		list := mkList()
 		FilterExperimentalNodesForClient(list, "clash-verge/1.0")

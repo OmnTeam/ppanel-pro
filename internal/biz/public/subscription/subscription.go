@@ -361,6 +361,7 @@ func isOfficialClient(userAgent string) bool {
 	// 自有客户端/SDK 的 UA 关键字白名单
 	officialKeywords := []string{
 		"omnxt",
+		"slag/",
 		"slaglab",
 	}
 	for _, keyword := range officialKeywords {
